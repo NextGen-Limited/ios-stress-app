@@ -86,8 +86,8 @@ final class StressViewModelTests: XCTestCase {
 
     func testLoadHistoricalData() async throws {
         let measurements = [
-            StressMeasurement(timestamp: Date(), stressLevel: 30, hrv: 50, heartRate: 70, category: .mild),
-            StressMeasurement(timestamp: Date(), stressLevel: 50, hrv: 45, heartRate: 80, category: .moderate)
+            StressMeasurement(timestamp: Date(), stressLevel: 30, hrv: 50, restingHeartRate: 70),
+            StressMeasurement(timestamp: Date(), stressLevel: 50, hrv: 45, restingHeartRate: 80)
         ]
         mockRepository.measurementsToReturn = measurements
 
