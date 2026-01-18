@@ -70,12 +70,13 @@ final class StressRepository: StressRepositoryProtocol {
 
         let measurements = try modelContext.fetch(descriptor)
 
-        guard !measurements.isEmpty else {
-            return PersonalBaseline()
+        let baseline: PersonalBaseline
+        if measurements.isEmpty {
+            baseline = PersonalBaseline()
+        } else {
+            let hrvMeasurements = measurements.map { HRVMeasurement(value: $0.hrv, timestamp: $0.timestamp) }
+            baseline = try await baselineCalculator.calculateBaseline(from: hrvMeasurements)
         }
-
-        let hrvMeasurements = measurements.map { HRVMeasurement(value: $0.hrv, timestamp: $0.timestamp) }
-        let baseline = try await baselineCalculator.calculateBaseline(from: hrvMeasurements)
 
         cachedBaseline = baseline
         return baseline
