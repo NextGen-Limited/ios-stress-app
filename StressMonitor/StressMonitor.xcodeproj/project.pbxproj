@@ -1,0 +1,1001 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		F2E2EC392F1CC605000C2B53 /* StressMonitorWatch Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = F2E2EC192F1CC602000C2B53 /* StressMonitorWatch Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		F2E2EBF92F1CC556000C2B53 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F2E2EBE12F1CC553000C2B53 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = F2E2EBE82F1CC553000C2B53;
+			remoteInfo = StressMonitor;
+		};
+		F2E2EC032F1CC556000C2B53 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F2E2EBE12F1CC553000C2B53 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = F2E2EBE82F1CC553000C2B53;
+			remoteInfo = StressMonitor;
+		};
+		F2E2EC262F1CC605000C2B53 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F2E2EBE12F1CC553000C2B53 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = F2E2EC182F1CC602000C2B53;
+			remoteInfo = "StressMonitorWatch Watch App";
+		};
+		F2E2EC302F1CC605000C2B53 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F2E2EBE12F1CC553000C2B53 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = F2E2EC182F1CC602000C2B53;
+			remoteInfo = "StressMonitorWatch Watch App";
+		};
+		F2E2EC372F1CC605000C2B53 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F2E2EBE12F1CC553000C2B53 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = F2E2EC182F1CC602000C2B53;
+			remoteInfo = "StressMonitorWatch Watch App";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		F2E2EC3D2F1CC605000C2B53 /* Embed Watch Content */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "$(CONTENTS_FOLDER_PATH)/Watch";
+			dstSubfolderSpec = 16;
+			files = (
+				F2E2EC392F1CC605000C2B53 /* StressMonitorWatch Watch App.app in Embed Watch Content */,
+			);
+			name = "Embed Watch Content";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		F2E2EBE92F1CC553000C2B53 /* StressMonitor.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = StressMonitor.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		F2E2EBF82F1CC556000C2B53 /* StressMonitorTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = StressMonitorTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		F2E2EC022F1CC556000C2B53 /* StressMonitorUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = StressMonitorUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		F2E2EC192F1CC602000C2B53 /* StressMonitorWatch Watch App.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "StressMonitorWatch Watch App.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		F2E2EC252F1CC605000C2B53 /* StressMonitorWatch Watch AppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "StressMonitorWatch Watch AppTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+		F2E2EC2F2F1CC605000C2B53 /* StressMonitorWatch Watch AppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "StressMonitorWatch Watch AppUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
+/* End PBXFileReference section */
+
+/* Begin PBXFileSystemSynchronizedRootGroup section */
+		F2E2EBEB2F1CC553000C2B53 /* StressMonitor */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = StressMonitor;
+			sourceTree = "<group>";
+		};
+		F2E2EBFB2F1CC556000C2B53 /* StressMonitorTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = StressMonitorTests;
+			sourceTree = "<group>";
+		};
+		F2E2EC052F1CC556000C2B53 /* StressMonitorUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = StressMonitorUITests;
+			sourceTree = "<group>";
+		};
+		F2E2EC1A2F1CC602000C2B53 /* StressMonitorWatch Watch App */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "StressMonitorWatch Watch App";
+			sourceTree = "<group>";
+		};
+		F2E2EC282F1CC605000C2B53 /* StressMonitorWatch Watch AppTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "StressMonitorWatch Watch AppTests";
+			sourceTree = "<group>";
+		};
+		F2E2EC322F1CC605000C2B53 /* StressMonitorWatch Watch AppUITests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = "StressMonitorWatch Watch AppUITests";
+			sourceTree = "<group>";
+		};
+/* End PBXFileSystemSynchronizedRootGroup section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		F2E2EBE62F1CC553000C2B53 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F2E2EBF52F1CC556000C2B53 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F2E2EBFF2F1CC556000C2B53 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F2E2EC162F1CC602000C2B53 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F2E2EC222F1CC605000C2B53 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F2E2EC2C2F1CC605000C2B53 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		F2E2EBE02F1CC553000C2B53 = {
+			isa = PBXGroup;
+			children = (
+				F2E2EBEB2F1CC553000C2B53 /* StressMonitor */,
+				F2E2EBFB2F1CC556000C2B53 /* StressMonitorTests */,
+				F2E2EC052F1CC556000C2B53 /* StressMonitorUITests */,
+				F2E2EC1A2F1CC602000C2B53 /* StressMonitorWatch Watch App */,
+				F2E2EC282F1CC605000C2B53 /* StressMonitorWatch Watch AppTests */,
+				F2E2EC322F1CC605000C2B53 /* StressMonitorWatch Watch AppUITests */,
+				F2E2EBEA2F1CC553000C2B53 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		F2E2EBEA2F1CC553000C2B53 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				F2E2EBE92F1CC553000C2B53 /* StressMonitor.app */,
+				F2E2EBF82F1CC556000C2B53 /* StressMonitorTests.xctest */,
+				F2E2EC022F1CC556000C2B53 /* StressMonitorUITests.xctest */,
+				F2E2EC192F1CC602000C2B53 /* StressMonitorWatch Watch App.app */,
+				F2E2EC252F1CC605000C2B53 /* StressMonitorWatch Watch AppTests.xctest */,
+				F2E2EC2F2F1CC605000C2B53 /* StressMonitorWatch Watch AppUITests.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		F2E2EBE82F1CC553000C2B53 /* StressMonitor */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F2E2EC0C2F1CC556000C2B53 /* Build configuration list for PBXNativeTarget "StressMonitor" */;
+			buildPhases = (
+				F2E2EBE52F1CC553000C2B53 /* Sources */,
+				F2E2EBE62F1CC553000C2B53 /* Frameworks */,
+				F2E2EBE72F1CC553000C2B53 /* Resources */,
+				F2E2EC3D2F1CC605000C2B53 /* Embed Watch Content */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				F2E2EC382F1CC605000C2B53 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				F2E2EBEB2F1CC553000C2B53 /* StressMonitor */,
+			);
+			name = StressMonitor;
+			packageProductDependencies = (
+			);
+			productName = StressMonitor;
+			productReference = F2E2EBE92F1CC553000C2B53 /* StressMonitor.app */;
+			productType = "com.apple.product-type.application";
+		};
+		F2E2EBF72F1CC556000C2B53 /* StressMonitorTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F2E2EC0F2F1CC556000C2B53 /* Build configuration list for PBXNativeTarget "StressMonitorTests" */;
+			buildPhases = (
+				F2E2EBF42F1CC556000C2B53 /* Sources */,
+				F2E2EBF52F1CC556000C2B53 /* Frameworks */,
+				F2E2EBF62F1CC556000C2B53 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				F2E2EBFA2F1CC556000C2B53 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				F2E2EBFB2F1CC556000C2B53 /* StressMonitorTests */,
+			);
+			name = StressMonitorTests;
+			packageProductDependencies = (
+			);
+			productName = StressMonitorTests;
+			productReference = F2E2EBF82F1CC556000C2B53 /* StressMonitorTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		F2E2EC012F1CC556000C2B53 /* StressMonitorUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F2E2EC122F1CC556000C2B53 /* Build configuration list for PBXNativeTarget "StressMonitorUITests" */;
+			buildPhases = (
+				F2E2EBFE2F1CC556000C2B53 /* Sources */,
+				F2E2EBFF2F1CC556000C2B53 /* Frameworks */,
+				F2E2EC002F1CC556000C2B53 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				F2E2EC042F1CC556000C2B53 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				F2E2EC052F1CC556000C2B53 /* StressMonitorUITests */,
+			);
+			name = StressMonitorUITests;
+			packageProductDependencies = (
+			);
+			productName = StressMonitorUITests;
+			productReference = F2E2EC022F1CC556000C2B53 /* StressMonitorUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+		F2E2EC182F1CC602000C2B53 /* StressMonitorWatch Watch App */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F2E2EC3A2F1CC605000C2B53 /* Build configuration list for PBXNativeTarget "StressMonitorWatch Watch App" */;
+			buildPhases = (
+				F2E2EC152F1CC602000C2B53 /* Sources */,
+				F2E2EC162F1CC602000C2B53 /* Frameworks */,
+				F2E2EC172F1CC602000C2B53 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				F2E2EC1A2F1CC602000C2B53 /* StressMonitorWatch Watch App */,
+			);
+			name = "StressMonitorWatch Watch App";
+			packageProductDependencies = (
+			);
+			productName = "StressMonitorWatch Watch App";
+			productReference = F2E2EC192F1CC602000C2B53 /* StressMonitorWatch Watch App.app */;
+			productType = "com.apple.product-type.application";
+		};
+		F2E2EC242F1CC605000C2B53 /* StressMonitorWatch Watch AppTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F2E2EC3E2F1CC605000C2B53 /* Build configuration list for PBXNativeTarget "StressMonitorWatch Watch AppTests" */;
+			buildPhases = (
+				F2E2EC212F1CC605000C2B53 /* Sources */,
+				F2E2EC222F1CC605000C2B53 /* Frameworks */,
+				F2E2EC232F1CC605000C2B53 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				F2E2EC272F1CC605000C2B53 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				F2E2EC282F1CC605000C2B53 /* StressMonitorWatch Watch AppTests */,
+			);
+			name = "StressMonitorWatch Watch AppTests";
+			packageProductDependencies = (
+			);
+			productName = "StressMonitorWatch Watch AppTests";
+			productReference = F2E2EC252F1CC605000C2B53 /* StressMonitorWatch Watch AppTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+		F2E2EC2E2F1CC605000C2B53 /* StressMonitorWatch Watch AppUITests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F2E2EC412F1CC605000C2B53 /* Build configuration list for PBXNativeTarget "StressMonitorWatch Watch AppUITests" */;
+			buildPhases = (
+				F2E2EC2B2F1CC605000C2B53 /* Sources */,
+				F2E2EC2C2F1CC605000C2B53 /* Frameworks */,
+				F2E2EC2D2F1CC605000C2B53 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				F2E2EC312F1CC605000C2B53 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				F2E2EC322F1CC605000C2B53 /* StressMonitorWatch Watch AppUITests */,
+			);
+			name = "StressMonitorWatch Watch AppUITests";
+			packageProductDependencies = (
+			);
+			productName = "StressMonitorWatch Watch AppUITests";
+			productReference = F2E2EC2F2F1CC605000C2B53 /* StressMonitorWatch Watch AppUITests.xctest */;
+			productType = "com.apple.product-type.bundle.ui-testing";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		F2E2EBE12F1CC553000C2B53 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2610;
+				LastUpgradeCheck = 2610;
+				TargetAttributes = {
+					F2E2EBE82F1CC553000C2B53 = {
+						CreatedOnToolsVersion = 26.1;
+					};
+					F2E2EBF72F1CC556000C2B53 = {
+						CreatedOnToolsVersion = 26.1;
+						TestTargetID = F2E2EBE82F1CC553000C2B53;
+					};
+					F2E2EC012F1CC556000C2B53 = {
+						CreatedOnToolsVersion = 26.1;
+						TestTargetID = F2E2EBE82F1CC553000C2B53;
+					};
+					F2E2EC182F1CC602000C2B53 = {
+						CreatedOnToolsVersion = 26.1;
+					};
+					F2E2EC242F1CC605000C2B53 = {
+						CreatedOnToolsVersion = 26.1;
+						TestTargetID = F2E2EC182F1CC602000C2B53;
+					};
+					F2E2EC2E2F1CC605000C2B53 = {
+						CreatedOnToolsVersion = 26.1;
+						TestTargetID = F2E2EC182F1CC602000C2B53;
+					};
+				};
+			};
+			buildConfigurationList = F2E2EBE42F1CC553000C2B53 /* Build configuration list for PBXProject "StressMonitor" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = F2E2EBE02F1CC553000C2B53;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = F2E2EBEA2F1CC553000C2B53 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				F2E2EBE82F1CC553000C2B53 /* StressMonitor */,
+				F2E2EBF72F1CC556000C2B53 /* StressMonitorTests */,
+				F2E2EC012F1CC556000C2B53 /* StressMonitorUITests */,
+				F2E2EC182F1CC602000C2B53 /* StressMonitorWatch Watch App */,
+				F2E2EC242F1CC605000C2B53 /* StressMonitorWatch Watch AppTests */,
+				F2E2EC2E2F1CC605000C2B53 /* StressMonitorWatch Watch AppUITests */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		F2E2EBE72F1CC553000C2B53 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F2E2EBF62F1CC556000C2B53 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F2E2EC002F1CC556000C2B53 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F2E2EC172F1CC602000C2B53 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F2E2EC232F1CC605000C2B53 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F2E2EC2D2F1CC605000C2B53 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		F2E2EBE52F1CC553000C2B53 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F2E2EBF42F1CC556000C2B53 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F2E2EBFE2F1CC556000C2B53 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F2E2EC152F1CC602000C2B53 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F2E2EC212F1CC605000C2B53 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		F2E2EC2B2F1CC605000C2B53 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		F2E2EBFA2F1CC556000C2B53 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = F2E2EBE82F1CC553000C2B53 /* StressMonitor */;
+			targetProxy = F2E2EBF92F1CC556000C2B53 /* PBXContainerItemProxy */;
+		};
+		F2E2EC042F1CC556000C2B53 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = F2E2EBE82F1CC553000C2B53 /* StressMonitor */;
+			targetProxy = F2E2EC032F1CC556000C2B53 /* PBXContainerItemProxy */;
+		};
+		F2E2EC272F1CC605000C2B53 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = F2E2EC182F1CC602000C2B53 /* StressMonitorWatch Watch App */;
+			targetProxy = F2E2EC262F1CC605000C2B53 /* PBXContainerItemProxy */;
+		};
+		F2E2EC312F1CC605000C2B53 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = F2E2EC182F1CC602000C2B53 /* StressMonitorWatch Watch App */;
+			targetProxy = F2E2EC302F1CC605000C2B53 /* PBXContainerItemProxy */;
+		};
+		F2E2EC382F1CC605000C2B53 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = F2E2EC182F1CC602000C2B53 /* StressMonitorWatch Watch App */;
+			targetProxy = F2E2EC372F1CC605000C2B53 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin XCBuildConfiguration section */
+		F2E2EC0A2F1CC556000C2B53 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				DEVELOPMENT_TEAM = EQ8B89SPCX;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.1;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		F2E2EC0B2F1CC556000C2B53 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				DEVELOPMENT_TEAM = EQ8B89SPCX;
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.1;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		F2E2EC0D2F1CC556000C2B53 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = EQ8B89SPCX;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = StressMonitor.StressMonitor;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		F2E2EC0E2F1CC556000C2B53 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = EQ8B89SPCX;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 17.6;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = StressMonitor.StressMonitor;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SUPPORTS_MACCATALYST = NO;
+				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+		F2E2EC102F1CC556000C2B53 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = EQ8B89SPCX;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.1;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = StressMonitor.StressMonitorTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/StressMonitor.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/StressMonitor";
+			};
+			name = Debug;
+		};
+		F2E2EC112F1CC556000C2B53 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = EQ8B89SPCX;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 26.1;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = StressMonitor.StressMonitorTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/StressMonitor.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/StressMonitor";
+			};
+			name = Release;
+		};
+		F2E2EC132F1CC556000C2B53 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = EQ8B89SPCX;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = StressMonitor.StressMonitorUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = StressMonitor;
+			};
+			name = Debug;
+		};
+		F2E2EC142F1CC556000C2B53 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = EQ8B89SPCX;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = StressMonitor.StressMonitorUITests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				TEST_TARGET_NAME = StressMonitor;
+			};
+			name = Release;
+		};
+		F2E2EC3B2F1CC605000C2B53 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = EQ8B89SPCX;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = StressMonitorWatch;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = StressMonitor.StressMonitor;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = StressMonitor.StressMonitor.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 26.1;
+			};
+			name = Debug;
+		};
+		F2E2EC3C2F1CC605000C2B53 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = EQ8B89SPCX;
+				ENABLE_PREVIEWS = YES;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_CFBundleDisplayName = StressMonitorWatch;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = StressMonitor.StressMonitor;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = StressMonitor.StressMonitor.watchkitapp;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				WATCHOS_DEPLOYMENT_TARGET = 26.1;
+			};
+			name = Release;
+		};
+		F2E2EC3F2F1CC605000C2B53 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = K2TYLYAWMK;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "StressMonitor.StressMonitorWatch-Watch-AppTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/StressMonitorWatch Watch App.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/StressMonitorWatch Watch App";
+				WATCHOS_DEPLOYMENT_TARGET = 26.1;
+			};
+			name = Debug;
+		};
+		F2E2EC402F1CC605000C2B53 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = K2TYLYAWMK;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "StressMonitor.StressMonitorWatch-Watch-AppTests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/StressMonitorWatch Watch App.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/StressMonitorWatch Watch App";
+				WATCHOS_DEPLOYMENT_TARGET = 26.1;
+			};
+			name = Release;
+		};
+		F2E2EC422F1CC605000C2B53 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = K2TYLYAWMK;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "StressMonitor.StressMonitorWatch-Watch-AppUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				TEST_TARGET_NAME = "StressMonitorWatch Watch App";
+				WATCHOS_DEPLOYMENT_TARGET = 26.1;
+			};
+			name = Debug;
+		};
+		F2E2EC432F1CC605000C2B53 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = K2TYLYAWMK;
+				GENERATE_INFOPLIST_FILE = YES;
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = "StressMonitor.StressMonitorWatch-Watch-AppUITests";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SDKROOT = watchos;
+				STRING_CATALOG_GENERATE_SYMBOLS = NO;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = 4;
+				TEST_TARGET_NAME = "StressMonitorWatch Watch App";
+				WATCHOS_DEPLOYMENT_TARGET = 26.1;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		F2E2EBE42F1CC553000C2B53 /* Build configuration list for PBXProject "StressMonitor" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F2E2EC0A2F1CC556000C2B53 /* Debug */,
+				F2E2EC0B2F1CC556000C2B53 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F2E2EC0C2F1CC556000C2B53 /* Build configuration list for PBXNativeTarget "StressMonitor" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F2E2EC0D2F1CC556000C2B53 /* Debug */,
+				F2E2EC0E2F1CC556000C2B53 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F2E2EC0F2F1CC556000C2B53 /* Build configuration list for PBXNativeTarget "StressMonitorTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F2E2EC102F1CC556000C2B53 /* Debug */,
+				F2E2EC112F1CC556000C2B53 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F2E2EC122F1CC556000C2B53 /* Build configuration list for PBXNativeTarget "StressMonitorUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F2E2EC132F1CC556000C2B53 /* Debug */,
+				F2E2EC142F1CC556000C2B53 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F2E2EC3A2F1CC605000C2B53 /* Build configuration list for PBXNativeTarget "StressMonitorWatch Watch App" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F2E2EC3B2F1CC605000C2B53 /* Debug */,
+				F2E2EC3C2F1CC605000C2B53 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F2E2EC3E2F1CC605000C2B53 /* Build configuration list for PBXNativeTarget "StressMonitorWatch Watch AppTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F2E2EC3F2F1CC605000C2B53 /* Debug */,
+				F2E2EC402F1CC605000C2B53 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F2E2EC412F1CC605000C2B53 /* Build configuration list for PBXNativeTarget "StressMonitorWatch Watch AppUITests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F2E2EC422F1CC605000C2B53 /* Debug */,
+				F2E2EC432F1CC605000C2B53 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = F2E2EBE12F1CC553000C2B53 /* Project object */;
+}
