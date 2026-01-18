@@ -16,24 +16,16 @@ struct DashboardView: View {
 
     var body: some View {
         NavigationStack {
-            ScrollView {
-                VStack(spacing: 24) {
-                    if viewModel.isLoading {
-                        ProgressView("Loading...")
-                    } else if let stress = viewModel.currentStress {
-                        stressRing(stress)
-                        detailsCard(stress)
-                    } else {
-                        emptyState
-                    }
-
-                    if let heartRate = viewModel.liveHeartRate {
-                        heartRateCard(heartRate)
-                    }
+            Group {
+                if viewModel.isLoading && viewModel.currentStress == nil {
+                    loadingView
+                } else if let stress = viewModel.currentStress {
+                    content(stress)
+                } else {
+                    emptyState
                 }
-                .padding()
             }
-            .navigationTitle("Dashboard")
+            .navigationTitle("Now")
             .alert("Error", isPresented: .constant(viewModel.errorMessage != nil)) {
                 Button("OK") {
                     viewModel.clearError()
@@ -54,115 +46,145 @@ struct DashboardView: View {
 
     private func loadInitialData() async {
         let repository = StressRepository(modelContext: modelContext)
-        let updatedViewModel = StressViewModel(
+        viewModel = StressViewModel(
             healthKit: HealthKitManager(),
             algorithm: StressCalculator(),
             repository: repository
         )
-        viewModel = updatedViewModel
 
         await viewModel.loadCurrentStress()
         await viewModel.loadBaseline()
         viewModel.observeHeartRate()
     }
 
-    private func stressRing(_ stress: StressResult) -> some View {
-        VStack(spacing: 16) {
-            ZStack {
-                Circle()
-                    .stroke(stress.category.color.opacity(0.2), lineWidth: 20)
+    private var loadingView: some View {
+        VStack(spacing: DesignTokens.Spacing.lg) {
+            ProgressView()
+                .scaleEffect(1.5)
 
-                Circle()
-                    .trim(from: 0, to: stress.level / 100)
-                    .stroke(stress.category.color, style: StrokeStyle(lineWidth: 20, lineCap: .round))
-                    .rotationEffect(.degrees(-90))
-                    .animation(.easeInOut, value: stress.level)
+            Text("Loading stress data...")
+                .font(.system(size: DesignTokens.Typography.body))
+                .foregroundColor(.secondary)
+        }
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
+    }
 
-                VStack {
-                    Image(systemName: stress.category.icon)
-                        .font(.system(size: 40))
-                        .foregroundStyle(stress.category.color)
+    private func content(_ stress: StressResult) -> some View {
+        ScrollView {
+            VStack(spacing: DesignTokens.Layout.sectionSpacing) {
+                header
 
-                    Text("\(Int(stress.level))")
-                        .font(.system(size: 48, weight: .bold))
-                        .foregroundStyle(stress.category.color)
+                StressRingView(level: stress.level)
+                    .frame(height: 280)
 
-                    Text(stress.category.rawValue.capitalized)
-                        .font(.headline)
-                        .foregroundStyle(.secondary)
+                statusText(stress)
+
+                MeasureButton(isLoading: viewModel.isLoading) {
+                    await measureStress(stress.category)
+                }
+                .padding(.horizontal, DesignTokens.Spacing.md)
+
+                if viewModel.liveHeartRate != nil {
+                    liveHeartRateCard
                 }
             }
-            .frame(width: 200, height: 200)
+            .padding(DesignTokens.Spacing.lg)
         }
     }
 
-    private func detailsCard(_ stress: StressResult) -> some View {
-        VStack(alignment: .leading, spacing: 12) {
-            Text("Details")
-                .font(.headline)
+    private var header: some View {
+        VStack(alignment: .leading, spacing: DesignTokens.Spacing.xs) {
+            Text(greeting)
+                .font(.system(size: DesignTokens.Typography.title, weight: .bold))
 
-            DetailRow(label: "HRV", value: "\(Int(stress.hrv)) ms")
-            DetailRow(label: "Heart Rate", value: "\(Int(stress.heartRate)) bpm")
-            DetailRow(label: "Confidence", value: "\(Int(stress.confidence * 100))%")
+            Text("Here's your current stress level")
+                .font(.system(size: DesignTokens.Typography.body))
+                .foregroundColor(.secondary)
         }
-        .padding()
-        .background(Color(.systemGray6))
-        .cornerRadius(12)
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
-    private func heartRateCard(_ heartRate: Double) -> some View {
-        HStack {
+    private var greeting: String {
+        let hour = Calendar.current.component(.hour, from: Date())
+        switch hour {
+        case 0..<12: return "Good morning"
+        case 12..<17: return "Good afternoon"
+        default: return "Good evening"
+        }
+    }
+
+    private func statusText(_ stress: StressResult) -> some View {
+        HStack(spacing: DesignTokens.Spacing.sm) {
+            Image(systemName: stress.category.icon)
+                .font(.system(size: 20))
+
+            Text(stress.category.rawValue.capitalized)
+                .font(.system(size: DesignTokens.Typography.headline, weight: .semibold))
+
+            Text("•")
+                .foregroundColor(.secondary)
+
+            Text("\(Int(stress.confidence * 100))% confidence")
+                .font(.system(size: DesignTokens.Typography.body))
+                .foregroundColor(.secondary)
+        }
+    }
+
+    private var liveHeartRateCard: some View {
+        HStack(spacing: DesignTokens.Spacing.md) {
             Image(systemName: "heart.fill")
-                .foregroundStyle(.red)
+                .font(.system(size: 24))
+                .foregroundColor(.red)
 
-            VStack(alignment: .leading) {
+            VStack(alignment: .leading, spacing: DesignTokens.Spacing.xs) {
                 Text("Live Heart Rate")
-                    .font(.caption)
-                    .foregroundStyle(.secondary)
+                    .font(.system(size: DesignTokens.Typography.caption))
+                    .foregroundColor(.secondary)
 
-                Text("\(Int(heartRate)) bpm")
-                    .font(.title2)
-                    .fontWeight(.semibold)
+                Text("\(Int(viewModel.liveHeartRate ?? 0)) bpm")
+                    .font(.system(size: DesignTokens.Typography.headline, weight: .semibold))
             }
 
             Spacer()
         }
-        .padding()
-        .background(Color(.systemGray6))
-        .cornerRadius(12)
+        .padding(DesignTokens.Layout.cardPadding)
+        .background(Color(.systemBackground))
+        .clipShape(RoundedRectangle(cornerRadius: DesignTokens.Layout.cornerRadius))
+        .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 2)
     }
 
     private var emptyState: some View {
-        VStack(spacing: 16) {
+        VStack(spacing: DesignTokens.Spacing.lg) {
             Image(systemName: "heart.slash")
                 .font(.system(size: 60))
-                .foregroundStyle(.secondary)
+                .foregroundColor(.secondary)
 
             Text("No stress data available")
-                .font(.headline)
-                .foregroundStyle(.secondary)
+                .font(.system(size: DesignTokens.Typography.headline, weight: .semibold))
+                .foregroundColor(.secondary)
 
-            Button("Refresh") {
-                Task {
-                    await viewModel.refreshHealthData()
-                }
+            Text("Tap below to measure your current stress level")
+                .font(.system(size: DesignTokens.Typography.body))
+                .foregroundColor(.secondary)
+                .multilineTextAlignment(.center)
+
+            MeasureButton {
+                await measureStress(nil)
             }
-            .buttonStyle(.borderedProminent)
+            .padding(.horizontal, DesignTokens.Spacing.md)
         }
+        .padding(DesignTokens.Spacing.lg)
     }
-}
 
-struct DetailRow: View {
-    let label: String
-    let value: String
+    private func measureStress(_ previousCategory: StressCategory?) async {
+        do {
+            try await viewModel.calculateAndSaveStress()
 
-    var body: some View {
-        HStack {
-            Text(label)
-                .foregroundStyle(.secondary)
-            Spacer()
-            Text(value)
-                .fontWeight(.medium)
+            if let newCategory = viewModel.currentStress?.category, newCategory != previousCategory {
+                HapticManager.shared.stressLevelChanged(to: newCategory)
+            }
+        } catch {
+            // Error handled by viewModel.errorMessage
         }
     }
 }
