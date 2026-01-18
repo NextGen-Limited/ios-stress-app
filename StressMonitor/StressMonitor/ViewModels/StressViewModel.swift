@@ -106,8 +106,8 @@ final class StressViewModel {
             timestamp: result.timestamp,
             stressLevel: result.level,
             hrv: result.hrv,
-            heartRate: result.heartRate,
-            category: result.category
+            restingHeartRate: result.heartRate,
+            confidences: [result.confidence]
         )
 
         try await repository.save(measurement)

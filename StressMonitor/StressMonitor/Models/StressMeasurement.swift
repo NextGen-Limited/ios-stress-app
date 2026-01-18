@@ -4,22 +4,30 @@ import SwiftUI
 
 @Model
 final class StressMeasurement {
-    var timestamp: Date
-    var stressLevel: Double
-    var hrv: Double
-    var heartRate: Double
-    var categoryRawValue: String
+  var timestamp: Date
+  var stressLevel: Double
+  var hrv: Double
+  var restingHeartRate: Double
+  var categoryRawValue: String
+  var confidences: [Double]?
 
-    init(timestamp: Date, stressLevel: Double, hrv: Double, heartRate: Double, category: StressCategory) {
-        self.timestamp = timestamp
-        self.stressLevel = stressLevel
-        self.hrv = hrv
-        self.heartRate = heartRate
-        self.categoryRawValue = category.rawValue
-    }
+  init(
+    timestamp: Date,
+    stressLevel: Double,
+    hrv: Double,
+    restingHeartRate: Double,
+    confidences: [Double]? = nil
+  ) {
+    self.timestamp = timestamp
+    self.stressLevel = stressLevel
+    self.hrv = hrv
+    self.restingHeartRate = restingHeartRate
+    self.categoryRawValue = StressResult.category(for: stressLevel).rawValue
+    self.confidences = confidences
+  }
 
-    var category: StressCategory {
-        get { StressCategory(rawValue: categoryRawValue) ?? .mild }
-        set { categoryRawValue = newValue.rawValue }
-    }
+  var category: StressCategory {
+    get { StressCategory(rawValue: categoryRawValue) ?? .mild }
+    set { categoryRawValue = newValue.rawValue }
+  }
 }
