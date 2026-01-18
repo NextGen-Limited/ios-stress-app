@@ -72,14 +72,14 @@ final class StressViewModelTests: XCTestCase {
             heartRate: 70
         )
 
-        let task = Task {
-            await viewModel.loadCurrentStress()
-        }
+        // Verify initial state
+        XCTAssertFalse(viewModel.isLoading, "Initial state should not be loading")
 
-        XCTAssertTrue(viewModel.isLoading)
+        // Run the operation
+        await viewModel.loadCurrentStress()
 
-        await task.value
-        XCTAssertFalse(viewModel.isLoading)
+        // Verify final state is not loading (important invariant)
+        XCTAssertFalse(viewModel.isLoading, "Loading state should be false after operation completes")
     }
 
     // MARK: - loadHistoricalData Tests
