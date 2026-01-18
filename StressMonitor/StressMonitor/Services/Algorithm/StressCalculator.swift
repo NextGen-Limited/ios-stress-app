@@ -22,11 +22,11 @@ final class StressCalculator: StressAlgorithmServiceProtocol {
         let hrvComponent = calculateHRVComponent(normalizedHRV)
         let hrComponent = calculateHRComponent(normalizedHR)
 
-        // Combine components (70% HRV, 30% HR)
+        // Combine components (70% HRV, 30% HR) on 0-1 scale
         let stressLevel = (hrvComponent * 0.7) + (hrComponent * 0.3)
 
-        // Clamp to 0-100 range
-        let clampedLevel = max(0, min(100, stressLevel))
+        // Convert to 0-100 scale and clamp
+        let clampedLevel = max(0, min(100, stressLevel * 100))
 
         // Determine category
         let category = StressResult.category(for: clampedLevel)
@@ -80,22 +80,22 @@ final class StressCalculator: StressAlgorithmServiceProtocol {
     }
 
     /// Calculates HRV component using power function
-    /// Returns: Normalized HRV ^ 0.8
+    /// Returns: Normalized HRV ^ 0.8 (0-1 scale)
     private func calculateHRVComponent(_ normalizedHRV: Double) -> Double {
         // Ensure non-negative for power operation
         let value = max(0, normalizedHRV)
-        return pow(value, 0.8) * 100
+        return pow(value, 0.8)
     }
 
     /// Calculates heart rate component using atan function
-    /// Returns: atan(Normalized HR * 2) / (π/2)
+    /// Returns: atan(Normalized HR * 2) / (π/2) (0-1 scale)
     private func calculateHRComponent(_ normalizedHR: Double) -> Double {
         let scaled = normalizedHR * 2
         let atanValue = atan(scaled)
         let result = atanValue / (.pi / 2)
 
-        // Convert to 0-100 scale
-        return max(0, result) * 100
+        // Return 0-1 scale
+        return max(0, result)
     }
 }
 
