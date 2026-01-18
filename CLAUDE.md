@@ -6,28 +6,171 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Build & Test Commands
 
+Use the `xc-all` MCP tools for Xcode operations:
+
 ### Building
 
-```bash
-# Build iOS app
-xcodebuild -scheme StressMonitor -destination 'platform=iOS Simulator,name=iPhone 15' build
+```swift
+// MCP Tool: mcp__plugin_xclaude-plugin_xc-all__xcode_build
+// Build iOS app (auto-detects destination)
+mcp__plugin_xclaude-plugin_xc-all__xcode_build(scheme: "StressMonitor")
 
-# Build watchOS app
-xcodebuild -scheme StressMonitorWatch -destination 'platform=watchOS Simulator,name=Apple Watch Series 9' build
+// Build with specific destination
+mcp__plugin_xclaude-plugin_xc-all__xcode_build(
+    scheme: "StressMonitor",
+    destination: "platform=iOS Simulator,name=iPhone 15,OS=18.0"
+)
+
+// Build watchOS app
+mcp__plugin_xclaude-plugin_xc-all__xcode_build(
+    scheme: "StressMonitorWatch",
+    destination: "platform=watchOS Simulator,name=Apple Watch Series 9"
+)
 ```
 
 ### Testing
 
-```bash
-# Run all tests
-xcodebuild test -scheme StressMonitor -destination 'platform=iOS Simulator,name=iPhone 15'
+```swift
+// MCP Tool: mcp__plugin_xclaude-plugin_xc-all__xcode_test
+// Run all tests
+mcp__plugin_xclaude-plugin_xc-all__xcode_test(
+    scheme: "StressMonitor",
+    destination: "platform=iOS Simulator,name=iPhone 15"
+)
 
-# Run single test class
-xcodebuild test -scheme StressMonitor -destination 'platform=iOS Simulator,name=iPhone 15' -only-testing:StressMonitorTests/StressCalculatorTests
+// Run single test class
+mcp__plugin_xclaude-plugin_xc-all__xcode_test(
+    scheme: "StressMonitor",
+    destination: "platform=iOS Simulator,name=iPhone 15",
+    only_testing: ["StressMonitorTests/StressCalculatorTests"]
+)
 
-# Run single test method
-xcodebuild test -scheme StressMonitor -destination 'platform=iOS Simulator,name=iPhone 15' -only-testing:StressMonitorTests/StressCalculatorTests/testNormalStress
+// Run single test method
+mcp__plugin_xclaude-plugin_xc-all__xcode_test(
+    scheme: "StressMonitor",
+    destination: "platform=iOS Simulator,name=iPhone 15",
+    only_testing: ["StressMonitorTests/StressCalculatorTests/testNormalStress"]
+)
 ```
+
+### Cleaning Build Artifacts
+
+```swift
+// MCP Tool: mcp__plugin_xclaude-plugin_xc-all__xcode_clean
+// Clean all
+mcp__plugin_xclaude-plugin_xc-all__xcode_clean()
+
+// Clean specific scheme
+mcp__plugin_xclaude-plugin_xc-all__xcode_clean(scheme: "StressMonitor")
+```
+
+### Simulator Management
+
+```swift
+// MCP Tool: mcp__plugin_xclaude-plugin_xc-all__simulator_list
+// List available simulators
+mcp__plugin_xclaude-plugin_xc-all__simulator_list(
+    device_type: "iPhone",
+    availability: "available"
+)
+
+// MCP Tool: mcp__plugin_xclaude-plugin_xc-all__simulator_boot
+// Boot a simulator
+mcp__plugin_xclaude-plugin_xc-all__simulator_boot(device_id: "iPhone 15")
+
+// MCP Tool: mcp__plugin_xclaude-plugin_xc-all__simulator_shutdown
+// Shutdown simulator
+mcp__plugin_xclaude-plugin_xc-all__simulator_shutdown(device_id: "booted")
+```
+
+### App Installation & Launch
+
+```swift
+// MCP Tool: mcp__plugin_xclaude-plugin_xc-all__simulator_install_app
+// Install .app bundle
+mcp__plugin_xclaude-plugin_xc-all__simulator_install_app(
+    device_id: "booted",
+    app_path: "/path/to/StressMonitor.app"
+)
+
+// MCP Tool: mcp__plugin_xclaude-plugin_xc-all__simulator_launch_app
+// Launch app by bundle ID
+mcp__plugin_xclaude-plugin_xc-all__simulator_launch_app(
+    device_id: "booted",
+    app_identifier: "com.stressmonitor.app"
+)
+```
+
+### UI Interaction & Testing
+
+```swift
+// MCP Tool: mcp__plugin_xclaude-plugin_xc-all__idb_describe
+// Query accessibility tree
+mcp__plugin_xclaude-plugin_xc-all__idb_describe(operation: "all")
+
+// MCP Tool: mcp__plugin_xclaude-plugin_xc-all__idb_find_element
+// Find UI element by label
+mcp__plugin_xclaude-plugin_xc-all__idb_find_element(query: "Stress Level")
+
+// MCP Tool: mcp__plugin_xclaude-plugin_xc-all__idb_tap
+// Tap at coordinates
+mcp__plugin_xclaude-plugin_xc-all__idb_tap(x: 200, y: 400)
+
+// MCP Tool: mcp__plugin_xclaude-plugin_xc-all__idb_input
+// Type text or press keys
+mcp__plugin_xclaude-plugin_xc-all__idb_input(text: "test input")
+mcp__plugin_xclaude-plugin_xc-all__idb_input(key: "return")
+```
+
+### Screenshots
+
+```swift
+// MCP Tool: mcp__plugin_xclaude-plugin_xc-all__simulator_screenshot
+// Capture screenshot (auto-generated path)
+mcp__plugin_xclaude-plugin_xc-all__simulator_screenshot(device_id: "booted")
+
+// With custom output path
+mcp__plugin_xclaude-plugin_xc-all__simulator_screenshot(
+    device_id: "booted",
+    output_path: "/Users/ddphuong/Downloads/screenshot.png"
+)
+```
+
+### Xcode Info
+
+```swift
+// MCP Tool: mcp__plugin_xclaude-plugin_xc-all__xcode_version
+// Get Xcode version
+mcp__plugin_xclaude-plugin_xc-all__xcode_version()
+
+// Check specific SDK
+mcp__plugin_xclaude-plugin_xc-all__xcode_version(sdk: "iphoneos")
+
+// MCP Tool: mcp__plugin_xclaude-plugin_xc-all__xcode_list
+// List schemes and targets
+mcp__plugin_xclaude-plugin_xc-all__xcode_list()
+```
+
+### Environment Health Check
+
+```swift
+// MCP Tool: mcp__plugin_xclaude-plugin_xc-all__simulator_health_check
+// Validate iOS dev environment
+mcp__plugin_xclaude-plugin_xc-all__simulator_health_check()
+```
+
+---
+
+## MCP Plugin Categories
+
+- **xc-setup**: Simulator and environment setup (`simulator_boot`, `simulator_create`, `simulator_list`, `xcode_version`)
+- **xc-build**: Build operations (`xcode_build`, `xcode_clean`, `xcode_list`)
+- **xc-launch**: App lifecycle (`simulator_install_app`, `simulator_launch_app`)
+- **xc-interact**: UI automation (`idb_tap`, `idb_input`, `idb_find_element`, `idb_gesture`)
+- **xc-testing**: Test execution (`xcode_test`, `idb_describe`, `simulator_screenshot`)
+- **xc-meta**: Management operations (`simulator_shutdown`, `simulator_delete`, `xcode_version`)
+
+---
 
 ---
 
