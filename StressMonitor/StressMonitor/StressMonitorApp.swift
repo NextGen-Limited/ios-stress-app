@@ -1,21 +1,15 @@
-//
-//  StressMonitorApp.swift
-//  StressMonitor
-//
-//  Created by Phuong Doan Duy on 18/1/26.
-//
-
 import SwiftUI
 import SwiftData
 
 @main
 struct StressMonitorApp: App {
-    var sharedModelContainer: ModelContainer = {
-        let schema = Schema([
-            Item.self,
-        ])
-        let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
+    static let schema = Schema([
+        StressMeasurement.self,
+    ])
 
+    static let modelConfiguration = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false)
+
+    var sharedModelContainer: ModelContainer = {
         do {
             return try ModelContainer(for: schema, configurations: [modelConfiguration])
         } catch {
