@@ -1,6 +1,5 @@
 import Foundation
 import HealthKit
-import WatchKit
 
 final class WatchHealthKitManager: HealthKitServiceProtocol {
   private let healthStore = HKHealthStore()

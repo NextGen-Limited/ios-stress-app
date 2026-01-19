@@ -31,6 +31,12 @@ extension Color {
         })
     }
 
+    // Onboarding-specific colors
+    static let stressRelaxed = Color(light: Color(hex: "#34C759"), dark: Color(hex: "#30D158"))
+    static let primaryBlue = Color(light: Color(hex: "#007AFF"), dark: Color(hex: "#0A84FF"))
+    static let stressModerate = Color(hex: "#FFD60A")
+    static let stressHigh = Color(light: Color(hex: "#FF9500"), dark: Color(hex: "#FF9F0A"))
+
     static func stressColor(for category: StressCategory) -> Color {
         switch category {
         case .relaxed:
