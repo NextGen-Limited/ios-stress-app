@@ -74,7 +74,7 @@ struct DashboardView: View {
             VStack(spacing: DesignTokens.Layout.sectionSpacing) {
                 header
 
-                StressRingView(level: stress.level)
+                StressRingView(stressLevel: stress.level, category: stress.category)
                     .frame(height: 280)
 
                 statusText(stress)
