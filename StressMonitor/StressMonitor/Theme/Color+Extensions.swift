@@ -31,11 +31,51 @@ extension Color {
         })
     }
 
-    // Onboarding-specific colors
+    // MARK: - Stress Level Colors
+
     static let stressRelaxed = Color(light: Color(hex: "#34C759"), dark: Color(hex: "#30D158"))
-    static let primaryBlue = Color(light: Color(hex: "#007AFF"), dark: Color(hex: "#0A84FF"))
+    static let stressMild = Color(light: Color(hex: "#007AFF"), dark: Color(hex: "#0A84FF"))
     static let stressModerate = Color(hex: "#FFD60A")
     static let stressHigh = Color(light: Color(hex: "#FF9500"), dark: Color(hex: "#FF9F0A"))
+    static let stressSevere = Color(light: Color(hex: "#FF3B30"), dark: Color(hex: "#FF453A"))
+
+    // MARK: - Semantic Colors
+
+    static let primaryBlue = Color(light: Color(hex: "#007AFF"), dark: Color(hex: "#0A84FF"))
+    static let primaryGreen = Color(light: Color(hex: "#34C759"), dark: Color(hex: "#30D158"))
+    static let success = Color(light: Color(hex: "#34C759"), dark: Color(hex: "#30D158"))
+    static let warning = Color(hex: "#FFB00A")
+    static let error = Color(light: Color(hex: "#FF3B30"), dark: Color(hex: "#FF453A"))
+
+    // MARK: - Light Mode Colors
+
+    static let backgroundLight = Color(hex: "#F2F2F7")
+    static let surfaceLight = Color.white
+    static let cardLight = Color.white
+    static let textPrimaryLight = Color.black
+    static let textSecondaryLight = Color(hex: "#8E8E93")
+    static let dividerLight = Color(hex: "#C6C6C8")
+
+    // MARK: - Dark Mode Colors
+
+    static let backgroundDark = Color.black
+    static let surfaceDark = Color(hex: "#1C1C1E")
+    static let cardDark = Color(hex: "#1C1C1E")
+    static let textPrimaryDark = Color.white
+    static let textSecondaryDark = Color(hex: "#EBEBF5")
+    static let dividerDark = Color(hex: "#38383A")
+
+    // MARK: - Color Helpers
+
+    static func stressColor(for level: Double) -> Color {
+        switch level {
+        case 0...25: return .stressRelaxed
+        case 26...50: return .stressMild
+        case 51...75: return .stressModerate
+        case 76...100: return .stressHigh
+        default: return .secondary
+        }
+    }
 
     static func stressColor(for category: StressCategory) -> Color {
         switch category {
@@ -47,6 +87,15 @@ extension Color {
             return Color(hex: "#FFD60A")
         case .high:
             return Color(light: Color(hex: "#FF9500"), dark: Color(hex: "#FF9F0A"))
+        }
+    }
+
+    static func stressIcon(for category: StressCategory) -> String {
+        switch category {
+        case .relaxed: return "leaf.fill"
+        case .mild: return "circle.fill"
+        case .moderate: return "triangle.fill"
+        case .high: return "square.fill"
         }
     }
 }

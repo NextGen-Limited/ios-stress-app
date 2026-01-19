@@ -85,4 +85,49 @@ final class StressRepository: StressRepositoryProtocol {
     func updateBaseline(_ baseline: PersonalBaseline) async throws {
         cachedBaseline = baseline
     }
+
+    func fetchMeasurements(from: Date, to: Date) async throws -> [StressMeasurement] {
+        let descriptor = FetchDescriptor<StressMeasurement>(
+            predicate: #Predicate<StressMeasurement> { $0.timestamp >= from && $0.timestamp <= to },
+            sortBy: [SortDescriptor(\.timestamp, order: .reverse)]
+        )
+
+        do {
+            return try modelContext.fetch(descriptor)
+        } catch {
+            return []
+        }
+    }
+
+    func delete(_ measurement: StressMeasurement) async throws {
+        modelContext.delete(measurement)
+        try modelContext.save()
+    }
+
+    func fetchAverageHRV(hours: Int) async throws -> Double {
+        let startDate = Calendar.current.date(byAdding: .hour, value: -hours, to: Date()) ?? Date()
+        let measurements = try await fetchMeasurements(from: startDate, to: Date())
+
+        guard !measurements.isEmpty else { return 0 }
+        return measurements.map { $0.hrv }.reduce(0, +) / Double(measurements.count)
+    }
+
+    func fetchAverageHRV(days: Int) async throws -> Double {
+        let startDate = Calendar.current.date(byAdding: .day, value: -days, to: Date()) ?? Date()
+        let measurements = try await fetchMeasurements(from: startDate, to: Date())
+
+        guard !measurements.isEmpty else { return 0 }
+        return measurements.map { $0.hrv }.reduce(0, +) / Double(measurements.count)
+    }
+
+    func deleteAllMeasurements() async throws {
+        let descriptor = FetchDescriptor<StressMeasurement>()
+        let allMeasurements = try modelContext.fetch(descriptor)
+
+        for measurement in allMeasurements {
+            modelContext.delete(measurement)
+        }
+        try modelContext.save()
+        cachedBaseline = nil
+    }
 }

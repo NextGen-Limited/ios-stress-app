@@ -3,7 +3,7 @@ import SwiftUI
 struct MainTabView: View {
     var body: some View {
         TabView {
-            DashboardView()
+            StressDashboardView()
                 .tabItem {
                     Label("Now", systemImage: "heart.fill")
                 }
@@ -11,13 +11,21 @@ struct MainTabView: View {
                 .accessibilityLabel("Current stress level")
                 .accessibilityHint("View your current stress measurement")
 
-            HistoryView()
+            MeasurementHistoryView()
                 .tabItem {
                     Label("History", systemImage: "chart.bar")
                 }
                 .accessibilityIdentifier("HistoryTab")
                 .accessibilityLabel("Stress history")
                 .accessibilityHint("View past stress measurements")
+
+            TrendsView()
+                .tabItem {
+                    Label("Trends", systemImage: "chart.xyaxis.line")
+                }
+                .accessibilityIdentifier("TrendsTab")
+                .accessibilityLabel("Trends and patterns")
+                .accessibilityHint("View your stress trends over time")
 
             SettingsView()
                 .tabItem {

@@ -249,6 +249,3 @@ struct StressDashboardView: View {
         .modelContainer(container)
 }
 
-extension Color {
-    static let backgroundLight = Color(red: 0.97, green: 0.97, blue: 0.98)
-}
