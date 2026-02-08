@@ -6,8 +6,6 @@ final class WatchConnectivityManager: NSObject, ObservableObject {
   static let shared = WatchConnectivityManager()
 
   @Published var isReachable = false
-  @Published var isPaired = false
-  @Published var isWatchAppInstalled = false
 
   private override init() {
     super.init()
@@ -45,14 +43,28 @@ final class WatchConnectivityManager: NSObject, ObservableObject {
 }
 
 extension WatchConnectivityManager: WCSessionDelegate {
+  // MARK: - Required WCSessionDelegate methods for watchOS
+  
   func session(
-    _ session: WCSession, activationDidCompleteWith activationState: WCSessionActivationState,
+    _ session: WCSession, 
+    activationDidCompleteWith activationState: WCSessionActivationState,
     error: Error?
   ) {
-    isReachable = session.isReachable
+    DispatchQueue.main.async {
+      self.isReachable = session.isReachable
+    }
   }
 
   func sessionReachabilityDidChange(_ session: WCSession) {
-    isReachable = session.isReachable
+    DispatchQueue.main.async {
+      self.isReachable = session.isReachable
+    }
+  }
+
+  // MARK: - Message handling
+
+  func session(_ session: WCSession, didReceiveMessage message: [String: Any]) {
+    // Handle incoming messages from iPhone
+    // Can be extended to process specific message types
   }
 }

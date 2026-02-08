@@ -1,5 +1,6 @@
 import Foundation
 import Observation
+import WidgetKit
 
 @Observable
 final class WatchStressViewModel {
@@ -10,15 +11,18 @@ final class WatchStressViewModel {
   private let healthKit: WatchHealthKitManager
   private let algorithm: StressAlgorithmServiceProtocol
   private let connectivity: WatchConnectivityManager
+  private let complicationProvider: ComplicationDataProvider
 
   init(
     healthKit: WatchHealthKitManager = WatchHealthKitManager(),
     algorithm: StressAlgorithmServiceProtocol = StressCalculator(),
-    connectivity: WatchConnectivityManager = .shared
+    connectivity: WatchConnectivityManager = .shared,
+    complicationProvider: ComplicationDataProvider = .shared
   ) {
     self.healthKit = healthKit
     self.algorithm = algorithm
     self.connectivity = connectivity
+    self.complicationProvider = complicationProvider
   }
 
   func requestAuthorization() async {
@@ -54,6 +58,7 @@ final class WatchStressViewModel {
 
       currentStress = result
       syncToPhone(result: result)
+      syncToComplications(result: result)
     } catch {
       errorMessage = error.localizedDescription
     }
@@ -98,5 +103,9 @@ final class WatchStressViewModel {
     ]
 
     connectivity.syncData(data)
+  }
+
+  private func syncToComplications(result: StressResult) {
+    complicationProvider.saveMeasurement(result)
   }
 }
