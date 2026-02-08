@@ -1,0 +1,722 @@
+import XCTest
+import SwiftData
+import CloudKit
+@testable import StressMonitor
+
+@MainActor
+@preconcurrency import SwiftData
+@preconcurrency import CloudKit
+
+/// Comprehensive unit tests for DataManagementViewModel
+/// Tests export operations, delete operations, state management, error handling, and progress tracking
+final class DataManagementViewModelTests: XCTestCase {
+
+    var viewModel: DataManagementViewModel!
+    var modelContainer: ModelContainer!
+    var modelContext: ModelContext!
+    var testDataFactory: TestDataFactory!
+    var mockRepository: MockStressRepository!
+
+    override func setUp() async throws {
+        try await super.setUp()
+
+        // Create in-memory container
+        modelContainer = try TestDataFactory.createInMemoryContainer()
+        modelContext = ModelContext(modelContainer)
+        testDataFactory = TestDataFactory()
+        mockRepository = MockStressRepository()
+
+        // Create view model
+        viewModel = DataManagementViewModel(
+            modelContext: modelContext,
+            cloudKitContainer: CKContainer.default(),
+            repository: mockRepository
+        )
+    }
+
+    override func tearDown() async throws {
+        viewModel = nil
+        modelContext = nil
+        modelContainer = nil
+        testDataFactory = nil
+        mockRepository = nil
+        try await super.tearDown()
+    }
+
+    // MARK: - Export Operations Tests
+
+    func testExportToCSV_Success() async throws {
+        // Given
+        let measurements = testDataFactory.createMeasurementBatch(count: 5)
+        mockRepository.measurementsToReturn = measurements
+
+        // When
+        await viewModel.exportToCSV()
+
+        // Then
+        XCTAssertFalse(viewModel.isExporting)
+        XCTAssertNil(viewModel.errorMessage)
+        XCTAssertNotNil(viewModel.exportedFileURL)
+    }
+
+    func testExportToCSV_WithDateRange() async throws {
+        // Given
+        let startDate = Date().addingTimeInterval(-7 * 86400)
+        let endDate = Date()
+        let measurements = testDataFactory.createMeasurementBatch(count: 3)
+        mockRepository.measurementsToReturn = measurements
+
+        // When
+        await viewModel.exportToCSV(startDate: startDate, endDate: endDate)
+
+        // Then
+        XCTAssertFalse(viewModel.isExporting)
+        XCTAssertNil(viewModel.errorMessage)
+    }
+
+    func testExportToCSV_NoData() async throws {
+        // Given
+        mockRepository.measurementsToReturn = []
+
+        // When
+        await viewModel.exportToCSV()
+
+        // Then
+        XCTAssertFalse(viewModel.isExporting)
+        XCTAssertNotNil(viewModel.errorMessage)
+        XCTAssertEqual(viewModel.errorTitle, "No Data")
+    }
+
+    func testExportToJSON_Success() async throws {
+        // Given
+        let measurements = testDataFactory.createMeasurementBatch(count: 5)
+        mockRepository.measurementsToReturn = measurements
+        mockRepository.baselineToReturn = PersonalBaseline(
+            restingHeartRate: 62,
+            baselineHRV: 48,
+            lastUpdated: Date()
+        )
+
+        // When
+        await viewModel.exportToJSON()
+
+        // Then
+        XCTAssertFalse(viewModel.isExporting)
+        XCTAssertNil(viewModel.errorMessage)
+        XCTAssertNotNil(viewModel.exportedFileURL)
+    }
+
+    func testExportToJSON_WithDateRange() async throws {
+        // Given
+        let startDate = Date().addingTimeInterval(-30 * 86400)
+        let endDate = Date()
+        let measurements = testDataFactory.createMeasurementBatch(count: 3)
+        mockRepository.measurementsToReturn = measurements
+        mockRepository.baselineToReturn = PersonalBaseline(
+            restingHeartRate: 60,
+            baselineHRV: 50,
+            lastUpdated: Date()
+        )
+
+        // When
+        await viewModel.exportToJSON(startDate: startDate, endDate: endDate)
+
+        // Then
+        XCTAssertFalse(viewModel.isExporting)
+        XCTAssertNil(viewModel.errorMessage)
+    }
+
+    func testGenerateReport_Success() async throws {
+        // Given
+        let startDate = Date().addingTimeInterval(-7 * 86400)
+        let endDate = Date()
+
+        // When
+        await viewModel.generateReport(startDate: startDate, endDate: endDate)
+
+        // Then
+        XCTAssertFalse(viewModel.isExporting)
+    }
+
+    // MARK: - Delete Operations Tests
+
+    func testConfirmDeleteAll() {
+        // When
+        viewModel.confirmDeleteAll()
+
+        // Then
+        XCTAssertTrue(viewModel.showDeleteConfirmation)
+        XCTAssertNotNil(viewModel.pendingDeleteOperation)
+        if case .deleteAll = viewModel.pendingDeleteOperation {
+            // Expected
+        } else {
+            XCTFail("Expected deleteAll operation")
+        }
+    }
+
+    func testConfirmDeleteBefore() {
+        // Given
+        let date = Date().addingTimeInterval(-30 * 86400)
+
+        // When
+        viewModel.confirmDeleteBefore(date: date)
+
+        // Then
+        XCTAssertTrue(viewModel.showDeleteConfirmation)
+        if case .deleteBefore(let d) = viewModel.pendingDeleteOperation {
+            XCTAssertEqual(d, date)
+        } else {
+            XCTFail("Expected deleteBefore operation")
+        }
+    }
+
+    func testConfirmDeleteInRange() {
+        // Given
+        let range = Date().addingTimeInterval(-7 * 86400)...Date()
+
+        // When
+        viewModel.confirmDeleteInRange(range: range)
+
+        // Then
+        XCTAssertTrue(viewModel.showDeleteConfirmation)
+        if case .deleteInRange(let r) = viewModel.pendingDeleteOperation {
+            XCTAssertEqual(r.lowerBound, range.lowerBound)
+            XCTAssertEqual(r.upperBound, range.upperBound)
+        } else {
+            XCTFail("Expected deleteInRange operation")
+        }
+    }
+
+    func testConfirmCloudKitReset() {
+        // When
+        viewModel.confirmCloudKitReset()
+
+        // Then
+        XCTAssertTrue(viewModel.showDeleteConfirmation)
+        if case .resetCloudKit = viewModel.pendingDeleteOperation {
+            // Expected
+        } else {
+            XCTFail("Expected resetCloudKit operation")
+        }
+    }
+
+    func testConfirmFactoryReset() {
+        // When
+        viewModel.confirmFactoryReset()
+
+        // Then
+        XCTAssertTrue(viewModel.showDeleteConfirmation)
+        if case .factoryReset = viewModel.pendingDeleteOperation {
+            // Expected
+        } else {
+            XCTFail("Expected factoryReset operation")
+        }
+    }
+
+    func testExecutePendingDelete_DeleteAll() async throws {
+        // Given
+        viewModel.confirmDeleteAll()
+        XCTAssertTrue(viewModel.showDeleteConfirmation)
+
+        // When
+        await viewModel.executePendingDelete()
+
+        // Then
+        XCTAssertFalse(viewModel.showDeleteConfirmation)
+        XCTAssertNil(viewModel.pendingDeleteOperation)
+        XCTAssertFalse(viewModel.isDeleting)
+    }
+
+    func testCancelPendingDelete() {
+        // Given
+        viewModel.confirmDeleteAll()
+        XCTAssertTrue(viewModel.showDeleteConfirmation)
+
+        // When
+        viewModel.cancelPendingDelete()
+
+        // Then
+        XCTAssertFalse(viewModel.showDeleteConfirmation)
+        XCTAssertNil(viewModel.pendingDeleteOperation)
+    }
+
+    // MARK: - State Management Tests
+
+    func testExportState_InitialValues() {
+        // Then
+        XCTAssertFalse(viewModel.isExporting)
+        XCTAssertEqual(viewModel.exportProgress, 0.0)
+        XCTAssertNil(viewModel.exportOperation)
+        XCTAssertNil(viewModel.exportedFileURL)
+    }
+
+    func testDeleteState_InitialValues() {
+        // Then
+        XCTAssertFalse(viewModel.isDeleting)
+        XCTAssertEqual(viewModel.deleteProgress, 0.0)
+        XCTAssertNil(viewModel.deleteOperation)
+    }
+
+    func testErrorState_InitialValues() {
+        // Then
+        XCTAssertNil(viewModel.errorMessage)
+        XCTAssertNil(viewModel.errorTitle)
+    }
+
+    func testSuccessState_InitialValues() {
+        // Then
+        XCTAssertFalse(viewModel.showSuccessAlert)
+        XCTAssertNil(viewModel.successMessage)
+    }
+
+    func testClearError() async throws {
+        // Given - Set an error
+        mockRepository.measurementsToReturn = []
+        await viewModel.exportToCSV()
+        XCTAssertNotNil(viewModel.errorMessage)
+
+        // When
+        viewModel.clearError()
+
+        // Then
+        XCTAssertNil(viewModel.errorMessage)
+        XCTAssertNil(viewModel.errorTitle)
+    }
+
+    func testClearSuccess() async throws {
+        // Given - Trigger success
+        let measurements = testDataFactory.createMeasurementBatch(count: 3)
+        mockRepository.measurementsToReturn = measurements
+        await viewModel.exportToCSV()
+        XCTAssertTrue(viewModel.showSuccessAlert)
+
+        // When
+        viewModel.clearSuccess()
+
+        // Then
+        XCTAssertFalse(viewModel.showSuccessAlert)
+        XCTAssertNil(viewModel.successMessage)
+    }
+
+    // MARK: - Progress Tracking Tests
+
+    func testExportProgress_Updates() async throws {
+        // Given
+        let measurements = testDataFactory.createMeasurementBatch(count: 10)
+        mockRepository.measurementsToReturn = measurements
+
+        var progressObserved = false
+
+        // Track progress
+        Task {
+            for _ in 0..<10 {
+                if viewModel.exportProgress > 0 && viewModel.exportProgress < 1.0 {
+                    progressObserved = true
+                    break
+                }
+                try? await Task.sleep(nanoseconds: 10_000_000)
+            }
+        }
+
+        // When
+        await viewModel.exportToCSV()
+
+        // Then
+        XCTAssertTrue(progressObserved || viewModel.exportProgress == 1.0)
+        XCTAssertEqual(viewModel.exportProgress, 1.0)
+    }
+
+    func testDeleteProgress_Updates() async {
+        // Given
+        viewModel.confirmDeleteAll()
+
+        var progressObserved = false
+
+        // Track progress
+        Task {
+            for _ in 0..<10 {
+                if viewModel.deleteProgress > 0 && viewModel.deleteProgress < 1.0 {
+                    progressObserved = true
+                    break
+                }
+                try? await Task.sleep(nanoseconds: 10_000_000)
+            }
+        }
+
+        // When
+        await viewModel.executePendingDelete()
+
+        // Then
+        XCTAssertTrue(progressObserved || viewModel.deleteProgress == 1.0)
+    }
+
+    func testExportOperation_Updates() async throws {
+        // Given
+        let measurements = testDataFactory.createMeasurementBatch(count: 3)
+        mockRepository.measurementsToReturn = measurements
+
+        // When
+        await viewModel.exportToCSV()
+
+        // Then - Operation should be cleared after completion
+        XCTAssertNil(viewModel.exportOperation)
+    }
+
+    func testDeleteOperation_Updates() async {
+        // Given
+        viewModel.confirmDeleteAll()
+
+        // When
+        await viewModel.executePendingDelete()
+
+        // Then - Operation should be cleared after completion
+        XCTAssertNil(viewModel.deleteOperation)
+    }
+
+    // MARK: - Statistics Tests
+
+    func testLoadStatistics_Success() async throws {
+        // Given
+        let measurements = testDataFactory.createMeasurementBatch(count: 10)
+        mockRepository.measurementsToReturn = measurements
+
+        // When
+        await viewModel.loadStatistics()
+
+        // Then
+        XCTAssertEqual(viewModel.totalMeasurementCount, 10)
+        XCTAssertNotNil(viewModel.oldestMeasurementDate)
+        XCTAssertNotNil(viewModel.newestMeasurementDate)
+    }
+
+    func testLoadStatistics_EmptyData() async throws {
+        // Given
+        mockRepository.measurementsToReturn = []
+
+        // When
+        await viewModel.loadStatistics()
+
+        // Then
+        XCTAssertEqual(viewModel.totalMeasurementCount, 0)
+    }
+
+    // MARK: - Callback Tests
+
+    func testOnExportComplete_Callback() async throws {
+        // Given
+        let measurements = testDataFactory.createMeasurementBatch(count: 3)
+        mockRepository.measurementsToReturn = measurements
+
+        var callbackURL: URL?
+        let expectation = XCTestExpectation(description: "Export complete callback")
+        viewModel.onExportComplete = { url in
+            callbackURL = url
+            expectation.fulfill()
+        }
+
+        // When
+        await viewModel.exportToCSV()
+
+        // Then
+        await fulfillment(of: [expectation], timeout: 2.0)
+        XCTAssertNotNil(callbackURL)
+    }
+
+    func testOnDeleteComplete_Callback() async {
+        // Given
+        viewModel.confirmDeleteAll()
+
+        var callbackCalled = false
+        let expectation = XCTestExpectation(description: "Delete complete callback")
+        viewModel.onDeleteComplete = {
+            callbackCalled = true
+            expectation.fulfill()
+        }
+
+        // When
+        await viewModel.executePendingDelete()
+
+        // Then
+        await fulfillment(of: [expectation], timeout: 2.0)
+        XCTAssertTrue(callbackCalled)
+    }
+
+    // MARK: - Error Handling Tests
+
+    func testExportToCSV_WithError() async throws {
+        // Given
+        mockRepository.shouldThrowError = true
+
+        // When
+        await viewModel.exportToCSV()
+
+        // Then
+        XCTAssertFalse(viewModel.isExporting)
+        XCTAssertNotNil(viewModel.errorMessage)
+        XCTAssertEqual(viewModel.errorTitle, "Export Failed")
+    }
+
+    func testExportToJSON_WithError() async throws {
+        // Given
+        mockRepository.shouldThrowError = true
+
+        // When
+        await viewModel.exportToJSON()
+
+        // Then
+        XCTAssertFalse(viewModel.isExporting)
+        XCTAssertNotNil(viewModel.errorMessage)
+    }
+
+    func testDeleteOperation_WithError() async {
+        // Given
+        viewModel.confirmDeleteAll()
+        mockRepository.shouldThrowError = true
+
+        // When
+        await viewModel.executePendingDelete()
+
+        // Then
+        XCTAssertFalse(viewModel.isDeleting)
+        XCTAssertNotNil(viewModel.errorMessage)
+        XCTAssertEqual(viewModel.errorTitle, "Delete Failed")
+    }
+
+    // MARK: - Edge Cases Tests
+
+    func testExportToCSV_WithNilDates() async throws {
+        // Given
+        let measurements = testDataFactory.createMeasurementBatch(count: 3)
+        mockRepository.measurementsToReturn = measurements
+
+        // When
+        await viewModel.exportToCSV(startDate: nil, endDate: nil)
+
+        // Then
+        XCTAssertFalse(viewModel.isExporting)
+    }
+
+    func testExportToCSV_WithStartDateOnly() async throws {
+        // Given
+        let startDate = Date().addingTimeInterval(-7 * 86400)
+        let measurements = testDataFactory.createMeasurementBatch(count: 3)
+        mockRepository.measurementsToReturn = measurements
+
+        // When
+        await viewModel.exportToCSV(startDate: startDate, endDate: nil)
+
+        // Then
+        XCTAssertFalse(viewModel.isExporting)
+    }
+
+    func testExportToCSV_WithEndDateOnly() async throws {
+        // Given
+        let endDate = Date()
+        let measurements = testDataFactory.createMeasurementBatch(count: 3)
+        mockRepository.measurementsToReturn = measurements
+
+        // When
+        await viewModel.exportToCSV(startDate: nil, endDate: endDate)
+
+        // Then
+        XCTAssertFalse(viewModel.isExporting)
+    }
+
+    func testLoadStatistics_WithUnsortedData() async throws {
+        // Given
+        let unsortedMeasurements = [
+            testDataFactory.createMeasurement(daysAgo: 5),
+            testDataFactory.createMeasurement(daysAgo: 1),
+            testDataFactory.createMeasurement(daysAgo: 10)
+        ]
+        mockRepository.measurementsToReturn = unsortedMeasurements
+
+        // When
+        await viewModel.loadStatistics()
+
+        // Then
+        XCTAssertNotNil(viewModel.oldestMeasurementDate)
+        XCTAssertNotNil(viewModel.newestMeasurementDate)
+    }
+
+    // MARK: - DeleteOperation Equatable Tests
+
+    func testDeleteOperationEquality() {
+        // Given
+        let date = Date()
+        let range = date...Date().addingTimeInterval(86400)
+
+        // Then
+        XCTAssertEqual(DeleteOperation.deleteAll, .deleteAll)
+        XCTAssertEqual(DeleteOperation.deleteBefore(date), .deleteBefore(date))
+        XCTAssertEqual(DeleteOperation.deleteInRange(range), .deleteInRange(range))
+        XCTAssertEqual(DeleteOperation.resetCloudKit, .resetCloudKit)
+        XCTAssertEqual(DeleteOperation.factoryReset, .factoryReset)
+    }
+
+    func testDeleteOperationInequality() {
+        // Given
+        let date1 = Date()
+        let date2 = Date().addingTimeInterval(86400)
+
+        // Then
+        XCTAssertNotEqual(DeleteOperation.deleteAll, .factoryReset)
+        XCTAssertNotEqual(DeleteOperation.deleteBefore(date1), .deleteBefore(date2))
+        XCTAssertNotEqual(DeleteOperation.resetCloudKit, .factoryReset)
+    }
+
+    // MARK: - Concurrent Operations Tests
+
+    func testConcurrentExports_Sequential() async throws {
+        // Given
+        let measurements = testDataFactory.createMeasurementBatch(count: 5)
+        mockRepository.measurementsToReturn = measurements
+
+        // When
+        await viewModel.exportToCSV()
+        await viewModel.exportToJSON()
+
+        // Then - Both should complete
+        XCTAssertFalse(viewModel.isExporting)
+    }
+
+    func testConsecutiveDeletes() async {
+        // Given
+        viewModel.confirmDeleteAll()
+        await viewModel.executePendingDelete()
+
+        viewModel.confirmDeleteBefore(date: Date())
+        await viewModel.executePendingDelete()
+
+        // Then - Both should complete
+        XCTAssertFalse(viewModel.isDeleting)
+    }
+
+    // MARK: - State Consistency Tests
+
+    func testStateConsistency_AfterExport() async throws {
+        // Given
+        let measurements = testDataFactory.createMeasurementBatch(count: 3)
+        mockRepository.measurementsToReturn = measurements
+
+        // When
+        await viewModel.exportToCSV()
+
+        // Then
+        XCTAssertFalse(viewModel.isExporting)
+        XCTAssertNil(viewModel.exportOperation)
+        XCTAssertEqual(viewModel.exportProgress, 1.0)
+    }
+
+    func testStateConsistency_AfterError() async throws {
+        // Given
+        mockRepository.shouldThrowError = true
+
+        // When
+        await viewModel.exportToCSV()
+
+        // Then
+        XCTAssertFalse(viewModel.isExporting)
+        XCTAssertNil(viewModel.exportOperation)
+        XCTAssertNotNil(viewModel.errorMessage)
+    }
+
+    // MARK: - Performance Tests
+
+    func testPerformance_LoadStatistics() async throws {
+        // Given
+        let measurements = testDataFactory.createMeasurementBatch(count: 100)
+        mockRepository.measurementsToReturn = measurements
+
+        // Measure
+        measure {
+            Task {
+                await self.viewModel.loadStatistics()
+            }
+        }
+    }
+
+    func testPerformance_ExportToCSV() async throws {
+        // Given
+        let measurements = testDataFactory.createMeasurementBatch(count: 100)
+        mockRepository.measurementsToReturn = measurements
+
+        // Measure
+        measure {
+            Task {
+                await self.viewModel.exportToCSV()
+            }
+        }
+    }
+}
+
+// MARK: - Mock Repository
+
+@MainActor
+class MockStressRepository: StressRepositoryProtocol {
+    var measurementsToReturn: [StressMeasurement] = []
+    var baselineToReturn: PersonalBaseline?
+    var shouldThrowError = false
+
+    func fetchAll() async throws -> [StressMeasurement] {
+        if shouldThrowError {
+            throw NSError(domain: "Test", code: 1)
+        }
+        return measurementsToReturn
+    }
+
+    func fetchMeasurements(from startDate: Date, to endDate: Date) async throws -> [StressMeasurement] {
+        if shouldThrowError {
+            throw NSError(domain: "Test", code: 1)
+        }
+        return measurementsToReturn.filter {
+            $0.timestamp >= startDate && $0.timestamp <= endDate
+        }
+    }
+
+    func getBaseline() async throws -> PersonalBaseline {
+        if shouldThrowError {
+            throw NSError(domain: "Test", code: 1)
+        }
+        return baselineToReturn ?? PersonalBaseline(
+            restingHeartRate: 60,
+            baselineHRV: 50,
+            lastUpdated: Date()
+        )
+    }
+
+    func updateBaseline(_ baseline: PersonalBaseline) async throws {
+        if shouldThrowError {
+            throw NSError(domain: "Test", code: 1)
+        }
+        baselineToReturn = baseline
+    }
+
+    func save(_ measurement: StressMeasurement) async throws {
+        if shouldThrowError {
+            throw NSError(domain: "Test", code: 1)
+        }
+        measurementsToReturn.append(measurement)
+    }
+
+    func fetchRecent(limit: Int) async throws -> [StressMeasurement] {
+        if shouldThrowError {
+            throw NSError(domain: "Test", code: 1)
+        }
+        return Array(measurementsToReturn.prefix(limit))
+    }
+
+    func delete(_ measurement: StressMeasurement) async throws {
+        if shouldThrowError {
+            throw NSError(domain: "Test", code: 1)
+        }
+        measurementsToReturn.removeAll { $0.timestamp == measurement.timestamp }
+    }
+
+    func deleteAll() async throws {
+        if shouldThrowError {
+            throw NSError(domain: "Test", code: 1)
+        }
+        measurementsToReturn.removeAll()
+    }
+}
