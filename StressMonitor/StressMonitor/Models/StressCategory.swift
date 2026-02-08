@@ -1,12 +1,12 @@
 import SwiftUI
 
-enum StressCategory: String, CaseIterable, Codable, Sendable {
+public enum StressCategory: String, CaseIterable, Codable, Sendable {
     case relaxed
     case mild
     case moderate
     case high
 
-    var color: Color {
+    public var color: Color {
         switch self {
         case .relaxed: return .green
         case .mild: return .blue
@@ -15,7 +15,7 @@ enum StressCategory: String, CaseIterable, Codable, Sendable {
         }
     }
 
-    var icon: String {
+    public var icon: String {
         switch self {
         case .relaxed: return "face.smiling"
         case .mild: return "face.dashed"

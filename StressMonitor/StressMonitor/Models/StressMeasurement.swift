@@ -3,20 +3,30 @@ import SwiftData
 import SwiftUI
 
 @Model
-final class StressMeasurement {
-  var timestamp: Date
-  var stressLevel: Double
-  var hrv: Double
-  var restingHeartRate: Double
-  var categoryRawValue: String
-  var confidences: [Double]?
+public final class StressMeasurement {
+  public var timestamp: Date
+  public var stressLevel: Double
+  public var hrv: Double
+  public var restingHeartRate: Double
+  public var categoryRawValue: String
+  public var confidences: [Double]?
 
-  init(
+  // MARK: - CloudKit Sync Properties
+  public var isSynced: Bool
+  public var cloudKitRecordName: String?
+  public var deviceID: String
+  public var cloudKitModTime: Date?
+
+  public init(
     timestamp: Date,
     stressLevel: Double,
     hrv: Double,
     restingHeartRate: Double,
-    confidences: [Double]? = nil
+    confidences: [Double]? = nil,
+    isSynced: Bool = false,
+    cloudKitRecordName: String? = nil,
+    deviceID: String = CloudKitDeviceID.current,
+    cloudKitModTime: Date? = nil
   ) {
     self.timestamp = timestamp
     self.stressLevel = stressLevel
@@ -24,10 +34,30 @@ final class StressMeasurement {
     self.restingHeartRate = restingHeartRate
     self.categoryRawValue = StressResult.category(for: stressLevel).rawValue
     self.confidences = confidences
+    self.isSynced = isSynced
+    self.cloudKitRecordName = cloudKitRecordName
+    self.deviceID = deviceID
+    self.cloudKitModTime = cloudKitModTime
   }
 
-  var category: StressCategory {
+  public var category: StressCategory {
     get { StressCategory(rawValue: categoryRawValue) ?? .mild }
     set { categoryRawValue = newValue.rawValue }
+  }
+}
+
+// MARK: - CloudKit Device ID Helper
+
+public enum CloudKitDeviceID {
+  private static let key = "com.stressmonitor.deviceID"
+
+  public static var current: String {
+    if let existingID = UserDefaults.standard.string(forKey: key) {
+      return existingID
+    }
+
+    let newID = UUID().uuidString
+    UserDefaults.standard.set(newID, forKey: key)
+    return newID
   }
 }
