@@ -7,6 +7,7 @@ class SettingsViewModel {
     var notificationSettings: NotificationSettings
     var exportSettings: ExportSettings
     var isDeletingAllData = false
+    var cloudKitStatus: CloudKitSyncStatus = .unknown
 
     private let repository: StressRepositoryProtocol
 
@@ -26,6 +27,15 @@ class SettingsViewModel {
                 baselineHRV: baseline.baselineHRV
             )
         }
+
+        // Check CloudKit status
+        await checkCloudKitStatus()
+    }
+
+    private func checkCloudKitStatus() async {
+        // TODO: Implement actual CloudKit status check
+        // For now, default to upToDate
+        cloudKitStatus = .upToDate
     }
 
     func updateProfile(_ profile: UserProfile) async throws {
@@ -73,9 +83,39 @@ enum ExportDateRange: String, CaseIterable, Codable {
     case month = "Last 4 Weeks"
     case threeMonths = "Last 3 Months"
     case all = "All Time"
+    case custom = "Custom"
 }
 
 enum ExportFormat: String, CaseIterable, Codable {
     case csv = "CSV"
     case json = "JSON"
+}
+
+/// CloudKit sync status for display in settings
+enum CloudKitSyncStatus {
+    case unknown
+    case notSignedIn
+    case syncing
+    case syncFailed
+    case upToDate
+
+    var statusText: String {
+        switch self {
+        case .unknown: return "Unknown"
+        case .notSignedIn: return "Not Signed In"
+        case .syncing: return "Syncing..."
+        case .syncFailed: return "Sync Failed"
+        case .upToDate: return "Up to Date"
+        }
+    }
+
+    var color: Color {
+        switch self {
+        case .unknown: return .secondary
+        case .notSignedIn: return .secondary
+        case .syncing: return .primaryBlue
+        case .syncFailed: return .error
+        case .upToDate: return .success
+        }
+    }
 }

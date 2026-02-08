@@ -5,7 +5,6 @@ struct SettingsView: View {
     @Environment(\.modelContext) private var modelContext
     @State private var viewModel: SettingsViewModel
     @State private var showingDeleteConfirmation = false
-    @State private var showingExport = false
     @State private var exportURL: URL?
 
     init() {
@@ -46,22 +45,40 @@ struct SettingsView: View {
                 Toggle("Weekly Report", isOn: $viewModel.notificationSettings.weeklyReport)
             }
 
-            Section("Data") {
-                Button(action: { showingExport = true }) {
-                    HStack {
-                        Text("Export Data")
-                        Spacer()
-                        Image(systemName: "square.and.arrow.up")
-                    }
+            // MARK: - Data Management Section
+            Section("Data Management") {
+                // CloudKit Sync Status
+                HStack {
+                    Image(systemName: "icloud.fill")
+                        .foregroundColor(viewModel.cloudKitStatus.color)
+                    Text("iCloud Sync")
+                        .foregroundColor(.primary)
+                    Spacer()
+                    Text(viewModel.cloudKitStatus.statusText)
+                        .font(.caption)
+                        .foregroundColor(.secondary)
                 }
+                .accessibilityElement(children: .combine)
+                .accessibilityLabel("iCloud sync status: \(viewModel.cloudKitStatus.statusText)")
 
-                Button(role: .destructive, action: { showingDeleteConfirmation = true }) {
+                NavigationLink(destination: DataExportView()) {
                     HStack {
-                        Text("Delete All Data")
-                        Spacer()
-                        Image(systemName: "trash")
+                        Image(systemName: "square.and.arrow.up")
+                            .foregroundColor(.primaryBlue)
+                        Text("Export Data")
                     }
                 }
+                .accessibilityLabel("Export data")
+
+                NavigationLink(destination: DataDeleteView()) {
+                    HStack {
+                        Image(systemName: "trash")
+                            .foregroundColor(.error)
+                        Text("Delete Data")
+                            .foregroundColor(.primary)
+                    }
+                }
+                .accessibilityLabel("Delete data")
             }
 
             Section {
@@ -87,11 +104,6 @@ struct SettingsView: View {
         }
         .sheet(isPresented: $showingDeleteConfirmation) {
             deleteConfirmationSheet
-        }
-        .sheet(isPresented: $showingExport) {
-            ExportOptionsView(settings: $viewModel.exportSettings) {
-                handleExport()
-            }
         }
     }
 
@@ -150,29 +162,6 @@ struct SettingsView: View {
         }
     }
 
-    private func handleExport() {
-        showingExport = false
-
-        // Create CSV export
-        let csv = "Timestamp,HRV,Heart Rate,Stress Level\n\(Date()),65,60,42"
-
-        if let url = createExportFile(content: csv, format: .csv) {
-            exportURL = url
-            shareExport(url: url)
-        }
-    }
-
-    private func createExportFile(content: String, format: ExportFormat) -> URL? {
-        let fileName = "stress_data_\(Int(Date().timeIntervalSince1970)).\(format == .csv ? "csv" : "json")"
-
-        if let url = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first {
-            let fileURL = url.appendingPathComponent(fileName)
-            try? content.write(to: fileURL, atomically: true, encoding: .utf8)
-            return fileURL
-        }
-        return nil
-    }
-
     private func shareExport(url: URL) {
         let activityVC = UIActivityViewController(
             activityItems: [url],
@@ -182,48 +171,6 @@ struct SettingsView: View {
         if let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
            let rootVC = windowScene.windows.first?.rootViewController {
             rootVC.present(activityVC, animated: true)
-        }
-    }
-}
-
-struct ExportOptionsView: View {
-    @Binding var settings: ExportSettings
-    let onExport: () -> Void
-
-    var body: some View {
-        NavigationView {
-            Form {
-                Section("Data to Include") {
-                    Toggle("Include HRV", isOn: $settings.includeHRV)
-                    Toggle("Include Heart Rate", isOn: $settings.includeHeartRate)
-                    Toggle("Include Stress Level", isOn: $settings.includeStressLevel)
-                }
-
-                Section("Date Range") {
-                    Picker("Range", selection: $settings.dateRange) {
-                        ForEach(ExportDateRange.allCases, id: \.self) { range in
-                            Text(range.rawValue).tag(range)
-                        }
-                    }
-                }
-
-                Section("Format") {
-                    Picker("Format", selection: $settings.format) {
-                        ForEach(ExportFormat.allCases, id: \.self) { format in
-                            Text(format.rawValue).tag(format)
-                        }
-                    }
-                }
-
-                Section {
-                    Button(action: onExport) {
-                        Text("Export")
-                            .frame(maxWidth: .infinity)
-                    }
-                }
-            }
-            .navigationTitle("Export Data")
-            .navigationBarTitleDisplayMode(.inline)
         }
     }
 }
