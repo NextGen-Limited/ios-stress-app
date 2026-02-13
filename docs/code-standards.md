@@ -713,6 +713,140 @@ Circle()
     .fill(.green)  // No icon or text
 ```
 
+---
+
+### Phase 2: Character System ✅
+
+#### Character Usage Guidelines
+
+**DO:** Use StressCharacterCard for stress visualization
+
+```swift
+// Good - Character card with all data
+StressCharacterCard(
+    mood: .calm,
+    stressLevel: 15,
+    hrv: 70,
+    size: .dashboard
+)
+
+// Better - From StressResult
+StressCharacterCard(
+    result: stressResult,
+    size: .widget
+)
+
+// Minimal - When HRV unavailable
+StressCharacterCard(
+    stressLevel: 60,
+    size: .watchOS
+)
+```
+
+**DON'T:** Create custom character representations
+
+```swift
+// Avoid - Inconsistent with character system
+Image(systemName: "face.smiling")
+    .foregroundColor(.green)
+
+// Avoid - No animation support
+ZStack {
+    Image(systemName: mood.symbol)
+    // Manual accessory layout
+}
+```
+
+#### Animation Guidelines
+
+**MANDATORY:** All animations must respect Reduce Motion
+
+```swift
+// Good - Respects Reduce Motion
+@Environment(\.accessibilityReduceMotion) var reduceMotion
+
+withAnimation(.wellness(reduceMotion: reduceMotion)) {
+    scale = 1.2
+}
+
+// Better - Use built-in wellness animations
+withAnimation(.breathing(reduceMotion: reduceMotion)) {
+    breathingScale = 1.05
+}
+
+// Best - Use view modifier
+Image(systemName: mood.symbol)
+    .characterAnimation(for: mood)
+```
+
+**DON'T:** Use animations without Reduce Motion support
+
+```swift
+// Avoid - No accessibility consideration
+withAnimation(.easeInOut(duration: 1.0)) {
+    scale = 1.2
+}
+
+// Avoid - Always animates
+.animation(.spring(), value: value)
+```
+
+#### Character Animation Patterns
+
+```swift
+// Breathing (sleeping): Slow, gentle scale
+.characterAnimation(for: .sleeping)
+// → 4s scale 0.95-1.05, auto-reverse
+
+// Fidget (concerned): Random subtle movement
+.characterAnimation(for: .concerned)
+// → Random ±3pt offset every 2.5s
+
+// Shake (worried): Alert trembling
+.characterAnimation(for: .worried)
+// → ±5° rotation over 0.5s, repeat 3x
+
+// Dizzy (overwhelmed): Continuous spin
+.characterAnimation(for: .overwhelmed)
+// → 360° rotation over 1.5s
+
+// Accessory floating
+Image(systemName: "drop.fill")
+    .accessoryAnimation(index: 0)
+// → Staggered float -5pt with rotation
+```
+
+#### Character Mood Mapping
+
+**ALWAYS** use `StressBuddyMood.from(stressLevel:)` for consistency
+
+```swift
+// Good - Automatic mapping
+let mood = StressBuddyMood.from(stressLevel: 65)  // → .worried
+
+// Mapping rules:
+//   0-10:   .sleeping
+//   10-25:  .calm
+//   25-50:  .concerned
+//   50-75:  .worried
+//   75-100: .overwhelmed
+```
+
+#### Context Sizing
+
+**Use predefined sizes** for consistency across platforms
+
+```swift
+// Dashboard (iOS main screen): 120pt symbol
+StressCharacterCard(..., size: .dashboard)
+
+// Widget (iOS home screen): 80pt symbol
+StressCharacterCard(..., size: .widget)
+
+// watchOS (watch face): 60pt symbol
+StressCharacterCard(..., size: .watchOS)
+```
+
 #### Typography Guidelines
 
 **DO:** Use wellness typography with Dynamic Type

@@ -1135,6 +1135,176 @@ See complete documentation:
 
 ---
 
+### Phase 2: Character System (2026-02-13) ✅
+
+**Character System Architecture:**
+
+New component layer for playful, character-based stress visualization:
+
+```
+Character System Layer
+├── Models
+│   └── StressBuddyMood (5 mood states)
+│       ├── Stress level mapping (0-100 → mood)
+│       ├── SF Symbol selection
+│       ├── Accessory symbols
+│       └── Context-aware sizing
+│
+├── Utilities
+│   └── Animation+Wellness
+│       ├── Reduce Motion support
+│       ├── Wellness animations (breathing, fidget, shake, dizzy)
+│       └── Accessible transitions
+│
+└── Components
+    ├── CharacterAnimationModifier
+    │   ├── Mood-specific animations
+    │   ├── Breathing (sleeping)
+    │   ├── Fidget (concerned)
+    │   ├── Shake (worried)
+    │   └── Dizzy (overwhelmed)
+    │
+    └── StressCharacterCard
+        ├── Character display
+        ├── Stress level number
+        ├── Optional HRV value
+        └── Accessory positioning
+```
+
+**Component Architecture:**
+
+```
+StressCharacterCard (View)
+    │
+    ├─ Uses StressBuddyMood (Model)
+    │   ├─ Stress level → Mood mapping
+    │   ├─ Symbol + Accessories
+    │   └─ Color from StressCategory
+    │
+    ├─ Applies CharacterAnimationModifier
+    │   ├─ Mood-specific animations
+    │   └─ Reduce Motion awareness
+    │
+    └─ Uses Animation+Wellness
+        ├─ Returns nil if Reduce Motion enabled
+        └─ Wellness timing patterns
+```
+
+**Animation Architecture:**
+
+```
+@Environment(\.accessibilityReduceMotion) var reduceMotion
+    │
+    ▼
+Animation.wellness(reduceMotion: reduceMotion)
+    │
+    ├─ Reduce Motion ON  → Returns nil (static)
+    └─ Reduce Motion OFF → Returns animation
+        │
+        ▼
+CharacterAnimationModifier
+    │
+    ├─ Sleeping  → Breathing (4s scale)
+    ├─ Calm      → No animation
+    ├─ Concerned → Fidget (random offset)
+    ├─ Worried   → Shake (rotation ±5°)
+    └─ Overwhelmed → Dizzy (360° rotation)
+```
+
+**Mood Mapping Logic:**
+
+```swift
+// StressBuddyMood.from(stressLevel:)
+0-10    → sleeping      (moon.zzz.fill + Z's)
+10-25   → calm          (figure.mind.and.body)
+25-50   → concerned     (figure.walk.circle + star)
+50-75   → worried       (exclamationmark.triangle.fill + drops)
+75-100  → overwhelmed   (flame.fill + drops + stars)
+```
+
+**Cross-Platform Sizing:**
+
+```swift
+enum CharacterContext {
+    case dashboard  // 120pt symbol, 36pt accessories
+    case widget     // 80pt symbol, 24pt accessories
+    case watchOS    // 60pt symbol, 18pt accessories
+}
+```
+
+**Integration with MVVM:**
+
+```
+View (StressCharacterCard)
+    ↓
+Receives StressResult from ViewModel
+    ↓
+Maps stressLevel → StressBuddyMood
+    ↓
+Selects SF Symbol + Color + Accessories
+    ↓
+Applies CharacterAnimationModifier
+    ↓
+Respects Reduce Motion Environment
+    ↓
+Renders Animated Character
+```
+
+**Accessibility Features:**
+
+1. **Reduce Motion Support**
+   - All animations return `nil` when Reduce Motion enabled
+   - Static fallback automatically applied
+   - No manual environment checks needed in views
+
+2. **VoiceOver Integration**
+   - Character mood accessible descriptions
+   - Stress level value announcements
+   - HRV value reading (when present)
+
+3. **Dual Coding Compliance**
+   - Character symbol (visual)
+   - Mood color (visual)
+   - Accessories (visual)
+   - VoiceOver labels (non-visual)
+
+**File Locations:**
+
+```
+StressMonitor/StressMonitor/
+├── Models/
+│   └── StressBuddyMood.swift        // NEW - Mood states
+│
+├── Utilities/
+│   └── Animation+Wellness.swift     // NEW - Animation utilities
+│
+└── Components/
+    └── Character/
+        ├── CharacterAnimationModifier.swift   // NEW - Animations
+        └── StressCharacterCard.swift          // NEW - Card component
+```
+
+**Testing Coverage:**
+
+- ✅ Mood mapping tests (0-100 → 5 moods)
+- ✅ Animation Reduce Motion tests
+- ✅ Accessory layout tests (circular positioning)
+- ✅ VoiceOver label validation
+- ✅ Context sizing tests
+- ✅ Dark mode rendering
+- ✅ 253/254 tests passing (99.6%)
+
+**Architectural Benefits:**
+
+- ✅ SF Symbols composition (no custom assets)
+- ✅ Full Reduce Motion compliance (WCAG 2.1)
+- ✅ Mood-driven animation system
+- ✅ Context-aware sizing (iOS/watch/widget)
+- ✅ Testable component architecture
+- ✅ Reusable across platforms
+
+---
+
 **Document Version:** 1.0
 **Last Updated:** 2026-02-13
 **Lines of Code Count:** Under 800-line target
