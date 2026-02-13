@@ -49,11 +49,23 @@ struct StressDashboardView: View {
                         .padding(.horizontal)
                         .padding(.top, 16)
 
-                    stressRingSection
-                        .padding(.vertical, 24)
+                    // Stress Character Card (Phase 2)
+                    if let stress = viewModel.currentStress {
+                        StressCharacterCard(
+                            result: stress,
+                            size: .dashboard
+                        )
+                        .padding(.horizontal)
+                    }
 
                     quickStatsRow
                         .padding(.horizontal)
+
+                    // Breathing Exercise CTA (Phase 4)
+                    BreathingExerciseCTA {
+                        showingBreathing = true
+                    }
+                    .padding(.horizontal)
 
                     if let insight = viewModel.aiInsight {
                         AIInsightCard(insight: insight) {
@@ -88,8 +100,15 @@ struct StressDashboardView: View {
                     .font(.caption)
                     .foregroundColor(.secondary)
 
-                Text("Stress Monitor")
+                Text(greetingText())
                     .font(.largeTitle)
+                    .fontWeight(.bold)
+
+                if let viewModel = viewModel, let stress = viewModel.currentStress {
+                    Text("Your stress is \(stress.category.rawValue) today")
+                        .font(.body)
+                        .foregroundColor(.secondary)
+                }
             }
 
             Spacer()
@@ -99,6 +118,7 @@ struct StressDashboardView: View {
                     .font(.title)
                     .foregroundColor(.secondary)
             }
+            .frame(width: DesignTokens.Layout.minTouchTarget, height: DesignTokens.Layout.minTouchTarget)
         }
     }
 
@@ -207,6 +227,19 @@ struct StressDashboardView: View {
         }
     }
 
+    private func greetingText() -> String {
+        let hour = Calendar.current.component(.hour, from: Date())
+
+        switch hour {
+        case 0..<12:
+            return "Good Morning"
+        case 12..<17:
+            return "Good Afternoon"
+        default:
+            return "Good Evening"
+        }
+    }
+
     private func formatDate(_ date: Date) -> String {
         let formatter = DateFormatter()
         formatter.dateFormat = "EEEE, MMM d"
@@ -225,20 +258,7 @@ struct StressDashboardView: View {
     }
 
     private var breathingPlaceholder: some View {
-        VStack(spacing: 20) {
-            Text("Breathing Exercise")
-                .font(.title)
-                .padding()
-
-            Text("This feature is coming soon!")
-                .foregroundColor(.secondary)
-
-            Button("Close") {
-                showingBreathing = false
-            }
-            .buttonStyle(.bordered)
-        }
-        .padding()
+        BreathingExerciseView()
     }
 }
 

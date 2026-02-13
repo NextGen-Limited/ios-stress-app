@@ -1218,7 +1218,7 @@ StressMonitor/
     └── README.md                  // Font installation guide
 ```
 
-### Accessibility Checklist (Updated Phase 3)
+### Accessibility Checklist (Updated Phase 4)
 
 Before merging any UI code, verify:
 
@@ -1232,6 +1232,9 @@ Before merging any UI code, verify:
 - [ ] **Touch Targets**: Minimum 44x44pt for interactive elements
 - [ ] **Dark Mode**: All colors have light/dark variants
 - [ ] **Color Blindness**: Test with simulator in DEBUG (optional but recommended)
+- [ ] **Reduce Motion**: Provide static alternatives for animations
+- [ ] **Haptic Feedback**: Use HapticManager for all interactive feedback
+- [ ] **Chart Accessibility**: Provide VoiceOver data table alternatives
 
 ### Migration from Old System
 
@@ -1256,6 +1259,245 @@ For complete usage examples, see:
 - **Quick Reference**: `./docs/wellness-design-system-quick-reference.md`
 - **Implementation Guide**: `./docs/implementation-phase-1-visual-foundation.md`
 - **Design Specs**: `./docs/design-guidelines.md`
+
+---
+
+## Phase 4: Component Implementation Guidelines
+
+### Breathing Exercise Implementation
+
+**Timer Lifecycle Management:**
+
+```swift
+// GOOD - Proper timer cleanup
+struct BreathingExerciseView: View {
+    @State private var timer: Timer?
+    @State private var isCancelled = false
+
+    var body: some View {
+        // UI
+        .onAppear {
+            startBreathingSession()
+        }
+        .onDisappear {
+            stopBreathingSession()
+        }
+    }
+
+    private func startBreathingSession() {
+        guard !isCancelled else { return }
+        // Start timer
+    }
+
+    private func stopBreathingSession() {
+        timer?.invalidate()
+        timer = nil
+        isCancelled = true
+    }
+}
+
+// BAD - No cleanup
+struct BreathingExercise: View {
+    var body: some View {
+        // Timer running without cleanup
+    }
+}
+```
+
+**Breathing Animation with Reduce Motion:**
+
+```swift
+// GOOD - Reduce Motion support
+@Environment(\.accessibilityReduceMotion) var reduceMotion
+
+if reduceMotion {
+    // Static circle with text instructions
+    Circle()
+        .fill(Color.Wellness.calmBlue)
+        .frame(width: 200, height: 200)
+        .overlay {
+            Text(phase.displayText)
+        }
+} else {
+    // Animated circle
+    Circle()
+        .fill(Color.Wellness.calmBlue)
+        .frame(width: 200, height: 200)
+        .scaleEffect(phase.circleScale)
+        .animation(.easeInOut(duration: phase.duration), value: phase)
+}
+
+// BAD - Always animated
+Circle()
+    .scaleEffect(phase.circleScale)
+    .animation(.easeInOut, value: phase)
+```
+
+**4-7-8 Breathing Pattern:**
+
+```swift
+enum BreathingPhase {
+    case inhale     // 4 seconds
+    case hold       // 7 seconds
+    case exhale     // 8 seconds
+    case pause      // 1 second
+
+    var duration: TimeInterval {
+        switch self {
+        case .inhale: return 4.0
+        case .hold: return 7.0
+        case .exhale: return 8.0
+        case .pause: return 1.0
+        }
+    }
+
+    var displayText: String {
+        switch self {
+        case .inhale: return "Breathe In"
+        case .hold: return "Hold"
+        case .exhale: return "Breathe Out"
+        case .pause: return "Rest"
+        }
+    }
+
+    var color: Color {
+        switch self {
+        case .inhale: return Color.Wellness.calmBlue
+        case .hold: return Color.Wellness.gentlePurple
+        case .exhale: return Color.Wellness.healthGreen
+        case .pause: return Color.Wellness.surface
+        }
+    }
+}
+```
+
+### Haptic Feedback Guidelines
+
+**MANDATORY: Use HapticManager for all haptic feedback**
+
+```swift
+// GOOD - Centralized haptic management
+Button("Measure Stress") {
+    HapticManager.shared.buttonPress()
+    measureStress()
+}
+
+// Phase transitions
+private func transitionToNextPhase() {
+    phase = nextPhase()
+    HapticManager.shared.breathingCue()
+}
+
+// Stress level changes
+private func updateStress(_ newLevel: Double) {
+    let newCategory = StressCategory.from(level: newLevel)
+    if newCategory != currentCategory {
+        HapticManager.shared.stressLevelChanged(to: newCategory)
+    }
+}
+
+// BAD - Direct haptic calls
+Button("Action") {
+    UIImpactFeedbackGenerator(style: .medium).impactOccurred()
+    // Use HapticManager instead
+}
+```
+
+**Haptic Patterns:**
+
+| Event | Method | Intensity | Use Case |
+|-------|--------|-----------|----------|
+| Breathing cue | `breathingCue()` | 0.5 (light) | Phase transitions |
+| Button press | `buttonPress()` | 1.0 (medium) | UI interactions |
+| Stress change | `stressLevelChanged(to:)` | Varies | Category changes |
+| Mood change | `stressBuddyMoodChange(to:)` | 1.0 (medium) | Character updates |
+
+**Hardware Capability Detection:**
+
+```swift
+// HapticManager handles capability detection
+private var supportsHaptics: Bool {
+    CHHapticEngine.capabilitiesForHardware().supportsHaptics
+}
+
+func breathingCue() {
+    guard supportsHaptics else { return }
+    // Haptic feedback
+}
+```
+
+### Chart Accessibility Guidelines
+
+**MANDATORY: VoiceOver data table alternatives**
+
+```swift
+// GOOD - VoiceOver detection
+@Environment(\.accessibilityVoiceOverEnabled) var voiceOverEnabled
+
+if voiceOverEnabled {
+    // Data table for VoiceOver users
+    dataTableView
+        .accessibilityLabel("Stress trend data table")
+} else {
+    // Visual chart for sighted users
+    visualChartView
+        .accessibilityLabel("Stress trend chart")
+}
+
+// BAD - Chart only
+Chart(data) {
+    LineMark(...)
+}
+// Missing VoiceOver alternative
+```
+
+**Data Table Format:**
+
+```swift
+private var dataTableView: some View {
+    VStack(alignment: .leading, spacing: 8) {
+        ForEach(data) { measurement in
+            HStack {
+                Text(measurement.timestamp.formatted())
+                Spacer()
+                Text("\(Int(measurement.stressLevel))")
+                    .fontWeight(.semibold)
+                Text(measurement.category.displayName)
+                    .foregroundStyle(measurement.category.color)
+            }
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel("\(measurement.timestamp.formatted()), stress level \(Int(measurement.stressLevel)), \(measurement.category.displayName)")
+        }
+    }
+    .font(.body)
+    .padding(.vertical, 8)
+}
+```
+
+**Statistical Summaries:**
+
+```swift
+// Provide context for chart data
+private func calculateStats() -> (average: Double, min: Double, max: Double)? {
+    guard !data.isEmpty else { return nil }
+
+    let levels = data.map { $0.stressLevel }
+    let average = levels.reduce(0, +) / Double(levels.count)
+    let min = levels.min() ?? 0
+    let max = levels.max() ?? 0
+
+    return (average, min, max)
+}
+
+// Display in chart header
+if let stats = calculateStats() {
+    HStack {
+        statLabel(title: "Avg", value: "\(Int(stats.average))")
+        statLabel(title: "Min", value: "\(Int(stats.min))")
+        statLabel(title: "Max", value: "\(Int(stats.max))")
+    }
+}
+```
 
 ---
 
