@@ -42,7 +42,7 @@ enum StressCategory: String, CaseIterable, Codable, Sendable {
         case .relaxed: return "solid fill"
         case .mild: return "diagonal lines"
         case .moderate: return "dots pattern"
-        case .high: return "horizontal lines"
+        case .high: return "crosshatch"
         }
     }
 

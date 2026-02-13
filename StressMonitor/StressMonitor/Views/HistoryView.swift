@@ -15,7 +15,12 @@ struct HistoryView: View {
             }
         }
         .navigationTitle("History")
+        .accessibilityLabel("Stress measurement history")
         .refreshable {
+            HapticManager.shared.success()
+        }
+        .accessibilityAction(named: "Refresh") {
+            // Trigger refresh action
             HapticManager.shared.success()
         }
     }
@@ -24,9 +29,12 @@ struct HistoryView: View {
         List {
             ForEach(measurements) { measurement in
                 HistoryRow(measurement: measurement)
+                    .accessibilityElement(children: .combine)
             }
         }
         .listStyle(.insetGrouped)
+        .accessibilityLabel("Stress measurements list")
+        .accessibilityHint("\(measurements.count) measurements available")
     }
 
     private var emptyState: some View {
@@ -60,6 +68,7 @@ struct HistoryRow: View {
                     Image(systemName: measurement.category.icon)
                         .font(.system(size: 14))
                         .foregroundColor(Color.stressColor(for: measurement.category))
+                        .accessibilityHidden(true)
 
                     Text("\(Int(measurement.stressLevel))")
                         .font(.system(size: DesignTokens.Typography.headline, weight: .semibold))
@@ -72,8 +81,9 @@ struct HistoryRow: View {
             }
         }
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("\(measurement.category.rawValue) stress level")
-        .accessibilityValue("\(Int(measurement.stressLevel)) out of 100, \(Int(measurement.hrv)) milliseconds HRV")
+        .accessibilityLabel("Stress measurement from \(formattedTime)")
+        .accessibilityValue("\(measurement.category.rawValue.capitalized) stress, level \(Int(measurement.stressLevel)) out of 100, with \(Int(measurement.hrv)) milliseconds heart rate variability")
+        .accessibilityHint("Tap for detailed information about this measurement")
     }
 
     private var formattedTime: String {

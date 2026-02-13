@@ -951,6 +951,254 @@ Circle()
     .frame(width: 20, height: 20)
 ```
 
+---
+
+### Phase 3: Accessibility Enhancements ✅
+
+#### Pattern Overlay Guidelines
+
+**MANDATORY:** Use pattern overlays for triple redundancy (color + icon + pattern)
+
+```swift
+// Good - Pattern overlay on stress indicator
+Circle()
+    .fill(category.color)
+    .stressPattern(for: category)
+    // Adds diagonal/dots/crosshatch pattern based on category
+
+// Better - Manual pattern control
+RoundedRectangle(cornerRadius: 12)
+    .fill(Color.green)
+    .stressPattern(.diagonal, color: .green)
+    // Custom pattern with specific color
+
+// Best - Pattern + icon + text (triple redundancy)
+HStack {
+    Circle()
+        .fill(category.color)
+        .stressPattern(for: category)
+        .overlay {
+            Image(systemName: category.icon)
+        }
+    Text(category.displayName)
+}
+.accessibilityLabel(category.accessibilityDescription)
+```
+
+**DON'T:** Use color-only or color+icon without pattern
+
+```swift
+// Avoid - Only color + icon (missing pattern)
+Circle()
+    .fill(Color.green)
+    .overlay {
+        Image(systemName: "leaf.fill")
+    }
+// Add: .stressPattern(for: .relaxed)
+
+// Avoid - Custom pattern implementations
+// Use built-in StressPattern enum instead
+```
+
+**Pattern Types:**
+- `.solid` - Relaxed (no overlay)
+- `.diagonal` - Mild (45° lines)
+- `.dots` - Moderate (dot grid)
+- `.crosshatch` - High (grid lines)
+
+#### High Contrast Border Guidelines
+
+**MANDATORY:** Apply high contrast borders to all interactive elements
+
+```swift
+// Good - Button with high contrast support
+Button("Measure Stress") { }
+    .padding()
+    .background(Color.Wellness.calmBlue)
+    .cornerRadius(10)
+    .highContrastButton(style: .primary)
+    // Adds 2pt border when "Differentiate Without Color" enabled
+
+// Good - Card with high contrast support
+VStack {
+    // Card content
+}
+.padding()
+.highContrastCard(backgroundColor: Color.Wellness.surface, cornerRadius: 12)
+// Adds 2pt border + ensures background visibility
+
+// Good - Generic interactive element
+Image(systemName: "heart.fill")
+    .font(.largeTitle)
+    .frame(width: 60, height: 60)
+    .highContrastBorder(interactive: true, cornerRadius: 30)
+```
+
+**DON'T:** Create buttons/cards without high contrast support
+
+```swift
+// Avoid - No high contrast support
+Button("Measure") { }
+    .padding()
+    .background(.blue)
+// Add: .highContrastButton(style: .primary)
+```
+
+**Environment Detection:**
+
+```swift
+// Manual high contrast handling (rare - prefer modifiers)
+@Environment(\.accessibilityDifferentiateWithoutColor) var differentiateWithoutColor
+
+var body: some View {
+    Button("Action") { }
+        .overlay {
+            if differentiateWithoutColor {
+                RoundedRectangle(cornerRadius: 10)
+                    .strokeBorder(Color.primary, lineWidth: 2)
+            }
+        }
+}
+```
+
+#### Dynamic Type Scaling Guidelines
+
+**MANDATORY:** Apply scalable text to all text elements
+
+```swift
+// Good - Basic scalable text
+Text("Stress Level")
+    .scalableText(minimumScale: 0.75)
+    // Allows text wrapping, minimum 75% scale
+
+// Better - Adaptive sizing with manual control
+Text("72")
+    .adaptiveTextSize(72, weight: .bold)
+    // Scales from 0.8x to 2.6x based on Dynamic Type setting
+
+// Best - Comprehensive accessibility support
+VStack {
+    Text("Current Stress")
+        .font(.headline)
+    Text("Detailed explanation of stress levels...")
+        .font(.body)
+}
+.accessibleDynamicType(minimumScale: 0.75, maxDynamicTypeSize: .accessibility3)
+// Limits max size to prevent layout breaks
+
+// Critical UI - Limit scaling
+Text("42")
+    .font(.system(size: 72, weight: .bold))
+    .limitedDynamicType()
+    // Max: accessibility3 (2.0x)
+```
+
+**DON'T:** Use fixed font sizes without scaling
+
+```swift
+// Avoid - No Dynamic Type support
+Text("Title")
+    .font(.system(size: 28))
+
+// Add: .scalableText(minimumScale: 0.75)
+```
+
+**Scaling Best Practices:**
+- **Content text**: Unlimited scaling (`.scalableText()`)
+- **Critical UI** (stress numbers, buttons): Limit to `.accessibility3`
+- **Minimum scale**: 0.75 (prevents truncation)
+- **Line limit**: Use `nil` (allow wrapping)
+
+#### VoiceOver Label Guidelines
+
+**MANDATORY:** Comprehensive accessibility labels for all UI elements
+
+```swift
+// Good - Interactive element
+Button("Measure") { }
+    .accessibilityLabel("Measure stress")
+    .accessibilityHint("Tap to calculate your current stress level from heart rate data")
+
+// Better - Visual indicator
+StressRingView(stressLevel: 60, category: .moderate)
+    .accessibilityLabel("Stress level indicator")
+    .accessibilityValue("60 out of 100, moderate stress")
+    .accessibilityHint("Visual representation of your current stress level")
+
+// Best - Combined elements
+HStack {
+    Image(systemName: "heart.fill")
+        .accessibilityHidden(true)  // Decorative icon
+    VStack(alignment: .leading) {
+        Text("Live Heart Rate")
+        Text("\(Int(heartRate)) bpm")
+    }
+}
+.accessibilityElement(children: .combine)
+.accessibilityLabel("Live heart rate")
+.accessibilityValue("\(Int(heartRate)) beats per minute")
+
+// Headers
+Text(greeting)
+    .font(.largeTitle)
+    .accessibilityLabel(greeting)
+    .accessibilityAddTraits(.isHeader)
+```
+
+**DON'T:** Omit accessibility labels or use generic labels
+
+```swift
+// Avoid - Missing label
+Button("✓") { }
+// Add: .accessibilityLabel("Confirm selection")
+
+// Avoid - Generic label
+Image(systemName: "heart.fill")
+    .accessibilityLabel("Icon")
+// Better: Hide decorative (.accessibilityHidden(true)) or be specific
+```
+
+**VoiceOver Best Practices:**
+- **Label**: What is it? ("Stress level indicator")
+- **Value**: Current state ("60 out of 100, moderate stress")
+- **Hint**: What happens? ("Tap to view details")
+- **Traits**: Add `.isHeader`, `.isButton`, etc.
+- **Hide decorative**: Use `.accessibilityHidden(true)` for non-functional icons
+- **Combine children**: Use `.accessibilityElement(children: .combine)` for grouped content
+
+#### Color Blindness Testing (DEBUG Only)
+
+```swift
+#if DEBUG
+// Preview with color blindness simulation
+#Preview("Deuteranopia") {
+    DashboardView()
+        .simulateColorBlindness(.deuteranopia)
+}
+
+// Test all types
+#Preview("Color Blindness Tests") {
+    ColorBlindnessPreviewContainer {
+        StressIndicatorView(category: .moderate)
+    }
+}
+
+// Validate stress colors
+func testColorAccessibility() {
+    StressColorValidator.printValidationResults()
+}
+#endif
+```
+
+**DON'T:** Ship color blindness simulator in production
+
+```swift
+// Avoid - DEBUG-only feature in production
+MyView()
+    .simulateColorBlindness(.protanopia)
+// This will cause compile error in Release builds
+```
+
 ### Design System File Locations
 
 ```
@@ -959,22 +1207,31 @@ StressMonitor/
 │   ├── Color+Wellness.swift      // Wellness colors, stress colors
 │   ├── Gradients.swift            // Background/stress gradients
 │   └── Font+WellnessType.swift   // Custom typography
+├── Utilities/
+│   ├── PatternOverlay.swift      // Pattern overlay system (Phase 3)
+│   ├── HighContrastModifier.swift // High contrast borders (Phase 3)
+│   ├── DynamicTypeScaling.swift  // Dynamic Type scaling (Phase 3)
+│   └── ColorBlindnessSimulator.swift // DEBUG testing tool (Phase 3)
 ├── Models/
 │   └── StressCategory.swift       // Enhanced with dual coding
 └── Fonts/
     └── README.md                  // Font installation guide
 ```
 
-### Accessibility Checklist
+### Accessibility Checklist (Updated Phase 3)
 
 Before merging any UI code, verify:
 
-- [ ] **Color + Icon + Text**: No color-only indicators
-- [ ] **Dynamic Type**: All text uses `.accessibleWellnessType()`
-- [ ] **VoiceOver**: Meaningful `.accessibilityLabel()` and `.accessibilityHint()`
-- [ ] **High Contrast**: Uses `.accessibleStressColor()` for stress indicators
-- [ ] **Dark Mode**: All colors have light/dark variants
+- [ ] **Color + Icon + Pattern**: Triple redundancy for all stress indicators
+- [ ] **Pattern Overlays**: Use `.stressPattern(for:)` on all stress visuals
+- [ ] **High Contrast Borders**: Apply `.highContrastBorder()` to interactive elements
+- [ ] **Dynamic Type**: All text uses `.scalableText()` or `.accessibleDynamicType()`
+- [ ] **VoiceOver**: Complete labels (label + value + hint + traits)
+- [ ] **Decorative Icons**: Use `.accessibilityHidden(true)` for non-functional icons
+- [ ] **Combined Elements**: Use `.accessibilityElement(children: .combine)` for grouped content
 - [ ] **Touch Targets**: Minimum 44x44pt for interactive elements
+- [ ] **Dark Mode**: All colors have light/dark variants
+- [ ] **Color Blindness**: Test with simulator in DEBUG (optional but recommended)
 
 ### Migration from Old System
 

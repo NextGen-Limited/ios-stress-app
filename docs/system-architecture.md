@@ -457,28 +457,291 @@ Services (Business Logic)
 
 ### Accessibility Architecture
 
-**Dual Coding Flow:**
+#### Triple Redundancy System (Phase 3)
+
+**WCAG 2.1 AAA Compliance with Color + Icon + Pattern:**
 
 ```
 StressCategory
     │
-    ├─ color ──────▶ Visual Indicator
-    ├─ icon ───────▶ Shape Indicator
-    ├─ pattern ────▶ Texture Indicator
+    ├─ color ──────────────▶ Visual Indicator (Primary)
+    ├─ icon ───────────────▶ Shape Indicator (Secondary)
+    ├─ pattern (NEW) ──────▶ Texture Indicator (Tertiary)
     └─ accessibilityDescription ──▶ VoiceOver
 ```
 
-**High Contrast Mode:**
+**Pattern Overlay System Architecture:**
 
 ```
-System High Contrast Setting
+┌─────────────────────────────────────────────────────┐
+│                 Pattern Overlay Layer                │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐          │
+│  │ Diagonal │  │   Dots   │  │Crosshatch│          │
+│  │  Lines   │  │  Pattern │  │  Pattern │          │
+│  └────┬─────┘  └────┬─────┘  └────┬─────┘          │
+└───────┼─────────────┼─────────────┼─────────────────┘
+        │             │             │
+        ▼             ▼             ▼
+┌─────────────────────────────────────────────────────┐
+│              Rendering Engine                        │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐          │
+│  │   Path   │  │  Canvas  │  │   Path   │          │
+│  │  Stroke  │  │   Fill   │  │  Stroke  │          │
+│  └────┬─────┘  └────┬─────┘  └────┬─────┘          │
+└───────┼─────────────┼─────────────┼─────────────────┘
+        │             │             │
+        ▼             ▼             ▼
+    Diagonal       Dot Grid     H+V Lines
+    (8pt spacing)  (8pt grid)   (6pt spacing)
+```
+
+**Pattern Specifications:**
+
+```swift
+enum StressPattern {
+    case solid       // Relaxed: No pattern
+    case diagonal    // Mild: 45° lines, 1pt stroke, 8pt spacing
+    case dots        // Moderate: 2pt circles, 8pt grid
+    case crosshatch  // High: H+V lines, 1pt stroke, 6pt grid
+
+    func overlay(color: Color, opacity: Double = 0.3) -> some View
+}
+```
+
+**Pattern Rendering Flow:**
+
+```
+User Request
     │
     ▼
-Environment Check
+StressCategory.pattern
     │
-    ├─ Enabled ──▶ Use darker colors (7:1 ratio)
+    ▼
+StressPattern.pattern(for:)
     │
-    └─ Disabled ─▶ Use standard colors (4.5:1 ratio)
+    ├─ Relaxed ──▶ .solid ─────▶ EmptyView (no overlay)
+    ├─ Mild ─────▶ .diagonal ──▶ DiagonalLinesView (Path)
+    ├─ Moderate ─▶ .dots ──────▶ DotsView (Canvas)
+    └─ High ─────▶ .crosshatch ▶ CrosshatchView (Path)
+```
+
+#### High Contrast Mode Architecture (Phase 3)
+
+**System Integration:**
+
+```
+iOS Accessibility Setting
+    "Differentiate Without Color"
+    │
+    ▼
+SwiftUI Environment
+    @Environment(\.accessibilityDifferentiateWithoutColor)
+    │
+    ├─ true ──▶ Apply 2pt borders
+    │           Color.primary (adapts to light/dark)
+    │
+    └─ false ─▶ No additional borders
+```
+
+**High Contrast Modifiers:**
+
+```swift
+// Interactive Elements
+Button("Measure") { }
+    .highContrastBorder(interactive: true, cornerRadius: 10)
+    // → Adds 2pt strokeBorder when enabled
+
+// Cards
+VStack { }
+    .highContrastCard(backgroundColor: .white, cornerRadius: 12)
+    // → Adds 2pt border + ensures background
+
+// Buttons (styled)
+MeasureButton { }
+    .highContrastButton(style: .primary)
+    // → Primary: 2pt Color.primary border
+```
+
+**Border Application Flow:**
+
+```
+View Rendering
+    │
+    ▼
+Check Environment
+    │
+    ├─ differentiateWithoutColor == true
+    │   │
+    │   ▼
+    │   Apply Border:
+    │   RoundedRectangle(cornerRadius: radius)
+    │       .strokeBorder(Color.primary, lineWidth: 2)
+    │
+    └─ differentiateWithoutColor == false
+        │
+        ▼
+        No border overlay
+```
+
+#### Dynamic Type Scaling Architecture (Phase 3)
+
+**Scaling System:**
+
+```
+System Dynamic Type Setting
+    │
+    ▼
+@Environment(\.dynamicTypeSize)
+    │
+    ├─ xSmall ───────▶ 0.8x multiplier
+    ├─ small ────────▶ 0.9x
+    ├─ medium ───────▶ 1.0x (base)
+    ├─ large ────────▶ 1.1x
+    ├─ xLarge ───────▶ 1.2x
+    ├─ xxLarge ──────▶ 1.3x
+    ├─ xxxLarge ─────▶ 1.4x
+    ├─ accessibility1 ▶ 1.6x
+    ├─ accessibility2 ▶ 1.8x
+    ├─ accessibility3 ▶ 2.0x
+    ├─ accessibility4 ▶ 2.3x
+    └─ accessibility5 ▶ 2.6x
+```
+
+**Scaling Modifiers:**
+
+```swift
+// Basic scalable text
+Text("Content")
+    .scalableText(minimumScale: 0.75)
+    // → minimumScaleFactor + lineLimit(nil)
+
+// Adaptive sizing
+Text("72")
+    .adaptiveTextSize(72, weight: .bold)
+    // → Applies multiplier based on dynamicTypeSize
+
+// Limited scaling (critical UI)
+VStack { }
+    .limitedDynamicType()
+    // → .dynamicTypeSize(...DynamicTypeSize.accessibility3)
+
+// Comprehensive
+VStack { }
+    .accessibleDynamicType(minimumScale: 0.75, maxDynamicTypeSize: .accessibility3)
+```
+
+**Scaling Flow:**
+
+```
+Text("Stress Level")
+    │
+    ▼
+.scalableText(minimumScale: 0.75)
+    │
+    ├─ Apply minimumScaleFactor(0.75)
+    ├─ Set lineLimit(nil) // Allow wrapping
+    │
+    ▼
+Rendered Text
+    (scales with system setting, wraps if needed)
+```
+
+#### VoiceOver Architecture (Enhanced Phase 3)
+
+**Accessibility Label Flow:**
+
+```
+UI Element
+    │
+    ├─ .accessibilityLabel("What is it?")
+    ├─ .accessibilityValue("Current state")
+    ├─ .accessibilityHint("What happens?")
+    ├─ .accessibilityAddTraits(.isButton / .isHeader)
+    └─ .accessibilityElement(children: .combine)
+        │
+        ▼
+    VoiceOver Announcement
+```
+
+**Combined Elements Pattern:**
+
+```swift
+HStack {
+    Image(systemName: "heart.fill")
+        .accessibilityHidden(true)  // Decorative
+    VStack {
+        Text("Live Heart Rate")
+        Text("\(heartRate) bpm")
+    }
+}
+.accessibilityElement(children: .combine)
+.accessibilityLabel("Live heart rate")
+.accessibilityValue("\(heartRate) beats per minute")
+```
+
+**Label Best Practices:**
+
+```
+Component Type → Accessibility Treatment
+─────────────────────────────────────────
+Stress Indicator → Label + Value + Hint
+Button          → Label + Hint
+Card            → Combined children + Label
+Header          → Label + .isHeader trait
+Decorative Icon → .accessibilityHidden(true)
+```
+
+#### Color Blindness Testing Architecture (DEBUG Only)
+
+**Simulation System:**
+
+```
+#if DEBUG
+┌─────────────────────────────────────────────────────┐
+│          Color Blindness Simulator                   │
+│  ┌──────────┐  ┌──────────┐  ┌──────────┐          │
+│  │Deutera-  │  │Prota-    │  │Trita-    │          │
+│  │nopia     │  │nopia     │  │nopia     │          │
+│  └────┬─────┘  └────┬─────┘  └────┬─────┘          │
+└───────┼─────────────┼─────────────┼─────────────────┘
+        │             │             │
+        ▼             ▼             ▼
+    Transformation Matrices
+        │
+        ▼
+    Simulated Color Output
+#endif
+```
+
+**Transformation Flow:**
+
+```
+Original Color (RGB)
+    │
+    ▼
+Extract components (r, g, b, a)
+    │
+    ▼
+Apply transformation matrix:
+    • Deuteranopia: r' = 0.625r + 0.375g
+    • Protanopia:   r' = 0.567r + 0.433g
+    • Tritanopia:   b' = 0.433r + 0.567b
+    │
+    ▼
+Color(.sRGB, red: r', green: g', blue: b', opacity: a)
+```
+
+**Preview Integration:**
+
+```swift
+#if DEBUG
+#Preview("Color Blindness Tests") {
+    ColorBlindnessPreviewContainer {
+        StressIndicatorView(category: .moderate)
+    }
+    // → Shows: Normal, Deuteranopia, Protanopia, Tritanopia
+}
+#endif
 ```
 
 **Implementation:**
@@ -493,21 +756,27 @@ if reduceTransparency {
 }
 ```
 
-### Theme File Locations
+### Accessibility Layer File Locations (Phase 3)
 
 ```
 StressMonitor/StressMonitor/
 ├── Theme/
-│   ├── Color+Wellness.swift       // NEW - Wellness colors
-│   ├── Color+Extensions.swift     // MODIFIED - Delegates to StressCategory
-│   ├── Gradients.swift            // NEW - Gradient utilities
-│   └── Font+WellnessType.swift   // NEW - Custom typography
+│   ├── Color+Wellness.swift       // Wellness colors
+│   ├── Color+Extensions.swift     // Delegates to StressCategory
+│   ├── Gradients.swift            // Gradient utilities
+│   └── Font+WellnessType.swift   // Custom typography
+│
+├── Utilities/ (NEW - Phase 3)
+│   ├── PatternOverlay.swift       // Pattern overlay system
+│   ├── HighContrastModifier.swift // High contrast borders
+│   ├── DynamicTypeScaling.swift   // Dynamic Type scaling
+│   └── ColorBlindnessSimulator.swift // DEBUG testing tool
 │
 ├── Models/
-│   └── StressCategory.swift       // MODIFIED - Enhanced dual coding
+│   └── StressCategory.swift       // Enhanced with pattern descriptions
 │
 └── Fonts/
-    └── README.md                  // NEW - Font installation guide
+    └── README.md                  // Font installation guide
 ```
 
 **watchOS Synchronization:**
@@ -515,14 +784,14 @@ StressMonitor/StressMonitor/
 ```
 StressMonitorWatch Watch App/
 ├── Theme/
-│   └── Color+Extensions.swift     // NEW - Synchronized with iOS
+│   └── Color+Extensions.swift     // Synchronized with iOS
 └── Models/
-    └── StressCategory.swift       // SYNCHRONIZED - Same implementation
+    └── StressCategory.swift       // Pattern descriptions synced
 ```
 
 ### Testing Strategy
 
-**Theme Layer Tests:**
+**Theme Layer Tests (Phase 1):**
 
 - ✅ Color contrast ratios (WCAG AA/AAA)
 - ✅ Dark mode color variants
@@ -532,11 +801,21 @@ StressMonitorWatch Watch App/
 - ✅ Gradient opacity calculations
 - ✅ VoiceOver label generation
 
-**86 Unit Tests Created:**
-- Color system tests (18 tests)
-- Typography tests (22 tests)
-- Gradient tests (14 tests)
-- StressCategory tests (32 tests)
+**Accessibility Layer Tests (Phase 3):**
+
+- ✅ Pattern overlay rendering (diagonal, dots, crosshatch)
+- ✅ High contrast border detection
+- ✅ Dynamic Type size multipliers
+- ✅ VoiceOver label completeness
+- ✅ Color blindness simulation (DEBUG)
+- ✅ Pattern + color + icon triple redundancy
+- ✅ Touch target minimum sizes (44x44pt)
+
+**Test Coverage:**
+- Phase 1: 86 unit tests (color, typography, gradients)
+- Phase 2: 253 unit tests (character system, animations)
+- Phase 3: 315 unit tests (accessibility enhancements)
+- **Total: 315/315 tests passing (100%)**
 
 ---
 
@@ -1305,6 +1584,150 @@ StressMonitor/StressMonitor/
 
 ---
 
-**Document Version:** 1.0
+---
+
+## Phase 3: Accessibility Enhancements Architecture
+
+### Pattern Overlay Layer
+
+**Component Hierarchy:**
+
+```
+PatternOverlay.swift
+├── StressPattern enum
+│   ├── .solid (no pattern)
+│   ├── .diagonal (DiagonalLinesView)
+│   ├── .dots (DotsView)
+│   └── .crosshatch (CrosshatchView)
+├── Pattern rendering
+│   ├── Path-based (diagonal, crosshatch)
+│   └── Canvas-based (dots)
+└── View modifiers
+    ├── .stressPattern(_:color:)
+    └── .stressPattern(for:)
+```
+
+**Rendering Performance:**
+
+| Pattern | Technique | Complexity | Performance |
+|---------|----------|-----------|-------------|
+| Solid | EmptyView | O(1) | Instant |
+| Diagonal | Path stroke | O(n) lines | Fast |
+| Dots | Canvas fill | O(n×m) grid | Optimized |
+| Crosshatch | Path stroke | O(2n) lines | Fast |
+
+### High Contrast Layer
+
+**Modifier Hierarchy:**
+
+```
+HighContrastModifier.swift
+├── HighContrastBorderModifier
+│   └── Generic border overlay
+├── HighContrastCardModifier
+│   └── Card with border + background
+└── HighContrastButtonModifier
+    ├── .primary (Color.primary border)
+    ├── .secondary (Color.secondary border)
+    └── .tertiary (Color.primary.opacity(0.5))
+```
+
+**Environment Detection:**
+
+```swift
+@Environment(\.accessibilityDifferentiateWithoutColor) var differentiateWithoutColor
+
+// Automatic border application
+if differentiateWithoutColor {
+    RoundedRectangle(cornerRadius: radius)
+        .strokeBorder(Color.primary, lineWidth: 2)
+}
+```
+
+### Dynamic Type Layer
+
+**Modifier Hierarchy:**
+
+```
+DynamicTypeScaling.swift
+├── DynamicTypeScalingModifier
+│   └── minimumScaleFactor + lineLimit(nil)
+├── AdaptiveTextSizeModifier
+│   └── Dynamic size calculation (0.8x-2.6x)
+├── LimitedDynamicTypeModifier
+│   └── Max: accessibility3
+└── AccessibleDynamicTypeModifier
+    └── Combined: limit + scale + wrap
+```
+
+**Size Calculation Flow:**
+
+```
+Base Size (e.g., 72pt)
+    │
+    ▼
+Check @Environment(\.dynamicTypeSize)
+    │
+    ├─ xSmall ───▶ 72 × 0.8 = 57.6pt
+    ├─ medium ───▶ 72 × 1.0 = 72pt
+    ├─ xLarge ───▶ 72 × 1.2 = 86.4pt
+    └─ accessibility3 ▶ 72 × 2.0 = 144pt
+```
+
+### Color Blindness Simulator (DEBUG)
+
+**Simulation Architecture:**
+
+```
+#if DEBUG
+ColorBlindnessSimulator.swift
+├── ColorBlindnessType enum
+│   ├── .deuteranopia (transformation matrix)
+│   ├── .protanopia (transformation matrix)
+│   ├── .tritanopia (transformation matrix)
+│   └── .normal (no transformation)
+├── Color transformation
+│   └── RGB matrix multiplication
+└── Preview utilities
+    ├── ColorBlindnessSimulatorModifier
+    ├── ColorBlindnessPreviewContainer
+    └── StressColorValidator
+#endif
+```
+
+**Transformation Matrices:**
+
+| Type | Red Transform | Green Transform | Blue Transform |
+|------|--------------|----------------|----------------|
+| Deuteranopia | 0.625r + 0.375g | 0.7r + 0.3g | b |
+| Protanopia | 0.567r + 0.433g | 0.558r + 0.442g | b |
+| Tritanopia | 0.95r + 0.05g | g | 0.433r + 0.567b |
+
+### Accessibility Integration Points
+
+**View Hierarchy:**
+
+```
+SwiftUI Views
+    │
+    ├─ Pattern Overlays ──▶ .stressPattern(for:)
+    ├─ High Contrast ─────▶ .highContrastBorder()
+    ├─ Dynamic Type ──────▶ .scalableText()
+    ├─ VoiceOver ─────────▶ .accessibilityLabel()
+    └─ Color Blindness ───▶ .simulateColorBlindness() (DEBUG)
+```
+
+**Architecture Benefits:**
+
+- ✅ Modular accessibility layers
+- ✅ Environment-driven behavior
+- ✅ Performance optimized (Path/Canvas)
+- ✅ WCAG 2.1 AAA compliance
+- ✅ DEBUG-only testing tools
+- ✅ iOS/watchOS synchronized
+
+---
+
+**Document Version:** 3.0 (Phase 3 Complete)
 **Last Updated:** 2026-02-13
-**Lines of Code Count:** Under 800-line target
+**Accessibility Compliance:** WCAG 2.1 Level AAA

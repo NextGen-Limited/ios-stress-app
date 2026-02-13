@@ -76,6 +76,9 @@ struct DashboardView: View {
 
                 StressRingView(stressLevel: stress.level, category: stress.category)
                     .frame(height: 280)
+                    .accessibilityLabel("Stress level indicator")
+                    .accessibilityValue("\(Int(stress.level)) out of 100, \(stress.category.rawValue) stress")
+                    .accessibilityHint("Visual representation of your current stress level")
 
                 statusText(stress)
 
@@ -83,6 +86,8 @@ struct DashboardView: View {
                     await measureStress(stress.category)
                 }
                 .padding(.horizontal, DesignTokens.Spacing.md)
+                .accessibilityLabel("Measure stress")
+                .accessibilityHint("Tap to calculate your current stress level from heart rate data")
 
                 if viewModel.liveHeartRate != nil {
                     liveHeartRateCard
@@ -96,12 +101,16 @@ struct DashboardView: View {
         VStack(alignment: .leading, spacing: DesignTokens.Spacing.xs) {
             Text(greeting)
                 .font(.system(size: DesignTokens.Typography.title, weight: .bold))
+                .accessibilityLabel(greeting)
+                .accessibilityAddTraits(.isHeader)
 
             Text("Here's your current stress level")
                 .font(.system(size: DesignTokens.Typography.body))
                 .foregroundColor(.secondary)
+                .accessibilityLabel("Current stress level overview")
         }
         .frame(maxWidth: .infinity, alignment: .leading)
+        .accessibilityElement(children: .combine)
     }
 
     private var greeting: String {
@@ -135,6 +144,7 @@ struct DashboardView: View {
             Image(systemName: "heart.fill")
                 .font(.system(size: 24))
                 .foregroundColor(.red)
+                .accessibilityHidden(true)
 
             VStack(alignment: .leading, spacing: DesignTokens.Spacing.xs) {
                 Text("Live Heart Rate")
@@ -151,6 +161,9 @@ struct DashboardView: View {
         .background(Color(.systemBackground))
         .clipShape(RoundedRectangle(cornerRadius: DesignTokens.Layout.cornerRadius))
         .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 2)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("Live heart rate")
+        .accessibilityValue("\(Int(viewModel.liveHeartRate ?? 0)) beats per minute")
     }
 
     private var emptyState: some View {
@@ -158,20 +171,26 @@ struct DashboardView: View {
             Image(systemName: "heart.slash")
                 .font(.system(size: 60))
                 .foregroundColor(.secondary)
+                .accessibilityHidden(true)
 
             Text("No stress data available")
                 .font(.system(size: DesignTokens.Typography.headline, weight: .semibold))
                 .foregroundColor(.secondary)
+                .accessibilityLabel("No stress data available")
+                .accessibilityAddTraits(.isHeader)
 
             Text("Tap below to measure your current stress level")
                 .font(.system(size: DesignTokens.Typography.body))
                 .foregroundColor(.secondary)
                 .multilineTextAlignment(.center)
+                .accessibilityLabel("Tap the measure button below to calculate your current stress level")
 
             MeasureButton {
                 await measureStress(nil)
             }
             .padding(.horizontal, DesignTokens.Spacing.md)
+            .accessibilityLabel("Measure stress")
+            .accessibilityHint("Tap to start measuring your stress level")
         }
         .padding(DesignTokens.Spacing.lg)
     }
