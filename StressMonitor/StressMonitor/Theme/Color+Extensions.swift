@@ -78,24 +78,12 @@ extension Color {
     }
 
     static func stressColor(for category: StressCategory) -> Color {
-        switch category {
-        case .relaxed:
-            return Color(light: Color(hex: "#34C759"), dark: Color(hex: "#30D158"))
-        case .mild:
-            return Color(light: Color(hex: "#007AFF"), dark: Color(hex: "#0A84FF"))
-        case .moderate:
-            return Color(hex: "#FFD60A")
-        case .high:
-            return Color(light: Color(hex: "#FF9500"), dark: Color(hex: "#FF9F0A"))
-        }
+        // Delegate to StressCategory as single source of truth
+        return category.color
     }
 
     static func stressIcon(for category: StressCategory) -> String {
-        switch category {
-        case .relaxed: return "leaf.fill"
-        case .mild: return "circle.fill"
-        case .moderate: return "triangle.fill"
-        case .high: return "square.fill"
-        }
+        // Delegate to StressCategory as single source of truth
+        return category.icon
     }
 }
