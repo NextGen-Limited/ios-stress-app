@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>StressMonitor iOS Widgets</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#0d59f2",
+                        "background-light": "#f5f6f8",
+                        "background-dark": "#101622",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "0.5rem",
+                        "lg": "1rem",
+                        "xl": "1.5rem",
+                        "2xl": "1.75rem", // Closer to iOS widget curve
+                        "3xl": "2rem",
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        /* Custom styles for precise widget simulation */
+        .ios-shadow {
+            box-shadow: 0px 4px 24px -1px rgba(0, 0, 0, 0.1), 0px 2px 8px -2px rgba(0, 0, 0, 0.05);
+        }
+        .widget-bg-gradient {
+            background: linear-gradient(135deg, #e0eafc 0%, #cfdef3 100%);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light text-slate-900 font-display min-h-screen flex items-center justify-center p-8">
+<!-- Presentation Container -->
+<div class="w-full max-w-4xl mx-auto flex flex-col items-center gap-12">
+<div class="text-center space-y-2">
+<h1 class="text-3xl font-bold tracking-tight text-slate-900">StressMonitor Widgets</h1>
+<p class="text-slate-500 font-medium">iOS 17 Home Screen • Light Mode</p>
+</div>
+<!-- Simulation Area: Abstract Phone Wallpaper Background -->
+<div class="relative w-full p-12 rounded-[3rem] overflow-hidden flex flex-col md:flex-row items-center justify-center gap-10 min-h-[500px]" data-alt="Abstract soft blue and purple gradient background representing an iOS wallpaper" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuAFKcma6FVy0dsyTYJe99PU4L-j37NlQ3xW3sHyE45MBYwG2WA9MYR5q8RxXc3tvhfB83_i5rlkVXhail59vysXT5_J2FdNxG1qqVUL1C1Guf6XKTVOowtsj55kwd0gEmzlMAas4z-8pq3_Q4vhUKkqUay99FTIYiBtYuowGe3aVyFVV4JXJpKvkFUpdhg2IyunE9wknAhWVkwPPdN68YBr64Kb-O45JjROcjfOZPBWfvrPCmn5BMqAMWtzEtZO4f1-Y9Ws-KSCevDF'); background-size: cover; background-position: center;">
+<!-- Dark overlay for contrast if needed, but we want light mode vibe -->
+<div class="absolute inset-0 bg-white/10 backdrop-blur-[2px]"></div>
+<!-- Widget Group -->
+<div class="relative z-10 flex flex-col items-center gap-8 animate-in fade-in zoom-in duration-700">
+<!-- Label Small -->
+<div class="flex flex-col items-center gap-4">
+<span class="text-xs font-semibold uppercase tracking-wider text-slate-800 bg-white/80 px-3 py-1 rounded-full backdrop-blur-md shadow-sm">Small (2x2)</span>
+<!-- SMALL WIDGET START -->
+<!-- Standard iOS Small Widget size is approx 150-170px square depending on device scaling. Using 160px. -->
+<div class="w-40 h-40 bg-white rounded-[1.3rem] p-3.5 flex flex-col justify-between relative ios-shadow overflow-hidden group cursor-pointer transition-transform hover:scale-[1.02]">
+<!-- Header -->
+<div class="flex items-center justify-between z-10">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[18px] text-primary" style="font-variation-settings: 'FILL' 1;">vital_signs</span>
+<span class="text-[10px] font-semibold text-slate-400 uppercase tracking-wide">Stress</span>
+</div>
+<span class="text-[10px] font-medium text-slate-300">Now</span>
+</div>
+<!-- Radial Chart & Score -->
+<div class="absolute inset-0 flex items-center justify-center pt-3">
+<div class="relative w-24 h-24 flex items-center justify-center">
+<!-- Background Circle -->
+<svg class="w-full h-full transform -rotate-90">
+<circle cx="50%" cy="50%" fill="transparent" r="42" stroke="#f1f5f9" stroke-width="8"></circle>
+<!-- Progress Circle (42%) -->
+<circle cx="50%" cy="50%" fill="transparent" r="42" stroke="#0d59f2" stroke-dasharray="264" stroke-dashoffset="153" stroke-linecap="round" stroke-width="8"></circle>
+</svg>
+<!-- Center Content -->
+<div class="absolute flex flex-col items-center">
+<span class="text-2xl font-bold text-slate-900 leading-none">42</span>
+<span class="text-[10px] font-semibold text-primary mt-0.5">Normal</span>
+</div>
+</div>
+</div>
+<!-- Footer decoration (Status indicator) -->
+<div class="mt-auto z-10 flex justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+<div class="h-1 w-8 bg-slate-100 rounded-full"></div>
+</div>
+</div>
+<!-- SMALL WIDGET END -->
+</div>
+<!-- Label Medium -->
+<div class="flex flex-col items-center gap-4">
+<span class="text-xs font-semibold uppercase tracking-wider text-slate-800 bg-white/80 px-3 py-1 rounded-full backdrop-blur-md shadow-sm">Medium (4x2)</span>
+<!-- MEDIUM WIDGET START -->
+<!-- Standard iOS Medium Widget size is approx 338x158px. -->
+<div class="w-[338px] h-[158px] bg-white rounded-[1.3rem] p-4 flex items-stretch relative ios-shadow overflow-hidden transition-transform hover:scale-[1.02] cursor-pointer">
+<!-- Left Panel: Stress Ring (Similar to Small Widget) -->
+<div class="flex-1 flex flex-col justify-between pr-4 border-r border-slate-50 relative">
+<!-- Header -->
+<div class="flex items-center gap-1.5">
+<div class="w-5 h-5 rounded-full bg-primary/10 flex items-center justify-center">
+<span class="material-symbols-outlined text-[14px] text-primary" style="font-variation-settings: 'FILL' 1;">bolt</span>
+</div>
+<span class="text-[11px] font-bold text-slate-700">Stress</span>
+</div>
+<!-- Mini Radial -->
+<div class="flex-1 flex items-center justify-center relative">
+<svg class="w-20 h-20 transform -rotate-90">
+<circle cx="50%" cy="50%" fill="transparent" r="34" stroke="#f1f5f9" stroke-width="7"></circle>
+<!-- Progress (42%) -->
+<circle cx="50%" cy="50%" fill="transparent" r="34" stroke="#0d59f2" stroke-dasharray="213" stroke-dashoffset="123" stroke-linecap="round" stroke-width="7"></circle>
+</svg>
+<div class="absolute flex flex-col items-center">
+<span class="text-xl font-bold text-slate-900 leading-tight">42</span>
+<span class="text-[9px] font-medium text-slate-400">Normal</span>
+</div>
+</div>
+<!-- Bottom text -->
+<div class="text-[10px] text-slate-400 font-medium pl-1">
+                                No significant peaks
+                            </div>
+</div>
+<!-- Right Panel: HRV Trend -->
+<div class="flex-[1.3] flex flex-col justify-between pl-4">
+<!-- Header & Current Value -->
+<div class="flex flex-col">
+<div class="flex items-center justify-between mb-0.5">
+<div class="flex items-center gap-1.5">
+<span class="material-symbols-outlined text-[14px] text-slate-400">ecg_heart</span>
+<span class="text-[11px] font-semibold text-slate-500 uppercase tracking-wide">HRV Avg</span>
+</div>
+<span class="text-[10px] font-medium text-emerald-600 bg-emerald-50 px-1.5 py-0.5 rounded-md flex items-center gap-0.5">
+<span class="material-symbols-outlined text-[10px]">trending_up</span> +3ms
+                                    </span>
+</div>
+<div class="flex items-baseline gap-1">
+<span class="text-[26px] font-bold text-slate-900 tracking-tight">56</span>
+<span class="text-sm font-medium text-slate-400">ms</span>
+</div>
+</div>
+<!-- Sparkline Chart -->
+<div class="relative h-14 w-full mt-1">
+<!-- Grid Lines (Subtle) -->
+<div class="absolute inset-0 flex flex-col justify-between pointer-events-none">
+<div class="w-full h-px bg-slate-50"></div>
+<div class="w-full h-px bg-slate-50"></div>
+<div class="w-full h-px bg-slate-50"></div>
+</div>
+<!-- Chart SVG -->
+<svg class="w-full h-full overflow-visible" preserveaspectratio="none" viewbox="0 0 160 60">
+<defs>
+<lineargradient id="gradientHRV" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#0d59f2" stop-opacity="0.2"></stop>
+<stop offset="100%" stop-color="#0d59f2" stop-opacity="0"></stop>
+</lineargradient>
+</defs>
+<!-- Area Fill -->
+<path d="M0,45 C20,40 40,50 60,30 C80,10 100,25 120,20 C140,15 160,5 160,5 V60 H0 Z" fill="url(#gradientHRV)"></path>
+<!-- Stroke Line -->
+<path d="M0,45 C20,40 40,50 60,30 C80,10 100,25 120,20 C140,15 160,5 160,5" fill="none" stroke="#0d59f2" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"></path>
+<!-- End Point Dot -->
+<circle cx="160" cy="5" fill="#0d59f2" r="3" stroke="white" stroke-width="1.5"></circle>
+</svg>
+</div>
+<!-- X Axis Labels -->
+<div class="flex justify-between text-[9px] text-slate-300 font-medium pt-1 mt-auto">
+<span>Mon</span>
+<span>Wed</span>
+<span>Fri</span>
+<span>Sun</span>
+</div>
+</div>
+</div>
+<!-- MEDIUM WIDGET END -->
+</div>
+</div>
+</div>
+<!-- Descriptive Caption -->
+<div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-sm text-slate-600 max-w-3xl">
+<div class="flex gap-3">
+<span class="material-symbols-outlined text-primary">palette</span>
+<div>
+<strong class="text-slate-900 block mb-1">Light Mode</strong>
+<p>Designed with high-contrast metrics on pure white backgrounds for optimal daylight legibility.</p>
+</div>
+</div>
+<div class="flex gap-3">
+<span class="material-symbols-outlined text-primary">shapes</span>
+<div>
+<strong class="text-slate-900 block mb-1">Native Geometry</strong>
+<p>Uses Apple's continuous curvature shapes to blend seamlessly with the iOS 17 home screen.</p>
+</div>
+</div>
+<div class="flex gap-3">
+<span class="material-symbols-outlined text-primary">data_usage</span>
+<div>
+<strong class="text-slate-900 block mb-1">At-a-Glance</strong>
+<p>Key metrics like Stress Score and HRV Trends are prioritized without needing to open the app.</p>
+</div>
+</div>
+</div>
+</div>
+</body></html>

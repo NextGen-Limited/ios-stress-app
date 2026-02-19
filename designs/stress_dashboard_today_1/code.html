@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Stress Dashboard Today</title>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Theme Configuration -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#007fff",
+                        "background-light": "#f2f2f7", // iOS system grouped background approximation
+                        "background-dark": "#000000",
+                        "card-light": "#ffffff",
+                        "card-dark": "#1c1c1e",
+                        "stress-yellow": "#FFD60A",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "1rem", 
+                        "lg": "1.5rem", 
+                        "xl": "2rem", 
+                        "2xl": "2.5rem",
+                        "full": "9999px"
+                    },
+                    boxShadow: {
+                        'glass': '0 8px 32px 0 rgba(31, 38, 135, 0.05)',
+                        'soft': '0 4px 20px -2px rgba(0, 0, 0, 0.05)',
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        /* Custom font import */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+
+        /* Glassmorphism utilities */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+        
+        .dark .glass-panel {
+            background: rgba(28, 28, 30, 0.6);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Circular Progress Ring Animation */
+        .progress-ring__circle {
+            transition: stroke-dashoffset 0.35s;
+            transform: rotate(-90deg);
+            transform-origin: 50% 50%;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white transition-colors duration-200">
+<!-- App Container -->
+<div class="relative flex h-full min-h-screen w-full flex-col max-w-md mx-auto overflow-hidden">
+<!-- Header -->
+<header class="flex items-center justify-between px-6 pt-12 pb-4">
+<div class="flex flex-col">
+<span class="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">Wednesday, Oct 24</span>
+<h1 class="text-2xl font-bold tracking-tight text-slate-900 dark:text-white">Stress Dashboard</h1>
+</div>
+<button class="relative flex h-10 w-10 items-center justify-center rounded-full bg-white dark:bg-zinc-800 shadow-sm hover:bg-slate-50 transition-colors">
+<span class="material-symbols-outlined text-primary" style="font-size: 24px;">account_circle</span>
+<!-- Notification Dot -->
+<span class="absolute top-0 right-0 h-3 w-3 rounded-full bg-red-500 border-2 border-white dark:border-zinc-800"></span>
+</button>
+</header>
+<!-- Main Content Scroll Area -->
+<main class="flex-1 overflow-y-auto pb-24 px-4 space-y-6">
+<!-- Hero Section: Stress Ring -->
+<div class="flex flex-col items-center justify-center pt-4 pb-2">
+<div class="relative flex items-center justify-center">
+<!-- Ring SVG -->
+<svg class="h-64 w-64" viewbox="0 0 120 120">
+<!-- Track -->
+<circle class="text-slate-200 dark:text-zinc-800" cx="60" cy="60" fill="transparent" r="52" stroke="currentColor" stroke-width="8"></circle>
+<!-- Progress (approx 65%) -->
+<circle class="progress-ring__circle text-stress-yellow drop-shadow-lg" cx="60" cy="60" fill="transparent" r="52" stroke="currentColor" stroke-dasharray="326.72" stroke-dashoffset="114.35" stroke-linecap="round" stroke-width="8"></circle>
+</svg>
+<!-- Center Content -->
+<div class="absolute flex flex-col items-center justify-center">
+<span class="material-symbols-outlined text-stress-yellow mb-1" style="font-variation-settings: 'FILL' 1;">warning</span>
+<h2 class="text-6xl font-bold tracking-tighter text-slate-900 dark:text-white">65</h2>
+<span class="text-sm font-medium text-slate-400 dark:text-slate-500">OUT OF 100</span>
+</div>
+</div>
+<!-- Status Badge -->
+<div class="-mt-4 relative z-10 bg-yellow-100 dark:bg-yellow-900/30 border border-yellow-200 dark:border-yellow-700/50 px-5 py-2 rounded-full flex items-center gap-2 shadow-sm">
+<div class="h-2 w-2 rounded-full bg-stress-yellow animate-pulse"></div>
+<span class="text-yellow-800 dark:text-yellow-200 font-semibold text-sm">Elevated Stress</span>
+</div>
+<!-- Meta Text -->
+<div class="mt-4 flex items-center justify-center gap-2 text-xs text-slate-500 dark:text-slate-400 font-medium">
+<span class="flex items-center gap-1">
+<span class="material-symbols-outlined text-[14px]">verified_user</span>
+                        85% Confidence
+                    </span>
+<span>•</span>
+<span>Updated 2m ago</span>
+</div>
+</div>
+<!-- Quick Stats Grid -->
+<div class="grid grid-cols-3 gap-3">
+<!-- HRV Card -->
+<div class="glass-panel p-4 rounded-2xl flex flex-col items-center justify-center gap-1 shadow-soft">
+<div class="h-8 w-8 rounded-full bg-blue-50 dark:bg-blue-900/20 flex items-center justify-center mb-1">
+<span class="material-symbols-outlined text-primary text-[18px]">ecg_heart</span>
+</div>
+<span class="text-xs font-medium text-slate-500 dark:text-slate-400 text-center">HRV</span>
+<span class="text-xl font-bold text-slate-900 dark:text-white">62<span class="text-xs font-normal text-slate-400 ml-0.5">ms</span></span>
+</div>
+<!-- Trend Card -->
+<div class="glass-panel p-4 rounded-2xl flex flex-col items-center justify-center gap-1 shadow-soft">
+<div class="h-8 w-8 rounded-full bg-green-50 dark:bg-green-900/20 flex items-center justify-center mb-1">
+<span class="material-symbols-outlined text-green-600 text-[18px]">trending_up</span>
+</div>
+<span class="text-xs font-medium text-slate-500 dark:text-slate-400 text-center">7-Day</span>
+<span class="text-xl font-bold text-slate-900 dark:text-white">Up</span>
+</div>
+<!-- Baseline Card -->
+<div class="glass-panel p-4 rounded-2xl flex flex-col items-center justify-center gap-1 shadow-soft">
+<div class="h-8 w-8 rounded-full bg-purple-50 dark:bg-purple-900/20 flex items-center justify-center mb-1">
+<span class="material-symbols-outlined text-purple-600 text-[18px]">tune</span>
+</div>
+<span class="text-xs font-medium text-slate-500 dark:text-slate-400 text-center">Baseline</span>
+<span class="text-lg font-bold text-slate-900 dark:text-white">55-75</span>
+</div>
+</div>
+<!-- AI Insight Card -->
+<div class="glass-panel rounded-3xl p-5 shadow-soft relative overflow-hidden group cursor-pointer">
+<!-- Decorative gradient background opacity -->
+<div class="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>
+<div class="flex items-start justify-between mb-3">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary" style="font-variation-settings: 'FILL' 1;">auto_awesome</span>
+<h3 class="font-bold text-slate-900 dark:text-white">AI Insight</h3>
+</div>
+<span class="text-xs font-medium text-slate-400 bg-slate-100 dark:bg-zinc-800 px-2 py-1 rounded-md">New</span>
+</div>
+<p class="text-sm text-slate-600 dark:text-slate-300 leading-relaxed mb-4">
+                    Your recovery is slightly lower than usual. Consider a 5-minute breathing exercise to reset your nervous system.
+                </p>
+<!-- Sparkline Chart -->
+<div class="h-16 w-full relative">
+<!-- Grid Lines -->
+<div class="absolute inset-0 flex flex-col justify-between">
+<div class="w-full h-px bg-slate-100 dark:bg-zinc-700/50"></div>
+<div class="w-full h-px bg-slate-100 dark:bg-zinc-700/50"></div>
+<div class="w-full h-px bg-slate-100 dark:bg-zinc-700/50"></div>
+</div>
+<!-- Chart SVG -->
+<svg class="absolute inset-0 h-full w-full" preserveaspectratio="none">
+<path d="M0 45 C 20 45, 30 20, 50 30 S 80 60, 110 40 S 140 20, 170 35 S 200 10, 230 25 S 260 50, 290 35 S 320 15, 350 30" fill="none" stroke="#007fff" stroke-linecap="round" stroke-width="2.5" vector-effect="non-scaling-stroke"></path>
+<!-- Gradient Fill under the line -->
+<defs>
+<lineargradient id="gradientArea" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#007fff" stop-opacity="0.2"></stop>
+<stop offset="100%" stop-color="#007fff" stop-opacity="0"></stop>
+</lineargradient>
+</defs>
+<path d="M0 45 C 20 45, 30 20, 50 30 S 80 60, 110 40 S 140 20, 170 35 S 200 10, 230 25 S 260 50, 290 35 S 320 15, 350 30 V 64 H 0 Z" fill="url(#gradientArea)" stroke="none"></path>
+</svg>
+</div>
+</div>
+<!-- Spacer for bottom button -->
+<div class="h-16"></div>
+</main>
+<!-- Floating Action Button Area -->
+<div class="absolute bottom-6 left-0 right-0 px-6 z-20">
+<button class="w-full bg-primary hover:bg-blue-600 active:scale-95 transition-all duration-200 h-14 rounded-full shadow-lg shadow-blue-500/30 flex items-center justify-center gap-3 text-white font-bold text-lg">
+<span class="material-symbols-outlined">monitor_heart</span>
+                Measure Now
+            </button>
+</div>
+<!-- Decorative Blurs for Background Atmosphere -->
+<div class="fixed top-0 left-0 w-full h-64 bg-gradient-to-b from-blue-100/40 to-transparent dark:from-blue-900/10 pointer-events-none -z-10"></div>
+<div class="fixed bottom-0 right-0 w-64 h-64 bg-yellow-100/30 dark:bg-yellow-900/5 rounded-full blur-3xl pointer-events-none -z-10 translate-y-1/2 translate-x-1/2"></div>
+</div>
+</body></html>

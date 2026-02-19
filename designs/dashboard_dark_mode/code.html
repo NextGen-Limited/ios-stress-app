@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>StressMonitor Dashboard</title>
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<!-- Material Symbols -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<!-- Tailwind CSS -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Theme Configuration -->
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#2b7cee",
+                        "accent-green": "#30D158",
+                        "background-light": "#f6f7f8",
+                        "background-dark": "#000000", /* Pure Black as requested */
+                        "card-dark": "#1C1C1E", /* Secondary Dark Gray */
+                        "text-main": "#FFFFFF",
+                        "text-secondary": "#EBEBF5",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "1rem", 
+                        "lg": "1.5rem", 
+                        "xl": "2rem", /* Adjusted for iOS rounded look */
+                        "2xl": "2.5rem",
+                        "full": "9999px"
+                    },
+                    boxShadow: {
+                        "glow-green": "0 0 20px rgba(48, 209, 88, 0.15)",
+                    }
+                },
+            },
+        }
+    </script>
+<style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 1, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+        }
+        
+        /* Custom scrollbar hiding for clean UI */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-dark text-text-main font-display antialiased selection:bg-primary/30 min-h-screen relative pb-24">
+<!-- Header -->
+<header class="fixed top-0 w-full z-40 bg-background-dark/80 backdrop-blur-md border-b border-white/5 pt-safe-top">
+<div class="px-6 py-4 flex items-center justify-between">
+<div class="flex flex-col">
+<p class="text-text-secondary text-sm font-medium uppercase tracking-wider">Monday, Oct 24</p>
+<h1 class="text-2xl font-bold tracking-tight text-white">Good Evening, Alex</h1>
+</div>
+<button class="relative rounded-full overflow-hidden w-10 h-10 border border-white/10">
+<img alt="User profile picture" class="w-full h-full object-cover" data-alt="Portrait of a young woman smiling" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBtRXJPLFTdNUn-5gVSorCSGsBYF5ee3TnnK_3KcCEBWKiGM_CQSUlBwoZ5lIZ4Bnj-1EkF_PKgksV-V-6b6ph6gxB15gEa37sbUFCuaFVYxVeqbEOMGSRMpfgKVUnY-p-Vw9UDVu_WXLwL_0NFrY9D6w_AVeE0JDieDU39lhw_SKwTwGm3czWqAm9ZG4XRGFKdBTMWsC4-qI-Tw8CY8u0L5AQFcV-PK7OPZWH5WFW-_FvvM4LQ_lj3dQsgBO4TywLghFUiMzmvoYl1"/>
+</button>
+</div>
+</header>
+<!-- Main Scrollable Content -->
+<main class="w-full max-w-md mx-auto px-4 pt-24 flex flex-col gap-6">
+<!-- Hero Card (Stress Score) -->
+<section class="bg-card-dark rounded-xl p-8 flex flex-col items-center justify-center relative overflow-hidden shadow-lg">
+<!-- Radial Gradient Background Effect -->
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-64 h-64 bg-accent-green/5 rounded-full blur-3xl pointer-events-none"></div>
+<div class="w-full flex justify-between items-center mb-6">
+<span class="text-text-secondary text-sm font-semibold uppercase tracking-wider">Stress Score</span>
+<button class="text-primary hover:text-white transition-colors">
+<span class="material-symbols-outlined text-xl">info</span>
+</button>
+</div>
+<!-- Chart Ring Container -->
+<div class="relative w-64 h-64 flex items-center justify-center mb-6">
+<!-- SVG Ring -->
+<svg class="w-full h-full -rotate-90 transform" viewbox="0 0 200 200">
+<!-- Track -->
+<circle cx="100" cy="100" fill="none" r="85" stroke="#2C2C2E" stroke-linecap="round" stroke-width="18"></circle>
+<!-- Progress (22%) -->
+<circle class="drop-shadow-[0_0_10px_rgba(48,209,88,0.5)]" cx="100" cy="100" fill="none" r="85" stroke="#30D158" stroke-dasharray="534" stroke-dashoffset="416" stroke-linecap="round" stroke-width="18"></circle>
+</svg>
+<!-- Inner Content -->
+<div class="absolute inset-0 flex flex-col items-center justify-center gap-1">
+<span class="material-symbols-outlined text-accent-green text-4xl mb-1" style="font-size: 32px;">spa</span>
+<span class="text-6xl font-bold text-white tracking-tighter">22</span>
+<div class="bg-accent-green/20 border border-accent-green/30 px-3 py-1 rounded-full mt-2">
+<span class="text-accent-green text-xs font-bold uppercase tracking-wide">Relaxed</span>
+</div>
+</div>
+</div>
+<!-- Measure Now Button -->
+<button class="w-full bg-primary hover:bg-blue-600 active:scale-95 transition-all duration-200 h-14 rounded-full flex items-center justify-center gap-2 shadow-lg shadow-blue-900/20 group">
+<span class="material-symbols-outlined text-white group-hover:animate-pulse">vital_signs</span>
+<span class="text-white text-lg font-bold">Measure Now</span>
+</button>
+</section>
+<!-- Insights Grid -->
+<section class="grid grid-cols-2 gap-4">
+<!-- HRV Card -->
+<div class="bg-card-dark rounded-xl p-5 flex flex-col justify-between h-44 relative overflow-hidden group">
+<div class="flex flex-col gap-1 z-10">
+<div class="flex items-center gap-2 mb-1">
+<span class="material-symbols-outlined text-accent-green text-lg">ecg_heart</span>
+<span class="text-text-secondary text-xs font-medium uppercase">HRV</span>
+</div>
+<span class="text-3xl font-bold text-white">65 <span class="text-lg text-text-secondary font-normal">ms</span></span>
+</div>
+<!-- Sparkline Chart -->
+<div class="absolute bottom-0 left-0 right-0 h-24 opacity-80">
+<svg height="100%" preserveaspectratio="none" viewbox="0 0 200 80" width="100%">
+<defs>
+<lineargradient id="hrvGradient" x1="0%" x2="0%" y1="0%" y2="100%">
+<stop offset="0%" stop-color="#30D158" stop-opacity="0.3"></stop>
+<stop offset="100%" stop-color="#30D158" stop-opacity="0"></stop>
+</lineargradient>
+</defs>
+<path d="M0,60 C20,60 30,40 50,45 C70,50 80,30 100,35 C120,40 130,20 150,25 C170,30 180,10 200,15 L200,80 L0,80 Z" fill="url(#hrvGradient)"></path>
+<path d="M0,60 C20,60 30,40 50,45 C70,50 80,30 100,35 C120,40 130,20 150,25 C170,30 180,10 200,15" fill="none" stroke="#30D158" stroke-width="3" vector-effect="non-scaling-stroke"></path>
+</svg>
+</div>
+</div>
+<!-- Resting Heart Rate Card -->
+<div class="bg-card-dark rounded-xl p-5 flex flex-col justify-between h-44">
+<div class="flex flex-col gap-1">
+<div class="flex items-center gap-2 mb-1">
+<span class="material-symbols-outlined text-red-500 text-lg">favorite</span>
+<span class="text-text-secondary text-xs font-medium uppercase">Resting HR</span>
+</div>
+<span class="text-3xl font-bold text-white">58 <span class="text-lg text-text-secondary font-normal">bpm</span></span>
+</div>
+<div class="flex items-end justify-between">
+<div class="flex flex-col">
+<span class="text-text-secondary text-xs">Daily Avg</span>
+<div class="flex items-center gap-1 mt-1">
+<span class="material-symbols-outlined text-accent-green text-sm">trending_down</span>
+<span class="text-accent-green text-sm font-bold">-2 bpm</span>
+</div>
+</div>
+</div>
+</div>
+</section>
+<!-- Weekly Trends / Wide Card -->
+<section class="bg-card-dark rounded-xl p-6 flex items-center justify-between mb-8">
+<div class="flex items-center gap-4">
+<div class="w-12 h-12 rounded-full bg-[#2C2C2E] flex items-center justify-center">
+<span class="material-symbols-outlined text-white">calendar_month</span>
+</div>
+<div class="flex flex-col">
+<span class="text-white font-bold text-lg">Weekly Average</span>
+<span class="text-text-secondary text-sm">You are 15% more relaxed</span>
+</div>
+</div>
+<span class="material-symbols-outlined text-text-secondary">chevron_right</span>
+</section>
+</main>
+<!-- Bottom Navigation -->
+<nav class="fixed bottom-0 w-full bg-[#161618]/90 backdrop-blur-xl border-t border-white/5 pb-6 pt-3 px-6 z-50">
+<ul class="flex justify-between items-center max-w-md mx-auto">
+<li>
+<a class="flex flex-col items-center gap-1 text-primary group" href="#">
+<span class="material-symbols-outlined text-2xl group-hover:scale-110 transition-transform">dashboard</span>
+<span class="text-[10px] font-medium">Dashboard</span>
+</a>
+</li>
+<li>
+<a class="flex flex-col items-center gap-1 text-text-secondary hover:text-white transition-colors group" href="#">
+<span class="material-symbols-outlined text-2xl group-hover:scale-110 transition-transform">history</span>
+<span class="text-[10px] font-medium">History</span>
+</a>
+</li>
+<li>
+<a class="flex flex-col items-center gap-1 text-text-secondary hover:text-white transition-colors group" href="#">
+<span class="material-symbols-outlined text-2xl group-hover:scale-110 transition-transform">self_improvement</span>
+<span class="text-[10px] font-medium">Meditate</span>
+</a>
+</li>
+<li>
+<a class="flex flex-col items-center gap-1 text-text-secondary hover:text-white transition-colors group" href="#">
+<span class="material-symbols-outlined text-2xl group-hover:scale-110 transition-transform">settings</span>
+<span class="text-[10px] font-medium">Settings</span>
+</a>
+</li>
+</ul>
+</nav>
+</body></html>

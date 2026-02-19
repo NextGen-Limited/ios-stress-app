@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+
+<html class="light" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Breathing Session</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#477eeb",
+                        "background-light": "#f6f6f8",
+                        "background-dark": "#111621",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+<style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+        
+        /* Simulating the breathing animation */
+        @keyframes breathe {
+            0%, 100% { transform: scale(0.85); opacity: 0.6; }
+            50% { transform: scale(1.1); opacity: 0.9; }
+        }
+        
+        @keyframes breathe-inner {
+            0%, 100% { transform: scale(0.8); }
+            50% { transform: scale(1.0); }
+        }
+
+        .animate-breathe {
+            animation: breathe 5s ease-in-out infinite;
+        }
+        
+        .animate-breathe-inner {
+            animation: breathe-inner 5s ease-in-out infinite;
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-[#111318] dark:text-white font-display min-h-screen flex flex-col items-center justify-center overflow-hidden relative selection:bg-primary/30">
+<!-- Background blurred blob for ambient feel -->
+<div class="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-primary/5 rounded-full blur-3xl -z-10 pointer-events-none"></div>
+<!-- Main Container representing iPhone screen area -->
+<div class="w-full max-w-[480px] h-full min-h-screen flex flex-col relative bg-white dark:bg-black/5 rounded-none md:rounded-[3rem] shadow-2xl overflow-hidden">
+<!-- Header -->
+<header class="flex items-center justify-end p-6 w-full z-20">
+<button aria-label="Close session" class="flex items-center justify-center w-10 h-10 rounded-full bg-[#f0f2f4] dark:bg-white/10 text-[#111318] dark:text-white hover:bg-gray-200 dark:hover:bg-white/20 transition-colors cursor-pointer">
+<span class="material-symbols-outlined text-xl font-bold">close</span>
+</button>
+</header>
+<!-- Main Content Area -->
+<main class="flex-1 flex flex-col items-center justify-center w-full px-6 relative z-10">
+<!-- Breathing Visual -->
+<div class="relative w-72 h-72 flex items-center justify-center mb-12">
+<!-- Outer glow ring -->
+<div class="absolute inset-0 bg-primary/20 rounded-full blur-xl animate-breathe"></div>
+<!-- Middle ring -->
+<div class="absolute inset-4 border border-primary/30 rounded-full animate-breathe"></div>
+<!-- Main Pacer Circle -->
+<div class="w-full h-full bg-gradient-to-br from-primary/30 to-primary/10 rounded-full flex items-center justify-center shadow-inner backdrop-blur-sm animate-breathe transition-all duration-[2500ms]">
+<!-- Inner solid core -->
+<div class="w-48 h-48 bg-white dark:bg-background-dark rounded-full shadow-lg flex items-center justify-center relative z-20 animate-breathe-inner">
+<div class="absolute inset-0 bg-gradient-to-b from-white to-primary/5 dark:from-white/5 dark:to-transparent rounded-full opacity-50"></div>
+<span class="material-symbols-outlined text-primary text-4xl opacity-80">air</span>
+</div>
+</div>
+</div>
+<!-- Instructional Text -->
+<div class="text-center space-y-2 mb-8">
+<h1 class="text-[#111318] dark:text-white text-4xl font-bold tracking-tight animate-pulse" style="animation-duration: 5s;">
+                    Inhale...
+                </h1>
+<p class="text-gray-500 dark:text-gray-400 text-lg font-medium">
+                    Deeply through your nose
+                </p>
+</div>
+</main>
+<!-- Footer / Controls -->
+<footer class="w-full p-8 pb-12 flex flex-col items-center gap-8 z-20 bg-gradient-to-t from-white via-white to-transparent dark:from-background-dark dark:via-background-dark">
+<!-- Timer Display -->
+<div class="flex items-center gap-3 bg-[#f0f2f4] dark:bg-white/5 px-6 py-3 rounded-full">
+<span class="material-symbols-outlined text-gray-500 dark:text-gray-400 text-xl">timer</span>
+<div class="flex items-baseline gap-1">
+<span class="font-mono text-xl font-semibold text-[#111318] dark:text-white tabular-nums">02:00</span>
+<span class="text-xs text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wide">remaining</span>
+</div>
+</div>
+<!-- Action Button -->
+<button class="w-full max-w-[280px] h-14 flex items-center justify-center rounded-full bg-primary/10 dark:bg-primary/20 text-primary hover:bg-primary/20 dark:hover:bg-primary/30 transition-all active:scale-95 group">
+<span class="text-base font-semibold tracking-wide">End Session</span>
+</button>
+</footer>
+</div>
+</body></html>

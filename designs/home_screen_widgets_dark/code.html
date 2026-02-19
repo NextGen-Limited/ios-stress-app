@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>StressMonitor Widgets</title>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#0d59f2",
+                        "background-light": "#f5f6f8",
+                        "background-dark": "#000000", /* Pure black for OLED */
+                        "widget-bg": "#1C1C1E", /* iOS System Dark Gray */
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: {
+                        "DEFAULT": "1rem",
+                        "lg": "1.5rem",
+                        "xl": "2rem", /* iOS widget curvature approximation */
+                        "full": "9999px"
+                    },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Custom Glowing Ring Effect */
+        .glow-ring {
+            filter: drop-shadow(0 0 8px rgba(13, 89, 242, 0.5));
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark min-h-screen flex items-center justify-center p-4 sm:p-8">
+<!-- Container imitating a phone screen width -->
+<div class="w-full max-w-[420px] flex flex-col gap-8">
+<!-- Header -->
+<div class="flex items-center justify-between px-2">
+<div>
+<h1 class="text-slate-900 dark:text-white text-2xl font-bold tracking-tight">Widgets</h1>
+<p class="text-slate-500 dark:text-slate-400 text-sm">iOS 17 • Dark Mode</p>
+</div>
+<span class="material-symbols-outlined text-primary text-3xl">monitor_heart</span>
+</div>
+<!-- Small Widget (2x2) -->
+<div class="w-[160px] h-[160px] bg-widget-bg rounded-xl relative overflow-hidden flex flex-col items-center justify-center shadow-2xl ring-1 ring-white/10 group">
+<!-- App Icon (Top Right) -->
+<div class="absolute top-3 right-3 opacity-50">
+<span class="material-symbols-outlined text-white text-lg">ecg_heart</span>
+</div>
+<!-- Background Gradient Mesh -->
+<div class="absolute inset-0 bg-gradient-to-br from-primary/20 via-transparent to-transparent opacity-20 pointer-events-none"></div>
+<!-- Stress Ring Container -->
+<div class="relative w-28 h-28 flex items-center justify-center">
+<!-- Background Ring -->
+<svg class="absolute w-full h-full transform -rotate-90" viewbox="0 0 100 100">
+<circle class="opacity-50" cx="50" cy="50" fill="transparent" r="40" stroke="#3A3A3C" stroke-width="8"></circle>
+<!-- Progress Ring -->
+<circle class="glow-ring transition-all duration-1000 ease-out" cx="50" cy="50" fill="transparent" r="40" stroke="#0d59f2" stroke-dasharray="251.2" stroke-dashoffset="60" stroke-linecap="round" stroke-width="8"></circle>
+</svg>
+<!-- Central Score -->
+<div class="flex flex-col items-center z-10">
+<span class="text-white text-3xl font-bold tracking-tighter leading-none">78</span>
+<span class="text-primary text-[10px] font-medium uppercase tracking-wide mt-1">Normal</span>
+</div>
+</div>
+<!-- Bottom Label -->
+<div class="absolute bottom-4 flex flex-col items-center gap-0.5">
+<span class="text-slate-400 text-xs font-medium">Stress Score</span>
+</div>
+</div>
+<!-- Medium Widget (2x4) -->
+<div class="w-[338px] h-[160px] bg-widget-bg rounded-xl relative overflow-hidden flex flex-row items-center p-4 shadow-2xl ring-1 ring-white/10">
+<!-- Background Gradient -->
+<div class="absolute inset-0 bg-gradient-to-r from-transparent via-primary/5 to-transparent pointer-events-none"></div>
+<!-- Left Section: Mini Ring & Current Stat -->
+<div class="flex flex-col justify-between h-full w-1/3 pr-2 border-r border-white/5">
+<div class="flex flex-col gap-1">
+<div class="flex items-center gap-1">
+<span class="material-symbols-outlined text-primary text-sm">vital_signs</span>
+<span class="text-slate-400 text-[10px] font-medium uppercase tracking-wider">Current</span>
+</div>
+<span class="text-white text-3xl font-bold tracking-tighter">78</span>
+</div>
+<div class="relative w-16 h-16 self-center mt-2">
+<svg class="w-full h-full transform -rotate-90" viewbox="0 0 100 100">
+<circle cx="50" cy="50" fill="transparent" r="40" stroke="#3A3A3C" stroke-width="10"></circle>
+<circle class="glow-ring" cx="50" cy="50" fill="transparent" r="40" stroke="#0d59f2" stroke-dasharray="251.2" stroke-dashoffset="60" stroke-linecap="round" stroke-width="10"></circle>
+</svg>
+<div class="absolute inset-0 flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-xl">bolt</span>
+</div>
+</div>
+<span class="text-emerald-400 text-xs font-medium mt-auto">-2% vs Avg</span>
+</div>
+<!-- Right Section: HRV Trend Chart -->
+<div class="flex flex-col flex-1 pl-4 h-full justify-between">
+<div class="flex items-start justify-between w-full">
+<div class="flex flex-col">
+<span class="text-white text-sm font-semibold">HRV Trend</span>
+<span class="text-slate-500 text-xs">Last 24 Hours</span>
+</div>
+<span class="text-white text-lg font-bold">42<span class="text-sm text-slate-500 font-normal ml-0.5">ms</span></span>
+</div>
+<!-- Sparkline Chart -->
+<div class="relative h-16 w-full my-1">
+<svg class="w-full h-full overflow-visible" preserveaspectratio="none" viewbox="0 0 200 60">
+<!-- Gradient Definition -->
+<defs>
+<lineargradient id="hrvGradient" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#0d59f2" stop-opacity="0.5"></stop>
+<stop offset="100%" stop-color="#0d59f2" stop-opacity="0"></stop>
+</lineargradient>
+</defs>
+<!-- Area Fill -->
+<path d="M0 45 C20 45, 30 20, 50 25 C70 30, 80 50, 100 40 C120 30, 130 10, 150 15 C170 20, 180 35, 200 30 V 60 H 0 Z" fill="url(#hrvGradient)"></path>
+<!-- Line -->
+<path class="drop-shadow-md" d="M0 45 C20 45, 30 20, 50 25 C70 30, 80 50, 100 40 C120 30, 130 10, 150 15 C170 20, 180 35, 200 30" fill="none" stroke="#0d59f2" stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"></path>
+</svg>
+</div>
+<!-- Footer Metrics -->
+<div class="flex items-center justify-between mt-1 pt-2 border-t border-white/5">
+<div class="flex gap-3">
+<div class="flex flex-col">
+<span class="text-[9px] text-slate-500 uppercase">Avg</span>
+<span class="text-xs text-white font-medium">45ms</span>
+</div>
+<div class="flex flex-col">
+<span class="text-[9px] text-slate-500 uppercase">Max</span>
+<span class="text-xs text-white font-medium">72ms</span>
+</div>
+</div>
+<span class="text-[10px] text-slate-600">Updated 2m ago</span>
+</div>
+</div>
+</div>
+<!-- Interactive Widget State (Optional Locked/Loading) -->
+<div class="w-[338px] h-[160px] bg-widget-bg rounded-xl relative overflow-hidden flex flex-col justify-center items-center p-4 shadow-2xl ring-1 ring-white/10 opacity-60">
+<div class="absolute inset-0 bg-black/40 backdrop-blur-[2px] z-10 flex flex-col items-center justify-center">
+<span class="material-symbols-outlined text-slate-500 text-3xl mb-2">lock</span>
+<p class="text-slate-400 text-sm font-medium">Stress Monitor</p>
+</div>
+<!-- Mock Content behind blur -->
+<div class="flex w-full h-full opacity-30">
+<div class="w-1/3 bg-slate-700/50 rounded-lg mr-4"></div>
+<div class="w-2/3 bg-slate-700/50 rounded-lg"></div>
+</div>
+</div>
+</div>
+</body></html>

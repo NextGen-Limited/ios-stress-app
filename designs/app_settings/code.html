@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>App Settings</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#13e748",
+                        "background-light": "#f2f2f7", // iOS grouped background light
+                        "background-dark": "#000000", // iOS grouped background dark (pure black as requested)
+                        "surface-light": "#ffffff",
+                        "surface-dark": "#1c1c1e",
+                        "separator-light": "#c6c6c8",
+                        "separator-dark": "#38383a",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "0.25rem", "lg": "0.5rem", "xl": "0.75rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+<style>
+        /* Custom scrollbar hiding for cleaner mobile look */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
+        }
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        
+        /* iOS Switch Styles */
+        .ios-switch {
+            appearance: none;
+            width: 51px;
+            height: 31px;
+            background: #39393d;
+            border-radius: 9999px;
+            position: relative;
+            cursor: pointer;
+            outline: none;
+            transition: background-color 0.3s;
+        }
+        
+        .ios-switch::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            width: 27px;
+            height: 27px;
+            background: white;
+            border-radius: 50%;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.15), 0 3px 1px rgba(0,0,0,0.06);
+            transition: transform 0.3s cubic-bezier(0.4, 0.0, 0.2, 1);
+        }
+        
+        .ios-switch:checked {
+            background-color: #13e748;
+        }
+        
+        .ios-switch:checked::after {
+            transform: translateX(20px);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark text-slate-900 dark:text-white font-display antialiased transition-colors duration-300">
+<div class="max-w-md mx-auto min-h-screen relative pb-10">
+<!-- Navigation Bar -->
+<div class="pt-4 px-4 pb-2 flex justify-between items-center sticky top-0 z-10 bg-background-light/90 dark:bg-background-dark/90 backdrop-blur-md">
+<div class="flex items-center gap-1 text-primary cursor-pointer">
+<span class="material-symbols-outlined text-2xl" style="font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;">arrow_back_ios_new</span>
+<span class="text-[17px] leading-[22px] -ml-1">Health</span>
+</div>
+<div class="font-semibold text-[17px] opacity-0">Settings</div> <!-- Hidden title for scroll effect simulation -->
+<div class="w-[60px]"></div> <!-- Spacer for balance -->
+</div>
+<!-- Large Title -->
+<div class="px-5 pb-2">
+<h1 class="text-[34px] font-bold tracking-tight text-black dark:text-white">Settings</h1>
+</div>
+<!-- Profile Header -->
+<div class="mx-4 mt-2 mb-6 bg-surface-light dark:bg-surface-dark rounded-[10px] p-4 flex items-center gap-4 shadow-sm">
+<div class="w-[60px] h-[60px] rounded-full bg-gray-200 dark:bg-gray-700 overflow-hidden relative flex-shrink-0">
+<img class="w-full h-full object-cover" data-alt="User avatar with initials JD" src="https://lh3.googleusercontent.com/aida-public/AB6AXuBinwg2vMnQI2oIfIefyUDDo4L-aj-wl6D_VzjnowjHaDBT-NPxy9Tl5P_wNEWfkS7yOVutoo3ZEeEsHR-oxu2uDpW4jF75XSQUIH7iBuRI_7If4HwdjGbvomqD-OXs1ePJerEbFffzObjfC426umJvnIkkh9gLqsY2U0_gr1CnZv-TGUug-AxOMibh2kIPP0uwImd2GxPeNm6yNjDzfz2H6v8ut800mHmaq9MDgyJEfh6Y_kYCqquqhBaWZEd_ymUUggsfXoY-p15S"/>
+</div>
+<div class="flex flex-col justify-center flex-1 min-w-0">
+<h2 class="text-[20px] font-semibold text-black dark:text-white truncate">John Doe</h2>
+<div class="flex items-center gap-1.5 mt-0.5">
+<span class="material-symbols-outlined text-primary text-sm" style="font-variation-settings: 'FILL' 1, 'wght' 600;">ecg_heart</span>
+<span class="text-[15px] text-gray-500 dark:text-gray-400">Baseline: <span class="text-primary font-medium">52-68 ms</span></span>
+</div>
+</div>
+<span class="material-symbols-outlined text-gray-400 dark:text-[#58585a]" style="font-variation-settings: 'wght' 400;">chevron_right</span>
+</div>
+<!-- Section: Measurements -->
+<div class="mb-6">
+<h3 class="px-5 mb-2 text-[13px] text-gray-500 dark:text-gray-400 uppercase tracking-wide font-normal ml-4">Measurements</h3>
+<div class="mx-4 bg-surface-light dark:bg-surface-dark rounded-[10px] overflow-hidden shadow-sm">
+<!-- List Item -->
+<div class="flex items-center justify-between pl-4 pr-3 py-3 min-h-[44px] bg-surface-light dark:bg-surface-dark border-b border-gray-200 dark:border-separator-dark">
+<div class="flex items-center gap-3">
+<div class="bg-blue-500 p-1 rounded-md flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-lg">watch</span>
+</div>
+<span class="text-[17px] text-black dark:text-white">Auto-Measurement</span>
+</div>
+<input checked="" class="ios-switch" type="checkbox"/>
+</div>
+<!-- List Item -->
+<div class="flex items-center justify-between pl-4 pr-3 py-3 min-h-[44px] bg-surface-light dark:bg-surface-dark cursor-pointer active:bg-gray-100 dark:active:bg-[#2c2c2e] transition-colors">
+<div class="flex items-center gap-3">
+<div class="bg-orange-500 p-1 rounded-md flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-lg">alarm</span>
+</div>
+<span class="text-[17px] text-black dark:text-white">Reminders</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="text-[17px] text-gray-500 dark:text-gray-400">Daily at 8 AM</span>
+<span class="material-symbols-outlined text-gray-400 dark:text-[#58585a] text-xl">chevron_right</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Section: Notifications -->
+<div class="mb-6">
+<h3 class="px-5 mb-2 text-[13px] text-gray-500 dark:text-gray-400 uppercase tracking-wide font-normal ml-4">Notifications</h3>
+<div class="mx-4 bg-surface-light dark:bg-surface-dark rounded-[10px] overflow-hidden shadow-sm">
+<!-- List Item -->
+<div class="flex items-center justify-between pl-4 pr-3 py-3 min-h-[44px] bg-surface-light dark:bg-surface-dark border-b border-gray-200 dark:border-separator-dark">
+<div class="flex items-center gap-3">
+<div class="bg-red-500 p-1 rounded-md flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-lg">notifications_active</span>
+</div>
+<span class="text-[17px] text-black dark:text-white">Stress Alerts</span>
+</div>
+<input checked="" class="ios-switch" type="checkbox"/>
+</div>
+<!-- List Item -->
+<div class="flex items-center justify-between pl-4 pr-3 py-3 min-h-[44px] bg-surface-light dark:bg-surface-dark cursor-pointer active:bg-gray-100 dark:active:bg-[#2c2c2e] transition-colors">
+<div class="flex items-center gap-3">
+<div class="bg-purple-500 p-1 rounded-md flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-lg">tune</span>
+</div>
+<span class="text-[17px] text-black dark:text-white">Alert Threshold</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="text-[17px] text-gray-500 dark:text-gray-400">High (&gt;80)</span>
+<span class="material-symbols-outlined text-gray-400 dark:text-[#58585a] text-xl">chevron_right</span>
+</div>
+</div>
+</div>
+<p class="mx-9 mt-2 text-[13px] text-gray-500 dark:text-gray-400 leading-tight">
+                Get notified when your stress levels exceed the configured threshold during resting periods.
+            </p>
+</div>
+<!-- Section: Appearance -->
+<div class="mb-6">
+<h3 class="px-5 mb-2 text-[13px] text-gray-500 dark:text-gray-400 uppercase tracking-wide font-normal ml-4">Display</h3>
+<div class="mx-4 bg-surface-light dark:bg-surface-dark rounded-[10px] overflow-hidden shadow-sm p-4">
+<div class="flex flex-col gap-3">
+<div class="flex items-center gap-3 mb-1">
+<div class="bg-gray-500 p-1 rounded-md flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-lg">dark_mode</span>
+</div>
+<span class="text-[17px] text-black dark:text-white">Theme</span>
+</div>
+<!-- Segmented Control -->
+<div class="bg-[#767680]/15 dark:bg-[#767680]/25 rounded-[9px] p-0.5 flex w-full h-[32px]">
+<button class="flex-1 rounded-[7px] text-[13px] font-medium text-black dark:text-white hover:bg-black/5 dark:hover:bg-white/5 transition-colors">System</button>
+<button class="flex-1 rounded-[7px] text-[13px] font-medium text-black dark:text-white hover:bg-black/5 dark:hover:bg-white/5 transition-colors">Light</button>
+<button class="flex-1 bg-white dark:bg-[#636366] rounded-[7px] shadow-sm text-[13px] font-medium text-black dark:text-white">Dark</button>
+</div>
+</div>
+</div>
+</div>
+<!-- Section: Data & Privacy -->
+<div class="mb-8">
+<h3 class="px-5 mb-2 text-[13px] text-gray-500 dark:text-gray-400 uppercase tracking-wide font-normal ml-4">Data &amp; Privacy</h3>
+<div class="mx-4 bg-surface-light dark:bg-surface-dark rounded-[10px] overflow-hidden shadow-sm">
+<!-- Health Access -->
+<div class="flex items-center justify-between pl-4 pr-3 py-3 min-h-[44px] bg-surface-light dark:bg-surface-dark border-b border-gray-200 dark:border-separator-dark cursor-pointer active:bg-gray-100 dark:active:bg-[#2c2c2e] transition-colors">
+<div class="flex items-center gap-3">
+<div class="bg-pink-500 p-1 rounded-md flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-lg">health_and_safety</span>
+</div>
+<span class="text-[17px] text-black dark:text-white">Health Access</span>
+</div>
+<div class="flex items-center gap-1">
+<span class="text-[17px] text-gray-500 dark:text-gray-400">Authorized</span>
+<span class="material-symbols-outlined text-gray-400 dark:text-[#58585a] text-xl">chevron_right</span>
+</div>
+</div>
+<!-- iCloud Sync -->
+<div class="flex items-center justify-between pl-4 pr-3 py-3 min-h-[44px] bg-surface-light dark:bg-surface-dark border-b border-gray-200 dark:border-separator-dark">
+<div class="flex items-center gap-3">
+<div class="bg-[#38b7f7] p-1 rounded-md flex items-center justify-center">
+<span class="material-symbols-outlined text-white text-lg">cloud</span>
+</div>
+<span class="text-[17px] text-black dark:text-white">iCloud Sync</span>
+</div>
+<input checked="" class="ios-switch" type="checkbox"/>
+</div>
+<!-- Export Data -->
+<div class="flex items-center justify-between pl-4 pr-3 py-3 min-h-[44px] bg-surface-light dark:bg-surface-dark border-b border-gray-200 dark:border-separator-dark cursor-pointer active:bg-gray-100 dark:active:bg-[#2c2c2e] transition-colors">
+<div class="flex items-center gap-3">
+<div class="w-[28px]"></div> <!-- Spacer to align text since no icon box -->
+<span class="text-[17px] text-primary">Export All Data</span>
+</div>
+<span class="material-symbols-outlined text-gray-400 dark:text-[#58585a] text-xl">ios_share</span>
+</div>
+<!-- Delete Data -->
+<div class="flex items-center justify-center py-3 min-h-[44px] bg-surface-light dark:bg-surface-dark cursor-pointer active:bg-gray-100 dark:active:bg-[#2c2c2e] transition-colors">
+<span class="text-[17px] text-red-500">Delete All Data</span>
+</div>
+</div>
+</div>
+<!-- Footer Info -->
+<div class="text-center pb-8">
+<p class="text-[13px] text-gray-400 dark:text-gray-600">StressMonitor v1.0.2 (Build 45)</p>
+</div>
+</div>
+</body></html>

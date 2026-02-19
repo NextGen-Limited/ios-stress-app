@@ -8,12 +8,12 @@ final class StressViewModelTests: XCTestCase {
     var viewModel: StressViewModel!
     var mockHealthKit: MockHealthKitService!
     var mockAlgorithm: MockStressAlgorithmService!
-    var mockRepository: MockStressRepository!
+    var mockRepository: MockStressViewModelRepository!
 
     override func setUp() async throws {
         mockHealthKit = MockHealthKitService()
         mockAlgorithm = MockStressAlgorithmService()
-        mockRepository = MockStressRepository()
+        mockRepository = MockStressViewModelRepository()
 
         viewModel = StressViewModel(
             healthKit: mockHealthKit,
@@ -177,7 +177,7 @@ final class MockStressAlgorithmService: StressAlgorithmServiceProtocol {
     }
 }
 
-final class MockStressRepository: StressRepositoryProtocol {
+final class MockStressViewModelRepository: StressRepositoryProtocol {
     var measurementsToReturn: [StressMeasurement] = []
     var baselineToReturn: PersonalBaseline?
     var saveWasCalled = false
@@ -203,4 +203,20 @@ final class MockStressRepository: StressRepositoryProtocol {
 
     func updateBaseline(_ baseline: PersonalBaseline) async throws {
     }
+
+    func fetchMeasurements(from: Date, to: Date) async throws -> [StressMeasurement] {
+        return measurementsToReturn
+    }
+
+    func delete(_ measurement: StressMeasurement) async throws {}
+
+    func fetchAverageHRV(hours: Int) async throws -> Double {
+        return 0.0
+    }
+
+    func fetchAverageHRV(days: Int) async throws -> Double {
+        return 0.0
+    }
+
+    func deleteAllMeasurements() async throws {}
 }

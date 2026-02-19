@@ -75,4 +75,20 @@ final class MockSuccessRepository: StressRepositoryProtocol {
     }
 
     func updateBaseline(_ baseline: PersonalBaseline) async throws {}
+
+    func fetchMeasurements(from: Date, to: Date) async throws -> [StressMeasurement] {
+        return []
+    }
+
+    func delete(_ measurement: StressMeasurement) async throws {}
+
+    func fetchAverageHRV(hours: Int) async throws -> Double {
+        return 0.0
+    }
+
+    func fetchAverageHRV(days: Int) async throws -> Double {
+        return 0.0
+    }
+
+    func deleteAllMeasurements() async throws {}
 }

@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html class="dark" lang="en"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>Onboarding Baseline Calibration</title>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet"/>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script id="tailwind-config">
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: {
+                        "primary": "#0d59f2",
+                        "background-light": "#f5f6f8",
+                        "background-dark": "#000000",
+                        "surface-dark": "#1C1C1E",
+                    },
+                    fontFamily: {
+                        "display": ["Inter", "sans-serif"]
+                    },
+                    borderRadius: { "DEFAULT": "1rem", "lg": "2rem", "xl": "3rem", "full": "9999px" },
+                },
+            },
+        }
+    </script>
+<style>
+        body {
+          min-height: max(884px, 100dvh);
+        }
+    </style>
+<style>
+    body {
+      min-height: max(884px, 100dvh);
+    }
+  </style>
+  </head>
+<body class="bg-background-light dark:bg-background-dark font-display text-slate-900 dark:text-white antialiased transition-colors duration-300">
+<div class="relative flex h-full min-h-screen w-full flex-col overflow-x-hidden bg-white dark:bg-background-dark sm:mx-auto sm:max-w-md shadow-xl sm:rounded-[3rem] sm:my-8 border-x border-slate-100 dark:border-white/10">
+<div class="h-14 w-full bg-transparent"></div>
+<div class="flex flex-1 flex-col px-6">
+<div class="flex w-full flex-row items-center justify-center gap-2 py-4">
+<div class="h-1.5 w-1.5 rounded-full bg-slate-200 dark:bg-neutral-700"></div>
+<div class="h-1.5 w-1.5 rounded-full bg-slate-200 dark:bg-neutral-700"></div>
+<div class="h-1.5 w-6 rounded-full bg-primary"></div>
+<div class="h-1.5 w-1.5 rounded-full bg-slate-200 dark:bg-neutral-700"></div>
+</div>
+<div class="pt-4 pb-2 text-center">
+<h2 class="text-slate-900 dark:text-white tracking-tight text-[28px] font-bold leading-tight">
+                    Set Your Baseline
+                </h2>
+<p class="text-slate-500 dark:text-gray-400 text-base font-normal leading-relaxed mt-3 px-2">
+                    To personalize your stress insights, we need to learn your body's patterns over the next 7 days.
+                </p>
+</div>
+<div class="flex flex-col items-center justify-center py-8">
+<div class="relative flex items-center justify-center h-48 w-48">
+<svg class="h-full w-full rotate-[-90deg]" viewBox="0 0 100 100">
+<circle class="text-slate-100 dark:text-neutral-800" cx="50" cy="50" fill="transparent" r="42" stroke="currentColor" stroke-width="8"></circle>
+<circle class="text-primary" cx="50" cy="50" fill="transparent" r="42" stroke="currentColor" stroke-dasharray="264" stroke-dashoffset="264" stroke-linecap="round" stroke-width="8"></circle>
+<circle class="text-primary" cx="50" cy="50" fill="transparent" r="42" stroke="currentColor" stroke-dasharray="264" stroke-dashoffset="260" stroke-linecap="round" stroke-width="8"></circle>
+</svg>
+<div class="absolute flex flex-col items-center justify-center">
+<span class="material-symbols-outlined text-4xl text-primary mb-1">
+                            vital_signs
+                        </span>
+<span class="text-sm font-semibold text-slate-400 dark:text-gray-500 uppercase tracking-wide">Ready</span>
+</div>
+</div>
+</div>
+<div class="mt-2 flex flex-col gap-5 rounded-3xl bg-slate-50 dark:bg-surface-dark p-6 border border-slate-100 dark:border-white/5">
+<div class="flex justify-between items-center px-1">
+<div class="flex flex-col items-center gap-1.5">
+<div class="h-8 w-8 rounded-full bg-primary flex items-center justify-center text-white text-xs font-bold shadow-lg shadow-primary/30">1</div>
+</div>
+<div class="h-0.5 flex-1 bg-primary/20 mx-1"></div>
+<div class="flex flex-col items-center gap-1.5">
+<div class="h-8 w-8 rounded-full bg-primary flex items-center justify-center text-white text-xs font-bold shadow-lg shadow-primary/30">2</div>
+</div>
+<div class="h-0.5 flex-1 bg-primary/20 mx-1"></div>
+<div class="flex flex-col items-center gap-1.5">
+<div class="h-8 w-8 rounded-full bg-primary flex items-center justify-center text-white text-xs font-bold shadow-lg shadow-primary/30">3</div>
+</div>
+<div class="h-0.5 flex-1 bg-slate-200 dark:bg-white/10 mx-1"></div>
+<div class="flex flex-col items-center gap-1.5">
+<div class="h-8 w-8 rounded-full border-2 border-slate-200 dark:border-white/20 bg-white dark:bg-transparent flex items-center justify-center text-slate-400 dark:text-gray-500 text-xs font-medium">4</div>
+</div>
+<div class="h-0.5 flex-1 bg-slate-200 dark:bg-white/10 mx-1"></div>
+<div class="flex flex-col items-center gap-1.5">
+<div class="h-8 w-8 rounded-full border-2 border-slate-200 dark:border-white/20 bg-white dark:bg-transparent flex items-center justify-center text-slate-400 dark:text-gray-500 text-xs font-medium">5</div>
+</div>
+<div class="h-0.5 flex-1 bg-slate-200 dark:bg-white/10 mx-1"></div>
+<div class="flex flex-col items-center gap-1.5">
+<div class="h-8 w-8 rounded-full border-2 border-slate-200 dark:border-white/20 bg-white dark:bg-transparent flex items-center justify-center text-slate-400 dark:text-gray-500 text-xs font-medium">6</div>
+</div>
+<div class="h-0.5 flex-1 bg-slate-200 dark:bg-white/10 mx-1"></div>
+<div class="flex flex-col items-center gap-1.5">
+<div class="h-8 w-8 rounded-full border-2 border-slate-200 dark:border-white/20 bg-white dark:bg-transparent flex items-center justify-center text-slate-400 dark:text-gray-500 text-xs font-medium">7</div>
+</div>
+</div>
+<div class="flex flex-col gap-3 pt-2">
+<div class="flex items-start gap-3">
+<div class="mt-1.5 h-2 w-2 rounded-full bg-primary flex-shrink-0"></div>
+<div>
+<p class="text-sm font-semibold text-slate-900 dark:text-white">Learning Phase <span class="text-slate-400 dark:text-gray-500 font-normal ml-1">(Days 1-3)</span></p>
+<p class="text-xs text-slate-500 dark:text-gray-400 leading-relaxed">Analyzing your initial HRV range and resting heart rate patterns.</p>
+</div>
+</div>
+<div class="flex items-start gap-3">
+<div class="mt-1.5 h-2 w-2 rounded-full border border-slate-300 dark:border-gray-600 flex-shrink-0"></div>
+<div>
+<p class="text-sm font-semibold text-slate-900 dark:text-white">Calibration <span class="text-slate-400 dark:text-gray-500 font-normal ml-1">(Days 4-5)</span></p>
+<p class="text-xs text-slate-500 dark:text-gray-400 leading-relaxed">Identifying stress triggers and recovery moments.</p>
+</div>
+</div>
+<div class="flex items-start gap-3">
+<div class="mt-1.5 h-2 w-2 rounded-full border border-slate-300 dark:border-gray-600 flex-shrink-0"></div>
+<div>
+<p class="text-sm font-semibold text-slate-900 dark:text-white">Validation <span class="text-slate-400 dark:text-gray-500 font-normal ml-1">(Days 6-7)</span></p>
+<p class="text-xs text-slate-500 dark:text-gray-400 leading-relaxed">Confirming baseline accuracy before full activation.</p>
+</div>
+</div>
+</div>
+</div>
+<div class="flex-1"></div>
+<div class="flex flex-col gap-4 py-8">
+<button class="group relative flex w-full items-center justify-center gap-2 rounded-full bg-primary px-6 py-4 transition-all hover:bg-blue-600 active:scale-[0.98]">
+<span class="text-lg font-semibold text-white">Start Calibration</span>
+<span class="material-symbols-outlined text-white text-xl">arrow_forward</span>
+</button>
+<div class="flex items-center justify-center gap-1.5 opacity-70">
+<span class="material-symbols-outlined text-slate-400 dark:text-gray-500 text-base">verified_user</span>
+<p class="text-xs font-medium text-slate-400 dark:text-gray-500">HealthKit data stays private on your device</p>
+</div>
+</div>
+</div>
+<div class="h-6 w-full"></div>
+</div>
+
+</body></html>

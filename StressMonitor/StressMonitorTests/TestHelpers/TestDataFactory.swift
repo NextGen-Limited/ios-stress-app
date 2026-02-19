@@ -2,7 +2,6 @@ import Foundation
 import SwiftData
 @testable import StressMonitor
 
-@MainActor
 struct TestDataFactory {
 
     static func createMeasurement(
@@ -41,7 +40,7 @@ struct TestDataFactory {
     }
 
     static func createInMemoryContainer() throws -> ModelContainer {
-        let schema = Schema([StressMeasurement.self, PersonalBaseline.self])
+        let schema = Schema([StressMeasurement.self])
         let configuration = ModelConfiguration(isStoredInMemoryOnly: true)
         return try ModelContainer(for: schema, configurations: [configuration])
     }
