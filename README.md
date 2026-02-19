@@ -126,13 +126,15 @@ ios-stress-app/
 │   │   └── Complications/                # WidgetKit complications (9 files)
 │   ├── StressMonitorWidget/              # Home Screen Widgets (7 files)
 │   └── StressMonitorTests/               # Unit Tests (21 files, ~7,073 LOC)
-├── docs/                                 # Comprehensive documentation
+├── docs/                                 # Comprehensive documentation (see INDEX.md)
+│   ├── INDEX.md                          # Navigation hub
 │   ├── project-overview-pdr.md           # Product requirements
 │   ├── codebase-summary.md               # Codebase organization
-│   ├── code-standards.md                 # Swift coding conventions
-│   ├── system-architecture.md            # MVVM architecture guide
-│   ├── deployment-guide.md               # Build & release process
-│   └── design-guidelines.md              # UI/UX design system
+│   ├── project-roadmap.md                # Roadmap & progress
+│   ├── code-standards.md                 # Swift conventions (→ swift, patterns)
+│   ├── system-architecture.md            # MVVM architecture (→ core, platform)
+│   ├── deployment-guide.md               # Build & release (→ environment, release)
+│   └── design-guidelines.md              # UI/UX design (→ visual, ux)
 └── README.md                             # This file
 ```
 
@@ -323,14 +325,19 @@ CloudKit (optional, E2E encrypted)
 
 ## Documentation
 
-Comprehensive documentation available in `docs/`:
+Comprehensive documentation available in `docs/`. Start with the index:
 
-1. **[Project Overview & PDR](docs/project-overview-pdr.md)** - Product requirements and vision
-2. **[Codebase Summary](docs/codebase-summary.md)** - File structure and organization
-3. **[Code Standards](docs/code-standards.md)** - Swift conventions and patterns
-4. **[System Architecture](docs/system-architecture.md)** - MVVM design and data flow
-5. **[Deployment Guide](docs/deployment-guide.md)** - Build and release process
-6. **[Design Guidelines](docs/design-guidelines.md)** - UI/UX design system
+**[→ docs/INDEX.md](docs/INDEX.md)** — Navigation hub for all docs
+
+| Document | Description |
+|----------|-------------|
+| [Project Overview & PDR](docs/project-overview-pdr.md) | Product requirements and vision |
+| [Codebase Summary](docs/codebase-summary.md) | File structure and organization |
+| [Project Roadmap](docs/project-roadmap.md) | Milestones and progress |
+| [Code Standards](docs/code-standards.md) | Swift conventions and patterns |
+| [System Architecture](docs/system-architecture.md) | MVVM design and data flow |
+| [Deployment Guide](docs/deployment-guide.md) | Build and release process |
+| [Design Guidelines](docs/design-guidelines.md) | UI/UX design system |
 
 ---
 
