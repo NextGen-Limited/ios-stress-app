@@ -65,6 +65,24 @@ extension Color {
     static let textSecondaryDark = Color(hex: "#EBEBF5")
     static let dividerDark = Color(hex: "#38383A")
 
+    // MARK: - OLED Dark Mode Colors
+
+    /// Deep dark background for OLED displays - #121212
+    static let oledBackground = Color(hex: "#121212")
+    /// Card background for OLED dark theme - #1E1E1E
+    static let oledCardBackground = Color(hex: "#1E1E1E")
+    /// Secondary card background for OLED - #2A2A2A
+    static let oledCardSecondary = Color(hex: "#2A2A2A")
+    /// Secondary text color for OLED - #9CA3AF
+    static let oledTextSecondary = Color(hex: "#9CA3AF")
+
+    // MARK: - Accent Colors
+
+    /// HRV accent color (green-teal)
+    static let hrvAccent = Color(hex: "#34D399")
+    /// Heart rate accent color (red-pink)
+    static let heartRateAccent = Color(hex: "#F87171")
+
     // MARK: - Color Helpers
 
     static func stressColor(for level: Double) -> Color {

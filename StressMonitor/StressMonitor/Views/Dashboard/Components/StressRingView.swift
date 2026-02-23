@@ -5,6 +5,7 @@ struct StressRingView: View {
     let category: StressCategory
 
     @State private var animateRing = false
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         ZStack {
@@ -13,7 +14,7 @@ struct StressRingView: View {
                     Color.secondary.opacity(0.15),
                     lineWidth: 30
                 )
-                .frame(width: 220, height: 220)
+                .frame(width: 260, height: 260)
 
             Circle()
                 .trim(from: 0, to: animateRing ? stressLevel / 100 : 0)
@@ -21,19 +22,29 @@ struct StressRingView: View {
                     colorForCategory(category),
                     style: StrokeStyle(lineWidth: 30, lineCap: .round)
                 )
-                .frame(width: 220, height: 220)
+                .frame(width: 260, height: 260)
                 .rotationEffect(.degrees(-90))
-                .animation(.easeInOut(duration: 0.8), value: animateRing)
+                .animation(
+                    reduceMotion
+                        ? .linear(duration: 0.3)
+                        : .spring(response: 0.6, dampingFraction: 0.7),
+                    value: animateRing
+                )
 
             VStack(spacing: 4) {
                 Image(systemName: iconForCategory(category))
-                    .font(.system(size: 40))
+                    .font(.system(size: 44))
                     .foregroundColor(colorForCategory(category))
+                    .symbolEffect(.bounce, value: category)
 
                 Text("\(Int(stressLevel))")
                     .font(.system(size: 72, weight: .bold, design: .rounded))
                     .foregroundColor(.primary)
-                    .contentTransition(.numericText())
+                    .contentTransition(
+                        reduceMotion
+                            ? .identity
+                            : .numericText(countsDown: false)
+                    )
 
                 Text("STRESS")
                     .font(.caption)
@@ -44,7 +55,14 @@ struct StressRingView: View {
         .accessibilityLabel("Stress level")
         .accessibilityValue("\(Int(stressLevel)) out of 100")
         .onAppear {
-            animateRing = true
+            withAnimation(.spring(response: 0.8, dampingFraction: 0.7)) {
+                animateRing = true
+            }
+        }
+        .onChange(of: stressLevel) { _, newValue in
+            withAnimation(.spring(response: 0.6, dampingFraction: 0.7)) {
+                animateRing = true
+            }
         }
     }
 

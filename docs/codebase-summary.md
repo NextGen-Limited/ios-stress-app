@@ -1,7 +1,7 @@
 # Codebase Summary
 
-**Total Lines of Code:** ~22,727 (Swift)
-**Total Files:** 179 Swift files
+**Total Lines of Code:** ~24,500 (Swift)
+**Total Files:** 189 Swift files
 **Architecture:** MVVM + Protocol-Oriented Design
 **Last Updated:** February 2026
 
@@ -38,7 +38,7 @@ Data structures for health metrics and stress calculations.
 | `Models/StressBuddyMood.swift` | 38 | Character mood states |
 | `Models/ExportModels.swift` | 279 | CSV/JSON export structures |
 
-### Services (25 files, ~4,890 LOC)
+### Services (26 files, ~5,000 LOC)
 Business logic, HealthKit integration, data persistence, cloud sync.
 
 #### HealthKit Service (1 file, 156 LOC)
@@ -50,6 +50,14 @@ Business logic, HealthKit integration, data persistence, cloud sync.
 - `requestAuthorization()` - HealthKit permission flow
 - `fetchLatestHRV()` - Get latest HRV measurement
 - `fetchHeartRate(samples:)` - Get HR samples
+
+#### Insight Service (1 file, 83 LOC)
+| File | LOC | Purpose |
+|------|-----|---------|
+| `Services/InsightGeneratorService.swift` | 83 | AI-powered insight generation |
+
+**Key Methods:**
+- `generateInsight(stress:baseline:history:)` - Generate personalized insights from patterns
 
 #### Algorithm Service (2 files, 312 LOC)
 | File | LOC | Purpose |
@@ -106,12 +114,13 @@ Large module for export, delete, and CloudKit reset operations.
 | `Services/Protocols/StressRepositoryProtocol.swift` | 32 | Repository interface |
 | `Services/Protocols/CloudKitServiceProtocol.swift` | 40 | CloudKit interface |
 
-### ViewModels (2 files, ~640 LOC)
+### ViewModels (3 files, ~900 LOC)
 State management with @Observable macro.
 
 | File | LOC | Purpose |
 |------|-----|---------|
-| `ViewModels/StressViewModel.swift` | 181 | Main app state (stress, history, loading) |
+| `ViewModels/StressViewModel.swift` | 278 | Main app state with auto-refresh (HKObserverQuery) |
+| `ViewModels/DashboardViewModel.swift` | 128 | Dashboard-specific state + component coordination |
 | `ViewModels/DataManagementViewModel.swift` | 459 | Export, delete, reset operations state |
 
 **Key Properties in StressViewModel:**
@@ -120,20 +129,46 @@ State management with @Observable macro.
 - `baseline: PersonalBaseline`
 - `isLoading: Bool`
 - `errorMessage: String?`
+- `todayMeasurements: [StressMeasurement]` (NEW)
+- `weeklyAverage: (current: Double, previous: Double)?` (NEW)
+- `hrvHistory: [Double]` (NEW)
+- `heartRateTrend: TrendDirection` (NEW)
+- `aiInsight: AIInsight?` (NEW)
 
-### Views (57 files, ~3,200 LOC)
+**Auto-Refresh Features (NEW):**
+- HKObserverQuery subscription for automatic updates
+- Debounced refresh (60-second minimum interval)
+- Background health data monitoring
+
+### Views (60 files, ~4,100 LOC)
 SwiftUI declarative interface organized by feature.
 
-#### Dashboard Module (8 files, 623 LOC)
-Main stress display screen.
+#### Dashboard Module (14 files, ~1,900 LOC)
+Main stress display screen with enhanced UI.
 
 | File | LOC | Purpose |
 |------|-----|---------|
-| `Views/Dashboard/DashboardView.swift` | 156 | Main dashboard layout |
-| `Views/Dashboard/StressRingView.swift` | 134 | Animated stress indicator |
-| `Views/Dashboard/ConfidenceIndicatorView.swift` | 87 | Confidence score display |
-| `Views/Dashboard/MeasureButtonView.swift` | 92 | Large measure CTA |
-| `Views/Dashboard/StressCategoryBadgeView.swift` | 154 | Category with icon/text |
+| `Views/Dashboard/StressDashboardView.swift` | 271 | Main dashboard with unified scroll layout |
+| `Views/Dashboard/DashboardViewModel.swift` | 128 | Dashboard state coordination |
+| `Views/Dashboard/Components/StressRingView.swift` | 86 | 260pt animated ring with spring animations |
+| `Views/Dashboard/Components/MetricCardView.swift` | 171 | HRV + HR cards with number transitions |
+| `Views/Dashboard/Components/DailyTimelineView.swift` | 263 | 24-hour stress timeline chart |
+| `Views/Dashboard/Components/WeeklyInsightCard.swift` | 138 | Week-over-week comparison |
+| `Views/Dashboard/Components/AIInsightCard.swift` | 124 | AI-generated personalized insights |
+| `Views/Dashboard/Components/LearningPhaseCard.swift` | 192 | Baseline learning progress |
+| `Views/Dashboard/Components/MiniLineChartView.swift` | 106 | Sparkline for metrics |
+| `Views/Dashboard/Components/StatusBadgeView.swift` | 92 | Stress category badge |
+| `Views/Dashboard/Components/EmptyDashboardView.swift` | 98 | Empty state placeholder |
+| `Views/Dashboard/Components/NoDataCard.swift` | 101 | No data state |
+| `Views/Dashboard/Components/PermissionErrorCard.swift` | 131 | HealthKit error state |
+| `Views/Dashboard/Components/QuickStatCard.swift` | 70 | Quick stat display |
+
+**Dashboard Enhancement Features:**
+- OLED dark theme (pure black #121212 background)
+- Unified single-column scroll layout
+- Auto-refresh via HKObserverQuery (no manual Measure button)
+- Spring animations with Reduce Motion support
+- All 6 components visible in single scroll
 
 #### History Module (6 files, 412 LOC)
 Timeline view with filtering.
@@ -191,12 +226,12 @@ Reusable components and design patterns.
 | `Views/Components/LoadingStateView.swift` | 67 | Loading skeleton |
 | `Views/Components/ErrorStateView.swift` | 85 | Error message + retry |
 
-### Theme (5 files, ~287 LOC)
+### Theme (5 files, ~330 LOC)
 Design tokens and styling.
 
 | File | LOC | Purpose |
 |------|-----|---------|
-| `Theme/Color+Extensions.swift` | 67 | Stress color mapping |
+| `Theme/Color+Extensions.swift` | 107 | Stress color mapping + OLED/accent colors |
 | `Theme/Color+Wellness.swift` | 56 | Wellness color palette |
 | `Theme/DesignTokens.swift` | 89 | Spacing, corner radius, shadows |
 | `Theme/Font+WellnessType.swift` | 45 | Typography scale |
@@ -208,18 +243,26 @@ Design tokens and styling.
 .stressColor(for: .mild)      // Blue (#007AFF)
 .stressColor(for: .moderate)  // Yellow (#FFD60A)
 .stressColor(for: .high)      // Orange (#FF9500)
+
+// NEW: OLED Dark Theme
+.oledBackground               // #121212 (pure black)
+.cardBackground              // #1E1E1E
+.cardSecondary               // #2A2A2A
+.accentFor(stress:)          // Dynamic accent per stress level
 ```
 
-### Utilities (5 files, ~156 LOC)
+### Utilities (7 files, ~435 LOC)
 Helper functions and extensions.
 
 | File | LOC | Purpose |
 |------|-----|---------|
 | `Utilities/HapticManager.swift` | 45 | Haptic feedback |
+| `Utilities/AnimationPresets.swift` | 135 | Spring animation configurations (NEW) |
+| `Utilities/AccessibilityModifiers.swift` | 144 | Custom accessibility modifiers (NEW) |
 | `Utilities/ColorBlindnessSimulator.swift` | 38 | Accessibility testing |
 | `Utilities/DynamicTypeScaling.swift` | 34 | Text scaling helper |
 | `Utilities/DateFormattingUtility.swift` | 28 | Date formatting |
-| `Utilities/AccessibilityUtilities.swift` | 11 | A11y helpers |
+| `Utilities/AccessibilityUtilities.swift` | 11 | A11y helpers | |
 
 ---
 
@@ -352,15 +395,15 @@ Watch-specific design tokens.
 
 | Metric | Value |
 |--------|-------|
-| **Total Swift Files** | 179 |
-| **Total LOC** | 22,727 |
-| **iOS App LOC** | 12,270 |
+| **Total Swift Files** | 189 |
+| **Total LOC** | ~24,500 |
+| **iOS App LOC** | ~13,500 |
 | **watchOS App LOC** | 2,541 |
 | **Widget LOC** | 1,287 |
 | **Test LOC** | 7,073 |
-| **Average File Size** | 127 LOC |
+| **Average File Size** | 130 LOC |
 | **Test Coverage** | 100+ tests (>80% core logic) |
-| **No External Dependencies** | ✅ System frameworks only |
+| **No External Dependencies** | System frameworks only |
 
 ---
 
@@ -376,9 +419,10 @@ Watch-specific design tokens.
 - **BaselineCalculator:** Physiological baseline adaptation
 - **HealthKitManager:** Apple Health API wrapper
 - **CloudKitManager:** iCloud sync orchestration
+- **InsightGeneratorService:** AI-powered personalized insights (NEW)
 
 ### Presentation
-- **ViewModels:** @Observable state management
+- **ViewModels:** @Observable state management with auto-refresh
 - **Views:** SwiftUI declarative UI
 - **Theme:** Design tokens, colors, fonts
 
@@ -388,5 +432,5 @@ Watch-specific design tokens.
 
 ---
 
-**Last Updated:** February 2026
+**Last Updated:** February 23, 2026
 **Maintainers:** Phuong Doan

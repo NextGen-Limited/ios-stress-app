@@ -1,9 +1,12 @@
 import SwiftUI
+import SwiftData
 
 struct MainTabView: View {
+    @Environment(\.modelContext) private var modelContext
+
     var body: some View {
         TabView {
-            StressDashboardView()
+            DashboardView(repository: StressRepository(modelContext: modelContext))
                 .tabItem {
                     Label("Now", systemImage: "heart.fill")
                 }
@@ -41,4 +44,5 @@ struct MainTabView: View {
 
 #Preview {
     MainTabView()
+        .modelContainer(for: StressMeasurement.self, inMemory: true)
 }

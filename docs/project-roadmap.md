@@ -31,6 +31,12 @@
 
 #### User Interface
 - ✅ Dashboard with stress ring display
+- ✅ Enhanced dashboard with unified scroll layout (Feb 2026)
+- ✅ OLED dark theme support (Feb 2026)
+- ✅ Auto-refresh via HealthKit observer (Feb 2026)
+- ✅ AI-powered personalized insights (Feb 2026)
+- ✅ Daily timeline chart (24-hour view) (Feb 2026)
+- ✅ Weekly insight card (week-over-week comparison) (Feb 2026)
 - ✅ Historical timeline (measurement list)
 - ✅ Trend analytics (24h/week/month charts)
 - ✅ Distribution statistics
@@ -53,8 +59,10 @@
 - ✅ WCAG AA accessibility compliance
 - ✅ VoiceOver support
 - ✅ Dynamic Type support
+- ✅ Reduce Motion animation support (Feb 2026)
 - ✅ Haptic feedback
 - ✅ Dark mode support
+- ✅ Spring animations with accessibility fallback (Feb 2026)
 
 #### Testing & Quality
 - ✅ 100+ unit tests
@@ -490,5 +498,5 @@ Potential features for future consideration:
 ---
 
 **Owner:** Phuong Doan
-**Last Review:** February 19, 2026
+**Last Review:** February 23, 2026
 **Next Review:** May 2026 (post v1.0 launch)
