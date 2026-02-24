@@ -207,6 +207,90 @@ enum PreviewDataFactory {
 
         return viewModel
     }
+
+    // MARK: - Dashboard Mock Data
+
+    /// Generate mock measurements for today's timeline
+    static func mockTodayMeasurements() -> [StressMeasurement] {
+        let now = Date()
+        let calendar = Calendar.current
+        return (0..<8).map { i in
+            let hourOffset = -(i * 2)
+            let timestamp = calendar.date(byAdding: .hour, value: hourOffset, to: now) ?? now
+            return StressMeasurement(
+                timestamp: timestamp,
+                stressLevel: Double.random(in: 25...65),
+                hrv: Double.random(in: 35...70),
+                restingHeartRate: Double.random(in: 58...75),
+                confidences: [Double.random(in: 0.75...0.95)]
+            )
+        }.reversed().asArray
+    }
+
+    /// Generate mock HRV history for mini chart
+    static func mockHRVHistory() -> [Double] {
+        [42, 48, 45, 52, 49, 55, 58]
+    }
+
+    /// Mock weekly comparison data
+    static func mockWeeklyComparison() -> (current: Double, previous: Double) {
+        (current: 38.5, previous: 42.0)
+    }
+
+    /// Mock AI insight
+    static func mockAIInsight() -> AIInsight {
+        AIInsight(
+            title: "Stable Stress Pattern",
+            message: "Your stress has been consistent today. Regular breaks can help maintain this balance.",
+            actionTitle: "Start Breathing",
+            trendData: [35, 42, 38, 45, 40, 38]
+        )
+    }
+
+    /// Fully populated StressViewModel for dashboard preview
+    static func mockDashboardViewModel() -> StressViewModel {
+        let viewModel = mockStressViewModel(
+            stressResult: mildStress(),
+            liveHeartRate: 68
+        )
+
+        // Populate dashboard-specific properties
+        viewModel.hrvHistory = mockHRVHistory()
+        viewModel.todayMeasurements = mockTodayMeasurements()
+        viewModel.historicalData = generateMockHistoricalData()
+        viewModel.weeklyCurrentAvg = 38.5
+        viewModel.weeklyPreviousAvg = 42.0
+        viewModel.heartRateTrend = .down
+        viewModel.aiInsight = mockAIInsight()
+
+        return viewModel
+    }
+
+    /// Generate 14 days of mock historical data
+    static func generateMockHistoricalData() -> [StressMeasurement] {
+        let calendar = Calendar.current
+        let now = Date()
+
+        return (0..<14).flatMap { dayOffset -> [StressMeasurement] in
+            let day = calendar.date(byAdding: .day, value: -dayOffset, to: now) ?? now
+            return (0..<3).map { hourOffset in
+                let timestamp = calendar.date(byAdding: .hour, value: hourOffset * 6, to: day) ?? day
+                return StressMeasurement(
+                    timestamp: timestamp,
+                    stressLevel: Double.random(in: 20...70),
+                    hrv: Double.random(in: 30...65),
+                    restingHeartRate: Double.random(in: 60...80),
+                    confidences: [Double.random(in: 0.7...0.95)]
+                )
+            }
+        }.sorted { $0.timestamp > $1.timestamp }
+    }
+}
+
+// MARK: - Array Extension
+
+private extension Array {
+    var asArray: Array<Element> { self }
 }
 
 // MARK: - StressResult Preview Extensions

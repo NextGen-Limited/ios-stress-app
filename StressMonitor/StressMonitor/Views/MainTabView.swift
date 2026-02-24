@@ -4,15 +4,35 @@ import SwiftData
 struct MainTabView: View {
     @Environment(\.modelContext) private var modelContext
 
+    /// Enable mock data mode for development/simulator testing
+    /// Set to true to see sample data without real HealthKit data
+    static var useMockData: Bool = {
+        #if DEBUG
+        return ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PREVIEWS"] != "1"
+        #else
+        return false
+        #endif
+    }()
+
     var body: some View {
         TabView {
-            DashboardView(repository: StressRepository(modelContext: modelContext))
-                .tabItem {
-                    Label("Now", systemImage: "heart.fill")
-                }
-                .accessibilityIdentifier("DashboardTab")
-                .accessibilityLabel("Current stress level")
-                .accessibilityHint("View your current stress measurement")
+            if Self.useMockData {
+                DashboardView(viewModel: PreviewDataFactory.mockDashboardViewModel())
+                    .tabItem {
+                        Label("Now", systemImage: "heart.fill")
+                    }
+                    .accessibilityIdentifier("DashboardTab")
+                    .accessibilityLabel("Current stress level")
+                    .accessibilityHint("View your current stress measurement")
+            } else {
+                DashboardView(repository: StressRepository(modelContext: modelContext))
+                    .tabItem {
+                        Label("Now", systemImage: "heart.fill")
+                    }
+                    .accessibilityIdentifier("DashboardTab")
+                    .accessibilityLabel("Current stress level")
+                    .accessibilityHint("View your current stress measurement")
+            }
 
             MeasurementHistoryView()
                 .tabItem {

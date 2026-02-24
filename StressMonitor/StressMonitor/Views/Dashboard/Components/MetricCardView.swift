@@ -86,19 +86,23 @@ struct MetricCardView: View {
                 Spacer()
             }
 
-            // Chart or trend indicator
-            if let chartData = chartData, !chartData.isEmpty {
-                MiniLineChartView(dataPoints: chartData, color: iconColor)
-            } else if let trend = trend {
-                HStack(spacing: 4) {
-                    Image(systemName: trend.icon)
-                        .font(.caption2)
-                    Text(trend.displayValue)
-                        .font(.caption2)
-                        .fontWeight(.medium)
+            // Chart or trend indicator - fixed height for equal card heights
+            Group {
+                if let chartData = chartData, !chartData.isEmpty {
+                    MiniLineChartView(dataPoints: chartData, color: iconColor)
+                } else if let trend = trend {
+                    HStack(spacing: 4) {
+                        Image(systemName: trend.icon)
+                            .font(.caption2)
+                        Text(trend.displayValue)
+                            .font(.caption2)
+                            .fontWeight(.medium)
+                    }
+                    .foregroundColor(trend.color)
+                    .frame(height: 40, alignment: .leading)
                 }
-                .foregroundColor(trend.color)
             }
+            .frame(height: 40)
         }
         .padding(16)
         .frame(maxWidth: .infinity, alignment: .leading)

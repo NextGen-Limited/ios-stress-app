@@ -252,6 +252,13 @@ struct DashboardView: View {
     }
 }
 
-#Preview {
+// MARK: - Previews
+
+#Preview("Dashboard - With Mock Data") {
+    let viewModel = PreviewDataFactory.mockDashboardViewModel()
+    DashboardView(viewModel: viewModel)
+}
+
+#Preview("Dashboard - Empty State") {
     DashboardView()
 }
