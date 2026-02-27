@@ -1,8 +1,8 @@
 import SwiftUI
 
 /// Day and date header view for dashboard
+/// Matches Figma design: 28px bold day, 14px bold date
 struct DateHeaderView: View {
-    private let calendar = Calendar.current
     private let date: Date
 
     init(date: Date = Date()) {
@@ -24,12 +24,12 @@ struct DateHeaderView: View {
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             Text(dayName)
-                .font(.system(size: 34, weight: .bold))
-                .foregroundColor(Color.Wellness.adaptivePrimaryText)
+                .font(.system(size: 28, weight: .bold))
+                .foregroundStyle(Color.Wellness.adaptivePrimaryText)
 
             Text(fullDate)
-                .font(.system(size: 17, weight: .regular))
-                .foregroundColor(Color.Wellness.adaptivePrimaryText)
+                .font(.system(size: 14, weight: .bold))
+                .foregroundStyle(Color.Wellness.adaptivePrimaryText)
         }
         .accessibilityElement(children: .combine)
         .accessibilityLabel("\(dayName), \(fullDate)")

@@ -99,31 +99,14 @@ struct DashboardView: View {
     private func content(_ stress: StressResult) -> some View {
         ScrollView {
             LazyVStack(spacing: 24) {
-                // 1. Date Header
-                DateHeaderView()
-                    .opacity(appearAnimation ? 1 : 0)
-                    .offset(y: appearAnimation ? 0 : -10)
-
-                // 2. Stress Character Card
-                StressCharacterCard(result: stress, size: .dashboard)
-                    .background(Color.Wellness.adaptiveCardBackground)
-                    .cornerRadius(16)
-                    .opacity(appearAnimation ? 1 : 0)
-                    .scaleEffect(appearAnimation ? 1 : 0.95)
-
-                // 3. Status Badge + Last Updated
-                HStack {
-                    StatusBadgeView(category: stress.category)
-                    Spacer()
-                    if let lastUpdated = viewModel.lastRefresh {
-                        Text("Last Updated \(lastUpdated, style: .relative)")
-                            .font(Typography.caption1)
-                            .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
-                    }
+                // 1. Stress Character Card (includes date header, status, last updated)
+                StressCharacterCard(result: stress, size: .dashboard) {
+                    Task { await viewModel.loadDashboardData() }
                 }
                 .opacity(appearAnimation ? 1 : 0)
+                .scaleEffect(appearAnimation ? 1 : 0.95)
 
-                // 4. Insight Card
+                // 2. Insight Card
                 if let insight = viewModel.aiInsight {
                     DashboardInsightCard(
                         title: "Today's Insight",

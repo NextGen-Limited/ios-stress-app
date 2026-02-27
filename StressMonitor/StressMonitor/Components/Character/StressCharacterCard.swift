@@ -1,44 +1,97 @@
 import SwiftUI
 
-// MARK: - Stress Character Card
+// MARK: - Stress Character Card (Figma Design)
 
-/// Character-based stress level visualization with animations
-/// Displays Stress Buddy mascot with mood-based appearance
+/// Character-based stress visualization matching Figma design
+/// Displays Stress Buddy mascot with mood-based appearance in a 390x408px card
 /// Full Reduce Motion support with static fallbacks
 struct StressCharacterCard: View {
     let mood: StressBuddyMood
     let stressLevel: Double
     let hrv: Double?
     let size: StressBuddyMood.CharacterContext
+    let lastUpdated: Date?
+    let onRefresh: (() -> Void)?
 
     @Environment(\.accessibilityReduceMotion) var reduceMotion
 
+    init(
+        mood: StressBuddyMood,
+        stressLevel: Double,
+        hrv: Double? = nil,
+        size: StressBuddyMood.CharacterContext,
+        lastUpdated: Date? = nil,
+        onRefresh: (() -> Void)? = nil
+    ) {
+        self.mood = mood
+        self.stressLevel = stressLevel
+        self.hrv = hrv
+        self.size = size
+        self.lastUpdated = lastUpdated
+        self.onRefresh = onRefresh
+    }
+
     var body: some View {
-        VStack(spacing: DesignTokens.Spacing.md) {
-            // Character with animation
-            characterView
-                .accessibilityLabel(mood.accessibilityDescription)
-                .accessibilityValue("Stress level: \(Int(stressLevel))")
+        VStack(spacing: 0) {
+            // Date header with refresh button
+            HStack(alignment: .top) {
+                DateHeaderView(date: lastUpdated ?? Date())
+                Spacer()
+                refreshButton
+            }
+            .padding(.horizontal, 20)
+            .padding(.top, 22)
 
-            // Stress level
-            Text("\(Int(stressLevel))")
-                .font(fontForSize())
-                .foregroundStyle(mood.color)
-                .monospacedDigit()
+            Spacer()
 
-            // Mood label
+            // Status text (centered)
             Text(mood.displayName)
-                .font(labelFontForSize())
-                .foregroundStyle(.secondary)
+                .font(.system(size: 26, weight: .bold))
+                .foregroundStyle(moodColor)
+                .padding(.top, 30)
 
-            // HRV value (optional)
-            if let hrv = hrv {
-                Text("HRV: \(Int(hrv))ms")
-                    .font(captionFontForSize())
-                    .foregroundStyle(.tertiary)
+            Spacer()
+
+            // Character illustration
+            characterView
+                .padding(.vertical, 20)
+
+            Spacer()
+
+            // Last updated timestamp
+            if let lastUpdated = lastUpdated {
+                Text("Last Updated: \(lastUpdated, style: .relative)")
+                    .font(.system(size: 13, weight: .bold))
+                    .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
+                    .padding(.bottom, 24)
             }
         }
-        .padding(DesignTokens.Spacing.md)
+        .frame(width: cardSize.width, height: cardSize.height)
+        .background(Color.Wellness.adaptiveCardBackground)
+        .clipShape(RoundedRectangle(cornerRadius: 24))
+        .shadow(color: .black.opacity(0.04), radius: 7.7, x: 0, y: 3)
+        .shadow(color: .black.opacity(0.03), radius: 13.9, x: 0, y: 7)
+        .shadow(color: .black.opacity(0.02), radius: 26.4, x: 0, y: 13.9)
+        .shadow(color: .black.opacity(0.01), radius: 46.9, x: 0, y: 24.5)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel(accessibilityLabel)
+    }
+
+    // MARK: - Refresh Button
+
+    @ViewBuilder
+    private var refreshButton: some View {
+        if let onRefresh = onRefresh {
+            Button(action: onRefresh) {
+                Image(systemName: "arrow.clockwise")
+                    .font(.system(size: 16, weight: .medium))
+                    .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
+                    .frame(width: 32, height: 32)
+                    .contentShape(Rectangle())
+            }
+            .buttonStyle(.plain)
+            .accessibilityLabel("Refresh stress data")
+        }
     }
 
     // MARK: - Character View
@@ -56,6 +109,7 @@ struct StressCharacterCard: View {
             // Accessories
             accessoriesView
         }
+        .accessibilityHidden(true)
     }
 
     @ViewBuilder
@@ -73,6 +127,17 @@ struct StressCharacterCard: View {
 
     // MARK: - Layout Helpers
 
+    private var cardSize: CGSize {
+        switch size {
+        case .dashboard:
+            return CGSize(width: 390, height: 408)
+        case .widget:
+            return CGSize(width: 338, height: 354)
+        case .watchOS:
+            return CGSize(width: 180, height: 180)
+        }
+    }
+
     /// Position accessories around the character
     private func accessoryOffset(for index: Int, total: Int) -> CGSize {
         let radius = mood.symbolSize(for: size) * 0.6
@@ -84,39 +149,28 @@ struct StressCharacterCard: View {
         )
     }
 
-    // MARK: - Typography Helpers
-
-    private func fontForSize() -> Font {
-        switch size {
-        case .dashboard:
-            return Typography.dataLarge
-        case .widget:
-            return Typography.dataMedium
-        case .watchOS:
-            return Typography.dataSmall
+    /// Mood color matching Figma design (#86CECD for relaxed)
+    private var moodColor: Color {
+        switch mood {
+        case .sleeping, .calm:
+            return Color.Wellness.exerciseCyan // #86CECD
+        case .concerned:
+            return Color.Wellness.daylightYellow
+        case .worried:
+            return Color.stressModerate
+        case .overwhelmed:
+            return Color.stressHigh
         }
     }
 
-    private func labelFontForSize() -> Font {
-        switch size {
-        case .dashboard:
-            return Typography.headline
-        case .widget:
-            return Typography.callout
-        case .watchOS:
-            return Typography.footnote
+    private var accessibilityLabel: String {
+        var timeText = ""
+        if let lastUpdated = lastUpdated {
+            let formatter = RelativeDateTimeFormatter()
+            formatter.unitsStyle = .abbreviated
+            timeText = "Last updated \(formatter.localizedString(for: lastUpdated, relativeTo: Date()))"
         }
-    }
-
-    private func captionFontForSize() -> Font {
-        switch size {
-        case .dashboard:
-            return Typography.footnote
-        case .widget:
-            return Typography.caption1
-        case .watchOS:
-            return Typography.caption2
-        }
+        return "\(mood.accessibilityDescription). Stress level: \(Int(stressLevel)). \(timeText)"
     }
 }
 
@@ -124,19 +178,32 @@ struct StressCharacterCard: View {
 
 extension StressCharacterCard {
     /// Create character card from StressResult
-    init(result: StressResult, size: StressBuddyMood.CharacterContext) {
+    init(
+        result: StressResult,
+        size: StressBuddyMood.CharacterContext,
+        onRefresh: (() -> Void)? = nil
+    ) {
         self.mood = StressBuddyMood.from(stressLevel: result.level)
         self.stressLevel = result.level
         self.hrv = result.hrv
         self.size = size
+        self.lastUpdated = result.timestamp
+        self.onRefresh = onRefresh
     }
 
     /// Create character card with minimal data
-    init(stressLevel: Double, size: StressBuddyMood.CharacterContext) {
+    init(
+        stressLevel: Double,
+        size: StressBuddyMood.CharacterContext,
+        lastUpdated: Date? = nil,
+        onRefresh: (() -> Void)? = nil
+    ) {
         self.mood = StressBuddyMood.from(stressLevel: stressLevel)
         self.stressLevel = stressLevel
         self.hrv = nil
         self.size = size
+        self.lastUpdated = lastUpdated
+        self.onRefresh = onRefresh
     }
 }
 
@@ -150,14 +217,15 @@ extension StressCharacterCard {
                     mood: .from(stressLevel: level),
                     stressLevel: level,
                     hrv: 65,
-                    size: .dashboard
-                )
-                .background(Color.Wellness.surface)
-                .cornerRadius(DesignTokens.Layout.cornerRadius)
+                    size: .dashboard,
+                    lastUpdated: Date().addingTimeInterval(-30000)
+                ) {
+                    print("Refresh tapped")
+                }
             }
         }
         .padding()
-        .background(Color.Wellness.background)
+        .background(Color.Wellness.adaptiveBackground)
     }
 }
 
@@ -167,22 +235,20 @@ extension StressCharacterCard {
             mood: .calm,
             stressLevel: 15,
             hrv: 70,
-            size: .widget
+            size: .widget,
+            lastUpdated: Date().addingTimeInterval(-3600)
         )
-        .background(Color.Wellness.surface)
-        .cornerRadius(DesignTokens.Layout.cornerRadius)
 
         StressCharacterCard(
             mood: .worried,
             stressLevel: 60,
             hrv: 45,
-            size: .widget
+            size: .widget,
+            lastUpdated: Date().addingTimeInterval(-7200)
         )
-        .background(Color.Wellness.surface)
-        .cornerRadius(DesignTokens.Layout.cornerRadius)
     }
     .padding()
-    .background(Color.Wellness.background)
+    .background(Color.Wellness.adaptiveBackground)
 }
 
 #Preview("watchOS Size") {
@@ -190,15 +256,12 @@ extension StressCharacterCard {
         StressCharacterCard(
             mood: .sleeping,
             stressLevel: 5,
-            hrv: nil,
-            size: .watchOS
+            size: .watchOS,
+            lastUpdated: Date()
         )
-        .frame(width: 200, height: 200)
-        .background(Color.Wellness.surface)
-        .cornerRadius(DesignTokens.Layout.cornerRadius)
     }
     .padding()
-    .background(Color.Wellness.background)
+    .background(Color.Wellness.adaptiveBackground)
 }
 
 #Preview("Dark Mode") {
@@ -207,12 +270,11 @@ extension StressCharacterCard {
             mood: .overwhelmed,
             stressLevel: 90,
             hrv: 30,
-            size: .dashboard
+            size: .dashboard,
+            lastUpdated: Date().addingTimeInterval(-1800)
         )
-        .background(Color.Wellness.surface)
-        .cornerRadius(DesignTokens.Layout.cornerRadius)
     }
     .padding()
-    .background(Color.Wellness.background)
+    .background(Color.Wellness.adaptiveBackground)
     .preferredColorScheme(.dark)
 }
