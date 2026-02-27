@@ -37,7 +37,18 @@ struct DashboardView: View {
                     emptyState
                 }
             }
-            .navigationTitle("Now")
+            .navigationTitle("Dashboard")
+            .navigationBarTitleDisplayMode(.inline)
+            .toolbar {
+                ToolbarItem(placement: .navigationBarTrailing) {
+                    Button {
+                        Task { await viewModel.loadDashboardData() }
+                    } label: {
+                        Image(systemName: "arrow.clockwise")
+                            .foregroundStyle(Color.primaryBlue)
+                    }
+                }
+            }
             .alert("Error", isPresented: .constant(viewModel.errorMessage != nil)) {
                 Button("OK") {
                     viewModel.clearError()
@@ -61,8 +72,6 @@ struct DashboardView: View {
     }
 
     private func loadInitialData() async {
-        // Use the existing viewModel but update its repository with the real modelContext
-        // Note: We pass the repository during init in production via MainTabView
         await viewModel.loadDashboardData()
         await viewModel.loadBaseline()
         viewModel.observeHeartRate()
@@ -82,147 +91,94 @@ struct DashboardView: View {
                 .foregroundColor(.secondary)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color.oledBackground)
+        .background(Color.Wellness.adaptiveBackground)
     }
+
+    // MARK: - Main Content
 
     private func content(_ stress: StressResult) -> some View {
         ScrollView {
-            LazyVStack(spacing: DesignTokens.Layout.sectionSpacing) {
-                // 1. Greeting Header
-                greetingHeader
-                    .transition(.opacity.combined(with: .move(edge: .top)))
-
-                // 2. Hero Stress Ring (260pt)
-                StressRingView(stressLevel: stress.level, category: stress.category)
-                    .frame(height: 300)
-                    .scaleEffect(appearAnimation ? 1 : 0.9)
+            LazyVStack(spacing: 24) {
+                // 1. Date Header
+                DateHeaderView()
                     .opacity(appearAnimation ? 1 : 0)
-                    .accessibilityLabel("Stress level indicator")
-                    .accessibilityValue("\(Int(stress.level)) out of 100, \(stress.category.rawValue) stress")
-                    .accessibilityHint("Visual representation of your current stress level")
+                    .offset(y: appearAnimation ? 0 : -10)
 
-                // 3. Metrics Row (HRV + HR)
-                metricsRow
-                    .offset(y: appearAnimation ? 0 : 20)
+                // 2. Stress Character Card
+                StressCharacterCard(result: stress, size: .dashboard)
+                    .background(Color.Wellness.adaptiveCardBackground)
+                    .cornerRadius(16)
                     .opacity(appearAnimation ? 1 : 0)
+                    .scaleEffect(appearAnimation ? 1 : 0.95)
 
-                // 4. Live Heart Rate (conditional)
-                if viewModel.liveHeartRate != nil {
-                    liveHeartRateCard
-                        .offset(y: appearAnimation ? 0 : 20)
-                        .opacity(appearAnimation ? 1 : 0)
+                // 3. Status Badge + Last Updated
+                HStack {
+                    StatusBadgeView(category: stress.category)
+                    Spacer()
+                    if let lastUpdated = viewModel.lastRefresh {
+                        Text("Last Updated \(lastUpdated, style: .relative)")
+                            .font(Typography.caption1)
+                            .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
+                    }
                 }
-
-                // 5. Daily Timeline
-                DailyTimelineView(
-                    measurements: viewModel.todayMeasurements,
-                    isExpanded: false
-                )
-                .offset(y: appearAnimation ? 0 : 20)
                 .opacity(appearAnimation ? 1 : 0)
 
-                // 6. Weekly Insight
-                WeeklyInsightCard(
-                    currentWeekAvg: viewModel.weeklyCurrentAvg,
-                    lastWeekAvg: viewModel.weeklyPreviousAvg,
-                    startDate: Calendar.current.date(byAdding: .day, value: -7, to: Date()) ?? Date(),
-                    endDate: Date()
-                )
-                .offset(y: appearAnimation ? 0 : 20)
-                .opacity(appearAnimation ? 1 : 0)
-
-                // 7. AI Insight (conditional)
+                // 4. Insight Card
                 if let insight = viewModel.aiInsight {
-                    AIInsightCard(insight: insight)
-                        .offset(y: appearAnimation ? 0 : 20)
-                        .opacity(appearAnimation ? 1 : 0)
+                    DashboardInsightCard(
+                        title: "Today's Insight",
+                        description: insight.message
+                    )
+                    .opacity(appearAnimation ? 1 : 0)
                 }
+
+                // 5. Triple Metric Row
+                TripleMetricRow(
+                    rhrValue: "\(Int(stress.heartRate))",
+                    hrvValue: "\(Int(stress.hrv))",
+                    rrValue: "14"
+                )
+                .opacity(appearAnimation ? 1 : 0)
+
+                // 6. Self Note Card
+                SelfNoteCard()
+                    .opacity(appearAnimation ? 1 : 0)
+
+                // 7. Your Health Data Section
+                SectionHeader(title: "Your health data", icon: "heart.fill")
+                    .opacity(appearAnimation ? 1 : 0)
+
+                HealthDataSection()
+                    .opacity(appearAnimation ? 1 : 0)
+
+                // 8. Quick Action Section
+                SectionHeader(title: "Quick Action", icon: "bolt.fill")
+                    .opacity(appearAnimation ? 1 : 0)
+
+                ScrollView(.horizontal, showsIndicators: false) {
+                    HStack(spacing: 12) {
+                        QuickActionCard.miniWalk()
+                        QuickActionCard.boxBreathing()
+                        QuickActionCard.gratitude()
+                    }
+                    .padding(.horizontal, 4)
+                }
+                .opacity(appearAnimation ? 1 : 0)
+
+                // 9. Stress Over Time Section
+                SectionHeader(title: "Stress over time", icon: "chart.bar.fill")
+                    .opacity(appearAnimation ? 1 : 0)
+
+                StressOverTimeChart()
+                    .opacity(appearAnimation ? 1 : 0)
+
+                // Bottom padding
+                Spacer()
+                    .frame(height: 32)
             }
-            .padding(DesignTokens.Spacing.lg)
+            .padding()
         }
-        .background(Color.oledBackground)
-    }
-
-    // MARK: - Greeting Header
-
-    private var greetingHeader: some View {
-        VStack(alignment: .leading, spacing: DesignTokens.Spacing.xs) {
-            Text(greeting)
-                .font(.system(size: DesignTokens.Typography.title, weight: .bold))
-                .foregroundColor(.white)
-                .accessibilityLabel(greeting)
-                .accessibilityAddTraits(.isHeader)
-
-            Text("Here's your current stress level")
-                .font(.system(size: DesignTokens.Typography.body))
-                .foregroundColor(Color.oledTextSecondary)
-                .accessibilityLabel("Current stress level overview")
-        }
-        .frame(maxWidth: .infinity, alignment: .leading)
-        .accessibilityElement(children: .combine)
-    }
-
-    private var greeting: String {
-        let hour = Calendar.current.component(.hour, from: Date())
-        switch hour {
-        case 0..<12: return "Good morning"
-        case 12..<17: return "Good afternoon"
-        default: return "Good evening"
-        }
-    }
-
-    // MARK: - Metrics Row
-
-    private var metricsRow: some View {
-        HStack(spacing: DesignTokens.Spacing.md) {
-            MetricCardView.hrv(
-                value: String(Int(viewModel.currentStress?.hrv ?? 0)),
-                chartData: viewModel.hrvHistory
-            )
-
-            MetricCardView.heartRate(
-                value: String(Int(viewModel.currentStress?.heartRate ?? 0)),
-                trendValue: heartRateTrendValue,
-                isDown: viewModel.heartRateTrend == .down
-            )
-        }
-    }
-
-    private var heartRateTrendValue: String {
-        switch viewModel.heartRateTrend {
-        case .up: return "+2 bpm"
-        case .down: return "-2 bpm"
-        case .stable: return "—"
-        }
-    }
-
-    // MARK: - Live Heart Rate Card
-
-    private var liveHeartRateCard: some View {
-        HStack(spacing: DesignTokens.Spacing.md) {
-            Image(systemName: "heart.fill")
-                .font(.system(size: 24))
-                .foregroundColor(.heartRateAccent)
-                .accessibilityHidden(true)
-
-            VStack(alignment: .leading, spacing: DesignTokens.Spacing.xs) {
-                Text("Live Heart Rate")
-                    .font(.system(size: DesignTokens.Typography.caption))
-                    .foregroundColor(Color.oledTextSecondary)
-
-                Text("\(Int(viewModel.liveHeartRate ?? 0)) bpm")
-                    .font(.system(size: DesignTokens.Typography.headline, weight: .semibold))
-                    .foregroundColor(.white)
-            }
-
-            Spacer()
-        }
-        .padding(DesignTokens.Layout.cardPadding)
-        .background(Color.oledCardBackground)
-        .clipShape(RoundedRectangle(cornerRadius: DesignTokens.Layout.cornerRadius))
-        .accessibilityElement(children: .combine)
-        .accessibilityLabel("Live heart rate")
-        .accessibilityValue("\(Int(viewModel.liveHeartRate ?? 0)) beats per minute")
+        .background(Color.Wellness.adaptiveBackground)
     }
 
     // MARK: - Empty State
@@ -231,24 +187,24 @@ struct DashboardView: View {
         VStack(spacing: DesignTokens.Spacing.lg) {
             Image(systemName: "heart.slash")
                 .font(.system(size: 60))
-                .foregroundColor(Color.oledTextSecondary)
+                .foregroundColor(Color.Wellness.adaptiveSecondaryText)
                 .accessibilityHidden(true)
 
             Text("No stress data available")
                 .font(.system(size: DesignTokens.Typography.headline, weight: .semibold))
-                .foregroundColor(.white)
+                .foregroundStyle(Color.Wellness.adaptivePrimaryText)
                 .accessibilityLabel("No stress data available")
                 .accessibilityAddTraits(.isHeader)
 
             Text("Data will appear automatically when HealthKit has readings")
                 .font(.system(size: DesignTokens.Typography.body))
-                .foregroundColor(Color.oledTextSecondary)
+                .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
                 .multilineTextAlignment(.center)
                 .accessibilityLabel("Stress data will refresh automatically from HealthKit")
         }
         .padding(DesignTokens.Spacing.lg)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color.oledBackground)
+        .background(Color.Wellness.adaptiveBackground)
     }
 }
 
@@ -261,4 +217,10 @@ struct DashboardView: View {
 
 #Preview("Dashboard - Empty State") {
     DashboardView()
+}
+
+#Preview("Dashboard - Dark Mode") {
+    let viewModel = PreviewDataFactory.mockDashboardViewModel()
+    DashboardView(viewModel: viewModel)
+        .preferredColorScheme(.dark)
 }

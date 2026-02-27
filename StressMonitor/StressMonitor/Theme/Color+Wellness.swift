@@ -51,6 +51,68 @@ extension Color {
             light: surfaceLight,
             dark: surfaceDark
         )
+
+        // MARK: - Adaptive UI Colors (Dashboard Redesign)
+
+        /// Adaptive background - warm cream light, deep dark
+        static let adaptiveBackground = Color(
+            light: Color(hex: "#FFFDF6"),
+            dark: Color(hex: "#121212")
+        )
+
+        /// Adaptive card background
+        static let adaptiveCardBackground = Color(
+            light: Color.white,
+            dark: Color(hex: "#1E1E1E")
+        )
+
+        /// Adaptive primary text
+        static let adaptivePrimaryText = Color(
+            light: Color(hex: "#101223"),
+            dark: Color.white
+        )
+
+        /// Adaptive secondary text
+        static let adaptiveSecondaryText = Color(
+            light: Color(hex: "#777986"),
+            dark: Color(hex: "#9CA3AF")
+        )
+
+        // MARK: - Fixed Accent Colors
+
+        /// Elevated badge accent (yellow-gold)
+        static let elevatedBadge = Color(hex: "#FDD57A")
+
+        /// Teal card accent
+        static let tealCard = Color(hex: "#85C9C9")
+
+        /// Exercise cyan accent
+        static let exerciseCyan = Color(hex: "#86CECD")
+
+        /// Sleep purple accent
+        static let sleepPurple = Color(hex: "#BE8BE5")
+
+        /// Daylight yellow accent
+        static let daylightYellow = Color(hex: "#FFBD42")
+
+        // MARK: - Quick Action Colors
+
+        /// Gratitude purple
+        static let gratitudePurple = Color(hex: "#9E85C9")
+
+        /// Mini walk blue
+        static let miniWalkBlue = Color(hex: "#859DC9")
+
+        /// Box breathing purple
+        static let boxBreathingPurple = Color(hex: "#A58FC7")
+
+        // MARK: - Insight Colors
+
+        /// AI insight title color
+        static let insightTitle = Color(hex: "#FFBF00")
+
+        /// AI insight text color
+        static let insightText = Color(hex: "#5E5E5E")
     }
 }
 
