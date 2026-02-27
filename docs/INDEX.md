@@ -71,9 +71,9 @@ Current status, planned features, timeline, and success metrics.
 
 | Metric | Value |
 |--------|-------|
-| **Total Swift Files** | 202 |
-| **Total Tokens** | ~200,000 |
-| **iOS App** | ~110 files |
+| **Total Swift Files** | 206 |
+| **Total Tokens** | ~205,000 |
+| **iOS App** | ~114 files |
 | **watchOS App** | ~35 files |
 | **Widgets** | 7 files |
 | **Tests** | ~50 files |

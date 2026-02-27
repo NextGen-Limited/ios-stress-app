@@ -1,7 +1,7 @@
 # Codebase Summary
 
-**Total Files:** 202 Swift files
-**Total Tokens:** ~200,000
+**Total Files:** 206 Swift files
+**Total Tokens:** ~205,000
 **Architecture:** MVVM + Protocol-Oriented Design
 **Last Updated:** February 27, 2026
 
@@ -29,7 +29,23 @@ ios-stress-app/
 
 ---
 
-## iOS App Structure (96 files, ~12,270 LOC)
+## iOS App Structure (114 files, ~14,500 LOC)
+
+### Components (4 files, ~1,123 LOC)
+Custom UI components for character illustration and animations.
+
+| File | LOC | Purpose |
+|------|-----|---------|
+| `Components/Character/StressBuddyIllustration.swift` | 583 | Custom SwiftUI character with 5 mood expressions |
+| `Components/Character/StressCharacterCard.swift` | 270 | Character card with ZStack layout |
+| `Components/Character/CharacterAnimationModifier.swift` | 161 | Mood-specific animations (breathing, fidget, shake, dizzy) |
+| `Components/Character/DecorativeTriangleView.swift` | 109 | Decorative triangle element for card corners |
+
+**Key Features:**
+- 5 mood expressions: sleeping, calm, concerned, worried, overwhelmed
+- Custom shapes: TriangleShape, TeardropShape, FlameShape
+- Reduce Motion support throughout
+- Accessibility labels and VoiceOver support
 
 ### Models (9 files, ~485 LOC)
 Data structures for health metrics and stress calculations.
@@ -240,7 +256,7 @@ Design tokens and styling.
 | File | LOC | Purpose |
 |------|-----|---------|
 | `Theme/Color+Extensions.swift` | 107 | Stress color mapping + OLED/accent colors |
-| `Theme/Color+Wellness.swift` | 56 | Wellness color palette |
+| `Theme/Color+Wellness.swift` | 56 | Wellness color palette + `figmaIconGray` (#717171) |
 | `Theme/DesignTokens.swift` | 89 | Spacing, corner radius, shadows |
 | `Theme/Font+WellnessType.swift` | 45 | Typography scale |
 | `Theme/Gradients.swift` | 30 | Gradient definitions |
@@ -252,11 +268,14 @@ Design tokens and styling.
 .stressColor(for: .moderate)  // Yellow (#FFD60A)
 .stressColor(for: .high)      // Orange (#FF9500)
 
-// NEW: OLED Dark Theme
+// OLED Dark Theme
 .oledBackground               // #121212 (pure black)
 .cardBackground              // #1E1E1E
 .cardSecondary               // #2A2A2A
 .accentFor(stress:)          // Dynamic accent per stress level
+
+// NEW (Feb 2026)
+.figmaIconGray               // #717171 (Character card icons)
 ```
 
 ### Utilities (7 files, ~435 LOC)
@@ -403,13 +422,13 @@ Watch-specific design tokens.
 
 | Metric | Value |
 |--------|-------|
-| **Total Swift Files** | 189 |
-| **Total LOC** | ~24,500 |
-| **iOS App LOC** | ~13,500 |
+| **Total Swift Files** | 206 |
+| **Total LOC** | ~26,000 |
+| **iOS App LOC** | ~15,500 |
 | **watchOS App LOC** | 2,541 |
 | **Widget LOC** | 1,287 |
-| **Test LOC** | 7,073 |
-| **Average File Size** | 130 LOC |
+| **Test LOC** | 7,200 |
+| **Average File Size** | 126 LOC |
 | **Test Coverage** | 100+ tests (>80% core logic) |
 | **No External Dependencies** | System frameworks only |
 
@@ -440,5 +459,5 @@ Watch-specific design tokens.
 
 ---
 
-**Last Updated:** February 23, 2026
+**Last Updated:** February 27, 2026
 **Maintainers:** Phuong Doan

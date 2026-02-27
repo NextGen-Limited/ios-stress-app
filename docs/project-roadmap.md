@@ -37,6 +37,11 @@
 - ✅ AI-powered personalized insights (Feb 2026)
 - ✅ Daily timeline chart (24-hour view) (Feb 2026)
 - ✅ Weekly insight card (week-over-week comparison) (Feb 2026)
+- ✅ Custom StressBuddy character illustration (Feb 2026)
+  - 5 mood expressions: sleeping, calm, concerned, worried, overwhelmed
+  - Mood-specific animations: breathing, fidget, shake, dizzy
+  - Custom shapes: TriangleShape, TeardropShape, FlameShape
+  - Full Reduce Motion + VoiceOver support
 - ✅ Historical timeline (measurement list)
 - ✅ Trend analytics (24h/week/month charts)
 - ✅ Distribution statistics
@@ -498,5 +503,5 @@ Potential features for future consideration:
 ---
 
 **Owner:** Phuong Doan
-**Last Review:** February 23, 2026
+**Last Review:** February 27, 2026
 **Next Review:** May 2026 (post v1.0 launch)

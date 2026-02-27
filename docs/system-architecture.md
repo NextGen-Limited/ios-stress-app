@@ -242,6 +242,32 @@ let viewModel = StressViewModel(healthKit: MockHealthKitManager())
 4. Register in `DataExporter`
 5. Test with sample data
 
+### Adding Custom Shapes (for illustrations)
+
+Custom SwiftUI shapes follow a reusable pattern:
+
+```swift
+// Public reusable shape
+struct TriangleShape: Shape {
+    func path(in rect: CGRect) -> Path {
+        var path = Path()
+        // Custom path logic
+        return path
+    }
+}
+
+// Usage in views
+TriangleShape()
+    .fill(Color.Wellness.figmaIconGray)
+    .frame(width: 37, height: 34.5)
+```
+
+**Pattern Guidelines:**
+- Use `Shape` protocol for reusable geometric shapes
+- Keep shapes pure (no side effects)
+- Accept configuration via init parameters
+- Support accessibility with descriptive labels
+
 ---
 
 **Maintained By:** Phuong Doan

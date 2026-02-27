@@ -58,6 +58,8 @@ Before committing code, verify:
 
 ```
 StressMonitor/
+├── Components/              # Shared UI components
+│   └── Character/           # StressBuddy illustration + animations
 ├── Models/                  # Data structures
 ├── Services/                # Business logic
 │   ├── HealthKit/
