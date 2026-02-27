@@ -13,8 +13,6 @@ struct StressCharacterCard: View {
     let lastUpdated: Date?
     let onRefresh: (() -> Void)?
 
-    @Environment(\.accessibilityReduceMotion) var reduceMotion
-
     init(
         mood: StressBuddyMood,
         stressLevel: Double,
@@ -32,47 +30,58 @@ struct StressCharacterCard: View {
     }
 
     var body: some View {
-        VStack(spacing: 0) {
-            // Date header with refresh button
-            HStack(alignment: .top) {
-                DateHeaderView(date: lastUpdated ?? Date())
+        ZStack(alignment: .topTrailing) {
+            // Main card content
+            VStack(spacing: 0) {
+                // Date header with refresh button
+                HStack(alignment: .top) {
+                    DateHeaderView(date: lastUpdated ?? Date())
+                    Spacer()
+                    refreshButton
+                }
+                .padding(.horizontal, 20)
+                .padding(.top, 22)
+
                 Spacer()
-                refreshButton
+
+                // Status text (centered)
+                Text(mood.displayName)
+                    .font(.system(size: 26, weight: .bold))
+                    .foregroundStyle(moodColor)
+                    .padding(.top, 30)
+
+                Spacer()
+
+                // Character illustration
+                characterView
+                    .padding(.vertical, 20)
+
+                Spacer()
+
+                // Last updated timestamp
+                if let lastUpdated = lastUpdated {
+                    Text("Last Updated: \(lastUpdated, style: .relative)")
+                        .font(.system(size: 13, weight: .bold))
+                        .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
+                        .padding(.bottom, 24)
+                }
             }
-            .padding(.horizontal, 20)
-            .padding(.top, 22)
+            .frame(width: cardSize.width, height: cardSize.height)
+            .background(Color.Wellness.adaptiveCardBackground)
+            .clipShape(RoundedRectangle(cornerRadius: 24))
+            .shadow(color: .black.opacity(0.04), radius: 7.7, x: 0, y: 3)
+            .shadow(color: .black.opacity(0.03), radius: 13.9, x: 0, y: 7)
+            .shadow(color: .black.opacity(0.02), radius: 26.4, x: 0, y: 13.9)
+            .shadow(color: .black.opacity(0.01), radius: 46.9, x: 0, y: 24.5)
 
-            Spacer()
-
-            // Status text (centered)
-            Text(mood.displayName)
-                .font(.system(size: 26, weight: .bold))
-                .foregroundStyle(moodColor)
-                .padding(.top, 30)
-
-            Spacer()
-
-            // Character illustration
-            characterView
-                .padding(.vertical, 20)
-
-            Spacer()
-
-            // Last updated timestamp
-            if let lastUpdated = lastUpdated {
-                Text("Last Updated: \(lastUpdated, style: .relative)")
-                    .font(.system(size: 13, weight: .bold))
-                    .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
-                    .padding(.bottom, 24)
+            // Decorative triangle (top-right area, Figma position)
+            if size == .dashboard {
+                DecorativeTriangleView()
+                    .padding(.top, 60)
+                    .padding(.trailing, 30)
+                    .accessibilityHidden(true)
             }
         }
-        .frame(width: cardSize.width, height: cardSize.height)
-        .background(Color.Wellness.adaptiveCardBackground)
-        .clipShape(RoundedRectangle(cornerRadius: 24))
-        .shadow(color: .black.opacity(0.04), radius: 7.7, x: 0, y: 3)
-        .shadow(color: .black.opacity(0.03), radius: 13.9, x: 0, y: 7)
-        .shadow(color: .black.opacity(0.02), radius: 26.4, x: 0, y: 13.9)
-        .shadow(color: .black.opacity(0.01), radius: 46.9, x: 0, y: 24.5)
         .accessibilityElement(children: .combine)
         .accessibilityLabel(accessibilityLabel)
     }
@@ -99,29 +108,21 @@ struct StressCharacterCard: View {
     @ViewBuilder
     private var characterView: some View {
         ZStack {
-            // Main character symbol
-            Image(systemName: mood.symbol)
-                .font(.system(size: mood.symbolSize(for: size)))
-                .foregroundStyle(mood.color)
-                .symbolRenderingMode(.hierarchical)
-                .characterAnimation(for: mood)
-
-            // Accessories
-            accessoriesView
+            // Custom character illustration (replaces SF Symbols)
+            StressBuddyIllustration(mood: mood, size: characterSize)
         }
         .accessibilityHidden(true)
     }
 
-    @ViewBuilder
-    private var accessoriesView: some View {
-        if !mood.accessories.isEmpty {
-            ForEach(Array(mood.accessories.enumerated()), id: \.offset) { index, accessory in
-                Image(systemName: accessory)
-                    .font(.system(size: mood.accessorySize(for: size)))
-                    .foregroundStyle(mood.color.opacity(0.7))
-                    .offset(accessoryOffset(for: index, total: mood.accessories.count))
-                    .accessoryAnimation(index: index)
-            }
+    /// Character size based on context
+    private var characterSize: CGFloat {
+        switch size {
+        case .dashboard:
+            return 126
+        case .widget:
+            return 100
+        case .watchOS:
+            return 60
         }
     }
 
@@ -136,17 +137,6 @@ struct StressCharacterCard: View {
         case .watchOS:
             return CGSize(width: 180, height: 180)
         }
-    }
-
-    /// Position accessories around the character
-    private func accessoryOffset(for index: Int, total: Int) -> CGSize {
-        let radius = mood.symbolSize(for: size) * 0.6
-        let angle = (Double(index) / Double(total)) * 2 * Double.pi
-
-        return CGSize(
-            width: CGFloat(cos(angle)) * radius,
-            height: CGFloat(sin(angle)) * radius
-        )
     }
 
     /// Mood color matching Figma design (#86CECD for relaxed)

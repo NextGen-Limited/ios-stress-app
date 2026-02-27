@@ -95,6 +95,9 @@ extension Color {
         /// Daylight yellow accent
         static let daylightYellow = Color(hex: "#FFBD42")
 
+        /// Icon gray (from Figma)
+        static let figmaIconGray = Color(hex: "#717171")
+
         // MARK: - Quick Action Colors
 
         /// Gratitude purple
