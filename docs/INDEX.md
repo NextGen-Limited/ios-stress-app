@@ -1,7 +1,7 @@
 # StressMonitor Documentation Index
 
 **Version:** 1.0 (Production)
-**Last Updated:** February 19, 2026
+**Last Updated:** February 27, 2026
 
 Complete documentation for the StressMonitor iOS/watchOS stress monitoring application.
 
@@ -9,7 +9,7 @@ Complete documentation for the StressMonitor iOS/watchOS stress monitoring appli
 
 ## Quick Navigation
 
-### 1. **[Project Overview & PDR](./project-overview-pdr.md)** (265 lines)
+### 1. **[Project Overview & PDR](./project-overview-pdr.md)**
 Product vision, requirements, features, algorithm specifications, and success metrics.
 - Product value proposition
 - Key features (v1.0 + planned)
@@ -17,13 +17,13 @@ Product vision, requirements, features, algorithm specifications, and success me
 - User stories and acceptance criteria
 - Success metrics and acceptance criteria
 
-### 2. **[Codebase Summary](./codebase-summary.md)** (392 lines)
+### 2. **[Codebase Summary](./codebase-summary.md)**
 File structure, organization, component breakdown, and code metrics.
 - High-level project structure
-- iOS app architecture (96 files, ~12,270 LOC)
-- watchOS app architecture (28 files, ~2,541 LOC)
-- Widget architecture (7 files, ~1,287 LOC)
-- Test suite organization (21 files, ~7,073 LOC)
+- iOS app architecture (110+ files)
+- watchOS app architecture (35+ files)
+- Widget architecture (7 files)
+- Test suite organization (50+ files)
 - Component responsibilities and file metrics
 
 ### 3. **[Code Standards](./code-standards.md)** (Overview)
@@ -33,57 +33,28 @@ Swift conventions, patterns, testing standards, and quality guidelines.
 - **[Code Standards: Swift](./code-standards-swift.md)** - File organization, naming, imports, indentation, state management, SwiftUI views
 - **[Code Standards: Patterns](./code-standards-patterns.md)** - Dependency injection, async/await, SwiftData, testing, error handling, design patterns, performance targets
 
-### 4. **[System Architecture](./system-architecture.md)** (617 lines)
+### 4. **[System Architecture](./system-architecture.md)** (Overview)
 MVVM architecture, data flow, service layer design, and technical decisions.
-- High-level architecture diagram
-- Layer responsibilities (Presentation, ViewModel, Services, Data)
-- Service protocols and implementations
-- Data layer (SwiftData + CloudKit)
-- Apple Watch architecture
-- Home screen widgets
-- Concurrency model (async/await)
-- Error handling strategy
-- Design decisions and trade-offs
-- Testing architecture
-- Security considerations
-- Extensibility points
 
-### 5. **[Deployment Guide](./deployment-guide.md)** (643 lines)
+**Quick Links:**
+- **[System Architecture: Core](./system-architecture-core.md)** - MVVM pattern, layer responsibilities, service architecture, data models, data flow, concurrency, error handling
+- **[System Architecture: Platform](./system-architecture-platform.md)** - CloudKit sync, Apple Watch standalone app, WidgetKit complications, home screen widgets, security model
+
+### 5. **[Deployment Guide](./deployment-guide.md)** (Overview)
 Build setup, testing, TestFlight distribution, and App Store submission.
-- Prerequisites and environment setup
-- Build instructions (development + release)
-- Testing checklist (unit tests + manual)
-- App Store Connect configuration
-- HealthKit privacy setup
-- Screenshots and app information
-- TestFlight distribution workflow
-- App Store submission process
-- Version management and release cadence
-- Troubleshooting guide
-- Performance optimization
-- Post-release monitoring
-- Rollback procedures
 
-### 6. **[Design Guidelines](./design-guidelines.md)** (613 lines)
+**Quick Links:**
+- **[Deployment: Environment](./deployment-guide-environment.md)** - Prerequisites, signing, capabilities, build instructions, testing checklist
+- **[Deployment: Release](./deployment-guide-release.md)** - App Store configuration, TestFlight distribution, review process, version management, rollback
+
+### 6. **[Design Guidelines](./design-guidelines.md)** (Overview)
 Color system, typography, components, accessibility, and animations.
-- Design philosophy (5 core principles)
-- Stress level color system (WCAG AA compliant)
-- Typography scale with Dynamic Type
-- Spacing and layout tokens
-- Component specifications (Ring, Badge, Cards)
-- Accessibility requirements (WCAG AA)
-- VoiceOver and Dynamic Type support
-- Touch target sizing
-- Color contrast ratios
-- Haptic feedback system
-- Animation timing and easing
-- StressBuddy character design
-- Dark mode support
-- Icon usage (SF Symbols)
-- Onboarding flow design
-- Data visualization guidelines
 
-### 7. **[Project Roadmap](./project-roadmap.md)** (494 lines)
+**Quick Links:**
+- **[Design Guidelines: Visual](./design-guidelines-visual.md)** - Color system, typography, spacing, components, dark mode, iconography
+- **[Design Guidelines: UX](./design-guidelines-ux.md)** - WCAG AA compliance, VoiceOver, Dynamic Type, haptics, StressBuddy character, onboarding
+
+### 7. **[Project Roadmap](./project-roadmap.md)**
 Current status, planned features, timeline, and success metrics.
 - Version 1.0 status (complete & shipping)
 - Version 1.1 planned features (Q2 2026)
@@ -91,36 +62,34 @@ Current status, planned features, timeline, and success metrics.
 - Maintenance and bug fix timeline
 - Release schedule and criteria
 - Success metrics (engagement, quality, financial)
-- Team capacity and effort estimates
-- Stakeholder communication plan
 
 ---
 
 ## Quick Reference
 
-### File Metrics Summary
+### Codebase Metrics (as of Feb 2026)
 
-| Document | Lines | Focus |
-|----------|-------|-------|
-| Project Overview | 265 | Requirements, features |
-| Codebase Summary | 392 | Code organization |
-| Code Standards | 634 | Conventions, patterns |
-| System Architecture | 617 | Design, data flow |
-| Deployment Guide | 643 | Build, release |
-| Design Guidelines | 613 | UI/UX, accessibility |
-| Project Roadmap | 494 | Timeline, features |
-| **Total** | **3,658** | Complete reference |
+| Metric | Value |
+|--------|-------|
+| **Total Swift Files** | 202 |
+| **Total Tokens** | ~200,000 |
+| **iOS App** | ~110 files |
+| **watchOS App** | ~35 files |
+| **Widgets** | 7 files |
+| **Tests** | ~50 files |
+| **External Dependencies** | 0 |
 
-### Key Numbers
+### Documentation Metrics
 
-- **Total Lines of Swift Code:** 22,727
-- **Total Swift Files:** 179
-- **iOS App:** 12,270 LOC (96 files)
-- **watchOS App:** 2,541 LOC (28 files)
-- **Widgets:** 1,287 LOC (7 files)
-- **Tests:** 7,073 LOC (21 files)
-- **Test Methods:** 100+ (>80% coverage)
-- **Documentation:** 3,658 LOC (7 files)
+| Document | Focus |
+|----------|-------|
+| Project Overview | Requirements, features |
+| Codebase Summary | Code organization |
+| Code Standards | Conventions, patterns |
+| System Architecture | Design, data flow |
+| Deployment Guide | Build, release |
+| Design Guidelines | UI/UX, accessibility |
+| Project Roadmap | Timeline, features |
 
 ---
 
@@ -245,5 +214,6 @@ SwiftUI Views → @Observable ViewModels → Protocol-based Services
 
 **Read the README.md** at project root for quick start and feature overview.
 
-**Last Updated:** February 19, 2026
+**Last Updated:** February 27, 2026
 **Maintained By:** Phuong Doan
+**Generated with:** repomix codebase analysis

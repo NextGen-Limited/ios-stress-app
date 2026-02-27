@@ -1,9 +1,9 @@
 # Codebase Summary
 
-**Total Lines of Code:** ~24,500 (Swift)
-**Total Files:** 189 Swift files
+**Total Files:** 202 Swift files
+**Total Tokens:** ~200,000
 **Architecture:** MVVM + Protocol-Oriented Design
-**Last Updated:** February 2026
+**Last Updated:** February 27, 2026
 
 ---
 
@@ -12,10 +12,18 @@
 ```
 ios-stress-app/
 ├── StressMonitor/                      # Xcode project root
-│   ├── StressMonitor/                  # iOS App (~12,270 LOC, 96 files)
-│   ├── StressMonitorWatch Watch App/   # watchOS App (~2,541 LOC, 28 files)
-│   ├── StressMonitorWidget/            # Home Screen Widgets (~1,287 LOC, 7 files)
-│   └── StressMonitorTests/             # Unit Tests (~7,073 LOC, 21 files)
+│   ├── StressMonitor/                  # iOS App (~110 files)
+│   │   ├── Components/                 # Shared UI components
+│   │   ├── Models/                     # Data models (10 files)
+│   │   ├── Services/                   # Business logic (26 files)
+│   │   ├── Theme/                      # Design tokens (5 files)
+│   │   ├── Utilities/                  # Helpers (7 files)
+│   │   ├── ViewModels/                 # State management (2 files)
+│   │   └── Views/                      # SwiftUI screens (50+ files)
+│   ├── StressMonitorWatch Watch App/   # watchOS App (~35 files)
+│   ├── StressMonitorWidget/            # Home Screen Widgets (7 files)
+│   ├── StressMonitorTests/             # Unit Tests (~35 files)
+│   └── StressMonitorUITests/           # UI Tests (2 files)
 └── docs/                               # Project documentation
 ```
 
