@@ -1,0 +1,37 @@
+<svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<radialGradient id="bodyGradient" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(128 128) rotate(90) scale(120)">
+<stop offset="0%" stop-color="#86CECD"/>
+<stop offset="100%" stop-color="#55A5A4"/>
+</radialGradient>
+<radialGradient id="shadowGradient" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(128 230) rotate(0) scale(100 20)">
+<stop offset="0%" stop-color="#000000" stop-opacity="0.15"/>
+<stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+</radialGradient>
+</defs>
+
+<!-- Soft shadow -->
+<ellipse cx="128" cy="230" rx="90" ry="15" fill="url(#shadowGradient)"/>
+
+<!-- Body -->
+<path d="M128 32C75 32 32 75 32 128C32 181 75 224 128 224C181 224 224 181 224 128C224 75 181 32 128 32Z" fill="url(#bodyGradient)"/>
+
+<!-- Face: Worried -->
+<!-- Eyes (Wide and startled) -->
+<circle cx="95" cy="118" r="10" fill="white"/>
+<circle cx="95" cy="118" r="5" fill="#2C3E50"/>
+<circle cx="161" cy="118" r="10" fill="white"/>
+<circle cx="161" cy="118" r="5" fill="#2C3E50"/>
+
+<!-- Mouth (Wavy frown) -->
+<path d="M110 160C110 160 115 150 128 150C141 150 146 160 146 160" stroke="#2C3E50" stroke-width="4" stroke-linecap="round"/>
+
+<!-- Sweat Drops -->
+<path d="M190 70C190 70 185 85 190 90C195 95 200 90 195 80C195 70 190 70 190 70Z" fill="#87CEEB" opacity="0.8"/>
+<path d="M205 90C205 90 200 100 205 104C210 108 215 104 210 96C210 88 205 90 205 90Z" fill="#87CEEB" opacity="0.6"/>
+
+<!-- Worried Brow Lines -->
+<path d="M85 95L105 100" stroke="#2C3E50" stroke-width="2" stroke-linecap="round" opacity="0.7"/>
+<path d="M151 100L171 95" stroke="#2C3E50" stroke-width="2" stroke-linecap="round" opacity="0.7"/>
+
+</svg>
