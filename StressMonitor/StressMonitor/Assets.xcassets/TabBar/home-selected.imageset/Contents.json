@@ -1,15 +1,12 @@
 {
   "images" : [
     {
-      "filename" : "TabAction.svg",
+      "filename" : "home-selected.pdf",
       "idiom" : "universal"
     }
   ],
   "info" : {
     "author" : "xcode",
     "version" : 1
-  },
-  "properties" : {
-    "preserves-vector-representation" : true
   }
 }
