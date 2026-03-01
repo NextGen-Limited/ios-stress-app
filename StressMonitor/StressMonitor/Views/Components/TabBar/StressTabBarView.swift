@@ -23,39 +23,36 @@ public enum TabBarVisibility {
 /// Uses separate images for selected/unselected states.
 struct StressTabBarView: View {
     @Binding var selectedTab: TabItem
-    @Namespace private var animation
 
     // Figma specs
     private let tabBarHeight: CGFloat = 100
     private let tabSpacing: CGFloat = 80
     private let topPadding: CGFloat = 21
-    private let bottomSafeArea: CGFloat = 34
+    private let bottomSafeArea: CGFloat = 0
+
+    // Corner radius for tab bar top edges
+    private let cornerRadius: CGFloat = 24
 
     var body: some View {
-        ZStack(alignment: .bottom) {
-            // Tab items HStack
-            HStack(spacing: tabSpacing) {
-                ForEach(TabItem.allCases) { item in
-                    TabBarItem(
-                        item: item,
-                        isSelected: selectedTab == item
-                    ) {
-                        HapticManager.shared.buttonPress()
-                        withAnimation(.easeInOut(duration: 0.25)) {
-                            selectedTab = item
-                        }
+        HStack(spacing: tabSpacing) {
+            ForEach(TabItem.allCases) { item in
+                TabBarItem(
+                    item: item,
+                    isSelected: selectedTab == item
+                ) {
+                    HapticManager.shared.buttonPress()
+                    withAnimation(.easeInOut(duration: 0.25)) {
+                        selectedTab = item
                     }
                 }
             }
-            .padding(.top, topPadding)
-            .padding(.bottom, bottomSafeArea)
         }
-        .frame(height: tabBarHeight)
-        .frame(maxWidth: .infinity)
-        .background(
-            Color(.systemBackground)
-                .shadow(color: .black.opacity(0.11), radius: 14, y: -5)
+        .padding()
+        .background(Color(.systemBackground))
+        .clipShape(
+            .rect(cornerRadius: cornerRadius)
         )
+        .shadow(color: .black.opacity(0.11), radius: 14, y: -5)
         .accessibilityElement(children: .contain)
         .accessibilityIdentifier("StressTabBar")
     }

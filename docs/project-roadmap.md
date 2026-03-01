@@ -332,6 +332,13 @@ remains on your device or encrypted in iCloud.
 - Watch app requires watchOS 10+ (intentional)
 - No iPad support yet (planned for v2.0)
 
+**Recent Fixes (March 2026):**
+- ✅ Fixed TabBar compilation errors (TabItem enum structure)
+- ✅ Added Identifiable conformance to TabItem
+- ✅ Fixed Tabbable protocol conformance (icon property)
+- ✅ Removed unused @Namespace variable from StressTabBarView
+- ⚠️ Watch app WCSessionDelegate conformance pending (separate issue)
+
 **Bug Tracking:**
 Use GitHub Issues for bug reports:
 ```
