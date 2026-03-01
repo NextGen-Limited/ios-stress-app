@@ -132,32 +132,47 @@ Animated character that reflects stress level and provides encouragement.
 
 ### Mood States
 
-| Stress Level | Expression | Color | Message |
-|-------------|-----------|-------|---------|
-| **Relaxed (0-25)** | Smiling 😊 | Green | "You're doing great!" |
-| **Mild (25-50)** | Neutral 😐 | Blue | "Stay calm and breathe" |
-| **Moderate (50-75)** | Concerned 😟 | Yellow | "Take a moment to relax" |
-| **High (75-100)** | Worried 😰 | Orange | "Try a breathing exercise" |
+| Stress Level | Expression | SVG Asset | Color | Message |
+|-------------|-----------|-----------|-------|---------|
+| **Sleeping** | Rest state | `CharacterSleeping.svg` | - | "Rest mode" |
+| **Relaxed (0-25)** | Smiling | `CharacterCalm.svg` | Green | "You're doing great!" |
+| **Mild (25-50)** | Concerned | `CharacterConcerned.svg` | Blue | "Stay calm and breathe" |
+| **Moderate (50-75)** | Worried | `CharacterWorried.svg` | Yellow | "Take a moment to relax" |
+| **High (75-100)** | Overwhelmed | `CharacterOverwhelmed.svg` | Orange | "Try a breathing exercise" |
 
-**Implementation:**
+### Implementation (Refactored Feb 2026)
+
+The StressBuddy now uses SVG assets instead of code-drawn shapes:
+
 ```swift
-struct StressBuddyView: View {
-  let stressLevel: Double
-  let category: StressCategory
+struct StressBuddyIllustration: View {
+  let mood: StressBuddyMood
+  let size: CGSize
 
   var body: some View {
-    VStack(spacing: 16) {
-      Image(systemName: category.buddyEmoji)
-        .font(.system(size: 64))
-        .scaleEffect(1.0 + (stressLevel / 200))  // Subtle breathing animation
+    SvgImageView(assetName: mood.svgAsset, size: size)
+      .applyAnimation(for: mood)  // Breathing, fidget, shake animations
+  }
+}
 
-      Text(category.motivationalMessage)
-        .font(.headline)
-        .foregroundColor(Color.stressColor(for: category))
+// SVG assets are loaded from Assets.xcassets
+extension StressBuddyMood {
+  var svgAsset: String {
+    switch self {
+    case .sleeping: return "CharacterSleeping"
+    case .calm: return "CharacterCalm"
+    case .concerned: return "CharacterConcerned"
+    case .worried: return "CharacterWorried"
+    case .overwhelmed: return "CharacterOverwhelmed"
     }
   }
 }
 ```
+
+**Architecture Change:**
+- Previously: 549 LOC of custom SwiftUI shapes
+- Now: 66 LOC + 5 SVG assets in Asset Catalog
+- Benefits: Easier design updates, faster compilation, smaller binary
 
 ---
 

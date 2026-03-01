@@ -3,7 +3,7 @@
 **Total Files:** 206 Swift files
 **Total Tokens:** ~205,000
 **Architecture:** MVVM + Protocol-Oriented Design
-**Last Updated:** February 27, 2026
+**Last Updated:** February 28, 2026
 
 ---
 
@@ -12,38 +12,44 @@
 ```
 ios-stress-app/
 ├── StressMonitor/                      # Xcode project root
-│   ├── StressMonitor/                  # iOS App (~110 files)
-│   │   ├── Components/                 # Shared UI components
+│   ├── StressMonitor/                  # iOS App (136 files)
+│   │   ├── Components/                 # Shared UI components (7 files)
 │   │   ├── Models/                     # Data models (10 files)
-│   │   ├── Services/                   # Business logic (26 files)
+│   │   ├── Services/                   # Business logic (27 files)
 │   │   ├── Theme/                      # Design tokens (5 files)
 │   │   ├── Utilities/                  # Helpers (7 files)
 │   │   ├── ViewModels/                 # State management (2 files)
-│   │   └── Views/                      # SwiftUI screens (50+ files)
-│   ├── StressMonitorWatch Watch App/   # watchOS App (~35 files)
+│   │   └── Views/                      # SwiftUI screens (77 files)
+│   ├── StressMonitorWatch Watch App/   # watchOS App (29 files)
 │   ├── StressMonitorWidget/            # Home Screen Widgets (7 files)
-│   ├── StressMonitorTests/             # Unit Tests (~35 files)
-│   └── StressMonitorUITests/           # UI Tests (2 files)
+│   ├── StressMonitorTests/             # Unit Tests (27 files)
+│   └── StressMonitorUITests/           # UI Tests
 └── docs/                               # Project documentation
 ```
 
 ---
 
-## iOS App Structure (114 files, ~14,500 LOC)
+## iOS App Structure (136 files, ~14,500 LOC)
 
-### Components (4 files, ~1,123 LOC)
-Custom UI components for character illustration and animations.
+### Components (7 files, ~606 LOC)
+Character components using SVG assets with SwiftUI animations.
 
 | File | LOC | Purpose |
 |------|-----|---------|
-| `Components/Character/StressBuddyIllustration.swift` | 583 | Custom SwiftUI character with 5 mood expressions |
+| `Components/Character/StressBuddyIllustration.swift` | 66 | SVG-based character loader with 5 mood expressions |
 | `Components/Character/StressCharacterCard.swift` | 270 | Character card with ZStack layout |
 | `Components/Character/CharacterAnimationModifier.swift` | 161 | Mood-specific animations (breathing, fidget, shake, dizzy) |
 | `Components/Character/DecorativeTriangleView.swift` | 109 | Decorative triangle element for card corners |
 
+**SVG Assets (refactored Feb 2026):**
+- `CharacterCalm.svg` - Relaxed expression
+- `CharacterConcerned.svg` - Moderate concern
+- `CharacterOverwhelmed.svg` - High stress
+- `CharacterSleeping.svg` - Rest state
+- `CharacterWorried.svg` - Mild stress
+
 **Key Features:**
-- 5 mood expressions: sleeping, calm, concerned, worried, overwhelmed
-- Custom shapes: TriangleShape, TeardropShape, FlameShape
+- 5 mood expressions via SVG assets (replaced 549 LOC of custom drawing)
 - Reduce Motion support throughout
 - Accessibility labels and VoiceOver support
 
@@ -62,7 +68,7 @@ Data structures for health metrics and stress calculations.
 | `Models/StressBuddyMood.swift` | 38 | Character mood states |
 | `Models/ExportModels.swift` | 279 | CSV/JSON export structures |
 
-### Services (26 files, ~5,000 LOC)
+### Services (27 files, ~4,861 LOC)
 Business logic, HealthKit integration, data persistence, cloud sync.
 
 #### HealthKit Service (1 file, 156 LOC)
@@ -138,13 +144,12 @@ Large module for export, delete, and CloudKit reset operations.
 | `Services/Protocols/StressRepositoryProtocol.swift` | 32 | Repository interface |
 | `Services/Protocols/CloudKitServiceProtocol.swift` | 40 | CloudKit interface |
 
-### ViewModels (3 files, ~900 LOC)
+### ViewModels (2 files, ~737 LOC)
 State management with @Observable macro.
 
 | File | LOC | Purpose |
 |------|-----|---------|
 | `ViewModels/StressViewModel.swift` | 278 | Main app state with auto-refresh (HKObserverQuery) |
-| `ViewModels/DashboardViewModel.swift` | 128 | Dashboard-specific state + component coordination |
 | `ViewModels/DataManagementViewModel.swift` | 459 | Export, delete, reset operations state |
 
 **Key Properties in StressViewModel:**
@@ -164,16 +169,15 @@ State management with @Observable macro.
 - Debounced refresh (60-second minimum interval)
 - Background health data monitoring
 
-### Views (60 files, ~4,100 LOC)
+### Views (77 files, ~9,308 LOC)
 SwiftUI declarative interface organized by feature.
 
-#### Dashboard Module (14 files, ~1,900 LOC)
+#### Dashboard Module (23 files, ~2,100 LOC)
 Main stress display screen with enhanced UI.
 
 | File | LOC | Purpose |
 |------|-----|---------|
 | `Views/Dashboard/StressDashboardView.swift` | 271 | Main dashboard with unified scroll layout |
-| `Views/Dashboard/DashboardViewModel.swift` | 128 | Dashboard state coordination |
 | `Views/Dashboard/Components/StressRingView.swift` | 86 | 260pt animated ring with spring animations |
 | `Views/Dashboard/Components/MetricCardView.swift` | 171 | HRV + HR cards with number transitions |
 | `Views/Dashboard/Components/DailyTimelineView.swift` | 263 | 24-hour stress timeline chart |
@@ -194,7 +198,7 @@ Main stress display screen with enhanced UI.
 - Spring animations with Reduce Motion support
 - All 6 components visible in single scroll
 
-#### History Module (6 files, 412 LOC)
+#### History Module (8 files, ~550 LOC)
 Timeline view with filtering.
 
 | File | LOC | Purpose |
@@ -203,7 +207,7 @@ Timeline view with filtering.
 | `Views/History/HistoryFilterView.swift` | 128 | Date/category filter UI |
 | `Views/History/MeasurementDetailView.swift` | 128 | Individual measurement details |
 
-#### Trends Module (5 files, 387 LOC)
+#### Trends Module (6 files, ~420 LOC)
 Charts and analytics.
 
 | File | LOC | Purpose |
@@ -212,7 +216,7 @@ Charts and analytics.
 | `Views/Trends/StressTrendChartView.swift` | 134 | Line chart (24h/week/month) |
 | `Views/Trends/StressDistributionView.swift` | 108 | Category distribution chart |
 
-#### Breathing Module (3 files, 423 LOC)
+#### Breathing Module (6 files, ~450 LOC)
 Guided breathing exercises.
 
 | File | LOC | Purpose |
@@ -220,7 +224,7 @@ Guided breathing exercises.
 | `Views/Breathing/BreathingExerciseView.swift` | 245 | Guided session UI + timer |
 | `Views/Breathing/BreathingHistoryView.swift` | 178 | Past sessions list |
 
-#### Settings Module (12 files, ~800 LOC)
+#### Settings Module (6 files, ~400 LOC)
 App settings and data management.
 
 | File | LOC | Purpose |
@@ -241,7 +245,7 @@ First-launch flow with baseline setup.
 | `Views/Onboarding/BaselineSetupView.swift` | 156 | Collect baseline data |
 | `Views/Onboarding/OnboardingCompletionView.swift` | 7 | Success screen |
 
-#### DesignSystem & Components (8 files, ~340 LOC)
+#### DesignSystem & Components (11 files, ~650 LOC)
 Reusable components and design patterns.
 
 | File | LOC | Purpose |
@@ -249,6 +253,13 @@ Reusable components and design patterns.
 | `Views/Components/StressRingProgressView.swift` | 98 | Circular progress ring |
 | `Views/Components/LoadingStateView.swift` | 67 | Loading skeleton |
 | `Views/Components/ErrorStateView.swift` | 85 | Error message + retry |
+
+#### Journal Module (1 file)
+Stress journaling (v1.1 feature foundation).
+
+| File | LOC | Purpose |
+|------|-----|---------|
+| `Views/Journal/` | - | Stress trigger tracking |
 
 ### Theme (5 files, ~330 LOC)
 Design tokens and styling.
@@ -293,7 +304,7 @@ Helper functions and extensions.
 
 ---
 
-## watchOS App Structure (28 files, ~2,541 LOC)
+## watchOS App Structure (29 files, ~2,541 LOC)
 
 ### Models (6 files)
 Shared with iOS (via target membership).
@@ -360,7 +371,7 @@ Watch-specific design tokens.
 
 ---
 
-## Unit Tests (21 files, ~7,073 LOC)
+## Unit Tests (27 files, ~7,500 LOC)
 
 ### Core Algorithm Tests (2 files, 312 LOC)
 
@@ -424,10 +435,10 @@ Watch-specific design tokens.
 |--------|-------|
 | **Total Swift Files** | 206 |
 | **Total LOC** | ~26,000 |
-| **iOS App LOC** | ~15,500 |
-| **watchOS App LOC** | 2,541 |
-| **Widget LOC** | 1,287 |
-| **Test LOC** | 7,200 |
+| **iOS App LOC** | ~14,500 |
+| **watchOS App LOC** | ~2,541 |
+| **Widget LOC** | ~1,287 |
+| **Test LOC** | ~7,500 |
 | **Average File Size** | 126 LOC |
 | **Test Coverage** | 100+ tests (>80% core logic) |
 | **No External Dependencies** | System frameworks only |
@@ -459,5 +470,5 @@ Watch-specific design tokens.
 
 ---
 
-**Last Updated:** February 27, 2026
+**Last Updated:** February 28, 2026
 **Maintainers:** Phuong Doan

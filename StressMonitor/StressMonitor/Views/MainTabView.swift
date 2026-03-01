@@ -3,6 +3,7 @@ import SwiftData
 
 struct MainTabView: View {
     @Environment(\.modelContext) private var modelContext
+    @State private var selectedTab: TabItem = .home
 
     /// Enable mock data mode for development/simulator testing
     /// Set to true to see sample data without real HealthKit data
@@ -15,49 +16,28 @@ struct MainTabView: View {
     }()
 
     var body: some View {
-        TabView {
-            if Self.useMockData {
-                DashboardView(viewModel: PreviewDataFactory.mockDashboardViewModel())
-                    .tabItem {
-                        Label("Now", systemImage: "heart.fill")
+        ZStack(alignment: .bottom) {
+            // Content area
+            Group {
+                switch selectedTab {
+                case .home:
+                    if Self.useMockData {
+                        DashboardView(viewModel: PreviewDataFactory.mockDashboardViewModel())
+                    } else {
+                        DashboardView(repository: StressRepository(modelContext: modelContext))
                     }
-                    .accessibilityIdentifier("DashboardTab")
-                    .accessibilityLabel("Current stress level")
-                    .accessibilityHint("View your current stress measurement")
-            } else {
-                DashboardView(repository: StressRepository(modelContext: modelContext))
-                    .tabItem {
-                        Label("Now", systemImage: "heart.fill")
-                    }
-                    .accessibilityIdentifier("DashboardTab")
-                    .accessibilityLabel("Current stress level")
-                    .accessibilityHint("View your current stress measurement")
+                case .action:
+                    ActionView()
+                case .trend:
+                    TrendsView()
+                }
             }
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
 
-            MeasurementHistoryView()
-                .tabItem {
-                    Label("History", systemImage: "chart.bar")
-                }
-                .accessibilityIdentifier("HistoryTab")
-                .accessibilityLabel("Stress history")
-                .accessibilityHint("View past stress measurements")
-
-            TrendsView()
-                .tabItem {
-                    Label("Trends", systemImage: "chart.xyaxis.line")
-                }
-                .accessibilityIdentifier("TrendsTab")
-                .accessibilityLabel("Trends and patterns")
-                .accessibilityHint("View your stress trends over time")
-
-            SettingsView()
-                .tabItem {
-                    Label("Settings", systemImage: "gear")
-                }
-                .accessibilityIdentifier("SettingsTab")
-                .accessibilityLabel("Settings")
-                .accessibilityHint("Configure app settings")
+            // Stress tab bar fixed at bottom
+            StressTabBarView(selectedTab: $selectedTab)
         }
+        .ignoresSafeArea(.keyboard)
         .tint(.accentColor)
     }
 }

@@ -312,9 +312,10 @@ struct StressResultBuilder {
 ### Result Type for Error Handling
 
 ```swift
-typealias StressResult = Swift.Result<Double, StressError>
+// Use Swift.Result explicitly to avoid collision with StressResult model
+typealias StressComputationResult = Swift.Result<Double, StressError>
 
-func calculateStress() -> StressResult {
+func calculateStress() -> StressComputationResult {
   do {
     let value = try computation()
     return .success(value)

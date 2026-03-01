@@ -98,18 +98,13 @@ All text must support Dynamic Type scaling (user's accessibility settings):
 ```swift
 Text("Stress Level")
   .font(.headline)
-  .accessibleDynamicType()  // Custom modifier
+  .dynamicTypeSize(...(.accessibility3))  // iOS 15+ range
 
-// Modifier implementation
-struct AccessibleDynamicTypeModifier: ViewModifier {
-  @Environment(\.sizeCategory) var sizeCategory
-
-  func body(content: Content) -> some View {
-    content
-      .minimumScaleFactor(0.8)  // Prevent clipping
-      .lineLimit(nil)            // Allow wrapping
-  }
-}
+// For more control
+Text("Stress Level")
+  .font(.headline)
+  .minimumScaleFactor(0.75)  // Don't shrink below 75%
+  .lineLimit(nil)            // Allow wrapping
 ```
 
 ---
@@ -308,13 +303,32 @@ struct MeasurementCardView: View {
 | **Entrance** | 600ms | easeOut |
 | **Transition** | 300ms | linear |
 
+### Spring Animations (iOS 17+)
+
+Use the new spring API with parameters:
+
+```swift
+// iOS 17+ spring animation
+.animation(.spring(response: 0.4, dampingFraction: 0.7, blendDuration: 0.2), value: stressLevel)
+
+// Or using Animation initializer
+Animation.spring(response: 0.4, dampingFraction: 0.7, blendDuration: 0.2)
+```
+
 ### Stress Ring Animation
 
 Animates from 0 to current stress level on load:
 
 ```swift
-.withAnimation(.easeInOut(duration: 0.6)) {
-  stressLevel = newValue
+// iOS 17+ recommended approach
+@State private var animatedLevel: Double = 0
+
+var body: some View {
+  Circle()
+    .trim(from: 0, to: animatedLevel / 100)
+    .stroke(stressColor, lineWidth: 8)
+    .animation(.spring(response: 0.6, dampingFraction: 0.8), value: animatedLevel)
+    .onAppear { animatedLevel = stressLevel }
 }
 ```
 

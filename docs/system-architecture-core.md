@@ -53,7 +53,7 @@
 
 ### Presentation Layer (Views)
 
-**Files:** `Views/` (57 files)
+**Files:** `Views/` (77 files)
 
 Declarative SwiftUI screens, zero business logic.
 
@@ -138,7 +138,7 @@ final class StressViewModel {
 
 ### Service Layer
 
-**Files:** `Services/` (25 files)
+**Files:** `Services/` (27 files)
 
 Business logic, domain-specific operations, protocol-based.
 
