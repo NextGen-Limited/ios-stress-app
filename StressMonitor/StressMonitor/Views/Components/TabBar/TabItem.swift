@@ -26,26 +26,13 @@ enum TabItem: Int, Tabbable, CaseIterable, Identifiable {
 
     // MARK: - Custom Properties
 
-    /// Asset name in Asset Catalog (backwards compatible)
+    /// Asset name in Asset Catalog
     var iconName: String {
         switch self {
         case .home:   return "TabHome"
         case .action: return "TabAction"
         case .trend:  return "TabTrend"
         }
-    }
-
-    /// Dynamic icon name based on selection state
-    /// Returns Selected variant (teal) or Unselected variant (gray)
-    func iconName(isSelected: Bool) -> String {
-        let base: String
-        switch self {
-        case .home:   base = "TabHome"
-        case .action: base = "TabAction"
-        case .trend:  base = "TabTrend"
-        }
-        let suffix = isSelected ? "-Selected" : "-Unselected"
-        return "\(base)\(suffix)"
     }
 
     /// Accessibility label (WCAG AA)
