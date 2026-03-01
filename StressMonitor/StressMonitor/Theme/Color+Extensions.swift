@@ -83,6 +83,37 @@ extension Color {
     /// Heart rate accent color (red-pink)
     static let heartRateAccent = Color(hex: "#F87171")
 
+    // MARK: - Settings Screen Colors
+
+    /// Settings background (light: #F3F4F8, dark: #1C1C1E)
+    static let settingsBackground = Color(light: Color(hex: "F3F4F8"), dark: Color(hex: "1C1C1E"))
+    /// Accent teal (light: #85C9C9, dark: #6DB3B3)
+    static let accentTeal = Color(light: Color(hex: "85C9C9"), dark: Color(hex: "6DB3B3"))
+    /// Premium gold - #FE9901
+    static let premiumGold = Color(hex: "FE9901")
+    /// Tertiary text - #808080
+    static let textTertiary = Color(hex: "808080")
+    /// Descriptive text - #848484
+    static let textDescriptive = Color(hex: "848484")
+    /// Light border - #DBDBDB
+    static let borderLight = Color(light: Color(hex: "DBDBDB"), dark: Color(hex: "38383A"))
+    /// Widget border - #C0C0C0
+    static let widgetBorder = Color(light: Color(hex: "C0C0C0"), dark: Color(hex: "48484A"))
+    /// Settings card shadow color - #18274B
+    static let settingsCardShadowColor = Color(hex: "18274B")
+
+    // MARK: - Adaptive Colors for Settings
+
+    /// Adaptive background for settings screen
+    static var adaptiveSettingsBackground: Color {
+        Color(light: Color(hex: "F3F4F8"), dark: Color(hex: "1C1C1E"))
+    }
+
+    /// Adaptive card background (white in light, elevated in dark)
+    static var adaptiveCardBackground: Color {
+        Color(light: .white, dark: Color(hex: "2C2C2E"))
+    }
+
     // MARK: - Color Helpers
 
     static func stressColor(for level: Double) -> Color {

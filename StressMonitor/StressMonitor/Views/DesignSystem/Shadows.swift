@@ -30,6 +30,16 @@ struct AppShadow {
         x: 0,
         y: 1
     )
+
+    // MARK: - Settings Card Shadow
+
+    /// Settings card shadow per Figma spec
+    static let settingsCard = ShadowDefinition(
+        color: Color.settingsCardShadowColor.opacity(0.08),
+        radius: 5.71,
+        x: 0,
+        y: 2.85
+    )
 }
 
 struct ShadowDefinition {

@@ -1,9 +1,9 @@
 # Codebase Summary
 
-**Total Files:** 206 Swift files
-**Total Tokens:** ~205,000
+**Total Files:** 214 Swift files
+**Total Tokens:** ~210,000
 **Architecture:** MVVM + Protocol-Oriented Design
-**Last Updated:** February 28, 2026
+**Last Updated:** March 1, 2026
 
 ---
 
@@ -12,14 +12,15 @@
 ```
 ios-stress-app/
 ├── StressMonitor/                      # Xcode project root
-│   ├── StressMonitor/                  # iOS App (136 files)
+│   ├── StressMonitor/                  # iOS App (144 files)
 │   │   ├── Components/                 # Shared UI components (7 files)
 │   │   ├── Models/                     # Data models (10 files)
 │   │   ├── Services/                   # Business logic (27 files)
-│   │   ├── Theme/                      # Design tokens (5 files)
+│   │   ├── Theme/                      # Design tokens (7 files)
 │   │   ├── Utilities/                  # Helpers (7 files)
 │   │   ├── ViewModels/                 # State management (2 files)
-│   │   └── Views/                      # SwiftUI screens (77 files)
+│   │   ├── Views/                      # SwiftUI screens (85 files)
+│   │   │   └── DesignSystem/           # Design system components (2 files)
 │   ├── StressMonitorWatch Watch App/   # watchOS App (29 files)
 │   ├── StressMonitorWidget/            # Home Screen Widgets (7 files)
 │   ├── StressMonitorTests/             # Unit Tests (27 files)
@@ -29,7 +30,7 @@ ios-stress-app/
 
 ---
 
-## iOS App Structure (136 files, ~14,500 LOC)
+## iOS App Structure (144 files, ~15,300 LOC)
 
 ### Components (7 files, ~606 LOC)
 Character components using SVG assets with SwiftUI animations.
@@ -169,7 +170,7 @@ State management with @Observable macro.
 - Debounced refresh (60-second minimum interval)
 - Background health data monitoring
 
-### Views (77 files, ~9,308 LOC)
+### Views (85 files, ~9,880 LOC)
 SwiftUI declarative interface organized by feature.
 
 #### Dashboard Module (23 files, ~2,100 LOC)
@@ -224,15 +225,28 @@ Guided breathing exercises.
 | `Views/Breathing/BreathingExerciseView.swift` | 245 | Guided session UI + timer |
 | `Views/Breathing/BreathingHistoryView.swift` | 178 | Past sessions list |
 
-#### Settings Module (6 files, ~400 LOC)
-App settings and data management.
+#### Settings Module (14 files, ~740 LOC)
+App settings with card-based layout.
 
 | File | LOC | Purpose |
 |------|-----|---------|
-| `Views/Settings/SettingsView.swift` | 167 | Settings tabs |
+| `Views/Settings/SettingsView.swift` | 167 | Settings tabs with card layout |
 | `Views/Settings/DataManagementView.swift` | 245 | Export, delete, reset controls |
 | `Views/Settings/AccountSettingsView.swift` | 156 | iCloud/CloudKit options |
 | `Views/Settings/PrivacyView.swift` | 94 | Privacy policy + data usage |
+| `Views/Settings/Components/AddComplicationButton.swift` | 36 | Add complication button |
+| `Views/Settings/Components/ComplicationWidget.swift` | 68 | Widget preview card |
+| `Views/Settings/Components/DataSharingCard.swift` | 40 | Data sharing options |
+| `Views/Settings/Components/PremiumCard.swift` | 36 | Premium upgrade card |
+| `Views/Settings/Components/SettingsSectionHeader.swift` | 44 | Section header |
+| `Views/Settings/Components/ShareButton.swift` | 36 | Share action button |
+| `Views/Settings/Components/WatchFaceCard.swift` | 40 | Watch face preview |
+
+**Settings Design Features (Mar 2026):**
+- Card-based layout with adaptive backgrounds
+- Settings-specific color tokens (light/dark mode)
+- Custom shadow and spacing design tokens
+- 5 SVG icons for Settings actions
 
 #### Onboarding Module (10 files, ~467 LOC)
 First-launch flow with baseline setup.
@@ -245,7 +259,7 @@ First-launch flow with baseline setup.
 | `Views/Onboarding/BaselineSetupView.swift` | 156 | Collect baseline data |
 | `Views/Onboarding/OnboardingCompletionView.swift` | 7 | Success screen |
 
-#### DesignSystem & Components (11 files, ~650 LOC)
+#### DesignSystem & Components (12 files, ~690 LOC)
 Reusable components and design patterns.
 
 | File | LOC | Purpose |
@@ -253,6 +267,7 @@ Reusable components and design patterns.
 | `Views/Components/StressRingProgressView.swift` | 98 | Circular progress ring |
 | `Views/Components/LoadingStateView.swift` | 67 | Loading skeleton |
 | `Views/Components/ErrorStateView.swift` | 85 | Error message + retry |
+| `Views/DesignSystem/Components/SettingsCard.swift` | 40 | Generic Settings card container |
 
 #### Journal Module (1 file)
 Stress journaling (v1.1 feature foundation).
@@ -261,16 +276,18 @@ Stress journaling (v1.1 feature foundation).
 |------|-----|---------|
 | `Views/Journal/` | - | Stress trigger tracking |
 
-### Theme (5 files, ~330 LOC)
+### Theme (7 files, ~390 LOC)
 Design tokens and styling.
 
 | File | LOC | Purpose |
 |------|-----|---------|
-| `Theme/Color+Extensions.swift` | 107 | Stress color mapping + OLED/accent colors |
+| `Theme/Color+Extensions.swift` | 138 | Stress colors + Settings adaptive colors |
 | `Theme/Color+Wellness.swift` | 56 | Wellness color palette + `figmaIconGray` (#717171) |
 | `Theme/DesignTokens.swift` | 89 | Spacing, corner radius, shadows |
 | `Theme/Font+WellnessType.swift` | 45 | Typography scale |
 | `Theme/Gradients.swift` | 30 | Gradient definitions |
+| `Views/DesignSystem/Spacing.swift` | 29 | 8pt grid + Settings card spacing |
+| `Views/DesignSystem/Shadows.swift` | 71 | Shadow presets + Settings card shadow |
 
 **Key Colors:**
 ```swift
@@ -287,6 +304,12 @@ Design tokens and styling.
 
 // NEW (Feb 2026)
 .figmaIconGray               // #717171 (Character card icons)
+
+// NEW (Mar 2026) - Settings Screen
+.settingsBackground          // #F3F4F8 (light), #1C1C1E (dark)
+.adaptiveSettingsBackground  // Auto-adapts to light/dark
+.adaptiveCardBackground      // White (light), #2C2C2E (dark)
+.settingsCardShadowColor     // #18274B
 ```
 
 ### Utilities (7 files, ~435 LOC)
@@ -433,9 +456,9 @@ Watch-specific design tokens.
 
 | Metric | Value |
 |--------|-------|
-| **Total Swift Files** | 206 |
-| **Total LOC** | ~26,000 |
-| **iOS App LOC** | ~14,500 |
+| **Total Swift Files** | 214 |
+| **Total LOC** | ~27,000 |
+| **iOS App LOC** | ~15,300 |
 | **watchOS App LOC** | ~2,541 |
 | **Widget LOC** | ~1,287 |
 | **Test LOC** | ~7,500 |
@@ -470,5 +493,5 @@ Watch-specific design tokens.
 
 ---
 
-**Last Updated:** February 28, 2026
+**Last Updated:** March 1, 2026
 **Maintainers:** Phuong Doan

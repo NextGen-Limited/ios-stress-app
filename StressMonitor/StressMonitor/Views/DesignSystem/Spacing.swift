@@ -17,4 +17,12 @@ struct Spacing {
     static let cellPadding: CGFloat = 16
     static let listRowSpacing: CGFloat = 12
     static let sectionSpacing: CGFloat = 24
+
+    // MARK: - Settings Card Spacing
+
+    static let settingsCardPadding: CGFloat = 20
+    static let settingsCardSpacing: CGFloat = 14
+    static let settingsCardRadius: CGFloat = 20
+    static let widgetRadius: CGFloat = 20
+    static let buttonRadius: CGFloat = 20
 }

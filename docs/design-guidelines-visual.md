@@ -147,6 +147,7 @@ VStack(spacing: DesignTokens.spacing_m) {
 | **8pt** | Small cards, buttons |
 | **12pt** | Medium cards, input fields |
 | **16pt** | Large cards, modals |
+| **20pt** | Settings cards, widgets (NEW Mar 2026) |
 | **24pt** | Stress ring, avatar |
 
 ### Shadows
@@ -164,6 +165,13 @@ VStack(spacing: DesignTokens.spacing_m) {
 **Elevated Shadow** (modals):
 ```swift
 .shadow(color: Color.black.opacity(0.3), radius: 20, x: 0, y: 8)
+```
+
+**Settings Card Shadow** (NEW Mar 2026):
+```swift
+// Per Figma spec for Settings screen
+.shadow(color: Color.settingsCardShadowColor.opacity(0.08),
+        radius: 5.71, x: 0, y: 2.85)
 ```
 
 ---
@@ -426,6 +434,6 @@ Xcode → Debug → View Debugging → Core Animation
 ---
 
 **Next:** See `design-guidelines-ux.md` for accessibility, haptics, animations, and StressBuddy character.
-**Design System Version:** 1.0
-**Last Updated:** February 2026
+**Design System Version:** 1.1
+**Last Updated:** March 1, 2026
 **Maintained By:** Phuong Doan
