@@ -8,6 +8,7 @@ class SettingsViewModel {
     var exportSettings: ExportSettings
     var isDeletingAllData = false
     var cloudKitStatus: CloudKitSyncStatus = .unknown
+    var iCloudSyncEnabled: Bool = true
 
     private let repository: StressRepositoryProtocol
 
@@ -67,6 +68,12 @@ struct NotificationSettings: Codable {
     var dailyReminders: Bool = true
     var reminderTime: Date = Calendar.current.date(from: DateComponents(hour: 9, minute: 0)) ?? Date()
     var weeklyReport: Bool = true
+    // Settings screen UI controls
+    var snapshotTipsEnabled: Bool = true
+    var morningPreviewEnabled: Bool = true
+    var intensity: Double = 0.5
+    var quietHoursStart: Date = Calendar.current.date(from: DateComponents(hour: 0, minute: 0)) ?? Date()
+    var quietHoursEnd: Date = Calendar.current.date(from: DateComponents(hour: 8, minute: 0)) ?? Date()
 }
 
 struct ExportSettings: Codable {

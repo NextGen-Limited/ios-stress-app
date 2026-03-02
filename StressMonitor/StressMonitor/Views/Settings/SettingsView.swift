@@ -3,8 +3,8 @@ import SwiftData
 
 struct SettingsView: View {
     @Environment(\.modelContext) private var modelContext
+    @Environment(\.openURL) private var openURL
     @State private var viewModel: SettingsViewModel
-    @State private var showingDeleteConfirmation = false
     @State private var navigateToExport = false
     @State private var navigateToDelete = false
 
@@ -17,25 +17,42 @@ struct SettingsView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: Spacing.settingsCardSpacing) {
-                // Premium Card
+                // Widget CTA
                 PremiumCard()
                     .padding(.top, 8)
 
-                // Watch Face Card
+                // Watch face & Complications
                 WatchFaceCard()
 
-                // Data Sharing Card with navigation
-                DataSharingCard()
-                    .contentShape(Rectangle())
-                    .onTapGesture {
-                        navigateToExport = true
-                    }
+                // iOS Widget
+                WidgetCard()
 
-                // Data Management Section
-                dataManagementSection
+                // Health Data
+                HealthDataCard(onSyncNow: {
+                    Task { await viewModel.loadUserProfile() }
+                })
 
-                // Version Footer
-                versionFooter
+                // Notifications
+                NotificationsCard(
+                    snapshotTipsEnabled: $viewModel.notificationSettings.snapshotTipsEnabled,
+                    morningPreviewEnabled: $viewModel.notificationSettings.morningPreviewEnabled,
+                    notificationIntensity: $viewModel.notificationSettings.intensity,
+                    quietHoursStart: $viewModel.notificationSettings.quietHoursStart,
+                    quietHoursEnd: $viewModel.notificationSettings.quietHoursEnd
+                )
+
+                // Privacy
+                PrivacyCard(
+                    iCloudSyncEnabled: $viewModel.iCloudSyncEnabled,
+                    onExportCSV: { navigateToExport = true }
+                )
+
+                // About and Support
+                AboutCard(
+                    onContactSupport: { openURLString("mailto:support@stressmonitor.app") },
+                    onPrivacyPolicy: { openURLString("https://stressmonitor.app/privacy") },
+                    onTermsOfService: { openURLString("https://stressmonitor.app/terms") }
+                )
             }
             .padding(.horizontal, 16)
             .padding(.bottom, 20)
@@ -53,149 +70,13 @@ struct SettingsView: View {
         .navigationDestination(isPresented: $navigateToDelete) {
             DataDeleteView()
         }
-        .sheet(isPresented: $showingDeleteConfirmation) {
-            deleteConfirmationSheet
-        }
     }
 
-    // MARK: - Data Management Section
+    // MARK: - Helpers
 
-    private var dataManagementSection: some View {
-        SettingsCard {
-            VStack(alignment: .leading, spacing: 16) {
-                SettingsSectionHeader(
-                    icon: "externaldrive.badge.icloud",
-                    title: "Data Management"
-                )
-
-                // CloudKit Sync Status
-                HStack {
-                    Image(systemName: "icloud.fill")
-                        .foregroundColor(viewModel.cloudKitStatus.color)
-                        .frame(width: 24)
-                    Text("iCloud Sync")
-                        .foregroundColor(.primary)
-                    Spacer()
-                    Text(viewModel.cloudKitStatus.statusText)
-                        .font(.caption)
-                        .foregroundColor(.secondary)
-                }
-                .accessibilityElement(children: .combine)
-                .accessibilityLabel("iCloud sync status: \(viewModel.cloudKitStatus.statusText)")
-
-                Divider()
-
-                // Export Data
-                Button {
-                    navigateToExport = true
-                } label: {
-                    HStack {
-                        Image(systemName: "square.and.arrow.up")
-                            .foregroundColor(.primaryBlue)
-                            .frame(width: 24)
-                        Text("Export Data")
-                            .foregroundColor(.primary)
-                        Spacer()
-                        Image(systemName: "chevron.right")
-                            .foregroundColor(.secondary)
-                            .font(.caption)
-                    }
-                }
-                .accessibilityLabel("Export data")
-
-                Divider()
-
-                // Delete Data
-                Button {
-                    navigateToDelete = true
-                } label: {
-                    HStack {
-                        Image(systemName: "trash")
-                            .foregroundColor(.error)
-                            .frame(width: 24)
-                        Text("Delete Data")
-                            .foregroundColor(.primary)
-                        Spacer()
-                        Image(systemName: "chevron.right")
-                            .foregroundColor(.secondary)
-                            .font(.caption)
-                    }
-                }
-                .accessibilityLabel("Delete data")
-            }
-        }
-    }
-
-    // MARK: - Version Footer
-
-    private var versionFooter: some View {
-        VStack(spacing: 4) {
-            Text("StressMonitor")
-                .font(.system(size: 12, weight: .regular))
-                .foregroundColor(.textTertiary)
-            Text("Version 1.0.0 (2025.01.19)")
-                .font(.system(size: 11, weight: .regular))
-                .foregroundColor(.textTertiary)
-        }
-        .frame(maxWidth: .infinity)
-        .padding(.top, 8)
-    }
-
-    // MARK: - Delete Confirmation Sheet
-
-    private var deleteConfirmationSheet: some View {
-        NavigationView {
-            VStack(spacing: 24) {
-                Spacer()
-
-                Image(systemName: "trash.circle.fill")
-                    .font(.system(size: 64))
-                    .foregroundColor(.error)
-
-                Text("Delete All Data")
-                    .font(.title2)
-                    .fontWeight(.bold)
-
-                Text("This will permanently delete all your stress measurements. This action cannot be undone.")
-                    .font(.body)
-                    .foregroundColor(.secondary)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal)
-
-                VStack(spacing: 12) {
-                    Button(role: .destructive, action: {
-                        Task {
-                            try? await viewModel.deleteAllMeasurements()
-                        }
-                        showingDeleteConfirmation = false
-                    }) {
-                        Text("Delete Everything")
-                            .font(.headline)
-                            .foregroundColor(.white)
-                            .frame(maxWidth: .infinity)
-                            .frame(height: 52)
-                            .background(Color.error)
-                            .cornerRadius(26)
-                    }
-
-                    Button(action: { showingDeleteConfirmation = false }) {
-                        Text("Cancel")
-                            .font(.headline)
-                            .foregroundColor(.primaryBlue)
-                            .frame(maxWidth: .infinity)
-                            .frame(height: 52)
-                            .background(Color.primaryBlue.opacity(0.1))
-                            .cornerRadius(26)
-                    }
-                }
-                .padding(.horizontal, 32)
-
-                Spacer()
-            }
-            .padding(.top, 32)
-            .navigationTitle("Confirm Deletion")
-            .navigationBarTitleDisplayMode(.inline)
-        }
+    private func openURLString(_ urlString: String) {
+        guard let url = URL(string: urlString) else { return }
+        openURL(url)
     }
 }
 

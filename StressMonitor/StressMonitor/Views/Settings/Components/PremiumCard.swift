@@ -1,6 +1,6 @@
 import SwiftUI
 
-/// Premium upgrade card for Settings screen
+/// Widget setup card for Settings screen
 struct PremiumCard: View {
     var body: some View {
         SettingsCard {
@@ -12,19 +12,22 @@ struct PremiumCard: View {
                     .accessibilityHidden(true)
 
                 VStack(alignment: .leading, spacing: 2) {
-                    Text("Premium")
+                    Text("Set widget now!")
                         .font(.system(size: 18, weight: .bold))
+                        .tracking(-0.27)
                         .foregroundColor(.premiumGold)
 
-                    Text("Upgrade to unlock all features")
+                    Text("Widgets that nudge you with insights")
                         .font(.system(size: 13, weight: .regular))
+                        .tracking(-0.195)
                         .foregroundColor(.textDescriptive)
                 }
 
                 Spacer()
             }
+            .padding(.horizontal, 5)
             .accessibilityElement(children: .combine)
-            .accessibilityLabel("Premium upgrade. Unlock all features.")
+            .accessibilityLabel("Set widget now. Widgets that nudge you with insights.")
         }
     }
 }

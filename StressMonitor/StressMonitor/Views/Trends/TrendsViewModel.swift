@@ -14,6 +14,15 @@ class TrendsViewModel {
     var selectedDataPoint: ChartDataPoint?
     var isLoading = false
 
+    // MARK: - New properties for Figma design
+    var weeklyMeasurements: [StressMeasurement] = []
+    var stressSources: [StressSource] = [
+        StressSource(name: "Work", percentage: 50, color: .primaryBlue),
+        StressSource(name: "Finance", percentage: 30, color: Color(hex: "#00BFA5")),
+        StressSource(name: "Relationship", percentage: 15, color: Color(hex: "#FF9800")),
+        StressSource(name: "Health", percentage: 5, color: Color(hex: "#FFD60A"))
+    ]
+
     private let repository: StressRepositoryProtocol
 
     init(modelContext: ModelContext, baselineCalculator: BaselineCalculator? = nil) {
@@ -54,6 +63,9 @@ class TrendsViewModel {
             stressDistribution = calculateDistribution(measurements: measurements)
             weeklyInsight = generateWeeklyInsight(measurements: measurements)
             patternInsights = generatePatternInsights(measurements: measurements)
+
+            // Store weekly measurements for heatmap
+            weeklyMeasurements = measurements
 
         } catch {
             hrvData = []

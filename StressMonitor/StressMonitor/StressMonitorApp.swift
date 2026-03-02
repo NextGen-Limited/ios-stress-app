@@ -22,20 +22,10 @@ struct StressMonitorApp: App {
 
   var body: some Scene {
     WindowGroup {
-      MainTabView()
-        .task {
-          await initializeServices()
-        }
+      NavigationStack {
+        SettingsView()
+      }
     }
     .modelContainer(sharedModelContainer)
-  }
-
-  @MainActor
-  private func initializeServices() async {
-    let context = sharedModelContainer.mainContext
-
-    PhoneConnectivityManager.shared.setModelContext(context)
-
-    try? await NotificationManager.shared.requestAuthorization()
   }
 }

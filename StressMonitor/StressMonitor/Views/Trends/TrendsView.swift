@@ -14,18 +14,30 @@ struct TrendsView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: 24) {
+                // NEW: Premium banner
+                PremiumBannerView()
+                    .padding(.horizontal)
+
                 headerSection
                     .padding(.horizontal)
 
+                // NEW: Stress over time with circular indicators
+                stressOverTimeCard
+                    .padding(.horizontal)
+
+                // NEW: Daily timeline heatmap
+                WeeklyHeatmapView(measurements: viewModel.weeklyMeasurements)
+                    .padding(.horizontal)
+
+                // KEEP: HRV Trend chart
                 hrvTrendCard
                     .padding(.horizontal)
 
-                summaryStatsRow
+                // NEW: Stress sources donut
+                StressSourcesDonutChart(sources: viewModel.stressSources)
                     .padding(.horizontal)
 
-                distributionCard
-                    .padding(.horizontal)
-
+                // UPDATED: Smart insights
                 if let insight = viewModel.weeklyInsight {
                     InsightCard(insight: PatternInsight(icon: "💡", title: "Weekly Insight", description: insight))
                         .padding(.horizontal)
@@ -64,6 +76,64 @@ struct TrendsView: View {
                 Task { await viewModel.loadTrendData() }
             }
         }
+    }
+
+    private var stressOverTimeCard: some View {
+        VStack(alignment: .leading, spacing: 16) {
+            HStack {
+                Text("Stress over time")
+                    .font(Typography.title2)
+                    .fontWeight(.bold)
+
+                Spacer()
+
+                Text("Last 7 days")
+                    .font(Typography.caption1)
+                    .foregroundColor(.secondary)
+            }
+
+            if viewModel.isLoading {
+                loadingPlaceholder
+            } else {
+                let distribution = viewModel.stressDistribution
+
+                HStack(spacing: 16) {
+                    CircularStressIndicatorView(
+                        icon: "leaf.fill",
+                        label: "Relaxed",
+                        percentage: distribution.relaxed,
+                        color: .stressRelaxed
+                    )
+
+                    CircularStressIndicatorView(
+                        icon: "circle.fill",
+                        label: "Neutral",
+                        percentage: distribution.normal,
+                        color: .stressMild
+                    )
+
+                    CircularStressIndicatorView(
+                        icon: "triangle.fill",
+                        label: "Working",
+                        percentage: distribution.elevated,
+                        color: .stressModerate
+                    )
+
+                    CircularStressIndicatorView(
+                        icon: "square.fill",
+                        label: "Stressed",
+                        percentage: distribution.high,
+                        color: .stressHigh
+                    )
+                }
+                .frame(maxWidth: .infinity)
+            }
+        }
+        .padding(20)
+        .background(
+            RoundedRectangle(cornerRadius: 16)
+                .fill(Color.secondary.opacity(0.1))
+        )
     }
 
     private var hrvTrendCard: some View {
@@ -107,76 +177,6 @@ struct TrendsView: View {
         )
     }
 
-    private var summaryStatsRow: some View {
-        HStack(spacing: 12) {
-            StatCard(
-                icon: "chart.bar.fill",
-                value: "\(Int(viewModel.averageHRV))",
-                unit: "ms",
-                label: "Average"
-            )
-
-            StatCard(
-                icon: "arrow.up.arrow.down",
-                value: "\(Int(viewModel.hrvRange.lowerBound))-\(Int(viewModel.hrvRange.upperBound))",
-                unit: "ms",
-                label: "Range"
-            )
-
-            StatCard(
-                icon: trendIcon,
-                value: trendIcon,
-                label: "Trend"
-            )
-            .foregroundColor(trendColor)
-        }
-    }
-
-    private var distributionCard: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text("Stress Level Distribution")
-                .font(Typography.title2)
-                .fontWeight(.bold)
-
-            let distribution = viewModel.stressDistribution
-
-            VStack(spacing: 12) {
-                DistributionBarView(
-                    icon: "leaf.fill",
-                    label: "Relaxed",
-                    percentage: distribution.relaxed,
-                    color: .stressRelaxed
-                )
-
-                DistributionBarView(
-                    icon: "circle.fill",
-                    label: "Normal",
-                    percentage: distribution.normal,
-                    color: .stressMild
-                )
-
-                DistributionBarView(
-                    icon: "triangle.fill",
-                    label: "Elevated",
-                    percentage: distribution.elevated,
-                    color: .stressModerate
-                )
-
-                DistributionBarView(
-                    icon: "square.fill",
-                    label: "High",
-                    percentage: distribution.high,
-                    color: .stressHigh
-                )
-            }
-        }
-        .padding(20)
-        .background(
-            RoundedRectangle(cornerRadius: 16)
-                .fill(Color.secondary.opacity(0.1))
-        )
-    }
-
     private var loadingPlaceholder: some View {
         VStack(spacing: 12) {
             ProgressView()
@@ -205,21 +205,5 @@ struct TrendsView: View {
         }
         .frame(height: 200)
         .frame(maxWidth: .infinity)
-    }
-
-    private var trendIcon: String {
-        switch viewModel.trendDirection {
-        case .up: return "↑"
-        case .down: return "↓"
-        case .stable: return "→"
-        }
-    }
-
-    private var trendColor: Color {
-        switch viewModel.trendDirection {
-        case .up: return .stressRelaxed
-        case .down: return .stressHigh
-        case .stable: return .secondary
-        }
     }
 }

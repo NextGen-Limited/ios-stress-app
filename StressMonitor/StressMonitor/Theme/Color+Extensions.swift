@@ -101,6 +101,8 @@ extension Color {
     static let widgetBorder = Color(light: Color(hex: "C0C0C0"), dark: Color(hex: "48484A"))
     /// Settings card shadow color - #18274B
     static let settingsCardShadowColor = Color(hex: "18274B")
+    /// Info banner yellow background (light: #FFF9E6, dark: #2A2400)
+    static let bannerYellow = Color(light: Color(hex: "FFF9E6"), dark: Color(hex: "2A2400"))
 
     // MARK: - Adaptive Colors for Settings
 
