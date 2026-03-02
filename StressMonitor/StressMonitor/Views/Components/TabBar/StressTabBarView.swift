@@ -31,7 +31,7 @@ struct StressTabBarView: View {
     private let bottomSafeArea: CGFloat = 0
 
     // Corner radius for tab bar top edges
-    private let cornerRadius: CGFloat = 24
+    private let cornerRadius: CGFloat = 32
 
     var body: some View {
         HStack(spacing: tabSpacing) {
