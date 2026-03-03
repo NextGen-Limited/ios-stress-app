@@ -3,7 +3,7 @@
 **Pattern:** MVVM + Protocol-Oriented Design
 **Concurrency:** async/await
 **Data Flow:** Unidirectional (Models → Services → ViewModels → Views)
-**Last Updated:** February 2026
+**Last Updated:** March 3, 2026
 
 ---
 
@@ -85,6 +85,22 @@ System APIs (HealthKit)
 Apple Watch Sensors
 ```
 
+**Auto-refresh path (Mar 2026):**
+```
+HKObserverQuery (background) → StressViewModel.startAutoRefresh()
+    ↓ [#if !targetEnvironment(simulator)]
+Debounce (60s min) → fetchAndCalculate() → State update → SwiftUI re-render
+```
+
+**Weekly dashboard data flow (Mar 2026):**
+```
+StressRepository.fetchRecent() → StressViewModel.weeklyMeasurements
+    ↓
+DashboardViewModel.weeklyMeasurements (7-day slice)
+    ↓
+DailyTimelineView (7-day × 7-slot dot-matrix grid)
+```
+
 **Reverse for updates:**
 ```
 Model Change
@@ -111,6 +127,11 @@ UI Updates on screen
 - Compute confidence scoring
 - Manage 30-day baseline adaptation
 - Handle edge cases
+
+### Insight Service
+- Generate AI-powered personalized insights from measurement history
+- `InsightGeneratorService.generateInsight(stress:baseline:history:)`
+- Surfaces patterns and recommendations to `AIInsightCard` on dashboard
 
 ### Repository Service
 - SwiftData CRUD operations
@@ -272,4 +293,4 @@ TriangleShape()
 
 **Maintained By:** Phuong Doan
 **Version:** 1.0 Production
-**Last Updated:** February 2026
+**Last Updated:** March 3, 2026

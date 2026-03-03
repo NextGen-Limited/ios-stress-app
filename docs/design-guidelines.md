@@ -3,7 +3,7 @@
 **System:** iOS Human Interface Guidelines compliant
 **Accessibility:** WCAG AA
 **Version:** 1.0
-**Last Updated:** February 2026
+**Last Updated:** March 3, 2026
 
 ---
 
@@ -242,19 +242,44 @@ All UI files follow this structure:
 ```
 Views/
 ├── Dashboard/
-│   ├── DashboardView.swift
-│   ├── StressRingView.swift
-│   └── MeasurementCardView.swift
+│   ├── StressDashboardView.swift
+│   ├── DashboardViewModel.swift
+│   └── Components/
+│       ├── StressRingView.swift
+│       ├── DailyTimelineView.swift       # 7-day dot-matrix grid (Mar 2026)
+│       ├── WeeklyInsightCard.swift
+│       └── AIInsightCard.swift
 ├── History/
-│   ├── HistoryView.swift
+│   ├── MeasurementHistoryView.swift
+│   ├── HistoryViewModel.swift
 │   └── MeasurementDetailView.swift
-├── Components/
-│   ├── StressCategoryBadgeView.swift
-│   ├── StressBuddyView.swift
-│   └── BreathingGuidanceView.swift
-└── Shared/
-    ├── LoadingView.swift
-    └── ErrorAlertView.swift
+├── Trends/
+│   ├── TrendsView.swift                  # Figma-aligned card list (Mar 2026)
+│   ├── TrendsViewModel.swift
+│   └── Components/
+│       ├── StressBarChartView.swift
+│       ├── LineChartView.swift
+│       ├── WeeklyHeatmapView.swift
+│       ├── StressSourcesDonutChart.swift
+│       ├── PremiumBannerView.swift
+│       └── MascotSpeechBubbleView.swift
+├── Breathing/
+│   └── BreathingExerciseView.swift
+├── Settings/
+│   ├── SettingsView.swift               # Figma card-based design (Mar 2026)
+│   └── Components/
+│       ├── HealthDataCard.swift
+│       ├── NotificationsCard.swift
+│       └── PrivacyCard.swift
+├── Onboarding/
+│   └── OnboardingWelcomeView.swift
+├── Components/                          # Shared components
+│   ├── MeasureButton.swift
+│   └── TabBar/StressTabBarView.swift    # Pill-shaped tabbar (Mar 2026)
+└── DesignSystem/
+    ├── Typography.swift
+    ├── Spacing.swift
+    └── Shadows.swift
 ```
 
 ---
@@ -291,5 +316,34 @@ Views/
 
 ---
 
+## March 2026 Design Patterns
+
+### Adaptive Card Background
+All cards now use unified adaptive backgrounds that auto-switch in light/dark mode:
+
+```swift
+.background(Color.adaptiveCardBackground)     // White / #2C2C2E
+.background(Color.adaptiveSettingsBackground) // #F3F4F8 / #1C1C1E
+```
+
+### Settings Card System (Mar 2026)
+- Card corner radius: `settingsCardRadius` token
+- Card shadow: `settingsCardShadow` preset (color: `#18274B`)
+- Section headers: `SettingsSectionHeader` reusable component
+
+### TabBar (Mar 2026)
+- Corner radius: 64pt (pill-shaped)
+- Spacing: 50pt between tabs (was 80)
+- Explicit horizontal padding applied
+- Separate icon assets for selected / unselected states
+
+### 7-Day Dot-Matrix Timeline (Mar 2026)
+- Rows: Mon–Sun, Columns: 3-hour blocks (7 slots/day)
+- Filled dot = stress measurement (colored by category)
+- Empty slot = gray dot (no data)
+- Integrated between quickStatsRow and breathing CTA in dashboard
+
+---
+
 **Enforced By:** Code review & QA testing
-**Last Updated:** February 2026
+**Last Updated:** March 3, 2026

@@ -1,7 +1,7 @@
 # StressMonitor Documentation Index
 
 **Version:** 1.0 (Production)
-**Last Updated:** February 28, 2026
+**Last Updated:** March 3, 2026
 
 Complete documentation for the StressMonitor iOS/watchOS stress monitoring application.
 
@@ -20,7 +20,7 @@ Product vision, requirements, features, algorithm specifications, and success me
 ### 2. **[Codebase Summary](./codebase-summary.md)**
 File structure, organization, component breakdown, and code metrics.
 - High-level project structure
-- iOS app architecture (136 files)
+- iOS app architecture (144 files)
 - watchOS app architecture (29 files)
 - Widget architecture (7 files)
 - Test suite organization (27 files)
@@ -67,13 +67,13 @@ Current status, planned features, timeline, and success metrics.
 
 ## Quick Reference
 
-### Codebase Metrics (as of Feb 2026)
+### Codebase Metrics (as of Mar 2026)
 
 | Metric | Value |
 |--------|-------|
-| **Total Swift Files** | 206 |
-| **Total Tokens** | ~205,000 |
-| **iOS App** | 136 files |
+| **Total Swift Files** | 214 |
+| **Total Tokens** | ~210,000 |
+| **iOS App** | 144 files |
 | **watchOS App** | 29 files |
 | **Widgets** | 7 files |
 | **Tests** | 27 files |
@@ -214,6 +214,6 @@ SwiftUI Views → @Observable ViewModels → Protocol-based Services
 
 **Read the README.md** at project root for quick start and feature overview.
 
-**Last Updated:** February 28, 2026
+**Last Updated:** March 3, 2026
 **Maintained By:** Phuong Doan
 **Generated with:** repomix codebase analysis

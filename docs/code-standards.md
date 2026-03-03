@@ -2,7 +2,7 @@
 
 **Framework:** Swift 5.9+ with SwiftUI & SwiftData
 **Architecture:** MVVM + Protocol-Oriented Design
-**Last Updated:** February 2026
+**Last Updated:** March 3, 2026
 
 ---
 
@@ -68,6 +68,8 @@ StressMonitor/
 │   ├── CloudKit/
 │   ├── DataManagement/
 │   ├── Sync/
+│   ├── Background/
+│   ├── Connectivity/
 │   ├── Protocols/
 │   └── ...
 ├── ViewModels/              # State management (@Observable)
@@ -192,5 +194,28 @@ All pull requests must pass:
 
 ---
 
+## Simulator Guard Pattern
+
+Use `#if targetEnvironment(simulator)` to skip HealthKit observer queries in simulator builds (prevents HealthKit entitlement error):
+
+```swift
+func startAutoRefresh() {
+    #if targetEnvironment(simulator)
+    // Skip HKObserverQuery — HealthKit entitlements unavailable in simulator
+    return
+    #else
+    // Register real HKObserverQuery for background updates
+    setupObserverQuery()
+    #endif
+}
+```
+
+**When to apply:**
+- Any `HKObserverQuery` registration that requires background delivery entitlements
+- HealthKit background delivery setup
+- Not required for simple `HKHealthStore` reads (those work in simulator)
+
+---
+
 **Enforced By:** Code review & automated tests
-**Last Updated:** February 2026
+**Last Updated:** March 3, 2026

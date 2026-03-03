@@ -182,7 +182,7 @@ Main stress display screen with enhanced UI.
 | `Views/Dashboard/StressDashboardView.swift` | 271 | Main dashboard with unified scroll layout |
 | `Views/Dashboard/Components/StressRingView.swift` | 86 | 260pt animated ring with spring animations |
 | `Views/Dashboard/Components/MetricCardView.swift` | 171 | HRV + HR cards with number transitions |
-| `Views/Dashboard/Components/DailyTimelineView.swift` | 263 | 24-hour stress timeline chart |
+| `Views/Dashboard/Components/DailyTimelineView.swift` | ~160 | 7-day × 7-slot weekly dot-matrix grid (Mar 2026) |
 | `Views/Dashboard/Components/WeeklyInsightCard.swift` | 138 | Week-over-week comparison |
 | `Views/Dashboard/Components/AIInsightCard.swift` | 124 | AI-generated personalized insights |
 | `Views/Dashboard/Components/LearningPhaseCard.swift` | 192 | Baseline learning progress |
@@ -215,7 +215,7 @@ Charts and analytics — Figma-aligned (Mar 2026).
 | File | LOC | Purpose |
 |------|-----|---------|
 | `Views/Trends/TrendsView.swift` | 147 | Scrollable card list; global NavigationStack/TimeRangePicker removed |
-| `Views/Trends/TrendsViewModel.swift` | - | Trends-specific state |
+| `Views/Trends/TrendsViewModel.swift` | 265 | Trends-specific state |
 | `Views/Trends/Components/StressBarChartView.swift` | 116 | Swift Charts bar chart (replaces circular indicators) — "Stress Over Time" card |
 | `Views/Trends/Components/LineChartView.swift` | 154 | HRV trend line chart with Y-axis labels + "Today" marker |
 | `Views/Trends/Components/WeeklyHeatmapView.swift` | 87 | Weekly heatmap with circular dot cells (replaces square cells) |
@@ -223,10 +223,10 @@ Charts and analytics — Figma-aligned (Mar 2026).
 | `Views/Trends/Components/PremiumBannerView.swift` | 60 | Light-blue gradient banner; CharacterCalm mascot + sparkles + orange CTA |
 | `Views/Trends/Components/MascotSpeechBubbleView.swift` | 34 | Speech bubble component for mascot (NEW) |
 | `Views/Trends/Components/SmartInsightsTeaser.swift` | 48 | Static "Coming Soon" teaser (replaces dynamic pattern insights) |
-| `Views/Trends/Components/TimeRangePicker.swift` | - | Time range selector (used within individual cards) |
-| `Views/Trends/Components/InsightCard.swift` | - | Individual insight card |
-| `Views/Trends/Components/DistributionBarView.swift` | - | Distribution bar sub-component |
-| `Views/Trends/Components/CircularStressIndicatorView.swift` | - | Legacy circular indicator (superseded by bar chart) |
+| `Views/Trends/Components/TimeRangePicker.swift` | 24 | Time range selector (used within individual cards) |
+| `Views/Trends/Components/InsightCard.swift` | 32 | Individual insight card |
+| `Views/Trends/Components/DistributionBarView.swift` | 38 | Distribution bar sub-component |
+| `Views/Trends/Components/CircularStressIndicatorView.swift` | 48 | Legacy circular indicator (superseded by bar chart) |
 
 **Trends Card Design (Mar 2026):**
 - All cards use `adaptiveCardBackground` + `settingsCardRadius` + Settings card shadow

@@ -3,7 +3,7 @@
 **Current Version:** 1.0 (Production)
 **Release Date:** February 2026
 **Maintenance Mode:** Active
-**Last Updated:** February 2026
+**Last Updated:** March 3, 2026
 
 ---
 
@@ -35,7 +35,7 @@
 - ✅ OLED dark theme support (Feb 2026)
 - ✅ Auto-refresh via HealthKit observer (Feb 2026)
 - ✅ AI-powered personalized insights (Feb 2026)
-- ✅ Daily timeline chart (24-hour view) (Feb 2026)
+- ✅ Daily timeline chart — redesigned as 7-day × 7-slot weekly dot-matrix grid (Mar 2026)
 - ✅ Weekly insight card (week-over-week comparison) (Feb 2026)
 - ✅ Custom StressBuddy character illustration (Feb 2026)
   - 5 mood expressions: sleeping, calm, concerned, worried, overwhelmed
@@ -342,6 +342,8 @@ remains on your device or encrypted in iCloud.
 - No iPad support yet (planned for v2.0)
 
 **Recent Fixes (March 2026):**
+- ✅ `DailyTimelineView` redesigned: 24-hour scatter → 7-day × 7-slot weekly dot-matrix (Mar 2026)
+- ✅ `DashboardViewModel.weeklyMeasurements` added; chart wired into `StressDashboardView` (Mar 2026)
 - ✅ Fixed TabBar compilation errors (TabItem enum structure)
 - ✅ Added Identifiable conformance to TabItem
 - ✅ Fixed Tabbable protocol conformance (icon property)

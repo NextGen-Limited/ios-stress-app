@@ -3,7 +3,7 @@
 **Version:** 1.0 (Production)
 **Status:** Complete and Shipping
 **Platform:** iOS 17+ / watchOS 10+
-**Last Updated:** February 28, 2026
+**Last Updated:** March 3, 2026
 
 ---
 
@@ -24,7 +24,9 @@ StressMonitor is a **privacy-first stress monitoring application** that uses Hea
 | **Real-Time Stress Measurement** | On-demand HRV + HR calculation with confidence scoring | ✅ Complete |
 | **Personal Baseline Adaptation** | Learns individual physiology over 30 days | ✅ Complete |
 | **Historical Tracking** | Timeline view with date/category filtering | ✅ Complete |
-| **Trend Analytics** | Line charts (24h/week/month), distribution stats | ✅ Complete |
+| **Trend Analytics** | Line charts, bar charts, heatmap, distribution stats — Figma-aligned | ✅ Complete |
+| **AI-Powered Insights** | Personalized insights via InsightGeneratorService | ✅ Complete |
+| **Weekly Dot-Matrix Timeline** | 7-day × 7-slot dot grid replacing 24h scatter chart | ✅ Complete |
 | **Apple Watch Standalone App** | Independent stress monitoring with WidgetKit complications | ✅ Complete |
 | **CloudKit Sync** | E2E encrypted offline-first cloud sync | ✅ Complete |
 | **Data Export** | CSV/JSON export with date filtering | ✅ Complete |
@@ -82,11 +84,11 @@ Each measurement includes a confidence value (0-1) based on:
 **So that** I can understand my physiological state at any moment
 
 **Acceptance Criteria:**
-- [ ] Measure button accessible from Dashboard
-- [ ] Calculation completes within 5 seconds
-- [ ] Result displays stress level with color and category
-- [ ] Confidence score visible
-- [ ] Data auto-saves to SwiftData and CloudKit
+- [x] Measure button accessible from Dashboard
+- [x] Calculation completes within 5 seconds
+- [x] Result displays stress level with color and category
+- [x] Confidence score visible
+- [x] Data auto-saves to SwiftData and CloudKit
 
 ### User Story 2: Track Historical Stress
 **As a** user
@@ -94,11 +96,11 @@ Each measurement includes a confidence value (0-1) based on:
 **So that** I can identify patterns over time
 
 **Acceptance Criteria:**
-- [ ] History view shows chronological list
-- [ ] Filter by date range (today/week/month/all)
-- [ ] Filter by stress category
-- [ ] Tap measurement to view details
-- [ ] Export available from detail view
+- [x] History view shows chronological list
+- [x] Filter by date range (today/week/month/all)
+- [x] Filter by stress category
+- [x] Tap measurement to view details
+- [x] Export available from detail view
 
 ### User Story 3: Analyze Stress Trends
 **As a** user
@@ -106,10 +108,10 @@ Each measurement includes a confidence value (0-1) based on:
 **So that** I can see if I'm getting more or less stressed
 
 **Acceptance Criteria:**
-- [ ] Line chart shows stress over 24h/week/month
-- [ ] Distribution chart shows % time per category
-- [ ] Statistics displayed (avg, min, max, std dev)
-- [ ] Charts update when new data arrives
+- [x] Line chart shows stress over 24h/week/month
+- [x] Distribution chart shows % time per category
+- [x] Statistics displayed (avg, min, max, std dev)
+- [x] Charts update when new data arrives
 
 ### User Story 4: Monitor on Apple Watch
 **As a** user
@@ -117,10 +119,10 @@ Each measurement includes a confidence value (0-1) based on:
 **So that** I don't need my iPhone
 
 **Acceptance Criteria:**
-- [ ] Watch app is fully functional standalone
-- [ ] Complications show current stress level
-- [ ] Data syncs to CloudKit independently
-- [ ] Complications update every 5 minutes
+- [x] Watch app is fully functional standalone
+- [x] Complications show current stress level
+- [x] Data syncs to CloudKit independently
+- [x] Complications update every 5 minutes
 
 ### User Story 5: Reduce Stress with Breathing
 **As a** user
@@ -128,10 +130,10 @@ Each measurement includes a confidence value (0-1) based on:
 **So that** I can actively reduce my stress level
 
 **Acceptance Criteria:**
-- [ ] Breathing exercise available from Dashboard
-- [ ] Guided visual/haptic feedback
-- [ ] Before/after HRV measurement option
-- [ ] Session history tracked
+- [x] Breathing exercise available from Dashboard
+- [x] Guided visual/haptic feedback
+- [x] Before/after HRV measurement option
+- [x] Session history tracked
 
 ---
 
@@ -262,4 +264,4 @@ All core features complete and shipping.
 
 **Owner:** Phuong Doan
 **Status:** ✅ Production v1.0
-**Next Review:** March 2026
+**Next Review:** May 2026 (post v1.1 release)
