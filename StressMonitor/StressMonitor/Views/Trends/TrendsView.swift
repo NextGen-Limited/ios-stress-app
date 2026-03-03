@@ -13,40 +13,39 @@ struct TrendsView: View {
 
     var body: some View {
         ScrollView {
-            VStack(spacing: 24) {
-                // NEW: Premium banner
+            VStack(spacing: 16) {
+                // Premium banner
                 PremiumBannerView()
                     .padding(.horizontal)
 
-                headerSection
-                    .padding(.horizontal)
+                // Mascot speech bubble
+                MascotSpeechBubbleView(
+                    message: "I've been keeping an eye on your days! Want to see how stress changed this week?"
+                )
+                .padding(.horizontal)
 
-                // NEW: Stress over time with circular indicators
-                stressOverTimeCard
-                    .padding(.horizontal)
+                // Stress over time bar chart
+                StressBarChartView(
+                    dailyStress: viewModel.dailyStressData,
+                    distribution: viewModel.stressDistribution
+                )
+                .padding(.horizontal)
 
-                // NEW: Daily timeline heatmap
+                // Daily timeline heatmap
                 WeeklyHeatmapView(measurements: viewModel.weeklyMeasurements)
                     .padding(.horizontal)
 
-                // KEEP: HRV Trend chart
+                // HRV Trend chart
                 hrvTrendCard
                     .padding(.horizontal)
 
-                // NEW: Stress sources donut
+                // Stress sources donut
                 StressSourcesDonutChart(sources: viewModel.stressSources)
                     .padding(.horizontal)
 
-                // UPDATED: Smart insights
-                if let insight = viewModel.weeklyInsight {
-                    InsightCard(insight: PatternInsight(icon: "💡", title: "Weekly Insight", description: insight))
-                        .padding(.horizontal)
-                }
-
-                ForEach(viewModel.patternInsights, id: \.title) { pattern in
-                    InsightCard(insight: pattern)
-                        .padding(.horizontal)
-                }
+                // Smart Insights teaser
+                SmartInsightsTeaser()
+                    .padding(.horizontal)
 
                 Spacer()
                     .frame(height: 100)
@@ -62,85 +61,16 @@ struct TrendsView: View {
         }
     }
 
-    private var headerSection: some View {
-        VStack(spacing: 16) {
-            Text("Trends")
-                .font(Typography.largeTitle)
-                .frame(maxWidth: .infinity, alignment: .leading)
-
-            TimeRangePicker(
-                selectedRange: $viewModel.selectedTimeRange,
-                options: [.day, .week, .month, .threeMonths]
-            )
-            .onChange(of: viewModel.selectedTimeRange) { _, _ in
-                Task { await viewModel.loadTrendData() }
-            }
-        }
-    }
-
-    private var stressOverTimeCard: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            HStack {
-                Text("Stress over time")
-                    .font(Typography.title2)
-                    .fontWeight(.bold)
-
-                Spacer()
-
-                Text("Last 7 days")
-                    .font(Typography.caption1)
-                    .foregroundColor(.secondary)
-            }
-
-            if viewModel.isLoading {
-                loadingPlaceholder
-            } else {
-                let distribution = viewModel.stressDistribution
-
-                HStack(spacing: 16) {
-                    CircularStressIndicatorView(
-                        icon: "leaf.fill",
-                        label: "Relaxed",
-                        percentage: distribution.relaxed,
-                        color: .stressRelaxed
-                    )
-
-                    CircularStressIndicatorView(
-                        icon: "circle.fill",
-                        label: "Neutral",
-                        percentage: distribution.normal,
-                        color: .stressMild
-                    )
-
-                    CircularStressIndicatorView(
-                        icon: "triangle.fill",
-                        label: "Working",
-                        percentage: distribution.elevated,
-                        color: .stressModerate
-                    )
-
-                    CircularStressIndicatorView(
-                        icon: "square.fill",
-                        label: "Stressed",
-                        percentage: distribution.high,
-                        color: .stressHigh
-                    )
-                }
-                .frame(maxWidth: .infinity)
-            }
-        }
-        .padding(20)
-        .background(
-            RoundedRectangle(cornerRadius: 16)
-                .fill(Color.secondary.opacity(0.1))
-        )
-    }
-
     private var hrvTrendCard: some View {
-        VStack(alignment: .leading, spacing: 16) {
+        VStack(alignment: .leading, spacing: 8) {
             Text("HRV Trend")
                 .font(Typography.title2)
                 .fontWeight(.bold)
+
+            // Phase 6: subtitle
+            Text("Last 30 days")
+                .font(Typography.caption1)
+                .foregroundColor(.secondary)
 
             if viewModel.isLoading {
                 loadingPlaceholder
@@ -150,9 +80,18 @@ struct TrendsView: View {
                 LineChartView(
                     dataPoints: viewModel.hrvData,
                     accentColor: .primaryBlue,
-                    showGrid: true
+                    showGrid: true,
+                    showYAxisLabels: true
                 )
                 .frame(height: 200)
+            }
+
+            // Phase 6: "Today" label
+            HStack {
+                Spacer()
+                Text("Today")
+                    .font(Typography.caption1)
+                    .foregroundColor(.secondary)
             }
 
             if let selectedPoint = viewModel.selectedDataPoint {
@@ -171,10 +110,9 @@ struct TrendsView: View {
             }
         }
         .padding(20)
-        .background(
-            RoundedRectangle(cornerRadius: 16)
-                .fill(Color.secondary.opacity(0.1))
-        )
+        .background(Color.adaptiveCardBackground)
+        .clipShape(RoundedRectangle(cornerRadius: Spacing.settingsCardRadius))
+        .shadow(AppShadow.settingsCard)
     }
 
     private var loadingPlaceholder: some View {

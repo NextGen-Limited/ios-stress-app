@@ -258,25 +258,37 @@ struct BreathingGuidanceView: View {
 
 ## Trends Analysis View
 
+**Updated:** March 2026 (Figma alignment)
+
+### Layout Pattern
+
+Scrollable card list. No global NavigationStack or TimeRangePicker header — each card has its own static label.
+
+### Cards (top to bottom)
+
+| Card | Component | Chart Type |
+|------|-----------|-----------|
+| Stress Over Time | `StressBarChartView` | Swift Charts bar chart |
+| Weekly Heatmap | `WeeklyHeatmapView` | Circular dot grid |
+| HRV Trend | `LineChartView` | Line chart + Y-axis + "Today" label |
+| Stress Sources | `StressSourcesDonutChart` | 180° semi-donut, 6-category legend |
+| Premium Banner | `PremiumBannerView` | Light-blue gradient + CharacterCalm + orange CTA |
+| Smart Insights | `SmartInsightsTeaser` | Static "Coming Soon" teaser |
+
+### Card Style
+
+All cards use the standard card pattern: `adaptiveCardBackground` + `settingsCardRadius` + Settings card shadow. See [Design Guidelines: Visual](./design-guidelines-visual.md) → Standard Card Pattern.
+
+### Mascot Component
+
+`MascotSpeechBubbleView` — speech bubble attached to CharacterCalm SVG asset in `PremiumBannerView`.
+
 ### Metrics Displayed
 
-- **Average stress:** 7-day rolling average
-- **Peak times:** When stress is typically highest
-- **Improvement:** Change from previous period
-- **Baseline:** Personal baseline status
-
-### Filter Options
-
-- **Time Range:** Today, Week, Month, 3 Months, Year
-- **Category:** All, Relaxed, Mild, Moderate, High
-- **Confidence:** Show/hide low-confidence measurements
-
-### Export Formats
-
-Data can be exported as:
-- **CSV** - Spreadsheet format (Excel-compatible)
-- **JSON** - Structured data format (API-compatible)
-- **PDF** - Printable report
+- **Stress Over Time:** Bar chart with daily average by selected time range
+- **Weekly Heatmap:** Stress intensity per day/hour as circular dot grid
+- **HRV Trend:** HRV history line with Y-axis scale and "Today" reference
+- **Stress Sources:** 180° semi-donut breaking down 6 categories
 
 ---
 

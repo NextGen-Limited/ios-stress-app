@@ -42,10 +42,19 @@
   - Mood-specific animations: breathing, fidget, shake, dizzy
   - Custom shapes: TriangleShape, TeardropShape, FlameShape
   - Full Reduce Motion + VoiceOver support
+- ✅ Settings screen — Figma card-based design (Mar 2026)
+- ✅ Trends view — Figma alignment (Mar 2026)
+  - Scrollable card list; global NavigationStack/TimeRangePicker removed
+  - All cards unified: `adaptiveCardBackground` + `settingsCardRadius` + shadow
+  - `StressBarChartView`: Swift Charts bar chart (replaces circular indicators)
+  - `WeeklyHeatmapView`: Circular dot cells (replaces square cells)
+  - `LineChartView` (HRV Trend): Y-axis labels + "Today" marker + subtitle
+  - `StressSourcesDonutChart`: 180° semi-donut with 6-category legend
+  - `PremiumBannerView`: Light-blue gradient + CharacterCalm mascot + orange CTA
+  - `MascotSpeechBubbleView`: New speech bubble component
+  - `SmartInsightsTeaser`: Static "Coming Soon" teaser
 - ✅ Historical timeline (measurement list)
-- ✅ Trend analytics (24h/week/month charts)
 - ✅ Distribution statistics
-- ✅ Settings screen
 - ✅ Onboarding flow
 - ✅ HealthKit permission request
 
@@ -337,6 +346,8 @@ remains on your device or encrypted in iCloud.
 - ✅ Added Identifiable conformance to TabItem
 - ✅ Fixed Tabbable protocol conformance (icon property)
 - ✅ Removed unused @Namespace variable from StressTabBarView
+- ✅ Fixed invalid NavigationStack wrapper in `StressMonitorApp.swift`; `MainTabView(modelContext: share)` → `MainTabView()`
+- ✅ Added `#if targetEnvironment(simulator)` guard in `StressViewModel.startAutoRefresh()` to skip HKObserverQuery in simulator (prevents HealthKit entitlement error)
 - ⚠️ Watch app WCSessionDelegate conformance pending (separate issue)
 
 **Bug Tracking:**
@@ -510,5 +521,5 @@ Potential features for future consideration:
 ---
 
 **Owner:** Phuong Doan
-**Last Review:** February 27, 2026
+**Last Review:** March 3, 2026
 **Next Review:** May 2026 (post v1.0 launch)

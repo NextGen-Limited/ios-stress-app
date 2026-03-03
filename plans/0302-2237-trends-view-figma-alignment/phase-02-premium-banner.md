@@ -1,19 +1,37 @@
-import SwiftUI
+# Phase 2 — Redesign PremiumBannerView
 
+**Priority:** High | **Effort:** Medium | **Status:** Completed
+
+## Overview
+
+Redesign to match Figma: light blue gradient background, large "UNLOCK PREMIUM" text, subtitle, orange "Upgrade Now" button, cat mascot illustration.
+
+## Design Specs (from Figma)
+- **Background:** Soft light blue gradient (top to bottom)
+- **Title:** "UNLOCK PREMIUM" — large, uppercase, bold, blue text
+- **Subtitle:** "Unlimited Access to premium features" — smaller, dark grey
+- **CTA:** "Upgrade Now" — orange bg (#F39C12), white bold text, rounded pill shape
+- **Mascot:** Large cat character on left side — use `CharacterCalm` asset
+- **Sparkles:** Decorative elements around button (SF Symbols `sparkle` or skip)
+
+## Changes
+
+### PremiumBannerView.swift — Full rewrite
+```swift
 struct PremiumBannerView: View {
     var action: () -> Void = {}
 
     var body: some View {
         ZStack(alignment: .bottomLeading) {
-            // Light blue gradient background
+            // Gradient background
             LinearGradient(
                 colors: [Color(hex: "#B8E4F0"), Color(hex: "#D4F1F9")],
                 startPoint: .top,
                 endPoint: .bottom
             )
 
-            // Cat mascot anchored bottom-left
             HStack(alignment: .bottom) {
+                // Cat mascot
                 Image("CharacterCalm")
                     .resizable()
                     .scaledToFit()
@@ -22,7 +40,7 @@ struct PremiumBannerView: View {
                 Spacer()
             }
 
-            // Text + CTA overlay centered
+            // Content overlay
             VStack(spacing: 8) {
                 Text("UNLOCK PREMIUM")
                     .font(.system(size: 22, weight: .bold))
@@ -45,16 +63,24 @@ struct PremiumBannerView: View {
             }
             .frame(maxWidth: .infinity)
             .padding(.vertical, 20)
-            .padding(.leading, 110) // leave space for mascot
         }
-        .frame(height: 140)
         .clipShape(RoundedRectangle(cornerRadius: Spacing.settingsCardRadius))
-        .shadow(AppShadow.settingsCard)
     }
 }
+```
 
-#Preview {
-    PremiumBannerView()
-        .padding()
-        .background(Color.backgroundLight)
-}
+## Files Modified
+- `Views/Trends/Components/PremiumBannerView.swift` — full redesign
+
+## Assets Required
+- `CharacterCalm` (exists in Assets.xcassets)
+
+## Success Criteria
+- Light blue gradient background visible
+- Cat mascot on left/bottom area
+- "UNLOCK PREMIUM" in bold blue
+- Orange "Upgrade Now" pill button
+
+## Completion Notes
+
+Completed 2026-03-02. Full rewrite of `PremiumBannerView.swift`. Light-blue gradient bg (`#B8E4F0` → `#D4F1F9`), `CharacterCalm` mascot at bottom-left, sparkle SF Symbol decorations, "UNLOCK PREMIUM" title, subtitle, and orange `#F39C12` "Upgrade Now" capsule button.

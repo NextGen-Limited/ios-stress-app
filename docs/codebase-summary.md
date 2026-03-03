@@ -3,7 +3,7 @@
 **Total Files:** 214 Swift files
 **Total Tokens:** ~210,000
 **Architecture:** MVVM + Protocol-Oriented Design
-**Last Updated:** March 1, 2026
+**Last Updated:** March 3, 2026
 
 ---
 
@@ -159,16 +159,17 @@ State management with @Observable macro.
 - `baseline: PersonalBaseline`
 - `isLoading: Bool`
 - `errorMessage: String?`
-- `todayMeasurements: [StressMeasurement]` (NEW)
-- `weeklyAverage: (current: Double, previous: Double)?` (NEW)
-- `hrvHistory: [Double]` (NEW)
-- `heartRateTrend: TrendDirection` (NEW)
-- `aiInsight: AIInsight?` (NEW)
+- `todayMeasurements: [StressMeasurement]`
+- `weeklyAverage: (current: Double, previous: Double)?`
+- `hrvHistory: [Double]`
+- `heartRateTrend: TrendDirection`
+- `aiInsight: AIInsight?`
 
-**Auto-Refresh Features (NEW):**
+**Auto-Refresh Features:**
 - HKObserverQuery subscription for automatic updates
 - Debounced refresh (60-second minimum interval)
 - Background health data monitoring
+- `#if targetEnvironment(simulator)` guard skips HKObserverQuery in simulator (prevents HealthKit entitlement error)
 
 ### Views (85 files, ~9,880 LOC)
 SwiftUI declarative interface organized by feature.
@@ -208,14 +209,29 @@ Timeline view with filtering.
 | `Views/History/HistoryFilterView.swift` | 128 | Date/category filter UI |
 | `Views/History/MeasurementDetailView.swift` | 128 | Individual measurement details |
 
-#### Trends Module (6 files, ~420 LOC)
-Charts and analytics.
+#### Trends Module (13 files, ~1,070 LOC)
+Charts and analytics — Figma-aligned (Mar 2026).
 
 | File | LOC | Purpose |
 |------|-----|---------|
-| `Views/Trends/TrendsView.swift` | 145 | Tab interface for charts |
-| `Views/Trends/StressTrendChartView.swift` | 134 | Line chart (24h/week/month) |
-| `Views/Trends/StressDistributionView.swift` | 108 | Category distribution chart |
+| `Views/Trends/TrendsView.swift` | 147 | Scrollable card list; global NavigationStack/TimeRangePicker removed |
+| `Views/Trends/TrendsViewModel.swift` | - | Trends-specific state |
+| `Views/Trends/Components/StressBarChartView.swift` | 116 | Swift Charts bar chart (replaces circular indicators) — "Stress Over Time" card |
+| `Views/Trends/Components/LineChartView.swift` | 154 | HRV trend line chart with Y-axis labels + "Today" marker |
+| `Views/Trends/Components/WeeklyHeatmapView.swift` | 87 | Weekly heatmap with circular dot cells (replaces square cells) |
+| `Views/Trends/Components/StressSourcesDonutChart.swift` | 168 | 180° semi-donut chart with 6-category legend (replaces full donut) |
+| `Views/Trends/Components/PremiumBannerView.swift` | 60 | Light-blue gradient banner; CharacterCalm mascot + sparkles + orange CTA |
+| `Views/Trends/Components/MascotSpeechBubbleView.swift` | 34 | Speech bubble component for mascot (NEW) |
+| `Views/Trends/Components/SmartInsightsTeaser.swift` | 48 | Static "Coming Soon" teaser (replaces dynamic pattern insights) |
+| `Views/Trends/Components/TimeRangePicker.swift` | - | Time range selector (used within individual cards) |
+| `Views/Trends/Components/InsightCard.swift` | - | Individual insight card |
+| `Views/Trends/Components/DistributionBarView.swift` | - | Distribution bar sub-component |
+| `Views/Trends/Components/CircularStressIndicatorView.swift` | - | Legacy circular indicator (superseded by bar chart) |
+
+**Trends Card Design (Mar 2026):**
+- All cards use `adaptiveCardBackground` + `settingsCardRadius` + Settings card shadow
+- Per-card static labels replace global NavigationStack header
+- Cards: Stress Over Time, Weekly Heatmap, HRV Trend, Stress Sources, Premium Banner, Smart Insights
 
 #### Breathing Module (6 files, ~450 LOC)
 Guided breathing exercises.
@@ -493,5 +509,5 @@ Watch-specific design tokens.
 
 ---
 
-**Last Updated:** March 1, 2026
+**Last Updated:** March 3, 2026
 **Maintainers:** Phuong Doan

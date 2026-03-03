@@ -4,6 +4,7 @@ struct LineChartView: View {
     let dataPoints: [ChartDataPoint]
     let accentColor: Color
     let showGrid: Bool
+    var showYAxisLabels: Bool = false
 
     @State private var selectedPoint: ChartDataPoint?
     @State private var touchLocation: CGPoint = .zero
@@ -13,6 +14,10 @@ struct LineChartView: View {
             ZStack {
                 if showGrid {
                     drawGrid(in: geometry.size)
+                }
+
+                if showYAxisLabels {
+                    drawYAxisLabels(in: geometry.size)
                 }
 
                 drawAreaFill(in: geometry.size)
@@ -42,6 +47,24 @@ struct LineChartView: View {
                     path.addLine(to: CGPoint(x: size.width, y: y))
                 }
                 .stroke(Color.secondary.opacity(0.1), lineWidth: 1)
+            }
+        }
+    }
+
+    /// Overlays Y-axis value labels (0, 50, 100, 150) on the left edge
+    private func drawYAxisLabels(in size: CGSize) -> some View {
+        let labels: [(value: Int, fraction: CGFloat)] = [
+            (150, 0.0),
+            (100, 0.25),
+            (50, 0.5),
+            (0, 1.0)
+        ]
+        return ZStack {
+            ForEach(labels, id: \.value) { item in
+                Text("\(item.value)")
+                    .font(.system(size: 9))
+                    .foregroundColor(.secondary)
+                    .position(x: 16, y: item.fraction * size.height)
             }
         }
     }

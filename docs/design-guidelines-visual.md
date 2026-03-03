@@ -167,12 +167,28 @@ VStack(spacing: DesignTokens.spacing_m) {
 .shadow(color: Color.black.opacity(0.3), radius: 20, x: 0, y: 8)
 ```
 
-**Settings Card Shadow** (NEW Mar 2026):
+**Settings Card Shadow** (Mar 2026):
 ```swift
-// Per Figma spec for Settings screen
+// Per Figma spec for Settings + Trends screens
 .shadow(color: Color.settingsCardShadowColor.opacity(0.08),
         radius: 5.71, x: 0, y: 2.85)
 ```
+
+---
+
+## Standard Card Pattern
+
+**All content cards** (Settings, Trends, and any new screens) use this unified style:
+
+```swift
+// Standard card container pattern
+.background(Color.adaptiveCardBackground)
+.cornerRadius(DesignTokens.settingsCardRadius)
+.shadow(color: Color.settingsCardShadowColor.opacity(0.08),
+        radius: 5.71, x: 0, y: 2.85)
+```
+
+**Rule:** Use `adaptiveCardBackground` + `settingsCardRadius` + Settings card shadow for all card containers. Introduced in Settings (Mar 2026) and extended to Trends (Mar 2026).
 
 ---
 

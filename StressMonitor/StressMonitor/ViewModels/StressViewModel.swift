@@ -212,6 +212,10 @@ final class StressViewModel {
 
     /// Start auto-refresh via HealthKit observer
     func startAutoRefresh() {
+        // Skip HealthKit observer in simulator — no HealthKit entitlement in sim builds
+        #if targetEnvironment(simulator)
+        return
+        #else
         let hrvType = HKObjectType.quantityType(forIdentifier: .heartRateVariabilitySDNN)!
 
         let query = HKObserverQuery(sampleType: hrvType, predicate: nil) { [weak self] _, completionHandler, error in
@@ -237,6 +241,7 @@ final class StressViewModel {
 
         healthStore.execute(query)
         observerQuery = query
+        #endif
     }
 
     /// Stop auto-refresh observer

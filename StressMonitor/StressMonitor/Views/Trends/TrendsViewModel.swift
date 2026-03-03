@@ -16,11 +16,14 @@ class TrendsViewModel {
 
     // MARK: - New properties for Figma design
     var weeklyMeasurements: [StressMeasurement] = []
+    var dailyStressData: [DailyStressData] = []
     var stressSources: [StressSource] = [
-        StressSource(name: "Work", percentage: 50, color: .primaryBlue),
-        StressSource(name: "Finance", percentage: 30, color: Color(hex: "#00BFA5")),
+        StressSource(name: "Finance", percentage: 35, color: Color(hex: "#00BFA5")),
         StressSource(name: "Relationship", percentage: 15, color: Color(hex: "#FF9800")),
-        StressSource(name: "Health", percentage: 5, color: Color(hex: "#FFD60A"))
+        StressSource(name: "Health", percentage: 50, color: Color(hex: "#FFD60A")),
+        StressSource(name: "Family", percentage: 0, color: .stressRelaxed),
+        StressSource(name: "Work", percentage: 0, color: .primaryBlue),
+        StressSource(name: "Environment", percentage: 0, color: .stressSevere)
     ]
 
     private let repository: StressRepositoryProtocol
@@ -66,6 +69,9 @@ class TrendsViewModel {
 
             // Store weekly measurements for heatmap
             weeklyMeasurements = measurements
+
+            // Compute daily stress averages for bar chart (last 7 days)
+            dailyStressData = computeDailyStress(measurements: measurements)
 
         } catch {
             hrvData = []
@@ -201,6 +207,24 @@ class TrendsViewModel {
         formatter.dateFormat = "MMM d"
         return formatter.string(from: date)
     }
+
+    /// Groups measurements from last 7 days into Mon–Sun averages for the bar chart
+    private func computeDailyStress(measurements: [StressMeasurement]) -> [DailyStressData] {
+        let calendar = Calendar.current
+        let now = Date()
+        let shortDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+
+        // Build ordered list of last 7 days (oldest → newest)
+        return (0..<7).compactMap { offset -> DailyStressData? in
+            guard let dayDate = calendar.date(byAdding: .day, value: -(6 - offset), to: calendar.startOfDay(for: now)),
+                  let dayEnd = calendar.date(byAdding: .day, value: 1, to: dayDate) else { return nil }
+
+            let dayMeasurements = measurements.filter { $0.timestamp >= dayDate && $0.timestamp < dayEnd }
+            let avg = dayMeasurements.isEmpty ? 0.0 : dayMeasurements.map { $0.stressLevel }.reduce(0, +) / Double(dayMeasurements.count)
+            let weekday = calendar.component(.weekday, from: dayDate) // 1=Sun, 7=Sat
+            return DailyStressData(dayLabel: shortDays[weekday - 1], averageStress: avg)
+        }
+    }
 }
 
 struct ChartDataPoint: Identifiable, Equatable {
@@ -231,4 +255,11 @@ enum TrendsTimeRange: String {
     case week = "7D"
     case month = "4W"
     case threeMonths = "3M"
+}
+
+/// One day's average stress data used for the bar chart
+struct DailyStressData: Identifiable {
+    let id = UUID()
+    let dayLabel: String     // e.g. "Mon", "Tue"
+    let averageStress: Double
 }
