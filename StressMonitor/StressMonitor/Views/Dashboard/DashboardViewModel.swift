@@ -12,6 +12,7 @@ class DashboardViewModel {
     var lastUpdated: Date?
     var isMeasuring = false
     var errorMessage: String?
+    var weeklyMeasurements: [StressMeasurement] = []
 
     private let healthKit: HealthKitServiceProtocol
     private let algorithm: StressAlgorithmServiceProtocol
@@ -54,6 +55,7 @@ class DashboardViewModel {
 
             weeklyTrend = calculateTrend(from: weeklyData)
             aiInsight = generateInsight()
+            weeklyMeasurements = weeklyData  // Store for the weekly timeline chart
 
             let measurement = StressMeasurement(
                 timestamp: Date(),

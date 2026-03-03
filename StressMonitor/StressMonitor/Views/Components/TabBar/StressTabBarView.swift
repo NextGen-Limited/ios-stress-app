@@ -24,17 +24,11 @@ public enum TabBarVisibility {
 struct StressTabBarView: View {
     @Binding var selectedTab: TabItem
 
-    // Figma specs
-    private let tabBarHeight: CGFloat = 100
-    private let tabSpacing: CGFloat = 80
-    private let topPadding: CGFloat = 21
-    private let bottomSafeArea: CGFloat = 0
-
     // Corner radius for tab bar top edges
-    private let cornerRadius: CGFloat = 32
+    private let cornerRadius: CGFloat = 64
 
     var body: some View {
-        HStack(spacing: tabSpacing) {
+        HStack(spacing: 50) {
             ForEach(TabItem.allCases) { item in
                 TabBarItem(
                     item: item,
@@ -47,7 +41,8 @@ struct StressTabBarView: View {
                 }
             }
         }
-        .padding()
+        .padding(.horizontal, 16)
+        .padding(.vertical, 8)
         .background(Color(.systemBackground))
         .clipShape(
             .rect(cornerRadius: cornerRadius)

@@ -61,6 +61,10 @@ struct StressDashboardView: View {
                     quickStatsRow
                         .padding(.horizontal)
 
+                    // Weekly timeline chart
+                    DailyTimelineView(measurements: viewModel.weeklyMeasurements)
+                        .padding(.horizontal)
+
                     // Breathing Exercise CTA (Phase 4)
                     BreathingExerciseCTA {
                         showingBreathing = true

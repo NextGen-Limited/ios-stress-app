@@ -1,263 +1,146 @@
 import SwiftUI
 
-/// Timeline view showing intraday stress patterns
-/// Displays 24-hour timeline with markers at 6-hour intervals
+/// Weekly stress timeline showing 7-day × 7-time-slot dot matrix
+/// Matches Figma design with pastel colored dots arranged in grid
 struct DailyTimelineView: View {
     let measurements: [StressMeasurement]
-    let isExpanded: Bool
 
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
-
-    private let hourMarkers: [Int] = [0, 6, 12, 18, 24]
-    private let collapsedHeight: CGFloat = 60
-    private let expandedHeight: CGFloat = 120
+    private let days = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"]
+    private let timeBlockCount = 7       // 3-hour blocks per day
+    private let dotSize: CGFloat = 19
+    private let hSpacing: CGFloat = 22
+    private let vSpacing: CGFloat = 24
+    private let dayLabelWidth: CGFloat = 30
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            // Header
-            HStack {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("Today's Timeline")
-                        .font(.subheadline.bold())
-                        .foregroundColor(.white)
+        VStack(alignment: .leading, spacing: 16) {
+            headerRow
+            dotGrid
+        }
+        .padding(24)
+        .background(Color.adaptiveCardBackground)
+        .clipShape(RoundedRectangle(cornerRadius: Spacing.settingsCardRadius))
+        .shadow(AppShadow.settingsCard)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(accessibilityLabel)
+    }
 
-                    if !measurements.isEmpty {
-                        Text(averageText)
-                            .font(.caption)
-                            .foregroundColor(.oledTextSecondary)
+    // MARK: - Header Row
+
+    private var headerRow: some View {
+        HStack {
+            Text("Daily Timeline")
+                .font(Typography.title2)
+                .fontWeight(.bold)
+
+            Spacer()
+
+            Text("Last 7 days")
+                .font(Typography.caption1)
+                .foregroundColor(.secondary)
+        }
+    }
+
+    // MARK: - Dot Grid Layout
+
+    private var dotGrid: some View {
+        HStack(alignment: .center, spacing: hSpacing) {
+            // Day label column
+            VStack(alignment: .leading, spacing: vSpacing) {
+                ForEach(days, id: \.self) { day in
+                    Text(day)
+                        .font(.system(size: 13, weight: .bold))
+                        .foregroundColor(Color(hex: "#363636"))
+                        .frame(width: dayLabelWidth, alignment: .leading)
+                }
+            }
+
+            // Time slot columns (7 blocks × 7 days)
+            ForEach(0..<timeBlockCount, id: \.self) { blockIndex in
+                VStack(spacing: vSpacing) {
+                    ForEach(0..<7, id: \.self) { dayIndex in
+                        Circle()
+                            .fill(dotColor(dayIndex: dayIndex, blockIndex: blockIndex))
+                            .frame(width: dotSize, height: dotSize)
+                            .accessibilityHidden(true)
                     }
                 }
-
-                Spacer()
-
-                if measurements.isEmpty {
-                    Text("No data")
-                        .font(.caption)
-                        .foregroundColor(.oledTextSecondary)
-                } else {
-                    Text("\(measurements.count) measurements")
-                        .font(.caption)
-                        .foregroundColor(.oledTextSecondary)
-                }
-            }
-
-            // Timeline
-            if measurements.isEmpty {
-                emptyTimeline
-            } else {
-                timelineContent
             }
         }
-        .padding(16)
-        .background(Color.oledCardBackground)
-        .cornerRadius(12)
-        .accessibilityElement(children: .combine)
-        .accessibilityLabel(accessibilityDescription)
+        .accessibilityElement(children: .ignore)
+        .accessibilityLabel(accessibilityLabel)
     }
 
-    // MARK: - Empty State
+    // MARK: - Data Mapping
 
-    private var emptyTimeline: some View {
-        VStack(spacing: 8) {
-            HStack(spacing: 8) {
-                ForEach(hourMarkers.dropLast(), id: \.self) { hour in
-                    Text(formatHour(hour))
-                        .font(.caption2)
-                        .foregroundColor(.oledTextSecondary)
-                    Spacer()
-                }
-                Text("24")
-                    .font(.caption2)
-                    .foregroundColor(.oledTextSecondary)
-            }
-
-            Rectangle()
-                .fill(Color.oledCardSecondary)
-                .frame(height: 40)
-                .cornerRadius(8)
-                .overlay(
-                    Text("Measure throughout the day to see patterns")
-                        .font(.caption)
-                        .foregroundColor(.oledTextSecondary)
-                )
-        }
-    }
-
-    // MARK: - Timeline Content
-
-    private var timelineContent: some View {
-        GeometryReader { geometry in
-            let chartHeight = isExpanded ? expandedHeight : collapsedHeight
-
-            ZStack(alignment: .top) {
-                // Hour markers and grid lines
-                HStack(spacing: 0) {
-                    ForEach(Array(hourMarkers.enumerated()), id: \.element) { index, hour in
-                        VStack(alignment: .leading, spacing: 4) {
-                            Text(formatHour(hour))
-                                .font(.system(size: 9))
-                                .foregroundColor(.oledTextSecondary)
-
-                            Rectangle()
-                                .fill(Color.oledCardSecondary)
-                                .frame(width: 1, height: chartHeight - 16)
-                        }
-                        .frame(maxWidth: .infinity, alignment: .leading)
-
-                        if index < hourMarkers.count - 1 {
-                            Spacer()
-                        }
-                    }
-                }
-
-                // Data points
-                ForEach(groupedByHour(), id: \.hour) { group in
-                    dataPoint(for: group, in: geometry.size)
-                }
-
-                // Current time indicator
-                currentTimeIndicator(in: geometry.size, chartHeight: chartHeight)
-            }
-        }
-        .frame(height: isExpanded ? expandedHeight + 24 : collapsedHeight + 24)
-        .clipped()
-    }
-
-    // MARK: - Data Point View
-
-    private func dataPoint(for group: HourlyDataGroup, in size: CGSize) -> some View {
-        let chartHeight = isExpanded ? expandedHeight : collapsedHeight
-        let xPosition = (size.width / 24) * CGFloat(group.hour)
-        let yPosition = chartHeight - (chartHeight * (group.averageStress / 100))
-
-        return Circle()
-            .fill(Color.stressColor(for: group.averageStress))
-            .frame(width: pointSize(for: group.count), height: pointSize(for: group.count))
-            .overlay(
-                Text("\(group.count)")
-                    .font(.system(size: 8, weight: .bold))
-                    .foregroundColor(.white)
-                    .opacity(group.count > 1 ? 1 : 0)
-            )
-            .position(x: xPosition, y: yPosition)
-            .accessibilityHidden(true)
-    }
-
-    private func pointSize(for count: Int) -> CGFloat {
-        min(10 + CGFloat(count * 3), 24)
-    }
-
-    // MARK: - Current Time Indicator
-
-    private func currentTimeIndicator(in size: CGSize, chartHeight: CGFloat) -> some View {
-        let currentHour = Calendar.current.component(.hour, from: Date())
-        let currentMinute = Calendar.current.component(.minute, from: Date())
-        let hourFraction = Double(currentHour) + Double(currentMinute) / 60.0
-        let xPosition = (size.width / 24) * hourFraction
-
-        return VStack(spacing: 0) {
-            Triangle()
-                .fill(Color.primaryBlue)
-                .frame(width: 10, height: 5)
-
-            Rectangle()
-                .fill(Color.primaryBlue)
-                .frame(width: 2, height: chartHeight - 16)
-        }
-        .position(x: xPosition, y: chartHeight / 2)
-        .accessibilityHidden(true)
-    }
-
-    // MARK: - Helpers
-
-    private func formatHour(_ hour: Int) -> String {
-        switch hour {
-        case 0: return "12 AM"
-        case 6: return "6 AM"
-        case 12: return "12 PM"
-        case 18: return "6 PM"
-        case 24: return "12 AM"
-        default: return "\(hour)"
-        }
-    }
-
-    private func groupedByHour() -> [HourlyDataGroup] {
+    /// Returns average stress level for a specific day (0=Mon) and 3-hour block (0–6)
+    private func stressLevel(dayIndex: Int, blockIndex: Int) -> Double? {
         let calendar = Calendar.current
-        let groups = Dictionary(grouping: measurements) { measurement -> Int in
-            calendar.component(.hour, from: measurement.timestamp)
+        let now = Date()
+        let hoursPerBlock = 24 / timeBlockCount  // 3 hours per block
+
+        // dayIndex 0=Mon. Today = dayIndex matching weekday.
+        // Compute offset: days ago from today
+        let todayWeekday = calendar.component(.weekday, from: now) // 1=Sun, 2=Mon...7=Sat
+        let todayDayIndex = (todayWeekday + 5) % 7  // convert to 0=Mon
+        let dayOffset = dayIndex - todayDayIndex     // negative = past days
+
+        guard let dayStart = calendar.date(
+                  byAdding: .day, value: dayOffset,
+                  to: calendar.startOfDay(for: now)),
+              let blockStart = calendar.date(
+                  byAdding: .hour, value: blockIndex * hoursPerBlock,
+                  to: dayStart),
+              let blockEnd = calendar.date(
+                  byAdding: .hour, value: hoursPerBlock,
+                  to: blockStart)
+        else { return nil }
+
+        let filtered = measurements.filter {
+            $0.timestamp >= blockStart && $0.timestamp < blockEnd
         }
-
-        return groups.map { hour, measurements in
-            HourlyDataGroup(
-                hour: hour,
-                averageStress: measurements.map(\.stressLevel).reduce(0, +) / Double(measurements.count),
-                count: measurements.count
-            )
-        }.sorted { $0.hour < $1.hour }
+        guard !filtered.isEmpty else { return nil }
+        return filtered.map(\.stressLevel).reduce(0, +) / Double(filtered.count)
     }
 
-    private var averageText: String {
-        guard !measurements.isEmpty else { return "" }
-        let avg = measurements.map(\.stressLevel).reduce(0, +) / Double(measurements.count)
-        return "Avg: \(Int(avg))%"
-    }
+    // MARK: - Color Helpers
 
-    private var accessibilityDescription: String {
-        if measurements.isEmpty {
-            return "Today's timeline: No measurements yet"
+    private func dotColor(dayIndex: Int, blockIndex: Int) -> Color {
+        guard let level = stressLevel(dayIndex: dayIndex, blockIndex: blockIndex) else {
+            return Color.secondary.opacity(0.15)  // No data: gray
         }
-
-        let avg = measurements.map(\.stressLevel).reduce(0, +) / Double(measurements.count)
-        return "Today's timeline: \(measurements.count) measurements, average stress \(Int(avg)) percent"
+        return Color.stressColor(for: level)
     }
-}
 
-// MARK: - Supporting Types
-
-struct HourlyDataGroup {
-    let hour: Int
-    let averageStress: Double
-    let count: Int
-}
-
-// MARK: - Triangle Shape
-
-struct Triangle: Shape {
-    func path(in rect: CGRect) -> Path {
-        var path = Path()
-        path.move(to: CGPoint(x: rect.midX, y: rect.minY))
-        path.addLine(to: CGPoint(x: rect.maxX, y: rect.maxY))
-        path.addLine(to: CGPoint(x: rect.minX, y: rect.maxY))
-        path.closeSubpath()
-        return path
+    private var accessibilityLabel: String {
+        guard !measurements.isEmpty else {
+            return "Daily timeline: No measurements for the past 7 days"
+        }
+        let avg = measurements.map(\.stressLevel).reduce(0, +) / Double(measurements.count)
+        return "Daily timeline: Last 7 days, average stress \(Int(avg)) percent"
     }
 }
 
 // MARK: - Preview
 
-#Preview("Timeline - Empty") {
-    ZStack {
-        Color.oledBackground.ignoresSafeArea()
-        DailyTimelineView(measurements: [], isExpanded: false)
-            .padding()
-    }
+#Preview("Weekly - Empty") {
+    DailyTimelineView(measurements: [])
+        .padding()
+        .background(Color.backgroundLight)
 }
 
-#Preview("Timeline - With Data") {
-    ZStack {
-        Color.oledBackground.ignoresSafeArea()
-
-        let measurements = (0..<10).map { i in
-            StressMeasurement(
-                timestamp: Calendar.current.date(byAdding: .hour, value: i * 2, to: Date()) ?? Date(),
-                stressLevel: Double.random(in: 20...70),
-                hrv: Double.random(in: 30...80),
-                restingHeartRate: 60,
-                confidences: [0.8]
-            )
-        }
-
-        DailyTimelineView(measurements: measurements, isExpanded: false)
-            .padding()
+#Preview("Weekly - With Data") {
+    let measurements = (0..<20).map { i in
+        StressMeasurement(
+            timestamp: Calendar.current.date(
+                byAdding: .hour, value: -(i * 8), to: Date()) ?? Date(),
+            stressLevel: Double.random(in: 10...90),
+            hrv: 50,
+            restingHeartRate: 65,
+            confidences: [0.8]
+        )
     }
+    return DailyTimelineView(measurements: measurements)
+        .padding()
+        .background(Color.backgroundLight)
 }
