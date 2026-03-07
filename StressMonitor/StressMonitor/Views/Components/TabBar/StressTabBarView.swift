@@ -69,15 +69,9 @@ private struct TabBarItem: View {
 
     var body: some View {
         Button(action: action) {
-            VStack(spacing: 2) {
-                iconView
-                    .frame(width: iconSize, height: iconSize)
-                    .frame(width: touchTargetSize, height: touchTargetSize)
-
-                Text(item.title)
-                    .font(.system(size: 10))
-                    .foregroundColor(isSelected ? .primaryBlue : .secondary)
-            }
+            iconView
+                .frame(width: iconSize, height: iconSize)
+                .frame(width: touchTargetSize, height: touchTargetSize)
         }
         .buttonStyle(.plain)
         .accessibilityLabel(item.accessibilityLabel)
