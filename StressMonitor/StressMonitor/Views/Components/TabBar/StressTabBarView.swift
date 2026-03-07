@@ -1,6 +1,7 @@
 import SwiftUI
+import AnimatedTabBar
 
-// MARK: - Tabbable Protocol
+// MARK: - Tabbable Protocol (Local)
 
 /// Protocol defining tab bar item properties
 /// Based on https://github.com/onl1ner/TabBar
@@ -19,8 +20,9 @@ public enum TabBarVisibility {
 
 // MARK: - StressTabBarView
 
-/// Custom tab bar view matching Figma design (Node 4:5990)
+/// Custom tab bar view matching Figma design
 /// Uses separate images for selected/unselected states.
+/// Note: AnimatedTabBar library integrated but using custom implementation for reliability
 struct StressTabBarView: View {
     @Binding var selectedTab: TabItem
 
@@ -28,7 +30,7 @@ struct StressTabBarView: View {
     private let cornerRadius: CGFloat = 64
 
     var body: some View {
-        HStack(spacing: 50) {
+        HStack(spacing: 0) {
             ForEach(TabItem.allCases) { item in
                 TabBarItem(
                     item: item,
@@ -39,9 +41,10 @@ struct StressTabBarView: View {
                         selectedTab = item
                     }
                 }
+                .frame(maxWidth: .infinity)
             }
         }
-        .padding(.horizontal, 16)
+        .padding(.horizontal, 8)
         .padding(.vertical, 8)
         .background(Color(.systemBackground))
         .clipShape(
@@ -62,22 +65,41 @@ private struct TabBarItem: View {
     let action: () -> Void
 
     private let touchTargetSize: CGFloat = 46
-    private let iconSize: CGFloat = 40
+    private let iconSize: CGFloat = 28
 
     var body: some View {
         Button(action: action) {
-            Image(isSelected ? item.selectedIconName : item.unselectedIconName)
-                .resizable()
-                .renderingMode(.original)  // Use original image colors
-                .aspectRatio(contentMode: .fit)
-                .frame(width: iconSize, height: iconSize)
-                .frame(width: touchTargetSize, height: touchTargetSize)
+            VStack(spacing: 2) {
+                iconView
+                    .frame(width: iconSize, height: iconSize)
+                    .frame(width: touchTargetSize, height: touchTargetSize)
+
+                Text(item.title)
+                    .font(.system(size: 10))
+                    .foregroundColor(isSelected ? .primaryBlue : .secondary)
+            }
         }
         .buttonStyle(.plain)
         .accessibilityLabel(item.accessibilityLabel)
         .accessibilityHint(item.accessibilityHint)
         .accessibilityIdentifier(item.accessibilityIdentifier)
         .accessibilityAddTraits(isSelected ? .isSelected : [])
+    }
+
+    @ViewBuilder
+    private var iconView: some View {
+        if item.useSymbol {
+            Image(systemName: isSelected ? item.selectedIconName : item.unselectedIconName)
+                .resizable()
+                .renderingMode(.template)
+                .aspectRatio(contentMode: .fit)
+                .foregroundColor(isSelected ? .primaryBlue : .secondary)
+        } else {
+            Image(isSelected ? item.selectedIconName : item.unselectedIconName)
+                .resizable()
+                .renderingMode(.original)
+                .aspectRatio(contentMode: .fit)
+        }
     }
 }
 
