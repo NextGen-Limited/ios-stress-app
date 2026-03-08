@@ -1,8 +1,9 @@
 import SwiftUI
 
-// MARK: - Quick Action Card
+// MARK: - Quick Action Card (Figma Design)
 
 /// Horizontal scrollable action cards for wellness activities
+/// Figma: 283pt × 98pt, title + description + duration badge + image
 struct QuickActionCard<Destination: View>: View {
     let title: String
     let description: String
@@ -12,51 +13,83 @@ struct QuickActionCard<Destination: View>: View {
 
     var body: some View {
         NavigationLink(destination: destination()) {
-            VStack(alignment: .leading, spacing: DesignTokens.Spacing.sm) {
-                // Title
-                Text(title)
-                    .font(Typography.headline)
-                    .fontWeight(.semibold)
-                    .foregroundStyle(.white)
-                    .lineLimit(1)
+            ZStack(alignment: .topLeading) {
+                // Background
+                color
+                    .cornerRadius(20)
 
-                // Description (13pt, 2 lines max)
-                Text(description)
-                    .font(Typography.footnote)
-                    .foregroundStyle(.white.opacity(0.9))
-                    .lineLimit(2)
+                // Content
+                HStack(alignment: .top, spacing: 0) {
+                    // Left: Title, description, duration
+                    VStack(alignment: .leading, spacing: 4) {
+                        Text(title)
+                            .font(.custom("Lato-Bold", size: 16))
+                            .foregroundStyle(.white)
+                            .tracking(-0.24)
+                            .lineLimit(1)
 
-                Spacer()
+                        Text(description)
+                            .font(.custom("Lato-Regular", size: 11))
+                            .foregroundStyle(.white)
+                            .tracking(-0.165)
+                            .lineLimit(2)
+                            .frame(width: 121, alignment: .leading)
 
-                // Duration badge and image placeholder
-                HStack {
-                    // Duration badge
-                    Text(duration)
-                        .font(Typography.caption1)
-                        .fontWeight(.medium)
-                        .foregroundStyle(.white)
-                        .padding(.horizontal, DesignTokens.Spacing.sm)
-                        .padding(.vertical, DesignTokens.Spacing.xs)
-                        .background(Color.white.opacity(0.2))
-                        .cornerRadius(8)
+                        // Duration badge
+                        Text(duration)
+                            .font(.custom("Lato-Bold", size: 12))
+                            .foregroundStyle(.white)
+                            .tracking(-0.18)
+                            .padding(.horizontal, 12)
+                            .padding(.vertical, 2)
+                            .background(color.darker())
+                            .cornerRadius(16.3)
+                    }
+                    .padding(.leading, 18)
+                    .padding(.top, 20)
+                    .padding(.bottom, 20)
 
                     Spacer()
 
-                    // Image placeholder
-                    Image(systemName: "play.circle.fill")
-                        .font(.title2)
-                        .foregroundStyle(.white.opacity(0.8))
+                    // Right: Image placeholder
+                    Image(systemName: "figure.mind.and.body")
+                        .resizable()
+                        .scaledToFit()
+                        .frame(width: 114, height: 98)
+                        .foregroundStyle(.white.opacity(0.3))
                 }
             }
-            .padding(DesignTokens.Layout.cardPadding)
-            .frame(width: 268, height: 98)
-            .background(color)
-            .cornerRadius(DesignTokens.Layout.cornerRadius)
+            .frame(width: 283, height: 98)
+            .shadow(color: Color.settingsCardShadowColor.opacity(0.08), radius: 5.71, x: 0, y: 2.85)
+            .shadow(color: Color.settingsCardShadowColor.opacity(0.04), radius: 5.71, x: 0, y: 5.71)
         }
         .buttonStyle(.plain)
         .accessibilityElement(children: .combine)
         .accessibilityLabel("\(title). \(description). Duration: \(duration)")
         .accessibilityHint("Double tap to start activity")
+    }
+}
+
+// MARK: - Color Extension for Darker
+
+private extension Color {
+    func darker() -> Color {
+        // Create a darker version of the color for the duration badge
+        UIColor(self).darkerColor.map { Color($0) } ?? self.opacity(0.6)
+    }
+}
+
+private extension UIColor {
+    var darkerColor: UIColor? {
+        var hue: CGFloat = 0
+        var saturation: CGFloat = 0
+        var brightness: CGFloat = 0
+        var alpha: CGFloat = 0
+
+        if getHue(&hue, saturation: &saturation, brightness: &brightness, alpha: &alpha) {
+            return UIColor(hue: hue, saturation: saturation, brightness: brightness * 0.7, alpha: alpha)
+        }
+        return nil
     }
 }
 

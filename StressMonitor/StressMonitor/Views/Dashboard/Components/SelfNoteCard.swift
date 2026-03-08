@@ -1,62 +1,69 @@
 import SwiftUI
 
-// MARK: - Self Note Card
-
-/// Teal journal prompt card that opens NoteEntryView as a sheet
+/// Self note card - "How do you feel?" prompt
+/// Figma: 358pt × 80pt, teal bg (#85c9c9), white text, chevron arrow
 struct SelfNoteCard: View {
-    @State private var isShowingNoteEntry = false
+    var onTap: (() -> Void)?
 
     var body: some View {
-        Button(action: {
-            HapticManager.shared.buttonPress()
-            isShowingNoteEntry = true
-        }) {
-            HStack(spacing: DesignTokens.Spacing.md) {
-                // Avatar placeholder circle
-                Circle()
-                    .fill(Color.white.opacity(0.3))
-                    .frame(width: 44, height: 44)
-                    .overlay(
-                        Image(systemName: "person.circle.fill")
-                            .font(.title2)
-                            .foregroundStyle(.white)
-                    )
+        Button(action: { onTap?() }) {
+            HStack {
+                // Avatar circle with gradient
+                ZStack {
+                    Circle()
+                        .fill(
+                            LinearGradient(
+                                colors: [Color(hex: "B5FFC9"), Color(hex: "85C9C9")],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                        .frame(width: 44.638, height: 44.638)
+                }
 
                 // Text content
-                VStack(alignment: .leading, spacing: DesignTokens.Spacing.xs) {
-                    Text("How was your day?")
-                        .font(Typography.headline)
-                        .fontWeight(.bold)
+                VStack(alignment: .leading, spacing: 0) {
+                    Text("How do you feel?")
+                        .font(.custom("Lato-Regular", size: 13))
                         .foregroundStyle(.white)
+                        .tracking(-0.195)
 
                     Text("Tell me about it")
-                        .font(Typography.subheadline)
-                        .foregroundStyle(.white.opacity(0.8))
+                        .font(.custom("Lato-Bold", size: 16))
+                        .foregroundStyle(.white)
+                        .tracking(-0.24)
                 }
+                .padding(.leading, 24.105)
 
                 Spacer()
 
                 // Chevron
                 Image(systemName: "chevron.right")
-                    .font(.body)
-                    .foregroundStyle(.white.opacity(0.8))
+                    .font(.system(size: 11.606, weight: .semibold))
+                    .foregroundStyle(.white)
+                    .rotationEffect(.degrees(90))
             }
-            .padding(DesignTokens.Layout.cardPadding)
-            .background(Color.Wellness.tealCard)
-            .cornerRadius(DesignTokens.Layout.cornerRadius)
+            .padding(.leading, 26.783)
+            .padding(.trailing, 17.855)
+            .padding(.top, 20)
+            .padding(.bottom, 17.855)
+            .frame(width: 358, height: 80)
+            .background(Color.accentTeal)
+            .cornerRadius(20)
+            .shadow(color: Color.settingsCardShadowColor.opacity(0.08), radius: 5.71, x: 0, y: 2.85)
+            .shadow(color: Color.settingsCardShadowColor.opacity(0.04), radius: 5.71, x: 0, y: 5.71)
         }
         .buttonStyle(.plain)
-        .accessibilityLabel("Journal entry. How was your day? Tell me about it.")
-        .accessibilityHint("Opens journal entry form")
-        .sheet(isPresented: $isShowingNoteEntry) {
-            NoteEntryView(isPresented: $isShowingNoteEntry)
-        }
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("How do you feel? Tell me about it")
+        .accessibilityHint("Double tap to share how you're feeling")
     }
 }
 
 // MARK: - Preview
 
-#Preview {
+#Preview("SelfNoteCard") {
     SelfNoteCard()
         .padding()
+        .background(Color.Wellness.adaptiveBackground)
 }
