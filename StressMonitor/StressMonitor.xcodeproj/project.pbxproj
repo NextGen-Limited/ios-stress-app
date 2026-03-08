@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		F26965312F5C0A9700B40F0F /* AnimatedTabBar in Frameworks */ = {isa = PBXBuildFile; productRef = F26965302F5C0A9700B40F0F /* AnimatedTabBar */; };
 		F2E2EC392F1CC605000C2B53 /* StressMonitorWatch Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = F2E2EC192F1CC602000C2B53 /* StressMonitorWatch Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
@@ -109,6 +110,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				F26965312F5C0A9700B40F0F /* AnimatedTabBar in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -198,6 +200,7 @@
 			);
 			name = StressMonitor;
 			packageProductDependencies = (
+				F26965302F5C0A9700B40F0F /* AnimatedTabBar */,
 			);
 			productName = StressMonitor;
 			productReference = F2E2EBE92F1CC553000C2B53 /* StressMonitor.app */;
@@ -360,6 +363,9 @@
 			);
 			mainGroup = F2E2EBE02F1CC553000C2B53;
 			minimizedProjectReferenceProxies = 1;
+			packageReferences = (
+				F269652F2F5C0A9700B40F0F /* XCRemoteSwiftPackageReference "AnimatedTabBar" */,
+			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = F2E2EBEA2F1CC553000C2B53 /* Products */;
 			projectDirPath = "";
@@ -1006,6 +1012,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		F269652F2F5C0A9700B40F0F /* XCRemoteSwiftPackageReference "AnimatedTabBar" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/exyte/AnimatedTabBar.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		F26965302F5C0A9700B40F0F /* AnimatedTabBar */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F269652F2F5C0A9700B40F0F /* XCRemoteSwiftPackageReference "AnimatedTabBar" */;
+			productName = AnimatedTabBar;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = F2E2EBE12F1CC553000C2B53 /* Project object */;
 }

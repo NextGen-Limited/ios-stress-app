@@ -420,7 +420,7 @@ Use **SF Symbols** exclusively for consistency:
 | Icon | Symbol | Usage |
 |------|--------|-------|
 | Measure | `waveform.circle.fill` | Primary action |
-| History | `list.bullet` | Timeline |
+| Action | `bolt.fill` | Quick actions |
 | Trends | `chart.line.uptrend.xyaxis` | Analytics |
 | Breathing | `lungs.fill` | Exercises |
 | Settings | `gearshape.fill` | Configuration |

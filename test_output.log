@@ -1,0 +1,379 @@
+Command line invocation:
+    /Applications/Xcode.app/Contents/Developer/usr/bin/xcodebuild test -scheme StressMonitor -sdk iphonesimulator -destination "platform=iOS Simulator,name=iPhone 17 Pro"
+
+Build settings from command line:
+    SDKROOT = iphonesimulator26.1
+
+2026-03-01 21:46:35.719 xcodebuild[85241:23166485] [MT] IDERunDestination: Supported platforms for the buildables in the current scheme is empty.
+ComputePackagePrebuildTargetDependencyGraph
+
+Prepare packages
+
+CreateBuildRequest
+
+SendProjectDescription
+
+CreateBuildOperation
+
+ComputeTargetDependencyGraph
+note: Building targets in dependency order
+note: Target dependency graph (4 targets)
+    Target 'StressMonitorTests' in project 'StressMonitor'
+        ➜ Explicit dependency on target 'StressMonitor' in project 'StressMonitor'
+    Target 'StressMonitorUITests' in project 'StressMonitor'
+        ➜ Explicit dependency on target 'StressMonitor' in project 'StressMonitor'
+    Target 'StressMonitor' in project 'StressMonitor'
+        ➜ Explicit dependency on target 'StressMonitorWatch Watch App' in project 'StressMonitor'
+    Target 'StressMonitorWatch Watch App' in project 'StressMonitor' (no dependencies)
+
+GatherProvisioningInputs
+
+CreateBuildDescription
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang -v -E -dM -isysroot /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.1.sdk -x c -c /dev/null
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc --version
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/usr/bin/actool --print-asset-tag-combinations --output-format xml1 /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch Watch App/Assets.xcassets
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/usr/bin/actool --print-asset-tag-combinations --output-format xml1 /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitor/Assets.xcassets
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/usr/bin/actool --version --output-format xml1
+
+ExecuteExternalTool /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/ld -version_details
+
+Build description signature: 44247ec077733dd757dc7443e161bb87
+Build description path: /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/XCBuildData/44247ec077733dd757dc7443e161bb87.xcbuilddata
+ClangStatCache /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.1.sdk /Users/ddphuong/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator26.1-23B77-90cf18a4295e390e64c810bc6bd7acbc.sdkstatcache
+    cd /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitor.xcodeproj
+    /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/clang-stat-cache /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.1.sdk -o /Users/ddphuong/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator26.1-23B77-90cf18a4295e390e64c810bc6bd7acbc.sdkstatcache
+
+ProcessProductPackaging "" /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorWatch\ Watch\ App.build/StressMonitorWatch\ Watch\ App.app-Simulated.xcent (in target 'StressMonitorWatch Watch App' from project 'StressMonitor')
+    cd /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor
+    
+    Entitlements:
+    
+    {
+    "application-identifier" = "EQ8B89SPCX.StressMonitor.StressMonitor.watchkitapp";
+}
+    
+    builtin-productPackagingUtility -entitlements -format xml -o /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorWatch\ Watch\ App.build/StressMonitorWatch\ Watch\ App.app-Simulated.xcent
+
+WriteAuxiliaryFile /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorUITests.build/StressMonitorUITests-own-target-headers.hmap (in target 'StressMonitorUITests' from project 'StressMonitor')
+    cd /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor
+    write-file /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorUITests.build/StressMonitorUITests-own-target-headers.hmap
+
+WriteAuxiliaryFile /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorUITests.build/StressMonitorUITests.hmap (in target 'StressMonitorUITests' from project 'StressMonitor')
+    cd /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor
+    write-file /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorUITests.build/StressMonitorUITests.hmap
+
+WriteAuxiliaryFile /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorUITests.build/StressMonitorUITests-generated-files.hmap (in target 'StressMonitorUITests' from project 'StressMonitor')
+    cd /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor
+    write-file /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorUITests.build/StressMonitorUITests-generated-files.hmap
+
+WriteAuxiliaryFile /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorUITests.build/empty-StressMonitorUITests.plist (in target 'StressMonitorUITests' from project 'StressMonitor')
+    cd /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor
+    write-file /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorUITests.build/empty-StressMonitorUITests.plist
+
+WriteAuxiliaryFile /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorUITests.build/StressMonitorUITests-project-headers.hmap (in target 'StressMonitorUITests' from project 'StressMonitor')
+    cd /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor
+    write-file /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorUITests.build/StressMonitorUITests-project-headers.hmap
+
+WriteAuxiliaryFile /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorUITests.build/StressMonitorUITests-all-target-headers.hmap (in target 'StressMonitorUITests' from project 'StressMonitor')
+    cd /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor
+    write-file /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorUITests.build/StressMonitorUITests-all-target-headers.hmap
+
+WriteAuxiliaryFile /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorUITests.build/StressMonitorUITests-all-non-framework-target-headers.hmap (in target 'StressMonitorUITests' from project 'StressMonitor')
+    cd /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor
+    write-file /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorUITests.build/StressMonitorUITests-all-non-framework-target-headers.hmap
+
+WriteAuxiliaryFile /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorUITests.build/ProductTypeInfoPlistAdditions.plist (in target 'StressMonitorUITests' from project 'StressMonitor')
+    cd /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor
+    write-file /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorUITests.build/ProductTypeInfoPlistAdditions.plist
+
+WriteAuxiliaryFile /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorUITests.build/Objects-normal/arm64/StressMonitorUITests.LinkFileList (in target 'StressMonitorUITests' from project 'StressMonitor')
+    cd /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor
+    write-file /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorUITests.build/Objects-normal/arm64/StressMonitorUITests.LinkFileList
+
+WriteAuxiliaryFile /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorUITests.build/Objects-normal/arm64/StressMonitorUITests_const_extract_protocols.json (in target 'StressMonitorUITests' from project 'StressMonitor')
+    cd /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor
+    write-file /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorUITests.build/Objects-normal/arm64/StressMonitorUITests_const_extract_protocols.json
+
+WriteAuxiliaryFile /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorUITests.build/StressMonitorUITests.DependencyStaticMetadataFileList (in target 'StressMonitorUITests' from project 'StressMonitor')
+    cd /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor
+    write-file /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorUITests.build/StressMonitorUITests.DependencyStaticMetadataFileList
+
+WriteAuxiliaryFile /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorUITests.build/StressMonitorUITests.DependencyMetadataFileList (in target 'StressMonitorUITests' from project 'StressMonitor')
+    cd /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor
+    write-file /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorUITests.build/StressMonitorUITests.DependencyMetadataFileList
+
+WriteAuxiliaryFile /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorUITests.build/Objects-normal/arm64/StressMonitorUITests.SwiftFileList (in target 'StressMonitorUITests' from project 'StressMonitor')
+    cd /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor
+    write-file /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorUITests.build/Objects-normal/arm64/StressMonitorUITests.SwiftFileList
+
+WriteAuxiliaryFile /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorUITests.build/Objects-normal/arm64/StressMonitorUITests.SwiftConstValuesFileList (in target 'StressMonitorUITests' from project 'StressMonitor')
+    cd /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor
+    write-file /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorUITests.build/Objects-normal/arm64/StressMonitorUITests.SwiftConstValuesFileList
+
+WriteAuxiliaryFile /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorUITests.build/Objects-normal/arm64/StressMonitorUITests-OutputFileMap.json (in target 'StressMonitorUITests' from project 'StressMonitor')
+    cd /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor
+    write-file /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorUITests.build/Objects-normal/arm64/StressMonitorUITests-OutputFileMap.json
+
+WriteAuxiliaryFile /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorUITests.build/DerivedSources/Entitlements-Simulated.plist (in target 'StressMonitorUITests' from project 'StressMonitor')
+    cd /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor
+    write-file /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorUITests.build/DerivedSources/Entitlements-Simulated.plist
+
+WriteAuxiliaryFile /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorTests.build/StressMonitorTests.hmap (in target 'StressMonitorTests' from project 'StressMonitor')
+    cd /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor
+    write-file /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorTests.build/StressMonitorTests.hmap
+
+WriteAuxiliaryFile /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorTests.build/StressMonitorTests.DependencyStaticMetadataFileList (in target 'StressMonitorTests' from project 'StressMonitor')
+    cd /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor
+    write-file /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorTests.build/StressMonitorTests.DependencyStaticMetadataFileList
+
+WriteAuxiliaryFile /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorTests.build/empty-StressMonitorTests.plist (in target 'StressMonitorTests' from project 'StressMonitor')
+    cd /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor
+    write-file /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorTests.build/empty-StressMonitorTests.plist
+
+WriteAuxiliaryFile /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorTests.build/StressMonitorTests-project-headers.hmap (in target 'StressMonitorTests' from project 'StressMonitor')
+    cd /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor
+    write-file /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorTests.build/StressMonitorTests-project-headers.hmap
+
+WriteAuxiliaryFile /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorTests.build/StressMonitorTests-own-target-headers.hmap (in target 'StressMonitorTests' from project 'StressMonitor')
+    cd /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor
+    write-file /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorTests.build/StressMonitorTests-own-target-headers.hmap
+
+WriteAuxiliaryFile /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorTests.build/StressMonitorTests.DependencyMetadataFileList (in target 'StressMonitorTests' from project 'StressMonitor')
+    cd /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor
+    write-file /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorTests.build/StressMonitorTests.DependencyMetadataFileList
+
+WriteAuxiliaryFile /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorTests.build/StressMonitorTests-generated-files.hmap (in target 'StressMonitorTests' from project 'StressMonitor')
+    cd /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor
+    write-file /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorTests.build/StressMonitorTests-generated-files.hmap
+
+WriteAuxiliaryFile /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorTests.build/StressMonitorTests-all-target-headers.hmap (in target 'StressMonitorTests' from project 'StressMonitor')
+    cd /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor
+    write-file /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorTests.build/StressMonitorTests-all-target-headers.hmap
+
+WriteAuxiliaryFile /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorTests.build/StressMonitorTests-all-non-framework-target-headers.hmap (in target 'StressMonitorTests' from project 'StressMonitor')
+    cd /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor
+    write-file /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorTests.build/StressMonitorTests-all-non-framework-target-headers.hmap
+
+MkDir /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Products/Debug-iphonesimulator/StressMonitor.app/PlugIns (in target 'StressMonitor' from project 'StressMonitor')
+    cd /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor
+    /bin/mkdir -p /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Products/Debug-iphonesimulator/StressMonitor.app/PlugIns
+
+MkDir /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Products/Debug-iphonesimulator/StressMonitor.app/Frameworks (in target 'StressMonitor' from project 'StressMonitor')
+    cd /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor
+    /bin/mkdir -p /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Products/Debug-iphonesimulator/StressMonitor.app/Frameworks
+
+MkDir /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Products/Debug-iphonesimulator/StressMonitor.app/PlugIns/StressMonitorTests.xctest (in target 'StressMonitorTests' from project 'StressMonitor')
+    cd /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor
+    /bin/mkdir -p /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Products/Debug-iphonesimulator/StressMonitor.app/PlugIns/StressMonitorTests.xctest
+
+WriteAuxiliaryFile /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorTests.build/Objects-normal/arm64/StressMonitorTests_const_extract_protocols.json (in target 'StressMonitorTests' from project 'StressMonitor')
+    cd /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor
+    write-file /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorTests.build/Objects-normal/arm64/StressMonitorTests_const_extract_protocols.json
+
+WriteAuxiliaryFile /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorTests.build/Objects-normal/arm64/StressMonitorTests.SwiftConstValuesFileList (in target 'StressMonitorTests' from project 'StressMonitor')
+    cd /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor
+    write-file /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorTests.build/Objects-normal/arm64/StressMonitorTests.SwiftConstValuesFileList
+
+WriteAuxiliaryFile /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorTests.build/Objects-normal/arm64/StressMonitorTests.SwiftFileList (in target 'StressMonitorTests' from project 'StressMonitor')
+    cd /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor
+    write-file /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorTests.build/Objects-normal/arm64/StressMonitorTests.SwiftFileList
+
+WriteAuxiliaryFile /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorTests.build/Objects-normal/arm64/StressMonitorTests.LinkFileList (in target 'StressMonitorTests' from project 'StressMonitor')
+    cd /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor
+    write-file /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorTests.build/Objects-normal/arm64/StressMonitorTests.LinkFileList
+
+WriteAuxiliaryFile /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorTests.build/Objects-normal/arm64/StressMonitorTests-OutputFileMap.json (in target 'StressMonitorTests' from project 'StressMonitor')
+    cd /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor
+    write-file /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorTests.build/Objects-normal/arm64/StressMonitorTests-OutputFileMap.json
+
+MkDir /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Products/Debug-iphonesimulator/StressMonitorUITests-Runner.app/PlugIns/StressMonitorUITests.xctest (in target 'StressMonitorUITests' from project 'StressMonitor')
+    cd /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor
+    /bin/mkdir -p /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Products/Debug-iphonesimulator/StressMonitorUITests-Runner.app/PlugIns/StressMonitorUITests.xctest
+
+ProcessProductPackagingDER /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorWatch\ Watch\ App.build/StressMonitorWatch\ Watch\ App.app-Simulated.xcent /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorWatch\ Watch\ App.build/StressMonitorWatch\ Watch\ App.app-Simulated.xcent.der (in target 'StressMonitorWatch Watch App' from project 'StressMonitor')
+    cd /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor
+    /usr/bin/derq query -f xml -i /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorWatch\ Watch\ App.build/StressMonitorWatch\ Watch\ App.app-Simulated.xcent -o /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorWatch\ Watch\ App.build/StressMonitorWatch\ Watch\ App.app-Simulated.xcent.der --raw
+
+ProcessInfoPlistFile /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Products/Debug-iphonesimulator/StressMonitorWatch\ Watch\ App.app/Info.plist /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorWatch\ Watch\ App.build/empty-StressMonitorWatch\ Watch\ App.plist (in target 'StressMonitorWatch Watch App' from project 'StressMonitor')
+    cd /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor
+    builtin-infoPlistUtility /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorWatch\ Watch\ App.build/empty-StressMonitorWatch\ Watch\ App.plist -producttype com.apple.product-type.application -genpkginfo /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Products/Debug-iphonesimulator/StressMonitorWatch\ Watch\ App.app/PkgInfo -expandbuildsettings -format binary -platform iphonesimulator -additionalcontentfile /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorWatch\ Watch\ App.build/assetcatalog_generated_info.plist -o /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Products/Debug-iphonesimulator/StressMonitorWatch\ Watch\ App.app/Info.plist
+warning: TARGETED_DEVICE_FAMILY value (4) does not contain any device family values compatible with the iOS platform. Please add one or more of the following values to the TARGETED_DEVICE_FAMILY build setting to indicate the device families supported by this target: '1' (indicating 'iPhone'), '2' (indicating 'iPad'). (in target 'StressMonitorWatch Watch App' from project 'StressMonitor')
+
+SwiftDriver StressMonitorWatch\ Watch\ App normal arm64 com.apple.xcode.tools.swift.compiler (in target 'StressMonitorWatch Watch App' from project 'StressMonitor')
+    cd /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor
+    builtin-SwiftDriver -- /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swiftc -module-name StressMonitorWatch_Watch_App -Onone -enforce-exclusivity\=checked @/Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorWatch\ Watch\ App.build/Objects-normal/arm64/StressMonitorWatch\ Watch\ App.SwiftFileList -DDEBUG -default-isolation\=MainActor -enable-bare-slash-regex -enable-upcoming-feature DisableOutwardActorInference -enable-upcoming-feature InferSendableFromCaptures -enable-upcoming-feature GlobalActorIsolatedTypesUsability -enable-upcoming-feature MemberImportVisibility -enable-upcoming-feature InferIsolatedConformances -enable-upcoming-feature NonisolatedNonsendingByDefault -enable-experimental-feature DebugDescriptionMacro -sdk /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.1.sdk -target arm64-apple-ios26.1-simulator -g -module-cache-path /Users/ddphuong/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -Xfrontend -serialize-debugging-options -profile-coverage-mapping -profile-generate -enable-testing -index-store-path /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Index.noindex/DataStore -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -swift-version 5 -I /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Products/Debug-iphonesimulator -F /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Products/Debug-iphonesimulator -emit-localized-strings -emit-localized-strings-path /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorWatch\ Watch\ App.build/Objects-normal/arm64 -c -j11 -enable-batch-mode -incremental -Xcc -ivfsstatcache -Xcc /Users/ddphuong/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator26.1-23B77-90cf18a4295e390e64c810bc6bd7acbc.sdkstatcache -output-file-map /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorWatch\ Watch\ App.build/Objects-normal/arm64/StressMonitorWatch\ Watch\ App-OutputFileMap.json -use-frontend-parseable-output -save-temps -no-color-diagnostics -explicit-module-build -module-cache-path /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -clang-scanner-module-cache-path /Users/ddphuong/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -sdk-module-cache-path /Users/ddphuong/Library/Developer/Xcode/DerivedData/ModuleCache.noindex -serialize-diagnostics -emit-dependencies -emit-module -emit-module-path /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorWatch\ Watch\ App.build/Objects-normal/arm64/StressMonitorWatch_Watch_App.swiftmodule -validate-clang-modules-once -clang-build-session-file /Users/ddphuong/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -I/Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorWatch\ Watch\ App.build/swift-overrides.hmap -emit-const-values -Xfrontend -const-gather-protocols-file -Xfrontend /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorWatch\ Watch\ App.build/Objects-normal/arm64/StressMonitorWatch\ Watch\ App_const_extract_protocols.json -Xcc -iquote -Xcc /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorWatch\ Watch\ App.build/StressMonitorWatch\ Watch\ App-generated-files.hmap -Xcc -I/Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorWatch\ Watch\ App.build/StressMonitorWatch\ Watch\ App-own-target-headers.hmap -Xcc -I/Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorWatch\ Watch\ App.build/StressMonitorWatch\ Watch\ App-all-target-headers.hmap -Xcc -iquote -Xcc /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorWatch\ Watch\ App.build/StressMonitorWatch\ Watch\ App-project-headers.hmap -Xcc -I/Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Products/Debug-iphonesimulator/include -Xcc -I/Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorWatch\ Watch\ App.build/DerivedSources-normal/arm64 -Xcc -I/Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorWatch\ Watch\ App.build/DerivedSources/arm64 -Xcc -I/Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorWatch\ Watch\ App.build/DerivedSources -Xcc -DDEBUG\=1 -emit-objc-header -emit-objc-header-path /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorWatch\ Watch\ App.build/Objects-normal/arm64/StressMonitorWatch_Watch_App-Swift.h -working-directory /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor -experimental-emit-module-separately -disable-cmo
+
+SwiftCompile normal arm64 Compiling\ RectangularComplicationProvider.swift,\ ComplicationDataProvider.swift,\ CircularStressView.swift /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/Complications/Providers/RectangularComplicationProvider.swift /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/Complications/Services/ComplicationDataProvider.swift /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/Complications/Views/CircularStressView.swift (in target 'StressMonitorWatch Watch App' from project 'StressMonitor')
+
+SwiftCompile normal arm64 /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/Complications/Providers/RectangularComplicationProvider.swift (in target 'StressMonitorWatch Watch App' from project 'StressMonitor')
+    cd /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor
+    
+
+SwiftCompile normal arm64 /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/Complications/Services/ComplicationDataProvider.swift (in target 'StressMonitorWatch Watch App' from project 'StressMonitor')
+    cd /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor
+    
+
+SwiftCompile normal arm64 /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/Complications/Views/CircularStressView.swift (in target 'StressMonitorWatch Watch App' from project 'StressMonitor')
+    cd /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor
+    
+
+SwiftCompile normal arm64 Compiling\ StressCategory.swift,\ StressMeasurement.swift,\ StressResult.swift /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/Models/StressCategory.swift /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/Models/StressMeasurement.swift /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/Models/StressResult.swift (in target 'StressMonitorWatch Watch App' from project 'StressMonitor')
+
+SwiftCompile normal arm64 /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/Models/StressCategory.swift (in target 'StressMonitorWatch Watch App' from project 'StressMonitor')
+    cd /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor
+    
+
+SwiftCompile normal arm64 /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/Models/StressMeasurement.swift (in target 'StressMonitorWatch Watch App' from project 'StressMonitor')
+    cd /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor
+    
+
+SwiftCompile normal arm64 /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/Models/StressResult.swift (in target 'StressMonitorWatch Watch App' from project 'StressMonitor')
+    cd /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor
+    
+
+SwiftCompile normal arm64 Compiling\ HeartRateSample.swift,\ HRVMeasurement.swift,\ PersonalBaseline.swift /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/Models/HeartRateSample.swift /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/Models/HRVMeasurement.swift /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/Models/PersonalBaseline.swift (in target 'StressMonitorWatch Watch App' from project 'StressMonitor')
+
+SwiftCompile normal arm64 /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/Models/HeartRateSample.swift (in target 'StressMonitorWatch Watch App' from project 'StressMonitor')
+    cd /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor
+    
+
+SwiftCompile normal arm64 /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/Models/HRVMeasurement.swift (in target 'StressMonitorWatch Watch App' from project 'StressMonitor')
+    cd /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor
+    
+
+SwiftCompile normal arm64 /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/Models/PersonalBaseline.swift (in target 'StressMonitorWatch Watch App' from project 'StressMonitor')
+    cd /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor
+    
+
+SwiftCompile normal arm64 Compiling\ OpenWatchAppIntent.swift,\ CircularComplicationProvider.swift,\ InlineComplicationProvider.swift /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/Complications/Intents/OpenWatchAppIntent.swift /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/Complications/Providers/CircularComplicationProvider.swift /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/Complications/Providers/InlineComplicationProvider.swift (in target 'StressMonitorWatch Watch App' from project 'StressMonitor')
+
+SwiftCompile normal arm64 /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/Complications/Intents/OpenWatchAppIntent.swift (in target 'StressMonitorWatch Watch App' from project 'StressMonitor')
+    cd /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor
+    
+
+SwiftCompile normal arm64 /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/Complications/Providers/CircularComplicationProvider.swift (in target 'StressMonitorWatch Watch App' from project 'StressMonitor')
+    cd /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor
+    
+
+SwiftCompile normal arm64 /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/Complications/Providers/InlineComplicationProvider.swift (in target 'StressMonitorWatch Watch App' from project 'StressMonitor')
+    cd /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor
+    
+
+SwiftCompile normal arm64 Compiling\ CompactStressView.swift,\ ContentView.swift /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/Views/Components/CompactStressView.swift /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/ContentView.swift (in target 'StressMonitorWatch Watch App' from project 'StressMonitor')
+
+SwiftCompile normal arm64 /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/Views/Components/CompactStressView.swift (in target 'StressMonitorWatch Watch App' from project 'StressMonitor')
+    cd /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor
+    
+
+SwiftCompile normal arm64 /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/ContentView.swift (in target 'StressMonitorWatch Watch App' from project 'StressMonitor')
+    cd /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor
+    
+
+SwiftCompile normal arm64 Compiling\ WatchConnectivityManager.swift,\ WatchHealthKitManager.swift,\ Color+Extensions.swift /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/Services/WatchConnectivityManager.swift /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/Services/WatchHealthKitManager.swift /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/Theme/Color+Extensions.swift (in target 'StressMonitorWatch Watch App' from project 'StressMonitor')
+Failed frontend command:
+/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/bin/swift-frontend -frontend -c /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/Complications/Intents/OpenWatchAppIntent.swift /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/Complications/Providers/CircularComplicationProvider.swift /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/Complications/Providers/InlineComplicationProvider.swift /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/Complications/Providers/RectangularComplicationProvider.swift /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/Complications/Services/ComplicationDataProvider.swift /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/Complications/Views/CircularStressView.swift /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/Complications/Views/InlineStressView.swift /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/Complications/Views/RectangularStressView.swift /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/Complications/ComplicationBundle.swift /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/Models/HeartRateSample.swift /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/Models/HRVMeasurement.swift /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/Models/PersonalBaseline.swift /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/Models/StressCategory.swift /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/Models/StressMeasurement.swift /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/Models/StressResult.swift /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/Services/CloudKit/WatchCloudKitManager.swift /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/Services/CloudKitSchema.swift /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/Services/CloudKitServiceProtocol.swift /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/Services/HealthKitServiceProtocol.swift /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/Services/StressAlgorithmServiceProtocol.swift /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/Services/StressCalculator.swift -primary-file /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/Services/WatchConnectivityManager.swift -primary-file /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/Services/WatchHealthKitManager.swift -primary-file /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/Theme/Color+Extensions.swift /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/Theme/WatchDesignTokens.swift /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/ViewModels/WatchStressViewModel.swift /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/Views/Components/CompactStressView.swift /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/ContentView.swift /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/StressMonitorWatchApp.swift /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorWatch\ Watch\ App.build/DerivedSources/GeneratedAssetSymbols.swift -supplementary-output-file-map /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorWatch\ Watch\ App.build/Objects-normal/arm64/supplementaryOutputs-8 -emit-localized-strings -emit-localized-strings-path /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorWatch\ Watch\ App.build/Objects-normal/arm64 -target arm64-apple-ios26.1-simulator -module-can-import-version DeveloperToolsSupport 23.0.4 23.0.4 -module-can-import-version SwiftUI 7.1.13.1 7.1.13 -module-can-import-version UIKit 9126.1.12.1 9126.1.12 -load-resolved-plugin /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/lib/swift/host/plugins/libAppIntentsMacros.dylib\#/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server\#AppIntentsMacros -load-resolved-plugin /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/lib/swift/host/plugins/libFoundationMacros.dylib\#/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server\#FoundationMacros -load-resolved-plugin /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/lib/swift/host/plugins/libObservationMacros.dylib\#/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server\#ObservationMacros -load-resolved-plugin /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/lib/swift/host/plugins/libPreviewsMacros.dylib\#/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server\#PreviewsMacros -load-resolved-plugin /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/lib/swift/host/plugins/libSwiftMacros.dylib\#/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server\#SwiftMacros -load-resolved-plugin /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/lib/swift/host/plugins/libSwiftUIMacros.dylib\#/Applications/Xcode.app/Contents/Developer/Platforms/iPhoneOS.platform/Developer/usr/bin/swift-plugin-server\#SwiftUIMacros -disable-implicit-swift-modules -Xcc -fno-implicit-modules -Xcc -fno-implicit-module-maps -explicit-swift-module-map-file /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorWatch\ Watch\ App.build/Objects-normal/arm64/StressMonitorWatch_Watch_App-dependencies-1.json -Xllvm -aarch64-use-tbi -enable-objc-interop -sdk /Applications/Xcode.app/Contents/Developer/Platforms/iPhoneSimulator.platform/Developer/SDKs/iPhoneSimulator26.1.sdk -I /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Products/Debug-iphonesimulator -F /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Products/Debug-iphonesimulator -no-color-diagnostics -Xcc -fno-color-diagnostics -enable-testing -g -debug-info-format\=dwarf -dwarf-version\=5 -module-cache-path /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/SwiftExplicitPrecompiledModules -profile-generate -profile-coverage-mapping -swift-version 5 -enforce-exclusivity\=checked -Onone -D DEBUG -serialize-debugging-options -const-gather-protocols-file /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorWatch\ Watch\ App.build/Objects-normal/arm64/StressMonitorWatch\ Watch\ App_const_extract_protocols.json -enable-upcoming-feature DisableOutwardActorInference -enable-upcoming-feature InferSendableFromCaptures -enable-upcoming-feature GlobalActorIsolatedTypesUsability -enable-upcoming-feature MemberImportVisibility -enable-upcoming-feature InferIsolatedConformances -enable-upcoming-feature NonisolatedNonsendingByDefault -enable-experimental-feature DebugDescriptionMacro -enable-bare-slash-regex -default-isolation\=MainActor -empty-abi-descriptor -validate-clang-modules-once -clang-build-session-file /Users/ddphuong/Library/Developer/Xcode/DerivedData/ModuleCache.noindex/Session.modulevalidation -Xcc -working-directory -Xcc /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor -enable-anonymous-context-mangled-names -file-compilation-dir /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor -Xcc -D_LIBCPP_HARDENING_MODE\=_LIBCPP_HARDENING_MODE_DEBUG -Xcc -ivfsstatcache -Xcc /Users/ddphuong/Library/Developer/Xcode/DerivedData/SDKStatCaches.noindex/iphonesimulator26.1-23B77-90cf18a4295e390e64c810bc6bd7acbc.sdkstatcache -Xcc -I/Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorWatch\ Watch\ App.build/swift-overrides.hmap -Xcc -iquote -Xcc /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorWatch\ Watch\ App.build/StressMonitorWatch\ Watch\ App-generated-files.hmap -Xcc -I/Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorWatch\ Watch\ App.build/StressMonitorWatch\ Watch\ App-own-target-headers.hmap -Xcc -I/Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorWatch\ Watch\ App.build/StressMonitorWatch\ Watch\ App-all-target-headers.hmap -Xcc -iquote -Xcc /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorWatch\ Watch\ App.build/StressMonitorWatch\ Watch\ App-project-headers.hmap -Xcc -I/Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Products/Debug-iphonesimulator/include -Xcc -I/Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorWatch\ Watch\ App.build/DerivedSources-normal/arm64 -Xcc -I/Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorWatch\ Watch\ App.build/DerivedSources/arm64 -Xcc -I/Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorWatch\ Watch\ App.build/DerivedSources -Xcc -DDEBUG\=1 -no-auto-bridging-header-chaining -module-name StressMonitorWatch_Watch_App -frontend-parseable-output -disable-clang-spi -target-sdk-version 26.1 -target-sdk-name iphonesimulator26.1 -clang-target arm64-apple-ios26.1-simulator -in-process-plugin-server-path /Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/host/libSwiftInProcPluginServer.dylib -o /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorWatch\ Watch\ App.build/Objects-normal/arm64/WatchConnectivityManager.o -o /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorWatch\ Watch\ App.build/Objects-normal/arm64/WatchHealthKitManager.o -o /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorWatch\ Watch\ App.build/Objects-normal/arm64/Color+Extensions.o -index-unit-output-path /StressMonitor.build/Debug-iphonesimulator/StressMonitorWatch\ Watch\ App.build/Objects-normal/arm64/WatchConnectivityManager.o -index-unit-output-path /StressMonitor.build/Debug-iphonesimulator/StressMonitorWatch\ Watch\ App.build/Objects-normal/arm64/WatchHealthKitManager.o -index-unit-output-path /StressMonitor.build/Debug-iphonesimulator/StressMonitorWatch\ Watch\ App.build/Objects-normal/arm64/Color+Extensions.o -index-store-path /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Index.noindex/DataStore -index-system-modules
+
+SwiftCompile normal arm64 /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/Services/WatchConnectivityManager.swift (in target 'StressMonitorWatch Watch App' from project 'StressMonitor')
+    cd /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor
+    
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch Watch App/Services/WatchConnectivityManager.swift:45:1: error: type 'WatchConnectivityManager' does not conform to protocol 'WCSessionDelegate'
+extension WatchConnectivityManager: WCSessionDelegate {
+^
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch Watch App/Services/WatchConnectivityManager.swift:45:1: note: add stubs for conformance
+extension WatchConnectivityManager: WCSessionDelegate {
+^
+WatchConnectivity.WCSessionDelegate.sessionDidBecomeInactive:3:8: note: protocol requires function 'sessionDidBecomeInactive' with type '(WCSession) -> Void'
+  func sessionDidBecomeInactive(_ session: WCSession)}
+       ^
+WatchConnectivity.WCSessionDelegate.sessionDidDeactivate:3:8: note: protocol requires function 'sessionDidDeactivate' with type '(WCSession) -> Void'
+  func sessionDidDeactivate(_ session: WCSession)}
+       ^
+
+SwiftCompile normal arm64 /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/Services/WatchHealthKitManager.swift (in target 'StressMonitorWatch Watch App' from project 'StressMonitor')
+    cd /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor
+    
+
+SwiftCompile normal arm64 /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/Theme/Color+Extensions.swift (in target 'StressMonitorWatch Watch App' from project 'StressMonitor')
+    cd /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor
+    
+
+SwiftEmitModule normal arm64 Emitting\ module\ for\ StressMonitorWatch_Watch_App (in target 'StressMonitorWatch Watch App' from project 'StressMonitor')
+
+EmitSwiftModule normal arm64 (in target 'StressMonitorWatch Watch App' from project 'StressMonitor')
+    cd /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor
+    
+
+SwiftCompile normal arm64 Compiling\ InlineStressView.swift,\ RectangularStressView.swift,\ ComplicationBundle.swift /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/Complications/Views/InlineStressView.swift /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/Complications/Views/RectangularStressView.swift /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/Complications/ComplicationBundle.swift (in target 'StressMonitorWatch Watch App' from project 'StressMonitor')
+
+SwiftCompile normal arm64 /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/Complications/Views/InlineStressView.swift (in target 'StressMonitorWatch Watch App' from project 'StressMonitor')
+    cd /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor
+    
+
+SwiftCompile normal arm64 /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/Complications/Views/RectangularStressView.swift (in target 'StressMonitorWatch Watch App' from project 'StressMonitor')
+    cd /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor
+    
+
+SwiftCompile normal arm64 /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/Complications/ComplicationBundle.swift (in target 'StressMonitorWatch Watch App' from project 'StressMonitor')
+    cd /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor
+    
+
+SwiftCompile normal arm64 Compiling\ WatchCloudKitManager.swift,\ CloudKitSchema.swift,\ CloudKitServiceProtocol.swift /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/Services/CloudKit/WatchCloudKitManager.swift /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/Services/CloudKitSchema.swift /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/Services/CloudKitServiceProtocol.swift (in target 'StressMonitorWatch Watch App' from project 'StressMonitor')
+
+SwiftCompile normal arm64 /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/Services/CloudKit/WatchCloudKitManager.swift (in target 'StressMonitorWatch Watch App' from project 'StressMonitor')
+    cd /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor
+    
+
+SwiftCompile normal arm64 /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/Services/CloudKitSchema.swift (in target 'StressMonitorWatch Watch App' from project 'StressMonitor')
+    cd /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor
+    
+
+SwiftCompile normal arm64 /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/Services/CloudKitServiceProtocol.swift (in target 'StressMonitorWatch Watch App' from project 'StressMonitor')
+    cd /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor
+    
+
+SwiftCompile normal arm64 Compiling\ HealthKitServiceProtocol.swift,\ StressAlgorithmServiceProtocol.swift,\ StressCalculator.swift /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/Services/HealthKitServiceProtocol.swift /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/Services/StressAlgorithmServiceProtocol.swift /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/Services/StressCalculator.swift (in target 'StressMonitorWatch Watch App' from project 'StressMonitor')
+SwiftCompile normal arm64 /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/Services/HealthKitServiceProtocol.swift (in target 'StressMonitorWatch Watch App' from project 'StressMonitor')
+    cd /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor
+    
+
+SwiftCompile normal arm64 /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/Services/StressAlgorithmServiceProtocol.swift (in target 'StressMonitorWatch Watch App' from project 'StressMonitor')
+    cd /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor
+    
+
+SwiftCompile normal arm64 /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/Services/StressCalculator.swift (in target 'StressMonitorWatch Watch App' from project 'StressMonitor')
+    cd /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor
+    
+
+SwiftCompile normal arm64 Compiling\ WatchDesignTokens.swift,\ WatchStressViewModel.swift /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/Theme/WatchDesignTokens.swift /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/ViewModels/WatchStressViewModel.swift (in target 'StressMonitorWatch Watch App' from project 'StressMonitor')
+
+SwiftCompile normal arm64 /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/Theme/WatchDesignTokens.swift (in target 'StressMonitorWatch Watch App' from project 'StressMonitor')
+    cd /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor
+    
+
+SwiftCompile normal arm64 /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/ViewModels/WatchStressViewModel.swift (in target 'StressMonitorWatch Watch App' from project 'StressMonitor')
+    cd /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor
+    
+
+SwiftCompile normal arm64 Compiling\ StressMonitorWatchApp.swift,\ GeneratedAssetSymbols.swift /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/StressMonitorWatchApp.swift /Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Build/Intermediates.noindex/StressMonitor.build/Debug-iphonesimulator/StressMonitorWatch\ Watch\ App.build/DerivedSources/GeneratedAssetSymbols.swift (in target 'StressMonitorWatch Watch App' from project 'StressMonitor')
+
+
+Test session results, code coverage, and logs:
+	/Users/ddphuong/Library/Developer/Xcode/DerivedData/StressMonitor-eywifxvfssitugduaxzagokaagmg/Logs/Test/Test-StressMonitor-2026.03.01_21-46-35-+0700.xcresult
+
+Testing failed:
+	Type 'WatchConnectivityManager' does not conform to protocol 'WCSessionDelegate'
+	Testing cancelled because the build failed.
+
+** TEST FAILED **
+
+
+The following build commands failed:
+	SwiftCompile normal arm64 Compiling\ WatchConnectivityManager.swift,\ WatchHealthKitManager.swift,\ Color+Extensions.swift /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/Services/WatchConnectivityManager.swift /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/Services/WatchHealthKitManager.swift /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/Theme/Color+Extensions.swift (in target 'StressMonitorWatch Watch App' from project 'StressMonitor')
+	SwiftCompile normal arm64 /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorWatch\ Watch\ App/Services/WatchConnectivityManager.swift (in target 'StressMonitorWatch Watch App' from project 'StressMonitor')
+	Testing project StressMonitor with scheme StressMonitor
+(3 failures)

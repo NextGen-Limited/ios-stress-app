@@ -7,7 +7,7 @@ struct TripleMetricRow: View {
     let rrValue: String
 
     var body: some View {
-        HStack(alignment: .top, spacing: 12) {
+        HStack(alignment: .top, spacing: 21) {
             MetricColumn(
                 title: "RHR",
                 value: rhrValue,
@@ -23,7 +23,7 @@ struct TripleMetricRow: View {
             MetricColumn(
                 title: "RR",
                 value: rrValue,
-                unit: "br/min"
+                unit: "brpm"
             )
         }
         .accessibilityElement(children: .combine)
@@ -38,23 +38,39 @@ private struct MetricColumn: View {
     let value: String
     let unit: String
 
+    private let cardWidth: CGFloat = 105
+    private let cardHeight: CGFloat = 81
+    private let cornerRadius: CGFloat = 8.928
+
     var body: some View {
-        VStack(alignment: .leading, spacing: 4) {
+        VStack(spacing: 4) {
             Text(title)
-                .font(.system(size: 13, weight: .medium))
+                .font(.system(size: 14, weight: .bold))
                 .foregroundColor(Color.Wellness.adaptiveSecondaryText)
 
-            HStack(alignment: .firstTextBaseline, spacing: 2) {
-                Text(value)
-                    .font(.system(size: 20, weight: .semibold))
-                    .foregroundColor(Color.Wellness.adaptivePrimaryText)
+            Text(value)
+                .font(.system(size: 18, weight: .heavy))
+                .foregroundColor(Color.Wellness.adaptivePrimaryText)
 
-                Text(unit)
-                    .font(.system(size: 12, weight: .regular))
-                    .foregroundColor(Color.Wellness.adaptiveSecondaryText)
-            }
+            Text(unit)
+                .font(.system(size: 13, weight: .bold))
+                .foregroundColor(Color.Wellness.adaptiveSecondaryText.opacity(0.39))
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
+        .frame(width: cardWidth, height: cardHeight)
+        .background(Color.white)
+        .cornerRadius(cornerRadius)
+        .shadow(
+            color: Color.black.opacity(0.08),
+            radius: 2.85,
+            x: 0,
+            y: 2.85
+        )
+        .shadow(
+            color: Color.black.opacity(0.04),
+            radius: 5.7,
+            x: 0,
+            y: 5.7
+        )
     }
 }
 

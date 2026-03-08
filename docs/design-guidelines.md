@@ -249,10 +249,6 @@ Views/
 │       ├── DailyTimelineView.swift       # 7-day dot-matrix grid (Mar 2026)
 │       ├── WeeklyInsightCard.swift
 │       └── AIInsightCard.swift
-├── History/
-│   ├── MeasurementHistoryView.swift
-│   ├── HistoryViewModel.swift
-│   └── MeasurementDetailView.swift
 ├── Trends/
 │   ├── TrendsView.swift                  # Figma-aligned card list (Mar 2026)
 │   ├── TrendsViewModel.swift

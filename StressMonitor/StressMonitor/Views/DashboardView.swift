@@ -6,8 +6,9 @@ struct DashboardView: View {
     @State private var viewModel: StressViewModel
     @State private var appeared = false
     @State private var appearAnimation = false
+    var onSettingsTapped: (() -> Void)?
 
-    init(viewModel: StressViewModel? = nil, repository: StressRepository? = nil) {
+    init(viewModel: StressViewModel? = nil, repository: StressRepository? = nil, onSettingsTapped: (() -> Void)? = nil) {
         if let viewModel = viewModel {
             _viewModel = State(initialValue: viewModel)
         } else if let repository = repository {
@@ -24,39 +25,38 @@ struct DashboardView: View {
                 repository: StressRepository(modelContext: ModelContext(try! ModelContainer(for: StressMeasurement.self, configurations: ModelConfiguration(isStoredInMemoryOnly: true))))
             ))
         }
+        self.onSettingsTapped = onSettingsTapped
     }
 
     var body: some View {
-        NavigationStack {
-            Group {
-                if viewModel.isLoading && viewModel.currentStress == nil {
-                    loadingView
-                } else if let stress = viewModel.currentStress {
-                    content(stress)
-                } else {
-                    emptyState
+        Group {
+            if viewModel.isLoading && viewModel.currentStress == nil {
+                loadingView
+            } else if let stress = viewModel.currentStress {
+                content(stress)
+            } else {
+                emptyState
+            }
+        }
+        .navigationTitle("Dashboard")
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .navigationBarTrailing) {
+                Button {
+                    Task { await viewModel.loadDashboardData() }
+                } label: {
+                    Image(systemName: "arrow.clockwise")
+                        .foregroundStyle(Color.primaryBlue)
                 }
             }
-            .navigationTitle("Dashboard")
-            .navigationBarTitleDisplayMode(.inline)
-            .toolbar {
-                ToolbarItem(placement: .navigationBarTrailing) {
-                    Button {
-                        Task { await viewModel.loadDashboardData() }
-                    } label: {
-                        Image(systemName: "arrow.clockwise")
-                            .foregroundStyle(Color.primaryBlue)
-                    }
-                }
+        }
+        .alert("Error", isPresented: .constant(viewModel.errorMessage != nil)) {
+            Button("OK") {
+                viewModel.clearError()
             }
-            .alert("Error", isPresented: .constant(viewModel.errorMessage != nil)) {
-                Button("OK") {
-                    viewModel.clearError()
-                }
-            } message: {
-                if let error = viewModel.errorMessage {
-                    Text(error)
-                }
+        } message: {
+            if let error = viewModel.errorMessage {
+                Text(error)
             }
         }
         .task {
@@ -100,9 +100,9 @@ struct DashboardView: View {
         ScrollView {
             LazyVStack(spacing: 24) {
                 // 1. Stress Character Card (includes date header, status, last updated)
-                StressCharacterCard(result: stress, size: .dashboard) {
+                StressCharacterCard(result: stress, size: .dashboard, onRefresh: {
                     Task { await viewModel.loadDashboardData() }
-                }
+                }, onSettingsTapped: onSettingsTapped)
                 .opacity(appearAnimation ? 1 : 0)
                 .scaleEffect(appearAnimation ? 1 : 0.95)
 

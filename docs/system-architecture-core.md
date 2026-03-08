@@ -13,7 +13,7 @@
 ```
 ┌─────────────────────────────────────────────────────────┐
 │                    SwiftUI Views                         │
-│  (Dashboard, History, Trends, Breathing, Settings)      │
+│  (Dashboard, Action, Trends, Breathing, Settings)      │
 └──────────────────────┬──────────────────────────────────┘
                        │
                        ↓

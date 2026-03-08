@@ -3,7 +3,39 @@ import SwiftData
 
 @Observable
 class TrendsViewModel {
+    // MARK: - Date Selection
+    var selectedDate: Date = Date()
     var selectedTimeRange: TrendsTimeRange = .week
+
+    // MARK: - Week Navigation
+    var weekOffset: Int = 0
+
+    var isCurrentWeek: Bool {
+        weekOffset == 0
+    }
+
+    var currentWeekStartDate: Date {
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: Date())
+        let weekday = calendar.component(.weekday, from: today)
+        let daysToSunday = weekday - 1
+        let sunday = calendar.date(byAdding: .day, value: -daysToSunday, to: today) ?? today
+        return calendar.date(byAdding: .weekOfYear, value: weekOffset, to: sunday) ?? sunday
+    }
+
+    var weekDates: [Date] {
+        let calendar = Calendar.current
+        return (0..<7).compactMap { dayOffset in
+            calendar.date(byAdding: .day, value: dayOffset, to: currentWeekStartDate)
+        }
+    }
+
+    // MARK: - Computed Properties
+    var weekStartDate: Date {
+        currentWeekStartDate
+    }
+
+    // MARK: - Data
     var hrvData: [ChartDataPoint] = []
     var averageHRV: Double = 0
     var hrvRange: ClosedRange<Double> = 0...0
@@ -32,6 +64,37 @@ class TrendsViewModel {
         self.repository = StressRepository(modelContext: modelContext, baselineCalculator: baselineCalculator)
     }
 
+    // MARK: - Navigation Methods
+    func previousWeek() {
+        weekOffset -= 1
+        Task {
+            await loadTrendData()
+        }
+    }
+
+    func nextWeek() {
+        guard !isCurrentWeek else { return }
+        weekOffset += 1
+        Task {
+            await loadTrendData()
+        }
+    }
+
+    func goToToday() {
+        weekOffset = 0
+        selectedDate = Calendar.current.startOfDay(for: Date())
+        Task {
+            await loadTrendData()
+        }
+    }
+
+    func selectDate(_ date: Date) {
+        selectedDate = date
+        Task {
+            await loadTrendData()
+        }
+    }
+
     func loadTrendData() async {
         isLoading = true
         defer { isLoading = false }
@@ -49,8 +112,11 @@ class TrendsViewModel {
             case .week:
                 startDate = calendar.date(byAdding: .day, value: -7, to: now) ?? now
                 groupBy = .day
+            case .twoWeeks:
+                startDate = calendar.date(byAdding: .day, value: -14, to: now) ?? now
+                groupBy = .day
             case .month:
-                startDate = calendar.date(byAdding: .weekOfYear, value: -4, to: now) ?? now
+                startDate = calendar.date(byAdding: .day, value: -30, to: now) ?? now
                 groupBy = .day
             case .threeMonths:
                 startDate = calendar.date(byAdding: .month, value: -3, to: now) ?? now
@@ -208,21 +274,39 @@ class TrendsViewModel {
         return formatter.string(from: date)
     }
 
-    /// Groups measurements from last 7 days into Mon–Sun averages for the bar chart
+    /// Groups measurements from selected time range into daily averages for the bar chart
     private func computeDailyStress(measurements: [StressMeasurement]) -> [DailyStressData] {
         let calendar = Calendar.current
         let now = Date()
         let shortDays = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"]
+        let daysToShow = min(selectedTimeRange.days, 7) // Show max 7 bars
 
-        // Build ordered list of last 7 days (oldest → newest)
-        return (0..<7).compactMap { offset -> DailyStressData? in
-            guard let dayDate = calendar.date(byAdding: .day, value: -(6 - offset), to: calendar.startOfDay(for: now)),
+        // Build ordered list of last N days (oldest → newest)
+        return (0..<daysToShow).compactMap { offset -> DailyStressData? in
+            guard let dayDate = calendar.date(byAdding: .day, value: -(daysToShow - 1 - offset), to: calendar.startOfDay(for: now)),
                   let dayEnd = calendar.date(byAdding: .day, value: 1, to: dayDate) else { return nil }
 
             let dayMeasurements = measurements.filter { $0.timestamp >= dayDate && $0.timestamp < dayEnd }
             let avg = dayMeasurements.isEmpty ? 0.0 : dayMeasurements.map { $0.stressLevel }.reduce(0, +) / Double(dayMeasurements.count)
+
+            // Calculate distribution for this day
+            let total = Double(dayMeasurements.count)
+            let relaxed = total > 0 ? Double(dayMeasurements.filter { $0.stressLevel <= 25 }.count) / total * 100 : 0
+            let normal = total > 0 ? Double(dayMeasurements.filter { $0.stressLevel > 25 && $0.stressLevel <= 50 }.count) / total * 100 : 0
+            let warning = total > 0 ? Double(dayMeasurements.filter { $0.stressLevel > 50 && $0.stressLevel <= 75 }.count) / total * 100 : 0
+            let stressed = total > 0 ? Double(dayMeasurements.filter { $0.stressLevel > 75 }.count) / total * 100 : 0
+
             let weekday = calendar.component(.weekday, from: dayDate) // 1=Sun, 7=Sat
-            return DailyStressData(dayLabel: shortDays[weekday - 1], averageStress: avg)
+            return DailyStressData(
+                dayLabel: shortDays[weekday - 1],
+                averageStress: avg,
+                distribution: StressDistributionPerDay(
+                    relaxed: relaxed,
+                    normal: normal,
+                    warning: warning,
+                    stressed: stressed
+                )
+            )
         }
     }
 }
@@ -250,11 +334,32 @@ struct PatternInsight {
     let description: String
 }
 
-enum TrendsTimeRange: String {
+enum TrendsTimeRange: String, CaseIterable {
     case day = "24H"
     case week = "7D"
+    case twoWeeks = "14D"
     case month = "4W"
     case threeMonths = "3M"
+
+    var displayName: String {
+        switch self {
+        case .day: return "Last 24 hours"
+        case .week: return "Last 7 days"
+        case .twoWeeks: return "Last 14 days"
+        case .month: return "Last 30 days"
+        case .threeMonths: return "Last 3 months"
+        }
+    }
+
+    var days: Int {
+        switch self {
+        case .day: return 1
+        case .week: return 7
+        case .twoWeeks: return 14
+        case .month: return 30
+        case .threeMonths: return 90
+        }
+    }
 }
 
 /// One day's average stress data used for the bar chart
@@ -262,4 +367,13 @@ struct DailyStressData: Identifiable {
     let id = UUID()
     let dayLabel: String     // e.g. "Mon", "Tue"
     let averageStress: Double
+    var distribution: StressDistributionPerDay? = nil
+}
+
+/// Per-day stress distribution for stacked bar chart
+struct StressDistributionPerDay {
+    var relaxed: Double = 0
+    var normal: Double = 0
+    var warning: Double = 0
+    var stressed: Double = 0
 }

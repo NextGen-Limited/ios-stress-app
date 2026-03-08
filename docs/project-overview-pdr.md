@@ -96,11 +96,11 @@ Each measurement includes a confidence value (0-1) based on:
 **So that** I can identify patterns over time
 
 **Acceptance Criteria:**
-- [x] History view shows chronological list
-- [x] Filter by date range (today/week/month/all)
-- [x] Filter by stress category
-- [x] Tap measurement to view details
-- [x] Export available from detail view
+- [x] ~~History view shows chronological list~~ (REMOVED - Mar 2026)
+- [x] ~~Filter by date range~~ (REMOVED)
+- [x] ~~Filter by stress category~~ (REMOVED)
+- [x] ~~Tap measurement to view details~~ (REMOVED)
+- [x] ~~Export available from detail view~~ (REMOVED)
 
 ### User Story 3: Analyze Stress Trends
 **As a** user

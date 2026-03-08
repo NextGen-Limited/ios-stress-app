@@ -12,6 +12,7 @@ struct StressCharacterCard: View {
     let size: StressBuddyMood.CharacterContext
     let lastUpdated: Date?
     let onRefresh: (() -> Void)?
+    let onSettingsTapped: (() -> Void)?
 
     init(
         mood: StressBuddyMood,
@@ -19,7 +20,8 @@ struct StressCharacterCard: View {
         hrv: Double? = nil,
         size: StressBuddyMood.CharacterContext,
         lastUpdated: Date? = nil,
-        onRefresh: (() -> Void)? = nil
+        onRefresh: (() -> Void)? = nil,
+        onSettingsTapped: (() -> Void)? = nil
     ) {
         self.mood = mood
         self.stressLevel = stressLevel
@@ -27,6 +29,7 @@ struct StressCharacterCard: View {
         self.size = size
         self.lastUpdated = lastUpdated
         self.onRefresh = onRefresh
+        self.onSettingsTapped = onSettingsTapped
     }
 
     var body: some View {
@@ -35,7 +38,7 @@ struct StressCharacterCard: View {
             VStack(spacing: 0) {
                 // Date header with refresh button
                 HStack(alignment: .top) {
-                    DateHeaderView(date: lastUpdated ?? Date())
+                    DateHeaderView(date: lastUpdated ?? Date(), onSettingsTapped: onSettingsTapped)
                     Spacer()
                     refreshButton
                 }
@@ -171,7 +174,8 @@ extension StressCharacterCard {
     init(
         result: StressResult,
         size: StressBuddyMood.CharacterContext,
-        onRefresh: (() -> Void)? = nil
+        onRefresh: (() -> Void)? = nil,
+        onSettingsTapped: (() -> Void)? = nil
     ) {
         self.mood = StressBuddyMood.from(stressLevel: result.level)
         self.stressLevel = result.level
@@ -179,6 +183,7 @@ extension StressCharacterCard {
         self.size = size
         self.lastUpdated = result.timestamp
         self.onRefresh = onRefresh
+        self.onSettingsTapped = onSettingsTapped
     }
 
     /// Create character card with minimal data
@@ -186,7 +191,8 @@ extension StressCharacterCard {
         stressLevel: Double,
         size: StressBuddyMood.CharacterContext,
         lastUpdated: Date? = nil,
-        onRefresh: (() -> Void)? = nil
+        onRefresh: (() -> Void)? = nil,
+        onSettingsTapped: (() -> Void)? = nil
     ) {
         self.mood = StressBuddyMood.from(stressLevel: stressLevel)
         self.stressLevel = stressLevel
@@ -194,6 +200,7 @@ extension StressCharacterCard {
         self.size = size
         self.lastUpdated = lastUpdated
         self.onRefresh = onRefresh
+        self.onSettingsTapped = onSettingsTapped
     }
 }
 

@@ -5,10 +5,11 @@ import SwiftUI
 struct StressBarChartView: View {
     let dailyStress: [DailyStressData]
     let distribution: StressDistribution
+    @Binding var selectedTimeRange: TrendsTimeRange
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
-            // Header
+            // Header with time range picker
             HStack {
                 Text("Stress over time")
                     .font(Typography.title2)
@@ -16,9 +17,33 @@ struct StressBarChartView: View {
 
                 Spacer()
 
-                Text("Last 7 days")
-                    .font(Typography.caption1)
+                // Interactive time range picker with chevron
+                Menu {
+                    ForEach(TrendsTimeRange.allCases, id: \.self) { range in
+                        Button {
+                            selectedTimeRange = range
+                        } label: {
+                            HStack {
+                                Text(range.displayName)
+                                if range == selectedTimeRange {
+                                    Image(systemName: "checkmark")
+                                }
+                            }
+                        }
+                    }
+                } label: {
+                    HStack(spacing: 4) {
+                        Text(selectedTimeRange.displayName)
+                            .font(Typography.caption1)
+                        Image(systemName: "chevron.down")
+                            .font(.system(size: 10, weight: .semibold))
+                    }
                     .foregroundColor(.secondary)
+                    .padding(.horizontal, 10)
+                    .padding(.vertical, 6)
+                    .background(Color.secondary.opacity(0.1))
+                    .clipShape(Capsule())
+                }
             }
 
             // Bar chart
@@ -99,17 +124,19 @@ struct StressBarChartView: View {
 }
 
 #Preview {
+    @Previewable @State var timeRange: TrendsTimeRange = .week
     StressBarChartView(
         dailyStress: [
-            DailyStressData(dayLabel: "Mon", averageStress: 30),
-            DailyStressData(dayLabel: "Tue", averageStress: 55),
-            DailyStressData(dayLabel: "Wed", averageStress: 70),
-            DailyStressData(dayLabel: "Thu", averageStress: 45),
-            DailyStressData(dayLabel: "Fri", averageStress: 80),
-            DailyStressData(dayLabel: "Sat", averageStress: 20),
-            DailyStressData(dayLabel: "Sun", averageStress: 25)
+            DailyStressData(dayLabel: "Mon", averageStress: 30, distribution: StressDistributionPerDay(relaxed: 40, normal: 30, warning: 20, stressed: 10)),
+            DailyStressData(dayLabel: "Tue", averageStress: 55, distribution: StressDistributionPerDay(relaxed: 20, normal: 35, warning: 30, stressed: 15)),
+            DailyStressData(dayLabel: "Wed", averageStress: 70, distribution: StressDistributionPerDay(relaxed: 10, normal: 25, warning: 40, stressed: 25)),
+            DailyStressData(dayLabel: "Thu", averageStress: 45, distribution: StressDistributionPerDay(relaxed: 30, normal: 40, warning: 20, stressed: 10)),
+            DailyStressData(dayLabel: "Fri", averageStress: 80, distribution: StressDistributionPerDay(relaxed: 5, normal: 15, warning: 35, stressed: 45)),
+            DailyStressData(dayLabel: "Sat", averageStress: 20, distribution: StressDistributionPerDay(relaxed: 60, normal: 25, warning: 10, stressed: 5)),
+            DailyStressData(dayLabel: "Sun", averageStress: 25, distribution: StressDistributionPerDay(relaxed: 50, normal: 35, warning: 10, stressed: 5))
         ],
-        distribution: StressDistribution(relaxed: 40, normal: 30, elevated: 20, high: 10)
+        distribution: StressDistribution(relaxed: 40, normal: 30, elevated: 20, high: 10),
+        selectedTimeRange: $timeRange
     )
     .padding()
     .background(Color.backgroundLight)

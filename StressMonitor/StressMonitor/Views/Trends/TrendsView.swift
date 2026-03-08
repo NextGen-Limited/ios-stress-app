@@ -18,6 +18,15 @@ struct TrendsView: View {
                 PremiumBannerView()
                     .padding(.horizontal)
 
+                // Horizontal Week Calendar
+                HorizontalWeekCalendarView(
+                    selectedDate: $viewModel.selectedDate,
+                    onDateSelected: { date in
+                        viewModel.selectDate(date)
+                    }
+                )
+                .padding(.horizontal)
+
                 // Mascot speech bubble
                 MascotSpeechBubbleView(
                     message: "I've been keeping an eye on your days! Want to see how stress changed this week?"
@@ -27,9 +36,15 @@ struct TrendsView: View {
                 // Stress over time bar chart
                 StressBarChartView(
                     dailyStress: viewModel.dailyStressData,
-                    distribution: viewModel.stressDistribution
+                    distribution: viewModel.stressDistribution,
+                    selectedTimeRange: $viewModel.selectedTimeRange
                 )
                 .padding(.horizontal)
+                .onChange(of: viewModel.selectedTimeRange) { _, _ in
+                    Task {
+                        await viewModel.loadTrendData()
+                    }
+                }
 
                 // Daily timeline heatmap
                 WeeklyHeatmapView(measurements: viewModel.weeklyMeasurements)
