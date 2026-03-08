@@ -54,9 +54,19 @@ struct TrendsView: View {
                 hrvTrendCard
                     .padding(.horizontal)
 
-                // Stress sources donut
-                StressSourcesDonutChart(sources: viewModel.stressSources)
-                    .padding(.horizontal)
+                // Stress sources card
+                StressSourcesCard(
+                    sources: viewModel.stressSources.map {
+                        StressSourcesCard.StressSourceData(
+                            name: $0.name,
+                            percentage: $0.percentage / 100.0,
+                            color: $0.color,
+                            icon: iconForSource($0.name)
+                        )
+                    },
+                    totalDays: 30
+                )
+                .padding(.horizontal)
 
                 // Smart Insights teaser
                 SmartInsightsTeaser()
@@ -158,5 +168,19 @@ struct TrendsView: View {
         }
         .frame(height: 200)
         .frame(maxWidth: .infinity)
+    }
+
+    // MARK: - Helpers
+
+    private func iconForSource(_ name: String) -> String {
+        switch name {
+        case "Finance": return "dollarsign.circle.fill"
+        case "Relationship": return "heart.fill"
+        case "Health": return "cross.case.fill"
+        case "Family": return "house.fill"
+        case "Work": return "briefcase.fill"
+        case "Environment": return "leaf.fill"
+        default: return "circle.fill"
+        }
     }
 }
