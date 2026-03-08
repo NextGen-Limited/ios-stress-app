@@ -83,6 +83,15 @@ extension Color {
     /// Heart rate accent color (red-pink)
     static let heartRateAccent = Color(hex: "#F87171")
 
+    // MARK: - Figma Design Colors (Action Demo Screen)
+
+    /// Positive green - #52B923
+    static let positive = Color(hex: "52B923")
+    /// Accents orange - #FF8D28
+    static let accentOrange = Color(hex: "FF8D28")
+    /// Light grey - #D2D4DA
+    static let lightGrey = Color(hex: "D2D4DA")
+
     // MARK: - Settings Screen Colors
 
     /// Settings background (light: #F3F4F8, dark: #1C1C1E)

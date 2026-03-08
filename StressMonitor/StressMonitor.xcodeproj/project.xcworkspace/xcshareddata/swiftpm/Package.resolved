@@ -1,5 +1,5 @@
 {
-  "originHash" : "21df1b9aca5cd77882891dfb6d86c0f55796f75efd0eccbe9d7480eb90f706be",
+  "originHash" : "3a4bbe48cab16d40a807d3ce343729dcf6892b0014027aa47207c18d015b9e7c",
   "pins" : [
     {
       "identity" : "animatedtabbar",
@@ -8,6 +8,15 @@
       "state" : {
         "revision" : "e958616dcaf725dea1dedeb61ba1e52c8f6a79f7",
         "version" : "1.0.0"
+      }
+    },
+    {
+      "identity" : "swiftuicharts",
+      "kind" : "remoteSourceControl",
+      "location" : "https://github.com/willdale/SwiftUICharts.git",
+      "state" : {
+        "revision" : "c16f47217d1e32900f6b37c322d419945fadae9c",
+        "version" : "2.10.4"
       }
     }
   ],

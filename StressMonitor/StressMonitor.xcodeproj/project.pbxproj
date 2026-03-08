@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		F26965312F5C0A9700B40F0F /* AnimatedTabBar in Frameworks */ = {isa = PBXBuildFile; productRef = F26965302F5C0A9700B40F0F /* AnimatedTabBar */; };
+		F26968812F5DAE2400B40F0F /* SwiftUICharts in Frameworks */ = {isa = PBXBuildFile; productRef = F26968802F5DAE2400B40F0F /* SwiftUICharts */; };
 		F2E2EC392F1CC605000C2B53 /* StressMonitorWatch Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = F2E2EC192F1CC602000C2B53 /* StressMonitorWatch Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
@@ -111,6 +112,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F26965312F5C0A9700B40F0F /* AnimatedTabBar in Frameworks */,
+				F26968812F5DAE2400B40F0F /* SwiftUICharts in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -201,6 +203,7 @@
 			name = StressMonitor;
 			packageProductDependencies = (
 				F26965302F5C0A9700B40F0F /* AnimatedTabBar */,
+				F26968802F5DAE2400B40F0F /* SwiftUICharts */,
 			);
 			productName = StressMonitor;
 			productReference = F2E2EBE92F1CC553000C2B53 /* StressMonitor.app */;
@@ -365,6 +368,7 @@
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
 				F269652F2F5C0A9700B40F0F /* XCRemoteSwiftPackageReference "AnimatedTabBar" */,
+				F269687F2F5DAE2400B40F0F /* XCRemoteSwiftPackageReference "SwiftUICharts" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = F2E2EBEA2F1CC553000C2B53 /* Products */;
@@ -1022,6 +1026,14 @@
 				minimumVersion = 1.0.0;
 			};
 		};
+		F269687F2F5DAE2400B40F0F /* XCRemoteSwiftPackageReference "SwiftUICharts" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/willdale/SwiftUICharts.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 2.10.4;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -1029,6 +1041,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = F269652F2F5C0A9700B40F0F /* XCRemoteSwiftPackageReference "AnimatedTabBar" */;
 			productName = AnimatedTabBar;
+		};
+		F26968802F5DAE2400B40F0F /* SwiftUICharts */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F269687F2F5DAE2400B40F0F /* XCRemoteSwiftPackageReference "SwiftUICharts" */;
+			productName = SwiftUICharts;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
