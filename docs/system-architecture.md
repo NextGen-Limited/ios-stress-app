@@ -3,7 +3,7 @@
 **Pattern:** MVVM + Protocol-Oriented Design
 **Concurrency:** async/await
 **Data Flow:** Unidirectional (Models → Services → ViewModels → Views)
-**Last Updated:** March 3, 2026
+**Last Updated:** March 15, 2026
 
 ---
 
@@ -64,6 +64,7 @@ Advanced platform capabilities:
 | **HealthKit** | Health data | Official Apple health API, privacy-first |
 | **WidgetKit** | Widgets & complications | Modern widget framework, watchOS 10+ |
 | **async/await** | Concurrency | Swift 5.9+ native, structured concurrency |
+| **AnimatedTabBar** | Tab bar animations | exyte library, reduces custom code |
 
 ---
 
@@ -99,6 +100,16 @@ StressRepository.fetchRecent() → StressViewModel.weeklyMeasurements
 DashboardViewModel.weeklyMeasurements (7-day slice)
     ↓
 DailyTimelineView (7-day × 7-slot dot-matrix grid)
+```
+
+**TabBar navigation flow (Mar 2026):**
+```
+MainTabView.selectedTab (TabItem enum)
+    ↔ selectedIndex Binding (Int conversion)
+    ↓
+AnimatedTabBar (exyte/AnimatedTabBar library)
+    ↓
+tabButtons() → [DropletButton] with accessibility labels
 ```
 
 **Reverse for updates:**
@@ -158,7 +169,7 @@ UI Updates on screen
 
 | Decision | Rationale | Trade-off |
 |----------|-----------|-----------|
-| **No external dependencies** | Privacy, control, reduced bloat | More code to maintain |
+| **Minimal external dependencies** | Only AnimatedTabBar for TabBar | Slight package dependency risk |
 | **Local-first architecture** | Works offline, fast responsiveness | Eventual consistency |
 | **MVVM + Protocols** | Testability, loose coupling | More boilerplate |
 | **@Observable macro** | Modern, iOS 17+ reactive | Excludes iOS 16 |

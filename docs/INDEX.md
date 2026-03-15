@@ -63,6 +63,12 @@ Current status, planned features, timeline, and success metrics.
 - Release schedule and criteria
 - Success metrics (engagement, quality, financial)
 
+### 8. **[Project Changelog](./project-changelog.md)**
+Detailed record of all notable changes, features, and fixes.
+- Version history with semantic versioning
+- Feature additions, changes, and removals
+- Release dates and summaries
+
 ---
 
 ## Quick Reference
@@ -77,7 +83,7 @@ Current status, planned features, timeline, and success metrics.
 | **watchOS App** | 29 files |
 | **Widgets** | 7 files |
 | **Tests** | 27 files |
-| **External Dependencies** | 0 |
+| **External Dependencies** | 1 (AnimatedTabBar) |
 
 ### Documentation Metrics
 
@@ -130,7 +136,7 @@ Current status, planned features, timeline, and success metrics.
 | **@Observable macro** | Modern iOS 17+ reactive |
 | **SwiftData (not Core Data)** | iOS 17+ native, SwiftUI-friendly |
 | **CloudKit E2E encryption** | User privacy guarantee |
-| **Zero external dependencies** | Control, privacy, simplicity |
+| **Minimal external dependencies** | Only AnimatedTabBar for TabBar |
 | **WidgetKit (not ClockKit)** | watchOS 10+ requirement |
 | **async/await throughout** | Modern concurrency |
 

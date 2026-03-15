@@ -1,3 +1,4 @@
+import AnimatedTabBar
 import SwiftUI
 import SwiftData
 
@@ -15,6 +16,14 @@ struct MainTabView: View {
         return false
         #endif
     }()
+
+    /// Convert TabItem to AnimatedTabBar index
+    private var selectedIndex: Binding<Int> {
+        Binding(
+            get: { selectedTab.rawValue },
+            set: { selectedTab = TabItem(rawValue: $0) ?? .home }
+        )
+    }
 
     var body: some View {
         ZStack(alignment: .bottom) {
@@ -46,8 +55,17 @@ struct MainTabView: View {
 
             // Tab bar - hidden when showing Settings
             if !showSettings {
-                StressTabBarView(selectedTab: $selectedTab)
-                    .transition(.move(edge: .bottom).combined(with: .opacity))
+                AnimatedTabBar(
+                    selectedIndex: selectedIndex,
+                    prevSelectedIndex: .constant(0),
+                    views: tabButtons(selectedIndex: selectedTab.rawValue)
+                )
+                .ballColor(.primaryBlue)
+                .selectedColor(.primaryBlue)
+                .unselectedColor(.gray)
+                .cornerRadius(24)
+                .transition(.move(edge: .bottom).combined(with: .opacity))
+                .padding(.bottom, 8)
             }
         }
         .ignoresSafeArea(.keyboard)

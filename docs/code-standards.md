@@ -2,7 +2,8 @@
 
 **Framework:** Swift 5.9+ with SwiftUI & SwiftData
 **Architecture:** MVVM + Protocol-Oriented Design
-**Last Updated:** March 3, 2026
+**External Dependencies:** AnimatedTabBar (exyte/SPM)
+**Last Updated:** March 15, 2026
 
 ---
 

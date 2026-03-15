@@ -2,7 +2,7 @@ import SwiftUI
 import SwiftData
 
 /// Tab bar items matching Figma design
-enum TabItem: Int, Tabbable, CaseIterable, Identifiable {
+enum TabItem: Int, CaseIterable, Identifiable {
     case home = 0
     case action = 1
     case trend = 2
@@ -10,8 +10,7 @@ enum TabItem: Int, Tabbable, CaseIterable, Identifiable {
     // MARK: - Identifiable
     var id: Int { rawValue }
 
-    // MARK: - Tabbable Protocol
-    var icon: String { unselectedIconName }
+    // MARK: - Tab Properties
 
     var title: String {
         switch self {

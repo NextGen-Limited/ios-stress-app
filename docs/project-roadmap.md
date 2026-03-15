@@ -342,6 +342,7 @@ remains on your device or encrypted in iCloud.
 - No iPad support yet (planned for v2.0)
 
 **Recent Fixes (March 2026):**
+- ✅ TabBar migration to exyte/AnimatedTabBar library: replaced custom `StressTabBarView` (~225 LOC) with library-based `AnimatedTabBar` + `DropletButton` (Mar 15, 2026)
 - ✅ SwiftUI Charts migration completed: `LineChartView`, `MiniLineChartView`, `StressOverTimeChart`, `BeforeAfterChart` all migrated to SwiftUI Charts; unused `StressSourcesDonutChart.swift` deleted (Mar 2026)
 - ✅ `DailyTimelineView` redesigned: 24-hour scatter → 7-day × 7-slot weekly dot-matrix (Mar 2026)
 - ✅ `DashboardViewModel.weeklyMeasurements` added; chart wired into `StressDashboardView` (Mar 2026)
@@ -419,14 +420,15 @@ Every release must meet:
 
 ### External Dependency Risks
 
-**Currently:** Zero external dependencies ✅
+**Currently:** 1 external dependency (AnimatedTabBar via SPM) ✅
 
 **v2.0 Risk Assessment:**
 - **CoreML** (Apple framework, no risk)
 - **SiriKit** (Apple framework, no risk)
 - **HealthKit Expansion** (Apple framework, no risk)
+- **AnimatedTabBar** (exyte/SPM, low risk - well-maintained)
 
-**Decision:** Maintain zero third-party dependencies to preserve:
+**Decision:** Minimize third-party dependencies to preserve:
 - Privacy guarantee
 - App size (<30MB)
 - Launch performance
