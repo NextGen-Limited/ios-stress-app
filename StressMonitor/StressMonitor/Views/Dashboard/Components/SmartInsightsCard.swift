@@ -7,11 +7,11 @@ struct SmartInsightsCard: View {
         HStack(alignment: .top, spacing: 16) {
             VStack(alignment: .leading, spacing: 8) {
                 Text("Smart Insights")
-                    .font(.custom("Lato-Bold", size: 18))
+                    .font(.custom("Roboto-Bold", size: 18))
                     .foregroundStyle(Color.Wellness.adaptivePrimaryText)
 
                 Text("Personalized analysis based on your rhythm")
-                    .font(.custom("Lato-Regular", size: 14))
+                    .font(.custom("Roboto-Regular", size: 14))
                     .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
             }
 
@@ -21,7 +21,7 @@ struct SmartInsightsCard: View {
                 // Coming soon action
             }) {
                 Text("Coming Soon")
-                    .font(.custom("Lato-Bold", size: 14))
+                    .font(.custom("Roboto-Bold", size: 14))
                     .foregroundStyle(.white)
                     .padding(.horizontal, 16)
                     .padding(.vertical, 8)

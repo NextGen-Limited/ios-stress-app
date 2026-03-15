@@ -13,12 +13,12 @@ struct PremiumBanner: View {
             // Content
             VStack(spacing: 8) {
                 Text("UNLOCK PREMIUM")
-                    .font(.custom("Lato-Bold", size: 24))
+                    .font(.custom("Roboto-Bold", size: 24))
                     .foregroundStyle(Color(hex: "#4682B4"))
                     .tracking(-0.48)
 
                 Text("Unlimited Access to premium features")
-                    .font(.custom("Lato-Regular", size: 14))
+                    .font(.custom("Roboto-Regular", size: 14))
                     .foregroundStyle(Color(hex: "#6A5ACD"))
 
                 // Upgrade button
@@ -31,7 +31,7 @@ struct PremiumBanner: View {
                             .foregroundStyle(.white)
 
                         Text("Upgrade Now")
-                            .font(.custom("Lato-Bold", size: 16))
+                            .font(.custom("Roboto-Bold", size: 16))
                             .foregroundStyle(.white)
 
                         Image(systemName: "sparkle")

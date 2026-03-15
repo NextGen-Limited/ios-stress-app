@@ -22,7 +22,12 @@
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>UIAppFonts</key>
 	<array>
-		<string>Lato-Bold.ttf</string>
+		<string>Roboto-Bold.ttf</string>
+		<string>Roboto-ExtraBold.ttf</string>
+		<string>Roboto-Italic.ttf</string>
+		<string>Roboto-Light.ttf</string>
+		<string>Roboto-Medium.ttf</string>
+		<string>Roboto-Regular.ttf</string>
 	</array>
 	<key>NSHealthShareUsageDescription</key>
 	<string>We need access to your health data to monitor stress levels.</string>

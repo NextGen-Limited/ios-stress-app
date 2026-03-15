@@ -1,8 +1,20 @@
+import Charts
 import SwiftUI
 
 struct BeforeAfterChart: View {
     let beforeValue: Double
     let afterValue: Double
+
+    private var chartData: [(label: String, value: Double, color: Color)] {
+        [
+            ("Before", beforeValue, .stressHigh),
+            ("After", afterValue, afterValue > beforeValue ? .stressRelaxed : .stressHigh)
+        ]
+    }
+
+    private var maxValue: Double {
+        max(beforeValue, afterValue) * 1.2
+    }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -10,29 +22,28 @@ struct BeforeAfterChart: View {
                 .font(Typography.headline)
 
             HStack(alignment: .bottom, spacing: 16) {
-                VStack(spacing: 8) {
-                    BarView(
-                        value: beforeValue,
-                        maxValue: max(beforeValue, afterValue) * 1.2,
-                        color: .stressHigh
+                Chart(chartData, id: \.label) { item in
+                    BarMark(
+                        x: .value("Label", item.label),
+                        y: .value("Value", item.value)
                     )
-
-                    Text("\(Int(beforeValue)) ms")
-                        .font(Typography.caption1)
-                        .foregroundColor(.secondary)
+                    .foregroundStyle(item.color)
+                    .cornerRadius(8)
                 }
-
-                VStack(spacing: 8) {
-                    BarView(
-                        value: afterValue,
-                        maxValue: max(beforeValue, afterValue) * 1.2,
-                        color: afterValue > beforeValue ? .stressRelaxed : .stressHigh
-                    )
-
-                    Text("\(Int(afterValue)) ms")
-                        .font(Typography.caption1)
-                        .foregroundColor(.secondary)
+                .chartYScale(domain: 0...maxValue)
+                .chartYAxis(.hidden)
+                .chartXAxis {
+                    AxisMarks { value in
+                        AxisValueLabel {
+                            if let label = value.as(String.self) {
+                                Text("\(Int(label == "Before" ? beforeValue : afterValue)) ms")
+                                    .font(Typography.caption1)
+                                    .foregroundColor(.secondary)
+                            }
+                        }
+                    }
                 }
+                .frame(width: 60, height: 150)
             }
         }
         .padding(20)
@@ -43,24 +54,7 @@ struct BeforeAfterChart: View {
     }
 }
 
-struct BarView: View {
-    let value: Double
-    let maxValue: Double
-    let color: Color
-
-    var body: some View {
-        GeometryReader { geometry in
-            VStack(spacing: 0) {
-                Spacer()
-
-                RoundedRectangle(cornerRadius: 8)
-                    .fill(color)
-                    .frame(height: geometry.size.height * (value / maxValue))
-
-                RoundedRectangle(cornerRadius: 8)
-                    .fill(Color.secondary.opacity(0.2))
-            }
-        }
-        .frame(width: 60, height: 150)
-    }
+#Preview {
+    BeforeAfterChart(beforeValue: 45, afterValue: 65)
+        .padding()
 }

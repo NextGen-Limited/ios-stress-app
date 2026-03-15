@@ -50,7 +50,7 @@ struct HorizontalWeekCalendarView: View {
             if !isCurrentWeek {
                 Button(action: goToToday) {
                     Text("Jump to today")
-                        .font(.custom("Lato-Bold", size: 13))
+                        .font(.custom("Roboto-Bold", size: 13))
                         .foregroundColor(.accentTeal)
                 }
                 .padding(.top, 6)
@@ -96,12 +96,12 @@ private struct DayCell: View {
         VStack(spacing: 2.8) {
             // Day number
             Text(dayNumber)
-                .font(.custom("Lato-Bold", size: 14))
+                .font(.custom("Roboto-Bold", size: 14))
                 .foregroundColor(isSelected ? .white : Color(hex: "101223"))
 
             // Day abbreviation
             Text(dayAbbreviation)
-                .font(.custom("Lato-Regular", size: 12.13))
+                .font(.custom("Roboto-Regular", size: 12.13))
                 .foregroundColor(isSelected ? .white : Color(hex: "777986"))
         }
         .frame(width: 21.47, height: 32.27)

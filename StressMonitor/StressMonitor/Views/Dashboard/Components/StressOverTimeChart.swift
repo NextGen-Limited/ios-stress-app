@@ -1,10 +1,10 @@
+import Charts
 import SwiftUI
 
 // MARK: - Chart Time Range Selector
 
-/// Time range options for the stress chart
-/// Note: Separate from TimeRange in HistoryViewModel to avoid conflicts
-enum ChartTimeRange: String, CaseIterable {
+/// Time range options for the stress chart - local to StressOverTimeChart
+private enum LocalChartTimeRange: String, CaseIterable {
     case sevenDays = "7 Days"
     case thirtyDays = "30 Days"
     case ninetyDays = "90 Days"
@@ -12,10 +12,10 @@ enum ChartTimeRange: String, CaseIterable {
 
 // MARK: - Stress Over Time Chart
 
-/// Bar chart visualization for stress data over time
+/// Bar chart visualization for stress data over time using SwiftUI Charts
 /// Shows daily stress levels with category-based coloring
 struct StressOverTimeChart: View {
-    @State private var selectedRange: ChartTimeRange = .sevenDays
+    @State private var selectedRange: LocalChartTimeRange = .sevenDays
     @AppStorage("isPremiumUser") private var isPremiumUser = false
 
     // Mock data for chart visualization
@@ -65,7 +65,7 @@ struct StressOverTimeChart: View {
             Spacer()
 
             Menu {
-                ForEach(ChartTimeRange.allCases, id: \.self) { range in
+                ForEach(LocalChartTimeRange.allCases, id: \.self) { range in
                     Button {
                         selectedRange = range
                     } label: {
@@ -93,14 +93,35 @@ struct StressOverTimeChart: View {
 
     private var chartContent: some View {
         VStack(alignment: .leading, spacing: 0) {
-            // Y-axis labels and chart area
-            HStack(alignment: .top, spacing: 8) {
-                // Y-axis labels
-                yAxisLabels
-
-                // Bar chart
-                barChart
+            // Chart with SwiftUI Charts
+            Chart(chartData) { dataPoint in
+                BarMark(
+                    x: .value("Day", dataPoint.day),
+                    y: .value("Stress", dataPoint.value)
+                )
+                .foregroundStyle(barColor(for: dataPoint.category))
+                .cornerRadius(6)
             }
+            .chartYScale(domain: 0...100)
+            .chartYAxis {
+                AxisMarks(values: [0, 33, 66, 100]) { value in
+                    AxisValueLabel {
+                        if let intValue = value.as(Int.self) {
+                            Text("\(intValue)")
+                                .font(Typography.caption1)
+                                .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
+                        }
+                    }
+                }
+            }
+            .chartXAxis {
+                AxisMarks { _ in
+                    AxisValueLabel()
+                        .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
+                        .font(Typography.caption2)
+                }
+            }
+            .frame(height: 240)
 
             Spacer()
 
@@ -108,43 +129,6 @@ struct StressOverTimeChart: View {
             legendView
                 .padding(.top, 16)
         }
-    }
-
-    // MARK: - Y-Axis Labels
-
-    private var yAxisLabels: some View {
-        VStack(alignment: .trailing, spacing: 0) {
-            ForEach([100, 66, 33, 0], id: \.self) { value in
-                Text("\(value)")
-                    .font(Typography.caption1)
-                    .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
-                    .frame(height: 60, alignment: .top)
-            }
-        }
-        .frame(width: 24)
-    }
-
-    // MARK: - Bar Chart
-
-    private var barChart: some View {
-        HStack(alignment: .bottom, spacing: 12) {
-            ForEach(chartData) { dataPoint in
-                VStack(spacing: 4) {
-                    // Bar
-                    Rectangle()
-                        .fill(barColor(for: dataPoint.category))
-                        .frame(width: 28, height: barHeight(for: dataPoint.value))
-                        .cornerRadius(6)
-
-                    // X-axis label
-                    Text(dataPoint.day)
-                        .font(Typography.caption2)
-                        .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
-                }
-                .frame(maxHeight: 240, alignment: .bottom)
-            }
-        }
-        .frame(maxWidth: .infinity)
     }
 
     // MARK: - Legend View
@@ -170,11 +154,6 @@ struct StressOverTimeChart: View {
     }
 
     // MARK: - Helper Methods
-
-    private func barHeight(for value: Int) -> CGFloat {
-        // Max height is 240, scale proportionally
-        return CGFloat(value) / 100.0 * 240.0
-    }
 
     private func barColor(for category: StressCategory) -> Color {
         switch category {

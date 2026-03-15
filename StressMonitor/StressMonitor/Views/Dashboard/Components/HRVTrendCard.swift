@@ -11,11 +11,11 @@ struct HRVTrendCard: View {
             HStack {
                 VStack(alignment: .leading, spacing: 0) {
                     Text("HRV Trend")
-                        .font(.custom("Lato-Bold", size: 18))
+                        .font(.custom("Roboto-Bold", size: 18))
                         .foregroundStyle(Color.Wellness.adaptivePrimaryText)
 
                     Text("Last 30 days")
-                        .font(.custom("Lato-Regular", size: 12))
+                        .font(.custom("Roboto-Regular", size: 12))
                         .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
                 }
 
@@ -29,7 +29,7 @@ struct HRVTrendCard: View {
                 } label: {
                     HStack(spacing: 4) {
                         Text(selectedRange)
-                            .font(.custom("Lato-Regular", size: 12))
+                            .font(.custom("Roboto-Regular", size: 12))
                             .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
 
                         Image(systemName: "chevron.down")
@@ -70,7 +70,7 @@ struct HRVTrendCard: View {
         VStack(alignment: .trailing, spacing: 0) {
             ForEach([150, 100, 50, 0], id: \.self) { value in
                 Text("\(value)")
-                    .font(.custom("Lato-Regular", size: 10))
+                    .font(.custom("Roboto-Regular", size: 10))
                     .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
                     .frame(height: 60, alignment: .top)
             }
@@ -130,7 +130,7 @@ struct HRVTrendCard: View {
                 HStack {
                     Spacer()
                     Text("Today")
-                        .font(.custom("Lato-Regular", size: 10))
+                        .font(.custom("Roboto-Regular", size: 10))
                         .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
                 }
             }

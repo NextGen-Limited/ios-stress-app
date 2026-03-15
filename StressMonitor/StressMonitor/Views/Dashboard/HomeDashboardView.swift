@@ -114,12 +114,12 @@ struct HomeDashboardView: View {
         HStack(alignment: .top) {
             VStack(alignment: .leading, spacing: 4) {
                 Text(dayName)
-                    .font(.custom("Lato-Bold", size: 32))
+                    .font(.custom("Roboto-Bold", size: 32))
                     .foregroundStyle(Color.Wellness.adaptivePrimaryText)
                     .tracking(-0.48)
 
                 Text(fullDate)
-                    .font(.custom("Lato-Bold", size: 16))
+                    .font(.custom("Roboto-Bold", size: 16))
                     .foregroundStyle(Color.Wellness.adaptivePrimaryText)
                     .tracking(-0.24)
             }
@@ -153,7 +153,7 @@ struct HomeDashboardView: View {
     private func sectionHeader(title: String) -> some View {
         HStack {
             Text(title)
-                .font(.custom("Lato-Bold", size: 14))
+                .font(.custom("Roboto-Bold", size: 14))
                 .foregroundStyle(.black)
                 .tracking(-0.21)
             Spacer()
@@ -165,13 +165,13 @@ struct HomeDashboardView: View {
     private var layoutHintSection: some View {
         VStack(spacing: 7) {
             Text("Long press any card to drag and re-order.")
-                .font(.custom("Lato-Regular", size: 14))
+                .font(.custom("Roboto-Regular", size: 14))
                 .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
                 .tracking(-0.21)
 
             Button(action: {}) {
                 Text("Reset Layout")
-                    .font(.custom("Lato-Bold", size: 14))
+                    .font(.custom("Roboto-Bold", size: 14))
                     .foregroundStyle(Color.accentTeal)
                     .underline()
                     .tracking(-0.21)

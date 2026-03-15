@@ -18,7 +18,7 @@ struct IntroMessageCard: View {
             // Speech bubble
             VStack(alignment: .leading, spacing: 0) {
                 Text("I've been keeping an eye on your days! Want to see how stress changed this week?")
-                    .font(.custom("Lato-Regular", size: 14))
+                    .font(.custom("Roboto-Regular", size: 14))
                     .foregroundStyle(Color(hex: "#333333"))
                     .fixedSize(horizontal: false, vertical: false)
             }

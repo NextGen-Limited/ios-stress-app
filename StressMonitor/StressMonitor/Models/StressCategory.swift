@@ -67,3 +67,13 @@ public enum StressCategory: String, CaseIterable, Codable, Sendable {
         return "\(Int(level)) out of 100, \(name) stress"
     }
 }
+
+// MARK: - Stress Source
+
+/// Represents a stress source with name, percentage, and color
+struct StressSource: Identifiable, Equatable {
+    let id = UUID()
+    let name: String
+    let percentage: Double
+    let color: Color
+}

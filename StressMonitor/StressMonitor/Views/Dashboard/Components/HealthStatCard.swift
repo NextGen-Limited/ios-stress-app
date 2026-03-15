@@ -20,7 +20,7 @@ struct HealthStatCard: View {
                     .frame(width: 18.249, height: 18.249)
 
                 Text(title)
-                    .font(.custom("Lato-Bold", size: 14))
+                    .font(.custom("Roboto-Bold", size: 14))
                     .foregroundStyle(Color.Wellness.adaptivePrimaryText)
                     .tracking(-0.21)
             }
@@ -28,13 +28,13 @@ struct HealthStatCard: View {
             // Value
             HStack(alignment: .firstTextBaseline, spacing: 7.299) {
                 Text(value)
-                    .font(.custom("Lato-Bold", size: 24))
+                    .font(.custom("Roboto-Bold", size: 24))
                     .foregroundStyle(Color.Wellness.adaptivePrimaryText)
                     .tracking(-0.36)
 
                 if let unit = unit {
                     Text(unit)
-                        .font(.custom("Lato-Bold", size: 23.723))
+                        .font(.custom("Roboto-Bold", size: 23.723))
                         .foregroundStyle(Color(hex: "707070"))
                 }
             }
@@ -43,16 +43,16 @@ struct HealthStatCard: View {
             if let secondaryValue = secondaryValue, let secondaryUnit = secondaryUnit {
                 HStack(alignment: .firstTextBaseline, spacing: 0) {
                     Text(secondaryValue)
-                        .font(.custom("Lato-Bold", size: 24))
+                        .font(.custom("Roboto-Bold", size: 24))
                         .foregroundStyle(Color.Wellness.adaptivePrimaryText)
                         .tracking(-0.36)
 
                     Text("/")
-                        .font(.custom("Lato-Bold", size: 24))
+                        .font(.custom("Roboto-Bold", size: 24))
                         .foregroundStyle(Color.lightGrey)
 
                     Text(secondaryUnit)
-                        .font(.custom("Lato-Bold", size: 16))
+                        .font(.custom("Roboto-Bold", size: 16))
                         .foregroundStyle(Color.lightGrey)
                 }
             }

@@ -17,12 +17,12 @@ struct WidgetPromoCard: View {
                 // Text content
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Set widget now!")
-                        .font(.custom("Lato-Bold", size: 18))
+                        .font(.custom("Roboto-Bold", size: 18))
                         .foregroundStyle(Color.premiumGold)
                         .tracking(-0.27)
 
                     Text("Widgets that nudge you with insights")
-                        .font(.custom("Lato-Regular", size: 13))
+                        .font(.custom("Roboto-Regular", size: 13))
                         .foregroundStyle(Color.textDescriptive)
                         .tracking(-0.195)
                 }

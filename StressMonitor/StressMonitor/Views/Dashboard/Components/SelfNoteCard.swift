@@ -24,12 +24,12 @@ struct SelfNoteCard: View {
                 // Text content
                 VStack(alignment: .leading, spacing: 0) {
                     Text("How do you feel?")
-                        .font(.custom("Lato-Regular", size: 13))
+                        .font(.custom("Roboto-Regular", size: 13))
                         .foregroundStyle(.white)
                         .tracking(-0.195)
 
                     Text("Tell me about it")
-                        .font(.custom("Lato-Bold", size: 16))
+                        .font(.custom("Roboto-Bold", size: 16))
                         .foregroundStyle(.white)
                         .tracking(-0.24)
                 }

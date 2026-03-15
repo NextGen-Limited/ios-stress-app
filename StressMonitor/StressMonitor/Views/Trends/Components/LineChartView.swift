@@ -1,5 +1,20 @@
+import Charts
 import SwiftUI
 
+// MARK: - Chart Time Range Selector
+
+/// Time range options for the stress chart
+/// Note: Separate from TimeRange in HistoryViewModel to avoid conflicts
+enum ChartTimeRange: String, CaseIterable {
+    case sevenDays = "7 Days"
+    case thirtyDays = "30 Days"
+    case ninetyDays = "90 Days"
+}
+
+// MARK: - Line Chart View
+
+/// Line chart with area fill using SwiftUI Charts
+/// Supports touch interaction via chart overlay
 struct LineChartView: View {
     let dataPoints: [ChartDataPoint]
     let accentColor: Color
@@ -7,148 +22,114 @@ struct LineChartView: View {
     var showYAxisLabels: Bool = false
 
     @State private var selectedPoint: ChartDataPoint?
-    @State private var touchLocation: CGPoint = .zero
 
     var body: some View {
-        GeometryReader { geometry in
-            ZStack {
-                if showGrid {
-                    drawGrid(in: geometry.size)
-                }
+        Chart {
+            ForEach(dataPoints) { point in
+                LineMark(
+                    x: .value("Date", point.date),
+                    y: .value("Value", point.value)
+                )
+                .foregroundStyle(accentColor)
+                .lineStyle(StrokeStyle(lineWidth: 3, lineCap: .round, lineJoin: .round))
 
-                if showYAxisLabels {
-                    drawYAxisLabels(in: geometry.size)
-                }
+                AreaMark(
+                    x: .value("Date", point.date),
+                    y: .value("Value", point.value)
+                )
+                .foregroundStyle(
+                    LinearGradient(
+                        colors: [accentColor.opacity(0.3), accentColor.opacity(0.0)],
+                        startPoint: .top,
+                        endPoint: .bottom
+                    )
+                )
+            }
 
-                drawAreaFill(in: geometry.size)
-                drawLine(in: geometry.size)
+            if let selected = selectedPoint {
+                RuleMark(x: .value("Selected", selected.date))
+                    .foregroundStyle(accentColor.opacity(0.5))
+                    .lineStyle(StrokeStyle(lineWidth: 1, dash: [4, 4]))
 
-                if selectedPoint != nil {
-                    drawSelectionIndicator(in: geometry.size)
+                PointMark(
+                    x: .value("Date", selected.date),
+                    y: .value("Value", selected.value)
+                )
+                .foregroundStyle(accentColor)
+                .symbolSize(100)
+            }
+        }
+        .chartXAxis {
+            if showGrid {
+                AxisMarks(values: .automatic(desiredCount: 5)) { _ in
+                    AxisGridLine(stroke: StrokeStyle(dash: [4, 4]))
+                        .foregroundStyle(Color.secondary.opacity(0.1))
                 }
             }
-            .gesture(
-                DragGesture(minimumDistance: 0)
-                    .onChanged { value in
-                        touchLocation = value.location
-                        selectedPoint = findNearestPoint(to: value.location, in: geometry.size)
+        }
+        .chartYAxis {
+            if showGrid || showYAxisLabels {
+                AxisMarks(values: [0, 50, 100, 150]) { value in
+                    AxisGridLine(stroke: StrokeStyle(dash: [4, 4]))
+                        .foregroundStyle(Color.secondary.opacity(0.1))
+
+                    if showYAxisLabels {
+                        AxisValueLabel {
+                            if let intValue = value.as(Int.self) {
+                                Text("\(intValue)")
+                                    .font(.system(size: 9))
+                                    .foregroundColor(.secondary)
+                            }
+                        }
                     }
-                    .onEnded { _ in }
-            )
-        }
-    }
-
-    private func drawGrid(in size: CGSize) -> some View {
-        ZStack {
-            ForEach(0..<5) { index in
-                let y = CGFloat(index) / 4 * size.height
-                Path { path in
-                    path.move(to: CGPoint(x: 0, y: y))
-                    path.addLine(to: CGPoint(x: size.width, y: y))
                 }
-                .stroke(Color.secondary.opacity(0.1), lineWidth: 1)
             }
         }
-    }
-
-    /// Overlays Y-axis value labels (0, 50, 100, 150) on the left edge
-    private func drawYAxisLabels(in size: CGSize) -> some View {
-        let labels: [(value: Int, fraction: CGFloat)] = [
-            (150, 0.0),
-            (100, 0.25),
-            (50, 0.5),
-            (0, 1.0)
-        ]
-        return ZStack {
-            ForEach(labels, id: \.value) { item in
-                Text("\(item.value)")
-                    .font(.system(size: 9))
-                    .foregroundColor(.secondary)
-                    .position(x: 16, y: item.fraction * size.height)
+        .chartOverlay { proxy in
+            GeometryReader { geometry in
+                Rectangle()
+                    .fill(.clear)
+                    .contentShape(Rectangle())
+                    .gesture(
+                        DragGesture(minimumDistance: 0)
+                            .onChanged { value in
+                                selectedPoint = findNearestPoint(at: value.location, in: geometry.size, proxy: proxy)
+                            }
+                            .onEnded { _ in
+                                selectedPoint = nil
+                            }
+                    )
             }
         }
+        .chartYScale(domain: 0...160)
     }
 
-    private func normalize(point: ChartDataPoint, in size: CGSize) -> CGPoint {
-        guard let minValue = dataPoints.map({ $0.value }).min(),
-              let maxValue = dataPoints.map({ $0.value }).max(),
-              !dataPoints.isEmpty else { return .zero }
+    private func findNearestPoint(at location: CGPoint, in size: CGSize, proxy: ChartProxy) -> ChartDataPoint? {
+        guard let date: Date = proxy.value(atX: location.x) else { return nil }
 
-        let x = CGFloat(dataPoints.firstIndex(of: point) ?? 0) / CGFloat(dataPoints.count - 1) * size.width
-
-        let valueRange = maxValue - minValue
-        let normalizedValue = (point.value - minValue) / (valueRange == 0 ? 1 : valueRange)
-        let y = size.height - (normalizedValue * size.height * 0.8 + size.height * 0.1)
-
-        return CGPoint(x: x, y: y)
-    }
-
-    private func drawLine(in size: CGSize) -> some View {
-        Path { path in
-            guard let first = dataPoints.first else { return }
-            let start = normalize(point: first, in: size)
-            path.move(to: start)
-
-            for point in dataPoints.dropFirst() {
-                let normalized = normalize(point: point, in: size)
-                path.addLine(to: normalized)
-            }
-        }
-        .stroke(accentColor, style: StrokeStyle(lineWidth: 3, lineCap: .round, lineJoin: .round))
-    }
-
-    private func drawAreaFill(in size: CGSize) -> some View {
-        Path { path in
-            guard let first = dataPoints.first else { return }
-            let start = normalize(point: first, in: size)
-            path.move(to: start)
-
-            for point in dataPoints.dropFirst() {
-                let normalized = normalize(point: point, in: size)
-                path.addLine(to: normalized)
-            }
-
-            path.addLine(to: CGPoint(x: size.width, y: size.height))
-            path.addLine(to: CGPoint(x: 0, y: size.height))
-            path.closeSubpath()
-        }
-        .fill(
-            LinearGradient(
-                colors: [accentColor.opacity(0.3), accentColor.opacity(0.0)],
-                startPoint: .top,
-                endPoint: .bottom
-            )
-        )
-    }
-
-    private func drawSelectionIndicator(in size: CGSize) -> some View {
-        Group {
-            if let point = selectedPoint, let location = normalizeOptional(point: point, in: size) {
-                Circle()
-                    .fill(accentColor)
-                    .frame(width: 12, height: 12)
-                    .position(location)
-
-                Circle()
-                    .stroke(accentColor, lineWidth: 2)
-                    .frame(width: 20, height: 20)
-                    .position(location)
-            }
-        }
-    }
-
-    private func findNearestPoint(to location: CGPoint, in size: CGSize) -> ChartDataPoint? {
-        dataPoints.min { point1, point2 in
-            let loc1 = normalize(point: point1, in: size)
-            let loc2 = normalize(point: point2, in: size)
-            let dist1 = hypot(loc1.x - location.x, loc1.y - location.y)
-            let dist2 = hypot(loc2.x - location.x, loc2.y - location.y)
+        return dataPoints.min { point1, point2 in
+            let dist1 = abs(point1.date.timeIntervalSince(date))
+            let dist2 = abs(point2.date.timeIntervalSince(date))
             return dist1 < dist2
         }
     }
+}
 
-    private func normalizeOptional(point: ChartDataPoint?, in size: CGSize) -> CGPoint? {
-        guard let point = point else { return nil }
-        return normalize(point: point, in: size)
-    }
+#Preview("Line Chart") {
+    LineChartView(
+        dataPoints: [
+            ChartDataPoint(date: Date().addingTimeInterval(-6 * 86400), value: 45),
+            ChartDataPoint(date: Date().addingTimeInterval(-5 * 86400), value: 52),
+            ChartDataPoint(date: Date().addingTimeInterval(-4 * 86400), value: 48),
+            ChartDataPoint(date: Date().addingTimeInterval(-3 * 86400), value: 55),
+            ChartDataPoint(date: Date().addingTimeInterval(-2 * 86400), value: 50),
+            ChartDataPoint(date: Date().addingTimeInterval(-1 * 86400), value: 58),
+            ChartDataPoint(date: Date(), value: 62)
+        ],
+        accentColor: .stressMild,
+        showGrid: true,
+        showYAxisLabels: true
+    )
+    .frame(height: 200)
+    .padding()
 }

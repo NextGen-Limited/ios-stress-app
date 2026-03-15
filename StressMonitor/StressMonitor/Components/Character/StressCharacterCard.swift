@@ -37,13 +37,7 @@ struct StressCharacterCard: View {
             // Main card content
             VStack(spacing: 0) {
                 // Date header with refresh button
-                HStack(alignment: .top) {
-                    DateHeaderView(date: lastUpdated ?? Date(), onSettingsTapped: onSettingsTapped)
-                    Spacer()
-                    refreshButton
-                }
-                .padding(.horizontal, 20)
-                .padding(.top, 22)
+                DateHeaderView(date: lastUpdated ?? Date(), onSettingsTapped: onSettingsTapped)
 
                 Spacer()
 

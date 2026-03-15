@@ -23,13 +23,13 @@ struct QuickActionCard<Destination: View>: View {
                     // Left: Title, description, duration
                     VStack(alignment: .leading, spacing: 4) {
                         Text(title)
-                            .font(.custom("Lato-Bold", size: 16))
+                            .font(.custom("Roboto-Bold", size: 16))
                             .foregroundStyle(.white)
                             .tracking(-0.24)
                             .lineLimit(1)
 
                         Text(description)
-                            .font(.custom("Lato-Regular", size: 11))
+                            .font(.custom("Roboto-Regular", size: 11))
                             .foregroundStyle(.white)
                             .tracking(-0.165)
                             .lineLimit(2)
@@ -37,7 +37,7 @@ struct QuickActionCard<Destination: View>: View {
 
                         // Duration badge
                         Text(duration)
-                            .font(.custom("Lato-Bold", size: 12))
+                            .font(.custom("Roboto-Bold", size: 12))
                             .foregroundStyle(.white)
                             .tracking(-0.18)
                             .padding(.horizontal, 12)

@@ -59,12 +59,12 @@ struct StressSourcesCard: View {
     private var headerView: some View {
         VStack(alignment: .leading, spacing: 4) {
             Text("Stress sources")
-                .font(.custom("Lato-Bold", size: 18))
+                .font(.custom("Roboto-Bold", size: 18))
                 .kerning(-0.27)
                 .foregroundStyle(Color.Wellness.adaptivePrimaryText)
 
             Text("Last \(totalDays) days")
-                .font(.custom("Lato-Bold", size: 13.97))
+                .font(.custom("Roboto-Bold", size: 13.97))
                 .kerning(-0.21)
                 .foregroundStyle(Color.Wellness.adaptivePrimaryText.opacity(0.6))
         }
@@ -112,10 +112,10 @@ struct StressSourcesCard: View {
 
             VStack(spacing: 2) {
                 Text("\(Int(totalPercentage * 100))%")
-                    .font(.custom("Lato-Bold", size: 16))
+                    .font(.custom("Roboto-Bold", size: 16))
                     .foregroundStyle(Color.Wellness.adaptivePrimaryText)
                 Text("Total")
-                    .font(.custom("Lato-Regular", size: 12))
+                    .font(.custom("Roboto-Regular", size: 12))
                     .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
             }
         }
@@ -146,7 +146,7 @@ struct StressSourcesCard: View {
                 .frame(width: 21.5, height: 21.5)
 
             Text(label)
-                .font(.custom("Lato-Bold", size: 11.99))
+                .font(.custom("Roboto-Bold", size: 11.99))
                 .foregroundStyle(Color(hex: "#363636"))
                 .lineLimit(1)
                 .minimumScaleFactor(0.7)
@@ -182,7 +182,7 @@ private struct PercentageLabelsView: View {
             )
 
             Text("\(Int(source.percentage * 100))%")
-                .font(.custom("Lato-Bold", size: 14))
+                .font(.custom("Roboto-Bold", size: 14))
                 .foregroundStyle(Color.Wellness.adaptivePrimaryText)
                 .offset(x: labelPosition.x, y: labelPosition.y)
         }

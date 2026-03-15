@@ -9,7 +9,7 @@ struct AIChatCard: View {
         VStack(alignment: .leading, spacing: 0) {
             // Title
             Text("AI Chat")
-                .font(.custom("Lato-Bold", size: 24))
+                .font(.custom("Roboto-Bold", size: 24))
                 .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
                 .tracking(-0.36)
                 .padding(.leading, 28.29)
@@ -17,7 +17,7 @@ struct AIChatCard: View {
 
             // Subtitle
             Text("Talk with AI Kitten")
-                .font(.custom("Lato-Regular", size: 14))
+                .font(.custom("Roboto-Regular", size: 14))
                 .foregroundStyle(Color(hex: "808080"))
                 .tracking(-0.21)
                 .padding(.leading, 28.29)
@@ -25,7 +25,7 @@ struct AIChatCard: View {
 
             // Description quote
             Text("\"It's always better to talk to your support group. If you need, Kitten is here for you!\"")
-                .font(.custom("Lato-Regular", size: 13))
+                .font(.custom("Roboto-Regular", size: 13))
                 .foregroundStyle(Color(hex: "808080"))
                 .tracking(-0.195)
                 .frame(width: 203.471, alignment: .leading)
@@ -52,7 +52,7 @@ struct AIChatCard: View {
                         .font(.system(size: 10.949))
 
                     Text("Chat with StressCat")
-                        .font(.custom("Lato-Semibold", size: 14))
+                        .font(.custom("Roboto-Medium", size: 14))
                         .foregroundStyle(.white)
                         .tracking(-0.21)
                 }
@@ -67,13 +67,13 @@ struct AIChatCard: View {
             // Footer text
             VStack(spacing: 4) {
                 Text("For informational purposes only.")
-                    .font(.custom("Lato-Regular", size: 10.037))
+                    .font(.custom("Roboto-Regular", size: 10.037))
                     .foregroundStyle(Color(hex: "808080"))
                     .tracking(-0.15)
 
                 Link(destination: URL(string: "settings:health")!) {
                     Text("Tap here if you need medical or therapy resource")
-                        .font(.custom("Lato-Regular", size: 10.037))
+                        .font(.custom("Roboto-Regular", size: 10.037))
                         .foregroundStyle(Color(hex: "A231CF"))
                         .underline()
                         .tracking(-0.15)
