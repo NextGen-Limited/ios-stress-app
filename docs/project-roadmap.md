@@ -3,7 +3,7 @@
 **Current Version:** 1.0 (Production)
 **Release Date:** February 2026
 **Maintenance Mode:** Active
-**Last Updated:** March 3, 2026
+**Last Updated:** March 8, 2026
 
 ---
 
@@ -342,6 +342,7 @@ remains on your device or encrypted in iCloud.
 - No iPad support yet (planned for v2.0)
 
 **Recent Fixes (March 2026):**
+- ✅ SwiftUI Charts migration completed: `LineChartView`, `MiniLineChartView`, `StressOverTimeChart`, `BeforeAfterChart` all migrated to SwiftUI Charts; unused `StressSourcesDonutChart.swift` deleted (Mar 2026)
 - ✅ `DailyTimelineView` redesigned: 24-hour scatter → 7-day × 7-slot weekly dot-matrix (Mar 2026)
 - ✅ `DashboardViewModel.weeklyMeasurements` added; chart wired into `StressDashboardView` (Mar 2026)
 - ✅ Fixed TabBar compilation errors (TabItem enum structure)
@@ -523,5 +524,5 @@ Potential features for future consideration:
 ---
 
 **Owner:** Phuong Doan
-**Last Review:** March 3, 2026
+**Last Review:** March 8, 2026
 **Next Review:** May 2026 (post v1.0 launch)

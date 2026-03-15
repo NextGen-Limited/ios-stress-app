@@ -1,0 +1,10 @@
+schemaVersion: 1
+sessionDefaultsProfiles:
+  ios:
+    projectPath: /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitor.xcodeproj
+    scheme: AnimatedTabBar
+    simulatorName: iPhone 17 Pro
+    simulatorId: 28F09C76-95B1-438C-BBC9-73BEB6998FAB
+    simulatorPlatform: iOS Simulator
+    bundleId: StressMonitor.StressMonitor
+activeSessionDefaultsProfile: ios
