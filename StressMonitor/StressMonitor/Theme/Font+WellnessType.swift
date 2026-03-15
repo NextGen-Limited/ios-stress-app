@@ -6,43 +6,42 @@ extension Font {
     struct WellnessType {
         // MARK: - Google Fonts Constants
 
-        private static let loraFontName = "Lora"
-        private static let ralewayFontName = "Raleway"
+        private static let robotoFontName = "Roboto"
 
-        // MARK: - Heading Fonts (Lora - Organic curves, wellness vibe)
+        // MARK: - Heading Fonts (Roboto - Modern, clean, wellness vibe)
 
         /// Hero number for stress ring center
-        static let heroNumber = custom(loraFontName, size: 72, weight: .bold)
+        static let heroNumber = custom(robotoFontName + "-Bold", size: 72, weight: .bold)
 
         /// Large metric display
-        static let largeMetric = custom(loraFontName, size: 48, weight: .bold)
+        static let largeMetric = custom(robotoFontName + "-Bold", size: 48, weight: .bold)
 
         /// Card titles
-        static let cardTitle = custom(loraFontName, size: 28, weight: .bold)
+        static let cardTitle = custom(robotoFontName + "-Bold", size: 28, weight: .bold)
 
         /// Section headers
-        static let sectionHeader = custom(loraFontName, size: 22, weight: .semibold)
+        static let sectionHeader = custom(robotoFontName + "-Medium", size: 22, weight: .semibold)
 
-        // MARK: - Body Fonts (Raleway - Elegant simplicity, accessible)
+        // MARK: - Body Fonts (Roboto - Elegant simplicity, accessible)
 
         /// Primary content
-        static let body = custom(ralewayFontName, size: 17, weight: .regular)
+        static let body = custom(robotoFontName + "-Regular", size: 17, weight: .regular)
 
         /// Emphasized text
-        static let bodyEmphasized = custom(ralewayFontName, size: 17, weight: .semibold)
+        static let bodyEmphasized = custom(robotoFontName + "-Medium", size: 17, weight: .semibold)
 
         /// Captions and labels
-        static let caption = custom(ralewayFontName, size: 13, weight: .regular)
+        static let caption = custom(robotoFontName + "-Regular", size: 13, weight: .regular)
 
         /// Tiny text
-        static let caption2 = custom(ralewayFontName, size: 11, weight: .regular)
+        static let caption2 = custom(robotoFontName + "-Regular", size: 11, weight: .regular)
 
         // MARK: - Helper Function
 
         /// Create custom font with fallback to SF Pro
         private static func custom(_ name: String, size: CGFloat, weight: Font.Weight) -> Font {
             // Try to use custom font first
-            if UIFont.familyNames.contains(where: { $0.contains(name) }) {
+            if UIFont.familyNames.contains(where: { $0.contains("Roboto") }) {
                 return .custom(name, size: size)
             }
 
@@ -106,19 +105,14 @@ extension Font {
 // MARK: - Font Registration Helper
 /// Helper to check if custom fonts are loaded
 struct WellnessFontLoader {
-    /// Check if Lora font family is available
-    static var isLoraAvailable: Bool {
-        UIFont.familyNames.contains { $0.contains("Lora") }
-    }
-
-    /// Check if Raleway font family is available
-    static var isRalewayAvailable: Bool {
-        UIFont.familyNames.contains { $0.contains("Raleway") }
+    /// Check if Roboto font family is available
+    static var isRobotoAvailable: Bool {
+        UIFont.familyNames.contains { $0.contains("Roboto") }
     }
 
     /// Check if all wellness fonts are available
     static var areAllFontsAvailable: Bool {
-        isLoraAvailable && isRalewayAvailable
+        isRobotoAvailable
     }
 
     /// Get list of available font families (for debugging)
@@ -129,8 +123,7 @@ struct WellnessFontLoader {
     /// Print font status to console (useful for debugging)
     static func printFontStatus() {
         print("=== Wellness Font Status ===")
-        print("Lora available: \(isLoraAvailable)")
-        print("Raleway available: \(isRalewayAvailable)")
+        print("Roboto available: \(isRobotoAvailable)")
         print("All fonts loaded: \(areAllFontsAvailable)")
 
         if !areAllFontsAvailable {

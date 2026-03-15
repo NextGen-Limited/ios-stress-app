@@ -73,9 +73,27 @@
 		F2E2EC2F2F1CC605000C2B53 /* StressMonitorWatch Watch AppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "StressMonitorWatch Watch AppUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
+/* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		F2D098F52F66727C00EC7538 /* Exceptions for "StressMonitor" folder in "StressMonitorWatch Watch App" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				"Fonts/Roboto-Bold.ttf",
+				"Fonts/Roboto-ExtraBold.ttf",
+				"Fonts/Roboto-Italic.ttf",
+				"Fonts/Roboto-Light.ttf",
+				"Fonts/Roboto-Medium.ttf",
+				"Fonts/Roboto-Regular.ttf",
+			);
+			target = F2E2EC182F1CC602000C2B53 /* StressMonitorWatch Watch App */;
+		};
+/* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
+
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		F2E2EBEB2F1CC553000C2B53 /* StressMonitor */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				F2D098F52F66727C00EC7538 /* Exceptions for "StressMonitor" folder in "StressMonitorWatch Watch App" target */,
+			);
 			path = StressMonitor;
 			sourceTree = "<group>";
 		};

@@ -44,16 +44,16 @@ struct Typography {
     static let dataMedium = Font.system(size: 34, weight: .semibold, design: .rounded)
     static let dataSmall = Font.system(size: 28, weight: .bold, design: .rounded)
 
-    // MARK: - Custom Fonts (Lato)
+    // MARK: - Custom Fonts (Roboto)
 
-    /// Custom Lato-Bold font. Use for special branding elements.
-    /// Font file: Lato-Bold.ttf (loaded via FontBlaster)
-    static func lato(size: CGFloat) -> Font {
-        .custom("Lato-Bold", size: size)
+    /// Custom Roboto-Bold font. Use for special branding elements.
+    /// Font file: Roboto-Bold.ttf (loaded via FontBlaster)
+    static func roboto(size: CGFloat) -> Font {
+        .custom("Roboto-Bold", size: size)
     }
 
-    static let latoTitle = Font.custom("Lato-Bold", size: 24)
-    static let latoHeadline = Font.custom("Lato-Bold", size: 17)
-    static let latoBody = Font.custom("Lato-Bold", size: 16)
-    static let latoCaption = Font.custom("Lato-Bold", size: 12)
+    static let robotoTitle = Font.custom("Roboto-Bold", size: 24)
+    static let robotoHeadline = Font.custom("Roboto-Bold", size: 17)
+    static let robotoBody = Font.custom("Roboto-Bold", size: 16)
+    static let robotoCaption = Font.custom("Roboto-Bold", size: 12)
 }
