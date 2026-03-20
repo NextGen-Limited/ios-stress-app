@@ -5,6 +5,7 @@ import SwiftData
 struct MainTabView: View {
     @Environment(\.modelContext) private var modelContext
     @State private var selectedTab: TabItem = .home
+    @State private var previousTab: TabItem = .home
     @State private var showSettings = false
 
     /// Enable mock data mode for development/simulator testing
@@ -21,7 +22,18 @@ struct MainTabView: View {
     private var selectedIndex: Binding<Int> {
         Binding(
             get: { selectedTab.rawValue },
-            set: { selectedTab = TabItem(rawValue: $0) ?? .home }
+            set: { newValue in
+                previousTab = selectedTab
+                selectedTab = TabItem(rawValue: newValue) ?? .home
+            }
+        )
+    }
+
+    /// Previous tab index binding for AnimatedTabBar animation
+    private var previousTabIndex: Binding<Int> {
+        Binding(
+            get: { previousTab.rawValue },
+            set: { previousTab = TabItem(rawValue: $0) ?? .home }
         )
     }
 
@@ -57,20 +69,15 @@ struct MainTabView: View {
             if !showSettings {
                 AnimatedTabBar(
                     selectedIndex: selectedIndex,
-                    prevSelectedIndex: .constant(0),
+                    prevSelectedIndex: previousTabIndex,
                     views: tabButtons(selectedIndex: selectedTab.rawValue)
                 )
-                .ballColor(.primaryBlue)
                 .selectedColor(.primaryBlue)
                 .unselectedColor(.gray)
                 .cornerRadius(24)
-                .transition(.move(edge: .bottom).combined(with: .opacity))
-                .padding(.bottom, 8)
+                .cardShadow()
             }
         }
-        .ignoresSafeArea(.keyboard)
-        .tint(.accentColor)
-        .animation(.easeInOut(duration: 0.25), value: showSettings)
     }
 }
 

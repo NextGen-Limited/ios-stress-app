@@ -1,5 +1,4 @@
 import SwiftUI
-import SwiftData
 
 /// Tab bar items matching Figma design
 enum TabItem: Int, CaseIterable, Identifiable {
@@ -20,26 +19,13 @@ enum TabItem: Int, CaseIterable, Identifiable {
         }
     }
 
-    // MARK: - Icon Names (custom images for main tabs, SF Symbols for others)
-    var selectedIconName: String {
-        switch self {
-        case .home:    return "home-selected"
-        case .action:  return "action-selected"
-        case .trend:   return "trend-selected"
-        }
-    }
-
-    var unselectedIconName: String {
+    // MARK: - Icon Name (used by DropletButton)
+    var iconName: String {
         switch self {
         case .home:    return "home"
         case .action:  return "action"
         case .trend:   return "trend"
         }
-    }
-
-    // MARK: - Use SF Symbols (for history)
-    var useSymbol: Bool {
-        false
     }
 
     // MARK: - Color for selected state
@@ -69,23 +55,6 @@ enum TabItem: Int, CaseIterable, Identifiable {
         case .home:    return "HomeTab"
         case .action:  return "ActionTab"
         case .trend:   return "TrendTab"
-        }
-    }
-
-    // MARK: - View Builder
-    @ViewBuilder
-    func destinationView(modelContext: ModelContext, useMockData: Bool) -> some View {
-        switch self {
-        case .home:
-            if useMockData {
-                DashboardView(viewModel: PreviewDataFactory.mockDashboardViewModel())
-            } else {
-                DashboardView(repository: StressRepository(modelContext: modelContext))
-            }
-        case .action:
-            ActionView()
-        case .trend:
-            TrendsView()
         }
     }
 }
