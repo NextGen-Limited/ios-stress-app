@@ -343,6 +343,7 @@ remains on your device or encrypted in iCloud.
 
 **Recent Fixes (March 2026):**
 - ✅ TabBar migration to exyte/AnimatedTabBar library: replaced custom `StressTabBarView` (~225 LOC) with library-based `AnimatedTabBar` + `DropletButton` (Mar 15, 2026)
+- ✅ TabBar haptic feedback: re-added `HapticManager.shared.buttonPress()` on tab selection (Mar 20, 2026)
 - ✅ SwiftUI Charts migration completed: `LineChartView`, `MiniLineChartView`, `StressOverTimeChart`, `BeforeAfterChart` all migrated to SwiftUI Charts; unused `StressSourcesDonutChart.swift` deleted (Mar 2026)
 - ✅ `DailyTimelineView` redesigned: 24-hour scatter → 7-day × 7-slot weekly dot-matrix (Mar 2026)
 - ✅ `DashboardViewModel.weeklyMeasurements` added; chart wired into `StressDashboardView` (Mar 2026)

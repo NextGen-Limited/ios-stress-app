@@ -23,8 +23,10 @@ struct MainTabView: View {
         Binding(
             get: { selectedTab.rawValue },
             set: { newValue in
+                guard newValue != selectedTab.rawValue else { return }
                 previousTab = selectedTab
                 selectedTab = TabItem(rawValue: newValue) ?? .home
+                HapticManager.shared.buttonPress()
             }
         )
     }
