@@ -1,28 +1,37 @@
-# Widget không cập nhật
+# Mặt đồng hồ không tự động cập nhật
 
-Nếu widget màn hình chính hoặc complication đồng hồ hiển thị dữ liệu cũ, đây là cách khắc phục.
+Do hạn chế hệ thống Apple Watch, tất cả complications trên mặt đồng hồ có thể bị chậm. **Chậm tới 15–30 phút là bình thường** — Apple Watch không cập nhật complications real-time để tiết kiệm pin. Nhà phát triển không thể trực tiếp kiểm soát tần suất làm mới complication.
 
-## Tại sao widget bị cũ
+Nếu complication không cập nhật trong vài giờ, hoặc chỉ cập nhật khi mở Watch app, hãy làm theo danh sách kiểm tra:
 
-iOS và watchOS quản lý ngân sách làm mới widget. Widget không được cập nhật theo thời gian thực — iOS quyết định khi nào làm mới dựa trên thói quen sử dụng, mức pin và tải hệ thống.
+## Bước 1: Xác nhận dữ liệu Health đang chạy
 
-## Khắc phục: Buộc làm mới
+iPhone app có hiển thị được dữ liệu HRV hiện tại không?
 
-1. Mở ứng dụng StressMonitor trên iPhone
-2. Chờ bảng điều khiển tải và hiển thị số liệu hiện tại
-3. Quay lại màn hình chính — widget sẽ cập nhật trong vài phút
+- **iPhone:** Settings → Privacy & Security → Health → StressMonitor → bật tất cả loại dữ liệu
+- **Apple Watch:** Settings → Health → Data Sources & Access → Apps & Services → StressMonitor → bật tất cả
 
-## Khắc phục: Cài lại widget
+## Bước 2: Xác nhận thông báo hoạt động
 
-Nếu widget vẫn bị kẹt:
-1. Nhấn giữ màn hình chính
-2. Nhấn **–** trên widget StressMonitor để xóa
-3. Nhấn **+** → tìm StressMonitor → thêm lại widget
+Nếu bạn nhận được thông báo căng thẳng trên iPhone, pipeline dữ liệu đang hoạt động. Nếu không, xem [Sự cố thông báo](../user-guide/notifications-troubleshoot) trước — sửa thông báo thường giải quyết luôn cả cập nhật complication.
 
-## Kiểm tra Làm mới ứng dụng nền
+## Bước 3: Bật Background App Refresh trên Watch
 
-Vào **Cài đặt → Chung → Làm mới ứng dụng nền** và xác nhận đã bật cho StressMonitor. Nếu không có điều này, widget không thể cập nhật khi ứng dụng không mở.
+Trên Apple Watch: **Settings → General → Background App Refresh** → bật cho StressMonitor.
 
-## Chế độ tiết kiệm pin
+Mặc dù tài liệu Apple nói điều này không ảnh hưởng complications, thử nghiệm cho thấy nó có tác động đến tần suất cập nhật.
 
-Khi Chế độ tiết kiệm pin đang bật, iOS tạm ngừng làm mới widget. Đây là hành vi bình thường — widget sẽ tiếp tục cập nhật bình thường khi tắt Chế độ tiết kiệm pin.
+## Bước 4: Khởi động lại Watch
+
+Nếu tất cả cài đặt đúng nhưng complication vẫn không cập nhật, khởi động lại Apple Watch. Vấn đề này phổ biến hơn trên watchOS 10.
+
+## Widget iPhone trên màn hình chính không cập nhật
+
+Nếu widget bị cũ:
+
+1. Mở StressMonitor và chờ dashboard làm mới
+2. Quay lại màn hình chính — widget sẽ cập nhật trong vài phút
+
+Nếu vẫn bị kẹt, xóa và thêm lại widget: nhấn giữ màn hình chính → **–** để xóa → **+** để thêm lại.
+
+Đồng thời đảm bảo **Settings → General → Background App Refresh** đã bật cho StressMonitor.

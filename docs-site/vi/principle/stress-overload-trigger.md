@@ -1,25 +1,33 @@
-# Khi nào kích hoạt cảnh báo?
+# Khi nào StressMonitor cảnh báo "Quá tải áp lực"?
 
-Cảnh báo Quá tải áp lực kích hoạt khi điểm căng thẳng của bạn vào vùng Quá tải áp lực (🔴 Đỏ) và duy trì trong một khoảng thời gian liên tục.
+## StressMonitor phát hiện được loại căng thẳng nào?
 
-## Điều kiện kích hoạt cảnh báo
+Có ba loại căng thẳng: **căng thẳng thể chất** (phản ứng chiến-hoặc-chạy), **căng thẳng cảm xúc** (cảm giác buồn bã, lo âu), và **căng thẳng nhận thức** (khó tập trung).
 
-Cần đồng thời hai điều kiện:
-1. Điểm căng thẳng vượt ngưỡng quá tải cá nhân (thường >75/100)
-2. Tình trạng kéo dài — không chỉ một cú tăng đột ngột
+StressMonitor phát hiện cụ thể **căng thẳng thể chất** bằng HRV và nhịp tim lúc nghỉ. HRV cao và nhịp tim lúc nghỉ thấp cho thấy cơ thể thư giãn; HRV thấp và nhịp tim lúc nghỉ cao cho thấy căng thẳng.
 
-Điều này ngăn cảnh báo sai do hoạt động ngắn (leo cầu thang, chạy nhanh).
+Ứng dụng thừa nhận căng thẳng cảm xúc và nhận thức có thể ảnh hưởng đến phản ứng thể chất, nhưng không thể phát hiện toàn diện tất cả loại căng thẳng.
 
-## Thời gian thông báo
+## Khi nào căng thẳng thể chất có khả năng cao?
 
-- **Giờ yên lặng**: Cảnh báo bị tắt trong giờ yên lặng đã cài đặt (mặc định: 22:00 – 7:00)
-- **Giới hạn tần suất**: Tối đa một cảnh báo quá tải mỗi 4 giờ để tránh mệt mỏi cảnh báo
+- Áp lực tinh thần cao (giảm HRV đáng kể)
+- Mệt mỏi thể chất do thiếu ngủ hoặc gắng sức quá mức
+- Bệnh tật (HRV giảm khi ốm)
+- Mất nước
+- Ăn uống không lành mạnh hoặc không đều đặn
+- Rượu bia, caffeine và thuốc lá
+- Trong hoặc ngay sau tập luyện
 
-## Nên làm gì
+## Lưu ý về cập nhật dữ liệu
 
-Khi nhận cảnh báo quá tải:
-1. Kiểm tra bảng điều khiển để xem số HRV và nhịp tim hiện tại
-2. Cân nhắc nghỉ ngơi, uống nước hoặc giảm hoạt động
-3. Nếu kéo dài nhiều ngày, hãy tham khảo ý kiến bác sĩ
+**Dữ liệu HRV:** Apple Watch tự động đo HRV mỗi 2–5 giờ trong điều kiện bình thường. Đo tạm dừng khi bật Low Power Mode, đang tập luyện, di chuyển nhiều, đồng hồ bị khóa, hoặc watchOS phiên bản cũ.
 
-Cảnh báo mang tính thông tin, không phải chẩn đoán y tế.
+**Dữ liệu căng thẳng real-time:** Cập nhật khoảng mỗi 15–30 phút trong điều kiện bình thường, chịu cùng các hạn chế.
+
+## Ba điều cần nhớ
+
+1. **HRV ≠ căng thẳng tinh thần.** HRV phản ánh trạng thái thể chất — cũng bị ảnh hưởng bởi mệt mỏi, chất kích thích, tuổi tác và di truyền.
+
+2. **Quan sát xu hướng, không phải đọc số đơn lẻ.** HRV dao động tự nhiên trong ngày; nhiều lần đo theo thời gian cho insight chính xác hơn.
+
+3. **Cá nhân hóa cần thời gian.** Độ chính xác cải thiện sau 30 ngày đeo Apple Watch liên tục khi đường cơ sở ổn định.

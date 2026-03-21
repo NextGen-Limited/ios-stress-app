@@ -1,20 +1,36 @@
 # HRV là gì?
 
-Heart Rate Variability (HRV) đo sự biến thiên về thời gian giữa các nhịp tim liên tiếp. Khác với nhịp tim (nhịp/phút), HRV nắm bắt sự không đều nhỏ — thực ra là dấu hiệu của hệ thần kinh thực vật khỏe mạnh, thích nghi tốt.
+HRV (Heart Rate Variability) đo sự biến thiên tự nhiên về khoảng thời gian giữa các nhịp tim liên tiếp. Khác với nhịp tim (nhịp/phút), HRV nắm bắt sự không đều nhỏ giữa các nhịp — dấu hiệu của hệ thần kinh thực vật khỏe mạnh, thích nghi tốt.
 
-## Tại sao HRV cho thấy căng thẳng
+## Hệ thần kinh thực vật điều khiển HRV như thế nào
 
-Hệ thần kinh thực vật điều khiển nhịp tim. Khi bạn thư giãn, hệ phó giao cảm ("nghỉ ngơi & tiêu hóa") tạo ra sự biến thiên tự nhiên giữa các nhịp tim — HRV cao. Khi căng thẳng, hệ giao cảm ("chiến hoặc chạy") chiếm ưu thế, giảm sự biến thiên đó — HRV thấp.
+Hệ thần kinh thực vật có hai nhánh:
+
+- **Hệ giao cảm** — kích hoạt phản ứng căng thẳng, tăng nhịp tim
+- **Hệ phó giao cảm** — thúc đẩy nghỉ ngơi và tiêu hóa, giảm nhịp tim
+
+Hai hệ này cân bằng lẫn nhau. Khi bạn thư giãn, hệ phó giao cảm tạo ra sự biến thiên tự nhiên giữa các nhịp — **HRV cao**. Khi căng thẳng, hệ giao cảm chiếm ưu thế và giảm biến thiên đó — **HRV thấp**.
 
 | Trạng thái HRV | Ý nghĩa |
 |----------------|---------|
-| HRV cao | Cơ thể đang hồi phục, thích nghi tốt, căng thẳng sinh lý thấp |
-| HRV thấp | Cơ thể đang chịu áp lực — thể chất hoặc tinh thần |
+| HRV cao | Cân bằng thần kinh thực vật tốt hơn, khả năng thích nghi cao, căng thẳng sinh lý thấp |
+| HRV thấp | Căng thẳng, mệt mỏi, hoặc sức khỏe đang chịu áp lực |
 
-## Đường cơ sở cá nhân
+## HRV và căng thẳng: Bằng chứng nghiên cứu
 
-StressMonitor không dùng giá trị trung bình dân số. Ứng dụng xây dựng đường cơ sở cá nhân từ lịch sử 7–30 ngày của bạn. HRV "thấp" với người này có thể bình thường với người khác.
+Nghiên cứu cho thấy mối liên hệ giữa HRV thấp với mức căng thẳng cao hơn, cũng như các tình trạng sức khỏe tâm thần như lo âu và trầm cảm. Tiếp xúc lâu dài với môi trường căng thẳng cao có thể dẫn đến mất cân bằng hệ thần kinh thực vật và HRV thấp liên tục.
 
-## Nguồn dữ liệu
+Dưới căng thẳng mãn tính, hệ giao cảm bị kích hoạt quá mức trong khi hệ phó giao cảm bị ức chế — giảm HRV và tăng nguy cơ tim mạch.
 
-Dữ liệu HRV được đọc từ Apple Health, do Apple Watch thu thập trong khi ngủ và đo nền. Cần ít nhất một lần đo Apple Watch trong 24 giờ qua để có kết quả chính xác.
+## Các yếu tố ảnh hưởng đến HRV
+
+HRV bị ảnh hưởng bởi tuổi tác, giới tính, thể lực, lối sống và di truyền. Không bao giờ so sánh con số HRV tuyệt đối của bạn với người khác — hãy so sánh với đường cơ sở cá nhân.
+
+StressMonitor xây dựng đường cơ sở cá nhân từ 7–30 ngày lịch sử của bạn để đánh giá cá nhân hóa, có ý nghĩa.
+
+---
+
+**Tài liệu tham khảo**
+
+1. Shaffer, F., & Ginsberg, J. P. (2017). An overview of heart rate variability metrics and norms. *Frontiers in public health*, 258.
+2. Kim, H. G., et al. (2018). Stress and Heart Rate Variability: A Meta-Analysis and Review of the Literature. *Psychiatry Investig. 15(3): 235–245.*

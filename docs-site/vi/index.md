@@ -14,10 +14,10 @@ hero:
 features:
   - icon: 🧠
     title: Nguyên lý
-    details: Cách chúng tôi đo căng thẳng thể chất bằng HRV và nhịp tim lúc nghỉ.
+    details: Cách đo căng thẳng thể chất bằng HRV và nhịp tim lúc nghỉ.
   - icon: 📱
     title: Hướng dẫn sử dụng
-    details: Tần suất đo, đo thủ công và khắc phục sự cố.
+    details: Tần suất đo, đo thủ công, tăng tần suất và khắc phục sự cố.
   - icon: ⌚
     title: Watch & Widget
     details: Cài đặt mặt đồng hồ, complications và widget màn hình chính.

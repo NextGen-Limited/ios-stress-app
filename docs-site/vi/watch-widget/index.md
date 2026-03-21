@@ -4,6 +4,5 @@ Cài đặt StressMonitor trên Apple Watch và màn hình chính iPhone.
 
 ## Chủ đề
 
-- [Cài mặt đồng hồ](./watch-face-setup) — Thêm complication căng thẳng vào mặt đồng hồ
-- [Complications](./complications) — Các loại và kích thước complication
-- [Widget không cập nhật](./widget-not-updating) — Khắc phục dữ liệu widget cũ
+- [Cài mặt đồng hồ](./watch-face-setup) — Thêm complication và khắc phục sự cố
+- [Mặt đồng hồ không cập nhật](./widget-not-updating) — Khắc phục complication và widget cũ
