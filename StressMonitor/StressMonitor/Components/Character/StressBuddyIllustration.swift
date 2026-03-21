@@ -41,8 +41,6 @@ struct StressBuddyIllustration: View {
         ForEach(StressBuddyMood.allCases, id: \.self) { mood in
             VStack {
                 StressBuddyIllustration(mood: mood, size: 120)
-                Text(mood.displayName)
-                    .font(.caption)
             }
         }
     }
@@ -55,8 +53,6 @@ struct StressBuddyIllustration: View {
         ForEach(StressBuddyMood.allCases, id: \.self) { mood in
             VStack {
                 StressBuddyIllustration(mood: mood, size: 120)
-                Text(mood.displayName)
-                    .font(.caption)
             }
         }
     }

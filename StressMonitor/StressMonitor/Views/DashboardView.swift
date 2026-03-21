@@ -38,18 +38,6 @@ struct DashboardView: View {
                 emptyState
             }
         }
-        .navigationTitle("Dashboard")
-        .navigationBarTitleDisplayMode(.inline)
-        .toolbar {
-            ToolbarItem(placement: .navigationBarTrailing) {
-                Button {
-                    Task { await viewModel.loadDashboardData() }
-                } label: {
-                    Image(systemName: "arrow.clockwise")
-                        .foregroundStyle(Color.primaryBlue)
-                }
-            }
-        }
         .alert("Error", isPresented: .constant(viewModel.errorMessage != nil)) {
             Button("OK") {
                 viewModel.clearError()
@@ -103,8 +91,6 @@ struct DashboardView: View {
                 StressCharacterCard(result: stress, size: .dashboard, onRefresh: {
                     Task { await viewModel.loadDashboardData() }
                 }, onSettingsTapped: onSettingsTapped)
-                .opacity(appearAnimation ? 1 : 0)
-                .scaleEffect(appearAnimation ? 1 : 0.95)
 
                 // 2. Insight Card
                 if let insight = viewModel.aiInsight {

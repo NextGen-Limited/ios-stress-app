@@ -44,6 +44,7 @@ extension MainTabView {
             dropletColor: .primaryBlue,
             isSelected: isSelected
         )
+        .frame(width: 50, height: 50)
         .accessibilityLabel(Text("\(label) tab"))
         .accessibilityHint(Text(hint))
         .accessibilityIdentifier("\(label)Tab")

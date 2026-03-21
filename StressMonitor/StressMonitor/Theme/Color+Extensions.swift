@@ -76,6 +76,11 @@ extension Color {
     /// Secondary text color for OLED - #9CA3AF
     static let oledTextSecondary = Color(hex: "#9CA3AF")
 
+    // MARK: - Tab Bar Colors
+
+    /// Unselected tab bar icon color (adaptive: system gray for both modes)
+    static let tabBarUnselected = Color(light: Color(hex: "#8E8E93"), dark: Color(hex: "#636366"))
+
     // MARK: - Accent Colors
 
     /// HRV accent color (green-teal)

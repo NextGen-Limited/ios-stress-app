@@ -3,7 +3,10 @@ import SwiftUI
 // MARK: - Stress Character Card (Figma Design)
 
 /// Character-based stress visualization matching Figma design
-/// Displays Stress Buddy mascot with mood-based appearance in a 390x408px card
+/// Displays Stress Buddy mascot with mood-based appearance in an adaptive card
+/// - Dashboard: Flexible width, content-based height
+/// - Widget: Fixed 354px height
+/// - watchOS: Fixed 180px height
 /// Full Reduce Motion support with static fallbacks
 struct StressCharacterCard: View {
     let mood: StressBuddyMood
@@ -41,43 +44,20 @@ struct StressCharacterCard: View {
 
                 Spacer()
 
-                // Status text (centered)
-                Text(mood.displayName)
-                    .font(.system(size: 26, weight: .bold))
-                    .foregroundStyle(moodColor)
-                    .padding(.top, 30)
-
-                Spacer()
-
                 // Character illustration
                 characterView
-                    .padding(.vertical, 20)
 
                 Spacer()
-
-                // Last updated timestamp
-                if let lastUpdated = lastUpdated {
-                    Text("Last Updated: \(lastUpdated, style: .relative)")
-                        .font(.system(size: 13, weight: .bold))
-                        .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
-                        .padding(.bottom, 24)
-                }
             }
-            .frame(width: cardSize.width, height: cardSize.height)
+            .frame(maxWidth: .infinity)
+            .frame(height: cardHeight)
+            .padding()
             .background(Color.Wellness.adaptiveCardBackground)
             .clipShape(RoundedRectangle(cornerRadius: 24))
             .shadow(color: .black.opacity(0.04), radius: 7.7, x: 0, y: 3)
             .shadow(color: .black.opacity(0.03), radius: 13.9, x: 0, y: 7)
             .shadow(color: .black.opacity(0.02), radius: 26.4, x: 0, y: 13.9)
             .shadow(color: .black.opacity(0.01), radius: 46.9, x: 0, y: 24.5)
-
-            // Decorative triangle (top-right area, Figma position)
-            if size == .dashboard {
-                DecorativeTriangleView()
-                    .padding(.top, 60)
-                    .padding(.trailing, 30)
-                    .accessibilityHidden(true)
-            }
         }
         .accessibilityElement(children: .combine)
         .accessibilityLabel(accessibilityLabel)
@@ -125,14 +105,15 @@ struct StressCharacterCard: View {
 
     // MARK: - Layout Helpers
 
-    private var cardSize: CGSize {
+    /// Adaptive card height - nil for flexible (dashboard), fixed for constrained contexts
+    private var cardHeight: CGFloat? {
         switch size {
         case .dashboard:
-            return CGSize(width: 390, height: 408)
+            return nil  // Flexible - adapts to content and container
         case .widget:
-            return CGSize(width: 338, height: 354)
+            return 354  // Widget has fixed size
         case .watchOS:
-            return CGSize(width: 180, height: 180)
+            return 180  // Watch has fixed size
         }
     }
 
