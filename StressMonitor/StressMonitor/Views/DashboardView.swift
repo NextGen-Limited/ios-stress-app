@@ -3,6 +3,7 @@ import SwiftData
 
 struct DashboardView: View {
     @Environment(\.modelContext) private var modelContext
+    @Environment(TabBarScrollState.self) private var tabBarScrollState
     @State private var viewModel: StressViewModel
     @State private var appeared = false
     @State private var appearAnimation = false
@@ -141,12 +142,13 @@ struct DashboardView: View {
                 StressOverTimeChart()
                     .opacity(appearAnimation ? 1 : 0)
 
-                // Bottom padding
+                // Bottom padding for tab bar
                 Spacer()
-                    .frame(height: 32)
+                    .frame(height: tabBarScrollState.tabBarHeight + 16)
             }
             .padding()
         }
+        .trackScrollOffsetForTabBar(state: tabBarScrollState)
         .background(Color.Wellness.adaptiveBackground)
     }
 

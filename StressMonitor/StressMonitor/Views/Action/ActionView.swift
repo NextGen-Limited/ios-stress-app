@@ -3,6 +3,7 @@ import SwiftUI
 /// Action view - Quick actions and wellness activities screen
 /// Implements Figma design: Action (demo)
 struct ActionView: View {
+    @Environment(TabBarScrollState.self) private var tabBarScrollState
     @State private var selectedDay: Int = 0
     @State private var currentDate = Date()
 
@@ -42,10 +43,11 @@ struct ActionView: View {
 
                     // Bottom padding
                     Spacer()
-                        .frame(height: 100)
+                        .frame(height: tabBarScrollState.tabBarHeight + 16)
                 }
                 .padding(.horizontal, 16)
             }
+            .trackScrollOffsetForTabBar(state: tabBarScrollState)
             .background(Color.Wellness.adaptiveBackground)
             .navigationTitle("Action")
             .navigationBarTitleDisplayMode(.inline)

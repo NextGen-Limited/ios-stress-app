@@ -7,6 +7,7 @@ struct MainTabView: View {
     @State private var selectedTab: TabItem = .home
     @State private var previousTab: TabItem = .home
     @State private var showSettings = false
+    @State private var tabBarScrollState = TabBarScrollState()
 
     /// Enable mock data mode for development/simulator testing
     /// Set to true to see sample data without real HealthKit data
@@ -27,6 +28,7 @@ struct MainTabView: View {
                 previousTab = selectedTab
                 selectedTab = TabItem(rawValue: newValue) ?? .home
                 HapticManager.shared.buttonPress()
+                tabBarScrollState.resetToVisible()
             }
         )
     }
@@ -65,6 +67,7 @@ struct MainTabView: View {
                     SettingsView()
                 }
             }
+            .environment(tabBarScrollState)
             .frame(maxWidth: .infinity, maxHeight: .infinity)
 
             // Tab bar - hidden when showing Settings
@@ -76,12 +79,21 @@ struct MainTabView: View {
                 )
                 .selectedColor(.primaryBlue)
                 .unselectedColor(.tabBarUnselected)
-                .ballColor(.primaryBlue)
-                .ballTrajectory(.straight)
+                .ballColor(.primaryGreen)
+                .ballTrajectory(.parabolic)
                 .verticalPadding(16)
                 .cornerRadius(24)
                 .buttonShadow()
                 .padding(.horizontal, 16)
+                .background(
+                    GeometryReader { proxy in
+                        Color.clear.onAppear {
+                            tabBarScrollState.tabBarHeight = proxy.size.height
+                        }
+                    }
+                )
+                .offset(y: tabBarScrollState.isVisible ? 0 : tabBarScrollState.tabBarHeight + 16)
+                .animation(.spring(response: 0.3, dampingFraction: 0.8), value: tabBarScrollState.isVisible)
             }
         }
     }

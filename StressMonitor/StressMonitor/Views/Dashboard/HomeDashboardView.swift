@@ -4,6 +4,7 @@ import SwiftUI
 /// Figma: Action (demo) screen - 390pt width iPhone frame
 /// Full scrollable dashboard with all components
 struct HomeDashboardView: View {
+    @Environment(TabBarScrollState.self) private var tabBarScrollState
     @State private var selectedDate = Date()
     @State private var quickActionOffset: CGFloat = 0
 
@@ -101,9 +102,10 @@ struct HomeDashboardView: View {
                 )
                 .padding(.top, 16)
                 .padding(.horizontal, 16)
-                .padding(.bottom, 150) // Space for tab bar
+                .padding(.bottom, tabBarScrollState.tabBarHeight + 16)
             }
         }
+        .trackScrollOffsetForTabBar(state: tabBarScrollState)
         .background(Color.Wellness.adaptiveBackground)
         .ignoresSafeArea(edges: .vertical)
     }
