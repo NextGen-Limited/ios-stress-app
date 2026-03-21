@@ -2,51 +2,31 @@ import AnimatedTabBar
 import SwiftUI
 
 // MARK: - Tab Button Helpers for AnimatedTabBar
-// These helpers create DropletButton instances with proper selection state
-
-/// Creates tab buttons for AnimatedTabBar with proper selection binding
-/// Usage: AnimatedTabBar(selectedIndex: $selectedIndex, views: tabButtons(selectedIndex: selectedIndex))
 
 extension MainTabView {
-    /// Creates array of tab buttons for AnimatedTabBar
     func tabButtons(selectedIndex: Int) -> [AnyView] {
-        [
-            AnyView(dropletButton(
-                imageName: "home",
-                isSelected: selectedIndex == 0,
-                label: "Home",
-                hint: "Double tap to view current stress measurement"
-            )),
-            AnyView(dropletButton(
-                imageName: "action",
-                isSelected: selectedIndex == 1,
-                label: "Action",
-                hint: "Double tap to access quick actions and exercises"
-            )),
-            AnyView(dropletButton(
-                imageName: "trend",
-                isSelected: selectedIndex == 2,
-                label: "Trend",
-                hint: "Double tap to view stress trends and history"
-            ))
-        ]
+        TabItem.allCases.map { tab in
+            AnyView(
+                TabBarImageButton(tab: tab, isSelected: selectedIndex == tab.rawValue)
+            )
+        }
     }
+}
 
-    /// Creates a single droplet button with accessibility
-    private func dropletButton(
-        imageName: String,
-        isSelected: Bool,
-        label: String,
-        hint: String
-    ) -> some View {
-        DropletButton(
-            imageName: imageName,
-            dropletColor: .primaryBlue,
-            isSelected: isSelected
-        )
-        .frame(width: 50, height: 50)
-        .accessibilityLabel(Text("\(label) tab"))
-        .accessibilityHint(Text(hint))
-        .accessibilityIdentifier("\(label)Tab")
+// MARK: - Custom Image-Based Tab Button
+
+private struct TabBarImageButton: View {
+    let tab: TabItem
+    let isSelected: Bool
+
+    var body: some View {
+        Image(isSelected ? "\(tab.iconName)-selected" : tab.iconName)
+            .renderingMode(.original)
+            .resizable()
+            .scaledToFit()
+            .frame(width: 50, height: 50)
+            .accessibilityLabel(Text(tab.title))
+            .accessibilityHint(Text(tab.accessibilityHint))
+            .accessibilityIdentifier(tab.accessibilityIdentifier)
     }
 }
