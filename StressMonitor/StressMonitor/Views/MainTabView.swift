@@ -75,10 +75,12 @@ struct MainTabView: View {
                     views: tabButtons(selectedIndex: selectedTab.rawValue)
                 )
                 .selectedColor(.primaryBlue)
-                .unselectedColor(.gray)
-                .verticalPadding(6)
-                .cornerRadius(20)
-                .cardShadow()
+                .unselectedColor(.tabBarUnselected)
+                .ballColor(.primaryBlue)
+                .ballTrajectory(.straight)
+                .verticalPadding(16)
+                .cornerRadius(24)
+                .buttonShadow()
                 .padding(.horizontal, 16)
             }
         }
