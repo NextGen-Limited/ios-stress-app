@@ -76,8 +76,10 @@ struct MainTabView: View {
                 )
                 .selectedColor(.primaryBlue)
                 .unselectedColor(.gray)
-                .cornerRadius(24)
+                .verticalPadding(6)
+                .cornerRadius(20)
                 .cardShadow()
+                .padding(.horizontal, 16)
             }
         }
     }
