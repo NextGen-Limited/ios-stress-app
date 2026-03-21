@@ -7,6 +7,7 @@ struct SettingsView: View {
     @State private var viewModel: SettingsViewModel
     @State private var navigateToExport = false
     @State private var navigateToDelete = false
+    @State private var docsURL: URL? = nil
 
     init() {
         _viewModel = State(initialValue: SettingsViewModel(
@@ -49,9 +50,10 @@ struct SettingsView: View {
 
                 // About and Support
                 AboutCard(
+                    onHelp: { docsURL = DocsURL.help },
                     onContactSupport: { openURLString("mailto:support@stressmonitor.app") },
-                    onPrivacyPolicy: { openURLString("https://stressmonitor.app/privacy") },
-                    onTermsOfService: { openURLString("https://stressmonitor.app/terms") }
+                    onPrivacyPolicy: { docsURL = DocsURL.privacy },
+                    onTermsOfService: { docsURL = DocsURL.terms }
                 )
             }
             .padding(.horizontal, 16)
@@ -69,6 +71,10 @@ struct SettingsView: View {
         }
         .navigationDestination(isPresented: $navigateToDelete) {
             DataDeleteView()
+        }
+        .sheet(item: $docsURL) { url in
+            SafariView(url: url)
+                .ignoresSafeArea()
         }
     }
 

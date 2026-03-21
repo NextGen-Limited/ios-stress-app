@@ -2,6 +2,7 @@ import SwiftUI
 
 /// About and support card with links, cat illustration, and version info
 struct AboutCard: View {
+    let onHelp: () -> Void
     let onContactSupport: () -> Void
     let onPrivacyPolicy: () -> Void
     let onTermsOfService: () -> Void
@@ -14,6 +15,7 @@ struct AboutCard: View {
 
                 // Support links
                 VStack(alignment: .leading, spacing: 12) {
+                    supportLink("Help & FAQ", action: onHelp)
                     supportLink("Contact Support", action: onContactSupport)
                     supportLink("Privacy Policy", action: onPrivacyPolicy)
                     supportLink("Terms of Service", action: onTermsOfService)
@@ -58,6 +60,7 @@ struct AboutCard: View {
 
 #Preview {
     AboutCard(
+        onHelp: {},
         onContactSupport: {},
         onPrivacyPolicy: {},
         onTermsOfService: {}
