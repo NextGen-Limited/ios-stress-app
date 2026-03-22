@@ -53,25 +53,15 @@ final class BaselineCalculator: Sendable {
         return daysSinceUpdate >= 7 || samples >= 10
     }
 
-    private func validateSampleCount(_ count: Int) throws {
-        guard count >= minimumSampleCount else {
-            throw BaselineCalculatorError.insufficientSamples
-        }
-    }
-
-    /// Circadian baseline adjustment — HRV peaks ~6 AM, declines through day by ±10%.
-    /// Cosine model: adjustment = 1.0 + 0.1 * cos((hour - 6) * π / 12)
     func circadianAdjustment(for hour: Int) -> Double {
         let radians = Double(hour - 6) * .pi / 12.0
         return 1.0 + 0.1 * cos(radians)
     }
 
-    /// Per-user circadian adjustment using actual hourly HRV data.
-    /// Falls back to cosine model when the user has <5 samples for the given hour.
     func circadianAdjustment(for hour: Int, userHourlyBaseline: [Int: Double]?,
                               globalBaseline: Double) -> Double {
-        guard let hourlyBaseline = userHourlyBaseline,
-              let hourlyHRV = hourlyBaseline[hour],
+        guard let userHourlyBaseline,
+              let hourlyHRV = userHourlyBaseline[hour],
               globalBaseline > 0 else {
             return circadianAdjustment(for: hour)
         }
@@ -93,5 +83,11 @@ final class BaselineCalculator: Sendable {
         let upperBound = q3 + (1.5 * iqr)
 
         return measurements.filter { $0.value >= lowerBound && $0.value <= upperBound }
+    }
+
+    private func validateSampleCount(_ count: Int) throws {
+        guard count >= minimumSampleCount else {
+            throw BaselineCalculatorError.insufficientSamples
+        }
     }
 }

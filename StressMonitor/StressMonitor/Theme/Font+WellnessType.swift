@@ -110,6 +110,16 @@ struct WellnessFontLoader {
         UIFont.familyNames.contains { $0.contains("Roboto") }
     }
 
+    /// Check if Lora font family is available (legacy compatibility)
+    static var isLoraAvailable: Bool {
+        UIFont.familyNames.contains { $0.contains("Lora") }
+    }
+
+    /// Check if Raleway font family is available (legacy compatibility)
+    static var isRalewayAvailable: Bool {
+        UIFont.familyNames.contains { $0.contains("Raleway") }
+    }
+
     /// Check if all wellness fonts are available
     static var areAllFontsAvailable: Bool {
         isRobotoAvailable

@@ -30,8 +30,8 @@ final class StressCalculatorTests: XCTestCase {
         // When: Calculating stress
         let result = try await sut.calculateStress(hrv: hrv, heartRate: heartRate)
 
-        // Then: Should be relaxed (low stress)
-        XCTAssertEqual(result.level, 0, accuracy: 10, "Normal readings should result in near-zero stress")
+        // Then: Should be relaxed — sigmoid(0) is non-zero (~0.12 for HRV, ~0.29 for HR) → ~17%
+        XCTAssertEqual(result.level, 17, accuracy: 5, "At-baseline readings result in ~17% stress with sigmoid")
         XCTAssertEqual(result.category, .relaxed, "Normal readings should be categorized as relaxed")
         XCTAssertEqual(result.hrv, hrv, accuracy: 0.001)
         XCTAssertEqual(result.heartRate, heartRate, accuracy: 0.001)
@@ -46,12 +46,12 @@ final class StressCalculatorTests: XCTestCase {
         // When: Calculating stress
         let result = try await sut.calculateStress(hrv: hrv, heartRate: heartRate)
 
-        // Then: Should show mild stress (HR component has 30% weight)
+        // Then: Should show mild stress
         // normalizedHR = (100-60)/60 = 0.667
-        // hrComponent = atan(0.667*2) / (π/2) ≈ 0.59
-        // stress = 0.59 * 0.3 * 100 ≈ 17.7
-        XCTAssertEqual(result.level, 17.7, accuracy: 2, "Elevated heart rate should result in mild stress")
-        XCTAssertEqual(result.category, .relaxed, "Normal HRV with elevated HR should be relaxed due to 70% HRV weight")
+        // hrComponent = sigmoid(0.667, k=3, x0=0.3) ≈ 0.75
+        // stress = (0.119*0.7 + 0.75*0.3) * 100 ≈ 30.8
+        XCTAssertEqual(result.level, 31, accuracy: 5, "Elevated heart rate with sigmoid HR scaling")
+        XCTAssertEqual(result.category, .mild, "Normal HRV + elevated HR → mild stress with sigmoid")
     }
 
     func testHighStressLowHRV() async throws {
@@ -129,10 +129,11 @@ final class StressCalculatorTests: XCTestCase {
         // When: Calculating stress
         let result = try await sut.calculateStress(hrv: hrv, heartRate: heartRate)
 
-        // Then: Should handle gracefully with high stress (70% max from HRV)
-        // normalizedHRV = (50-0)/50 = 1, hrvComponent = 1, stress = 1 * 0.7 * 100 = 70
-        XCTAssertEqual(result.level, 70, accuracy: 5, "Zero HRV with normal HR should result in 70 stress")
-        XCTAssertEqual(result.category, .moderate, "Level 70 falls in moderate range (50-75)")
+        // Then: Should handle gracefully with high stress
+        // normalizedHRV = 1.0, hrvComponent = sigmoid(1.0, k=4, x0=0.5) ≈ 0.88
+        // stress = (0.88*0.7 + 0.289*0.3) * 100 ≈ 70
+        XCTAssertEqual(result.level, 70, accuracy: 5, "Zero HRV with normal HR → ~70% stress with sigmoid")
+        XCTAssertEqual(result.category, .moderate, "Level ~70 falls in moderate range (50-75)")
     }
 
     func testZeroHeartRate() async throws {
@@ -156,13 +157,12 @@ final class StressCalculatorTests: XCTestCase {
         // When: Calculating stress
         let result = try await sut.calculateStress(hrv: hrv, heartRate: heartRate)
 
-        // Then: atan function asymptotes, so won't reach 100 but should be moderate
-        // normalizedHRV = 0, hrvComponent = 0
-        // normalizedHR = (200-60)/60 = 2.33
-        // hrComponent = atan(2.33*2) / (π/2) ≈ 0.87
-        // stress = 0.87 * 0.3 * 100 ≈ 26
-        XCTAssertEqual(result.level, 26, accuracy: 5, "Extreme heart rate should result in mild stress")
-        XCTAssertEqual(result.category, .mild, "Should be categorized as mild stress (26)")
+        // Then: sigmoid clamps at 2.0 input → hrComponent ≈ 0.994
+        // normalizedHR = (200-60)/60 = 2.33, clamped to 2.0
+        // hrComponent = sigmoid(2.0, k=3, x0=0.3) ≈ 0.994
+        // stress = (0.119*0.7 + 0.994*0.3) * 100 ≈ 38
+        XCTAssertEqual(result.level, 38, accuracy: 5, "Extreme heart rate clamped at 2.0 input → ~38% stress")
+        XCTAssertEqual(result.category, .mild, "Should be categorized as mild stress")
     }
 
     func testNegativeValues() async throws {
@@ -201,8 +201,8 @@ final class StressCalculatorTests: XCTestCase {
         // When: Calculating confidence
         let confidence = sut.calculateConfidence(hrv: hrv, heartRate: heartRate, samples: samples)
 
-        // Then: Should have reduced confidence
-        XCTAssertEqual(confidence, 0.5, accuracy: 0.1, "Low HRV should reduce confidence by 50%")
+        // Then: Gradual penalty — max(0.3, 15/20) = 0.75, not binary 0.5
+        XCTAssertEqual(confidence, 0.75, accuracy: 0.05, "Low HRV should reduce confidence proportionally")
     }
 
     func testConfidence_LowHeartRate() async throws {
@@ -214,12 +214,12 @@ final class StressCalculatorTests: XCTestCase {
         // When: Calculating confidence
         let confidence = sut.calculateConfidence(hrv: hrv, heartRate: heartRate, samples: samples)
 
-        // Then: Should have reduced confidence
-        XCTAssertEqual(confidence, 0.6, accuracy: 0.1, "Extreme heart rate should reduce confidence")
+        // Then: hr=35 < 50 threshold, deviation=(50-35)/50=0.3, *max(0.4, 0.7)=*0.7
+        XCTAssertEqual(confidence, 0.70, accuracy: 0.05, "Low HR reduces confidence proportionally (new threshold: 50bpm)")
     }
 
     func testConfidence_HighHeartRate() async throws {
-        // Given: Very high heart rate (> 180 bpm)
+        // Given: Very high heart rate (> 160 bpm — new threshold)
         let hrv = 50.0
         let heartRate = 190.0
         let samples = 10
@@ -227,8 +227,8 @@ final class StressCalculatorTests: XCTestCase {
         // When: Calculating confidence
         let confidence = sut.calculateConfidence(hrv: hrv, heartRate: heartRate, samples: samples)
 
-        // Then: Should have reduced confidence
-        XCTAssertEqual(confidence, 0.6, accuracy: 0.1, "Extreme heart rate should reduce confidence")
+        // Then: hr=190 > 160 threshold, deviation=(190-160)/160≈0.19, *max(0.4, 0.81)=*0.81
+        XCTAssertEqual(confidence, 0.81, accuracy: 0.05, "High HR reduces confidence proportionally (new threshold: 160bpm)")
     }
 
     func testConfidence_SampleCount() async throws {
@@ -255,9 +255,8 @@ final class StressCalculatorTests: XCTestCase {
         // When: Calculating confidence
         let confidence = sut.calculateConfidence(hrv: hrv, heartRate: heartRate, samples: samples)
 
-        // Then: Should have significantly reduced confidence
-        // Expected: 1.0 * 0.5 (low HRV) * 0.6 (extreme HR) * 0.7 (low samples) = 0.21
-        XCTAssertEqual(confidence, 0.21, accuracy: 0.05, "Multiple factors should compound confidence reduction")
+        // Then: 0.75 (hrv) * 0.7 (hr<50) * 0.73 (samples=1) ≈ 0.38
+        XCTAssertEqual(confidence, 0.38, accuracy: 0.05, "Multiple gradual penalties compound confidence reduction")
     }
 
     // MARK: - Algorithm Component Tests
@@ -282,10 +281,10 @@ final class StressCalculatorTests: XCTestCase {
         // When: Calculating stress
         let result = try await sut.calculateStress(hrv: hrv, heartRate: heartRate)
 
-        // Then: HR should contribute (30% weight) but HRV should moderate
-        // Same calculation as testHighStressElevatedHeartRate
-        XCTAssertEqual(result.level, 17.7, accuracy: 2, "HR component should contribute to stress")
-        XCTAssertEqual(result.category, .relaxed, "Normal HRV keeps stress in relaxed range")
+        // Then: HR contributes meaningfully with sigmoid scaling
+        // Same inputs as testHighStressElevatedHeartRate → ~30.8
+        XCTAssertEqual(result.level, 31, accuracy: 5, "HR component contributes to stress")
+        XCTAssertEqual(result.category, .mild, "Normal HRV + elevated HR → mild stress with sigmoid")
     }
 
     // MARK: - Baseline Customization Tests
@@ -297,8 +296,8 @@ final class StressCalculatorTests: XCTestCase {
         // When: Calculating stress with athlete's baseline
         let result = try await customCalculator.calculateStress(hrv: 70.0, heartRate: 45.0)
 
-        // Then: Should be relaxed for athlete
-        XCTAssertEqual(result.level, 0, accuracy: 10, "Athlete's normal readings should be relaxed")
+        // Then: At-baseline sigmoid gives ~17% — still in relaxed range
+        XCTAssertEqual(result.level, 17, accuracy: 5, "Athlete at-baseline → ~17% with sigmoid")
         XCTAssertEqual(result.category, .relaxed, "Athlete should be categorized as relaxed")
     }
 
@@ -314,6 +313,41 @@ final class StressCalculatorTests: XCTestCase {
         let afterDate = Date()
         XCTAssertGreaterThanOrEqual(result.timestamp, beforeDate, "Timestamp should be after start")
         XCTAssertLessThanOrEqual(result.timestamp, afterDate, "Timestamp should be before end")
+    }
+
+    // MARK: - Sigmoid Boundary Tests
+    func testSigmoid_AtMidpoint() async throws {
+        // hrv = 25ms with 50ms baseline → normalizedHRV = 0.5 → sigmoid midpoint = 0.5
+        let result = try await sut.calculateStress(hrv: 25.0, heartRate: 60.0)
+        // hrvComp = 0.5, hrComp = ~0.289 → stress = (0.5*0.7 + 0.289*0.3)*100 ≈ 43.7
+        XCTAssertEqual(result.level, 44, accuracy: 5, "At sigmoid midpoint → ~44% stress")
+    }
+
+    func testSigmoid_HighNormalization() async throws {
+        // hrv = 0ms → normalizedHRV = 1.0, sigmoid approaches ~0.88
+        let result = try await sut.calculateStress(hrv: 0.0, heartRate: 60.0)
+        XCTAssertGreaterThan(result.level, 60, "High normalization → stress above 60%")
+        XCTAssertLessThanOrEqual(result.level, 100, "Stress must not exceed 100")
+    }
+
+    // MARK: - Recency Penalty Tests
+    func testConfidence_RecentReading() async throws {
+        let recentDate = Date().addingTimeInterval(-5 * 60)  // 5 min ago
+        let confidence = sut.calculateConfidence(hrv: 50.0, heartRate: 60.0, samples: 10, lastReadingDate: recentDate)
+        // recency = max(0.3, 1.0 - 5/120) ≈ 0.958
+        XCTAssertGreaterThan(confidence, 0.9, "Recent reading should have high confidence")
+    }
+
+    func testConfidence_StaleReading() async throws {
+        let staleDate = Date().addingTimeInterval(-180 * 60)  // 3h ago
+        let confidence = sut.calculateConfidence(hrv: 50.0, heartRate: 60.0, samples: 10, lastReadingDate: staleDate)
+        // recency = max(0.3, 1.0 - 180/120) = max(0.3, -0.5) = 0.3
+        XCTAssertLessThan(confidence, 0.4, "Stale (3h) reading should have low confidence")
+    }
+
+    func testConfidence_NoLastReadingDate() async throws {
+        let confidence = sut.calculateConfidence(hrv: 50.0, heartRate: 60.0, samples: 10, lastReadingDate: nil)
+        XCTAssertEqual(confidence, 1.0, accuracy: 0.01, "No date means no recency penalty")
     }
 
     // MARK: - Thread Safety Tests

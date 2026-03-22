@@ -7,6 +7,7 @@ struct HomeDashboardView: View {
     @Environment(TabBarScrollState.self) private var tabBarScrollState
     @State private var selectedDate = Date()
     @State private var quickActionOffset: CGFloat = 0
+    var dataQualityInfo: DataQualityInfo? = nil
 
     private let quickActions: [(title: String, description: String, duration: String, color: Color)] = [
         ("Box Breathing", "Small description about the activity", "3 mins", Color.Wellness.boxBreathingPurple),
@@ -46,9 +47,15 @@ struct HomeDashboardView: View {
                     .padding(.horizontal, 16)
 
                 // Section: From your watch
-                sectionHeader(title: "From your watch")
-                    .padding(.top, 16)
-                    .padding(.horizontal, 16)
+                HStack {
+                    sectionHeader(title: "From your watch")
+                    Spacer()
+                    if let quality = dataQualityInfo {
+                        DataQualityBadge(qualityInfo: quality)
+                    }
+                }
+                .padding(.top, 16)
+                .padding(.horizontal, 16)
 
                 // Watch Metric Cards
                 VStack(spacing: 16) {

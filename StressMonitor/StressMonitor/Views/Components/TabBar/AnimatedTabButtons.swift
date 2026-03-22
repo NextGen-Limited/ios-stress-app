@@ -24,7 +24,7 @@ private struct TabBarImageButton: View {
             .renderingMode(.original)
             .resizable()
             .scaledToFit()
-            .frame(width: 50, height: 50)
+            .frame(width: 44, height: 44)
             .accessibilityLabel(Text(tab.title))
             .accessibilityHint(Text(tab.accessibilityHint))
             .accessibilityIdentifier(tab.accessibilityIdentifier)

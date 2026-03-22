@@ -28,6 +28,7 @@ final class StressViewModel {
     var weeklyPreviousAvg: Double = 0
     /// AI-generated insight
     var aiInsight: AIInsight?
+    var dataQualityInfo: DataQualityInfo?
 
     // MARK: - Auto-Refresh Properties
 
@@ -49,6 +50,7 @@ final class StressViewModel {
     private let healthKit: HealthKitServiceProtocol
     private let algorithm: StressAlgorithmServiceProtocol
     private let repository: StressRepositoryProtocol
+    private let calibrator = FactorCalibrator()
 
     /// Stored Task for heart rate observation cancellation
     private var heartRateTask: Task<Void, Never>?
@@ -68,9 +70,11 @@ final class StressViewModel {
         defer { isLoading = false }
 
         do {
+            let fetchedBaseline = try? await repository.getBaseline()
+            let currentBaseline = baseline ?? fetchedBaseline ?? PersonalBaseline()
+
             async let hrv = healthKit.fetchLatestHRV()
             async let hr = healthKit.fetchHeartRate(samples: 1)
-
             let (hrvData, hrData) = try await (hrv, hr)
 
             guard let hrvValue = hrvData?.value else {
@@ -78,12 +82,30 @@ final class StressViewModel {
                 return
             }
 
-            let heartRateValue = hrData.first?.value ?? 70
+            // Secondary factors fetched with graceful degradation
+            let sleepData = try? await healthKit.fetchSleepData(for: Date())
+            let activityData = try? await healthKit.fetchActivityData(for: Date())
+            let recoveryData = try? await healthKit.fetchRecoveryData(for: Date())
 
-            let result = try await algorithm.calculateStress(hrv: hrvValue, heartRate: heartRateValue)
+            let context = StressContext(
+                baseline: currentBaseline,
+                hrv: hrvValue,
+                heartRate: hrData.first?.value ?? 70,
+                sleepData: sleepData,
+                activityData: activityData,
+                recoveryData: recoveryData,
+                lastReadingDate: hrvData?.timestamp
+            )
+
+            let result = try await algorithm.calculateMultiFactorStress(context: context)
             currentStress = result
+            baseline = currentBaseline
             lastRefresh = Date()
             errorMessage = nil
+
+            if let breakdown = result.factorBreakdown {
+                dataQualityInfo = DataQualityInfo(from: breakdown, baseline: currentBaseline)
+            }
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -106,7 +128,23 @@ final class StressViewModel {
         defer { isLoading = false }
 
         do {
-            baseline = try await repository.getBaseline()
+            var loadedBaseline = try await repository.getBaseline()
+
+            // Trigger calibration if we have enough historical data
+            let measurements = try await repository.fetchRecent(limit: 200)
+            if measurements.count >= 30 {
+                let weights = calibrator.calibrate(from: measurements)
+                let hourly = calibrator.calculateHourlyBaseline(from: measurements)
+                loadedBaseline.factorWeights = weights
+                loadedBaseline.hourlyHRVBaseline = hourly
+                loadedBaseline.calibrationDate = Date()
+                try await repository.updateBaseline(loadedBaseline)
+            }
+
+            baseline = loadedBaseline
+            if let breakdown = currentStress?.factorBreakdown {
+                dataQualityInfo = DataQualityInfo(from: breakdown, baseline: loadedBaseline)
+            }
             errorMessage = nil
         } catch {
             errorMessage = error.localizedDescription
@@ -126,17 +164,30 @@ final class StressViewModel {
     }
 
     func calculateAndSaveStress() async throws {
+        let fetchedBaseline = try? await repository.getBaseline()
+        let currentBaseline = baseline ?? fetchedBaseline ?? PersonalBaseline()
+
         async let hrv = healthKit.fetchLatestHRV()
         async let hr = healthKit.fetchHeartRate(samples: 1)
-
         let (hrvData, hrData) = try await (hrv, hr)
 
-        guard let hrvValue = hrvData?.value else {
-            throw StressError.noData
-        }
+        guard let hrvValue = hrvData?.value else { throw StressError.noData }
 
-        let heartRateValue = hrData.first?.value ?? 70
-        let result = try await algorithm.calculateStress(hrv: hrvValue, heartRate: heartRateValue)
+        let sleepData = try? await healthKit.fetchSleepData(for: Date())
+        let activityData = try? await healthKit.fetchActivityData(for: Date())
+        let recoveryData = try? await healthKit.fetchRecoveryData(for: Date())
+
+        let context = StressContext(
+            baseline: currentBaseline,
+            hrv: hrvValue,
+            heartRate: hrData.first?.value ?? 70,
+            sleepData: sleepData,
+            activityData: activityData,
+            recoveryData: recoveryData,
+            lastReadingDate: hrvData?.timestamp
+        )
+
+        let result = try await algorithm.calculateMultiFactorStress(context: context)
 
         let measurement = StressMeasurement(
             timestamp: result.timestamp,
@@ -145,6 +196,15 @@ final class StressViewModel {
             restingHeartRate: result.heartRate,
             confidences: [result.confidence]
         )
+
+        if let breakdown = result.factorBreakdown {
+            measurement.hrvComponent = breakdown.hrvComponent
+            measurement.hrComponent = breakdown.hrComponent
+            measurement.sleepComponent = breakdown.sleepComponent
+            measurement.activityComponent = breakdown.activityComponent
+            measurement.recoveryComponent = breakdown.recoveryComponent
+            measurement.dataCompleteness = breakdown.dataCompleteness
+        }
 
         try await repository.save(measurement)
         currentStress = result

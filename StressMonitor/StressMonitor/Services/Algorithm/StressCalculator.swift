@@ -1,38 +1,35 @@
 import Foundation
 
 // MARK: - Main Stress Calculator
-/// Implements the stress algorithm combining HRV (70%) and heart rate (30%)
+/// Combines HRV (70%) and heart rate (30%) via sigmoid transforms.
+///
+/// Note: Apple HealthKit provides SDNN-based HRV (.heartRateVariabilitySDNN), not RMSSD.
+/// SDNN runs slightly higher than RMSSD but remains a reliable relative stress indicator
+/// when normalized against a personal baseline. Baseline normalization compensates for
+/// the SDNN/RMSSD difference at the individual level.
 final class StressCalculator: StressAlgorithmServiceProtocol {
 
-    // MARK: - Properties
     private let baseline: PersonalBaseline
+    private let baselineCalculator = BaselineCalculator()
 
-    // MARK: - Initialization
     init(baseline: PersonalBaseline = PersonalBaseline()) {
         self.baseline = baseline
     }
 
     // MARK: - StressAlgorithmServiceProtocol
+
     func calculateStress(hrv: Double, heartRate: Double) async throws -> StressResult {
-        // Calculate normalized values
         let normalizedHRV = normalizeHRV(hrv, baseline: baseline.baselineHRV)
         let normalizedHR = normalizeHeartRate(heartRate, resting: baseline.restingHeartRate)
 
-        // Calculate components
         let hrvComponent = calculateHRVComponent(normalizedHRV)
         let hrComponent = calculateHRComponent(normalizedHR)
 
-        // Combine components (70% HRV, 30% HR) on 0-1 scale
+        // 70% HRV, 30% HR
         let stressLevel = (hrvComponent * 0.7) + (hrComponent * 0.3)
-
-        // Convert to 0-100 scale and clamp
         let clampedLevel = max(0, min(100, stressLevel * 100))
-
-        // Determine category
         let category = StressResult.category(for: clampedLevel)
-
-        // Calculate confidence (default samples for now)
-        let confidence = calculateConfidence(hrv: hrv, heartRate: heartRate, samples: 1)
+        let confidence = calculateConfidence(hrv: hrv, heartRate: heartRate, samples: 1, lastReadingDate: nil)
 
         return StressResult(
             level: clampedLevel,
@@ -44,58 +41,68 @@ final class StressCalculator: StressAlgorithmServiceProtocol {
         )
     }
 
-    func calculateConfidence(hrv: Double, heartRate: Double, samples: Int) -> Double {
+    func calculateConfidence(hrv: Double, heartRate: Double, samples: Int, lastReadingDate: Date?) -> Double {
         var confidence = 1.0
 
-        // Reduce confidence for low HRV readings
+        // Gradual HRV penalty (hrv<20ms → proportional reduction, min 0.3)
         if hrv < 20 {
-            confidence *= 0.5
+            confidence *= max(0.3, hrv / 20.0)
         }
 
-        // Reduce confidence for extreme heart rates
-        if heartRate < 40 || heartRate > 180 {
-            confidence *= 0.6
+        // Gradual extreme HR penalty (outside 50-160 bpm range)
+        if heartRate < 50 || heartRate > 160 {
+            let deviation = heartRate < 50 ? (50 - heartRate) / 50 : (heartRate - 160) / 160
+            confidence *= max(0.4, 1.0 - deviation)
         }
 
-        // Adjust based on sample count (more samples = higher confidence)
-        let sampleMultiplier = min(1.0, Double(samples) / 10.0)
-        confidence *= (0.7 + (sampleMultiplier * 0.3))
+        // Sample count factor: 10+ samples → max confidence
+        let sampleFactor = min(1.0, Double(samples) / 10.0)
+        confidence *= (0.7 + sampleFactor * 0.3)
+
+        // Recency: confidence decays linearly for stale data (120 min → 0.3x)
+        if let lastDate = lastReadingDate {
+            let minutesAgo = Date().timeIntervalSince(lastDate) / 60.0
+            let recencyFactor = max(0.3, 1.0 - (minutesAgo / 120.0))
+            confidence *= recencyFactor
+        }
 
         return max(0.0, min(1.0, confidence))
     }
 
-    // MARK: - Private Helper Methods
-    /// Normalizes HRV value relative to baseline
-    /// Returns: (Baseline - HRV) / Baseline
+    // MARK: - Private Helpers
+
     private func normalizeHRV(_ hrv: Double, baseline: Double) -> Double {
         guard baseline > 0 else { return 0 }
-        return (baseline - hrv) / baseline
+        let hour = Calendar.current.component(.hour, from: Date())
+        let adjustment = baselineCalculator.circadianAdjustment(
+            for: hour,
+            userHourlyBaseline: self.baseline.hourlyHRVBaseline,
+            globalBaseline: baseline
+        )
+        let adjustedBaseline = max(1, baseline * adjustment)
+        return (adjustedBaseline - hrv) / adjustedBaseline
     }
 
-    /// Normalizes heart rate value relative to resting heart rate
-    /// Returns: (HR - Resting HR) / Resting HR
     private func normalizeHeartRate(_ heartRate: Double, resting: Double) -> Double {
         guard resting > 0 else { return 0 }
         return (heartRate - resting) / resting
     }
 
-    /// Calculates HRV component using power function
-    /// Returns: Normalized HRV ^ 0.8 (0-1 scale)
-    private func calculateHRVComponent(_ normalizedHRV: Double) -> Double {
-        // Ensure non-negative for power operation
-        let value = max(0, normalizedHRV)
-        return pow(value, 0.8)
+    /// Sigmoid: S-curve mapping input to [0,1]. k=steepness, x0=midpoint.
+    private func sigmoid(_ x: Double, k: Double, x0: Double) -> Double {
+        1.0 / (1.0 + exp(-k * (x - x0)))
     }
 
-    /// Calculates heart rate component using atan function
-    /// Returns: atan(Normalized HR * 2) / (π/2) (0-1 scale)
-    private func calculateHRComponent(_ normalizedHR: Double) -> Double {
-        let scaled = normalizedHR * 2
-        let atanValue = atan(scaled)
-        let result = atanValue / (.pi / 2)
+    /// Replaces pow(normalizedHRV, 0.8) — steepness 4, midpoint 0.5
+    private func calculateHRVComponent(_ normalizedHRV: Double) -> Double {
+        let clamped = max(0, min(2.0, normalizedHRV))
+        return sigmoid(clamped, k: 4.0, x0: 0.5)
+    }
 
-        // Return 0-1 scale
-        return max(0, result)
+    /// Replaces atan(normalizedHR * 2) / (π/2) — lower midpoint (0.3) since small elevation matters
+    private func calculateHRComponent(_ normalizedHR: Double) -> Double {
+        let clamped = max(0, min(2.0, normalizedHR))
+        return sigmoid(clamped, k: 3.0, x0: 0.3)
     }
 }
 

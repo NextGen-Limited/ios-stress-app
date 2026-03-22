@@ -15,7 +15,7 @@ final class WatchStressViewModel {
 
   init(
     healthKit: WatchHealthKitManager = WatchHealthKitManager(),
-    algorithm: StressAlgorithmServiceProtocol = StressCalculator(),
+    algorithm: StressAlgorithmServiceProtocol = MultiFactorStressCalculator(),
     connectivity: WatchConnectivityManager = .shared,
     complicationProvider: ComplicationDataProvider = .shared
   ) {
@@ -51,9 +51,20 @@ final class WatchStressViewModel {
         return
       }
 
-      let result = try await algorithm.calculateStress(
-        hrv: hrvValue,
-        heartRate: heartRate
+      let sleepData = try? await healthKit.fetchSleepData(for: Date())
+      let activityData = try? await healthKit.fetchActivityData(for: Date())
+      let recoveryData = try? await healthKit.fetchRecoveryData(for: Date())
+
+      let result = try await algorithm.calculateMultiFactorStress(
+        context: StressContext(
+          baseline: PersonalBaseline(),
+          hrv: hrvValue,
+          heartRate: heartRate,
+          sleepData: sleepData,
+          activityData: activityData,
+          recoveryData: recoveryData,
+          lastReadingDate: hrvData?.timestamp
+        )
       )
 
       currentStress = result

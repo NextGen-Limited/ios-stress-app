@@ -2,17 +2,29 @@ import Foundation
 import HealthKit
 
 final class WatchHealthKitManager: HealthKitServiceProtocol {
-  private let healthStore = HKHealthStore()
+  let healthStore = HKHealthStore()
 
-  private let hrvType = HKObjectType.quantityType(forIdentifier: .heartRateVariabilitySDNN)!
-  private let heartRateType = HKObjectType.quantityType(forIdentifier: .heartRate)!
+  let hrvType = HKObjectType.quantityType(forIdentifier: .heartRateVariabilitySDNN)!
+  let heartRateType = HKObjectType.quantityType(forIdentifier: .heartRate)!
+  let sleepType = HKCategoryType(.sleepAnalysis)
+  let stepCountType = HKQuantityType.quantityType(forIdentifier: .stepCount)!
+  let activeEnergyType = HKQuantityType.quantityType(forIdentifier: .activeEnergyBurned)!
+  let appleStandTimeType = HKQuantityType.quantityType(forIdentifier: .appleStandTime)!
+  let respiratoryRateType = HKQuantityType.quantityType(forIdentifier: .respiratoryRate)!
+  let oxygenSaturationType = HKQuantityType.quantityType(forIdentifier: .oxygenSaturation)!
+  let restingHeartRateType = HKQuantityType.quantityType(forIdentifier: .restingHeartRate)!
 
   func requestAuthorization() async throws {
     guard HKHealthStore.isHealthDataAvailable() else {
       throw HealthKitError.notAvailable
     }
 
-    let typesToRead: Set<HKSampleType> = [hrvType, heartRateType]
+    let typesToRead: Set<HKObjectType> = [
+      hrvType, heartRateType, sleepType,
+      stepCountType, activeEnergyType, appleStandTimeType,
+      respiratoryRateType, oxygenSaturationType, restingHeartRateType,
+      HKObjectType.workoutType()
+    ]
 
     try await healthStore.requestAuthorization(toShare: [], read: typesToRead)
   }

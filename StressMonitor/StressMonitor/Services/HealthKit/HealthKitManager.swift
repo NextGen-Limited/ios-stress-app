@@ -4,19 +4,30 @@ import HealthKit
 @MainActor
 @Observable
 final class HealthKitManager: HealthKitServiceProtocol {
-    private let healthStore: HKHealthStore
+    let healthStore: HKHealthStore
 
-    private let hrvType = HKQuantityType.quantityType(forIdentifier: .heartRateVariabilitySDNN)!
-    private let heartRateType = HKQuantityType.quantityType(forIdentifier: .heartRate)!
+    let hrvType = HKQuantityType.quantityType(forIdentifier: .heartRateVariabilitySDNN)!
+    let heartRateType = HKQuantityType.quantityType(forIdentifier: .heartRate)!
+    let sleepType = HKCategoryType(.sleepAnalysis)
+    let stepCountType = HKQuantityType.quantityType(forIdentifier: .stepCount)!
+    let activeEnergyType = HKQuantityType.quantityType(forIdentifier: .activeEnergyBurned)!
+    let appleStandTimeType = HKQuantityType.quantityType(forIdentifier: .appleStandTime)!
+    let respiratoryRateType = HKQuantityType.quantityType(forIdentifier: .respiratoryRate)!
+    let oxygenSaturationType = HKQuantityType.quantityType(forIdentifier: .oxygenSaturation)!
+    let restingHeartRateType = HKQuantityType.quantityType(forIdentifier: .restingHeartRate)!
 
     init(healthStore: HKHealthStore = .init()) {
         self.healthStore = healthStore
     }
 
     func requestAuthorization() async throws {
-        let types: Set<HKObjectType> = [hrvType, heartRateType]
-
-        try await healthStore.requestAuthorization(toShare: [] as Set<HKSampleType>, read: types)
+        let readTypes: Set<HKObjectType> = [
+            hrvType, heartRateType, sleepType,
+            stepCountType, activeEnergyType, appleStandTimeType,
+            respiratoryRateType, oxygenSaturationType, restingHeartRateType,
+            HKObjectType.workoutType()
+        ]
+        try await healthStore.requestAuthorization(toShare: [] as Set<HKSampleType>, read: readTypes)
     }
 
     func fetchLatestHRV() async throws -> HRVMeasurement? {

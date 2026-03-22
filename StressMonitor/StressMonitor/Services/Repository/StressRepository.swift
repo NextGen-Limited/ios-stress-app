@@ -5,6 +5,10 @@ import CloudKit
 @MainActor
 final class StressRepository: StressRepositoryProtocol {
 
+    private enum PersistenceKeys {
+        static let baseline = "com.stressmonitor.personalBaseline"
+    }
+
     // MARK: - Properties
 
     private let modelContext: ModelContext
@@ -204,6 +208,8 @@ final class StressRepository: StressRepositoryProtocol {
             return cached
         }
 
+        let persistedBaseline = loadPersistedBaseline()
+
         let thirtyDaysAgo = Calendar.current.date(byAdding: .day, value: -30, to: Date())!
         let descriptor = FetchDescriptor<StressMeasurement>(
             predicate: #Predicate<StressMeasurement> { $0.timestamp >= thirtyDaysAgo }
@@ -213,10 +219,13 @@ final class StressRepository: StressRepositoryProtocol {
 
         let baseline: PersonalBaseline
         if measurements.isEmpty {
-            baseline = PersonalBaseline()
+            baseline = persistedBaseline ?? PersonalBaseline()
         } else {
             let hrvMeasurements = measurements.map { HRVMeasurement(value: $0.hrv, timestamp: $0.timestamp) }
-            baseline = try await baselineCalculator.calculateBaseline(from: hrvMeasurements)
+            baseline = mergePersistedMetadata(
+                from: persistedBaseline,
+                into: try await baselineCalculator.calculateBaseline(from: hrvMeasurements)
+            )
         }
 
         cachedBaseline = baseline
@@ -225,6 +234,7 @@ final class StressRepository: StressRepositoryProtocol {
 
     func updateBaseline(_ baseline: PersonalBaseline) async throws {
         cachedBaseline = baseline
+        persistBaseline(baseline)
     }
 
     // MARK: - Statistics Operations
@@ -419,6 +429,35 @@ final class StressRepository: StressRepositoryProtocol {
         default:
             return .unknown(error)
         }
+    }
+
+    private func loadPersistedBaseline() -> PersonalBaseline? {
+        guard let data = UserDefaults.standard.data(forKey: PersistenceKeys.baseline) else {
+            return nil
+        }
+
+        return try? JSONDecoder().decode(PersonalBaseline.self, from: data)
+    }
+
+    private func persistBaseline(_ baseline: PersonalBaseline) {
+        guard let data = try? JSONEncoder().encode(baseline) else { return }
+        UserDefaults.standard.set(data, forKey: PersistenceKeys.baseline)
+    }
+
+    private func mergePersistedMetadata(
+        from persistedBaseline: PersonalBaseline?,
+        into calculatedBaseline: PersonalBaseline
+    ) -> PersonalBaseline {
+        guard let persistedBaseline else {
+            return calculatedBaseline
+        }
+
+        var merged = calculatedBaseline
+        merged.restingHeartRate = persistedBaseline.restingHeartRate
+        merged.factorWeights = persistedBaseline.factorWeights
+        merged.hourlyHRVBaseline = persistedBaseline.hourlyHRVBaseline
+        merged.calibrationDate = persistedBaseline.calibrationDate
+        return merged
     }
 }
 

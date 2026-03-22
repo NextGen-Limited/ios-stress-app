@@ -11,6 +11,14 @@ public final class StressMeasurement {
   public var categoryRawValue: String
   public var confidences: [Double]?
 
+  // MARK: - Multi-Factor Component Fields (optional — lightweight migration)
+  public var hrvComponent: Double?
+  public var hrComponent: Double?
+  public var sleepComponent: Double?
+  public var activityComponent: Double?
+  public var recoveryComponent: Double?
+  public var dataCompleteness: Double?
+
   // MARK: - CloudKit Sync Properties
   public var isSynced: Bool
   public var cloudKitRecordName: String?

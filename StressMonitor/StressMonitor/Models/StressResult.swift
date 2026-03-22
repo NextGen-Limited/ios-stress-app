@@ -8,8 +8,18 @@ struct StressResult: Identifiable, Codable, Sendable {
     let hrv: Double
     let heartRate: Double
     let timestamp: Date
+    /// Per-factor breakdown — nil for legacy single-factor measurements
+    let factorBreakdown: FactorBreakdown?
 
-    init(level: Double, category: StressCategory, confidence: Double, hrv: Double, heartRate: Double, timestamp: Date = Date()) {
+    init(
+        level: Double,
+        category: StressCategory,
+        confidence: Double,
+        hrv: Double,
+        heartRate: Double,
+        timestamp: Date = Date(),
+        factorBreakdown: FactorBreakdown? = nil
+    ) {
         self.id = UUID()
         self.level = level
         self.category = category
@@ -17,6 +27,7 @@ struct StressResult: Identifiable, Codable, Sendable {
         self.hrv = hrv
         self.heartRate = heartRate
         self.timestamp = timestamp
+        self.factorBreakdown = factorBreakdown
     }
 
     static func category(for level: Double) -> StressCategory {

@@ -130,4 +130,32 @@ final class BaselineCalculatorTests: XCTestCase {
         let filtered = calculator.filterOutliers(measurements)
         XCTAssertEqual(filtered.count, 3)
     }
+
+    // MARK: - Circadian Adjustment Tests
+
+    func testCircadianAdjustment_PeakAt6AM() {
+        // cos(0) = 1 → maximum adjustment: 1.0 + 0.1 = 1.1
+        let adjustment = calculator.circadianAdjustment(for: 6)
+        XCTAssertEqual(adjustment, 1.1, accuracy: 0.001, "HRV peaks at 6 AM (10% above baseline)")
+    }
+
+    func testCircadianAdjustment_TroughAt18() {
+        // hour 18: cos((18-6)*π/12) = cos(π) = -1 → 1.0 + 0.1*(-1) = 0.9
+        let adjustment = calculator.circadianAdjustment(for: 18)
+        XCTAssertEqual(adjustment, 0.9, accuracy: 0.001, "HRV trough at 6 PM (10% below baseline)")
+    }
+
+    func testCircadianAdjustment_Midday() {
+        // hour 12: cos((12-6)*π/12) = cos(π/2) = 0 → 1.0
+        let adjustment = calculator.circadianAdjustment(for: 12)
+        XCTAssertEqual(adjustment, 1.0, accuracy: 0.001, "Midday = neutral adjustment")
+    }
+
+    func testCircadianAdjustment_RangeIsValid() {
+        for hour in 0..<24 {
+            let adjustment = calculator.circadianAdjustment(for: hour)
+            XCTAssertGreaterThanOrEqual(adjustment, 0.9, "Adjustment must be >= 0.9")
+            XCTAssertLessThanOrEqual(adjustment, 1.1, "Adjustment must be <= 1.1")
+        }
+    }
 }
