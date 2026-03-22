@@ -1,6 +1,12 @@
 import SwiftData
 import SwiftUI
 
+#if DEBUG
+enum DemoMode {
+    static let isEnabled = ProcessInfo.processInfo.arguments.contains("-demo-mode")
+}
+#endif
+
 @main
 struct StressMonitorApp: App {
     static let schema = Schema([

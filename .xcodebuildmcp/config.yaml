@@ -4,7 +4,7 @@ sessionDefaultsProfiles:
     projectPath: /Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitor.xcodeproj
     scheme: StressMonitor
     simulatorName: iPhone 17 Pro
-    simulatorId: 28F09C76-95B1-438C-BBC9-73BEB6998FAB
     simulatorPlatform: iOS Simulator
     bundleId: StressMonitor.StressMonitor
+    simulatorId: 00AFDCEE-858A-4B7D-B5B4-08D3B1D6CAFB
 activeSessionDefaultsProfile: ios

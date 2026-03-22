@@ -55,6 +55,11 @@ final class StressViewModel {
     /// Stored Task for heart rate observation cancellation
     private var heartRateTask: Task<Void, Never>?
 
+    #if DEBUG
+    /// Demo mode periodic stress recalculation task
+    private var demoRefreshTask: Task<Void, Never>?
+    #endif
+
     init(
         healthKit: HealthKitServiceProtocol,
         algorithm: StressAlgorithmServiceProtocol,
@@ -272,6 +277,14 @@ final class StressViewModel {
 
     /// Start auto-refresh via HealthKit observer
     func startAutoRefresh() {
+        // Demo mode: timer-based refresh instead of HKObserverQuery
+        #if DEBUG
+        if DemoMode.isEnabled {
+            startDemoAutoRefresh()
+            return
+        }
+        #endif
+
         // Skip HealthKit observer in simulator — no HealthKit entitlement in sim builds
         #if targetEnvironment(simulator)
         return
@@ -304,6 +317,22 @@ final class StressViewModel {
         #endif
     }
 
+    #if DEBUG
+    /// Demo mode: periodic stress recalculation every 15s
+    private func startDemoAutoRefresh() {
+        demoRefreshTask?.cancel()
+        demoRefreshTask = Task { [weak self] in
+            while !Task.isCancelled {
+                try? await Task.sleep(for: .seconds(15))
+                guard !Task.isCancelled, let self else { return }
+                await self.loadCurrentStress()
+                self.loadTodayMeasurements()
+                self.generateInsight()
+            }
+        }
+    }
+    #endif
+
     /// Stop auto-refresh observer
     func stopAutoRefresh() {
         // Cancel HKObserverQuery
@@ -314,6 +343,10 @@ final class StressViewModel {
         // Cancel heart rate observation Task
         heartRateTask?.cancel()
         heartRateTask = nil
+        #if DEBUG
+        demoRefreshTask?.cancel()
+        demoRefreshTask = nil
+        #endif
     }
 
     /// Handle HealthKit update with debounce

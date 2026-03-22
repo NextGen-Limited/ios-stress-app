@@ -9,15 +9,14 @@ struct MainTabView: View {
     @State private var showSettings = false
     @State private var tabBarScrollState = TabBarScrollState()
 
-    /// Enable mock data mode for development/simulator testing
-    /// Set to true to see sample data without real HealthKit data
-    static var useMockData: Bool = {
+    /// Demo mode: uses SimulatorHealthKitService with dynamic data
+    private static var isDemoMode: Bool {
         #if DEBUG
-        return ProcessInfo.processInfo.environment["XCODE_RUNNING_FOR_PREVIEWS"] != "1"
+        return DemoMode.isEnabled
         #else
         return false
         #endif
-    }()
+    }
 
     /// Convert TabItem to AnimatedTabBar index
     private var selectedIndex: Binding<Int> {
@@ -48,15 +47,26 @@ struct MainTabView: View {
                 Group {
                     switch selectedTab {
                     case .home:
-                        if Self.useMockData {
-                            DashboardView(viewModel: PreviewDataFactory.mockDashboardViewModel(), onSettingsTapped: {
-                                showSettings = true
-                            })
+                        #if DEBUG
+                        if DemoMode.isEnabled {
+                            DashboardView(
+                                viewModel: StressViewModel(
+                                    healthKit: SimulatorHealthKitService(),
+                                    algorithm: MultiFactorStressCalculator(),
+                                    repository: StressRepository(modelContext: modelContext)
+                                ),
+                                onSettingsTapped: { showSettings = true }
+                            )
                         } else {
                             DashboardView(repository: StressRepository(modelContext: modelContext), onSettingsTapped: {
                                 showSettings = true
                             })
                         }
+                        #else
+                        DashboardView(repository: StressRepository(modelContext: modelContext), onSettingsTapped: {
+                            showSettings = true
+                        })
+                        #endif
                     case .action:
                         ActionView()
                     case .trend:
@@ -95,6 +105,15 @@ struct MainTabView: View {
                 .offset(y: tabBarScrollState.isVisible ? 0 : tabBarScrollState.tabBarHeight + 16)
                 .animation(.spring(response: 0.3, dampingFraction: 0.8), value: tabBarScrollState.isVisible)
             }
+        }
+        .overlay(alignment: .topTrailing) {
+            #if DEBUG
+            if DemoMode.isEnabled {
+                DemoModeBannerView()
+                    .padding(.trailing, 16)
+                    .padding(.top, 8)
+            }
+            #endif
         }
     }
 }

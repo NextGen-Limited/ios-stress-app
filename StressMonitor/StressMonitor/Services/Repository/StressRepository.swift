@@ -37,6 +37,11 @@ final class StressRepository: StressRepositoryProtocol {
         // the onSyncStatusChange callback property set by the caller
     }
 
+    deinit {
+        onSyncStatusChange = nil
+        onSyncError = nil
+    }
+
     // MARK: - Save Operations
 
     func save(_ measurement: StressMeasurement) async throws {
@@ -215,17 +220,19 @@ final class StressRepository: StressRepositoryProtocol {
             predicate: #Predicate<StressMeasurement> { $0.timestamp >= thirtyDaysAgo }
         )
 
+        // Fetch on MainActor and extract all data BEFORE any actor hop
         let measurements = try modelContext.fetch(descriptor)
+        let hrvMeasurements = measurements.map { HRVMeasurement(value: $0.hrv, timestamp: $0.timestamp) }
+        let isEmpty = measurements.isEmpty
+
+        // Now safe to hop actors - we're working with Sendable value types
+        let calculatedBaseline = try await baselineCalculator.calculateBaseline(from: hrvMeasurements)
 
         let baseline: PersonalBaseline
-        if measurements.isEmpty {
+        if isEmpty {
             baseline = persistedBaseline ?? PersonalBaseline()
         } else {
-            let hrvMeasurements = measurements.map { HRVMeasurement(value: $0.hrv, timestamp: $0.timestamp) }
-            baseline = mergePersistedMetadata(
-                from: persistedBaseline,
-                into: try await baselineCalculator.calculateBaseline(from: hrvMeasurements)
-            )
+            baseline = mergePersistedMetadata(from: persistedBaseline, into: calculatedBaseline)
         }
 
         cachedBaseline = baseline
