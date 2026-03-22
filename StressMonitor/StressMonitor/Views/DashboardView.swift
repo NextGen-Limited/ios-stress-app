@@ -15,14 +15,14 @@ struct DashboardView: View {
         } else if let repository = repository {
             _viewModel = State(initialValue: StressViewModel(
                 healthKit: HealthKitManager(),
-                algorithm: StressCalculator(),
+                algorithm: MultiFactorStressCalculator(),
                 repository: repository
             ))
         } else {
             // Fallback with in-memory container for previews
             _viewModel = State(initialValue: StressViewModel(
                 healthKit: HealthKitManager(),
-                algorithm: StressCalculator(),
+                algorithm: MultiFactorStressCalculator(),
                 repository: StressRepository(modelContext: ModelContext(try! ModelContainer(for: StressMeasurement.self, configurations: ModelConfiguration(isStoredInMemoryOnly: true))))
             ))
         }
@@ -61,8 +61,8 @@ struct DashboardView: View {
     }
 
     private func loadInitialData() async {
-        await viewModel.loadDashboardData()
         await viewModel.loadBaseline()
+        await viewModel.loadDashboardData()
         viewModel.observeHeartRate()
 
         withAnimation(.spring(response: 0.6, dampingFraction: 0.8).delay(0.1)) {
@@ -92,6 +92,14 @@ struct DashboardView: View {
                 StressCharacterCard(result: stress, size: .dashboard, onRefresh: {
                     Task { await viewModel.loadDashboardData() }
                 }, onSettingsTapped: onSettingsTapped)
+
+                if let qualityInfo = viewModel.dataQualityInfo {
+                    HStack {
+                        DataQualityBadge(qualityInfo: qualityInfo)
+                        Spacer()
+                    }
+                    .opacity(appearAnimation ? 1 : 0)
+                }
 
                 // 2. Insight Card
                 if let insight = viewModel.aiInsight {

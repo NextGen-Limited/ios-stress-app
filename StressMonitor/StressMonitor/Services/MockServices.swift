@@ -9,6 +9,9 @@ final class MockHealthKitService: HealthKitServiceProtocol, @unchecked Sendable 
     var mockHeartRate: Double = 72.0
     var mockHRVHistory: [HRVMeasurement] = []
     var shouldThrowError: Bool = false
+    var mockSleepData: SleepData? = nil
+    var mockActivityData: ActivityData? = nil
+    var mockRecoveryData: RecoveryData? = nil
 
     func requestAuthorization() async throws {
         if shouldThrowError { throw NSError(domain: "Mock", code: -1) }
@@ -37,6 +40,21 @@ final class MockHealthKitService: HealthKitServiceProtocol, @unchecked Sendable 
             continuation.finish()
         }
     }
+
+    func fetchSleepData(for date: Date) async throws -> SleepData? {
+        if shouldThrowError { throw NSError(domain: "Mock", code: -1) }
+        return mockSleepData
+    }
+
+    func fetchActivityData(for date: Date) async throws -> ActivityData? {
+        if shouldThrowError { throw NSError(domain: "Mock", code: -1) }
+        return mockActivityData
+    }
+
+    func fetchRecoveryData(for date: Date) async throws -> RecoveryData? {
+        if shouldThrowError { throw NSError(domain: "Mock", code: -1) }
+        return mockRecoveryData
+    }
 }
 
 // MARK: - Mock Algorithm Service
@@ -57,7 +75,7 @@ final class MockStressAlgorithmService: StressAlgorithmServiceProtocol, @uncheck
         )
     }
 
-    func calculateConfidence(hrv: Double, heartRate: Double, samples: Int) -> Double {
+    func calculateConfidence(hrv: Double, heartRate: Double, samples: Int, lastReadingDate: Date?) -> Double {
         mockConfidence
     }
 }
@@ -262,6 +280,13 @@ enum PreviewDataFactory {
         viewModel.weeklyPreviousAvg = 42.0
         viewModel.heartRateTrend = .down
         viewModel.aiInsight = mockAIInsight()
+        viewModel.dataQualityInfo = DataQualityInfo(
+            activeFactors: ["hrv", "heartRate", "sleep", "activity"],
+            missingFactors: ["recovery"],
+            dataCompleteness: 0.90,
+            isCalibrated: true,
+            lastCalibrationDate: Date()
+        )
 
         return viewModel
     }
