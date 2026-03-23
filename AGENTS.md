@@ -2,6 +2,8 @@
 
 This file provides guidance to Codex (Codex.ai/code) when working with code in this repository.
 
+> ⚠️ **IMPORTANT**: Always read `/docs/INDEX.md` first before implementing any feature. The `/docs/` folder contains authoritative project documentation.
+
 ---
 
 ## Build & Test Commands
@@ -176,7 +178,7 @@ mcp__plugin_xclaude-plugin_xc-all__simulator_health_check()
 
 ## Architecture Overview
 
-This is an **iOS 17+ / watchOS 10+ stress monitoring app** using MVVM with SwiftUI. The app tracks stress via Heart Rate Variability (HRV) from HealthKit.
+This is an **iOS 17+ / watchOS 10+ stress monitoring app** using MVVM with SwiftUI. The app tracks stress via a multi-factor algorithm using HealthKit data.
 
 ### Tech Stack
 - **Language**: Swift 5.9+
@@ -189,28 +191,28 @@ This is an **iOS 17+ / watchOS 10+ stress monitoring app** using MVVM with Swift
 ### Data Flow
 
 ```
-HealthKit (System) → HealthKitService → StressCalculator → StressRepository → SwiftData
-                                      ↓
-                               StressViewModel
-                                      ↓
-                                  SwiftUI Views
+HealthKit (System) → HealthKitManager → MultiFactorStressCalculator → StressRepository → SwiftData
+                                           ↓
+                                    StressViewModel
+                                           ↓
+                                      SwiftUI Views
 ```
 
 ---
 
 ## Core Algorithm
 
-The stress algorithm combines HRV (70% weight) and heart rate (30% weight):
+The stress algorithm uses **5 weighted factors** with dynamic weight normalization:
 
-```
-Normalized HRV = (Baseline - HRV) / Baseline
-Normalized HR = (HR - Resting HR) / Resting HR
+| Factor | Default Weight | Data Source |
+|--------|---------------|-------------|
+| HRV | 35% | Heart Rate Variability (SDNN) |
+| Heart Rate | 25% | Resting heart rate comparison |
+| Sleep | 20% | Sleep quality & duration |
+| Activity | 10% | Exercise & movement |
+| Recovery | 10% | Rest & recovery patterns |
 
-HRV Component = Normalized HRV ^ 0.8
-HR Component = atan(Normalized HR * 2) / (π/2)
-
-Stress Level = (HRV Component * 0.7) + (HR Component * 0.3)
-```
+**Composite Score** = Weighted average of available factors (weights normalized when factors missing)
 
 **Stress Categories** (0-100 scale):
 - 0-25: Relaxed
@@ -219,9 +221,10 @@ Stress Level = (HRV Component * 0.7) + (HR Component * 0.3)
 - 75-100: High Stress
 
 **Confidence scoring** adjusts for:
-- Low HRV readings (< 20ms)
-- Extreme heart rates (< 40 or > 180 bpm)
+- Data completeness (% of available factors)
+- Per-factor confidence scores
 - Sample count history
+- Last reading recency
 
 See `documentation/references/phase-3-core-algorithm.md` for full implementation.
 
@@ -229,22 +232,39 @@ See `documentation/references/phase-3-core-algorithm.md` for full implementation
 
 ## Key Service Protocols
 
-### HealthKitServiceProtocol
+### StressFactor Protocol
 
 ```swift
-protocol HealthKitServiceProtocol {
-    func requestAuthorization() async throws
-    func fetchLatestHRV() async throws -> HRVMeasurement?
-    func fetchHeartRate(samples: Int) async throws -> [HeartRateSample]
+protocol StressFactor {
+    var id: String { get }
+    var defaultWeight: Double { get }
+    func calculate(context: StressContext) async throws -> FactorResult?
 }
 ```
+
+**Implementations:** `HRVStressFactor`, `HeartRateStressFactor`, `SleepStressFactor`, `ActivityStressFactor`, `RecoveryStressFactor`
 
 ### StressAlgorithmServiceProtocol
 
 ```swift
 protocol StressAlgorithmServiceProtocol {
     func calculateStress(hrv: Double, heartRate: Double) async throws -> StressResult
-    func calculateConfidence(hrv: Double, heartRate: Double, samples: Int) -> Double
+    func calculateConfidence(hrv: Double, heartRate: Double, samples: Int, lastReadingDate: Date?) -> Double
+    func calculateMultiFactorStress(context: StressContext) async throws -> StressResult
+}
+```
+
+### HealthKitManager
+
+```swift
+// Singleton with async methods
+class HealthKitManager {
+    func requestAuthorization() async throws
+    func fetchLatestHRV() async throws -> HRVMeasurement?
+    func fetchHeartRate(samples: Int) async throws -> [HeartRateSample]
+    func fetchSleepData(for date: Date) async throws -> SleepData?
+    func fetchActivityData(for date: Date) async throws -> ActivityData?
+    func fetchRecoveryData(for date: Date) async throws -> RecoveryData?
 }
 ```
 
@@ -255,6 +275,7 @@ protocol StressRepositoryProtocol {
     func save(_ measurement: StressMeasurement) async throws
     func fetchRecent(limit: Int) async throws -> [StressMeasurement]
     func getBaseline() async throws -> PersonalBaseline
+    func updateBaseline(_ baseline: PersonalBaseline) async throws
 }
 ```
 
@@ -267,26 +288,84 @@ StressMonitor/
 ├── App/
 │   └── StressMonitorApp.swift
 ├── Models/
-│   ├── HRVMeasurement.swift
+│   ├── Base/
+│   │   └── ObservableModel.swift
+│   ├── ActivityData.swift
+│   ├── FactorBreakdown.swift
+│   ├── FactorWeights.swift
 │   ├── HeartRateSample.swift
-│   └── StressMeasurement.swift
+│   ├── HRVMeasurement.swift
+│   ├── PersonalBaseline.swift
+│   ├── RecoveryData.swift
+│   ├── SleepData.swift
+│   ├── StressBuddyMood.swift
+│   ├── StressCategory.swift
+│   ├── StressContext.swift
+│   ├── StressMeasurement.swift
+│   └── StressResult.swift
 ├── ViewModels/
 │   └── StressViewModel.swift
 ├── Views/
 │   ├── MainTabView.swift
 │   ├── DashboardView.swift
 │   ├── HistoryView.swift
-│   ├── SettingsView.swift
+│   ├── Settings/
+│   │   ├── SettingsView.swift
+│   │   └── Components/
+│   ├── Trends/
+│   │   ├── TrendsView.swift
+│   │   └── Components/
+│   ├── Onboarding/
+│   │   └── OnboardingWelcomeView.swift, etc.
+│   ├── History/
+│   │   └── MeasurementDetailView.swift, etc.
 │   └── Components/
-│       └── StressRingView.swift
-└── Services/
-    ├── HealthKit/
-    │   └── HealthKitManager.swift
-    ├── Algorithm/
-    │   ├── StressCalculator.swift
-    │   └── BaselineCalculator.swift
-    └── Repository/
-        └── StressRepository.swift
+│       ├── Character/
+│       └── Charts/
+├── Services/
+│   ├── HealthKit/
+│   │   ├── HealthKitManager.swift
+│   │   └── HealthKitManager+*Fetch.swift (extensions)
+│   ├── Algorithm/
+│   │   ├── StressFactor.swift (protocol)
+│   │   ├── StressCalculator.swift (fallback)
+│   │   ├── MultiFactorStressCalculator.swift
+│   │   ├── HRVStressFactor.swift
+│   │   ├── HeartRateStressFactor.swift
+│   │   ├── SleepStressFactor.swift
+│   │   ├── ActivityStressFactor.swift
+│   │   ├── RecoveryStressFactor.swift
+│   │   ├── BaselineCalculator.swift
+│   │   └── FactorCalibrator.swift
+│   ├── Repository/
+│   │   └── StressRepository.swift
+│   ├── CloudKit/
+│   │   ├── CloudKitManager.swift
+│   │   ├── CloudKitSchema.swift
+│   │   └── CloudKitSyncEngine.swift
+│   ├── Background/
+│   │   ├── HealthBackgroundScheduler.swift
+│   │   └── NotificationManager.swift
+│   ├── Connectivity/
+│   │   └── PhoneConnectivityManager.swift
+│   ├── DataManagement/
+│   │   ├── DataExporter.swift
+│   │   ├── DataDeleterService.swift
+│   │   └── CSVGenerator.swift, JSONGenerator.swift
+│   └── Protocols/
+│       └── StressAlgorithmServiceProtocol.swift
+├── StressMonitorTests/
+│   ├── MultiFactorStressCalculatorTests.swift
+│   ├── *StressFactorTests.swift (5 files)
+│   ├── StressCalculatorTests.swift
+│   └── ... (30+ test files)
+├── StressMonitorWatch Watch App/
+│   ├── ViewModels/
+│   └── Services/
+│       ├── MultiFactorStressCalculator.swift
+│       └── StressAlgorithmServiceProtocol.swift
+└── StressMonitorWidget/
+    └── Widget implementation
 ```
 
 ---
@@ -413,14 +492,21 @@ Color.stressColor(for: .high)          // Orange #FF9500
 
 Follow `documentation/references/README.md` for phased implementation:
 
-1. **Project Foundation** - Project setup, protocols
-2. **Data Layer** - SwiftData models, repository
-3. **Core Algorithm** - Stress calculation, confidence scoring
-4. **iPhone UI** - Dashboard, trends, settings
-5. **watchOS App** - Watch app, complications (WidgetKit, not ClockKit)
-6. **Background Notifications** - BGAppRefreshTask, alerts
-7. **Data Sync** - CloudKit integration
-8. **Testing & Polish** - Unit tests, accessibility, performance
+1. **Project Foundation** - Project setup, protocols ✅
+2. **Data Layer** - SwiftData models, repository ✅
+3. **Core Algorithm** - Multi-factor stress calculation, confidence scoring ✅
+4. **iPhone UI** - Dashboard, trends, settings, onboarding ✅
+5. **watchOS App** - Watch app, complications (WidgetKit, not ClockKit) ✅
+6. **Background Notifications** - BGAppRefreshTask, alerts ✅
+7. **Data Sync** - CloudKit integration ✅
+8. **Testing & Polish** - Unit tests, accessibility, performance 🔄
+
+### Testing Coverage
+
+- **30+ test files** covering all stress factors, calculators, and view models
+- Test naming: `test[MethodName]_[Condition]` or `test[Condition]`
+- Use `XCTAssertEqual` with `accuracy` for floating point comparisons
+- Tests located in `StressMonitorTests/` directory
 
 ---
 
@@ -429,11 +515,31 @@ Follow `documentation/references/README.md` for phased implementation:
 | Area | Decision | Rationale |
 |------|----------|-----------|
 | Architecture | MVVM with @Observable | Clean state management, testable |
+| Stress Algorithm | Multi-factor (5 factors) | More accurate than single HRV+HR |
 | Persistence | SwiftData | iOS 17+ native, SwiftUI-friendly |
 | Cloud Sync | CloudKit | End-to-end encrypted, seamless |
 | watchOS Complications | WidgetKit (NOT ClockKit) | Required for watchOS 10+ |
 | Background Tasks | BGAppRefreshTask | System-managed, battery-efficient |
 | Dependencies | None (system only) | Privacy-first, no bloat |
+| Testing | XCTest | Native, 30+ test files |
+
+### StressFactor Architecture
+
+Each stress factor implements the `StressFactor` protocol:
+
+```swift
+struct FactorResult {
+    let value: Double           // 0-1 normalized score
+    let confidence: Double      // 0-1 data quality
+    let hasData: Bool
+}
+```
+
+**Benefits:**
+- **Extensible**: Add new factors by implementing `StressFactor`
+- **Testable**: Each factor has dedicated test file
+- **Graceful degradation**: Missing factors → normalized remaining weights
+- **Confidence-weighted**: Data quality affects final score
 
 ---
 
@@ -460,8 +566,33 @@ Ensure Background Modes enabled in capabilities, verify device not in Low Power 
 
 ---
 
+## Documentation
+
+**ALWAYS check `/docs/` folder first** for project documentation before implementing anything:
+
+| Document | Purpose |
+|----------|---------|
+| `INDEX.md` | Documentation index and navigation |
+| `project-overview-pdr.md` | Product requirements |
+| `system-architecture.md` | System architecture overview |
+| `system-architecture-core.md` | Core module architecture |
+| `system-architecture-platform.md` | Platform-specific details |
+| `code-standards.md` | Coding standards main |
+| `code-standards-swift.md` | Swift-specific standards |
+| `code-standards-patterns.md` | Design patterns used |
+| `design-guidelines.md` | Design guidelines main |
+| `design-guidelines-ux.md` | UX guidelines |
+| `design-guidelines-visual.md` | Visual design guidelines |
+| `project-roadmap.md` | Project roadmap and milestones |
+| `deployment-guide.md` | Deployment main |
+| `deployment-guide-environment.md` | Environment setup |
+| `deployment-guide-release.md` | Release process |
+
+---
+
 ## References
 
+- **Project Docs**: `/docs/INDEX.md` (START HERE)
 - **Implementation Phases**: `documentation/references/README.md`
 - **UI/UX Design System**: `documentation/references/ui-ux-design-system.md`
 - **Algorithm Details**: `documentation/references/phase-3-core-algorithm.md`

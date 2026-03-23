@@ -161,6 +161,34 @@ mcp__plugin_xclaude-plugin_xc-all__simulator_health_check()
 
 ---
 
+### Demo Mode (Simulator Testing)
+
+To test with simulated HealthKit data on simulator:
+
+1. **Xcode** → Product → Scheme → Edit Scheme
+2. **Run** → Arguments → Arguments Passed on Launch
+3. Add `-demo-mode` (checkbox enabled)
+4. Build and run on simulator
+
+**What demo mode provides:**
+
+| Feature | Behavior |
+|---------|----------|
+| 5-Factor Data | Dynamic HRV, HR, Sleep, Activity, Recovery cycling through all stress levels |
+| Scenario Cycling | Relaxed → Mild → Moderate → High → Edge (30s each) |
+| Live HR Updates | AsyncStream emits every 3-5 seconds |
+| Historical Data | 7-14 days with circadian variation |
+| Edge Cases | Low HRV (<20ms), extreme HR (100-115), missing factors, partial recovery |
+| Real Pipeline | Uses actual `MultiFactorStressCalculator` + SwiftData (not static mocks) |
+| Graceful Degradation | Edge scenario omits sleep/activity/recovery to test weight redistribution |
+
+**Files:**
+- `Services/HealthKit/SimulatorHealthKitService.swift` — dynamic data generator
+- `Views/Components/DemoModeBannerView.swift` — "DEMO MODE" pill overlay
+- `DemoMode.isEnabled` in `StressMonitorApp.swift` — launch argument check
+
+---
+
 ## MCP Plugin Categories
 
 - **xc-setup**: Simulator and environment setup (`simulator_boot`, `simulator_create`, `simulator_list`, `xcode_version`)
