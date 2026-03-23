@@ -74,10 +74,15 @@ final class StressCalculator: StressAlgorithmServiceProtocol {
     private func normalizeHRV(_ hrv: Double, baseline: Double) -> Double {
         guard baseline > 0 else { return 0 }
         let hour = Calendar.current.component(.hour, from: Date())
+        // Extract ALL data from baseline FIRST to avoid actor boundary issues
+        // with Dictionary (reference type with COW) inside PersonalBaseline
+        // This matches the pattern in HRVStressFactor.calculate()
+        let baselineHRV = self.baseline.baselineHRV
+        let hourlyBaseline = self.baseline.hourlyHRVBaseline  // Local copy before any cross-actor call
         let adjustment = baselineCalculator.circadianAdjustment(
             for: hour,
-            userHourlyBaseline: self.baseline.hourlyHRVBaseline,
-            globalBaseline: baseline
+            userHourlyBaseline: hourlyBaseline,
+            globalBaseline: baselineHRV
         )
         let adjustedBaseline = max(1, baseline * adjustment)
         return (adjustedBaseline - hrv) / adjustedBaseline
@@ -107,4 +112,7 @@ final class StressCalculator: StressAlgorithmServiceProtocol {
 }
 
 // MARK: - Thread Safety
-extension StressCalculator: @unchecked Sendable {}
+// Safe Sendable: all stored properties are `let` (immutable)
+// - baseline: PersonalBaseline is Sendable struct
+// - baselineCalculator: BaselineCalculator is Sendable class
+extension StressCalculator: Sendable {}

@@ -96,4 +96,9 @@ final class MultiFactorStressCalculator: StressAlgorithmServiceProtocol {
     }
 }
 
-extension MultiFactorStressCalculator: @unchecked Sendable {}
+// MARK: - Thread Safety
+// Safe Sendable: all stored properties are `let` (immutable)
+// - factors: Array of struct-based StressFactor implementations (all Sendable)
+// - fallback: StressCalculator is now true Sendable
+// - calibratedWeights: FactorWeights? is Sendable struct
+extension MultiFactorStressCalculator: Sendable {}

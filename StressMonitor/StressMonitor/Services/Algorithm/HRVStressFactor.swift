@@ -12,30 +12,38 @@ struct HRVStressFactor: StressFactor {
     private let baselineCalculator = BaselineCalculator()
 
     func calculate(context: StressContext) async throws -> FactorResult? {
+        // Extract all data from context FIRST to avoid any actor boundary issues
+        // with Dictionary (reference type) inside PersonalBaseline
         guard let hrv = context.hrv else { return nil }
 
-        let baseline = context.baseline.baselineHRV
-        guard baseline > 0 else { return nil }
+        let baselineHRV = context.baseline.baselineHRV
+        guard baselineHRV > 0 else { return nil }
 
-        let hour = Calendar.current.component(.hour, from: context.timestamp)
+        let timestamp = context.timestamp
+        // Create a local copy of the dictionary to avoid shared reference issues
+        let hourlyHRVBaseline = context.baseline.hourlyHRVBaseline
+        let lastReadingDate = context.lastReadingDate
+
+        // Now safe to perform calculations with local copies
+        let hour = Calendar.current.component(.hour, from: timestamp)
         let adjustment = baselineCalculator.circadianAdjustment(
             for: hour,
-            userHourlyBaseline: context.baseline.hourlyHRVBaseline,
-            globalBaseline: baseline
+            userHourlyBaseline: hourlyHRVBaseline,
+            globalBaseline: baselineHRV
         )
-        let adjustedBaseline = max(1, baseline * adjustment)
+        let adjustedBaseline = max(1, baselineHRV * adjustment)
         let normalized = (adjustedBaseline - hrv) / adjustedBaseline
         let clamped = max(0, min(2.0, normalized))
         let value = sigmoid(clamped, k: 4.0, x0: 0.5)
 
-        let confidence = calculateConfidence(hrv: hrv, lastReadingDate: context.lastReadingDate)
+        let confidence = calculateConfidence(hrv: hrv, lastReadingDate: lastReadingDate)
 
         return FactorResult(
             value: value,
             confidence: confidence,
             metadata: [
                 "hrv": hrv,
-                "baseline": baseline,
+                "baseline": baselineHRV,
                 "adjustedBaseline": adjustedBaseline,
                 "normalized": normalized
             ]
