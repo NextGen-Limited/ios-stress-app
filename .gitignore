@@ -150,3 +150,8 @@ DerivedData/
 # CloudKit - Schema files (optional, uncomment if you want to ignore schema files)
 # *.xcdatamodeld/**/*.ccd
 .mcp.json
+
+# Runtime logs and session state
+.omx/logs/
+.claude/session-state/
+tmp-home/
