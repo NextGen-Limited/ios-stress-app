@@ -30,6 +30,24 @@ final class StressViewModel {
     var aiInsight: AIInsight?
     var dataQualityInfo: DataQualityInfo?
 
+    // MARK: - Permission State
+
+    /// Set exclusively when HKError.errorAuthorizationDenied is caught — NOT a proxy for currentStress == nil.
+    var isPermissionRequired: Bool = false
+    /// Re-entry guard for requestHealthKitAccess(). Drives button disabled state in PermissionCardView.
+    private(set) var isRequestingAccess: Bool = false
+
+    // MARK: - Render State
+
+    /// Maps loading/permission/data state to a single enum for DashboardView rendering.
+    /// Priority: permissionRequired > loading > content > noData
+    var renderState: DashboardRenderState {
+        if isPermissionRequired { return .permissionRequired }
+        if isLoading && currentStress == nil { return .loading }
+        if let stress = currentStress { return .content(stress) }
+        return .noData
+    }
+
     // MARK: - Auto-Refresh Properties
 
     /// Last refresh time for debounce
@@ -104,6 +122,7 @@ final class StressViewModel {
 
             let result = try await algorithm.calculateMultiFactorStress(context: context)
             currentStress = result
+            isPermissionRequired = false
             baseline = currentBaseline
             lastRefresh = Date()
             errorMessage = nil
@@ -111,6 +130,29 @@ final class StressViewModel {
             if let breakdown = result.factorBreakdown {
                 dataQualityInfo = DataQualityInfo(from: breakdown, baseline: currentBaseline)
             }
+        } catch let hkError as HKError where hkError.code == .errorAuthorizationDenied {
+            isPermissionRequired = true
+            currentStress = nil
+        } catch {
+            errorMessage = error.localizedDescription
+        }
+    }
+
+    /// Request HealthKit authorization. Only sets isPermissionRequired for known auth failures —
+    /// framework errors go to errorMessage. Guards against double-tap with isRequestingAccess.
+    func requestHealthKitAccess() async {
+        guard !isRequestingAccess else { return }
+        isRequestingAccess = true
+        defer { isRequestingAccess = false }
+
+        do {
+            try await healthKit.requestAuthorization()
+            isPermissionRequired = false
+            await loadCurrentStress()
+        } catch let hkError as HKError
+            where hkError.code == .errorAuthorizationNotDetermined
+               || hkError.code == .errorAuthorizationDenied {
+            isPermissionRequired = true
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -369,6 +411,15 @@ final class StressViewModel {
             lastRefreshTime = Date()
         }
     }
+}
+
+/// Single enum driving DashboardView's render branch.
+/// Eliminates 3-way conditional in the view body.
+enum DashboardRenderState {
+    case loading
+    case permissionRequired
+    case noData
+    case content(StressResult)
 }
 
 enum StressError: Error {

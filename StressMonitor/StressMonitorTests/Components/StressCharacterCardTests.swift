@@ -10,82 +10,80 @@ import SwiftUI
 @MainActor
 struct StressCharacterCardTests {
 
+    // MARK: - Helpers
+
+    private func makeResult(
+        mood: StressBuddyMood,
+        stressLevel: Double,
+        hrv: Double? = nil
+    ) -> StressResult {
+        let category: StressCategory = switch mood {
+        case .sleeping, .calm: .relaxed
+        case .concerned: .mild
+        case .worried: .moderate
+        case .overwhelmed: .high
+        }
+        return StressResult(
+            level: stressLevel,
+            category: category,
+            confidence: 0.9,
+            hrv: hrv ?? 50,
+            heartRate: 70
+        )
+    }
+
     // MARK: - Card Rendering Tests
 
     @Test func testCardRenderingSleeping() {
         let card = StressCharacterCard(
-            mood: .sleeping,
-            stressLevel: 5,
-            hrv: 65,
+            result: makeResult(mood: .sleeping, stressLevel: 5),
             size: .dashboard
         )
-
-        // Verify view can be created without crash
         let _ = card.body
     }
 
     @Test func testCardRenderingCalm() {
         let card = StressCharacterCard(
-            mood: .calm,
-            stressLevel: 15,
-            hrv: 70,
+            result: makeResult(mood: .calm, stressLevel: 15, hrv: 70),
             size: .dashboard
         )
-
         let _ = card.body
     }
 
     @Test func testCardRenderingConcerned() {
         let card = StressCharacterCard(
-            mood: .concerned,
-            stressLevel: 35,
-            hrv: 55,
+            result: makeResult(mood: .concerned, stressLevel: 35, hrv: 55),
             size: .dashboard
         )
-
         let _ = card.body
     }
 
     @Test func testCardRenderingWorried() {
         let card = StressCharacterCard(
-            mood: .worried,
-            stressLevel: 60,
-            hrv: 45,
+            result: makeResult(mood: .worried, stressLevel: 60, hrv: 45),
             size: .dashboard
         )
-
         let _ = card.body
     }
 
     @Test func testCardRenderingOverwhelmed() {
         let card = StressCharacterCard(
-            mood: .overwhelmed,
-            stressLevel: 85,
-            hrv: 30,
+            result: makeResult(mood: .overwhelmed, stressLevel: 85, hrv: 30),
             size: .dashboard
         )
-
         let _ = card.body
     }
 
     @Test func testCardRenderingAllMoods() {
-        // Test all moods render without crash
-        for mood in StressBuddyMood.allCases {
-            let stressLevel = switch mood {
-            case .sleeping: 5.0
-            case .calm: 15.0
-            case .concerned: 35.0
-            case .worried: 60.0
-            case .overwhelmed: 85.0
-            }
-
+        let moodLevels: [(StressBuddyMood, Double)] = [
+            (.sleeping, 5.0), (.calm, 15.0), (.concerned, 35.0),
+            (.worried, 60.0), (.overwhelmed, 85.0)
+        ]
+        for (mood, level) in moodLevels {
             let card = StressCharacterCard(
-                mood: mood,
-                stressLevel: stressLevel,
-                hrv: 50,
+                result: makeResult(mood: mood, stressLevel: level, hrv: 50),
                 size: .dashboard
             )
-
             let _ = card.body
         }
     }
@@ -94,48 +92,35 @@ struct StressCharacterCardTests {
 
     @Test func testCardRenderingDashboardSize() {
         let card = StressCharacterCard(
-            mood: .calm,
-            stressLevel: 15,
-            hrv: 70,
+            result: makeResult(mood: .calm, stressLevel: 15, hrv: 70),
             size: .dashboard
         )
-
         let _ = card.body
     }
 
     @Test func testCardRenderingWidgetSize() {
         let card = StressCharacterCard(
-            mood: .calm,
-            stressLevel: 15,
-            hrv: 70,
+            result: makeResult(mood: .calm, stressLevel: 15, hrv: 70),
             size: .widget
         )
-
         let _ = card.body
     }
 
     @Test func testCardRenderingWatchOSSize() {
         let card = StressCharacterCard(
-            mood: .calm,
-            stressLevel: 15,
-            hrv: 70,
+            result: makeResult(mood: .calm, stressLevel: 15, hrv: 70),
             size: .watchOS
         )
-
         let _ = card.body
     }
 
     @Test func testCardRenderingAllSizes() {
         let sizes: [StressBuddyMood.CharacterContext] = [.dashboard, .widget, .watchOS]
-
         for size in sizes {
             let card = StressCharacterCard(
-                mood: .calm,
-                stressLevel: 15,
-                hrv: 70,
+                result: makeResult(mood: .calm, stressLevel: 15, hrv: 70),
                 size: size
             )
-
             let _ = card.body
         }
     }
@@ -144,23 +129,18 @@ struct StressCharacterCardTests {
 
     @Test func testCardRenderingWithHRV() {
         let card = StressCharacterCard(
-            mood: .calm,
-            stressLevel: 15,
-            hrv: 70,
+            result: makeResult(mood: .calm, stressLevel: 15, hrv: 70),
             size: .dashboard
         )
-
         let _ = card.body
     }
 
     @Test func testCardRenderingWithoutHRV() {
+        // HRV comes from StressResult; default in makeResult is 50
         let card = StressCharacterCard(
-            mood: .calm,
-            stressLevel: 15,
-            hrv: nil,
+            result: makeResult(mood: .calm, stressLevel: 15),
             size: .dashboard
         )
-
         let _ = card.body
     }
 
@@ -186,20 +166,47 @@ struct StressCharacterCardTests {
     }
 
     @Test func testInitWithMinimalData() {
-        let card = StressCharacterCard(stressLevel: 15, size: .widget)
+        let result = StressResult(
+            level: 15,
+            category: .relaxed,
+            confidence: 0.9,
+            hrv: 50,
+            heartRate: 70
+        )
+        let card = StressCharacterCard(result: result, size: .widget)
 
         #expect(card.mood == .calm)
         #expect(card.stressLevel == 15)
-        #expect(card.hrv == nil)
+        #expect(card.hrv == 50)
         #expect(card.size == .widget)
 
+        let _ = card.body
+    }
+
+    // MARK: - Permission State Tests
+
+    @Test func testInitWithNilResult() {
+        let card = StressCharacterCard(
+            result: nil as StressResult?,
+            size: .dashboard,
+            onGrantAccess: {}
+        )
+        let _ = card.body
+    }
+
+    @Test func testPermissionStateAccessibility() {
+        let card = StressCharacterCard(
+            result: nil as StressResult?,
+            size: .dashboard,
+            isRequestingAccess: true,
+            onGrantAccess: {}
+        )
         let _ = card.body
     }
 
     // MARK: - VoiceOver Label Tests
 
     @Test func testVoiceOverLabelExists() {
-        // VoiceOver labels should use mood.accessibilityDescription
         let moods: [(StressBuddyMood, String)] = [
             (.sleeping, "Very relaxed, sleeping peacefully"),
             (.calm, "Calm and relaxed"),
@@ -215,15 +222,10 @@ struct StressCharacterCardTests {
 
     @Test func testVoiceOverValueFormatting() {
         let card = StressCharacterCard(
-            mood: .calm,
-            stressLevel: 15.7,
-            hrv: 70,
+            result: StressResult(level: 15.7, category: .relaxed, confidence: 0.9, hrv: 70, heartRate: 68),
             size: .dashboard
         )
 
-        // Verify stress level is converted to integer for VoiceOver
-        let expectedValue = "Stress level: 15"
-        // Note: In actual implementation, card uses Int(stressLevel)
         #expect(Int(card.stressLevel) == 15)
     }
 
@@ -239,35 +241,25 @@ struct StressCharacterCardTests {
 
     @Test func testFontSizeForDashboard() {
         let card = StressCharacterCard(
-            mood: .calm,
-            stressLevel: 15,
-            hrv: nil,
+            result: makeResult(mood: .calm, stressLevel: 15),
             size: .dashboard
         )
-
-        // Verify fonts are appropriate for size (can't directly test Font, but verify creation)
         let _ = card.body
     }
 
     @Test func testFontSizeForWidget() {
         let card = StressCharacterCard(
-            mood: .calm,
-            stressLevel: 15,
-            hrv: nil,
+            result: makeResult(mood: .calm, stressLevel: 15),
             size: .widget
         )
-
         let _ = card.body
     }
 
     @Test func testFontSizeForWatchOS() {
         let card = StressCharacterCard(
-            mood: .calm,
-            stressLevel: 15,
-            hrv: nil,
+            result: makeResult(mood: .calm, stressLevel: 15),
             size: .watchOS
         )
-
         let _ = card.body
     }
 
@@ -275,65 +267,45 @@ struct StressCharacterCardTests {
 
     @Test func testAccessoriesRenderForSleeping() {
         let card = StressCharacterCard(
-            mood: .sleeping,
-            stressLevel: 5,
-            hrv: nil,
+            result: makeResult(mood: .sleeping, stressLevel: 5),
             size: .dashboard
         )
-
-        // Sleeping has zzz accessory
         #expect(!card.mood.accessories.isEmpty)
         let _ = card.body
     }
 
     @Test func testNoAccessoriesRenderForCalm() {
         let card = StressCharacterCard(
-            mood: .calm,
-            stressLevel: 15,
-            hrv: nil,
+            result: makeResult(mood: .calm, stressLevel: 15),
             size: .dashboard
         )
-
-        // Calm has no accessories
         #expect(card.mood.accessories.isEmpty)
         let _ = card.body
     }
 
     @Test func testAccessoriesRenderForConcerned() {
         let card = StressCharacterCard(
-            mood: .concerned,
-            stressLevel: 35,
-            hrv: nil,
+            result: makeResult(mood: .concerned, stressLevel: 35),
             size: .dashboard
         )
-
-        // Concerned has star accessory
         #expect(card.mood.accessories.count == 1)
         let _ = card.body
     }
 
     @Test func testAccessoriesRenderForWorried() {
         let card = StressCharacterCard(
-            mood: .worried,
-            stressLevel: 60,
-            hrv: nil,
+            result: makeResult(mood: .worried, stressLevel: 60),
             size: .dashboard
         )
-
-        // Worried has drop accessory
         #expect(card.mood.accessories.count == 1)
         let _ = card.body
     }
 
     @Test func testMultipleAccessoriesRenderForOverwhelmed() {
         let card = StressCharacterCard(
-            mood: .overwhelmed,
-            stressLevel: 85,
-            hrv: nil,
+            result: makeResult(mood: .overwhelmed, stressLevel: 85),
             size: .dashboard
         )
-
-        // Overwhelmed has multiple accessories
         #expect(card.mood.accessories.count == 2)
         let _ = card.body
     }
@@ -341,16 +313,16 @@ struct StressCharacterCardTests {
     // MARK: - Character Animation Tests
 
     @Test func testCharacterAnimationModifierApplied() {
-        // Verify character has animation modifier
         for mood in StressBuddyMood.allCases {
+            let level = switch mood {
+            case .sleeping: 5.0; case .calm: 15.0; case .concerned: 35.0
+            case .worried: 60.0; case .overwhelmed: 85.0
+            }
             let card = StressCharacterCard(
-                mood: mood,
-                stressLevel: 50,
-                hrv: nil,
+                result: makeResult(mood: mood, stressLevel: level),
                 size: .dashboard
             )
-
-            let _ = card.body // Verify view with animation compiles
+            let _ = card.body
         }
     }
 
@@ -358,14 +330,14 @@ struct StressCharacterCardTests {
 
     @Test func testMoodColorApplied() {
         for mood in StressBuddyMood.allCases {
+            let level = switch mood {
+            case .sleeping: 5.0; case .calm: 15.0; case .concerned: 35.0
+            case .worried: 60.0; case .overwhelmed: 85.0
+            }
             let card = StressCharacterCard(
-                mood: mood,
-                stressLevel: 50,
-                hrv: nil,
+                result: makeResult(mood: mood, stressLevel: level),
                 size: .dashboard
             )
-
-            // Verify color can be created
             let _ = UIColor(card.mood.color)
             let _ = card.body
         }
@@ -375,61 +347,44 @@ struct StressCharacterCardTests {
 
     @Test func testZeroStressLevel() {
         let card = StressCharacterCard(
-            mood: .sleeping,
-            stressLevel: 0,
-            hrv: nil,
+            result: makeResult(mood: .sleeping, stressLevel: 0),
             size: .dashboard
         )
-
         let _ = card.body
     }
 
     @Test func testMaxStressLevel() {
         let card = StressCharacterCard(
-            mood: .overwhelmed,
-            stressLevel: 100,
-            hrv: nil,
+            result: makeResult(mood: .overwhelmed, stressLevel: 100),
             size: .dashboard
         )
-
         let _ = card.body
     }
 
     @Test func testVeryLowHRV() {
         let card = StressCharacterCard(
-            mood: .overwhelmed,
-            stressLevel: 85,
-            hrv: 10,
+            result: makeResult(mood: .overwhelmed, stressLevel: 85, hrv: 10),
             size: .dashboard
         )
-
         let _ = card.body
     }
 
     @Test func testVeryHighHRV() {
         let card = StressCharacterCard(
-            mood: .sleeping,
-            stressLevel: 5,
-            hrv: 150,
+            result: makeResult(mood: .sleeping, stressLevel: 5, hrv: 150),
             size: .dashboard
         )
-
         let _ = card.body
     }
 
     @Test func testDecimalStressLevels() {
-        // Test fractional stress levels are handled correctly
         let levels = [0.1, 5.5, 15.7, 35.3, 60.9, 85.2, 99.9]
-
         for level in levels {
             let mood = StressBuddyMood.from(stressLevel: level)
             let card = StressCharacterCard(
-                mood: mood,
-                stressLevel: level,
-                hrv: nil,
+                result: makeResult(mood: mood, stressLevel: level),
                 size: .dashboard
             )
-
             let _ = card.body
         }
     }
@@ -447,56 +402,42 @@ struct StressCharacterCardTests {
     // MARK: - Monospaced Digit Tests
 
     @Test func testStressLevelUsesMonospacedDigits() {
-        // Verify stress level text would use monospacedDigit() modifier
-        // This ensures consistent width for smooth transitions
         let card = StressCharacterCard(
-            mood: .calm,
-            stressLevel: 15,
-            hrv: nil,
+            result: makeResult(mood: .calm, stressLevel: 15),
             size: .dashboard
         )
-
-        let _ = card.body // Verify compilation with monospacedDigit modifier
+        let _ = card.body
     }
 
     // MARK: - HRV Formatting Tests
 
     @Test func testHRVFormattingWhenPresent() {
         let card = StressCharacterCard(
-            mood: .calm,
-            stressLevel: 15,
-            hrv: 65.7,
+            result: makeResult(mood: .calm, stressLevel: 15, hrv: 65.7),
             size: .dashboard
         )
-
-        // HRV should be shown as integer in ms
         #expect(card.hrv != nil)
         let hrvInt = Int(card.hrv!)
         #expect(hrvInt == 65)
-
         let _ = card.body
     }
 
     @Test func testHRVNotShownWhenNil() {
+        // StressResult.hrv is Double, not optional — verify value propagation
         let card = StressCharacterCard(
-            mood: .calm,
-            stressLevel: 15,
-            hrv: nil,
+            result: makeResult(mood: .calm, stressLevel: 15, hrv: 50),
             size: .dashboard
         )
-
-        #expect(card.hrv == nil)
+        #expect(card.hrv == 50)
         let _ = card.body
     }
 
     // MARK: - Symbol Rendering Mode Tests
 
     @Test func testSymbolHierarchicalRenderingMode() {
-        // Verify all symbols can be rendered in hierarchical mode
         for mood in StressBuddyMood.allCases {
             let symbolName = mood.symbol
             let image = UIImage(systemName: symbolName)
-
             #expect(image != nil, "Symbol '\(symbolName)' should be valid SF Symbol")
         }
     }
@@ -510,7 +451,7 @@ struct CharacterAnimationModifierTests {
     @Test func testAnimationModifierCreation() {
         for mood in StressBuddyMood.allCases {
             let modifier = CharacterAnimationModifier(mood: mood)
-            let _ = modifier // Verify creation
+            let _ = modifier
         }
     }
 
@@ -523,7 +464,7 @@ struct CharacterAnimationModifierTests {
         }
 
         let view = TestView()
-        let _ = view.body // Verify compilation
+        let _ = view.body
     }
 }
 

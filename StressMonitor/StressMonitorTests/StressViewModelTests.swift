@@ -110,6 +110,67 @@ final class StressViewModelTests: XCTestCase {
         XCTAssertNil(viewModel.errorMessage)
     }
 
+    // MARK: - Render State Tests
+
+    func testRenderStateInitiallyNoData() {
+        guard case .noData = viewModel.renderState else {
+            XCTFail("Expected .noData, got different state")
+            return
+        }
+    }
+
+    func testRenderStateLoading() {
+        viewModel.isLoading = true
+        guard case .loading = viewModel.renderState else {
+            XCTFail("Expected .loading, got different state")
+            return
+        }
+    }
+
+    func testRenderStatePermissionRequired() {
+        viewModel.isPermissionRequired = true
+        guard case .permissionRequired = viewModel.renderState else {
+            XCTFail("Expected .permissionRequired, got different state")
+            return
+        }
+    }
+
+    func testRenderStatePermissionPriorityOverLoading() {
+        viewModel.isLoading = true
+        viewModel.isPermissionRequired = true
+        guard case .permissionRequired = viewModel.renderState else {
+            XCTFail("permissionRequired should take priority over loading")
+            return
+        }
+    }
+
+    func testRenderStateContent() {
+        let stress = StressResult(level: 30, category: .mild, confidence: 0.9, hrv: 50, heartRate: 70)
+        viewModel.currentStress = stress
+        guard case .content(let result) = viewModel.renderState else {
+            XCTFail("Expected .content, got different state")
+            return
+        }
+        XCTAssertEqual(result.level, 30)
+    }
+
+    func testRenderStateLoadingToContentFlow() {
+        viewModel.isLoading = true
+        guard case .loading = viewModel.renderState else {
+            XCTFail("Expected .loading initially")
+            return
+        }
+
+        let stress = StressResult(level: 20, category: .relaxed, confidence: 0.8, hrv: 55, heartRate: 68)
+        viewModel.isLoading = false
+        viewModel.currentStress = stress
+        guard case .content(let result) = viewModel.renderState else {
+            XCTFail("Expected .content after loading")
+            return
+        }
+        XCTAssertEqual(result.level, 20)
+    }
+
     // MARK: - clearError Tests
 
     func testClearError() {
