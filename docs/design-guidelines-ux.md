@@ -307,18 +307,36 @@ Your stress data appears here once you begin tracking.
 [Measure Now]
 ```
 
-### Error State (HealthKit Permission Denied)
+### Permission Required State
 
-When user denies HealthKit access:
+Displayed when HealthKit authorization is denied or not yet determined. Uses `PermissionCardView` component with multi-type support:
 
+**Component:** `PermissionCardView.swift` (131 LOC)
+- Icon container with error color background
+- Permission type selector (`.healthKit`, `.heartRate`, `.hrv`)
+- "Grant Access" button with loading state
+- Secondary "Open Settings" button (deep link)
+
+**Implementation:**
+```swift
+PermissionCardView(
+    permissionType: .healthKit,
+    isLoading: viewModel.isRequestingAccess,
+    onGrantAccess: { Task { await viewModel.requestHealthKitAccess() } }
+)
 ```
-⚠️ HealthKit Access Required
 
-StressMonitor needs access to your Heart Rate data
-from Apple Watch to calculate stress levels.
+**Dashboard State Machine (Mar 2026):**
+- **Loading:** Initial fetch in progress
+- **Permission Required:** HealthKit denied or `.errorAuthorizationNotDetermined`
+- **Content:** Stress data available (4 sections visible)
+- **No Data:** Empty state when baseline not yet established
 
-[Grant Access] [Learn More]
-```
+**Permission Denied UX:**
+- PermissionCardView at top of scroll
+- `SkeletonBlock` placeholders hint at hidden content below
+- "Grant Access" triggers `viewModel.requestHealthKitAccess()`
+- Double-tap protection via `isRequestingAccess` guard
 
 ### Offline State (CloudKit Unavailable)
 

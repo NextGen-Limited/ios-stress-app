@@ -164,6 +164,9 @@ State management with @Observable macro.
 - `hrvHistory: [Double]`
 - `heartRateTrend: TrendDirection`
 - `aiInsight: AIInsight?`
+- `isPermissionRequired: Bool` (NEW) - Set when HealthKit authorization denied/not determined
+- `isRequestingAccess: Bool` (NEW) - Guards against double-tap on permission request
+- `requestHealthKitAccess()` (NEW) - Request HealthKit authorization with re-entry protection
 
 **Auto-Refresh Features:**
 - HKObserverQuery subscription for automatic updates
@@ -174,8 +177,8 @@ State management with @Observable macro.
 ### Views (85 files, ~9,880 LOC)
 SwiftUI declarative interface organized by feature.
 
-#### Dashboard Module (23 files, ~2,100 LOC)
-Main stress display screen with enhanced UI.
+#### Dashboard Module (24 files, ~2,150 LOC)
+Main stress display screen with enhanced UI and permission flow.
 
 | File | LOC | Purpose |
 |------|-----|---------|
@@ -190,7 +193,8 @@ Main stress display screen with enhanced UI.
 | `Views/Dashboard/Components/StatusBadgeView.swift` | 92 | Stress category badge |
 | `Views/Dashboard/Components/EmptyDashboardView.swift` | 98 | Empty state placeholder |
 | `Views/Dashboard/Components/NoDataCard.swift` | 101 | No data state |
-| `Views/Dashboard/Components/PermissionErrorCard.swift` | 131 | HealthKit error state |
+| `Views/Dashboard/Components/PermissionCardView.swift` | 131 | HealthKit permission request with multi-type support |
+| `Views/Dashboard/Components/SkeletonBlock.swift` | 20 | Skeleton placeholder with pulsing animation |
 | `Views/Dashboard/Components/QuickStatCard.swift` | 70 | Quick stat display |
 
 **Dashboard Enhancement Features:**
