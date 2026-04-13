@@ -81,31 +81,38 @@ def boot_simulator(udid: str, name: str) -> None:
 
 def run_tests(ci: bool = False) -> int:
     """Build and run tests. Returns xcodebuild exit code."""
-    data = get_simulators()
-
-    # Prefer already-booted simulator
-    booted = find_booted_iphone(data)
-    if booted:
-        udid, name = booted
-        print(f"Using already-booted simulator: {name}")
-    else:
-        found = find_available_iphone(data)
-        if not found:
-            print("ERROR: No available iPhone simulator found")
-            sys.exit(1)
-        udid, name = found
-        boot_simulator(udid, name)
-
     # Clean previous build artifacts
     if BUILD_DIR.exists():
         shutil.rmtree(BUILD_DIR)
     BUILD_DIR.mkdir(parents=True, exist_ok=True)
 
+    if ci:
+        # CI: use name-based destination — xcodebuild resolves and boots itself.
+        # UUID-based matching is unreliable because simctl and xcodebuild
+        # use different destination resolution logic (runtime/deployment target).
+        destination = "platform=iOS Simulator,name=iPhone 16,OS=latest"
+        print(f"CI destination: {destination}")
+    else:
+        # Local: use simctl to find/boot simulator, then pass UUID
+        data = get_simulators()
+        booted = find_booted_iphone(data)
+        if booted:
+            udid, name = booted
+            print(f"Using already-booted simulator: {name}")
+        else:
+            found = find_available_iphone(data)
+            if not found:
+                print("ERROR: No available iPhone simulator found")
+                sys.exit(1)
+            udid, name = found
+            boot_simulator(udid, name)
+        destination = f"platform=iOS Simulator,id={udid}"
+
     cmd = [
         "xcodebuild", "test",
         "-project", str(PROJECT),
         "-scheme", SCHEME,
-        "-destination", f"platform=iOS Simulator,id={udid}",
+        "-destination", destination,
         "-destination-timeout", "120",
         f"-only-testing:{TEST_TARGET}",
         "-resultBundlePath", str(BUILD_DIR / "TestResults.xcresult"),
