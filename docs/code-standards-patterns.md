@@ -3,7 +3,7 @@
 **Framework:** Swift 5.9+ with SwiftUI & SwiftData
 **Architecture:** MVVM + Protocol-Oriented Design
 **Section:** DI, async/await, SwiftData, testing, error handling
-**Last Updated:** February 2026
+**Last Updated:** April 13, 2026
 
 ---
 
@@ -342,4 +342,4 @@ func calculateStress() -> StressComputationResult {
 
 **Previous:** See `code-standards-swift.md` for formatting and naming conventions.
 **Enforced By:** Code review & automated tests
-**Last Updated:** February 2026
+**Last Updated:** April 13, 2026

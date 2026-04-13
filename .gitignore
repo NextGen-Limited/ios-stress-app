@@ -155,3 +155,4 @@ DerivedData/
 .omx/logs/
 .claude/session-state/
 tmp-home/
+.gitnexus

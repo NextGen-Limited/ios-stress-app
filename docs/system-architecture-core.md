@@ -4,7 +4,7 @@
 **Concurrency:** async/await
 **Data Flow:** Unidirectional (Models → Services → ViewModels → Views)
 **Section:** MVVM, data flow, core services, protocols
-**Last Updated:** February 2026
+**Last Updated:** April 13, 2026
 
 ---
 
@@ -172,18 +172,21 @@ protocol StressAlgorithmServiceProtocol {
 ```
 
 **Responsibilities:**
-- Core stress algorithm (HRV 70% + HR 30%)
+- Multi-factor stress algorithm (5 factors: HRV, HR, Sleep, Activity, Recovery)
+- Dynamic weight redistribution when factors are unavailable
 - Confidence scoring
 - Baseline computation (30-day adaptation)
+- Per-factor breakdown for UI display
 - Edge case handling
 
 **Algorithm:**
 ```
-Normalized HRV = (Baseline - Current) / Baseline
-Normalized HR = (Current - Resting) / Resting
-HRV Component = (Normalized HRV) ^ 0.8
-HR Component = atan(Normalized HR × 2) / (π/2)
-Stress = ((HRV × 0.7) + (HR × 0.3)) × 100
+5 StressFactor contributors:
+  - HRVStressFactor, HeartRateStressFactor, SleepStressFactor
+  - ActivityStressFactor, RecoveryStressFactor
+Each factor → FactorContribution (independent calculation)
+MultiFactorStressCalculator → dynamic weight redistribution
+StressContext → aggregates HRV, HR, Sleep, Activity, Recovery, Baseline
 ```
 
 #### Repository Service
@@ -405,4 +408,4 @@ final class StubRepository: StressRepositoryProtocol {
 **Next:** See `system-architecture-platform.md` for CloudKit, Watch, widgets, and security details.
 **Maintained By:** Phuong Doan
 **Version:** 1.0 Production
-**Last Updated:** February 2026
+**Last Updated:** April 13, 2026

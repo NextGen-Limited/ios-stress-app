@@ -2,7 +2,7 @@
 
 **Platform:** iOS 17+ / watchOS 10+
 **Distribution:** TestFlight → App Store
-**Last Updated:** February 2026
+**Last Updated:** April 13, 2026
 
 ---
 
@@ -65,4 +65,4 @@ Once your app is built and tested:
 ---
 
 **Maintained By:** Phuong Doan
-**Last Updated:** February 2026
+**Last Updated:** April 13, 2026

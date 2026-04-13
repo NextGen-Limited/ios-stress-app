@@ -3,7 +3,7 @@
 **System:** iOS Human Interface Guidelines compliant
 **Accessibility:** WCAG AA
 **Version:** 1.0
-**Last Updated:** March 3, 2026
+**Last Updated:** April 13, 2026
 
 ---
 
@@ -342,4 +342,4 @@ All cards now use unified adaptive backgrounds that auto-switch in light/dark mo
 ---
 
 **Enforced By:** Code review & QA testing
-**Last Updated:** March 3, 2026
+**Last Updated:** April 13, 2026

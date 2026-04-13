@@ -3,7 +3,7 @@
 **Version:** 1.0 (Production)
 **Status:** Complete and Shipping
 **Platform:** iOS 17+ / watchOS 10+
-**Last Updated:** March 3, 2026
+**Last Updated:** April 13, 2026
 
 ---
 
@@ -46,16 +46,30 @@ StressMonitor is a **privacy-first stress monitoring application** that uses Hea
 
 ## Stress Algorithm
 
-### Mathematical Model
+### Multi-Factor Model (5 Factors)
+
+The stress algorithm uses 5 independent factors with dynamic weight redistribution:
+
+**Factors:**
+1. **HRV** (HRVStressFactor) — Heart rate variability analysis
+2. **Heart Rate** (HeartRateStressFactor) — Elevated HR detection
+3. **Sleep Quality** (SleepStressFactor) — Sleep impact on stress
+4. **Physical Activity** (ActivityStressFactor) — Activity stress impact
+5. **Recovery Status** (RecoveryStressFactor) — Recovery assessment
+
+**Architecture:**
+- `StressFactor` protocol — each factor calculates `FactorContribution` independently
+- `MultiFactorStressCalculator` — orchestrates all factors, applies dynamic weight redistribution
+- `FactorWeights` — base weights with redistribution when factors are unavailable
+- `FactorBreakdown` — per-factor results for UI display
+- `StressContext` — aggregates all health data into single input
 
 ```
-Normalized HRV = (Baseline HRV - Current HRV) / Baseline HRV
-Normalized HR = (Current HR - Resting HR) / Resting HR
-
-HRV Component = (Normalized HRV) ^ 0.8
-HR Component = atan(Normalized HR × 2) / (π/2)
-
-Final Stress Level = ((HRV Component × 0.7) + (HR Component × 0.3)) × 100
+HealthKit → HRV + HR + Sleep + Activity + Recovery
+    → MultiFactorStressCalculator
+        → Each StressFactor.calculateContribution(context:)
+        → Weight redistribution if factors missing
+        → Final Stress Level (0-100) + FactorBreakdown
 ```
 
 ### Stress Categories (0-100 Scale)
@@ -70,9 +84,11 @@ Final Stress Level = ((HRV Component × 0.7) + (HR Component × 0.3)) × 100
 ### Confidence Scoring
 
 Each measurement includes a confidence value (0-1) based on:
+- Factor availability: More available factors increase confidence
 - HRV quality: Penalty if <20ms (unreliable)
 - Heart rate validity: Penalty if <40 or >180 bpm (outliers)
-- Sample count: More samples increase confidence
+- Sample count: More historical samples increase confidence
+- Weight redistribution reduces confidence when factors are missing
 
 ---
 

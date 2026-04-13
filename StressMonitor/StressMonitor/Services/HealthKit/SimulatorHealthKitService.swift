@@ -41,7 +41,8 @@ final class SimulatorHealthKitService: HealthKitServiceProtocol, @unchecked Send
     private var currentScenario: Scenario {
         let elapsed = Date().timeIntervalSince(startTime)
         let index = Int(elapsed / scenarioDuration) % Scenario.allCases.count
-        return Scenario(rawValue: index) ?? .relaxed
+//        return Scenario(rawValue: index) ?? .relaxed
+        return .edgeLowHRV
     }
 
     // MARK: - Core Data Generation

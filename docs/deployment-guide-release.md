@@ -2,7 +2,7 @@
 
 **Platform:** iOS 17+ / watchOS 10+
 **Section:** Distribution, Review, Post-Release Monitoring
-**Last Updated:** February 2026
+**Last Updated:** April 13, 2026
 
 ---
 
@@ -439,4 +439,4 @@ Typical timeline: 4-6 hours
 
 **Previous:** See `deployment-guide-environment.md` for setup instructions.
 **Managed By:** Phuong Doan
-**Last Updated:** February 2026
+**Last Updated:** April 13, 2026

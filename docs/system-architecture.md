@@ -3,7 +3,7 @@
 **Pattern:** MVVM + Protocol-Oriented Design
 **Concurrency:** async/await
 **Data Flow:** Unidirectional (Models → Services → ViewModels → Views)
-**Last Updated:** March 15, 2026
+**Last Updated:** April 13, 2026
 
 ---
 
@@ -65,6 +65,8 @@ Advanced platform capabilities:
 | **WidgetKit** | Widgets & complications | Modern widget framework, watchOS 10+ |
 | **async/await** | Concurrency | Swift 5.9+ native, structured concurrency |
 | **AnimatedTabBar** | Tab bar animations | exyte library, reduces custom code |
+| **Combine** | Async streams | Background health data observation |
+| **WidgetKit** | Home screen widgets | Interactive stress display |
 
 ---
 
@@ -129,15 +131,20 @@ UI Updates on screen
 
 ### HealthKit Service
 - Request HealthKit authorization
-- Fetch HRV data from Apple Watch
+- Fetch HRV data from Apple Watch  
 - Fetch heart rate samples
 - Handle permission denial gracefully
+- Support for 5-factor data (HRV, HR, Sleep, Activity, Recovery)
+- Extensions for activity, sleep, and recovery data fetching
+- Simulator service for testing
 
-### Algorithm Service
-- Calculate stress level (HRV 70% + HR 30%)
-- Compute confidence scoring
-- Manage 30-day baseline adaptation
-- Handle edge cases
+### Multi-Factor Algorithm Service
+- **NEW**: 5-factor stress algorithm with dynamic weight redistribution
+- Core algorithm: MultiFactorStressCalculator (HRV, HR, Sleep, Activity, Recovery)
+- Individual factor services: HRVStressFactor, HeartRateStressFactor, SleepStressFactor, ActivityStressFactor, RecoveryStressFactor
+- FactorCalibrator for adjusting weights based on data quality
+- StressFactor protocol for extensibility
+- Updated algorithm: HRV (70% dynamic), HR (30% dynamic), Sleep, Activity, Recovery weights redistribute based on data availability
 
 ### Insight Service
 - Generate AI-powered personalized insights from measurement history
@@ -149,6 +156,7 @@ UI Updates on screen
 - Query recent/filtered measurements
 - Persist baseline data
 - Data cleanup operations
+- **UPDATE**: 392 LOC (reduced from 445)
 
 ### CloudKit Service
 - Sync measurements to iCloud
@@ -156,12 +164,14 @@ UI Updates on screen
 - E2E encrypted storage
 - Offline queue management
 - Rate limiting (5-record batches, 5-minute throttle)
+- **UPDATE**: CloudKitManager (244 LOC), CloudKitSchema (71 LOC), CloudKitSyncEngine (181 LOC)
 
 ### DataManagement Service
 - Export to CSV/JSON
 - Delete by date range
 - Delete by category
 - Full local/cloud wipe
+- **NEW**: 9 files (~2,789 LOC) including DataManagementService, CSVGenerator, JSONGenerator, DataDeleterService, CloudKitResetService, LocalDataWipeService
 
 ---
 
@@ -175,6 +185,9 @@ UI Updates on screen
 | **@Observable macro** | Modern, iOS 17+ reactive | Excludes iOS 16 |
 | **CloudKit E2E encryption** | User privacy, Apple ecosystem | Requires iCloud account |
 | **WidgetKit (not ClockKit)** | watchOS 10+ requirement | No ClockKit support |
+| **Multi-factor algorithm** | More comprehensive stress assessment | Increased complexity, more data required |
+| **Offline-first sync** | UX resilience, privacy | Conflict resolution complexity |
+| **Protocol-based services** | Testability, extensibility | More abstraction overhead |
 
 ---
 
@@ -304,4 +317,4 @@ TriangleShape()
 
 **Maintained By:** Phuong Doan
 **Version:** 1.0 Production
-**Last Updated:** March 3, 2026
+**Last Updated:** April 13, 2026

@@ -3,7 +3,7 @@
 **Pattern:** MVVM + Protocol-Oriented Design
 **Concurrency:** async/await
 **Section:** CloudKit, Watch, widgets, security, extensibility
-**Last Updated:** February 2026
+**Last Updated:** April 13, 2026
 
 ---
 
@@ -254,4 +254,4 @@ let lastStress = defaults?.double(forKey: "lastStressLevel") ?? 0
 **Previous:** See `system-architecture-core.md` for core MVVM and service architecture.
 **Maintained By:** Phuong Doan
 **Version:** 1.0 Production
-**Last Updated:** February 2026
+**Last Updated:** April 13, 2026

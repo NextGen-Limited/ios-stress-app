@@ -3,7 +3,7 @@
 **Framework:** Swift 5.9+ with SwiftUI & SwiftData
 **Architecture:** MVVM + Protocol-Oriented Design
 **External Dependencies:** AnimatedTabBar (exyte/SPM)
-**Last Updated:** March 15, 2026
+**Last Updated:** April 13, 2026
 
 ---
 
@@ -71,11 +71,15 @@ StressMonitor/
 │   ├── Sync/
 │   ├── Background/
 │   ├── Connectivity/
-│   ├── Protocols/
-│   └── ...
+│   ├── Widget/
+│   ├── Watch/
+│   └── Protocols/
 ├── ViewModels/              # State management (@Observable)
 ├── Views/                   # SwiftUI screens
 ├── Theme/                   # Design tokens
+├── WidgetKit/              # iOS widgets (Small/Medium/Large families)
+├── WatchApp/               # watchOS app with complications
+├── Shared/                 # Shared models/data (App Groups)
 └── Utilities/               # Helper functions
 ```
 
@@ -84,6 +88,26 @@ StressMonitor/
 - Keep files under 200 lines of code
 - Group related functionality by domain
 - One public type per file (usually)
+
+### Platform-Specific Patterns
+
+**WidgetKit**: StaticConfiguration widgets with timeline providers
+```swift
+struct StressWidgetProvider: TimelineProvider {
+    func timeline(in context: Context) -> Timeline<StressWidgetEntry> {
+        // Provide updates for widget families
+    }
+}
+```
+
+**watchOS**: Direct HealthKit access and standalone cloud sync
+- WatchHealthKitManager (direct HealthKit calls)
+- WatchCloudKitManager (battery-aware throttling)
+- ComplicationDataProvider (App Groups for data sharing)
+
+**CloudKit**: Cross-device sync with conflict resolution
+- CloudKitSyncEngine (batch operations, deviceID priority)
+- WidgetSharedData (App Groups UserDefaults sharing)
 
 ---
 
@@ -128,6 +152,10 @@ class StressViewModel {
 class HealthKitManager {
   static let shared = HealthKitManager()
 }
+
+**Singleton Policy:** Avoid singletons for services, allow for infrastructure/manager objects
+- ✅ Allowed: HapticManager.shared, ConnectivityManager.shared, NotificationManager.shared
+- ❌ Avoid: Service instances with dependencies
 ```
 
 ---
@@ -219,4 +247,4 @@ func startAutoRefresh() {
 ---
 
 **Enforced By:** Code review & automated tests
-**Last Updated:** March 3, 2026
+**Last Updated:** April 13, 2026
