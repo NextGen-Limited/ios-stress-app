@@ -14,7 +14,7 @@ jobs:
   build-and-test:
     name: Build & Test
     runs-on: macos-15
-    timeout-minutes: 20
+    timeout-minutes: 25
 
     steps:
       - name: Checkout
@@ -25,10 +25,23 @@ jobs:
         with:
           xcode-version: latest-stable
 
-      - name: Print Xcode version
+      - name: Boot Simulator
         run: |
-          xcodebuild -version
           xcrun simctl list devices available | grep "iPhone" | head -5
+          SIMULATOR_ID=$(xcrun simctl list devices available -j | python3 -c "
+            import json, sys
+            data = json.load(sys.stdin)
+            for runtime in data['devices']:
+                if 'iOS' in runtime:
+                    for device in data['devices'][runtime]:
+                        if device['name'] == 'iPhone 16' and device['isAvailable']:
+                            print(device['udid'])
+                            sys.exit(0)
+            sys.exit(1)
+          ")
+          echo "Booting iPhone 16 ($SIMULATOR_ID)"
+          xcrun simctl boot "$SIMULATOR_ID" 2>/dev/null || true
+          xcrun simctl list devices booted
 
       - name: Cache SPM & DerivedData
         uses: actions/cache@v4
@@ -42,22 +55,20 @@ jobs:
       - name: Build & Test
         working-directory: StressMonitor
         run: |
-          set -o pipefail
-          mkdir -p build/reports
           xcodebuild test \
             -project StressMonitor.xcodeproj \
             -scheme StressMonitor \
             -destination "platform=iOS Simulator,name=iPhone 16,OS=latest" \
+            -destination-timeout 120 \
             -only-testing:StressMonitorTests \
+            -resultBundlePath build/TestResults.xcresult \
             CODE_SIGNING_ALLOWED=NO \
-            CI=1 \
-            2>&1 | tee build/build.log \
-            | if command -v xcpretty &>/dev/null; then xcpretty --color --report junit --output build/reports/junit.xml; else cat; fi
+            CI=1
 
       - name: Upload test results
         uses: actions/upload-artifact@v4
         if: always()
         with:
           name: test-results
-          path: StressMonitor/build/reports/
+          path: StressMonitor/build/TestResults.xcresult
           retention-days: 7
