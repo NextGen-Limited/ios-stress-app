@@ -25,23 +25,10 @@ jobs:
         with:
           xcode-version: latest-stable
 
-      - name: Boot Simulator
+      - name: Print environment
         run: |
-          xcrun simctl list devices available | grep "iPhone" | head -5
-          SIMULATOR_ID=$(xcrun simctl list devices available -j | python3 -c "
-            import json, sys
-            data = json.load(sys.stdin)
-            for runtime in data['devices']:
-                if 'iOS' in runtime:
-                    for device in data['devices'][runtime]:
-                        if device['name'] == 'iPhone 16' and device['isAvailable']:
-                            print(device['udid'])
-                            sys.exit(0)
-            sys.exit(1)
-          ")
-          echo "Booting iPhone 16 ($SIMULATOR_ID)"
-          xcrun simctl boot "$SIMULATOR_ID" 2>/dev/null || true
-          xcrun simctl list devices booted
+          xcodebuild -version
+          python3 --version
 
       - name: Cache SPM & DerivedData
         uses: actions/cache@v4
@@ -52,18 +39,10 @@ jobs:
           key: xcode-${{ runner.os }}-${{ hashFiles('StressMonitor/StressMonitor.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved') }}
           restore-keys: xcode-${{ runner.os }}-
 
-      - name: Build & Test
-        working-directory: StressMonitor
-        run: |
-          xcodebuild test \
-            -project StressMonitor.xcodeproj \
-            -scheme StressMonitor \
-            -destination "platform=iOS Simulator,name=iPhone 16,OS=latest" \
-            -destination-timeout 120 \
-            -only-testing:StressMonitorTests \
-            -resultBundlePath build/TestResults.xcresult \
-            CODE_SIGNING_ALLOWED=NO \
-            CI=1
+      - name: Run tests
+        run: python3 scripts/run-tests.py
+        env:
+          CI: "1"
 
       - name: Upload test results
         uses: actions/upload-artifact@v4
