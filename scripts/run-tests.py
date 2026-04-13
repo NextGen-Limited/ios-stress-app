@@ -119,7 +119,7 @@ def run_tests(ci: bool = False) -> int:
     ]
 
     if ci:
-        cmd.extend(["CODE_SIGNING_ALLOWED=NO", "CI=1"])
+        cmd.extend(["CODE_SIGNING_ALLOWED=NO", "CI=1", "-enableCodeCoverage", "YES"])
 
     print(f"\nRunning: {' '.join(cmd)}\n")
     result = subprocess.run(cmd, cwd=str(PROJECT_DIR))
