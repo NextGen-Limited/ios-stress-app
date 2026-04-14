@@ -5,10 +5,15 @@ on:
     branches: [main]
   pull_request:
     branches: [main]
+  workflow_dispatch:
 
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
+
+permissions:
+  contents: read
+  checks: write
 
 jobs:
   build-and-test:
@@ -44,27 +49,38 @@ jobs:
         env:
           CI: "1"
 
-      - name: Publish test results
-        uses: kishikawakatsumi/xcresulttool@v1
-        if: always()
-        with:
-          path: StressMonitor/build/TestResults.xcresult
-          show-passed-tests: true
-          show-code-coverage: true
-
-      - name: Code coverage summary
-        if: always()
+      - name: Validate xcresult bundle
+        id: xcresult
+        if: success() || failure()
         run: |
           if [ -d "StressMonitor/build/TestResults.xcresult" ]; then
-            echo "## Code Coverage" >> $GITHUB_STEP_SUMMARY
-            echo '```' >> $GITHUB_STEP_SUMMARY
-            xcrun xccov view --report StressMonitor/build/TestResults.xcresult 2>/dev/null | head -100 >> $GITHUB_STEP_SUMMARY || true
-            echo '```' >> $GITHUB_STEP_SUMMARY
+            echo "exists=true" >> "$GITHUB_OUTPUT"
+            echo "xcresult bundle found"
+          else
+            echo "exists=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::xcresult bundle not found, skipping test report"
           fi
+
+      - name: Publish test results
+        if: (success() || failure()) && steps.xcresult.outputs.exists == 'true'
+        run: |
+          echo "## Test Results" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          xcrun xcresulttool get test-results summary \
+            --path StressMonitor/build/TestResults.xcresult >> $GITHUB_STEP_SUMMARY 2>&1 || true
+          echo '```' >> $GITHUB_STEP_SUMMARY
+
+      - name: Code coverage summary
+        if: steps.xcresult.outputs.exists == 'true'
+        run: |
+          echo "## Code Coverage" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          xcrun xccov view --report StressMonitor/build/TestResults.xcresult 2>/dev/null | head -100 >> $GITHUB_STEP_SUMMARY || true
+          echo '```' >> $GITHUB_STEP_SUMMARY
 
       - name: Upload test results
         uses: actions/upload-artifact@v4
-        if: always()
+        if: steps.xcresult.outputs.exists == 'true'
         with:
           name: test-results
           path: StressMonitor/build/TestResults.xcresult
