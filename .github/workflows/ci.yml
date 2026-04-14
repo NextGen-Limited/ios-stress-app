@@ -47,7 +47,7 @@ jobs:
 
       - name: Publish test results
         uses: kishikawakatsumi/xcresulttool@v1
-        if: always()
+        if: success() || failure()
         with:
           path: StressMonitor/build/TestResults.xcresult
           show-passed-tests: true
