@@ -62,12 +62,13 @@ jobs:
           fi
 
       - name: Publish test results
-        uses: kishikawakatsumi/xcresulttool@v1
         if: (success() || failure()) && steps.xcresult.outputs.exists == 'true'
-        with:
-          path: StressMonitor/build/TestResults.xcresult
-          show-passed-tests: true
-          show-code-coverage: true
+        run: |
+          echo "## Test Results" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          xcrun xcresulttool get test-results summary \
+            --path StressMonitor/build/TestResults.xcresult >> $GITHUB_STEP_SUMMARY 2>&1 || true
+          echo '```' >> $GITHUB_STEP_SUMMARY
 
       - name: Code coverage summary
         if: steps.xcresult.outputs.exists == 'true'
