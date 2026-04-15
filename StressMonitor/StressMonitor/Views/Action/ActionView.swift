@@ -340,43 +340,9 @@ struct ActionView: View {
     // MARK: - AI Chat Card
 
     private var aiChatCard: some View {
-        HStack(spacing: 16) {
-            // Cat avatar
-            Circle()
-                .fill(Color.Wellness.gentlePurple.opacity(0.2))
-                .frame(width: 80, height: 80)
-                .overlay(
-                    Text("🐱")
-                        .font(.system(size: 40))
-                )
-
-            VStack(alignment: .leading, spacing: 4) {
-                Text("AI Chat")
-                    .font(.system(size: 17, weight: .semibold))
-                    .foregroundStyle(Color.Wellness.adaptivePrimaryText)
-
-                Text("Talk with AI Kitten")
-                    .font(.system(size: 15))
-                    .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
-
-                Text("\"It's always better to talk to your support group. If you need, Kitten is here for you!\"")
-                    .font(.system(size: 13))
-                    .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
-                    .lineLimit(2)
-            }
-
-            Spacer()
-
-            Image(systemName: "chevron.right")
-                .font(.system(size: 14, weight: .semibold))
-                .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
-        }
-        .padding(16)
-        .background(
-            RoundedRectangle(cornerRadius: 16)
-                .fill(Color.Wellness.adaptiveCardBackground)
-                .shadow(color: .black.opacity(0.05), radius: 8, x: 0, y: 2)
-        )
+        AIChatCard(onTap: {
+            // TODO: Navigate to AI chat screen
+        })
     }
 
     // MARK: - Recommendations Card
