@@ -3,7 +3,7 @@
 **Total Files:** 293 Swift files
 **Total Tokens:** ~280,000
 **Architecture:** MVVM + Protocol-Oriented Design
-**Last Updated:** April 13, 2026
+**Last Updated:** April 15, 2026
 
 ---
 
@@ -68,6 +68,7 @@ Data structures for health metrics and stress calculations.
 | `Models/PersonalBaseline.swift` | 48 | User's physiological baseline |
 | `Models/StressBuddyMood.swift` | 38 | Character mood states |
 | `Models/ExportModels.swift` | 279 | CSV/JSON export structures |
+| `Models/ChatMessage.swift` | ~33 | Chat message model (ChatRole enum + ChatMessage struct) |
 
 ### Services (27 files, ~4,861 LOC)
 Business logic, HealthKit integration, data persistence, cloud sync.
@@ -89,6 +90,19 @@ Business logic, HealthKit integration, data persistence, cloud sync.
 
 **Key Methods:**
 - `generateInsight(stress:baseline:history:)` - Generate personalized insights from patterns
+
+#### LLM Service (4 files, ~350 LOC)
+| File | LOC | Purpose |
+|------|-----|---------|
+| `Services/LLM/LLMServiceProtocol.swift` | ~58 | Protocol + `LLMServiceError` error enum |
+| `Services/LLM/AppleIntelligenceService.swift` | ~130 | Apple Foundation Models (iOS 26+) implementation |
+| `Services/LLM/ChatContextBuilder.swift` | ~90 | Health data → system prompt assembler |
+| `Services/LLM/ChatQuickActions.swift` | ~72 | Pre-built prompt suggestions |
+
+**Key Methods:**
+- `LLMServiceProtocol.send(messages:systemPrompt:)` - Stream LLM response tokens
+- `AppleIntelligenceService.isAvailable()` - Check iOS 26+ Foundation Models support
+- `ChatContextBuilder.buildSystemPrompt(stress:baseline:)` - Assemble health context
 
 #### Algorithm Service (2 files, 312 LOC)
 | File | LOC | Purpose |
@@ -145,13 +159,14 @@ Large module for export, delete, and CloudKit reset operations.
 | `Services/Protocols/StressRepositoryProtocol.swift` | 32 | Repository interface |
 | `Services/Protocols/CloudKitServiceProtocol.swift` | 40 | CloudKit interface |
 
-### ViewModels (2 files, ~737 LOC)
+### ViewModels (3 files, ~900 LOC)
 State management with @Observable macro.
 
 | File | LOC | Purpose |
 |------|-----|---------|
 | `ViewModels/StressViewModel.swift` | 278 | Main app state with auto-refresh (HKObserverQuery) |
 | `ViewModels/DataManagementViewModel.swift` | 459 | Export, delete, reset operations state |
+| `ViewModels/ChatViewModel.swift` | ~163 | Chat state management, LLM interaction, message streaming |
 
 **Key Properties in StressViewModel:**
 - `currentStress: StressResult?`
@@ -278,6 +293,14 @@ First-launch flow with baseline setup.
 | `Views/Onboarding/HealthKitPermissionView.swift` | 92 | HealthKit request |
 | `Views/Onboarding/BaselineSetupView.swift` | 156 | Collect baseline data |
 | `Views/Onboarding/OnboardingCompletionView.swift` | 7 | Success screen |
+
+#### Chat Module (2 files, ~400 LOC)
+AI chat bottom sheet with native SwiftUI.
+
+| File | LOC | Purpose |
+|------|-----|---------|
+| `Views/Chat/ChatBottomSheetView.swift` | ~300 | Native SwiftUI chat UI in bottom sheet |
+| `Views/Chat/QuickActionChipsView.swift` | ~100 | Pre-built prompt suggestion chips |
 
 #### DesignSystem & Components (12 files, ~690 LOC)
 Reusable components and design patterns.
@@ -513,5 +536,5 @@ Watch-specific design tokens.
 
 ---
 
-**Last Updated:** April 13, 2026
+**Last Updated:** April 15, 2026
 **Maintainers:** Phuong Doan

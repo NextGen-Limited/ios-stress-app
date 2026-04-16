@@ -10,6 +10,7 @@
 		F26965312F5C0A9700B40F0F /* AnimatedTabBar in Frameworks */ = {isa = PBXBuildFile; productRef = F26965302F5C0A9700B40F0F /* AnimatedTabBar */; };
 		F26968812F5DAE2400B40F0F /* SwiftUICharts in Frameworks */ = {isa = PBXBuildFile; productRef = F26968802F5DAE2400B40F0F /* SwiftUICharts */; };
 		F2E2EC392F1CC605000C2B53 /* StressMonitorWatch Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = F2E2EC192F1CC602000C2B53 /* StressMonitorWatch Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		F2FCD7AF2F8FFBFF000DE6E8 /* ExyteChat in Frameworks */ = {isa = PBXBuildFile; productRef = F2FCD7AE2F8FFBFF000DE6E8 /* ExyteChat */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -131,6 +132,7 @@
 			files = (
 				F26965312F5C0A9700B40F0F /* AnimatedTabBar in Frameworks */,
 				F26968812F5DAE2400B40F0F /* SwiftUICharts in Frameworks */,
+				F2FCD7AF2F8FFBFF000DE6E8 /* ExyteChat in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -222,6 +224,7 @@
 			packageProductDependencies = (
 				F26965302F5C0A9700B40F0F /* AnimatedTabBar */,
 				F26968802F5DAE2400B40F0F /* SwiftUICharts */,
+				F2FCD7AE2F8FFBFF000DE6E8 /* ExyteChat */,
 			);
 			productName = StressMonitor;
 			productReference = F2E2EBE92F1CC553000C2B53 /* StressMonitor.app */;
@@ -387,6 +390,7 @@
 			packageReferences = (
 				F269652F2F5C0A9700B40F0F /* XCRemoteSwiftPackageReference "AnimatedTabBar" */,
 				F269687F2F5DAE2400B40F0F /* XCRemoteSwiftPackageReference "SwiftUICharts" */,
+				F2FCD7AD2F8FFBFE000DE6E8 /* XCRemoteSwiftPackageReference "Chat" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = F2E2EBEA2F1CC553000C2B53 /* Products */;
@@ -1052,6 +1056,14 @@
 				minimumVersion = 2.10.4;
 			};
 		};
+		F2FCD7AD2F8FFBFE000DE6E8 /* XCRemoteSwiftPackageReference "Chat" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/exyte/Chat.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.0.2;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -1064,6 +1076,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = F269687F2F5DAE2400B40F0F /* XCRemoteSwiftPackageReference "SwiftUICharts" */;
 			productName = SwiftUICharts;
+		};
+		F2FCD7AE2F8FFBFF000DE6E8 /* ExyteChat */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = F2FCD7AD2F8FFBFE000DE6E8 /* XCRemoteSwiftPackageReference "Chat" */;
+			productName = ExyteChat;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

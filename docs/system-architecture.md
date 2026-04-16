@@ -65,6 +65,7 @@ Advanced platform capabilities:
 | **WidgetKit** | Widgets & complications | Modern widget framework, watchOS 10+ |
 | **async/await** | Concurrency | Swift 5.9+ native, structured concurrency |
 | **AnimatedTabBar** | Tab bar animations | exyte library, reduces custom code |
+| **Foundation Models** | On-device LLM | Apple Intelligence (iOS 26+), conversational AI |
 | **Combine** | Async streams | Background health data observation |
 | **WidgetKit** | Home screen widgets | Interactive stress display |
 
@@ -86,6 +87,19 @@ Data Layer (SwiftData + CloudKit)
 System APIs (HealthKit)
     ↓
 Apple Watch Sensors
+```
+
+**AI Chat data flow (Apr 2026):**
+```
+ActionView.isChatPresented → .sheet(ChatBottomSheetView)
+    ↓
+ChatViewModel (sends messages + receives streaming tokens)
+    ↓
+LLMServiceProtocol.send(messages:systemPrompt:) → AsyncThrowingStream<String, Error>
+    ↓
+AppleIntelligenceService (iOS 26+ Foundation Models) OR unavailable fallback
+    ↑
+ChatContextBuilder (assembles health/stress context into system prompt)
 ```
 
 **Auto-refresh path (Mar 2026):**
@@ -150,6 +164,15 @@ UI Updates on screen
 - Generate AI-powered personalized insights from measurement history
 - `InsightGeneratorService.generateInsight(stress:baseline:history:)`
 - Surfaces patterns and recommendations to `AIInsightCard` on dashboard
+
+### LLM Service (Apr 2026)
+- Protocol-based LLM abstraction (`LLMServiceProtocol`)
+- `AppleIntelligenceService` -- Apple Foundation Models (iOS 26+), streaming token response
+- `ChatContextBuilder` -- assembles health/stress data into system prompt
+- `ChatQuickActions` -- pre-built prompt suggestions for wellness topics
+- Graceful fallback on pre-iOS 26 devices
+- `LLMServiceError` enum covers all failure modes (unavailable, context exceeded, guardrail, rate limit, etc.)
+- Session-only chat persistence (no SwiftData)
 
 ### Repository Service
 - SwiftData CRUD operations
@@ -317,4 +340,4 @@ TriangleShape()
 
 **Maintained By:** Phuong Doan
 **Version:** 1.0 Production
-**Last Updated:** April 13, 2026
+**Last Updated:** April 15, 2026

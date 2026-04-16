@@ -3,7 +3,7 @@
 **Current Version:** 1.0 (Production)
 **Release Date:** February 2026
 **Maintenance Mode:** Active
-**Last Updated:** April 13, 2026
+**Last Updated:** April 15, 2026
 
 ---
 
@@ -67,6 +67,14 @@
 - ✅ Independent CloudKit sync
 
 #### Additional Features
+- ✅ AI Chat Mode (Apr 2026)
+  - Conversational AI via Apple Intelligence Foundation Models (iOS 26+)
+  - Bottom sheet overlay with native SwiftUI chat UI
+  - Health/stress context injected into system prompt via ChatContextBuilder
+  - Quick action prompt suggestions (ChatQuickActions)
+  - Protocol-based LLM service for future cloud provider swap
+  - Graceful fallback on pre-iOS 26 devices
+  - Session-only persistence (no SwiftData for chat)
 - ✅ Guided breathing exercises (4-7-8 technique)
 - ✅ Home screen widgets (small, medium, large)
 - ✅ Background health refresh (optional)
@@ -527,5 +535,5 @@ Potential features for future consideration:
 ---
 
 **Owner:** Phuong Doan
-**Last Review:** April 13, 2026
+**Last Review:** April 15, 2026
 **Next Review:** May 2026 (post v1.0 launch)
