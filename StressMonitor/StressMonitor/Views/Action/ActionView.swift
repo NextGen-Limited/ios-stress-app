@@ -6,6 +6,7 @@ struct ActionView: View {
     @Environment(TabBarScrollState.self) private var tabBarScrollState
     @State private var selectedDay: Int = 0
     @State private var currentDate = Date()
+    @State private var isChatPresented = false
 
     private let calendar = Calendar.current
     private let weekDays = ["S", "M", "T", "W", "T", "F", "S"]
@@ -51,6 +52,12 @@ struct ActionView: View {
             .background(Color.Wellness.adaptiveBackground)
             .navigationTitle("Action")
             .navigationBarTitleDisplayMode(.inline)
+            .sheet(isPresented: $isChatPresented) {
+                ChatBottomSheetView(
+                    stressResult: nil,
+                    baseline: nil
+                )
+            }
         }
     }
 
@@ -341,7 +348,7 @@ struct ActionView: View {
 
     private var aiChatCard: some View {
         AIChatCard(onTap: {
-            // TODO: Navigate to AI chat screen
+            isChatPresented = true
         })
     }
 
