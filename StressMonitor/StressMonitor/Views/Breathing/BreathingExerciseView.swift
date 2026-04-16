@@ -1,423 +1,311 @@
 import SwiftUI
 
-// MARK: - Breathing Exercise View
+// MARK: - Box Breathing Exercise View
 
-/// 4-7-8 Breathing Exercise Screen
-/// Implements: 4s inhale, 7s hold, 8s exhale, 1s pause between cycles
-/// Full Reduce Motion support with static circle and text instructions
+/// Box Breathing (4-4-4-4) exercise screen.
+/// Figma: node 3438:755 — Inhale 4s → Hold 4s → Exhale 4s → Hold 4s, session 3:00
 struct BreathingExerciseView: View {
-    @Environment(\.accessibilityReduceMotion) var reduceMotion
-    @Environment(\.dismiss) var dismiss
-    @State private var phase: BreathingPhase = .inhale
-    @State private var cycleCount: Int = 0
-    @State private var isPaused: Bool = false
-    @State private var timer: Timer?
-    @State private var progress: Double = 0
-    @State private var isCancelled = false
+    @Environment(\.dismiss) private var dismiss
 
-    private let totalCycles = 4
-    private let maxCycles = 4
+    @State private var isRunning = false
+    @State private var currentStepIndex = 0
+    @State private var phaseElapsed: Double = 0
+    @State private var remainingTime: TimeInterval = 180
+    @State private var timer: Timer?
+
+    private let phaseDuration: Double = 4.0
+    private let sessionDuration: TimeInterval = 180
+
+    private var currentStep: BreathingStepInfo {
+        BreathingStepInfo.steps[currentStepIndex]
+    }
+
+    private var phaseProgress: Double {
+        min(phaseElapsed / phaseDuration, 1.0)
+    }
 
     var body: some View {
-        ZStack {
-            Color.Wellness.background
-                .ignoresSafeArea()
-
-            ScrollView {
-                VStack(spacing: DesignTokens.Spacing.lg) {
-                    headerSection
-
-                    breathingCircleSection
-
-                    progressSection
-
-                    instructionSection
-
-                    tipsSection
-
-                    Spacer()
-                }
-                .padding(DesignTokens.Spacing.md)
-            }
-
-            controlButtons
+        VStack(spacing: 0) {
+            headerSection
+            Spacer()
+            circularTimerSection
+            phaseIndicatorRow
+                .padding(.top, 16)
+            instructionLabel
+                .padding(.top, 4)
+            progressBarSection
+                .padding(.top, 16)
+            howItWorksCard
+                .padding(.top, 24)
+            Spacer()
+            actionButtons
+                .padding(.bottom, 40)
         }
-        .onAppear {
-            startBreathingSession()
-        }
-        .onDisappear {
-            stopBreathingSession()
-        }
+        .background(Color.white)
+        .ignoresSafeArea(edges: .bottom)
+        .navigationBarHidden(true)
+        .onDisappear { stopTimer() }
     }
 
-    // MARK: - Header Section
+    // MARK: - Header
 
     private var headerSection: some View {
-        VStack(spacing: DesignTokens.Spacing.sm) {
-            HStack {
-                Button(action: {
-                    HapticManager.shared.buttonPress()
-                    dismiss()
-                }) {
-                    Image(systemName: "xmark.circle.fill")
-                        .font(.title2)
-                        .foregroundStyle(.secondary)
-                }
-                .frame(width: DesignTokens.Layout.minTouchTarget, height: DesignTokens.Layout.minTouchTarget)
-                .accessibilityLabel("Close breathing exercise")
-
-                Spacer()
-
-                Text("Breathing Exercise")
-                    .font(Typography.title2)
-                    .fontWeight(.bold)
-
-                Spacer()
-
-                Color.clear
-                    .frame(width: DesignTokens.Layout.minTouchTarget, height: DesignTokens.Layout.minTouchTarget)
+        HStack {
+            Button(action: { dismiss() }) {
+                Image(systemName: "chevron.left")
+                    .font(.system(size: 16, weight: .medium))
+                    .foregroundStyle(.gray)
+                    .frame(width: 36, height: 36)
+                    .overlay(
+                        RoundedRectangle(cornerRadius: 8)
+                            .stroke(Color(.systemGray4), lineWidth: 0.75)
+                    )
             }
+            .accessibilityLabel("Back")
 
-            Text("4-7-8 Breathing Technique")
-                .font(Typography.callout)
-                .foregroundStyle(.secondary)
-        }
-    }
-
-    // MARK: - Breathing Circle Section
-
-    private var breathingCircleSection: some View {
-        VStack(spacing: DesignTokens.Spacing.md) {
-            if reduceMotion {
-                staticBreathingCircle
-            } else {
-                animatedBreathingCircle
-            }
-
-            Text(phase.displayText)
-                .font(Typography.title1)
-                .fontWeight(.bold)
-                .foregroundStyle(phase.color)
-                .accessibilityLabel("Breathing phase: \(phase.displayText)")
-                .accessibilityAddTraits(.updatesFrequently)
-        }
-        .frame(height: 300)
-    }
-
-    @ViewBuilder
-    private var staticBreathingCircle: some View {
-        ZStack {
-            Circle()
-                .fill(phase.color.opacity(0.2))
-                .frame(width: 200, height: 200)
-
-            Circle()
-                .stroke(phase.color, lineWidth: 4)
-                .frame(width: 200, height: 200)
-
-            VStack(spacing: DesignTokens.Spacing.sm) {
-                Image(systemName: phase.icon)
-                    .font(.system(size: 60))
-                    .foregroundStyle(phase.color)
-
-                Text(phase.instruction)
-                    .font(Typography.headline)
-                    .foregroundStyle(.secondary)
-                    .multilineTextAlignment(.center)
-            }
-        }
-        .accessibilityElement(children: .combine)
-        .accessibilityLabel("\(phase.displayText). \(phase.instruction)")
-    }
-
-    @ViewBuilder
-    private var animatedBreathingCircle: some View {
-        ZStack {
-            Circle()
-                .fill(phase.color.opacity(0.2))
-                .frame(width: 200, height: 200)
-                .scaleEffect(circleScale)
-
-            Circle()
-                .stroke(phase.color, lineWidth: 4)
-                .frame(width: 200, height: 200)
-                .scaleEffect(circleScale)
-
-            Image(systemName: phase.icon)
-                .font(.system(size: 60))
-                .foregroundStyle(phase.color)
-        }
-        .accessibilityHidden(true)
-    }
-
-    private var circleScale: CGFloat {
-        switch phase {
-        case .inhale:
-            return progress
-        case .hold:
-            return 1.2
-        case .exhale:
-            return 1.2 - (progress * 0.4)
-        case .pause:
-            return 0.8
-        }
-    }
-
-    // MARK: - Progress Section
-
-    private var progressSection: some View {
-        VStack(spacing: DesignTokens.Spacing.sm) {
-            HStack {
-                Text("Cycle \(cycleCount + 1) of \(totalCycles)")
-                    .font(Typography.callout)
-                    .foregroundStyle(.secondary)
-
-                Spacer()
-
-                Text("\(Int(progress * phase.duration))s")
-                    .font(Typography.callout)
-                    .foregroundStyle(.secondary)
-                    .monospacedDigit()
-            }
-
-            ProgressView(value: progress)
-                .tint(phase.color)
-                .accessibilityLabel("Cycle progress: \(cycleCount + 1) of \(totalCycles)")
-                .accessibilityValue("\(Int(progress * 100)) percent complete")
-        }
-        .padding(DesignTokens.Spacing.md)
-        .background(Color.Wellness.surface)
-        .cornerRadius(DesignTokens.Layout.cornerRadius)
-    }
-
-    // MARK: - Instruction Section
-
-    private var instructionSection: some View {
-        VStack(alignment: .leading, spacing: DesignTokens.Spacing.md) {
-            Text("Breathing Pattern")
-                .font(Typography.headline)
-                .fontWeight(.semibold)
-
-            VStack(alignment: .leading, spacing: DesignTokens.Spacing.sm) {
-                patternRow(icon: "arrow.down.circle.fill", text: "Inhale for 4 seconds", color: .blue)
-                patternRow(icon: "pause.circle.fill", text: "Hold for 7 seconds", color: .purple)
-                patternRow(icon: "arrow.up.circle.fill", text: "Exhale for 8 seconds", color: .green)
-                patternRow(icon: "moon.circle.fill", text: "Pause for 1 second", color: .secondary)
-            }
-        }
-        .padding(DesignTokens.Spacing.md)
-        .background(Color.Wellness.surface)
-        .cornerRadius(DesignTokens.Layout.cornerRadius)
-        .accessibilityElement(children: .combine)
-        .accessibilityLabel("Breathing pattern: Inhale 4 seconds, Hold 7 seconds, Exhale 8 seconds, Pause 1 second")
-    }
-
-    private func patternRow(icon: String, text: String, color: Color) -> some View {
-        HStack(spacing: DesignTokens.Spacing.sm) {
-            Image(systemName: icon)
-                .font(.title3)
-                .foregroundStyle(color)
-                .frame(width: DesignTokens.Layout.minTouchTarget)
-
-            Text(text)
-                .font(Typography.callout)
-                .foregroundStyle(.primary)
-        }
-    }
-
-    // MARK: - Tips Section
-
-    private var tipsSection: some View {
-        VStack(alignment: .leading, spacing: DesignTokens.Spacing.md) {
-            Text("Tips")
-                .font(Typography.headline)
-                .fontWeight(.semibold)
-
-            VStack(alignment: .leading, spacing: DesignTokens.Spacing.sm) {
-                tipRow(icon: "heart.fill", text: "Focus on slow, deep breaths")
-                tipRow(icon: "figure.mind.and.body", text: "Relax your shoulders and jaw")
-                tipRow(icon: "moon.stars.fill", text: "Find a quiet, comfortable place")
-            }
-        }
-        .padding(DesignTokens.Spacing.md)
-        .background(Color.Wellness.surface)
-        .cornerRadius(DesignTokens.Layout.cornerRadius)
-    }
-
-    private func tipRow(icon: String, text: String) -> some View {
-        HStack(spacing: DesignTokens.Spacing.sm) {
-            Image(systemName: icon)
-                .font(.body)
-                .foregroundStyle(Color.Wellness.calmBlue)
-                .frame(width: 30)
-
-            Text(text)
-                .font(Typography.callout)
-                .foregroundStyle(.secondary)
-        }
-    }
-
-    // MARK: - Control Buttons
-
-    private var controlButtons: some View {
-        VStack {
             Spacer()
 
-            Button(action: togglePause) {
-                HStack {
-                    Image(systemName: isPaused ? "play.fill" : "pause.fill")
-                        .font(.title3)
+            Text("Box Breathing")
+                .font(.system(size: 18, weight: .bold))
+                .foregroundStyle(.gray)
 
-                    Text(isPaused ? "Resume" : "Pause")
-                        .font(Typography.headline)
-                }
-                .foregroundStyle(.white)
-                .frame(maxWidth: .infinity)
-                .frame(height: 52)
-                .background(Color.Wellness.calmBlue)
-                .cornerRadius(26)
-                .shadow(color: Color.black.opacity(0.1), radius: 8, y: 4)
-            }
-            .padding(.horizontal, DesignTokens.Spacing.lg)
-            .padding(.bottom, DesignTokens.Spacing.xl)
-            .accessibilityLabel(isPaused ? "Resume breathing exercise" : "Pause breathing exercise")
+            Spacer()
+
+            Color.clear.frame(width: 36, height: 36)
+        }
+        .padding(.horizontal, 16)
+        .padding(.top, 16)
+    }
+
+    // MARK: - Circular Timer
+
+    private var circularTimerSection: some View {
+        ZStack {
+            // Outer decorative ring
+            Circle()
+                .stroke(Color.tealLight.opacity(0.2), lineWidth: 2)
+                .frame(width: 210, height: 210)
+
+            // Progress arc — fills per phase
+            Circle()
+                .trim(from: 0, to: isRunning ? phaseProgress : 0)
+                .stroke(
+                    Color.tealLight,
+                    style: StrokeStyle(lineWidth: 8, lineCap: .round)
+                )
+                .frame(width: 156, height: 156)
+                .rotationEffect(.degrees(-90))
+                .animation(.linear(duration: 0.1), value: phaseProgress)
+
+            // Background circle
+            Circle()
+                .fill(Color.white)
+                .frame(width: 156, height: 156)
+                .shadow(color: .black.opacity(0.1), radius: 9, y: 3)
+                .shadow(color: .black.opacity(0.1), radius: 4, y: 5)
+
+            // Time display
+            Text(formattedTime)
+                .font(.system(size: 42, weight: .bold, design: .rounded))
+                .foregroundStyle(Color(red: 0.45, green: 0.45, blue: 0.45))
+                .monospacedDigit()
         }
     }
 
-    // MARK: - Breathing Logic
-
-    private func startBreathingSession() {
-        guard !isPaused else { return }
-
-        cycleCount = 0
-        phase = .inhale
-        progress = 0
-
-        startPhaseTimer()
+    private var formattedTime: String {
+        let t = max(0, remainingTime)
+        return String(format: "%d:%02d", Int(t) / 60, Int(t) % 60)
     }
 
-    private func stopBreathingSession() {
-        isCancelled = true
+    // MARK: - Phase Indicator
+
+    private var phaseIndicatorRow: some View {
+        HStack {
+            Text(currentStep.label)
+                .font(.system(size: 14))
+                .foregroundStyle(Color.tealDark)
+            Spacer()
+            Text("\(Int(phaseElapsed))s/\(Int(phaseDuration))s")
+                .font(.system(size: 14))
+                .foregroundStyle(Color.tealDark)
+        }
+        .padding(.horizontal, 17)
+    }
+
+    // MARK: - Instruction
+
+    private var instructionLabel: some View {
+        Text(currentStep.instruction)
+            .font(.system(size: 16, weight: .bold))
+            .foregroundStyle(Color(red: 0.26, green: 0.26, blue: 0.26))
+    }
+
+    // MARK: - Progress Bar
+
+    private var progressBarSection: some View {
+        GeometryReader { geo in
+            ZStack(alignment: .leading) {
+                RoundedRectangle(cornerRadius: 6)
+                    .fill(Color(red: 0.34, green: 0.34, blue: 0.34))
+                    .frame(height: 11)
+                RoundedRectangle(cornerRadius: 6)
+                    .fill(Color.tealLight)
+                    .frame(width: geo.size.width * phaseProgress, height: 11)
+                    .animation(.linear(duration: 0.1), value: phaseProgress)
+            }
+        }
+        .frame(height: 11)
+        .padding(.horizontal, 17)
+    }
+
+    // MARK: - How It Works Card
+
+    private var howItWorksCard: some View {
+        VStack(spacing: 20) {
+            Text("How it works:")
+                .font(.system(size: 16, weight: .semibold))
+                .foregroundStyle(Color(red: 0.26, green: 0.26, blue: 0.26))
+
+            HStack(spacing: 0) {
+                ForEach(0..<4, id: \.self) { index in
+                    let step = BreathingStepInfo.steps[index]
+                    VStack(spacing: 4) {
+                        Circle()
+                            .fill(step.dotColor)
+                            .frame(width: 20, height: 20)
+                        Text(step.label)
+                            .font(.system(size: 14))
+                            .foregroundStyle(Color.tealDark)
+                        Text("4s")
+                            .font(.system(size: 14))
+                            .foregroundStyle(Color.tealDark)
+                    }
+                    .frame(maxWidth: .infinity)
+
+                    if index < 3 {
+                        Image(systemName: "chevron.right")
+                            .font(.system(size: 10, weight: .semibold))
+                            .foregroundStyle(Color.tealDark)
+                    }
+                }
+            }
+        }
+        .padding(20)
+        .background(
+            RoundedRectangle(cornerRadius: 33)
+                .fill(Color.white)
+                .shadow(color: Color.black.opacity(0.04), radius: 7, y: 7)
+                .shadow(color: Color.black.opacity(0.08), radius: 4, y: 5)
+        )
+        .padding(.horizontal, 16)
+    }
+
+    // MARK: - Buttons
+
+    private var actionButtons: some View {
+        VStack(spacing: 12) {
+            Button(action: toggleRunning) {
+                HStack(spacing: 8) {
+                    Image(systemName: isRunning ? "pause.fill" : "play.fill")
+                    Text(isRunning ? "Pause" : "Start")
+                        .font(.system(size: 20, weight: .bold))
+                }
+                .foregroundStyle(.white)
+                .frame(width: 152, height: 58)
+                .background(RoundedRectangle(cornerRadius: 20).fill(Color.tealLight))
+            }
+
+            Button(action: resetSession) {
+                HStack(spacing: 8) {
+                    Image(systemName: "arrow.counterclockwise")
+                    Text("Reset")
+                        .font(.system(size: 20, weight: .bold))
+                }
+                .foregroundStyle(Color.tealLight)
+                .frame(width: 152, height: 58)
+                .background(
+                    RoundedRectangle(cornerRadius: 14)
+                        .strokeBorder(Color(.systemGray4), lineWidth: 1)
+                )
+            }
+        }
+    }
+
+    // MARK: - Timer Logic
+
+    private func toggleRunning() {
+        isRunning ? pauseSession() : startSession()
+    }
+
+    private func startSession() {
+        isRunning = true
+        timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { _ in
+            phaseElapsed += 0.1
+            remainingTime -= 0.1
+
+            if remainingTime <= 0 {
+                remainingTime = 0
+                stopTimer()
+                isRunning = false
+                return
+            }
+
+            if phaseElapsed >= phaseDuration {
+                phaseElapsed = 0
+                currentStepIndex = (currentStepIndex + 1) % 4
+            }
+        }
+    }
+
+    private func pauseSession() {
+        stopTimer()
+        isRunning = false
+    }
+
+    private func resetSession() {
+        stopTimer()
+        isRunning = false
+        phaseElapsed = 0
+        currentStepIndex = 0
+        remainingTime = sessionDuration
+    }
+
+    private func stopTimer() {
         timer?.invalidate()
         timer = nil
     }
-
-    private func togglePause() {
-        HapticManager.shared.buttonPress()
-        isPaused.toggle()
-
-        if isPaused {
-            timer?.invalidate()
-        } else {
-            startPhaseTimer()
-        }
-    }
-
-    private func startPhaseTimer() {
-        timer?.invalidate()
-
-        let updateInterval = 0.1
-        var elapsed: Double = 0
-
-        timer = Timer.scheduledTimer(withTimeInterval: updateInterval, repeats: true) { _ in
-            guard !isCancelled && !isPaused else { return }
-
-            elapsed += updateInterval
-            progress = min(elapsed / phase.duration, 1.0)
-
-            if elapsed >= phase.duration {
-                advancePhase()
-                elapsed = 0
-                progress = 0
-            }
-        }
-    }
-
-    private func advancePhase() {
-        HapticManager.shared.breathingCue()
-
-        switch phase {
-        case .inhale:
-            phase = .hold
-        case .hold:
-            phase = .exhale
-        case .exhale:
-            phase = .pause
-        case .pause:
-            cycleCount += 1
-            if cycleCount >= totalCycles {
-                sessionComplete()
-            } else {
-                phase = .inhale
-            }
-        }
-    }
-
-    private func sessionComplete() {
-        timer?.invalidate()
-        HapticManager.shared.success()
-
-        // Show completion state
-        isPaused = true
-    }
 }
 
-// MARK: - Breathing Phase
+// MARK: - Breathing Step Info
 
-enum BreathingPhase {
-    case inhale
-    case hold
-    case exhale
-    case pause
+private struct BreathingStepInfo {
+    let label: String
+    let instruction: String
+    let dotColor: Color
 
-    var duration: Double {
-        switch self {
-        case .inhale: return 4.0
-        case .hold: return 7.0
-        case .exhale: return 8.0
-        case .pause: return 1.0
-        }
-    }
+    static let steps: [BreathingStepInfo] = [
+        BreathingStepInfo(label: "Inhale", instruction: "Breathe in slowly",
+                          dotColor: Color(red: 0.741, green: 0.878, blue: 1.0)),
+        BreathingStepInfo(label: "Hold", instruction: "Hold your breath",
+                          dotColor: Color(red: 0.902, green: 0.902, blue: 0.980)),
+        BreathingStepInfo(label: "Exhale", instruction: "Breathe out slowly",
+                          dotColor: Color(red: 0.780, green: 0.961, blue: 0.780)),
+        BreathingStepInfo(label: "Hold", instruction: "Hold your breath",
+                          dotColor: Color(red: 1.0, green: 0.875, blue: 0.729)),
+    ]
+}
 
-    var displayText: String {
-        switch self {
-        case .inhale: return "Inhale"
-        case .hold: return "Hold"
-        case .exhale: return "Exhale"
-        case .pause: return "Pause"
-        }
-    }
+// MARK: - Teal Color Helpers
 
-    var instruction: String {
-        switch self {
-        case .inhale: return "Breathe in slowly through your nose"
-        case .hold: return "Hold your breath gently"
-        case .exhale: return "Breathe out slowly through your mouth"
-        case .pause: return "Relax and prepare"
-        }
-    }
-
-    var icon: String {
-        switch self {
-        case .inhale: return "arrow.down.circle.fill"
-        case .hold: return "pause.circle.fill"
-        case .exhale: return "arrow.up.circle.fill"
-        case .pause: return "moon.circle.fill"
-        }
-    }
-
-    var color: Color {
-        switch self {
-        case .inhale: return .blue
-        case .hold: return .purple
-        case .exhale: return .green
-        case .pause: return .secondary
-        }
-    }
+private extension Color {
+    static let tealLight = Color(red: 0.52, green: 0.79, blue: 0.79)   // #85C9C9
+    static let tealDark  = Color(red: 0.45, green: 0.73, blue: 0.73)   // #73B9B9
 }
 
 // MARK: - Preview
 
 #Preview {
-    BreathingExerciseView()
+    NavigationStack {
+        BreathingExerciseView()
+    }
 }
