@@ -22,9 +22,6 @@ struct SettingsView: View {
                 PremiumCard()
                     .padding(.top, 8)
 
-                // AI Chat Server
-                AIChatSettingsCard()
-
                 // Watch face & Complications
                 WatchFaceCard()
 

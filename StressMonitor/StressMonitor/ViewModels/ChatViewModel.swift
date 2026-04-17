@@ -47,18 +47,9 @@ final class ChatViewModel {
         self.recentHistory = recentHistory
 
         // Cloud-first strategy: cloud → on-device → unavailable
-        let serverURL = UserDefaults.standard.string(forKey: "ai_server_url") ?? ""
-        let apiKey = UserDefaults.standard.string(forKey: "ai_api_key") ?? ""
-
-        if !serverURL.isEmpty {
-            let cloudService = CloudLLMService(serverURL: serverURL, apiKey: apiKey)
-            if cloudService.isAvailable() {
-                self.llmService = cloudService
-            } else if #available(iOS 26, *) {
-                self.llmService = AppleIntelligenceService()
-            } else {
-                self.llmService = UnavailableLLMService()
-            }
+        let cloudService = CloudLLMService()
+        if cloudService.isAvailable() {
+            self.llmService = cloudService
         } else if #available(iOS 26, *) {
             self.llmService = AppleIntelligenceService()
         } else {

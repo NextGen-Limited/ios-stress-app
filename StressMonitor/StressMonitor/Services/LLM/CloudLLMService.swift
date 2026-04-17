@@ -6,19 +6,17 @@ import Foundation
 /// Falls back gracefully when server is unreachable.
 final class CloudLLMService: LLMServiceProtocol, Sendable {
 
-    private let serverURL: String
+    // TODO: Update to production URL before release
     private let apiKey: String
 
-    init(serverURL: String, apiKey: String) {
-        self.serverURL = serverURL
+    init(apiKey: String = "") {
         self.apiKey = apiKey
     }
 
     // MARK: - Availability
 
     nonisolated func isAvailable() -> Bool {
-        guard !serverURL.isEmpty else { return false }
-        guard let url = URL(string: "\(serverURL)/health") else { return false }
+        guard let url = URL(string: "https://hyperpolysyllabically-saronic-mee.ngrok-free.app/health") else { return false }
 
         var request = URLRequest(url: url)
         request.httpMethod = "GET"
@@ -42,14 +40,13 @@ final class CloudLLMService: LLMServiceProtocol, Sendable {
         messages: [ChatMessage],
         systemPrompt: String
     ) async throws -> AsyncThrowingStream<String, Error> {
-        let serverURL = self.serverURL
         let apiKey = self.apiKey
         let encodedMessages = messages.map { ["role": $0.role.rawValue, "content": $0.content] as [String: String] }
 
         return AsyncThrowingStream { (continuation: AsyncThrowingStream<String, Error>.Continuation) in
             let task = Task {
                 do {
-                    guard let url = URL(string: "\(serverURL)/v1/chat/completions") else {
+                    guard let url = URL(string: "https://hyperpolysyllabically-saronic-mee.ngrok-free.app/v1/chat/completions") else {
                         continuation.finish(throwing: LLMServiceError.unavailable(reason: "Invalid server URL"))
                         return
                     }
@@ -60,9 +57,13 @@ final class CloudLLMService: LLMServiceProtocol, Sendable {
                     request.setValue("application/json", forHTTPHeaderField: "Content-Type")
                     request.timeoutInterval = 60
 
+                    // Build messages array with system prompt as first message
+                    var allMessages = [["role": "system", "content": systemPrompt] as [String: String]]
+                    allMessages.append(contentsOf: encodedMessages)
+
                     let body: [String: Any] = [
-                        "messages": encodedMessages,
-                        "system_prompt": systemPrompt,
+                        "model": "deepseek-chat",
+                        "messages": allMessages,
                         "stream": true,
                     ]
                     request.httpBody = try JSONSerialization.data(withJSONObject: body)
@@ -112,9 +113,8 @@ final class CloudLLMService: LLMServiceProtocol, Sendable {
         switch statusCode {
         case 200...299: return nil
         case 401: return .unavailable(reason: "Invalid API key")
-        case 413: return .exceededContext
-        case 429: return .rateLimited
-        case 503: return .unavailable(reason: "Service unavailable")
+        case 422: return .unavailable(reason: "Bad request body")
+        case 502: return .unavailable(reason: "Provider failure")
         default: return .unavailable(reason: "Server error (\(statusCode))")
         }
     }
