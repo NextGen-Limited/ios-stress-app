@@ -48,15 +48,16 @@ final class ChatViewModel {
 
         // Cloud-first strategy: cloud → on-device → unavailable
         let cloudService = CloudLLMService()
-        if cloudService.isAvailable() {
-            self.llmService = cloudService
-        } else if #available(iOS 26, *) {
-            self.llmService = AppleIntelligenceService()
-        } else {
-            self.llmService = UnavailableLLMService()
-        }
-
-        self.isAvailable = llmService.isAvailable()
+//        if cloudService.isAvailable() {
+//            self.llmService = cloudService
+//        } else if #available(iOS 26, *) {
+//            self.llmService = AppleIntelligenceService()
+//        } else {
+//            self.llmService = UnavailableLLMService()
+//        }
+        
+        self.llmService = cloudService
+        self.isAvailable = true
     }
 
     // MARK: - Send Message

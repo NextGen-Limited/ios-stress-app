@@ -2,8 +2,8 @@
 
 **System:** iOS Human Interface Guidelines compliant
 **Accessibility:** WCAG AA
-**Version:** 1.0
-**Last Updated:** April 13, 2026
+**Version:** 1.1
+**Last Updated:** April 25, 2026
 
 ---
 
@@ -107,6 +107,41 @@ Interaction design and accessibility standards:
 - Toggle switches (min 44pt)
 - Progress indicators
 - Charts and graphs
+
+---
+
+## Navigation Architecture (3-Tab Structure)
+
+**Updated - April 2026:**
+
+The app uses a simplified 3-tab navigation structure:
+
+1. **Home** (`DashboardView.swift`)
+   - Main stress monitoring dashboard
+   - Current stress level with visual ring
+   - Recent measurements and timeline
+   - Quick actions and insights
+
+2. **Action** (`ActionView.swift`)
+   - **NEW**: Primary access point for quick stress relief
+   - Breathing exercises with Figma-aligned UI
+   - Direct AI chat access for conversational support
+   - Quick action chips for contextual suggestions
+   - Streamlined user experience for immediate intervention
+
+3. **Trend** (`TrendsView.swift`)
+   - Historical stress analytics
+   - Chart visualizations
+   - Statistical insights
+   - Trend patterns and correlations
+
+### Tab Bar Design Guidelines
+
+- **Corner Radius:** 64pt (pill-shaped)
+- **Spacing:** 50pt between tabs
+- **Explicit horizontal padding**
+- **Separate icon assets** for selected / unselected states
+- **Consistent with Apple HIG**
 
 ---
 
@@ -241,41 +276,59 @@ All UI files follow this structure:
 
 ```
 Views/
-├── Dashboard/
-│   ├── StressDashboardView.swift
-│   ├── DashboardViewModel.swift
+├── Action/
+│   ├── ActionView.swift                 # Primary quick stress relief interface
+│   └── Components/                      # Action components
+├── Breathing/
+│   ├── BreathingExerciseView.swift      # Box breathing 4-4-4-4 (Figma-aligned)
+│   ├── BreathingSessionView.swift
+│   ├── BreathingSummaryView.swift
+│   ├── BreathingViewModel.swift
 │   └── Components/
+│       ├── BeforeAfterChart.swift
+│       └── BreathingCircleView.swift
+├── Chat/
+│   ├── ChatBottomSheetView.swift        # AI chat bottom sheet
+│   └── QuickActionChipsView.swift       # Prompt suggestions
+├── Dashboard/
+│   ├── DashboardViewModel.swift
+│   └── Components/                      # ~40 component files
 │       ├── StressRingView.swift
-│       ├── DailyTimelineView.swift       # 7-day dot-matrix grid (Mar 2026)
-│       ├── WeeklyInsightCard.swift
-│       └── AIInsightCard.swift
+│       ├── DailyTimelineView.swift
+│       ├── AIChatCard.swift
+│       └── ...
+├── History/
+│   ├── MeasurementHistoryView.swift
+│   ├── HistoryViewModel.swift
+│   └── Components/
+├── Journal/
+│   └── NoteEntryView.swift
+├── Onboarding/
+│   ├── OnboardingWelcomeView.swift
+│   └── ...                              # 10 files total (View + ViewModel pairs)
+├── Settings/
+│   ├── SettingsView.swift               # Figma card-based design
+│   ├── SettingsViewModel.swift
+│   ├── Components/                      # 12 component files
+│   └── DataManagement/
+├── Shared/
+│   └── SafariView.swift
 ├── Trends/
-│   ├── TrendsView.swift                  # Figma-aligned card list (Mar 2026)
+│   ├── TrendsView.swift                 # Figma-aligned card list
 │   ├── TrendsViewModel.swift
 │   └── Components/
-│       ├── StressBarChartView.swift
-│       ├── LineChartView.swift
-│       ├── WeeklyHeatmapView.swift
-│       ├── StressSourcesDonutChart.swift
-│       ├── PremiumBannerView.swift
-│       └── MascotSpeechBubbleView.swift
-├── Breathing/
-│   └── BreathingExerciseView.swift
-├── Settings/
-│   ├── SettingsView.swift               # Figma card-based design (Mar 2026)
-│   └── Components/
-│       ├── HealthDataCard.swift
-│       ├── NotificationsCard.swift
-│       └── PrivacyCard.swift
-├── Onboarding/
-│   └── OnboardingWelcomeView.swift
 ├── Components/                          # Shared components
-│   ├── MeasureButton.swift
-│   └── TabBar/StressTabBarView.swift    # Pill-shaped tabbar (Mar 2026)
-└── DesignSystem/
-    ├── Typography.swift
-    ├── Spacing.swift
-    └── Shadows.swift
+│   ├── DemoModeBannerView.swift
+│   ├── HapticManager.swift
+│   └── TabBar/
+├── DesignSystem/
+│   ├── Typography.swift
+│   ├── Spacing.swift
+│   ├── Shadows.swift
+│   └── Components/
+├── DashboardView.swift
+├── MainTabView.swift
+└── ...                                 # Additional views (~100 total)
 ```
 
 ---
@@ -342,4 +395,4 @@ All cards now use unified adaptive backgrounds that auto-switch in light/dark mo
 ---
 
 **Enforced By:** Code review & QA testing
-**Last Updated:** April 13, 2026
+**Last Updated:** April 25, 2026

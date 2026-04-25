@@ -3,7 +3,7 @@
 **Version:** 1.0 (Production)
 **Status:** Complete and Shipping
 **Platform:** iOS 17+ / watchOS 10+
-**Last Updated:** April 13, 2026
+**Last Updated:** April 25, 2026
 
 ---
 
@@ -21,26 +21,29 @@ StressMonitor is a **privacy-first stress monitoring application** that uses Hea
 
 | Feature | Description | Status |
 |---------|-------------|--------|
-| **Real-Time Stress Measurement** | On-demand HRV + HR calculation with confidence scoring | ✅ Complete |
+| **Real-Time Stress Measurement** | 5-factor algorithm (HRV, HR, Sleep, Activity, Recovery) with confidence scoring | ✅ Complete |
 | **Personal Baseline Adaptation** | Learns individual physiology over 30 days | ✅ Complete |
 | **Historical Tracking** | Timeline view with date/category filtering | ✅ Complete |
-| **Trend Analytics** | Line charts, bar charts, heatmap, distribution stats — Figma-aligned | ✅ Complete |
+| **Trend Analytics** | Line charts, bar charts, heatmap, distribution stats -- Figma-aligned | ✅ Complete |
 | **AI-Powered Insights** | Personalized insights via InsightGeneratorService | ✅ Complete |
-| **Weekly Dot-Matrix Timeline** | 7-day × 7-slot dot grid replacing 24h scatter chart | ✅ Complete |
+| **AI Chat** | Conversational AI via Apple Intelligence (iOS 26+) or CloudLLM fallback with SSE streaming | ✅ Complete |
+| **Weekly Dot-Matrix Timeline** | 7-day x 7-slot dot grid replacing 24h scatter chart | ✅ Complete |
 | **Apple Watch Standalone App** | Independent stress monitoring with WidgetKit complications | ✅ Complete |
 | **CloudKit Sync** | E2E encrypted offline-first cloud sync | ✅ Complete |
 | **Data Export** | CSV/JSON export with date filtering | ✅ Complete |
 | **Data Management** | Delete by range, category, or full wipe | ✅ Complete |
-| **Breathing Exercises** | Guided 4-7-8 technique sessions | ✅ Complete |
+| **Box Breathing** | Figma-aligned 4-4-4-4 pattern, 3-min sessions | ✅ Complete |
+| **3-Tab Navigation** | Home (Dashboard), Action (Quick actions/Chat), Trend (Analytics) | ✅ Complete |
 | **Home Screen Widgets** | At-a-glance stress display | ✅ Complete |
 | **WCAG AA Accessibility** | Dual coding, VoiceOver, Dynamic Type | ✅ Complete |
 
 ### Planned Features (v1.1)
 
-- Advanced breathing techniques (box breathing, coherent breathing)
+- Additional breathing techniques (coherent breathing, custom patterns)
 - Stress triggers tracking
 - Weekly digest reports
 - App localization (Spanish, French, German)
+- Comprehensive test suite reimplementation
 
 ---
 
@@ -58,7 +61,7 @@ The stress algorithm uses 5 independent factors with dynamic weight redistributi
 5. **Recovery Status** (RecoveryStressFactor) — Recovery assessment
 
 **Architecture:**
-- `StressFactor` protocol — each factor calculates `FactorContribution` independently
+- `StressFactor` protocol — each factor returns a `FactorBreakdown` independently
 - `MultiFactorStressCalculator` — orchestrates all factors, applies dynamic weight redistribution
 - `FactorWeights` — base weights with redistribution when factors are unavailable
 - `FactorBreakdown` — per-factor results for UI display
@@ -96,11 +99,11 @@ Each measurement includes a confidence value (0-1) based on:
 
 ### User Story 1: Measure Stress on Demand
 **As a** user
-**I want to** tap a button and get my current stress level
+**I want to** access stress measurement from Home dashboard
 **So that** I can understand my physiological state at any moment
 
 **Acceptance Criteria:**
-- [x] Measure button accessible from Dashboard
+- [x] Stress measurement accessible from Dashboard
 - [x] Calculation completes within 5 seconds
 - [x] Result displays stress level with color and category
 - [x] Confidence score visible
@@ -112,11 +115,10 @@ Each measurement includes a confidence value (0-1) based on:
 **So that** I can identify patterns over time
 
 **Acceptance Criteria:**
-- [x] ~~History view shows chronological list~~ (REMOVED - Mar 2026)
-- [x] ~~Filter by date range~~ (REMOVED)
-- [x] ~~Filter by stress category~~ (REMOVED)
-- [x] ~~Tap measurement to view details~~ (REMOVED)
-- [x] ~~Export available from detail view~~ (REMOVED)
+- [x] History view shows chronological list of measurements
+- [x] Filter by date range and category
+- [x] Tap measurement to view details with factor breakdown
+- [x] Factor progress bars and stress gauge visualization
 
 ### User Story 3: Analyze Stress Trends
 **As a** user
@@ -140,16 +142,16 @@ Each measurement includes a confidence value (0-1) based on:
 - [x] Data syncs to CloudKit independently
 - [x] Complications update every 5 minutes
 
-### User Story 5: Reduce Stress with Breathing
+### User Story 5: Access Quick Actions and Tools
 **As a** user
-**I want to** follow guided breathing exercises
-**So that** I can actively reduce my stress level
+**I want to** quickly access breathing exercises and AI chat
+**So that** I can take immediate action to manage stress
 
 **Acceptance Criteria:**
-- [x] Breathing exercise available from Dashboard
-- [x] Guided visual/haptic feedback
-- [x] Before/after HRV measurement option
-- [x] Session history tracked
+- [x] ActionView provides quick access to breathing exercises
+- [x] AI chat accessible from ActionView
+- [x] Figma-aligned breathing guidance with animations
+- [x] 3-minute breathing sessions with effectiveness tracking
 
 ---
 
@@ -182,7 +184,7 @@ Each measurement includes a confidence value (0-1) based on:
 ### Privacy & Security
 - Zero data breaches
 - 100% CloudKit E2E encryption
-- Zero external API calls
+- Health data never sent externally (only anonymized chat context to CloudLLM)
 
 ---
 
@@ -191,9 +193,10 @@ Each measurement includes a confidence value (0-1) based on:
 | Constraint | Impact | Mitigation |
 |-----------|--------|-----------|
 | **iOS 17+ only** | Excludes iOS 16 users | Feature target for modern users |
+| **iOS 26+ for Apple Intelligence** | AI Chat limited to newest iOS | CloudLLM fallback for older devices |
 | **HealthKit dependency** | Requires health data access | Graceful degradation on denial |
 | **iCloud requirement** | CloudKit sync needs account | Optional feature, not required |
-| **No external dependencies** | Limited third-party libraries | Leverage system frameworks |
+| **CloudLLM external endpoint** | Chat data sent to ngrok-hosted gateway | Only anonymized context, no raw health data |
 
 ---
 
@@ -201,7 +204,7 @@ Each measurement includes a confidence value (0-1) based on:
 
 ### Privacy-First Design
 - **Local Storage:** SwiftData (encrypted at rest by iOS)
-- **No External Servers:** Zero third-party services
+- **CloudLLM Chat:** Sends anonymized chat context to self-hosted FastAPI gateway (no API key needed); health data stays on-device
 - **Read-Only HealthKit:** No writes to Apple Health
 - **CloudKit E2E Encryption:** End-to-end encrypted sync
 - **No Tracking:** No analytics, no advertising IDs
@@ -209,10 +212,18 @@ Each measurement includes a confidence value (0-1) based on:
 
 ### Data Flow
 ```
-HealthKit (Sensors) → HealthKitManager (read-only)
-→ StressCalculator (local computation)
-→ SwiftData (local encrypted storage)
-→ CloudKit (optional, E2E encrypted)
+HealthKit (Sensors) -> HealthKitManager (read-only)
+-> MultiFactorStressCalculator (local computation)
+-> SwiftData (local encrypted storage)
+-> CloudKit (optional, E2E encrypted)
+
+AI Chat (separate path):
+ActionView -> ChatBottomSheetView -> ChatViewModel
+-> AppleIntelligenceService (on-device, iOS 26+) OR
+   CloudLLMService (SSE streaming to hardcoded ngrok endpoint with SSEParser)
+-> ChatContextBuilder (assembles anonymized context only)
+-> SSEParser (NEW) for Server-Sent Events streaming
+-> LLMAPITarget (NEW) for API configuration
 ```
 
 ---
@@ -252,10 +263,11 @@ HealthKit (Sensors) → HealthKitManager (read-only)
 All core features complete and shipping.
 
 ### Version 1.1 (Next)
-- Advanced breathing techniques
+- Additional breathing techniques
 - Stress triggers journal
 - Weekly reports
 - Localization
+- Test suite reimplementation
 
 ### Version 2.0 (Future)
 - Machine learning insights
@@ -279,5 +291,5 @@ All core features complete and shipping.
 ---
 
 **Owner:** Phuong Doan
-**Status:** ✅ Production v1.0
+**Status:** Production v1.0
 **Next Review:** May 2026 (post v1.1 release)

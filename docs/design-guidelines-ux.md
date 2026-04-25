@@ -2,9 +2,9 @@
 
 **System:** iOS Human Interface Guidelines compliant
 **Accessibility:** WCAG AA
-**Section:** Accessibility, haptics, StressBuddy, onboarding, data visualization
-**Version:** 1.0
-**Last Updated:** April 13, 2026
+**Section:** Accessibility, haptics, StressBuddy, onboarding, data visualization, chat UX
+**Version:** 1.1
+**Last Updated:** April 25, 2026
 
 ---
 
@@ -176,6 +176,53 @@ extension StressBuddyMood {
 
 ---
 
+## Navigation Flow (3-Tab Structure)
+
+**Updated - April 2026:**
+
+### Tab Navigation Pattern
+
+1. **Home Tab** (`DashboardView.swift`)
+   - Primary stress measurement interface
+   - Current stress level visualization
+   - Quick access to recent measurements
+   - AI insights and chat entry point
+
+2. **Action Tab** (`ActionView.swift` - NEW)
+   - Quick actions for immediate stress relief
+   - Breathing exercises with Figma-aligned UI
+   - AI chat access for conversational support
+   - Wellness activities and tools
+
+3. **Trend Tab** (`TrendsView.swift`)
+   - Historical stress analysis
+   - Statistical insights and patterns
+   - Data visualization charts
+
+### ActionView UX Patterns
+
+**Quick Actions Layout:**
+- Large, tappable buttons (minimum 60x60 points)
+- Clear icon and label combinations
+- Haptic feedback on interaction
+- Progress indicators for active sessions
+- **NEW**: Context-aware quick action chips based on stress level
+
+**Breathing Exercise Integration:**
+- Figma-aligned 4-4-4-4 pattern
+- Animated breathing circle with phase guidance
+- 3-minute session duration
+- Before/after HRV comparison
+
+**AI Chat Access:**
+- **Enhanced**: Direct access from ActionView with streaming token display
+- **NEW**: Real-time token streaming via SSEParser and LLMAPITarget
+- Context-aware suggestions with quick action chips
+- Session-only message history
+- **NEW**: Hardcoded CloudLLM endpoint for simplified setup
+
+---
+
 ## Onboarding Flow
 
 ### Screen Progression
@@ -200,9 +247,9 @@ extension StressBuddyMood {
 ```
 100 │
     │     ╱╲
- 75 │   ╱    ╲───╱╲
+  75 │   ╱    ╲───╱╲
     │ ╱          ╲
- 50 │
+  50 │
     │
   0 └─────────────────
     0h   6h  12h  18h 24h
@@ -225,34 +272,70 @@ extension StressBuddyMood {
 
 ### Exercise Types
 
-| Type | Duration | Target HR Reduction |
-|------|----------|-------------------|
-| **Box Breathing** | 4 minutes | 10-15 bpm |
-| **4-7-8 Breathing** | 5 minutes | 15-20 bpm |
-| **Guided Relaxation** | 10 minutes | 20-30 bpm |
+| Type | Duration | Pattern | Status |
+|------|----------|---------|--------|
+| **Box Breathing** | 3 minutes | 4-4-4-4 (inhale-hold-exhale-hold) | Implemented |
+| **Coherent Breathing** | 5 minutes | 6 breaths/minute | Planned |
+| **4-7-8 Breathing** | 5 minutes | 4-7-8 (inhale-hold-exhale) | Planned |
 
-### Visual Guidance
+### Box Breathing Design (Apr 2026)
 
-Animated circle that expands/contracts with breathing rhythm:
+Figma-aligned 4-4-4-4 pattern with animated breathing circle (`BreathingCircleView`).
 
-```swift
-struct BreathingGuidanceView: View {
-  @State var isExpanded = false
-  let duration: Double
+**Session flow:**
+1. `BreathingExerciseView` - Pattern intro + start button
+2. `BreathingSessionView` - Active session with animated circle + phase label
+3. `BreathingSummaryView` - Post-session summary + effectiveness
 
-  var body: some View {
-    Circle()
-      .frame(width: 200, height: 200)
-      .foregroundColor(Color.stressColor(for: .relaxed))
-      .scaleEffect(isExpanded ? 1.2 : 0.8)
-      .animation(
-        Animation.easeInOut(duration: duration).repeatForever(autoreverses: true),
-        value: isExpanded
-      )
-      .onAppear { isExpanded = true }
-  }
-}
+**Visual guidance:**
+- Animated circle expands/contracts with breathing rhythm
+- Phase label: "Inhale" / "Hold" / "Exhale" / "Hold"
+- Progress indicator for 3-minute session
+- `BeforeAfterChart` shows HRV comparison
+
+---
+
+## AI Chat UX (Updated - Apr 2026)
+
+### Chat Entry Points
+- **ActionView** - Primary access point for quick stress relief
+- `AIChatCard` on Dashboard - Context-aware stress insights
+- Quick action chips in ActionView - Pre-built prompt suggestions
+
+### Chat UI (`ChatBottomSheetView`)
+- Bottom sheet overlay with native SwiftUI
+- **Enhanced**: Real-time token streaming via AsyncThrowingStream
+- `QuickActionChipsView` for contextual prompt suggestions
+- AI Kitten mascot icon in chat header
+- **NEW**: SSEParser for efficient token processing
+
+### Streaming Architecture (NEW)
 ```
+ChatViewModel.send()
+  → LLMServiceProtocol.send() → AsyncThrowingStream<String, Error>
+  → CloudLLMService (HTTP/SSE to self-hosted gateway) OR
+  → AppleIntelligenceService (on-device Foundation Models)
+  → Token-by-token streaming display in ChatBottomSheetView
+```
+
+### Chat Context
+- `ChatContextBuilder` assembles anonymized health/stress context into system prompt
+- **No raw health data transmitted to LLM**
+- Session-only persistence (no SwiftData for chat messages)
+- **Hardcoded endpoint configuration** (simplified LLM setup)
+
+### LLM Provider Fallback
+1. `AppleIntelligenceService` (on-device, iOS 26+) - preferred
+2. `CloudLLMService` (HTTP/SSE with SSEParser) - fallback with streaming
+3. `LLMAPITarget` for streamlined endpoint configuration
+4. **NEW**: Hardcoded endpoint configuration for simplicity
+
+### UX Improvements (Apr 2026)
+- **Real-time streaming** - Users see AI response as it's generated
+- **Contextual suggestions** - Quick action chips based on stress level
+- **Simplified access** - Direct from ActionView for immediate support
+- **Streaming indicators** - Visual feedback during AI response generation
+- **NEW**: Hardcoded endpoint eliminates configuration complexity
 
 ---
 
@@ -271,7 +354,6 @@ Scrollable card list. No global NavigationStack or TimeRangePicker header — ea
 | Stress Over Time | `StressBarChartView` | Swift Charts bar chart |
 | Weekly Heatmap | `WeeklyHeatmapView` | Circular dot grid |
 | HRV Trend | `LineChartView` | Line chart + Y-axis + "Today" label |
-| Stress Sources | `StressSourcesDonutChart` | 180° semi-donut, 6-category legend |
 | Premium Banner | `PremiumBannerView` | Light-blue gradient + CharacterCalm + orange CTA |
 | Smart Insights | `SmartInsightsTeaser` | Static "Coming Soon" teaser |
 
@@ -288,7 +370,6 @@ All cards use the standard card pattern: `adaptiveCardBackground` + `settingsCar
 - **Stress Over Time:** Bar chart with daily average by selected time range
 - **Weekly Heatmap:** Stress intensity per day/hour as circular dot grid
 - **HRV Trend:** HRV history line with Y-axis scale and "Today" reference
-- **Stress Sources:** 180° semi-donut breaking down 6 categories
 
 ---
 
@@ -450,6 +531,6 @@ Xcode → Debug → View Debugging → Accessibility Inspector
 ---
 
 **Previous:** See `design-guidelines-visual.md` for colors, typography, and components.
-**Design System Version:** 1.0
-**Last Updated:** April 13, 2026
+**Design System Version:** 1.1
+**Last Updated:** April 25, 2026
 **Maintained By:** Phuong Doan

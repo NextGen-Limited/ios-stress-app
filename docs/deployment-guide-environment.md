@@ -2,7 +2,7 @@
 
 **Platform:** iOS 17+ / watchOS 10+
 **Section:** Setup, Requirements, Build Instructions
-**Last Updated:** April 13, 2026
+**Last Updated:** April 17, 2026
 
 ---
 
@@ -12,11 +12,13 @@
 
 | Component | Minimum | Recommended |
 |-----------|---------|-------------|
-| **Xcode** | 15.0 | 15.4+ |
-| **macOS** | 14.0 Sonoma | 15.0 Sequoia |
-| **iOS** | 17.0 | 17.5+ |
-| **watchOS** | 10.0 | 10.5+ |
-| **Swift** | 5.9 | 5.9+ |
+| **Xcode** | 16.0 | 16.2+ |
+| **macOS** | 15.0 Sequoia | 15.3+ |
+| **iOS** | 17.0 | 18.0+ |
+| **watchOS** | 10.0 | 11.0+ |
+| **Swift** | 5.9 | 6.0+ |
+
+**Note:** Apple Intelligence features (on-device AI Chat) require iOS 26+ and compatible hardware.
 
 ### Required Accounts
 
@@ -157,11 +159,9 @@ xcodebuild test \
 ```
 
 **Expected Results:**
-- 100+ test methods
-- Core algorithm tests: ✅
-- Repository tests: ✅
-- ViewModel tests: ✅
-- CloudKit sync tests: ✅
+- Test suite currently minimal (pending rewrite)
+- Mock services available in `Services/MockServices.swift`
+- Demo mode available for manual testing (`-demo-mode` launch argument)
 
 ### Manual Testing Checklist
 
@@ -198,6 +198,11 @@ xcodebuild test \
 - [ ] Delete by date range works
 - [ ] Delete all data works
 - [ ] CloudKit reset works
+
+#### Streaming AI Features
+- [ ] CloudLLM streaming chat works with SSEParser
+- [ ] LLMAPITarget hardcoded endpoint configuration
+- [ ] Fallback to Apple Intelligence (iOS 26+)
 
 #### Accessibility
 - [ ] VoiceOver reads all elements

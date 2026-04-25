@@ -59,28 +59,27 @@ Before committing code, verify:
 
 ```
 StressMonitor/
-├── Components/              # Shared UI components
-│   └── Character/           # StressBuddy illustration + animations
-├── Models/                  # Data structures
+├── Components/              # Shared UI components (Character, Charts, Dashboard)
+├── Fonts/                   # Roboto font family (6 TTF files)
+├── Models/                  # Data structures (~18 files)
 ├── Services/                # Business logic
-│   ├── HealthKit/
-│   ├── Algorithm/
-│   ├── Repository/
-│   ├── CloudKit/
-│   ├── DataManagement/
-│   ├── Sync/
-│   ├── Background/
-│   ├── Connectivity/
-│   ├── Widget/
-│   ├── Watch/
-│   └── Protocols/
-├── ViewModels/              # State management (@Observable)
-├── Views/                   # SwiftUI screens
+│   ├── Algorithm/           # Multi-factor stress algorithm
+│   ├── Background/          # Background tasks
+│   ├── CloudKit/            # iCloud sync
+│   ├── Connectivity/        # Watch connectivity
+│   ├── DataManagement/      # Export/delete operations
+│   ├── HealthKit/           # Health data fetching (~5 files)
+│   ├── LLM/                 # AI chat services with SSE streaming
+│   │   ├── CloudLLMService.swift    # HTTP/SSE streaming service
+│   │   ├── SSEParser.swift          # NEW: Efficient SSE parsing
+│   │   └── LLMAPITarget.swift       # NEW: Hardcoded endpoint config
+│   ├── Protocols/           # Service interfaces
+│   ├── Repository/          # SwiftData persistence
+│   └── Sync/                # Sync coordination
+├── ViewModels/              # State management (@Observable, 4+ files)
+├── Views/                   # SwiftUI screens (~100 files total)
 ├── Theme/                   # Design tokens
-├── WidgetKit/              # iOS widgets (Small/Medium/Large families)
-├── WatchApp/               # watchOS app with complications
-├── Shared/                 # Shared models/data (App Groups)
-└── Utilities/               # Helper functions
+└── Utilities/               # Helper functions (~9 files)
 ```
 
 **Key Rules:**
@@ -107,7 +106,7 @@ struct StressWidgetProvider: TimelineProvider {
 
 **CloudKit**: Cross-device sync with conflict resolution
 - CloudKitSyncEngine (batch operations, deviceID priority)
-- WidgetSharedData (App Groups UserDefaults sharing)
+- `ComplicationEntry` / `WidgetEntry` (App Groups widget timeline data)
 
 ---
 
@@ -247,4 +246,4 @@ func startAutoRefresh() {
 ---
 
 **Enforced By:** Code review & automated tests
-**Last Updated:** April 13, 2026
+**Last Updated:** April 17, 2026

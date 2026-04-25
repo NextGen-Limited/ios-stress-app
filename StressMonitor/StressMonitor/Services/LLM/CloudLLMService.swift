@@ -1,34 +1,36 @@
 import Foundation
+import Moya
 
 // MARK: - Cloud LLM Service
 
-/// LLM service that calls a self-hosted FastAPI gateway via HTTP/SSE.
+/// LLM service using Moya for endpoint definitions (health check)
+/// and URLSession for SSE streaming (Moya lacks native SSE support).
 /// Falls back gracefully when server is unreachable.
-final class CloudLLMService: LLMServiceProtocol, Sendable {
+final class CloudLLMService: LLMServiceProtocol, @unchecked Sendable {
 
-    // TODO: Update to production URL before release
-    private let apiKey: String
+    // MARK: - Properties
 
-    init(apiKey: String = "") {
-        self.apiKey = apiKey
+    private let provider: MoyaProvider<LLMAPITarget>
+
+    // MARK: - Init
+
+    init(provider: MoyaProvider<LLMAPITarget> = MoyaProvider()) {
+        self.provider = provider
     }
 
     // MARK: - Availability
 
     nonisolated func isAvailable() -> Bool {
-        guard let url = URL(string: "https://hyperpolysyllabically-saronic-mee.ngrok-free.app/health") else { return false }
-
-        var request = URLRequest(url: url)
-        request.httpMethod = "GET"
-        request.timeoutInterval = 3
-
         let semaphore = DispatchSemaphore(value: 0)
         var available = false
 
-        URLSession.shared.dataTask(with: request) { _, response, _ in
-            available = (response as? HTTPURLResponse)?.statusCode == 200
+        // swiftlint:disable:next task_create_async_await_in_nonisolated
+        provider.request(.healthCheck) { result in
+            if case .success(let response) = result {
+                available = response.statusCode == 200
+            }
             semaphore.signal()
-        }.resume()
+        }
 
         _ = semaphore.wait(timeout: .now() + 4)
         return available
@@ -40,11 +42,12 @@ final class CloudLLMService: LLMServiceProtocol, Sendable {
         messages: [ChatMessage],
         systemPrompt: String
     ) async throws -> AsyncThrowingStream<String, Error> {
-        let apiKey = self.apiKey
-        let encodedMessages = messages.map { ["role": $0.role.rawValue, "content": $0.content] as [String: String] }
+        let encodedMessages = messages.map { ["role": $0.role.rawValue, "content": $0.content] }
+        var allMessages = [["role": "system", "content": systemPrompt]]
+        allMessages.append(contentsOf: encodedMessages)
 
         return AsyncThrowingStream { (continuation: AsyncThrowingStream<String, Error>.Continuation) in
-            let task = Task {
+            let task = Swift.Task {
                 do {
                     guard let url = URL(string: "https://hyperpolysyllabically-saronic-mee.ngrok-free.app/v1/chat/completions") else {
                         continuation.finish(throwing: LLMServiceError.unavailable(reason: "Invalid server URL"))
@@ -53,16 +56,12 @@ final class CloudLLMService: LLMServiceProtocol, Sendable {
 
                     var request = URLRequest(url: url)
                     request.httpMethod = "POST"
-                    request.setValue("Bearer \(apiKey)", forHTTPHeaderField: "Authorization")
                     request.setValue("application/json", forHTTPHeaderField: "Content-Type")
+                    request.setValue("Bearer changeme", forHTTPHeaderField: "Authorization")
                     request.timeoutInterval = 60
 
-                    // Build messages array with system prompt as first message
-                    var allMessages = [["role": "system", "content": systemPrompt] as [String: String]]
-                    allMessages.append(contentsOf: encodedMessages)
-
                     let body: [String: Any] = [
-                        "model": "deepseek-chat",
+                        "model": "auto",
                         "messages": allMessages,
                         "stream": true,
                     ]
@@ -78,22 +77,16 @@ final class CloudLLMService: LLMServiceProtocol, Sendable {
                     }
 
                     for try await line in bytes.lines {
-                        guard line.hasPrefix("data: ") else { continue }
-                        let payload = String(line.dropFirst(6))
-
-                        if payload == "[DONE]" { break }
-
-                        if let data = payload.data(using: .utf8),
-                           let json = try? JSONSerialization.jsonObject(with: data) as? [String: Any] {
-                            if let token = json["token"] as? String {
-                                continuation.yield(token)
-                            }
-                            if let errorMsg = json["error"] as? String {
-                                continuation.finish(throwing: LLMServiceError.unknown(
-                                    NSError(domain: "CloudLLM", code: 0, userInfo: [NSLocalizedDescriptionKey: errorMsg])
-                                ))
-                                return
-                            }
+                        switch SSEParser.parse(line: line) {
+                        case .content(let token):
+                            continuation.yield(token)
+                        case .done:
+                            break
+                        case .error(let msg):
+                            continuation.finish(throwing: LLMServiceError.unavailable(reason: msg))
+                            return
+                        case .none:
+                            break
                         }
                     }
                     continuation.finish()
@@ -112,7 +105,6 @@ final class CloudLLMService: LLMServiceProtocol, Sendable {
     nonisolated private static func mapHTTPError(_ statusCode: Int) -> LLMServiceError? {
         switch statusCode {
         case 200...299: return nil
-        case 401: return .unavailable(reason: "Invalid API key")
         case 422: return .unavailable(reason: "Bad request body")
         case 502: return .unavailable(reason: "Provider failure")
         default: return .unavailable(reason: "Server error (\(statusCode))")

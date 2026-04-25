@@ -1,9 +1,9 @@
 # Codebase Summary
 
-**Total Files:** 293 Swift files
-**Total Tokens:** ~280,000
+**Total Files:** ~570 files (including 210 Swift files)
+**Total Tokens:** ~582,571
 **Architecture:** MVVM + Protocol-Oriented Design
-**Last Updated:** April 15, 2026
+**Last Updated:** April 25, 2026
 
 ---
 
@@ -12,486 +12,276 @@
 ```
 ios-stress-app/
 ├── StressMonitor/                      # Xcode project root
-│   ├── StressMonitor/                  # iOS App (199 files)
-│   │   ├── Components/                 # Shared UI components (7 files)
-│   │   ├── Models/                     # Data models (10 files)
-│   │   ├── Services/                   # Business logic (27 files)
-│   │   ├── Theme/                      # Design tokens (7 files)
-│   │   ├── Utilities/                  # Helpers (7 files)
-│   │   ├── ViewModels/                 # State management (2 files)
-│   │   ├── Views/                      # SwiftUI screens (85 files)
-│   │   │   └── DesignSystem/           # Design system components (2 files)
-│   ├── StressMonitorWatch Watch App/   # watchOS App (44 files)
-│   ├── StressMonitorWidget/            # Home Screen Widgets (7 files)
-│   ├── StressMonitorTests/             # Unit Tests (39 files)
+│   ├── StressMonitor/                  # iOS App (210 files)
+│   │   ├── Models/                     # Data models (18 files)
+│   │   ├── Services/                   # Business logic (46 files)
+│   │   ├── ViewModels/                 # State management (4+ files)
+│   │   ├── Views/                      # SwiftUI screens (~100 files)
+│   │   ├── Theme/                      # Design tokens (5 files)
+│   │   ├── Utilities/                  # Helpers (9 files)
+│   │   └── Components/                 # Shared UI components (4 files)
+│   ├── StressMonitorWatch Watch App/   # watchOS App
+│   ├── StressMonitorWidget/            # Home Screen Widgets
+│   ├── StressMonitorTests/             # Unit Tests
 │   └── StressMonitorUITests/           # UI Tests
+├── .github/workflows/ci.yml            # GitHub Actions CI pipeline
+├── scripts/run-tests.py                # Python test runner
 └── docs/                               # Project documentation
 ```
 
 ---
 
-## iOS App Structure (144 files, ~15,300 LOC)
+## iOS App Structure (210 Swift files)
 
-### Components (7 files, ~606 LOC)
-Character components using SVG assets with SwiftUI animations.
+### Models (18 files, ~969 LOC)
+Core data structures for health metrics and stress calculations.
 
-| File | LOC | Purpose |
-|------|-----|---------|
-| `Components/Character/StressBuddyIllustration.swift` | 66 | SVG-based character loader with 5 mood expressions |
-| `Components/Character/StressCharacterCard.swift` | 270 | Character card with ZStack layout |
-| `Components/Character/CharacterAnimationModifier.swift` | 161 | Mood-specific animations (breathing, fidget, shake, dizzy) |
-| `Components/Character/DecorativeTriangleView.swift` | 109 | Decorative triangle element for card corners |
+| File | Purpose |
+|------|---------|
+| `StressMeasurement.swift` | @Model SwiftData entity for measurements |
+| `StressResult.swift` | Stress calculation output |
+| `StressCategory.swift` | Enum: Relaxed, Mild, Moderate, High |
+| `HRVMeasurement.swift` | Heart Rate Variability data |
+| `HeartRateSample.swift` | Individual HR reading |
+| `PersonalBaseline.swift` | User's physiological baseline |
+| `StressBuddyMood.swift` | Character mood states |
+| `ChatMessage.swift` | Chat message model |
+| `ActivityData.swift` | Activity metrics for multi-factor algorithm |
+| `SleepData.swift` | Sleep quality data |
+| `RecoveryData.swift` | Recovery status data |
+| `DataQualityInfo.swift` | Data quality assessment |
+| `FactorBreakdown.swift` | Per-factor stress breakdown |
+| `FactorWeights.swift` | Dynamic weight configuration |
+| `StressContext.swift` | Aggregated health data input |
+| `WidgetSharedData.swift` | `ComplicationEntry` + `WidgetEntry` widget timeline data |
+| `ExportModels.swift` | CSV/JSON export structures |
+| `ObservableModel.swift` | Base protocol for observable models |
 
-**SVG Assets (refactored Feb 2026):**
-- `CharacterCalm.svg` - Relaxed expression
-- `CharacterConcerned.svg` - Moderate concern
-- `CharacterOverwhelmed.svg` - High stress
-- `CharacterSleeping.svg` - Rest state
-- `CharacterWorried.svg` - Mild stress
+### Services (46 files, ~6,900 LOC)
+Business logic and system integrations.
 
-**Key Features:**
-- 5 mood expressions via SVG assets (replaced 549 LOC of custom drawing)
-- Reduce Motion support throughout
-- Accessibility labels and VoiceOver support
+#### Algorithm Services (10 files)
+- `StressCalculator.swift` - Main stress calculation orchestration
+- `MultiFactorStressCalculator.swift` - Advanced multi-factor stress analysis
+- `StressFactor.swift` - Base stress factor protocol
+- `HeartRateStressFactor.swift` - Heart rate-based stress analysis
+- `HRVStressFactor.swift` - HRV-based stress calculation
+- `SleepStressFactor.swift` - Sleep quality impact on stress
+- `ActivityStressFactor.swift` - Physical activity stress correlation
+- `RecoveryStressFactor.swift` - Recovery capacity assessment
+- `FactorCalibrator.swift` - Stress factor weight calibration
+- `BaselineCalculator.swift` - Individual baseline computation
 
-### Models (9 files, ~485 LOC)
-Data structures for health metrics and stress calculations.
+#### HealthKit Services (5 files)
+- `HealthKitManager.swift` - Core HealthKit integration
+- `ActivityDataFetcher.swift` - Activity data retrieval
+- `SleepDataFetcher.swift` - Sleep data collection  
+- `RecoveryDataFetcher.swift` - Recovery metrics integration
+- `SimulatorHealthKitService.swift` - Mock data for development
 
-| File | LOC | Purpose |
-|------|-----|---------|
-| `Models/Base/ObservableModel.swift` | 12 | Base protocol for observable models |
-| `Models/StressMeasurement.swift` | 45 | @Model SwiftData entity for measurements |
-| `Models/StressResult.swift` | 28 | Stress calculation output |
-| `Models/StressCategory.swift` | 35 | Enum: Relaxed, Mild, Moderate, High |
-| `Models/HRVMeasurement.swift` | 32 | Heart Rate Variability data |
-| `Models/HeartRateSample.swift` | 28 | Individual HR reading |
-| `Models/PersonalBaseline.swift` | 48 | User's physiological baseline |
-| `Models/StressBuddyMood.swift` | 38 | Character mood states |
-| `Models/ExportModels.swift` | 279 | CSV/JSON export structures |
-| `Models/ChatMessage.swift` | ~33 | Chat message model (ChatRole enum + ChatMessage struct) |
+#### CloudKit Services (3 files)
+- `CloudKitManager.swift` - CloudKit synchronization core
+- `CloudKitSyncEngine.swift` - Sync conflict resolution
+- `CloudKitSchema.swift` - CloudKit data model definitions
 
-### Services (27 files, ~4,861 LOC)
-Business logic, HealthKit integration, data persistence, cloud sync.
+#### LLM Services (7 files)
+- `LLMServiceProtocol.swift` - AI service abstraction
+- `AppleIntelligenceService.swift` - On-device AI integration (iOS 26+)
+- `CloudLLMService.swift` - Cloud-based AI fallback with hardcoded endpoint
+- `ChatContextBuilder.swift` - Conversation context management
+- `ChatQuickActions.swift` - Quick response suggestions
+- `SSEParser.swift` - Server-Sent Events streaming parser
+- `LLMAPITarget.swift` - API configuration for cloud LLM
 
-#### HealthKit Service (1 file, 156 LOC)
-| File | LOC | Purpose |
-|------|-----|---------|
-| `Services/HealthKit/HealthKitManager.swift` | 156 | HealthKit authorization + data fetching |
+#### Data Management Services (8 files)
+- `DataManagementService.swift` - Central data management
+- `DataExporter.swift` - Data export functionality
+- `DataDeleter.swift` - Data cleanup and management
+- `CSVGenerator.swift` - CSV file generation
+- `JSONGenerator.swift` - JSON export formatting
+- `CloudKitResetService.swift` - CloudKit data reset utilities
+- `LocalDataWipeService.swift` - Local data cleanup
+- `DataManagementUtilities.swift` - Data management helpers
 
-**Key Methods:**
-- `requestAuthorization()` - HealthKit permission flow
-- `fetchLatestHRV()` - Get latest HRV measurement
-- `fetchHeartRate(samples:)` - Get HR samples
+#### Background Services (2 files)
+- `HealthBackgroundScheduler.swift` - Background health data collection
+- `NotificationManager.swift` - Local notification system
 
-#### Insight Service (1 file, 83 LOC)
-| File | LOC | Purpose |
-|------|-----|---------|
-| `Services/InsightGeneratorService.swift` | 83 | AI-powered insight generation |
+#### Sync Services (2 files)
+- `SyncManager.swift` - Data synchronization coordination
+- `ConflictResolver.swift` - Sync conflict resolution
 
-**Key Methods:**
-- `generateInsight(stress:baseline:history:)` - Generate personalized insights from patterns
+#### Additional Services
+- `InsightGeneratorService.swift` - AI-powered insights
+- `MockServices.swift` - Development mock data services
 
-#### LLM Service (4 files, ~350 LOC)
-| File | LOC | Purpose |
-|------|-----|---------|
-| `Services/LLM/LLMServiceProtocol.swift` | ~58 | Protocol + `LLMServiceError` error enum |
-| `Services/LLM/AppleIntelligenceService.swift` | ~130 | Apple Foundation Models (iOS 26+) implementation |
-| `Services/LLM/ChatContextBuilder.swift` | ~90 | Health data → system prompt assembler |
-| `Services/LLM/ChatQuickActions.swift` | ~72 | Pre-built prompt suggestions |
+### ViewModels (4+ files)
+State management layer:
 
-**Key Methods:**
-- `LLMServiceProtocol.send(messages:systemPrompt:)` - Stream LLM response tokens
-- `AppleIntelligenceService.isAvailable()` - Check iOS 26+ Foundation Models support
-- `ChatContextBuilder.buildSystemPrompt(stress:baseline:)` - Assemble health context
+- `StressViewModel.swift` - Core stress tracking state
+- `ChatViewModel.swift` - AI chat with streaming responses
+- `DashboardViewModel.swift` - Dashboard data aggregation
+- `TrendViewModel.swift` - Historical trend analysis
+- `HistoryViewModel.swift` - Historical data browsing
+- `SettingsViewModel.swift` - App configuration state
+- `DataManagementViewModel.swift` - Data management operations
+- `BreathingViewModel.swift` - Breathing exercise state
 
-#### Algorithm Service (2 files, 312 LOC)
-| File | LOC | Purpose |
-|------|-----|---------|
-| `Services/Algorithm/StressCalculator.swift` | 187 | Core stress algorithm (HRV + HR) |
-| `Services/Algorithm/BaselineCalculator.swift` | 125 | Personal baseline computation |
+### Views (~100 files)
+SwiftUI user interface components:
 
-**Key Methods:**
-- `StressCalculator.calculateStress(hrv:, heartRate:)` - Main algorithm
-- `BaselineCalculator.computeBaseline(measurements:)` - 30-day baseline
+#### Main Navigation Structure (3 tabs)
+1. **Home** (`DashboardView.swift`) - Main stress monitoring dashboard
+2. **Action** (`ActionView.swift`) - Quick actions, exercises, breathing, AI chat
+3. **Trend** (`TrendsView.swift`) - Historical stress visualization
 
-#### Repository Service (1 file, 445 LOC)
-| File | LOC | Purpose |
-|------|-----|---------|
-| `Services/Repository/StressRepository.swift` | 445 | SwiftData persistence layer |
+#### Feature Views
+- `HistoryView.swift` - Historical stress data
+- `SettingsView.swift` - App settings and configuration
+- `BreathingView.swift` - Breathing exercise interface
+- `Journal/` - Journaling features
+- `Chat/` - AI chat interface components
 
-**Key Methods:**
-- `save(_:)` - Persist measurement
-- `fetchRecent(limit:)` - Query recent data
-- `getBaseline()` - Retrieve user baseline
+### Theme (5 files)
+Design system and styling:
 
-#### CloudKit Services (3 files, 869 LOC)
-| File | LOC | Purpose |
-|------|-----|---------|
-| `Services/CloudKit/CloudKitManager.swift` | 294 | CloudKit operations (CRUD) |
-| `Services/CloudKit/CloudKitSchema.swift` | 198 | Record type definitions |
-| `Services/CloudKit/CloudKitSyncEngine.swift` | 377 | Sync orchestration + conflict resolution |
+- `Color+Wellness.swift` - App-specific color definitions
+- `Color+Extensions.swift` - Color system extensions
+- `DesignTokens.swift` - Core design tokens
+- `Font+WellnessType.swift` - Typography system
+- `Gradients.swift` - Gradient definitions
 
-#### DataManagement Services (9 files, 2,789 LOC)
-Large module for export, delete, and CloudKit reset operations.
+### Components (4 files)
+Reusable UI components:
 
-| File | LOC | Purpose |
-|------|-----|---------|
-| `Services/DataManagement/DataManagementService.swift` | 464 | Orchestrator for all data operations |
-| `Services/DataManagement/CloudKitResetService.swift` | 539 | Wipe CloudKit container |
-| `Services/DataManagement/DataDeleterService.swift` | 358 | Delete local data by range/category |
-| `Services/DataManagement/LocalDataWipeService.swift` | 326 | Full local wipe |
-| `Services/DataManagement/CSVGenerator.swift` | 187 | CSV export format |
-| `Services/DataManagement/JSONGenerator.swift` | 249 | JSON export format |
-| `Services/DataManagement/DataExporter.swift` | 156 | Orchestrate export |
-| `Services/DataManagement/DataDeleter.swift` | 134 | Orchestrate delete |
-| `Services/DataManagement/DataManagementUtilities.swift` | 76 | Shared utilities |
+- `StressBuddyIllustration.swift` - AI companion visual components
+- `StressCharacterCard.swift` - Character representation
+- `CharacterAnimationModifier.swift` - Animation utilities
+- `DecorativeTriangleView.swift` - Decorative UI elements
 
-#### Supporting Services (9 files, 879 LOC)
-| File | LOC | Purpose |
-|------|-----|---------|
-| `Services/Sync/SyncManager.swift` | 278 | Coordinate local + cloud sync |
-| `Services/Sync/ConflictResolver.swift` | 271 | Resolve sync conflicts |
-| `Services/Connectivity/PhoneConnectivityManager.swift` | 198 | WatchConnectivity bridge |
-| `Services/Background/HealthBackgroundScheduler.swift` | 156 | BGAppRefreshTask setup |
-| `Services/Background/NotificationManager.swift` | 134 | Push notification handling |
-| `Services/Protocols/HealthKitServiceProtocol.swift` | 28 | HealthKit interface |
-| `Services/Protocols/StressAlgorithmServiceProtocol.swift` | 24 | Algorithm interface |
-| `Services/Protocols/StressRepositoryProtocol.swift` | 32 | Repository interface |
-| `Services/Protocols/CloudKitServiceProtocol.swift` | 40 | CloudKit interface |
+### Utilities (9 files)
+Helper functions and extensions:
 
-### ViewModels (3 files, ~900 LOC)
-State management with @Observable macro.
+- `Animation+Wellness.swift` - Animation utilities
+- `AnimationPresets.swift` - Pre-defined animations
+- `AccessibilityModifiers.swift` - Accessibility enhancements
+- `DynamicTypeScaling.swift` - Dynamic type scaling
+- `FontBlaster.swift` - Font loading utilities
+- `HighContrastModifier.swift` - High contrast support
+- `PatternOverlay.swift` - Visual pattern utilities
+- `ColorBlindnessSimulator.swift` - Accessibility testing
+- `DocsURL.swift` - Documentation references
 
-| File | LOC | Purpose |
-|------|-----|---------|
-| `ViewModels/StressViewModel.swift` | 278 | Main app state with auto-refresh (HKObserverQuery) |
-| `ViewModels/DataManagementViewModel.swift` | 459 | Export, delete, reset operations state |
-| `ViewModels/ChatViewModel.swift` | ~163 | Chat state management, LLM interaction, message streaming |
+### Protocols (5 files)
+Interface definitions:
 
-**Key Properties in StressViewModel:**
-- `currentStress: StressResult?`
-- `recentMeasurements: [StressMeasurement]`
-- `baseline: PersonalBaseline`
-- `isLoading: Bool`
-- `errorMessage: String?`
-- `todayMeasurements: [StressMeasurement]`
-- `weeklyAverage: (current: Double, previous: Double)?`
-- `hrvHistory: [Double]`
-- `heartRateTrend: TrendDirection`
-- `aiInsight: AIInsight?`
-- `isPermissionRequired: Bool` (NEW) - Set when HealthKit authorization denied/not determined
-- `isRequestingAccess: Bool` (NEW) - Guards against double-tap on permission request
-- `requestHealthKitAccess()` (NEW) - Request HealthKit authorization with re-entry protection
-
-**Auto-Refresh Features:**
-- HKObserverQuery subscription for automatic updates
-- Debounced refresh (60-second minimum interval)
-- Background health data monitoring
-- `#if targetEnvironment(simulator)` guard skips HKObserverQuery in simulator (prevents HealthKit entitlement error)
-
-### Views (85 files, ~9,880 LOC)
-SwiftUI declarative interface organized by feature.
-
-#### Dashboard Module (24 files, ~2,150 LOC)
-Main stress display screen with enhanced UI and permission flow.
-
-| File | LOC | Purpose |
-|------|-----|---------|
-| `Views/Dashboard/StressDashboardView.swift` | 271 | Main dashboard with unified scroll layout |
-| `Views/Dashboard/Components/StressRingView.swift` | 86 | 260pt animated ring with spring animations |
-| `Views/Dashboard/Components/MetricCardView.swift` | 171 | HRV + HR cards with number transitions |
-| `Views/Dashboard/Components/DailyTimelineView.swift` | ~160 | 7-day × 7-slot weekly dot-matrix grid (Mar 2026) |
-| `Views/Dashboard/Components/WeeklyInsightCard.swift` | 138 | Week-over-week comparison |
-| `Views/Dashboard/Components/AIInsightCard.swift` | 124 | AI-generated personalized insights |
-| `Views/Dashboard/Components/LearningPhaseCard.swift` | 192 | Baseline learning progress |
-| `Views/Dashboard/Components/MiniLineChartView.swift` | 106 | Sparkline for metrics |
-| `Views/Dashboard/Components/StatusBadgeView.swift` | 92 | Stress category badge |
-| `Views/Dashboard/Components/EmptyDashboardView.swift` | 98 | Empty state placeholder |
-| `Views/Dashboard/Components/NoDataCard.swift` | 101 | No data state |
-| `Views/Dashboard/Components/PermissionCardView.swift` | 131 | HealthKit permission request with multi-type support |
-| `Views/Dashboard/Components/SkeletonBlock.swift` | 20 | Skeleton placeholder with pulsing animation |
-| `Views/Dashboard/Components/QuickStatCard.swift` | 70 | Quick stat display |
-
-**Dashboard Enhancement Features:**
-- OLED dark theme (pure black #121212 background)
-- Unified single-column scroll layout
-- Auto-refresh via HKObserverQuery (no manual Measure button)
-- Spring animations with Reduce Motion support
-- All 6 components visible in single scroll
-
-#### History Module (8 files, ~550 LOC)
-Timeline view with filtering.
-
-| File | LOC | Purpose |
-|------|-----|---------|
-| `Views/History/HistoryView.swift` | 156 | List of all measurements |
-| `Views/History/HistoryFilterView.swift` | 128 | Date/category filter UI |
-| `Views/History/MeasurementDetailView.swift` | 128 | Individual measurement details |
-
-#### Trends Module (13 files, ~1,070 LOC)
-Charts and analytics — Figma-aligned (Mar 2026).
-
-| File | LOC | Purpose |
-|------|-----|---------|
-| `Views/Trends/TrendsView.swift` | 147 | Scrollable card list; global NavigationStack/TimeRangePicker removed |
-| `Views/Trends/TrendsViewModel.swift` | 265 | Trends-specific state |
-| `Views/Trends/Components/StressBarChartView.swift` | 116 | Swift Charts bar chart (replaces circular indicators) — "Stress Over Time" card |
-| `Views/Trends/Components/LineChartView.swift` | 154 | HRV trend line chart with Y-axis labels + "Today" marker |
-| `Views/Trends/Components/WeeklyHeatmapView.swift` | 87 | Weekly heatmap with circular dot cells (replaces square cells) |
-| `Views/Trends/Components/StressSourcesDonutChart.swift` | 168 | 180° semi-donut chart with 6-category legend (replaces full donut) |
-| `Views/Trends/Components/PremiumBannerView.swift` | 60 | Light-blue gradient banner; CharacterCalm mascot + sparkles + orange CTA |
-| `Views/Trends/Components/MascotSpeechBubbleView.swift` | 34 | Speech bubble component for mascot (NEW) |
-| `Views/Trends/Components/SmartInsightsTeaser.swift` | 48 | Static "Coming Soon" teaser (replaces dynamic pattern insights) |
-| `Views/Trends/Components/TimeRangePicker.swift` | 24 | Time range selector (used within individual cards) |
-| `Views/Trends/Components/InsightCard.swift` | 32 | Individual insight card |
-| `Views/Trends/Components/DistributionBarView.swift` | 38 | Distribution bar sub-component |
-| `Views/Trends/Components/CircularStressIndicatorView.swift` | 48 | Legacy circular indicator (superseded by bar chart) |
-
-**Trends Card Design (Mar 2026):**
-- All cards use `adaptiveCardBackground` + `settingsCardRadius` + Settings card shadow
-- Per-card static labels replace global NavigationStack header
-- Cards: Stress Over Time, Weekly Heatmap, HRV Trend, Stress Sources, Premium Banner, Smart Insights
-
-#### Breathing Module (6 files, ~450 LOC)
-Guided breathing exercises.
-
-| File | LOC | Purpose |
-|------|-----|---------|
-| `Views/Breathing/BreathingExerciseView.swift` | 245 | Guided session UI + timer |
-| `Views/Breathing/BreathingHistoryView.swift` | 178 | Past sessions list |
-
-#### Settings Module (14 files, ~740 LOC)
-App settings with card-based layout.
-
-| File | LOC | Purpose |
-|------|-----|---------|
-| `Views/Settings/SettingsView.swift` | 167 | Settings tabs with card layout |
-| `Views/Settings/DataManagementView.swift` | 245 | Export, delete, reset controls |
-| `Views/Settings/AccountSettingsView.swift` | 156 | iCloud/CloudKit options |
-| `Views/Settings/PrivacyView.swift` | 94 | Privacy policy + data usage |
-| `Views/Settings/Components/AddComplicationButton.swift` | 36 | Add complication button |
-| `Views/Settings/Components/ComplicationWidget.swift` | 68 | Widget preview card |
-| `Views/Settings/Components/DataSharingCard.swift` | 40 | Data sharing options |
-| `Views/Settings/Components/PremiumCard.swift` | 36 | Premium upgrade card |
-| `Views/Settings/Components/SettingsSectionHeader.swift` | 44 | Section header |
-| `Views/Settings/Components/ShareButton.swift` | 36 | Share action button |
-| `Views/Settings/Components/WatchFaceCard.swift` | 40 | Watch face preview |
-
-**Settings Design Features (Mar 2026):**
-- Card-based layout with adaptive backgrounds
-- Settings-specific color tokens (light/dark mode)
-- Custom shadow and spacing design tokens
-- 5 SVG icons for Settings actions
-
-#### Onboarding Module (10 files, ~467 LOC)
-First-launch flow with baseline setup.
-
-| File | LOC | Purpose |
-|------|-----|---------|
-| `Views/Onboarding/OnboardingContainerView.swift` | 134 | Pager controller |
-| `Views/Onboarding/WelcomeScreenView.swift` | 78 | Introduction |
-| `Views/Onboarding/HealthKitPermissionView.swift` | 92 | HealthKit request |
-| `Views/Onboarding/BaselineSetupView.swift` | 156 | Collect baseline data |
-| `Views/Onboarding/OnboardingCompletionView.swift` | 7 | Success screen |
-
-#### Chat Module (2 files, ~400 LOC)
-AI chat bottom sheet with native SwiftUI.
-
-| File | LOC | Purpose |
-|------|-----|---------|
-| `Views/Chat/ChatBottomSheetView.swift` | ~300 | Native SwiftUI chat UI in bottom sheet |
-| `Views/Chat/QuickActionChipsView.swift` | ~100 | Pre-built prompt suggestion chips |
-
-#### DesignSystem & Components (12 files, ~690 LOC)
-Reusable components and design patterns.
-
-| File | LOC | Purpose |
-|------|-----|---------|
-| `Views/Components/StressRingProgressView.swift` | 98 | Circular progress ring |
-| `Views/Components/LoadingStateView.swift` | 67 | Loading skeleton |
-| `Views/Components/ErrorStateView.swift` | 85 | Error message + retry |
-| `Views/DesignSystem/Components/SettingsCard.swift` | 40 | Generic Settings card container |
-
-#### Journal Module (1 file)
-Stress journaling (v1.1 feature foundation).
-
-| File | LOC | Purpose |
-|------|-----|---------|
-| `Views/Journal/` | - | Stress trigger tracking |
-
-### Theme (7 files, ~390 LOC)
-Design tokens and styling.
-
-| File | LOC | Purpose |
-|------|-----|---------|
-| `Theme/Color+Extensions.swift` | 138 | Stress colors + Settings adaptive colors |
-| `Theme/Color+Wellness.swift` | 56 | Wellness color palette + `figmaIconGray` (#717171) |
-| `Theme/DesignTokens.swift` | 89 | Spacing, corner radius, shadows |
-| `Theme/Font+WellnessType.swift` | 45 | Typography scale |
-| `Theme/Gradients.swift` | 30 | Gradient definitions |
-| `Views/DesignSystem/Spacing.swift` | 29 | 8pt grid + Settings card spacing |
-| `Views/DesignSystem/Shadows.swift` | 71 | Shadow presets + Settings card shadow |
-
-**Key Colors:**
-```swift
-.stressColor(for: .relaxed)   // Green (#34C759)
-.stressColor(for: .mild)      // Blue (#007AFF)
-.stressColor(for: .moderate)  // Yellow (#FFD60A)
-.stressColor(for: .high)      // Orange (#FF9500)
-
-// OLED Dark Theme
-.oledBackground               // #121212 (pure black)
-.cardBackground              // #1E1E1E
-.cardSecondary               // #2A2A2A
-.accentFor(stress:)          // Dynamic accent per stress level
-
-// NEW (Feb 2026)
-.figmaIconGray               // #717171 (Character card icons)
-
-// NEW (Mar 2026) - Settings Screen
-.settingsBackground          // #F3F4F8 (light), #1C1C1E (dark)
-.adaptiveSettingsBackground  // Auto-adapts to light/dark
-.adaptiveCardBackground      // White (light), #2C2C2E (dark)
-.settingsCardShadowColor     // #18274B
-```
-
-### Utilities (7 files, ~435 LOC)
-Helper functions and extensions.
-
-| File | LOC | Purpose |
-|------|-----|---------|
-| `Utilities/HapticManager.swift` | 45 | Haptic feedback |
-| `Utilities/AnimationPresets.swift` | 135 | Spring animation configurations (NEW) |
-| `Utilities/AccessibilityModifiers.swift` | 144 | Custom accessibility modifiers (NEW) |
-| `Utilities/ColorBlindnessSimulator.swift` | 38 | Accessibility testing |
-| `Utilities/DynamicTypeScaling.swift` | 34 | Text scaling helper |
-| `Utilities/DateFormattingUtility.swift` | 28 | Date formatting |
-| `Utilities/AccessibilityUtilities.swift` | 11 | A11y helpers | |
+- `LLMServiceProtocol.swift` - AI service contract
+- `CloudKitServiceProtocol.swift` - CloudKit abstraction
+- `HealthKitServiceProtocol.swift` - HealthKit access contract
+- `StressRepositoryProtocol.swift` - Data persistence contract
+- `StressAlgorithmServiceProtocol.swift` - Stress calculation contract
 
 ---
 
-## watchOS App Structure (29 files, ~2,541 LOC)
+## Navigation Structure
 
-### Models (6 files)
-Shared with iOS (via target membership).
+### 3-Tab Navigation Architecture
+The app uses a simplified 3-tab navigation structure:
 
-### Services (8 files, ~834 LOC)
-Watch-specific HealthKit and CloudKit.
+1. **Home** (`DashboardView.swift`) - Main stress monitoring dashboard with current stress levels, recent trends, and quick actions
+2. **Action** (`ActionView.swift`) - Quick access to exercises, breathing techniques, and AI chat
+3. **Trend** (`TrendsView.swift`) - Historical stress visualization and pattern analysis
 
-| File | LOC | Purpose |
-|------|-----|---------|
-| `Services/WatchHealthKitManager.swift` | 145 | Optimized HRV/HR fetch |
-| `Services/WatchCloudKitManager.swift` | 234 | CloudKit sync for watch |
-| `Services/WatchConnectivityManager.swift` | 167 | iPhone bridge |
-| `Services/WatchStressCalculator.swift` | 156 | Calculate on watch |
-| `Services/ComplicationDataProvider.swift` | 132 | Widget data source |
-
-### ViewModels (1 file, 156 LOC)
-| File | LOC | Purpose |
-|------|-----|---------|
-| `ViewModels/WatchStressViewModel.swift` | 156 | Watch app state |
-
-### Views (5 files, ~412 LOC)
-Compact watch UI.
-
-| File | LOC | Purpose |
-|------|-----|---------|
-| `Views/ContentView.swift` | 178 | Watch app root |
-| `Views/Components/CompactStressView.swift` | 145 | Condensed stress display |
-| `Views/DetailView.swift` | 89 | Stress detail on watch |
-
-### Complications (9 files, ~745 LOC)
-WidgetKit complications (not ClockKit).
-
-| File | LOC | Purpose |
-|------|-----|---------|
-| `Complications/ComplicationBundle.swift` | 34 | WidgetKit bundle entry |
-| `Complications/Providers/CircularComplicationProvider.swift` | 156 | Circular family |
-| `Complications/Providers/RectangularComplicationProvider.swift` | 167 | Rectangular family |
-| `Complications/Providers/InlineComplicationProvider.swift` | 123 | Inline family |
-| `Complications/Views/CircularStressView.swift` | 134 | Circular complication UI |
-| `Complications/Views/RectangularStressView.swift` | 145 | Rectangular complication UI |
-| `Complications/Views/InlineStressView.swift` | 86 | Inline complication UI |
-
-### Theme (2 files, ~98 LOC)
-Watch-specific design tokens.
-
-| File | LOC | Purpose |
-|------|-----|---------|
-| `Theme/Color+Extensions.swift` | 45 | Watch stress colors |
-| `Theme/WatchDesignTokens.swift` | 53 | Watch spacing/fonts |
+### Secondary Navigation
+- Settings, History, and Data Management are accessible via navigation within respective tabs
+- Settings accessible through Dashboard → Settings icon
+- History accessible through Trends → Historical data views
 
 ---
 
-## Home Screen Widgets (7 files, ~1,287 LOC)
+## Tech Stack
 
-| File | LOC | Purpose |
-|------|-----|---------|
-| `StressMonitorWidget/WidgetBundle.swift` | 28 | Widget bundle entry |
-| `StressMonitorWidget/Views/SmallWidgetView.swift` | 187 | 2x2 widget |
-| `StressMonitorWidget/Views/MediumWidgetView.swift` | 284 | 2x4 widget |
-| `StressMonitorWidget/Views/LargeWidgetView.swift` | 424 | 4x4 widget with trends |
-| `StressMonitorWidget/DataProviders.swift` | 156 | WidgetKit timeline provider |
-| `StressMonitorWidget/Intents/UpdateWidgetIntent.swift` | 73 | Intent for interactive widget |
-| `StressMonitorWidget/Utilities/WidgetDataHelper.swift` | 135 | Shared data access |
+### Core Technologies
+- **Language**: Swift 5.9+
+- **UI Framework**: SwiftUI (no UIKit dependencies)
+- **Architecture**: MVVM with @Observable macro (iOS 17+)
+- **Persistence**: SwiftData (iOS 17+ native)
+- **Health Data**: HealthKit (read-only access)
+- **Cloud Sync**: CloudKit (end-to-end encrypted)
+- **Background Tasks**: BGAppRefreshTask
+- **Widgets**: WidgetKit for watchOS complications
+
+### AI Integration
+- **Primary**: Apple Intelligence (Foundation Models, iOS 26+)
+- **Fallback**: CloudLLMService with SSE streaming
+- **Architecture**: Server-Sent Events for real-time streaming
+- **Features**: Stress insights, breathing guidance, conversation
+
+### Dependencies
+- **Zero third-party dependencies** - Uses only Apple system frameworks
+- **Privacy-first design** - All data processed locally when possible
+- **Modular architecture** - Protocol-based dependency injection
 
 ---
 
-## Unit Tests (27 files, ~7,500 LOC)
+## Key Features
 
-### Core Algorithm Tests (2 files, 312 LOC)
+### Stress Monitoring
+- Multi-factor stress calculation (HRV 70%, Heart Rate 30%)
+- Real-time stress level assessment with confidence scoring
+- Personalized baseline calibration
+- Stress categorization: Relaxed, Mild, Moderate, High
 
-| File | LOC | Purpose |
-|------|-----|---------|
-| `StressCalculatorTests.swift` | 167 | 20+ test cases for algorithm |
-| `BaselineCalculatorTests.swift` | 145 | 10+ baseline computation tests |
+### AI-Powered Insights
+- Apple Intelligence integration for iOS 26+
+- CloudLLM fallback with SSE streaming
+- Contextual stress analysis and recommendations
+- Breathing exercise guidance
+- Conversational stress management
 
-### Service Tests (8 files, ~1,890 LOC)
+### Data Management
+- Local data persistence with SwiftData
+- CloudKit synchronization for seamless cross-device experience
+- Data export functionality (CSV, JSON)
+- Privacy-focused data handling
 
-| File | LOC | Purpose |
-|------|-----|---------|
-| `HealthKitManagerTests.swift` | 198 | HRV/HR fetch mocking |
-| `StressRepositoryTests.swift` | 245 | SwiftData CRUD operations |
-| `CloudKitManagerTests.swift` | 289 | CloudKit sync tests |
-| `SyncManagerTests.swift` | 267 | Sync orchestration tests |
-| `DataManagementServiceTests.swift` | 234 | Export/delete functionality |
-| `NotificationManagerTests.swift` | 167 | Push notification handling |
-| `BaselineCalculatorTests.swift` | 156 | Edge cases for baseline |
-| `MockCloudKitManager.swift` | 337 | Mock implementation |
+### User Experience
+- Clean, accessible SwiftUI interface
+- Dynamic Type support for accessibility
+- Haptic feedback for stress level changes
+- Demo mode for development/testing
 
-### ViewModel Tests (3 files, ~534 LOC)
+---
 
-| File | LOC | Purpose |
-|------|-----|---------|
-| `StressViewModelTests.swift` | 267 | Main app state tests |
-| `DataManagementViewModelTests.swift` | 189 | Export/delete state |
-| `WatchStressViewModelTests.swift` | 78 | Watch app state |
+## Recent Updates (April 2026)
 
-### UI & Component Tests (5 files, ~876 LOC)
+1. **CloudLLMService** - Hardcoded endpoint configuration, removed server config UI
+2. **SSEParser** + **LLMAPITarget** - New SSE streaming infrastructure
+3. **ActionView** - New unified action tab replacing multi-tab layout
+4. **Box Breathing** - Aligned with Figma design specifications
+5. **ChatViewModel** - Streaming LLM responses with real-time updates
 
-| File | LOC | Purpose |
-|------|-----|---------|
-| `AccessibleStressTrendChartTests.swift` | 178 | Chart rendering |
-| `StressRingViewTests.swift` | 145 | Ring animation tests |
-| `ColorSystemTests.swift` | 134 | Stress color accuracy |
-| `AccessibilityTests.swift` | 289 | WCAG compliance |
-| `DynamicTypeTests.swift` | 130 | Text scaling |
+---
 
-### Onboarding Tests (4 files, ~478 LOC)
+## Implementation Standards
 
-| File | LOC | Purpose |
-|------|-----|---------|
-| `OnboardingViewTests.swift` | 156 | Flow completion |
-| `BaselineSetupTests.swift` | 134 | Baseline collection |
-| `HealthKitPermissionTests.swift` | 123 | Permission request flow |
-| `OnboardingStateTests.swift` | 65 | Onboarding transitions |
+### Architecture Patterns
+- **MVVM** with clear separation of concerns
+- **Protocol-oriented design** for testability and flexibility
+- **Dependency injection** for loose coupling
+- **Async/await** throughout for modern concurrency
 
-### Test Utilities (2 files, ~383 LOC)
+### Code Quality
+- Swift 5.9+ features and best practices
+- Comprehensive error handling and graceful degradation
+- Accessibility-first design principles
+- Consistent naming conventions and code structure
 
-| File | LOC | Purpose |
-|------|-----|---------|
-| `TestHelpers/TestDataFactory.swift` | 245 | Test data generation |
-| `TestHelpers/MockHealthKitManager.swift` | 138 | Health data mocks |
+### Testing Strategy
+- Unit tests for core algorithms
+- Integration tests for service layers
+- UI testing for critical user flows
+- Demo mode for comprehensive testing scenarios
 
 ---
 
@@ -499,42 +289,13 @@ Watch-specific design tokens.
 
 | Metric | Value |
 |--------|-------|
-| **Total Swift Files** | 214 |
-| **Total LOC** | ~27,000 |
-| **iOS App LOC** | ~15,300 |
-| **watchOS App LOC** | ~2,541 |
-| **Widget LOC** | ~1,287 |
-| **Test LOC** | ~7,500 |
-| **Average File Size** | 126 LOC |
-| **Test Coverage** | 100+ tests (>80% core logic) |
-| **No External Dependencies** | System frameworks only |
+| **Total Swift Files** | 210 |
+| **Total LOC** | ~25,600 |
+| **External Dependencies** | 0 (system frameworks only) |
+| **Average File Size** | <200 LOC |
+| **Font** | Roboto (6 weights) |
 
 ---
 
-## Component Responsibilities
-
-### Data Layer
-- **Models:** Data structures (@Model, Codable)
-- **Repository:** SwiftData CRUD, queries
-- **Protocols:** Interface definitions
-
-### Business Logic
-- **StressCalculator:** HRV + HR → Stress (0-100)
-- **BaselineCalculator:** Physiological baseline adaptation
-- **HealthKitManager:** Apple Health API wrapper
-- **CloudKitManager:** iCloud sync orchestration
-- **InsightGeneratorService:** AI-powered personalized insights (NEW)
-
-### Presentation
-- **ViewModels:** @Observable state management with auto-refresh
-- **Views:** SwiftUI declarative UI
-- **Theme:** Design tokens, colors, fonts
-
-### Supporting
-- **Services:** Background tasks, notifications, sync
-- **Utilities:** Haptics, accessibility, formatting
-
----
-
-**Last Updated:** April 15, 2026
+**Last Updated:** April 25, 2026
 **Maintainers:** Phuong Doan

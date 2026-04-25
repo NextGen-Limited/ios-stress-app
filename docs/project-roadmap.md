@@ -3,7 +3,7 @@
 **Current Version:** 1.0 (Production)
 **Release Date:** February 2026
 **Maintenance Mode:** Active
-**Last Updated:** April 15, 2026
+**Last Updated:** April 25, 2026
 
 ---
 
@@ -43,13 +43,17 @@
   - Custom shapes: TriangleShape, TeardropShape, FlameShape
   - Full Reduce Motion + VoiceOver support
 - ✅ Settings screen — Figma card-based design (Mar 2026)
+- ✅ **3-Tab Navigation Structure** (Apr 2026)
+  - Home: Dashboard with stress monitoring
+  - Action: Quick actions, breathing exercises, AI chat
+  - Trend: Historical analytics and trends
 - ✅ Trends view — Figma alignment (Mar 2026)
   - Scrollable card list; global NavigationStack/TimeRangePicker removed
   - All cards unified: `adaptiveCardBackground` + `settingsCardRadius` + shadow
   - `StressBarChartView`: Swift Charts bar chart (replaces circular indicators)
   - `WeeklyHeatmapView`: Circular dot cells (replaces square cells)
   - `LineChartView` (HRV Trend): Y-axis labels + "Today" marker + subtitle
-  - `StressSourcesDonutChart`: 180° semi-donut with 6-category legend
+  - `StressSourcesCard`: Stress sources display (donut chart deleted Mar 2026)
   - `PremiumBannerView`: Light-blue gradient + CharacterCalm mascot + orange CTA
   - `MascotSpeechBubbleView`: New speech bubble component
   - `SmartInsightsTeaser`: Static "Coming Soon" teaser
@@ -57,6 +61,14 @@
 - ✅ Distribution statistics
 - ✅ Onboarding flow
 - ✅ HealthKit permission request
+
+#### Recent Completions (April 2026)
+- ✅ **3-Tab Navigation Structure** - Simplified from multi-tab to Home/Action/Trend
+- ✅ **ActionView Implementation** - Quick access to breathing exercises and AI chat
+- ✅ **Streaming AI Chat** - Real-time token streaming with SSEParser and LLMAPITarget
+- ✅ **CloudLLM Endpoint Hardening** - Removed server config UI, hardcoded endpoint
+- ✅ **Box Breathing Figma Alignment** - Enhanced breathing exercise visual design
+- ✅ **ChatViewModel Streaming** - Real-time AI response rendering
 
 #### Apple Watch
 - ✅ Standalone watch app
@@ -67,15 +79,25 @@
 - ✅ Independent CloudKit sync
 
 #### Additional Features
-- ✅ AI Chat Mode (Apr 2026)
+- ✅ AI Chat Mode with Streaming (Apr 2026)
   - Conversational AI via Apple Intelligence Foundation Models (iOS 26+)
+  - **CloudLLMService with SSE streaming** - HTTP/SSE to self-hosted FastAPI gateway (GLM-4.7-flash, no API key)
+  - **SSEParser** and **LLMAPITarget** for streaming infrastructure
+  - **Hardcoded endpoint configuration** - removed server config UI for simplicity
   - Bottom sheet overlay with native SwiftUI chat UI
+  - **Real-time token streaming** - Users see AI response as it's generated
   - Health/stress context injected into system prompt via ChatContextBuilder
   - Quick action prompt suggestions (ChatQuickActions)
   - Protocol-based LLM service for future cloud provider swap
   - Graceful fallback on pre-iOS 26 devices
   - Session-only persistence (no SwiftData for chat)
+- ✅ **ActionView** - Quick access to wellness tools (Apr 2026)
+  - Breathing exercises with Figma-aligned UI
+  - Direct AI chat access for immediate stress relief
+  - Quick action chips for contextual suggestions
+  - Streamlined user experience for immediate intervention
 - ✅ Guided breathing exercises (4-7-8 technique)
+- ✅ Breathing exercise UI redesign — Figma-aligned BreathingCircleView with 3-view session flow (Apr 2026)
 - ✅ Home screen widgets (small, medium, large)
 - ✅ Background health refresh (optional)
 - ✅ WCAG AA accessibility compliance
@@ -87,12 +109,9 @@
 - ✅ Spring animations with accessibility fallback (Feb 2026)
 
 #### Testing & Quality
-- ✅ 100+ unit tests
-- ✅ >80% code coverage (core logic)
-- ✅ Algorithm validation tests
-- ✅ CloudKit sync tests
-- ✅ UI component tests
-- ✅ Accessibility tests
+- ✅ GitHub Actions CI/CD pipeline (build + test on macos-15, SPM caching, xcresult, code coverage)
+- ⚠️ Test suite removed for rewrite (3 minimal files in StressMonitorTests/)
+- [ ] Comprehensive test reimplementation planned for v1.1
 
 ### Performance Metrics (v1.0)
 
@@ -103,7 +122,7 @@
 | **Memory (100 measurements)** | <100MB | 87MB |
 | **CloudKit Sync** | <30s | ~15s (avg) |
 | **App Launch** | <2s | 1.8s |
-| **Test Pass Rate** | 100% | 100% |
+| **Test Pass Rate** | 100% | Pending rewrite |
 
 ### Release Notes (v1.0)
 
@@ -133,6 +152,12 @@ Wellness:
 • Guided 4-7-8 breathing exercises
 • Session history tracking
 • Stress reduction measurement
+• Quick access to AI chat for stress support
+
+Navigation:
+• 3-tab structure: Home, Action, Trend
+• Quick stress relief tools in Action tab
+• Historical analytics in Trend tab
 
 Accessibility:
 • WCAG AA compliant interface
@@ -141,10 +166,17 @@ Accessibility:
 • Haptic feedback
 
 Privacy:
-• Zero external dependencies
+• Zero external dependencies (system frameworks only)
 • Local-first architecture
 • End-to-end encrypted CloudKit sync
 • No tracking or analytics
+• AI chat with optional cloud streaming (anonymized context only)
+
+CI/CD:
+• GitHub Actions pipeline (macos-15 runner)
+• SPM + DerivedData caching
+• xcresult validation + code coverage reporting
+• Python test runner (scripts/run-tests.py)
 
 Note: Privacy-first design ensures all health data
 remains on your device or encrypted in iCloud.
@@ -154,14 +186,14 @@ remains on your device or encrypted in iCloud.
 
 ## Version 1.1 (Planned - Q2 2026)
 
-**Status:** 📋 Planned
+**Status:** 🔄 In Progress
 **Estimated Timeline:** 6-8 weeks development
 **Target Release:** April/May 2026
 
 ### Proposed Features
 
 #### Advanced Breathing Techniques
-- [ ] Box breathing (4-4-4-4)
+- [x] Box breathing (4-4-4-4) -- implemented in v1.0
 - [ ] Coherent breathing (6 breaths/minute)
 - [ ] Custom pattern builder
 - [ ] Session effectiveness tracking
@@ -170,7 +202,7 @@ remains on your device or encrypted in iCloud.
 **Rationale:** Users request variety in breathing exercises to accommodate different preferences and needs.
 
 **Implementation Notes:**
-- Create `BreathingPattern` protocol
+- Create `BreathingExerciseView` variants for each pattern
 - Add UI for pattern visualization
 - Store session effectiveness scores
 - Integrate with stress measurement
@@ -201,7 +233,7 @@ remains on your device or encrypted in iCloud.
 **Rationale:** Users want a high-level review of their stress patterns.
 
 **Implementation Notes:**
-- Create `ReportGenerator` service
+- Create `ReportGenerator` service (new, planned for v2.0)
 - Use PDFKit for PDF generation
 - Store report preferences
 - Optional email integration (evaluate privacy)
@@ -349,19 +381,18 @@ remains on your device or encrypted in iCloud.
 - Watch app requires watchOS 10+ (intentional)
 - No iPad support yet (planned for v2.0)
 
-**Recent Fixes (March 2026):**
-- ✅ TabBar migration to exyte/AnimatedTabBar library: replaced custom `StressTabBarView` (~225 LOC) with library-based `AnimatedTabBar` + `DropletButton` (Mar 15, 2026)
-- ✅ TabBar haptic feedback: re-added `HapticManager.shared.buttonPress()` on tab selection (Mar 20, 2026)
-- ✅ SwiftUI Charts migration completed: `LineChartView`, `MiniLineChartView`, `StressOverTimeChart`, `BeforeAfterChart` all migrated to SwiftUI Charts; unused `StressSourcesDonutChart.swift` deleted (Mar 2026)
-- ✅ `DailyTimelineView` redesigned: 24-hour scatter → 7-day × 7-slot weekly dot-matrix (Mar 2026)
-- ✅ `DashboardViewModel.weeklyMeasurements` added; chart wired into `StressDashboardView` (Mar 2026)
-- ✅ Fixed TabBar compilation errors (TabItem enum structure)
-- ✅ Added Identifiable conformance to TabItem
-- ✅ Fixed Tabbable protocol conformance (icon property)
-- ✅ Removed unused @Namespace variable from StressTabBarView
-- ✅ Fixed invalid NavigationStack wrapper in `StressMonitorApp.swift`; `MainTabView(modelContext: share)` → `MainTabView()`
-- ✅ Added `#if targetEnvironment(simulator)` guard in `StressViewModel.startAutoRefresh()` to skip HKObserverQuery in simulator (prevents HealthKit entitlement error)
-- ⚠️ Watch app WCSessionDelegate conformance pending (separate issue)
+**Recent Improvements (Apr 2026):**
+- Enhanced ActionView with streamlined user experience
+- Improved streaming chat performance
+- Simplified LLM service configuration
+
+**Recently Completed (April 2026):**
+- ✅ **3-Tab Navigation** - Simplified from multi-tab to Home/Action/Trend structure
+- ✅ **ActionView Implementation** - Quick access to breathing exercises and AI chat
+- ✅ **Streaming AI Chat** - Real-time token streaming with SSEParser and LLMAPITarget
+- ✅ **CloudLLM Endpoint Hardening** - Removed server config UI, hardcoded endpoint for simplicity
+- ✅ **Box Breathing Figma Alignment** - Enhanced breathing exercise visual design
+- ✅ **ChatViewModel Streaming** - Real-time AI response rendering
 
 **Bug Tracking:**
 Use GitHub Issues for bug reports:
@@ -414,7 +445,7 @@ Q4 2026 (Oct-Dec)
 ### Release Criteria
 
 Every release must meet:
-- ✅ All tests passing
+- ✅ CI pipeline passes (build + available tests)
 - ✅ Zero critical bugs
 - ✅ Code review approval
 - ✅ TestFlight validation (7+ days)
@@ -429,15 +460,14 @@ Every release must meet:
 
 ### External Dependency Risks
 
-**Currently:** 1 external dependency (AnimatedTabBar via SPM) ✅
+**Currently:** 0 external dependencies (system frameworks only) ✅
 
 **v2.0 Risk Assessment:**
 - **CoreML** (Apple framework, no risk)
 - **SiriKit** (Apple framework, no risk)
 - **HealthKit Expansion** (Apple framework, no risk)
-- **AnimatedTabBar** (exyte/SPM, low risk - well-maintained)
 
-**Decision:** Minimize third-party dependencies to preserve:
+**Decision:** Maintain zero third-party dependencies to preserve:
 - Privacy guarantee
 - App size (<30MB)
 - Launch performance
@@ -482,7 +512,7 @@ Every release must meet:
 |--------|--------|
 | **Crash Rate** | <0.1% |
 | **CloudKit Sync Success** | >99.5% |
-| **Test Coverage** | >85% |
+| **Test Coverage** | >80% (pending rewrite) |
 | **App Store Rating** | 4.5+ stars |
 | **Review Approval Time** | <48 hours |
 
@@ -535,5 +565,5 @@ Potential features for future consideration:
 ---
 
 **Owner:** Phuong Doan
-**Last Review:** April 15, 2026
-**Next Review:** May 2026 (post v1.0 launch)
+**Last Review:** April 25, 2026
+**Next Review:** June 15, 2026

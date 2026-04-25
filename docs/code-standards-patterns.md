@@ -3,7 +3,7 @@
 **Framework:** Swift 5.9+ with SwiftUI & SwiftData
 **Architecture:** MVVM + Protocol-Oriented Design
 **Section:** DI, async/await, SwiftData, testing, error handling
-**Last Updated:** April 13, 2026
+**Last Updated:** April 17, 2026
 
 ---
 
@@ -325,6 +325,60 @@ func calculateStress() -> StressComputationResult {
 }
 ```
 
+### AsyncThrowingStream for LLM Streaming (Apr 2026)
+
+The LLM service uses `AsyncThrowingStream<String, Error>` to stream tokens from the LLM to the ChatViewModel:
+
+```swift
+// Protocol definition
+protocol LLMServiceProtocol: Sendable {
+    func send(messages: [ChatMessage], systemPrompt: String) async throws -> AsyncThrowingStream<String, Error>
+    func isAvailable() -> Bool
+}
+
+// Usage in ViewModel
+func sendMessage(_ content: String) async {
+    let stream = try await llmService.send(messages: messages, systemPrompt: systemPrompt)
+    for try await token in stream {
+        // Append token to current response
+        currentResponse += token
+    }
+}
+```
+
+**Pattern rules:**
+- `continuation.yield(token)` for each SSE token
+- `continuation.finish()` on completion
+- `continuation.finish(throwing:)` on error
+- `continuation.onTermination` cancels the underlying Task
+
+### SSEParser for Efficient Streaming (Apr 2026)
+
+**NEW**: SSEParser efficiently processes Server-Sent Events from CloudLLMService:
+
+```swift
+// SSEParser.swift - Handles streaming token parsing
+func parseStream(_ stream: AsyncStream<String>) -> AsyncThrowingStream<String, Error> {
+    // Implementation details for parsing SSE format
+    // Handles: data: {token} lines and event boundaries
+}
+```
+
+### LLMAPITarget for Endpoint Configuration (Apr 2026)
+
+**NEW**: LLMAPITarget simplifies CloudLLM endpoint management:
+
+```swift
+// LLMAPITarget.swift - Streamlined endpoint configuration
+struct LLMAPITarget {
+    // Hardcoded endpoint for simplicity
+    static let cloudEndpoint = "https://self-hosted-gateway/v1/chat/completions"
+    
+    // Provides simplified API for CloudLLMService
+    func createRequest(messages: [ChatMessage]) -> URLRequest
+}
+```
+
 ---
 
 ## Performance Targets
@@ -342,4 +396,4 @@ func calculateStress() -> StressComputationResult {
 
 **Previous:** See `code-standards-swift.md` for formatting and naming conventions.
 **Enforced By:** Code review & automated tests
-**Last Updated:** April 13, 2026
+**Last Updated:** April 17, 2026

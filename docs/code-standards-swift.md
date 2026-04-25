@@ -27,20 +27,22 @@ Views/Dashboard/DashboardView.swift
 
 ```
 StressMonitor/
-├── Models/                  # Data structures
+├── Models/                  # Data structures (18 files incl. Base/)
 ├── Services/                # Business logic (organized by domain)
-│   ├── HealthKit/
-│   ├── Algorithm/
-│   ├── Repository/
+│   ├── Algorithm/           # 5-factor stress algorithm (10 files)
+│   ├── Background/
 │   ├── CloudKit/
+│   ├── Connectivity/
 │   ├── DataManagement/
-│   ├── Sync/
+│   ├── HealthKit/           # Health data + extensions (5 files)
+│   ├── LLM/                 # AI chat services (5 files)
 │   ├── Protocols/
-│   └── ...
-├── ViewModels/              # State management (@Observable)
+│   ├── Repository/
+│   └── Sync/
+├── ViewModels/              # State management (@Observable, 4 standalone + inline)
 ├── Views/                   # SwiftUI screens (organized by feature)
-├── Theme/                   # Design tokens
-└── Utilities/               # Helper functions
+├── Theme/                   # Design tokens (5 files)
+└── Utilities/               # Helper functions (10 files)
 ```
 
 ---
@@ -304,4 +306,4 @@ var allMeasurements: [StressMeasurement] = loadAll()
 
 **Next:** See `code-standards-patterns.md` for dependency injection, async/await, SwiftData, testing, and error handling patterns.
 **Enforced By:** Code review & automated tests
-**Last Updated:** April 13, 2026
+**Last Updated:** April 17, 2026

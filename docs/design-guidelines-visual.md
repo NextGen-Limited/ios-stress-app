@@ -3,8 +3,8 @@
 **System:** iOS Human Interface Guidelines compliant
 **Accessibility:** WCAG AA
 **Section:** Colors, typography, spacing, components
-**Version:** 1.0
-**Last Updated:** April 13, 2026
+**Version:** 1.1
+**Last Updated:** April 17, 2026
 
 ---
 
@@ -62,9 +62,10 @@ extension Color {
 
 ### Font Families
 
-**System Font (Default):**
-- San Francisco (`.system`)
-- Automatically switches for accessibility
+**Roboto (Primary):**
+- 6 weights bundled: Regular, Medium, Bold, ExtraBold, Light, Italic
+- Loaded via `FontBlaster` utility
+- Typography defined in `Theme/Font+WellnessType.swift`
 
 **Monospace (for data):**
 - Menlo or Courier (`.monospaced`)
@@ -451,5 +452,5 @@ Xcode → Debug → View Debugging → Core Animation
 
 **Next:** See `design-guidelines-ux.md` for accessibility, haptics, animations, and StressBuddy character.
 **Design System Version:** 1.1
-**Last Updated:** April 13, 2026
+**Last Updated:** April 17, 2026
 **Maintained By:** Phuong Doan

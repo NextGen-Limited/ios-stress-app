@@ -1,8 +1,10 @@
 # Deployment Guide: Overview
 
 **Platform:** iOS 17+ / watchOS 10+
-**Distribution:** TestFlight → App Store
-**Last Updated:** April 13, 2026
+**Distribution:** TestFlight -> App Store
+**Last Updated:** April 25, 2026
+
+**Note:** Apple Intelligence features (on-device AI Chat) require iOS 26+ and compatible hardware. CloudLLMService with SSE streaming provides fallback chat functionality for older devices.
 
 ---
 
@@ -31,6 +33,10 @@ Once your app is built and tested:
 - [ ] Run unit tests
 - [ ] Complete manual testing on device
 - [ ] Verify accessibility compliance
+- [ ] Test ActionView quick actions and breathing exercises
+- [ ] Test AI chat streaming functionality with SSEParser
+- [ ] Verify CloudLLM hardcoded endpoint connectivity
+- [ ] Test LLMAPITarget configuration
 
 ### TestFlight
 - [ ] Build & archive for distribution
@@ -38,6 +44,8 @@ Once your app is built and tested:
 - [ ] Invite testers
 - [ ] Monitor crash logs
 - [ ] Review feedback
+- [ ] Specifically test streaming chat performance
+- [ ] Verify 3-tab navigation flow
 
 ### App Store Submission
 - [ ] Fill app information (privacy, description, keywords)
@@ -46,12 +54,40 @@ Once your app is built and tested:
 - [ ] Create release notes
 - [ ] Submit for review
 - [ ] Monitor review status
+- [ ] Highlight new ActionView and streaming AI features
 
 ### Post-Release
 - [ ] Monitor crash rates
 - [ ] Track performance metrics
 - [ ] Respond to user ratings
 - [ ] Plan follow-up updates
+- [ ] Monitor streaming chat feedback
+
+---
+
+## Key Features Tested (v1.0)
+
+### Core Functionality
+- [ ] Stress measurement via HealthKit
+- [ ] Real-time stress calculation
+- [ ] Personal baseline adaptation
+- [ ] Stress categorization display
+
+### New Features (Apr 2026)
+- [ ] **3-Tab Navigation** - Home/Action/Trend flow
+- [ ] **ActionView** - Quick actions and breathing access
+- [ ] **Streaming AI Chat** - Real-time token rendering via SSEParser
+- [ ] **CloudLLM Integration** - SSE endpoint with hardcoded configuration
+- [ ] **Box Breathing Exercises** - Figma-aligned animations
+- [ ] **LLMAPITarget** - Simplified endpoint management
+
+### Quality Assurance
+- [ ] Accessibility compliance (WCAG AA)
+- [ ] Dynamic Type scaling
+- [ ] VoiceOver support
+- [ ] Haptic feedback
+- [ ] Dark mode support
+- [ ] Apple Watch complications
 
 ---
 
@@ -61,8 +97,9 @@ Once your app is built and tested:
 - **App Store Connect:** [appstoreconnect.apple.com](https://appstoreconnect.apple.com)
 - **HealthKit Documentation:** [developer.apple.com/healthkit](https://developer.apple.com/documentation/healthkit)
 - **Human Interface Guidelines:** [developer.apple.com/design/human-interface-guidelines](https://developer.apple.com/design/human-interface-guidelines)
+- **WidgetKit Documentation:** [developer.apple.com/widgetkit](https://developer.apple.com/documentation/widgetkit)
 
 ---
 
 **Maintained By:** Phuong Doan
-**Last Updated:** April 13, 2026
+**Last Updated:** April 25, 2026

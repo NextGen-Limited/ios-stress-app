@@ -368,7 +368,7 @@ struct ActionView: View {
                         .font(.system(size: 13, weight: .medium))
                         .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
 
-                    Image(systemName: "chevron.up.right")
+                    Image(systemName: "arrow.up.right")
                         .font(.system(size: 10, weight: .semibold))
                         .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
                 }

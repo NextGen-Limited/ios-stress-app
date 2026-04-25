@@ -3,7 +3,7 @@
 **Pattern:** MVVM + Protocol-Oriented Design
 **Concurrency:** async/await
 **Section:** CloudKit, Watch, widgets, security, extensibility
-**Last Updated:** April 13, 2026
+**Last Updated:** April 25, 2026
 
 ---
 
@@ -13,8 +13,8 @@
 
 **Files:**
 - `Services/CloudKit/CloudKitManager.swift` (294 LOC)
-- `Services/CloudKit/CloudKitSchema.swift` (198 LOC)
-- `Services/CloudKit/CloudKitSyncEngine.swift` (377 LOC)
+- `Services/CloudKit/CloudKitSchema.swift` (80 LOC)
+- `Services/CloudKit/CloudKitSyncEngine.swift` (222 LOC)
 
 ```swift
 protocol CloudKitServiceProtocol {
@@ -57,13 +57,14 @@ Local Measurement → Queue → Batch (5 records) → CloudKit
 
 ### DataManagement Service
 
-**Files:** 9 files (~2,789 LOC)
+**Files:** 8 files (~2,173 LOC)
 
 **Key Files:**
 - `DataManagementService.swift` - Orchestrator
-- `DataDeleterService.swift` - Delete operations
+- `DataDeleter.swift` - Delete operations
 - `CloudKitResetService.swift` - Wipe CloudKit
 - `CSVGenerator.swift` / `JSONGenerator.swift` - Export formats
+- `DataManagementUtilities.swift` - Helper functions
 
 **Responsibilities:**
 - Export data (CSV, JSON)
@@ -186,9 +187,10 @@ let lastStress = defaults?.double(forKey: "lastStressLevel") ?? 0
 - User control via export/delete
 
 ### Privacy
-- No external API calls
+- CloudLLMService sends anonymized chat context to self-hosted gateway; health data stays on-device
 - No telemetry or analytics
-- User data never leaves device+iCloud
+- Health data never leaves device+iCloud
+- SSE streaming ensures real-time AI responses without persistent data storage
 
 ---
 
@@ -217,6 +219,76 @@ let lastStress = defaults?.double(forKey: "lastStressLevel") ?? 0
 
 ---
 
+## Streaming Architecture (LLM Chat)
+
+**UPDATED - Apr 2026:**
+
+CloudLLMService uses `AsyncThrowingStream<String, Error>` for SSE token delivery.
+
+```
+CloudLLMService.send()
+  → URLRequest to /v1/chat/completions (stream: true) - **HARDCODED ENDPOINT**
+  → URLSession.shared.bytes(for:) -- async byte stream
+  → Parse SSE lines ("data: {...}")
+  → Extract choices[0].delta.content
+  → yield tokens via AsyncThrowingStream continuation
+  → ChatViewModel appends to messages[]
+  → SwiftUI renders incrementally
+```
+
+**SSE Infrastructure:**
+- `SSEParser.swift` - Server-Sent Events parser
+- `LLMAPITarget.swift` - API configuration for cloud LLM endpoints
+
+**Key Details:**
+- OpenAI-compatible SSE format (`data: [DONE]` terminator)
+- `continuation.onTermination` cancels upstream URLSession task
+- **Hardcoded endpoint configuration** (removed server config UI)
+- Health check via synchronous `GET /health` with 3s timeout
+- Error mapping: 422 (bad request), 502 (provider failure), network errors
+- AppleIntelligenceService uses same `AsyncThrowingStream` interface but via Foundation Models `streamResponse`
+
+---
+
+## CI/CD Pipeline
+
+**File:** `.github/workflows/ci.yml`
+**Runner:** macos-15
+**Trigger:** push/PR to `main`, manual dispatch
+
+### Pipeline Steps
+
+| Step | Purpose |
+|------|---------|
+| Checkout | `actions/checkout@v4` |
+| Select Xcode | `maxim-lobanov/setup-xcode@v1` (latest-stable) |
+| Cache | SPM packages + DerivedData (keyed on `Package.resolved` hash) |
+| Run tests | `scripts/run-tests.py` with `CI=1` |
+| Validate | Check `xcresult` bundle exists |
+| Publish | Test results summary to `$GITHUB_STEP_SUMMARY` |
+| Coverage | `xccov view` report (first 100 lines) |
+| Upload | `xcresult` artifact (7-day retention) |
+
+### Test Runner (`scripts/run-tests.py`, 148 LOC)
+
+- Python script wrapping `xcodebuild test`
+- Auto-discovers available iPhone simulator (prefers iPhone 16)
+- CI mode: name-based destination, `CODE_SIGNING_ALLOWED=NO`, code coverage enabled
+- Local mode: finds/boots simulator via `simctl`, UUID-based destination
+- Outputs `TestResults.xcresult` bundle
+
+### Breathing Exercise Session Lifecycle
+
+```
+BreathingExerciseView (setup)
+  → BreathingSessionView (active session with BreathingCircleView)
+    → BreathingSummaryView (post-session with BeforeAfterChart)
+```
+
+3-view session flow with `BreathingCircleView` providing animated phase visualization (inhale/hold/exhale with scale + pulse animations).
+
+---
+
 ## Design Decisions
 
 | Decision | Rationale | Trade-off |
@@ -224,6 +296,8 @@ let lastStress = defaults?.double(forKey: "lastStressLevel") ?? 0
 | **CloudKit E2E encryption** | User privacy, Apple ecosystem | Requires iCloud account |
 | **WidgetKit (not ClockKit)** | watchOS 10+ requirement | No ClockKit support |
 | **Offline-first sync** | UX resilience | Conflict complexity |
+| **Self-hosted LLM gateway** | No API keys, full control, cloud fallback | Requires ngrok for dev; chat context leaves device |
+| **Hardcoded LLM endpoint** | Simplified configuration, removed UI complexity | Requires deployment updates for endpoint changes |
 
 ---
 
@@ -240,6 +314,7 @@ let lastStress = defaults?.double(forKey: "lastStressLevel") ?? 0
 │  ├─ HealthKit (sensor data)
 │  ├─ Algorithm (calculations)
 │  ├─ Repository (local persistence)
+│  ├─ LLM (AI chat: Apple Intelligence + Cloud with SSE)
 │  ├─ CloudKit (cloud sync)
 │  ├─ DataManagement (export/delete)
 │  └─ Connectivity (watch sync)
@@ -254,4 +329,4 @@ let lastStress = defaults?.double(forKey: "lastStressLevel") ?? 0
 **Previous:** See `system-architecture-core.md` for core MVVM and service architecture.
 **Maintained By:** Phuong Doan
 **Version:** 1.0 Production
-**Last Updated:** April 13, 2026
+**Last Updated:** April 25, 2026

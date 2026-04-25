@@ -2,7 +2,7 @@
 
 **Platform:** iOS 17+ / watchOS 10+
 **Section:** Distribution, Review, Post-Release Monitoring
-**Last Updated:** April 13, 2026
+**Last Updated:** April 25, 2026
 
 ---
 
@@ -33,12 +33,21 @@ Complete privacy policy:
 StressMonitor is privacy-first. We collect ONLY:
 - Heart Rate Variability (from HealthKit on your device)
 - Heart Rate (from HealthKit on your device)
+- Sleep, Activity, and Recovery data (from HealthKit, for multi-factor stress algorithm)
 
 We DO NOT:
-- Share data with third parties
-- Collect personal data
+- Share health data with third parties
+- Collect personal data for advertising
 - Track user behavior
-- Use analytics or advertising
+
+AI Chat Feature (Apr 2026):
+- Chat messages are processed via streaming AI responses
+- Apple Intelligence (iOS 26+) provides on-device processing
+- CloudLLMService provides fallback via self-hosted gateway (SSE streaming)
+- Only anonymized conversation context is transmitted (no raw health data)
+- Health data remains on your device at all times
+- No API key or account required for chat
+- Hardcoded endpoint configuration ensures privacy
 
 All health data is stored locally on your device.
 Optional iCloud sync is end-to-end encrypted.
@@ -68,13 +77,13 @@ Prepare screenshots for each device:
 
 **iPhone 15 (6.1-inch)** - At least 2 screenshots
 1. Dashboard with stress ring
-2. Trends chart
-3. Watch app screen (marked as watch screenshot)
+2. 3-Tab navigation (Home/Action/Trend)
+3. ActionView with breathing exercises
+4. AI chat interface
+5. Trends charts
 
 **Apple Watch** - At least 1 screenshot
 1. Watch app with complications
-
-**iPad (if supporting)** - Screenshots at iPad resolution
 
 ### 5. Description
 
@@ -82,35 +91,37 @@ Prepare screenshots for each device:
 StressMonitor - Understand Your Stress
 
 Real-time stress monitoring using Heart Rate Variability
-from your Apple Watch. Our science-based algorithm adapts
+from your Apple Watch. Our 5-factor algorithm adapts
 to your unique physiology over time.
 
 Features:
-• Real-time stress measurement (HRV + Heart Rate)
+• 5-factor stress measurement (HRV, Heart Rate, Sleep, Activity, Recovery)
+• AI-powered chat with streaming responses (Apple Intelligence + Cloud LLM)
 • Personal baseline adaptation (learns over 30 days)
-• Historical tracking with filtering
-• Trend analysis with charts
-• Apple Watch standalone app
+• 3-tab navigation (Home/Action/Trend) for quick access
+• Quick action tools for immediate stress relief
+• Historical tracking with filtering and analytics
+• Trend analysis with interactive charts
+• Box breathing exercises with Figma-aligned animations
+• Apple Watch standalone app with complications
 • CloudKit sync across devices
 • Data export (CSV/JSON)
 • Complete data control (export/delete anytime)
 
 Privacy-First:
-• All data stored locally on your device
+• All health data stored locally on your device
 • Optional iCloud sync is end-to-end encrypted
-• No third-party services
-• No tracking or analytics
+• No third-party analytics or tracking
 • Open data access (export anytime)
-
-Zero External Dependencies
-Built entirely with Apple frameworks.
+• No API keys required for AI features
 ```
 
 ### 6. Keywords
 
 ```
 stress, heart rate, HRV, health, wellness, monitoring,
-apple watch, mindfulness, anxiety, relaxation
+apple watch, mindfulness, anxiety, relaxation, breathing,
+AI, chat, mindfulness, stress management
 ```
 
 ---
@@ -179,6 +190,7 @@ TestFlight → External Testing
 TestFlight → Testers → Session & Feedback
 → View crash logs, performance metrics
 → Review tester feedback
+→ Specifically test streaming chat performance
 ```
 
 ---
@@ -204,13 +216,24 @@ Build Version: 2
 StressMonitor 1.0
 
 Initial Release:
-• Real-time stress measurement with HRV algorithm
-• Personal baseline adaptation
+• 5-factor stress algorithm (HRV, Heart Rate, Sleep, Activity, Recovery)
+• AI Chat with streaming responses (Apple Intelligence + Cloud LLM with SSE)
+• Personal baseline adaptation over 30 days
+• 3-tab navigation (Home/Action/Trend) for improved user flow
+• ActionView with quick stress relief tools
 • Apple Watch standalone app with complications
-• CloudKit sync across devices
-• Historical tracking with trends analysis
-• Data export and management
-• Comprehensive accessibility features
+• CloudKit sync across devices with end-to-end encryption
+• Historical tracking with comprehensive trends analysis
+• Box breathing exercises with Figma-aligned animations
+• Data export and management capabilities
+• Comprehensive accessibility features (WCAG AA)
+
+New Features (Apr 2026):
+• Real-time streaming AI chat responses
+• Simplified 3-tab navigation structure
+• Quick access to breathing exercises and AI support
+• Enhanced breathing exercise visual design
+• Improved streaming chat performance
 
 Thank you for using StressMonitor!
 ```
@@ -220,9 +243,9 @@ Thank you for using StressMonitor!
 1. App Store Connect → My Apps → StressMonitor
 2. Version → Prepare for Submission
 3. Fill all required fields:
-   - [ ] Screenshots uploaded
-   - [ ] Description complete
-   - [ ] Keywords set
+   - [ ] Screenshots uploaded (include new ActionView and chat screenshots)
+   - [ ] Description complete (highlight new streaming features)
+   - [ ] Keywords set (include AI, chat, breathing)
    - [ ] Rating provided
    - [ ] HealthKit privacy explained
    - [ ] Contact info provided
@@ -235,6 +258,7 @@ Thank you for using StressMonitor!
    - [ ] Gambling: No
    - [ ] Unmoderated UGC: No
    - [ ] Medical: No (it's health, not medical)
+- [ ] AI features: Streaming chat with simplified endpoint configuration
 
 6. Submit for Review
 
@@ -309,6 +333,14 @@ Solution: In Xcode
 → Match configured App ID in Apple Developer
 ```
 
+**Error:** "CloudLLM endpoint connection failed"
+```
+Solution: Check internet connection
+→ Verify ngrok tunnel is active
+→ Test endpoint manually in browser
+→ Check hardcoded endpoint configuration
+```
+
 ### TestFlight Issues
 
 **Issue:** "Build Processing Failed"
@@ -317,14 +349,18 @@ Solution:
 → Wait 5-10 minutes (processing delay)
 → Check build archive integrity
 → Try uploading again
+→ Verify all new features (ActionView, streaming chat) work
+→ Test SSEParser and LLMAPITarget integration
 ```
 
-**Issue:** "Tester not receiving invite"
+**Issue:** "Streaming chat not working"
 ```
 Solution:
-→ Check email address in TestFlight
-→ Resend invite
-→ Tester check spam folder
+→ Test with CloudLLM hardcoded endpoint
+→ Verify SSEParser token processing
+→ Check network connectivity
+→ Test fallback to Apple Intelligence (iOS 26+)
+→ Verify LLMAPITarget configuration
 ```
 
 ### App Store Review Rejection
@@ -334,6 +370,7 @@ Solution:
 2. Crash on startup → Fix and retest
 3. Missing privacy policy → Add link in Settings
 4. Unclear functionality → Improve description
+5. AI features not working → Test streaming with SSEParser thoroughly
 
 **Response Process:**
 1. Read rejection reason carefully
@@ -354,7 +391,7 @@ Measure app size:
 ls -lh ./build/StressMonitor.xcarchive
 
 # Estimated App Store size (after thinning)
-# Typically: 15-25 MB
+# Typically: 15-25 MB (zero external dependencies)
 ```
 
 ### App Launch Time
@@ -376,6 +413,7 @@ Monitor in Xcode:
 Debug → Memory Graph
 → Check for retain cycles
 → Verify SwiftData cleanup
+→ Monitor streaming chat memory usage
 ```
 
 ---
@@ -389,6 +427,7 @@ App Store Connect → Crashes & Hangs
 → Monitor for exceptions
 → Fix top crashes in next version
 → Target: <0.1% crash rate
+→ Pay special attention to streaming chat, SSEParser, and ActionView
 ```
 
 ### Performance Metrics
@@ -398,6 +437,7 @@ App Store Connect → Performance
 → Hang ratio <0.1%
 → Memory growth acceptable
 → Battery impact minimal
+→ Monitor CloudLLM streaming performance via SSEParser
 ```
 
 ### User Ratings
@@ -407,7 +447,16 @@ App Store Connect → Ratings & Reviews
 → Monitor feedback
 → Respond to key issues
 → Aim for 4.5+ stars
+→ Track feedback on new streaming AI features and ActionView
 ```
+
+### Feature Usage Analytics
+
+Monitor usage of new features:
+- ActionView engagement
+- AI chat frequency with streaming
+- Breathing exercise completion
+- Streaming response satisfaction via SSEParser
 
 ---
 
@@ -425,6 +474,7 @@ If critical issue released:
    ```
    Fix issue → Build → TestFlight
    → Verify on device → TestFlight testers
+   → Specifically test streaming chat, SSEParser, and ActionView
    ```
 
 3. **Resubmit**
@@ -439,4 +489,4 @@ Typical timeline: 4-6 hours
 
 **Previous:** See `deployment-guide-environment.md` for setup instructions.
 **Managed By:** Phuong Doan
-**Last Updated:** April 13, 2026
+**Last Updated:** April 25, 2026

@@ -2,9 +2,9 @@
 
 **Pattern:** MVVM + Protocol-Oriented Design
 **Concurrency:** async/await
-**Data Flow:** Unidirectional (Models → Services → ViewModels → Views)
+**Data Flow:** Unidirectional (Models -> Services -> ViewModels -> Views)
 **Section:** MVVM, data flow, core services, protocols
-**Last Updated:** April 13, 2026
+**Last Updated:** April 25, 2026
 
 ---
 
@@ -13,13 +13,13 @@
 ```
 ┌─────────────────────────────────────────────────────────┐
 │                    SwiftUI Views                         │
-│  (Dashboard, Action, Trends, Breathing, Settings)      │
+│  (Dashboard, Action, Trends, Breathing, Settings, Chat) │
 └──────────────────────┬──────────────────────────────────┘
                        │
                        ↓
 ┌─────────────────────────────────────────────────────────┐
 │                  ViewModels (@Observable)                │
-│  (StressViewModel, DataManagementViewModel)             │
+│  (StressViewModel, ChatViewModel, DashboardViewModel)   │
 └──────────────────────┬──────────────────────────────────┘
                        │
                        ↓
@@ -53,7 +53,7 @@
 
 ### Presentation Layer (Views)
 
-**Files:** `Views/` (77 files)
+**Files:** `Views/` (~100 files)
 
 Declarative SwiftUI screens, zero business logic.
 
@@ -93,9 +93,21 @@ struct DashboardView: View {
 
 ### ViewModel Layer (@Observable)
 
-**Files:** `ViewModels/` (2 files)
+**Files:** `ViewModels/` (4+ files)
 
 Orchestrates business logic, manages UI state.
+
+**Standalone ViewModels:**
+| File | Purpose |
+|------|---------|
+| `StressViewModel.swift` | Main app state, auto-refresh, 5-factor algorithm |
+| `ChatViewModel.swift` | Chat state, LLM interaction, streaming responses |
+| `DashboardViewModel.swift` | Dashboard data aggregation |
+| `TrendViewModel.swift` | Historical trend analysis |
+| `HistoryViewModel.swift` | Historical data browsing |
+| `SettingsViewModel.swift` | App configuration state |
+| `DataManagementViewModel.swift` | Export, delete, reset operations |
+| `BreathingViewModel.swift` | Breathing exercise state |
 
 **Responsibilities:**
 - Manage @Observable state
@@ -138,12 +150,12 @@ final class StressViewModel {
 
 ### Service Layer
 
-**Files:** `Services/` (27 files)
+**Files:** `Services/` (46 files)
 
 Business logic, domain-specific operations, protocol-based.
 
 #### HealthKit Service
-**File:** `Services/HealthKit/HealthKitManager.swift` (156 LOC)
+**Files:** `Services/HealthKit/` (5 files, 624 LOC)
 
 ```swift
 protocol HealthKitServiceProtocol {
@@ -160,9 +172,13 @@ protocol HealthKitServiceProtocol {
 - Handle authorization errors
 
 #### Algorithm Service
-**Files:**
-- `Services/Algorithm/StressCalculator.swift` (187 LOC)
-- `Services/Algorithm/BaselineCalculator.swift` (125 LOC)
+**Files:** `Services/Algorithm/` (10 files, 656 LOC)
+- `MultiFactorStressCalculator.swift` (104 LOC) - Orchestrates 5 factors
+- `StressCalculator.swift` (118 LOC) - Legacy 2-factor calculator
+- `BaselineCalculator.swift` (97 LOC) - 30-day baseline adaptation
+- `StressFactor.swift` (22 LOC) - Protocol for individual factors
+- `FactorCalibrator.swift` (56 LOC) - Weight adjustment
+- `HRVStressFactor.swift`, `HeartRateStressFactor.swift`, `SleepStressFactor.swift`, `ActivityStressFactor.swift`, `RecoveryStressFactor.swift`
 
 ```swift
 protocol StressAlgorithmServiceProtocol {
@@ -190,7 +206,7 @@ StressContext → aggregates HRV, HR, Sleep, Activity, Recovery, Baseline
 ```
 
 #### Repository Service
-**File:** `Services/Repository/StressRepository.swift` (445 LOC)
+**File:** `Services/Repository/StressRepository.swift` (491 LOC)
 
 ```swift
 protocol StressRepositoryProtocol {
@@ -207,6 +223,43 @@ protocol StressRepositoryProtocol {
 - Query recent/filtered measurements
 - Baseline persistence
 - Data cleanup
+
+#### LLM Service
+**Files:** `Services/LLM/` (7 files, ~500+ LOC)
+
+Protocol-based LLM integration with on-device and cloud backends.
+
+```swift
+protocol LLMServiceProtocol: Sendable {
+    func isAvailable() -> Bool
+    func send(messages: [ChatMessage], systemPrompt: String)
+        async throws -> AsyncThrowingStream<String, Error>
+}
+```
+
+| Implementation | Platform | Transport | Model |
+|---------------|----------|-----------|-------|
+| `AppleIntelligenceService` | iOS 26+ (on-device) | Foundation Models framework | System default |
+| `CloudLLMService` | All iOS (network) | HTTP/SSE to self-hosted FastAPI gateway | glm-4.7-flash |
+
+**NEW - Apr 2026:**
+- `SSEParser.swift` - Server-Sent Events streaming parser
+- `LLMAPITarget.swift` - API configuration for cloud LLM endpoints
+- **Hardcoded endpoint configuration** (removed server config UI)
+
+**Supporting Types:**
+- `ChatContextBuilder` -- builds system prompts with live health data, "AI Kitten" persona (~600 tokens)
+- `ChatQuickActions` -- predefined prompt suggestions contextualized by stress level
+- `LLMServiceError` -- typed errors: unavailable, exceededContext, guardrailViolation, rateLimited, refused, concurrentRequests, decodingFailure, cancelled, unknown
+
+**Data Flow:**
+```
+ChatViewModel → ChatContextBuilder.buildSystemPrompt(stress:baseline:history:)
+             → LLMServiceProtocol.send(messages:systemPrompt:)
+             → AsyncThrowingStream<String, Error> (token-by-token streaming)
+```
+
+**Persistence:** Chat data is session-only (in-memory `[ChatMessage]` array). No SwiftData persistence. Messages are lost on app restart.
 
 ---
 
@@ -236,6 +289,15 @@ final class StressMeasurement {
 - `PersonalBaseline` - 30-day baseline
 - `StressResult` - Calculation output
 - `StressCategory` - Enum (Relaxed, Mild, Moderate, High)
+- `ChatMessage` - Chat message with role enum
+- `ActivityData` - Activity metrics for multi-factor algorithm
+- `SleepData` - Sleep quality data
+- `RecoveryData` - Recovery status data
+- `DataQualityInfo` - Data quality assessment
+- `FactorBreakdown` - Per-factor stress breakdown
+- `FactorWeights` - Dynamic weight configuration
+- `StressContext` - Aggregated health data input
+- `ComplicationEntry` / `WidgetEntry` - Widget timeline entries
 
 ### Storage
 
@@ -398,14 +460,16 @@ final class StubRepository: StressRepositoryProtocol {
 
 | Decision | Rationale | Trade-off |
 |----------|-----------|-----------|
-| **No external dependencies** | Privacy, control, reduced bloat | More code to maintain |
+| **Zero external dependencies** | Privacy, control, reduced bloat | More code to maintain |
+| **CloudLLMService gateway** | Provides LLM fallback for pre-iOS 26 devices | Connects to self-hosted FastAPI endpoint; chat context (not raw health data) sent externally |
 | **Local-first architecture** | Works offline, fast responsiveness | Eventual consistency |
 | **MVVM + Protocols** | Testability, loose coupling | More boilerplate |
 | **@Observable macro** | Modern, iOS 17+ reactive | Excludes iOS 16 |
+| **Hardcoded LLM endpoint** | Simplified configuration, removed UI complexity | Requires deployment updates for endpoint changes |
 
 ---
 
 **Next:** See `system-architecture-platform.md` for CloudKit, Watch, widgets, and security details.
 **Maintained By:** Phuong Doan
 **Version:** 1.0 Production
-**Last Updated:** April 13, 2026
+**Last Updated:** April 25, 2026

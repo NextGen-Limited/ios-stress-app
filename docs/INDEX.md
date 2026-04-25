@@ -1,7 +1,7 @@
 # StressMonitor Documentation Index
 
 **Version:** 1.0 (Production)
-**Last Updated:** April 13, 2026
+**Last Updated:** April 25, 2026
 
 Complete documentation for the StressMonitor iOS/watchOS stress monitoring application.
 
@@ -20,10 +20,9 @@ Product vision, requirements, features, algorithm specifications, and success me
 ### 2. **[Codebase Summary](./codebase-summary.md)**
 File structure, organization, component breakdown, and code metrics.
 - High-level project structure
-- iOS app architecture (144 files)
-- watchOS app architecture (29 files)
+- iOS app architecture (208 files)
+- watchOS app architecture (44 files)
 - Widget architecture (7 files)
-- Test suite organization (27 files)
 - Component responsibilities and file metrics
 
 ### 3. **[Code Standards](./code-standards.md)** (Overview)
@@ -74,13 +73,14 @@ Current status, planned features, timeline, and success metrics.
 
 | Metric | Value |
 |--------|-------|
-| **Total Swift Files** | 293 |
-| **Total Tokens** | ~280,000 |
-| **iOS App** | 199 files |
+| **Total Swift Files** | 210 |
+| **Total LOC** | ~25,600 |
+| **iOS App** | 210 files |
 | **watchOS App** | 44 files |
 | **Widgets** | 7 files |
-| **Tests** | 39 files |
-| **External Dependencies** | 1 (AnimatedTabBar) |
+| **Tests** | 3 files (suite pending rewrite) |
+| **External Dependencies** | 0 (system frameworks only) |
+| **CI/CD** | GitHub Actions (macos-15) |
 
 ### Documentation Metrics
 
@@ -133,9 +133,12 @@ Current status, planned features, timeline, and success metrics.
 | **@Observable macro** | Modern iOS 17+ reactive |
 | **SwiftData (not Core Data)** | iOS 17+ native, SwiftUI-friendly |
 | **CloudKit E2E encryption** | User privacy guarantee |
-| **Minimal external dependencies** | Only AnimatedTabBar for TabBar |
+| **Zero external dependencies** | Only Apple system frameworks |
 | **WidgetKit (not ClockKit)** | watchOS 10+ requirement |
 | **async/await throughout** | Modern concurrency |
+| **Foundation Models** | On-device LLM via Apple Intelligence (iOS 26+) |
+| **CloudLLMService** | Self-hosted FastAPI gateway as fallback LLM |
+| **GitHub Actions CI** | Automated build + test on macos-15 with SPM caching |
 
 ---
 
@@ -144,27 +147,28 @@ Current status, planned features, timeline, and success metrics.
 | Constraint | Impact | Mitigation |
 |-----------|--------|-----------|
 | iOS 17+ only | Excludes iOS 16 users | Target modern users |
+| iOS 26+ for Apple Intelligence | AI Chat limited to newest iOS | CloudLLM fallback for older devices |
 | HealthKit dependency | Requires permissions | Graceful degradation |
 | iCloud required for sync | CloudKit needs account | Optional feature |
-| No third-party deps | More code to maintain | Full control maintained |
+| External LLM endpoint | CloudLLM sends data to ngrok URL | Health data stays local; only chat context transmitted |
 
 ---
 
 ## Privacy & Security
 
-✅ **Privacy-First Design:**
+**Privacy-First Design:**
 - Local SwiftData storage (encrypted at rest)
 - CloudKit E2E encryption (optional)
-- Zero third-party services
+- Zero third-party analytics services
 - Read-only HealthKit access
 - User data ownership (full export/delete)
 
-✅ **Security Measures:**
-- No external API calls
+**Security Measures:**
+- CloudLLMService sends chat messages (not raw health data) to self-hosted gateway
 - No telemetry or analytics
 - HealthKit authorization flow
 - Error handling for denied permissions
-- User data never leaves device + iCloud
+- Health data never leaves device + iCloud (only anonymized chat context sent to LLM)
 
 ---
 
@@ -207,16 +211,16 @@ SwiftUI Views → @Observable ViewModels → Protocol-based Services
 
 ## Version History
 
-| Version | Release | Status |
-|---------|---------|--------|
-| **1.0** | Feb 2026 | ✅ Production |
-| **1.1** | Q2 2026 | 📋 Planned |
-| **2.0** | Q4 2026 | 🎯 Concept |
+| Version | Release | Status | Notable |
+|---------|---------|--------|---------|
+| **1.0** | Feb 2026 | ✅ Production | AI Chat with SSE streaming (Apr 2026), 3-tab navigation (Apr 2026), CloudLLM hardcoded endpoint (Apr 2026), Box Breathing Figma alignment (Apr 2026) |
+| **1.1** | Q2 2026 | 🔄 In Progress | Advanced breathing, stress triggers, weekly reports |
+| **2.0** | Q4 2026 | 🎯 Concept | ML insights, Siri Shortcuts, iPad support |
 
 ---
 
 **Read the README.md** at project root for quick start and feature overview.
 
-**Last Updated:** April 13, 2026
+**Last Updated:** April 25, 2026
 **Maintained By:** Phuong Doan
 **Generated with:** repomix codebase analysis

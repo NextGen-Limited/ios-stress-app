@@ -2,8 +2,8 @@
 
 **Pattern:** MVVM + Protocol-Oriented Design
 **Concurrency:** async/await
-**Data Flow:** Unidirectional (Models → Services → ViewModels → Views)
-**Last Updated:** April 13, 2026
+**Data Flow:** Unidirectional (Models -> Services -> ViewModels -> Views)
+**Last Updated:** April 25, 2026
 
 ---
 
@@ -64,10 +64,9 @@ Advanced platform capabilities:
 | **HealthKit** | Health data | Official Apple health API, privacy-first |
 | **WidgetKit** | Widgets & complications | Modern widget framework, watchOS 10+ |
 | **async/await** | Concurrency | Swift 5.9+ native, structured concurrency |
-| **AnimatedTabBar** | Tab bar animations | exyte library, reduces custom code |
+| **SSE Streaming** | Real-time AI chat | Server-sent events for CloudLLM responses |
 | **Foundation Models** | On-device LLM | Apple Intelligence (iOS 26+), conversational AI |
 | **Combine** | Async streams | Background health data observation |
-| **WidgetKit** | Home screen widgets | Interactive stress display |
 
 ---
 
@@ -97,7 +96,7 @@ ChatViewModel (sends messages + receives streaming tokens)
     ↓
 LLMServiceProtocol.send(messages:systemPrompt:) → AsyncThrowingStream<String, Error>
     ↓
-AppleIntelligenceService (iOS 26+ Foundation Models) OR unavailable fallback
+AppleIntelligenceService (iOS 26+ Foundation Models) OR CloudLLMService with SSE streaming
     ↑
 ChatContextBuilder (assembles health/stress context into system prompt)
 ```
@@ -118,14 +117,15 @@ DashboardViewModel.weeklyMeasurements (7-day slice)
 DailyTimelineView (7-day × 7-slot dot-matrix grid)
 ```
 
-**TabBar navigation flow (Mar 2026):**
+**3-Tab Navigation flow (Apr 2026):**
 ```
-MainTabView.selectedTab (TabItem enum)
-    ↔ selectedIndex Binding (Int conversion)
+MainTabView (3 tabs: Home, Action, Trend)
     ↓
-AnimatedTabBar (exyte/AnimatedTabBar library)
+Home → DashboardView (stress monitoring)
     ↓
-tabButtons() → [DropletButton] with accessibility labels
+Action → ActionView (quick actions, breathing, chat - NEW unified tab)
+    ↓
+Trend → TrendsView (analytics and trends)
 ```
 
 **Reverse for updates:**
@@ -153,7 +153,7 @@ UI Updates on screen
 - Simulator service for testing
 
 ### Multi-Factor Algorithm Service
-- **NEW**: 5-factor stress algorithm with dynamic weight redistribution
+- **5-factor stress algorithm with dynamic weight redistribution**
 - Core algorithm: MultiFactorStressCalculator (HRV, HR, Sleep, Activity, Recovery)
 - Individual factor services: HRVStressFactor, HeartRateStressFactor, SleepStressFactor, ActivityStressFactor, RecoveryStressFactor
 - FactorCalibrator for adjusting weights based on data quality
@@ -168,6 +168,15 @@ UI Updates on screen
 ### LLM Service (Apr 2026)
 - Protocol-based LLM abstraction (`LLMServiceProtocol`)
 - `AppleIntelligenceService` -- Apple Foundation Models (iOS 26+), streaming token response
+- `CloudLLMService` -- HTTP/SSE streaming to self-hosted FastAPI gateway (GLM-4.7-flash model)
+  - **Hardcoded endpoint configuration** (no server config UI)
+  - Calls `/v1/chat/completions` endpoint via ngrok-hosted URL
+  - No API key required
+  - Health check via `/health` endpoint
+  - SSE streaming: `data: {"token": "..."}` with `[DONE]` sentinel
+  - Graceful fallback when server unreachable
+- `SSEParser` -- New Server-Sent Events parser for streaming responses
+- `LLMAPITarget` -- API configuration for cloud LLM endpoints
 - `ChatContextBuilder` -- assembles health/stress data into system prompt
 - `ChatQuickActions` -- pre-built prompt suggestions for wellness topics
 - Graceful fallback on pre-iOS 26 devices
@@ -179,7 +188,7 @@ UI Updates on screen
 - Query recent/filtered measurements
 - Persist baseline data
 - Data cleanup operations
-- **UPDATE**: 392 LOC (reduced from 445)
+- **UPDATE**: 491 LOC
 
 ### CloudKit Service
 - Sync measurements to iCloud
@@ -187,14 +196,14 @@ UI Updates on screen
 - E2E encrypted storage
 - Offline queue management
 - Rate limiting (5-record batches, 5-minute throttle)
-- **UPDATE**: CloudKitManager (244 LOC), CloudKitSchema (71 LOC), CloudKitSyncEngine (181 LOC)
+- **UPDATE**: CloudKitManager (294 LOC), CloudKitSchema (80 LOC), CloudKitSyncEngine (222 LOC)
 
 ### DataManagement Service
 - Export to CSV/JSON
 - Delete by date range
 - Delete by category
 - Full local/cloud wipe
-- **NEW**: 9 files (~2,789 LOC) including DataManagementService, CSVGenerator, JSONGenerator, DataDeleterService, CloudKitResetService, LocalDataWipeService
+- **UPDATE**: 8 files (~2,173 LOC) including DataManagementService, CSVGenerator, JSONGenerator, DataDeleter, CloudKitResetService, LocalDataWipeService, DataManagementUtilities
 
 ---
 
@@ -202,7 +211,7 @@ UI Updates on screen
 
 | Decision | Rationale | Trade-off |
 |----------|-----------|-----------|
-| **Minimal external dependencies** | Only AnimatedTabBar for TabBar | Slight package dependency risk |
+| **Zero external dependencies** | Only Apple system frameworks | Maximum privacy, reliability |
 | **Local-first architecture** | Works offline, fast responsiveness | Eventual consistency |
 | **MVVM + Protocols** | Testability, loose coupling | More boilerplate |
 | **@Observable macro** | Modern, iOS 17+ reactive | Excludes iOS 16 |
@@ -211,6 +220,7 @@ UI Updates on screen
 | **Multi-factor algorithm** | More comprehensive stress assessment | Increased complexity, more data required |
 | **Offline-first sync** | UX resilience, privacy | Conflict resolution complexity |
 | **Protocol-based services** | Testability, extensibility | More abstraction overhead |
+| **Hardcoded LLM endpoint** | Simplified configuration, removed UI complexity | Requires deployment updates for endpoint changes |
 
 ---
 
@@ -277,10 +287,11 @@ let viewModel = StressViewModel(healthKit: MockHealthKitManager())
 - User can export/delete anytime
 
 ### Privacy
-- No external API calls
+- CloudLLMService sends anonymized chat context to self-hosted gateway (no raw health data)
 - No telemetry or analytics
-- No third-party services
-- Data never leaves device+iCloud
+- No third-party analytics services
+- Health data never leaves device+iCloud
+- SSE streaming ensures real-time AI responses without persistent data storage
 
 ---
 
@@ -340,4 +351,4 @@ TriangleShape()
 
 **Maintained By:** Phuong Doan
 **Version:** 1.0 Production
-**Last Updated:** April 15, 2026
+**Last Updated:** April 25, 2026
