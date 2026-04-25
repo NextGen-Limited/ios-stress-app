@@ -1,10 +1,10 @@
 # Phase 1: Simplify DashboardView to Content-Only
 
-**Priority:** P2 | **Effort:** 20m | **Status:** pending
+**Priority:** P2 | **Effort:** 15m | **Status:** completed
 
 ## Overview
 
-Replace 3-branch conditional Group with single `content(effectiveStress)` call. Remove all dead loading/empty state code.
+Replace 4-branch `renderState` switch with single `dashboardContent(viewModel.currentStress)` call. Pass `StressResult?` — never coalesce nil. Each component handles nil natively.
 
 ## Files to Modify
 
@@ -12,91 +12,108 @@ Replace 3-branch conditional Group with single `content(effectiveStress)` call. 
 
 ## Implementation Steps
 
-### 1. Add `effectiveStress` computed property
+### 1. Change `dashboardContent` signature to accept optional
 
 ```swift
-private var effectiveStress: StressResult {
-    viewModel.currentStress ?? StressResult(
-        level: 0, category: .relaxed, confidence: 1.0,
-        hrv: 50, heartRate: 70
-    )
-}
+// Before:
+private func dashboardContent(_ stress: StressResult) -> some View
+
+// After:
+private func dashboardContent(_ stress: StressResult?) -> some View
 ```
 
-### 2. Replace `body` Group with single content call
+### 2. Replace body's `switch renderState` with single call
 
 **Before:**
 ```swift
-Group {
-    if viewModel.isLoading && viewModel.currentStress == nil && !viewModel.isPermissionRequired {
-        loadingView
-    } else if let stress = viewModel.currentStress {
-        content(stress)
-    } else {
-        emptyState
-    }
+switch viewModel.renderState {
+case .loading:
+    loadingContent
+case .permissionRequired:
+    permissionContent
+case .noData:
+    noDataContent
+case .content(let stress):
+    dashboardContent(stress)
 }
-.alert(...)
-.sheet(item: $docsURL) { ... }
-.task { ... }
-.onDisappear { ... }
-.onChange(of: scenePhase) { ... }
 ```
 
 **After:**
 ```swift
-content(effectiveStress)
-    .alert("Error", isPresented: .constant(viewModel.errorMessage != nil)) {
-        Button("OK") { viewModel.clearError() }
-    } message: {
-        if let error = viewModel.errorMessage { Text(error) }
-    }
-    .task {
-        if !appeared {
-            appeared = true
-            await loadInitialData()
-            viewModel.startAutoRefresh()
-        }
-    }
-    .onDisappear { viewModel.stopAutoRefresh() }
-    .onChange(of: scenePhase) { _, newPhase in
-        if newPhase == .active && viewModel.isPermissionRequired {
-            Task { await viewModel.loadCurrentStress() }
-        }
-    }
+dashboardContent(viewModel.currentStress)
 ```
 
-### 3. Remove dead code
+### 3. Update `TripleMetricRow` to show placeholders when nil
+
+```swift
+// Before:
+TripleMetricRow(
+    rhrValue: "\(Int(stress.heartRate))",
+    hrvValue: "\(Int(stress.hrv))",
+    rrValue: "14"
+)
+
+// After:
+TripleMetricRow(
+    rhrValue: stress.map { "\($0.heartRate)" } ?? "--",
+    hrvValue: stress.map { "\($0.hrv)" } ?? "--",
+    rrValue: stress != nil ? "14" : "--"
+)
+.opacity(appearAnimation ? 1 : 0)
+```
+
+### 4. Remove dead code
 
 Delete these members:
-- `private static var lastEmptyDashboardAppearanceLog = Date.distantPast`
-- `@State private var docsURL: URL?`
-- `private var loadingView: some View` (lines 85-96)
-- `private var emptyState: some View` (lines 175-183)
-- `private func measureFirstStress()` (lines 185-194)
-- `private func showHelpDocumentation()` (lines 196-198)
-- `private func handleEmptyDashboardAppear()` (lines 200-208)
-- `.sheet(item: $docsURL)` modifier
+- `@State private var docsURL: URL?` (line 11)
+- `loadingContent` computed property (lines 87-94)
+- `permissionContent` computed property (lines 99-111)
+- `noDataContent` computed property (lines 116-150)
+- `measureFirstStress()` method (lines 222-231)
+- `showHelpDocumentation()` method (lines 233-235)
+- `.sheet(item: $docsURL)` modifier (lines 63-66)
 
-### 4. Update previews
+### 5. Keep permission-related state
 
-- Keep "Dashboard - With Mock Data" and "Dashboard - Dark Mode" previews (they work as-is)
-- Update "Dashboard - Permission Required" preview to not set `isPermissionRequired` since empty state no longer exists. Instead show it with nil result:
-  ```swift
-  #Preview("Dashboard - Permission State") {
-      DashboardView(viewModel: StressViewModel(
-          healthKit: HealthKitManager(),
-          algorithm: MultiFactorStressCalculator(),
-          repository: StressRepository(modelContext: ModelContext(try! ModelContainer(for: StressMeasurement.self, configurations: ModelConfiguration(isStoredInMemoryOnly: true))))
-      ))
-  }
-  ```
-  This will render content with default data, and StressCharacterCard will show PermissionCardView since `currentStress` is nil.
+**DO NOT remove:**
+- `onChange(of: scenePhase)` — still needed to re-check permission when app returns to foreground
+- `isPermissionRequired` check in `onChange` — guards permission re-request on foreground
+
+### 6. Update previews
+
+```swift
+#Preview("Dashboard - No Data") {
+    DashboardView(repository: StressRepository(modelContext: ModelContext(try! ModelContainer(for: StressMeasurement.self, configurations: ModelConfiguration(isStoredInMemoryOnly: true))))
+}
+```
+
+## Data Flow After Changes
+
+```
+currentStress is nil →
+  StressCharacterCard(result: nil) → PermissionCardView (embedded)
+  TripleMetricRow → visible with "--" placeholders
+  DataQualityBadge → hidden (already if let)
+  DashboardInsightCard → hidden (already if let)
+  SelfNoteCard, HealthDataSection, QuickActionCard, StressOverTimeChart → visible (independent)
+
+currentStress is non-nil →
+  StressCharacterCard(result: stress) → character illustration
+  TripleMetricRow → visible with real data
+  DataQualityBadge → visible if available
+  DashboardInsightCard → visible if available
+  All other components → visible
+
+No loading state — dashboard renders immediately, swaps to real data when loaded.
+```
 
 ## Success Criteria
 
-- [ ] DashboardView.body contains only `content(effectiveStress)` + modifiers
-- [ ] No references to `loadingView`, `emptyState`, `measureFirstStress`, `showHelpDocumentation`, `handleEmptyDashboardAppear`
-- [ ] No `docsURL` state or `.sheet` modifier
-- [ ] Compiles without errors
-- [ ] StressCharacterCard shows PermissionCardView when `currentStress` is nil (default data flows in)
+- [x] DashboardView.body contains only `dashboardContent(viewModel.currentStress)` — no switch/if branches
+- [x] No `loadingContent`, `permissionContent`, `noDataContent` computed properties
+- [x] No `docsURL` state or `.sheet` modifier
+- [x] No `measureFirstStress`, `showHelpDocumentation` methods
+- [x] `StressCharacterCard` receives nil when no data → shows PermissionCardView
+- [x] `TripleMetricRow` shows "--" placeholders when stress is nil
+- [x] No loading state — dashboard renders immediately
+- [x] Compiles without errors

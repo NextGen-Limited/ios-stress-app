@@ -37,17 +37,6 @@ final class StressViewModel {
     /// Re-entry guard for requestHealthKitAccess(). Drives button disabled state in PermissionCardView.
     private(set) var isRequestingAccess: Bool = false
 
-    // MARK: - Render State
-
-    /// Maps loading/permission/data state to a single enum for DashboardView rendering.
-    /// Priority: permissionRequired > loading > content > noData
-    var renderState: DashboardRenderState {
-        if isPermissionRequired { return .permissionRequired }
-        if isLoading && currentStress == nil { return .loading }
-        if let stress = currentStress { return .content(stress) }
-        return .noData
-    }
-
     // MARK: - Auto-Refresh Properties
 
     /// Last refresh time for debounce
@@ -411,15 +400,6 @@ final class StressViewModel {
             lastRefreshTime = Date()
         }
     }
-}
-
-/// Single enum driving DashboardView's render branch.
-/// Eliminates 3-way conditional in the view body.
-enum DashboardRenderState {
-    case loading
-    case permissionRequired
-    case noData
-    case content(StressResult)
 }
 
 enum StressError: Error {
