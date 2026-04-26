@@ -6,23 +6,6 @@ import SwiftUI
 struct HealthDataSection: View {
     var body: some View {
         VStack(alignment: .leading, spacing: DesignTokens.Spacing.md) {
-            // Section header
-            HStack(spacing: DesignTokens.Spacing.sm) {
-                Text("Your health data")
-                    .font(Typography.headline)
-                    .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
-
-                Button(action: {
-                    HapticManager.shared.buttonPress()
-                    // TODO: Show health data info
-                }) {
-                    Image(systemName: "info.circle")
-                        .font(.body)
-                        .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
-                }
-                .accessibilityLabel("Health data information")
-            }
-
             // Health data items
             HStack(spacing: DesignTokens.Spacing.md) {
                 HealthDataItem(
