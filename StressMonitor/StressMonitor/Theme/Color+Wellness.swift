@@ -98,6 +98,14 @@ extension Color {
         /// Icon gray (from Figma)
         static let figmaIconGray = Color(hex: "#717171")
 
+        // MARK: - Timer Colors
+
+        /// Timer track ring color (adaptive)
+        static let timerTrack = Color(
+            light: Color(hex: "#E5E7EB"),
+            dark: Color(hex: "#3A3A3C")
+        )
+
         // MARK: - Quick Action Colors
 
         /// Gratitude purple

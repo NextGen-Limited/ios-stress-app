@@ -107,14 +107,17 @@ extension QuickActionCard where Destination == PlaceholderDestination {
         )
     }
 
+}
+
+extension QuickActionCard where Destination == MiniWalkView {
     /// Mini walk activity card
-    static func miniWalk() -> QuickActionCard<PlaceholderDestination> {
-        QuickActionCard<PlaceholderDestination>(
+    static func miniWalk() -> QuickActionCard<MiniWalkView> {
+        QuickActionCard<MiniWalkView>(
             title: "Mini Walk",
             description: "A short walk to refresh your mind and body",
-            duration: "3 mins",
+            duration: "0:45s",
             color: Color.Wellness.miniWalkBlue,
-            destination: { PlaceholderDestination(title: "Mini Walk") }
+            destination: { MiniWalkView() }
         )
     }
 }
