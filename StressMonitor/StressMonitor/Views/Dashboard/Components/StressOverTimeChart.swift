@@ -16,7 +16,7 @@ private enum LocalChartTimeRange: String, CaseIterable {
 /// Shows daily stress levels with category-based coloring
 struct StressOverTimeChart: View {
     @State private var selectedRange: LocalChartTimeRange = .sevenDays
-    @AppStorage("isPremiumUser") private var isPremiumUser = false
+    var onUpgrade: (() -> Void)? = nil
 
     // Mock data for chart visualization
     private let chartData: [StressDataPoint] = [
@@ -39,11 +39,11 @@ struct StressOverTimeChart: View {
             // Header with title and dropdown
             headerView
 
-            if isPremiumUser {
+            if PremiumState.shared.isPremiumUser {
                 chartContent
             } else {
                 chartContent
-                    .overlay(PremiumLockOverlay())
+                    .overlay(PremiumLockOverlay(onUpgrade: onUpgrade))
             }
         }
         .padding(16)

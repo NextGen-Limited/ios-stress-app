@@ -7,6 +7,7 @@ struct SettingsView: View {
     @State private var viewModel: SettingsViewModel
     @State private var navigateToExport = false
     @State private var navigateToDelete = false
+    @State private var navigateToPremium = false
     @State private var docsURL: URL? = nil
 
     init() {
@@ -19,7 +20,7 @@ struct SettingsView: View {
         ScrollView {
             VStack(spacing: Spacing.settingsCardSpacing) {
                 // Widget CTA
-                PremiumCard()
+                PremiumCard(onTap: { navigateToPremium = true })
                     .padding(.top, 8)
 
                 // Watch face & Complications
@@ -72,6 +73,9 @@ struct SettingsView: View {
         .navigationDestination(isPresented: $navigateToDelete) {
             DataDeleteView()
         }
+        .navigationDestination(isPresented: $navigateToPremium) {
+            IAPPremiumView(storeKit: Self.makeStoreKitService(), premiumState: PremiumState.shared)
+        }
         .sheet(item: $docsURL) { url in
             SafariView(url: url)
                 .ignoresSafeArea()
@@ -79,6 +83,16 @@ struct SettingsView: View {
     }
 
     // MARK: - Helpers
+
+    #if DEBUG
+    private static func makeStoreKitService() -> StoreKitServiceProtocol {
+        MockStoreKitService(premiumState: PremiumState.shared)
+    }
+    #else
+    private static func makeStoreKitService() -> StoreKitServiceProtocol {
+        fatalError("Live StoreKit service not yet implemented")
+    }
+    #endif
 
     private func openURLString(_ urlString: String) {
         guard let url = URL(string: urlString) else { return }

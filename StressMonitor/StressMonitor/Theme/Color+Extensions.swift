@@ -130,6 +130,35 @@ extension Color {
         Color(light: .white, dark: Color(hex: "2C2C2E"))
     }
 
+    // MARK: - IAP Screen Colors (Figma)
+
+    /// IAP section header teal - #158B8B
+    static let iapHeaderTeal = Color(hex: "158B8B")
+    /// IAP CTA button teal - #85C9C9 (matches accentTeal)
+    static let iapCTATeal = Color(hex: "85C9C9")
+    /// IAP plan selected border amber - #FFAE3B
+    static let iapAmber = Color(hex: "FFAE3B")
+    /// IAP savings green - #4FC01B
+    static let iapSavingsGreen = Color(hex: "4FC01B")
+    /// IAP primary text - #111827
+    static let iapTextPrimary = Color(hex: "111827")
+    /// IAP secondary text - #6B7280
+    static let iapTextSecondary = Color(hex: "6B7280")
+    /// IAP muted text (nav title) - #808080
+    static let iapTextMuted = Color(hex: "808080")
+    /// IAP chevron/icon gray - #9CA3AF
+    static let iapChevronGray = Color(hex: "9CA3AF")
+    /// IAP icon border - #9EA7B8
+    static let iapIconBorder = Color(hex: "9EA7B8")
+    /// IAP restore icon blue - #3B82F6
+    static let iapRestoreBlue = Color(hex: "3B82F6")
+    /// IAP manage icon dark - #374151
+    static let iapManageDark = Color(hex: "374151")
+    /// IAP tagline gradient start - #00D9FF
+    static let iapGradientStart = Color(hex: "00D9FF")
+    /// IAP tagline gradient end - #24B9CC
+    static let iapGradientEnd = Color(hex: "24B9CC")
+
     // MARK: - Color Helpers
 
     static func stressColor(for level: Double) -> Color {

@@ -3,6 +3,8 @@ import SwiftUI
 /// Premium upgrade banner with cat mascot illustration
 /// Figma: Light blue banner with "UNLOCK PREMIUM" title and "Upgrade Now" button
 struct PremiumBanner: View {
+    var onUpgrade: (() -> Void)? = nil
+
     var body: some View {
         ZStack(alignment: .top) {
             // Background with illustration
@@ -23,7 +25,7 @@ struct PremiumBanner: View {
 
                 // Upgrade button
                 Button(action: {
-                    // Premium upgrade action
+                    onUpgrade?()
                 }) {
                     HStack(spacing: 4) {
                         Image(systemName: "sparkle")

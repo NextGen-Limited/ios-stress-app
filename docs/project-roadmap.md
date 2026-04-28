@@ -3,7 +3,7 @@
 **Current Version:** 1.0 (Production)
 **Release Date:** February 2026
 **Maintenance Mode:** Active
-**Last Updated:** April 25, 2026
+**Last Updated:** April 26, 2026
 
 ---
 
@@ -93,6 +93,7 @@
   - Session-only persistence (no SwiftData for chat)
 - ✅ **ActionView** - Quick access to wellness tools (Apr 2026)
   - Breathing exercises with Figma-aligned UI
+  - Mini Walk exercise with circular timer (Apr 26, 2026)
   - Direct AI chat access for immediate stress relief
   - Quick action chips for contextual suggestions
   - Streamlined user experience for immediate intervention
@@ -393,6 +394,8 @@ remains on your device or encrypted in iCloud.
 - ✅ **CloudLLM Endpoint Hardening** - Removed server config UI, hardcoded endpoint for simplicity
 - ✅ **Box Breathing Figma Alignment** - Enhanced breathing exercise visual design
 - ✅ **ChatViewModel Streaming** - Real-time AI response rendering
+- ✅ **Mini Walk Exercise** - New walking exercise screen with circular timer (Apr 26, 2026)
+- ✅ **IAP Premium Screen** - Complete subscription paywall with StoreKit service protocol and premium state management (Apr 26, 2026)
 
 **Bug Tracking:**
 Use GitHub Issues for bug reports:
