@@ -40,6 +40,24 @@ struct AppShadow {
         x: 0,
         y: 2.85
     )
+
+    // MARK: - IAP Shadows (Figma)
+
+    /// IAP plan card shadow (Figma multi-layer)
+    static let iapPlanCard = ShadowDefinition(
+        color: Color(hex: "5C5C5C").opacity(0.1),
+        radius: 8,
+        x: 0,
+        y: 2
+    )
+
+    /// IAP utility row shadow
+    static let iapUtilityRow = ShadowDefinition(
+        color: Color(hex: "18274B").opacity(0.06),
+        radius: 6,
+        x: 0,
+        y: 3
+    )
 }
 
 struct ShadowDefinition {

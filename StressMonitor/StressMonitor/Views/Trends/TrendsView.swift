@@ -5,6 +5,7 @@ struct TrendsView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(TabBarScrollState.self) private var tabBarScrollState
     @State private var viewModel: TrendsViewModel
+    @State private var navigateToPremium = false
 
     init() {
         _viewModel = State(initialValue: TrendsViewModel(
@@ -16,7 +17,7 @@ struct TrendsView: View {
         ScrollView {
             VStack(spacing: 16) {
                 // Premium banner
-                PremiumBannerView()
+                PremiumBannerView(action: { navigateToPremium = true })
                     .padding(.horizontal)
 
                 // Horizontal Week Calendar
@@ -86,7 +87,20 @@ struct TrendsView: View {
         .onAppear {
             viewModel = TrendsViewModel(modelContext: modelContext)
         }
+        .navigationDestination(isPresented: $navigateToPremium) {
+            IAPPremiumView(storeKit: Self.makeStoreKitService(), premiumState: PremiumState.shared)
+        }
     }
+
+    #if DEBUG
+    private static func makeStoreKitService() -> StoreKitServiceProtocol {
+        MockStoreKitService(premiumState: PremiumState.shared)
+    }
+    #else
+    private static func makeStoreKitService() -> StoreKitServiceProtocol {
+        fatalError("Live StoreKit service not yet implemented")
+    }
+    #endif
 
     private var hrvTrendCard: some View {
         VStack(alignment: .leading, spacing: 8) {

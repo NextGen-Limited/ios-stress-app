@@ -3,7 +3,7 @@
 **Total Files:** ~570 files (including 210 Swift files)
 **Total Tokens:** ~582,571
 **Architecture:** MVVM + Protocol-Oriented Design
-**Last Updated:** April 25, 2026
+**Last Updated:** April 26, 2026
 
 ---
 
@@ -260,6 +260,14 @@ The app uses a simplified 3-tab navigation structure:
 3. **ActionView** - New unified action tab replacing multi-tab layout
 4. **Box Breathing** - Aligned with Figma design specifications
 5. **ChatViewModel** - Streaming LLM responses with real-time updates
+6. **Mini Walk Exercise** - New walking exercise screen with circular timer and Figma-aligned design (Apr 26, 2026)
+7. **IAP Premium Screen** - Complete subscription paywall with StoreKit service protocol, premium state management, and Figma-aligned design (Apr 26, 2026)
+
+## New Files Added (IAP Premium)
+- **PremiumState** - Centralized premium state management singleton
+- **StoreKitServiceProtocol** - StoreKit abstraction layer with mock implementation
+- **IAPPremiumView** - Main subscription screen with plan selection
+- **Premium/Components** - Subscription card, CTA button, utility row components
 
 ---
 
@@ -297,5 +305,5 @@ The app uses a simplified 3-tab navigation structure:
 
 ---
 
-**Last Updated:** April 25, 2026
+**Last Updated:** April 26, 2026
 **Maintainers:** Phuong Doan

@@ -80,6 +80,10 @@
 		F2D098F52F66727C00EC7538 /* Exceptions for "StressMonitor" folder in "StressMonitorWatch Watch App" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
+				"Fonts/Lato-Black.ttf",
+				"Fonts/Lato-Bold.ttf",
+				"Fonts/Lato-Medium.ttf",
+				"Fonts/Lato-Regular.ttf",
 				"Fonts/Roboto-Bold.ttf",
 				"Fonts/Roboto-ExtraBold.ttf",
 				"Fonts/Roboto-Italic.ttf",

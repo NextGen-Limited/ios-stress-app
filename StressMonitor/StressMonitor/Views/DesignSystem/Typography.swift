@@ -56,4 +56,34 @@ struct Typography {
     static let robotoHeadline = Font.custom("Roboto-Bold", size: 17)
     static let robotoBody = Font.custom("Roboto-Bold", size: 16)
     static let robotoCaption = Font.custom("Roboto-Bold", size: 12)
+
+    // MARK: - Custom Fonts (Lato - IAP Screen)
+
+    /// Custom Lato font. Use for IAP/Premium screen elements.
+    static func lato(_ weight: LatoWeight, size: CGFloat) -> Font {
+        .custom(weight.fontName, size: size)
+    }
+
+    enum LatoWeight: String {
+        case regular = "Lato-Regular"
+        case medium = "Lato-Medium"
+        case bold = "Lato-Bold"
+        case black = "Lato-Black"
+
+        var fontName: String { rawValue }
+    }
+
+    // MARK: - IAP Typography (Figma)
+
+    static let iapNavTitle = Font.custom("Lato-Bold", size: 18)
+    static let iapTagline = Font.custom("Lato-Black", size: 21)
+    static let iapSectionHeader = Font.custom("Lato-Bold", size: 16)
+    static let iapPlanName = Font.custom("Lato-Bold", size: 13)
+    static let iapPrice = Font.custom("Lato-Bold", size: 20)
+    static let iapPerMonth = Font.custom("Lato-Regular", size: 11.5)
+    static let iapSavings = Font.custom("Lato-Bold", size: 12)
+    static let iapSubtitle = Font.custom("Lato-Regular", size: 11.5)
+    static let iapCTA = Font.custom("Lato-Bold", size: 14)
+    static let iapUtilityLabel = Font.custom("Lato-Medium", size: 13)
+    static let iapBadge = Font.custom("Lato-Bold", size: 13)
 }

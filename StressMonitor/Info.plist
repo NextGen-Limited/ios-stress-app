@@ -28,6 +28,10 @@
 		<string>Roboto-Light.ttf</string>
 		<string>Roboto-Medium.ttf</string>
 		<string>Roboto-Regular.ttf</string>
+		<string>Lato-Regular.ttf</string>
+		<string>Lato-Medium.ttf</string>
+		<string>Lato-Bold.ttf</string>
+		<string>Lato-Black.ttf</string>
 	</array>
 	<key>NSHealthShareUsageDescription</key>
 	<string>We need access to your health data to monitor stress levels.</string>
