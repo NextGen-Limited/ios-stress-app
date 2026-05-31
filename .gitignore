@@ -1,0 +1,29 @@
+# Xcode
+*.xcodeproj/
+*.xcworkspace/
+xcuserdata/
+*.pbxuser
+*.perspective
+*.perspectivev3
+!default.pbxuser
+!default.perspectivev3
+build/
+DerivedData/
+*.moved-aside
+*.hmap
+*.ipa
+*.dSYM.zip
+*.dSYM
+
+# Swift
+.build/
+.swiftpm/
+
+# macOS
+.DS_Store
+*.swp
+*~.nib
+
+# IDE
+.vscode/
+.idea/
