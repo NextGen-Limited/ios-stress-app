@@ -83,24 +83,3 @@ jobs:
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
             | xcpretty
-
-  validate:
-    name: Validate Project
-    runs-on: macos-latest
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Select Xcode
-        run: |
-          sudo xcode-select -s /Applications/Xcode_26.3.app/Contents/Developer
-
-      - name: Validate project structure
-        run: |
-          xcodebuild -list -project StressMonitor.xcodeproj
-          echo "✅ Project structure valid"
-
-      - name: Check Swift version
-        run: |
-          swift --version
-          echo "✅ Swift available"
