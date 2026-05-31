@@ -1,6 +1,19 @@
 import SwiftUI
 
-// MARK: - HistoryView has been replaced by StressHistoryView
-// See Views/StressHistoryView.swift for the full implementation.
-// Kept as typealias for backward compatibility.
-typealias HistoryView = StressHistoryView
+struct HistoryView: View {
+    var body: some View {
+        NavigationStack {
+            Text("Stress history will appear here")
+                .navigationTitle("History")
+        }
+    }
+}
+
+struct SettingsView: View {
+    var body: some View {
+        NavigationStack {
+            Text("Settings will appear here")
+                .navigationTitle("Settings")
+        }
+    }
+}

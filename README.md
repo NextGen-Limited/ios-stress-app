@@ -1,218 +1,43 @@
-# StressMonitor
+# StressMonitor iOS App
 
-**AI-powered stress monitoring for iOS and watchOS.**
-
-![iOS 17+](https://img.shields.io/badge/iOS-17%2B-blue) ![watchOS 10+](https://img.shields.io/badge/watchOS-10%2B-blue) ![Swift 5.9+](https://img.shields.io/badge/Swift-5.9%2B-orange)
-
----
-
-## Overview
-
-StressMonitor measures stress levels using Heart Rate Variability (HRV) and heart rate from HealthKit, combined with sleep, activity, and recovery data. An AI coaching chat provides personalized wellness guidance. Data stays private — local SwiftData storage with optional end-to-end encrypted CloudKit sync.
+An iOS application for real-time stress monitoring using Apple Watch sensor data, HealthKit integration, and on-device CoreML inference.
 
 ## Features
 
-- **Multi-Factor Stress Score** — HRV, heart rate, sleep, activity, and recovery weighted into a single 0–100 score
-- **AI Stress Coach** — LLM-powered chat with streaming responses, wellness guardrails, and context-aware suggestions
-- **Stress Buddy** — Character system with 5 mood states reflecting current stress level
-- **Breathing Exercises** — Guided box breathing with animated visual circle and session summaries
-- **Historical Tracking** — Timeline, trend charts, and distribution analytics
-- **Apple Watch** — Standalone watchOS app with WidgetKit complications
-- **Home Screen Widgets** — Small, medium, and large widgets for at-a-glance monitoring
-- **Journal** — Mood and stress notes alongside measurements
-- **Data Export** — CSV and JSON export with date filtering
-- **Privacy-First** — Local-first storage, HealthKit read-only, no third-party analytics
+- Real-time stress level detection from Apple Watch HRV data
+- HealthKit integration for health data collection
+- CoreML-based stress prediction model
+- SwiftUI interface with dashboard and history views
+- CloudKit sync across devices
+- Notifications for high stress events
 
-## Quick Start
+## Architecture
 
-### Requirements
-
-| Component | Minimum |
-|-----------|---------|
-| Xcode | 15.0+ |
-| iOS | 17.0+ |
-| watchOS | 10.0+ |
-| Device | iPhone 12, Apple Watch Series 6 |
-
-### Build
-
-```bash
-git clone https://github.com/your-org/ios-stress-app.git
-cd ios-stress-app/StressMonitor
-open StressMonitor.xcodeproj
-# Build and run (Cmd+R)
-```
-
-### Demo Mode
-
-For testing without real HealthKit data:
-
-1. Edit Scheme → Run → Arguments → add `-demo-mode`
-2. Build and run on simulator
-
-Demo mode generates dynamic HRV/HR data cycling through all stress levels with 30s scenario transitions.
-
-## How It Works
-
-### Stress Algorithm
-
-Multi-factor calculator combines 5 physiological signals:
-
-```
-Factor Scores → Weighted Sum → Stress Level (0-100)
-
-Default Weights:
-  HRV: 70% | Heart Rate: 30% | Sleep/Activity/Recovery: supplementary
-```
-
-Each factor computes a normalized deviation from personal baseline, then contributes to the weighted score. Confidence adjusts for data quality (low HRV, extreme HR, missing factors).
-
-### Stress Categories
-
-| Level | Range | Color | Icon |
-|-------|-------|-------|------|
-| Relaxed | 0–25 | Green | 😊 |
-| Mild | 25–50 | Blue | 😐 |
-| Moderate | 50–75 | Yellow | 〰️ |
-| High | 75–100 | Orange | ⚠️ |
+- **Pattern:** MVVM + Services
+- **UI:** SwiftUI
+- **Data:** HealthKit, CoreML, CloudKit
+- **Minimum iOS:** 17.0
+- **Watch companion:** watchOS 10.0
 
 ## Project Structure
 
 ```
 StressMonitor/
-├── StressMonitor/                          # iOS App (~210 files, ~24K LOC)
-│   ├── Models/                             # Data models (15+ files)
-│   ├── Services/
-│   │   ├── HealthKit/                      # Health data fetching
-│   │   ├── Algorithm/                      # Multi-factor stress calculation
-│   │   ├── Repository/                     # SwiftData persistence
-│   │   ├── CloudKit/                       # iCloud sync
-│   │   ├── LLM/                            # Cloud LLM + Apple Intelligence
-│   │   ├── Chat/                           # AI coaching chat
-│   │   ├── Background/                     # Notifications & tasks
-│   │   └── Connectivity/                   # Watch connectivity
-│   ├── ViewModels/                         # @Observable state
-│   ├── Views/
-│   │   ├── Dashboard/                      # Main stress display + AI cards
-│   │   ├── Chat/                           # AI coaching interface
-│   │   ├── Breathing/                      # Guided breathing exercises
-│   │   ├── Journal/                        # Mood & stress notes
-│   │   ├── History/                        # Measurement timeline
-│   │   ├── Trends/                         # Analytics charts
-│   │   ├── Settings/                       # App settings & data management
-│   │   └── Onboarding/                     # First-launch flow
-│   └── Theme/                              # Design system
-├── StressMonitorWatch Watch App/           # watchOS App (44 files, ~3.2K LOC)
-│   ├── Services/                           # Watch HealthKit + CloudKit
-│   ├── Models/                             # Shared data models
-│   ├── ViewModels/                         # Watch app state
-│   ├── Views/                              # Compact watch UI
-│   └── Complications/                      # WidgetKit complications
-├── StressMonitorWidget/                    # Home Screen Widgets (7 files, ~1.4K LOC)
-└── StressMonitorTests/                     # Unit & UI tests
+├── Models/           # Data models, CoreML model wrappers
+├── Views/            # SwiftUI views
+├── ViewModels/       # View models (MVVM)
+├── Services/         # HealthKit, CoreML, CloudKit services
+├── Utilities/        # Helpers, extensions
+└── Resources/        # Assets, CoreML models
 ```
 
-## Architecture
+## Setup
 
-MVVM with protocol-based dependency injection:
-
-```
-Views (SwiftUI)
-    ↓
-ViewModels (@Observable)
-    ↓
-Services (Protocol-based)
-    ↓
-Data Layer (SwiftData + CloudKit)
-```
-
-## Tech Stack
-
-| Layer | Technology |
-|-------|-----------|
-| UI | SwiftUI |
-| State | @Observable (iOS 17+) |
-| Persistence | SwiftData |
-| Cloud Sync | CloudKit (E2E encrypted) |
-| Health Data | HealthKit (read-only) |
-| Widgets | WidgetKit |
-| Networking | Moya + Alamofire |
-| AI Chat | Cloud LLM (SSE streaming) |
-| Charts | SwiftUICharts |
-
-## Dependencies
-
-Swift Package Manager (13 packages):
-
-| Package | Purpose |
-|---------|---------|
-| Moya | Network abstraction for LLM API |
-| Alamofire | HTTP networking |
-| Kingfisher | Image loading/caching |
-| SwiftUICharts | Custom chart views |
-| ReactiveSwift | Reactive primitives |
-| RxSwift | Reactive extensions |
-| Chat | Chat UI components |
-| Giphy iOS SDK | GIF support |
-| MediaPicker | Media selection |
-| ActivityIndicatorView | Loading indicators |
-| AnchoredPopup | Popup overlays |
-| AnimatedTabBar | Animated tab bar |
-| LibWebP | WebP image support |
-
-## Capabilities
-
-- **HealthKit** — Read HRV and Heart Rate
-- **iCloud (CloudKit)** — Data synchronization
-- **App Groups** — Widget data sharing
-- **Background Modes** — App Refresh
-
-## Privacy
-
-- Local SwiftData storage (encrypted at rest by iOS)
-- CloudKit end-to-end encrypted sync
-- HealthKit read-only (no writes)
-- No analytics, no advertising IDs, no tracking
-
-## Documentation
-
-Comprehensive docs in `docs/`:
-
-| Document | Description |
-|----------|-------------|
-| [Project Overview & PDR](docs/project-overview-pdr.md) | Product requirements |
-| [Codebase Summary](docs/codebase-summary.md) | File structure |
-| [Project Roadmap](docs/project-roadmap.md) | Milestones & progress |
-| [Code Standards](docs/code-standards.md) | Swift conventions |
-| [System Architecture](docs/system-architecture.md) | MVVM architecture |
-| [Deployment Guide](docs/deployment-guide.md) | Build & release |
-| [Design Guidelines](docs/design-guidelines.md) | UI/UX design system |
+1. Open `StressMonitor.xcodeproj` in Xcode 15+
+2. Configure signing with your Apple Developer account
+3. Enable HealthKit capability in project settings
+4. Build and run on device (HealthKit requires physical device)
 
 ## Development
 
-```bash
-# Build iOS app
-xcodebuild -scheme StressMonitor \
-    -destination 'platform=iOS Simulator,name=iPhone 15'
-
-# Build watchOS app
-xcodebuild -scheme "StressMonitorWatch Watch App" \
-    -destination 'platform=watchOS Simulator,name=Apple Watch Series 9'
-
-# Run tests
-xcodebuild test -scheme StressMonitor \
-    -destination 'platform=iOS Simulator,name=iPhone 15'
-```
-
-## Deployment
-
-1. Archive in Xcode (Product → Archive)
-2. Upload to App Store Connect
-3. Configure TestFlight or submit for review
-4. See [deployment guide](docs/deployment-guide.md) for details
-
----
-
-**Created by:** Phuong Doan
-**Version:** 1.0
-**Platform:** iOS 17+ / watchOS 10+
+This project is managed via the Hermes Kanban board. The `stress-app` worker profile handles assigned tasks.
