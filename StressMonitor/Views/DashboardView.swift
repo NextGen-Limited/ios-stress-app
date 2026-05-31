@@ -5,6 +5,7 @@ import Charts
 /// Features a circular stress gauge, HRV trend chart, and recent readings list.
 struct DashboardView: View {
     @EnvironmentObject var healthManager: HealthKitManager
+    @EnvironmentObject var readinessService: MorningReadinessService
 
     @State private var showingPermissionAlert = false
     @State private var isRefreshing = false
@@ -21,6 +22,9 @@ struct DashboardView: View {
                     if !healthManager.isMonitoring && healthManager.isAuthorized {
                         startMonitoringBanner
                     }
+
+                    // Morning Readiness Card (top of dashboard)
+                    MorningReadinessView(readinessService: readinessService)
 
                     // Main stress gauge (Welltory-style)
                     StressScoreView(
@@ -173,12 +177,15 @@ struct DashboardView: View {
         if healthManager.isAuthorized {
             healthManager.startMonitoring()
         }
+        // Compute morning readiness on load
+        await readinessService.computeReadiness()
     }
 
     private func refresh() {
         isRefreshing = true
         Task {
             healthManager.startMonitoring()
+            await readinessService.computeReadiness()
             try? await Task.sleep(for: .seconds(1))
             isRefreshing = false
         }
@@ -311,4 +318,5 @@ struct ReadingRow: View {
 #Preview {
     DashboardView()
         .environmentObject(HealthKitManager())
+        .environmentObject(MorningReadinessService())
 }

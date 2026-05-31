@@ -1,0 +1,1373 @@
+2026-03-01 23:29:03.275 xcodebuild[14188:23478462] [MT] IDERunDestination: Supported platforms for the buildables in the current scheme is empty.
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Mocks/MockCloudKitManager.swift:8:7: warning: non-final class 'MockCloudKitManager' cannot conform to 'Sendable'; use '@unchecked Sendable'; this is an error in the Swift 6 language mode
+class MockCloudKitManager: CloudKitServiceProtocol {
+      ^
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Mocks/MockCloudKitManager.swift:12:17: warning: stored property 'storedMeasurements' of 'Sendable'-conforming class 'MockCloudKitManager' is mutable; this is an error in the Swift 6 language mode
+    private var storedMeasurements: [CloudKitStressMeasurement] = []
+                ^
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/OnboardingHealthSyncViewModelTests.swift:65:9: warning: stored property 'shouldSucceed' of 'Sendable'-conforming class 'MockOnboardingHealthKitService' is mutable; this is an error in the Swift 6 language mode
+    var shouldSucceed = true
+        ^
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/OnboardingSuccessViewModelTests.swift:56:9: warning: stored property 'baselineToReturn' of 'Sendable'-conforming class 'MockSuccessRepository' is mutable; this is an error in the Swift 6 language mode
+    var baselineToReturn: PersonalBaseline?
+        ^
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/StressViewModelTests.swift:145:9: warning: stored property 'hrvToReturn' of 'Sendable'-conforming class 'MockHealthKitService' is mutable; this is an error in the Swift 6 language mode
+    var hrvToReturn: HRVMeasurement?
+        ^
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/StressViewModelTests.swift:169:9: warning: stored property 'stressToReturn' of 'Sendable'-conforming class 'MockStressAlgorithmService' is mutable; this is an error in the Swift 6 language mode
+    var stressToReturn: StressResult?
+        ^
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/StressViewModelTests.swift:181:9: warning: stored property 'measurementsToReturn' of 'Sendable'-conforming class 'MockStressViewModelRepository' is mutable; this is an error in the Swift 6 language mode
+    var measurementsToReturn: [StressMeasurement] = []
+        ^
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/StressCalculatorTests.swift:14:27: warning: main actor-isolated initializer 'init(restingHeartRate:baselineHRV:lastUpdated:)' cannot be called from outside of the actor; this is an error in the Swift 6 language mode
+        defaultBaseline = PersonalBaseline(restingHeartRate: 60.0, baselineHRV: 50.0)
+                          ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                          await 
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/StressCalculatorTests.swift:15:15: warning: main actor-isolated initializer 'init(baseline:)' cannot be called from outside of the actor; this is an error in the Swift 6 language mode
+        sut = StressCalculator(baseline: defaultBaseline)
+              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+              await 
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/StressCalculatorTests.swift:34:31: warning: main actor-isolated property 'level' can not be referenced from a nonisolated autoclosure
+        XCTAssertEqual(result.level, 0, accuracy: 10, "Normal readings should result in near-zero stress")
+                              ^
+StressMonitor.StressResult.level:2:25: note: property declared here
+@MainActor internal let level: Double}
+                        ^
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/StressCalculatorTests.swift:35:31: warning: main actor-isolated property 'category' can not be referenced from a nonisolated autoclosure
+        XCTAssertEqual(result.category, .relaxed, "Normal readings should be categorized as relaxed")
+                              ^
+StressMonitor.StressResult.category:2:25: note: property declared here
+@MainActor internal let category: StressMonitor.StressCategory}
+                        ^
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/StressCalculatorTests.swift:36:31: warning: main actor-isolated property 'hrv' can not be referenced from a nonisolated autoclosure
+        XCTAssertEqual(result.hrv, hrv, accuracy: 0.001)
+                              ^
+StressMonitor.StressResult.hrv:2:25: note: property declared here
+@MainActor internal let hrv: Double}
+                        ^
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/StressCalculatorTests.swift:37:31: warning: main actor-isolated property 'heartRate' can not be referenced from a nonisolated autoclosure
+        XCTAssertEqual(result.heartRate, heartRate, accuracy: 0.001)
+                              ^
+StressMonitor.StressResult.heartRate:2:25: note: property declared here
+@MainActor internal let heartRate: Double}
+                        ^
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/StressCalculatorTests.swift:38:30: warning: main actor-isolated property 'confidence' can not be referenced from a nonisolated autoclosure
+        XCTAssertTrue(result.confidence > 0, "Confidence should be positive")
+                             ^
+StressMonitor.StressResult.confidence:2:25: note: property declared here
+@MainActor internal let confidence: Double}
+                        ^
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/StressCalculatorTests.swift:53:31: warning: main actor-isolated property 'level' can not be referenced from a nonisolated autoclosure
+        XCTAssertEqual(result.level, 17.7, accuracy: 2, "Elevated heart rate should result in mild stress")
+                              ^
+StressMonitor.StressResult.level:2:25: note: property declared here
+@MainActor internal let level: Double}
+                        ^
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/StressCalculatorTests.swift:54:31: warning: main actor-isolated property 'category' can not be referenced from a nonisolated autoclosure
+        XCTAssertEqual(result.category, .relaxed, "Normal HRV with elevated HR should be relaxed due to 70% HRV weight")
+                              ^
+StressMonitor.StressResult.category:2:25: note: property declared here
+@MainActor internal let category: StressMonitor.StressCategory}
+                        ^
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/StressCalculatorTests.swift:66:37: warning: main actor-isolated property 'level' can not be referenced from a nonisolated autoclosure
+        XCTAssertGreaterThan(result.level, 30, "Low HRV should significantly increase stress")
+                                    ^
+StressMonitor.StressResult.level:2:25: note: property declared here
+@MainActor internal let level: Double}
+                        ^
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/StressCalculatorTests.swift:67:58: warning: main actor-isolated property 'category' can not be referenced from a nonisolated autoclosure
+        XCTAssertTrue([.mild, .moderate].contains(result.category), "Should be mild or moderate stress")
+                                                         ^
+StressMonitor.StressResult.category:2:25: note: property declared here
+@MainActor internal let category: StressMonitor.StressCategory}
+                        ^
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/StressCalculatorTests.swift:82:31: warning: main actor-isolated property 'level' can not be referenced from a nonisolated autoclosure
+        XCTAssertEqual(result.level, 65, accuracy: 5, "Severe stress indicators should result in high stress level")
+                              ^
+StressMonitor.StressResult.level:2:25: note: property declared here
+@MainActor internal let level: Double}
+                        ^
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/StressCalculatorTests.swift:83:31: warning: main actor-isolated property 'category' can not be referenced from a nonisolated autoclosure
+        XCTAssertEqual(result.category, .moderate, "Should be categorized as moderate stress (65)")
+                              ^
+StressMonitor.StressResult.category:2:25: note: property declared here
+@MainActor internal let category: StressMonitor.StressCategory}
+                        ^
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/StressCalculatorTests.swift:93:36: warning: main actor-isolated property 'category' can not be referenced from a nonisolated autoclosure
+            XCTAssertEqual(result1.category, .relaxed, "Level below 25 should be relaxed")
+                                   ^
+StressMonitor.StressResult.category:2:25: note: property declared here
+@MainActor internal let category: StressMonitor.StressCategory}
+                        ^
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/StressCalculatorTests.swift:98:43: warning: main actor-isolated property 'level' can not be referenced from a nonisolated autoclosure
+        if result2.level >= 25 && result2.level < 50 {
+                                          ^
+StressMonitor.StressResult.level:2:25: note: property declared here
+@MainActor internal let level: Double}
+                        ^
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/StressCalculatorTests.swift:99:36: warning: main actor-isolated property 'category' can not be referenced from a nonisolated autoclosure
+            XCTAssertEqual(result2.category, .mild, "Level 25-50 should be mild")
+                                   ^
+StressMonitor.StressResult.category:2:25: note: property declared here
+@MainActor internal let category: StressMonitor.StressCategory}
+                        ^
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/StressCalculatorTests.swift:92:20: warning: main actor-isolated property 'level' cannot be accessed from outside of the actor; this is an error in the Swift 6 language mode
+        if result1.level < 25 {
+           ~~~~~~~~^~~~~~~~~~
+           await 
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/StressCalculatorTests.swift:98:20: warning: main actor-isolated property 'level' cannot be accessed from outside of the actor; this is an error in the Swift 6 language mode
+        if result2.level >= 25 && result2.level < 50 {
+           ~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+           await 
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/StressCalculatorTests.swift:108:41: warning: main actor-isolated property 'level' can not be referenced from a nonisolated autoclosure
+        if result.level >= 50 && result.level < 75 {
+                                        ^
+StressMonitor.StressResult.level:2:25: note: property declared here
+@MainActor internal let level: Double}
+                        ^
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/StressCalculatorTests.swift:109:35: warning: main actor-isolated property 'category' can not be referenced from a nonisolated autoclosure
+            XCTAssertEqual(result.category, .moderate, "Level 50-75 should be moderate")
+                                  ^
+StressMonitor.StressResult.category:2:25: note: property declared here
+@MainActor internal let category: StressMonitor.StressCategory}
+                        ^
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/StressCalculatorTests.swift:108:19: warning: main actor-isolated property 'level' cannot be accessed from outside of the actor; this is an error in the Swift 6 language mode
+        if result.level >= 50 && result.level < 75 {
+           ~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+           await 
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/StressCalculatorTests.swift:119:35: warning: main actor-isolated property 'category' can not be referenced from a nonisolated autoclosure
+            XCTAssertEqual(result.category, .high, "Level 75+ should be high stress")
+                                  ^
+StressMonitor.StressResult.category:2:25: note: property declared here
+@MainActor internal let category: StressMonitor.StressCategory}
+                        ^
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/StressCalculatorTests.swift:118:19: warning: main actor-isolated property 'level' cannot be accessed from outside of the actor; this is an error in the Swift 6 language mode
+        if result.level >= 75 {
+           ~~~~~~~^~~~~~~~~~~
+           await 
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/StressCalculatorTests.swift:134:31: warning: main actor-isolated property 'level' can not be referenced from a nonisolated autoclosure
+        XCTAssertEqual(result.level, 70, accuracy: 5, "Zero HRV with normal HR should result in 70 stress")
+                              ^
+StressMonitor.StressResult.level:2:25: note: property declared here
+@MainActor internal let level: Double}
+                        ^
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/StressCalculatorTests.swift:135:31: warning: main actor-isolated property 'category' can not be referenced from a nonisolated autoclosure
+        XCTAssertEqual(result.category, .moderate, "Level 70 falls in moderate range (50-75)")
+                              ^
+StressMonitor.StressResult.category:2:25: note: property declared here
+@MainActor internal let category: StressMonitor.StressCategory}
+                        ^
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/StressCalculatorTests.swift:147:44: warning: main actor-isolated property 'level' can not be referenced from a nonisolated autoclosure
+        XCTAssertGreaterThanOrEqual(result.level, 0, "Stress level should be non-negative")
+                                           ^
+StressMonitor.StressResult.level:2:25: note: property declared here
+@MainActor internal let level: Double}
+                        ^
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/StressCalculatorTests.swift:148:41: warning: main actor-isolated property 'level' can not be referenced from a nonisolated autoclosure
+        XCTAssertLessThanOrEqual(result.level, 100, "Stress level should not exceed 100")
+                                        ^
+StressMonitor.StressResult.level:2:25: note: property declared here
+@MainActor internal let level: Double}
+                        ^
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/StressCalculatorTests.swift:164:31: warning: main actor-isolated property 'level' can not be referenced from a nonisolated autoclosure
+        XCTAssertEqual(result.level, 26, accuracy: 5, "Extreme heart rate should result in mild stress")
+                              ^
+StressMonitor.StressResult.level:2:25: note: property declared here
+@MainActor internal let level: Double}
+                        ^
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/StressCalculatorTests.swift:165:31: warning: main actor-isolated property 'category' can not be referenced from a nonisolated autoclosure
+        XCTAssertEqual(result.category, .mild, "Should be categorized as mild stress (26)")
+                              ^
+StressMonitor.StressResult.category:2:25: note: property declared here
+@MainActor internal let category: StressMonitor.StressCategory}
+                        ^
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/StressCalculatorTests.swift:177:44: warning: main actor-isolated property 'level' can not be referenced from a nonisolated autoclosure
+        XCTAssertGreaterThanOrEqual(result.level, 0, "Stress level should be non-negative")
+                                           ^
+StressMonitor.StressResult.level:2:25: note: property declared here
+@MainActor internal let level: Double}
+                        ^
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/StressCalculatorTests.swift:178:41: warning: main actor-isolated property 'level' can not be referenced from a nonisolated autoclosure
+        XCTAssertLessThanOrEqual(result.level, 100, "Stress level should not exceed 100")
+                                        ^
+StressMonitor.StressResult.level:2:25: note: property declared here
+@MainActor internal let level: Double}
+                        ^
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/StressCalculatorTests.swift:189:30: warning: main actor-isolated instance method 'calculateConfidence(hrv:heartRate:samples:)' cannot be called from outside of the actor; this is an error in the Swift 6 language mode
+        let confidence = sut.calculateConfidence(hrv: hrv, heartRate: heartRate, samples: samples)
+                         ~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                         await 
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/StressCalculatorTests.swift:202:30: warning: main actor-isolated instance method 'calculateConfidence(hrv:heartRate:samples:)' cannot be called from outside of the actor; this is an error in the Swift 6 language mode
+        let confidence = sut.calculateConfidence(hrv: hrv, heartRate: heartRate, samples: samples)
+                         ~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                         await 
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/StressCalculatorTests.swift:215:30: warning: main actor-isolated instance method 'calculateConfidence(hrv:heartRate:samples:)' cannot be called from outside of the actor; this is an error in the Swift 6 language mode
+        let confidence = sut.calculateConfidence(hrv: hrv, heartRate: heartRate, samples: samples)
+                         ~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                         await 
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/StressCalculatorTests.swift:228:30: warning: main actor-isolated instance method 'calculateConfidence(hrv:heartRate:samples:)' cannot be called from outside of the actor; this is an error in the Swift 6 language mode
+        let confidence = sut.calculateConfidence(hrv: hrv, heartRate: heartRate, samples: samples)
+                         ~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                         await 
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/StressCalculatorTests.swift:238:33: warning: main actor-isolated instance method 'calculateConfidence(hrv:heartRate:samples:)' cannot be called from outside of the actor; this is an error in the Swift 6 language mode
+        let confidenceLow = sut.calculateConfidence(hrv: 50.0, heartRate: 60.0, samples: 1)
+                            ~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                            await 
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/StressCalculatorTests.swift:241:34: warning: main actor-isolated instance method 'calculateConfidence(hrv:heartRate:samples:)' cannot be called from outside of the actor; this is an error in the Swift 6 language mode
+        let confidenceHigh = sut.calculateConfidence(hrv: 50.0, heartRate: 60.0, samples: 20)
+                             ~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                             await 
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/StressCalculatorTests.swift:256:30: warning: main actor-isolated instance method 'calculateConfidence(hrv:heartRate:samples:)' cannot be called from outside of the actor; this is an error in the Swift 6 language mode
+        let confidence = sut.calculateConfidence(hrv: hrv, heartRate: heartRate, samples: samples)
+                         ~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                         await 
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/StressCalculatorTests.swift:274:37: warning: main actor-isolated property 'level' can not be referenced from a nonisolated autoclosure
+        XCTAssertGreaterThan(result.level, 30, "HRV component should drive stress level")
+                                    ^
+StressMonitor.StressResult.level:2:25: note: property declared here
+@MainActor internal let level: Double}
+                        ^
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/StressCalculatorTests.swift:287:31: warning: main actor-isolated property 'level' can not be referenced from a nonisolated autoclosure
+        XCTAssertEqual(result.level, 17.7, accuracy: 2, "HR component should contribute to stress")
+                              ^
+StressMonitor.StressResult.level:2:25: note: property declared here
+@MainActor internal let level: Double}
+                        ^
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/StressCalculatorTests.swift:288:31: warning: main actor-isolated property 'category' can not be referenced from a nonisolated autoclosure
+        XCTAssertEqual(result.category, .relaxed, "Normal HRV keeps stress in relaxed range")
+                              ^
+StressMonitor.StressResult.category:2:25: note: property declared here
+@MainActor internal let category: StressMonitor.StressCategory}
+                        ^
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/StressCalculatorTests.swift:301:31: warning: main actor-isolated property 'level' can not be referenced from a nonisolated autoclosure
+        XCTAssertEqual(result.level, 0, accuracy: 10, "Athlete's normal readings should be relaxed")
+                              ^
+StressMonitor.StressResult.level:2:25: note: property declared here
+@MainActor internal let level: Double}
+                        ^
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/StressCalculatorTests.swift:302:31: warning: main actor-isolated property 'category' can not be referenced from a nonisolated autoclosure
+        XCTAssertEqual(result.category, .relaxed, "Athlete should be categorized as relaxed")
+                              ^
+StressMonitor.StressResult.category:2:25: note: property declared here
+@MainActor internal let category: StressMonitor.StressCategory}
+                        ^
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/StressCalculatorTests.swift:294:31: warning: main actor-isolated initializer 'init(restingHeartRate:baselineHRV:lastUpdated:)' cannot be called from outside of the actor; this is an error in the Swift 6 language mode
+        let athleteBaseline = PersonalBaseline(restingHeartRate: 45.0, baselineHRV: 70.0)
+                              ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                              await 
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/StressCalculatorTests.swift:295:32: warning: main actor-isolated initializer 'init(baseline:)' cannot be called from outside of the actor; this is an error in the Swift 6 language mode
+        let customCalculator = StressCalculator(baseline: athleteBaseline)
+                               ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                               await 
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/StressCalculatorTests.swift:315:44: warning: main actor-isolated property 'timestamp' can not be referenced from a nonisolated autoclosure
+        XCTAssertGreaterThanOrEqual(result.timestamp, beforeDate, "Timestamp should be after start")
+                                           ^
+StressMonitor.StressResult.timestamp:2:25: note: property declared here
+@MainActor internal let timestamp: Date}
+                        ^
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/StressCalculatorTests.swift:316:41: warning: main actor-isolated property 'timestamp' can not be referenced from a nonisolated autoclosure
+        XCTAssertLessThanOrEqual(result.timestamp, afterDate, "Timestamp should be before end")
+                                        ^
+StressMonitor.StressResult.timestamp:2:25: note: property declared here
+@MainActor internal let timestamp: Date}
+                        ^
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/StressCalculatorTests.swift:338:48: warning: main actor-isolated property 'level' can not be referenced from a nonisolated autoclosure
+            XCTAssertGreaterThanOrEqual(result.level, 0, "Stress should be non-negative")
+                                               ^
+StressMonitor.StressResult.level:2:25: note: property declared here
+@MainActor internal let level: Double}
+                        ^
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/StressCalculatorTests.swift:339:45: warning: main actor-isolated property 'level' can not be referenced from a nonisolated autoclosure
+            XCTAssertLessThanOrEqual(result.level, 100, "Stress should not exceed 100")
+                                            ^
+StressMonitor.StressResult.level:2:25: note: property declared here
+@MainActor internal let level: Double}
+                        ^
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/StressMonitorTests.swift:35:38: warning: main actor-isolated conformance of 'HRVMeasurement' to 'Encodable' cannot be used in nonisolated context; this is an error in the Swift 6 language mode
+        let data = try JSONEncoder().encode(hrv)
+                                     ^
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/StressMonitorTests.swift:36:41: warning: main actor-isolated conformance of 'HRVMeasurement' to 'Decodable' cannot be used in nonisolated context; this is an error in the Swift 6 language mode
+        let decoded = try JSONDecoder().decode(HRVMeasurement.self, from: data)
+                                        ^
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/StressMonitorTests.swift:49:38: warning: main actor-isolated conformance of 'HeartRateSample' to 'Encodable' cannot be used in nonisolated context; this is an error in the Swift 6 language mode
+        let data = try JSONEncoder().encode(hr)
+                                     ^
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/StressMonitorTests.swift:50:41: warning: main actor-isolated conformance of 'HeartRateSample' to 'Decodable' cannot be used in nonisolated context; this is an error in the Swift 6 language mode
+        let decoded = try JSONDecoder().decode(HeartRateSample.self, from: data)
+                                        ^
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/HealthKitManagerTests.swift:10:25: warning: comparing non-optional value of type 'HealthKitManager' to 'nil' always returns true
+        #expect(manager != nil)
+                ~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/HealthKitManagerTests.swift:16:25: warning: comparing non-optional value of type 'HealthKitManager' to 'nil' always returns true
+        #expect(manager != nil)
+                ~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/OnboardingSuccessViewModelTests.swift:56:9: warning: stored property 'baselineToReturn' of 'Sendable'-conforming class 'MockSuccessRepository' is mutable; this is an error in the Swift 6 language mode
+    var baselineToReturn: PersonalBaseline?
+        ^
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/ColorBlindnessSimulatorTests.swift:54:32: warning: comparing non-optional value of type 'Color' to 'nil' always returns true
+        #expect(simulatedColor != nil)
+                ~~~~~~~~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/ColorBlindnessSimulatorTests.swift:61:32: warning: comparing non-optional value of type 'Color' to 'nil' always returns true
+        #expect(simulatedColor != nil)
+                ~~~~~~~~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/ColorBlindnessSimulatorTests.swift:68:32: warning: comparing non-optional value of type 'Color' to 'nil' always returns true
+        #expect(simulatedColor != nil)
+                ~~~~~~~~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/ColorBlindnessSimulatorTests.swift:76:32: warning: comparing non-optional value of type 'Color' to 'nil' always returns true
+        #expect(simulatedColor != nil)
+                ~~~~~~~~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/ColorBlindnessSimulatorTests.swift:87:30: warning: comparing non-optional value of type 'Color' to 'nil' always returns true
+        #expect(deuteranopia != nil)
+                ~~~~~~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/ColorBlindnessSimulatorTests.swift:88:28: warning: comparing non-optional value of type 'Color' to 'nil' always returns true
+        #expect(protanopia != nil)
+                ~~~~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/ColorBlindnessSimulatorTests.swift:89:28: warning: comparing non-optional value of type 'Color' to 'nil' always returns true
+        #expect(tritanopia != nil)
+                ~~~~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/ColorBlindnessSimulatorTests.swift:98:30: warning: comparing non-optional value of type 'Color' to 'nil' always returns true
+        #expect(deuteranopia != nil)
+                ~~~~~~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/ColorBlindnessSimulatorTests.swift:99:28: warning: comparing non-optional value of type 'Color' to 'nil' always returns true
+        #expect(protanopia != nil)
+                ~~~~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/ColorBlindnessSimulatorTests.swift:100:28: warning: comparing non-optional value of type 'Color' to 'nil' always returns true
+        #expect(tritanopia != nil)
+                ~~~~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/ColorBlindnessSimulatorTests.swift:109:30: warning: comparing non-optional value of type 'Color' to 'nil' always returns true
+        #expect(deuteranopia != nil)
+                ~~~~~~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/ColorBlindnessSimulatorTests.swift:110:28: warning: comparing non-optional value of type 'Color' to 'nil' always returns true
+        #expect(protanopia != nil)
+                ~~~~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/ColorBlindnessSimulatorTests.swift:111:28: warning: comparing non-optional value of type 'Color' to 'nil' always returns true
+        #expect(tritanopia != nil)
+                ~~~~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/ColorBlindnessSimulatorTests.swift:120:30: warning: comparing non-optional value of type 'Color' to 'nil' always returns true
+        #expect(deuteranopia != nil)
+                ~~~~~~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/ColorBlindnessSimulatorTests.swift:121:28: warning: comparing non-optional value of type 'Color' to 'nil' always returns true
+        #expect(protanopia != nil)
+                ~~~~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/ColorBlindnessSimulatorTests.swift:122:28: warning: comparing non-optional value of type 'Color' to 'nil' always returns true
+        #expect(tritanopia != nil)
+                ~~~~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/ColorBlindnessSimulatorTests.swift:212:27: warning: comparing non-optional value of type 'ColorBlindnessPreviewContainer<some View>' to 'nil' always returns true
+        #expect(container != nil)
+                ~~~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/ColorBlindnessSimulatorTests.swift:330:17: note: '#expect(_:_:)' will always pass here; use 'Bool(true)' to silence this warning (from macro 'expect')
+        #expect(true, "Simulator should only be available in DEBUG builds")
+                ^~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/ColorBlindnessSimulatorTests.swift:344:24: warning: comparing non-optional value of type 'Color' to 'nil' always returns true
+        #expect(redSim != nil)
+                ~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/ColorBlindnessSimulatorTests.swift:345:26: warning: comparing non-optional value of type 'Color' to 'nil' always returns true
+        #expect(greenSim != nil)
+                ~~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/ColorBlindnessSimulatorTests.swift:346:25: warning: comparing non-optional value of type 'Color' to 'nil' always returns true
+        #expect(blueSim != nil)
+                ~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/ColorBlindnessSimulatorTests.swift:357:24: warning: comparing non-optional value of type 'Color' to 'nil' always returns true
+        #expect(redSim != nil)
+                ~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/ColorBlindnessSimulatorTests.swift:358:26: warning: comparing non-optional value of type 'Color' to 'nil' always returns true
+        #expect(greenSim != nil)
+                ~~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/ColorBlindnessSimulatorTests.swift:368:25: warning: comparing non-optional value of type 'Color' to 'nil' always returns true
+        #expect(blueSim != nil)
+                ~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/ColorBlindnessSimulatorTests.swift:369:27: warning: comparing non-optional value of type 'Color' to 'nil' always returns true
+        #expect(yellowSim != nil)
+                ~~~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/ColorBlindnessSimulatorTests.swift:377:27: warning: comparing non-optional value of type 'Color' to 'nil' always returns true
+        #expect(simulated != nil)
+                ~~~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/ColorBlindnessSimulatorTests.swift:383:27: warning: comparing non-optional value of type 'Color' to 'nil' always returns true
+        #expect(simulated != nil)
+                ~~~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/ColorBlindnessSimulatorTests.swift:389:27: warning: comparing non-optional value of type 'Color' to 'nil' always returns true
+        #expect(simulated != nil)
+                ~~~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/ColorBlindnessSimulatorTests.swift:395:27: warning: comparing non-optional value of type 'Color' to 'nil' always returns true
+        #expect(simulated != nil)
+                ~~~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/ColorBlindnessSimulatorTests.swift:54:32: warning: comparing non-optional value of type 'Color' to 'nil' always returns true
+        #expect(simulatedColor != nil)
+                ~~~~~~~~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/ColorBlindnessSimulatorTests.swift:61:32: warning: comparing non-optional value of type 'Color' to 'nil' always returns true
+        #expect(simulatedColor != nil)
+                ~~~~~~~~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/ColorBlindnessSimulatorTests.swift:68:32: warning: comparing non-optional value of type 'Color' to 'nil' always returns true
+        #expect(simulatedColor != nil)
+                ~~~~~~~~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/ColorBlindnessSimulatorTests.swift:76:32: warning: comparing non-optional value of type 'Color' to 'nil' always returns true
+        #expect(simulatedColor != nil)
+                ~~~~~~~~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/ColorBlindnessSimulatorTests.swift:87:30: warning: comparing non-optional value of type 'Color' to 'nil' always returns true
+        #expect(deuteranopia != nil)
+                ~~~~~~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/ColorBlindnessSimulatorTests.swift:88:28: warning: comparing non-optional value of type 'Color' to 'nil' always returns true
+        #expect(protanopia != nil)
+                ~~~~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/ColorBlindnessSimulatorTests.swift:89:28: warning: comparing non-optional value of type 'Color' to 'nil' always returns true
+        #expect(tritanopia != nil)
+                ~~~~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/ColorBlindnessSimulatorTests.swift:98:30: warning: comparing non-optional value of type 'Color' to 'nil' always returns true
+        #expect(deuteranopia != nil)
+                ~~~~~~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/ColorBlindnessSimulatorTests.swift:99:28: warning: comparing non-optional value of type 'Color' to 'nil' always returns true
+        #expect(protanopia != nil)
+                ~~~~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/ColorBlindnessSimulatorTests.swift:100:28: warning: comparing non-optional value of type 'Color' to 'nil' always returns true
+        #expect(tritanopia != nil)
+                ~~~~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/ColorBlindnessSimulatorTests.swift:109:30: warning: comparing non-optional value of type 'Color' to 'nil' always returns true
+        #expect(deuteranopia != nil)
+                ~~~~~~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/ColorBlindnessSimulatorTests.swift:110:28: warning: comparing non-optional value of type 'Color' to 'nil' always returns true
+        #expect(protanopia != nil)
+                ~~~~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/ColorBlindnessSimulatorTests.swift:111:28: warning: comparing non-optional value of type 'Color' to 'nil' always returns true
+        #expect(tritanopia != nil)
+                ~~~~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/ColorBlindnessSimulatorTests.swift:120:30: warning: comparing non-optional value of type 'Color' to 'nil' always returns true
+        #expect(deuteranopia != nil)
+                ~~~~~~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/ColorBlindnessSimulatorTests.swift:121:28: warning: comparing non-optional value of type 'Color' to 'nil' always returns true
+        #expect(protanopia != nil)
+                ~~~~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/ColorBlindnessSimulatorTests.swift:122:28: warning: comparing non-optional value of type 'Color' to 'nil' always returns true
+        #expect(tritanopia != nil)
+                ~~~~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/ColorBlindnessSimulatorTests.swift:212:27: warning: comparing non-optional value of type 'ColorBlindnessPreviewContainer<some View>' to 'nil' always returns true
+        #expect(container != nil)
+                ~~~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/ColorBlindnessSimulatorTests.swift:330:17: note: '#expect(_:_:)' will always pass here; use 'Bool(true)' to silence this warning (from macro 'expect')
+        #expect(true, "Simulator should only be available in DEBUG builds")
+                ^~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/ColorBlindnessSimulatorTests.swift:344:24: warning: comparing non-optional value of type 'Color' to 'nil' always returns true
+        #expect(redSim != nil)
+                ~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/ColorBlindnessSimulatorTests.swift:345:26: warning: comparing non-optional value of type 'Color' to 'nil' always returns true
+        #expect(greenSim != nil)
+                ~~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/ColorBlindnessSimulatorTests.swift:346:25: warning: comparing non-optional value of type 'Color' to 'nil' always returns true
+        #expect(blueSim != nil)
+                ~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/ColorBlindnessSimulatorTests.swift:357:24: warning: comparing non-optional value of type 'Color' to 'nil' always returns true
+        #expect(redSim != nil)
+                ~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/ColorBlindnessSimulatorTests.swift:358:26: warning: comparing non-optional value of type 'Color' to 'nil' always returns true
+        #expect(greenSim != nil)
+                ~~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/ColorBlindnessSimulatorTests.swift:368:25: warning: comparing non-optional value of type 'Color' to 'nil' always returns true
+        #expect(blueSim != nil)
+                ~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/ColorBlindnessSimulatorTests.swift:369:27: warning: comparing non-optional value of type 'Color' to 'nil' always returns true
+        #expect(yellowSim != nil)
+                ~~~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/ColorBlindnessSimulatorTests.swift:377:27: warning: comparing non-optional value of type 'Color' to 'nil' always returns true
+        #expect(simulated != nil)
+                ~~~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/ColorBlindnessSimulatorTests.swift:383:27: warning: comparing non-optional value of type 'Color' to 'nil' always returns true
+        #expect(simulated != nil)
+                ~~~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/ColorBlindnessSimulatorTests.swift:389:27: warning: comparing non-optional value of type 'Color' to 'nil' always returns true
+        #expect(simulated != nil)
+                ~~~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/ColorBlindnessSimulatorTests.swift:395:27: warning: comparing non-optional value of type 'Color' to 'nil' always returns true
+        #expect(simulated != nil)
+                ~~~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/DynamicTypeScalingTests.swift:16:26: warning: comparing non-optional value of type 'DynamicTypeScalingModifier' to 'nil' always returns true
+        #expect(modifier != nil)
+                ~~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/DynamicTypeScalingTests.swift:172:26: warning: comparing non-optional value of type 'LimitedDynamicTypeModifier' to 'nil' always returns true
+        #expect(modifier != nil)
+                ~~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/ColorBlindnessSimulatorTests.swift:54:32: warning: comparing non-optional value of type 'Color' to 'nil' always returns true
+        #expect(simulatedColor != nil)
+                ~~~~~~~~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/ColorBlindnessSimulatorTests.swift:61:32: warning: comparing non-optional value of type 'Color' to 'nil' always returns true
+        #expect(simulatedColor != nil)
+                ~~~~~~~~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/ColorBlindnessSimulatorTests.swift:68:32: warning: comparing non-optional value of type 'Color' to 'nil' always returns true
+        #expect(simulatedColor != nil)
+                ~~~~~~~~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/ColorBlindnessSimulatorTests.swift:76:32: warning: comparing non-optional value of type 'Color' to 'nil' always returns true
+        #expect(simulatedColor != nil)
+                ~~~~~~~~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/ColorBlindnessSimulatorTests.swift:87:30: warning: comparing non-optional value of type 'Color' to 'nil' always returns true
+        #expect(deuteranopia != nil)
+                ~~~~~~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/ColorBlindnessSimulatorTests.swift:88:28: warning: comparing non-optional value of type 'Color' to 'nil' always returns true
+        #expect(protanopia != nil)
+                ~~~~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/ColorBlindnessSimulatorTests.swift:89:28: warning: comparing non-optional value of type 'Color' to 'nil' always returns true
+        #expect(tritanopia != nil)
+                ~~~~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/ColorBlindnessSimulatorTests.swift:98:30: warning: comparing non-optional value of type 'Color' to 'nil' always returns true
+        #expect(deuteranopia != nil)
+                ~~~~~~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/ColorBlindnessSimulatorTests.swift:99:28: warning: comparing non-optional value of type 'Color' to 'nil' always returns true
+        #expect(protanopia != nil)
+                ~~~~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/ColorBlindnessSimulatorTests.swift:100:28: warning: comparing non-optional value of type 'Color' to 'nil' always returns true
+        #expect(tritanopia != nil)
+                ~~~~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/ColorBlindnessSimulatorTests.swift:109:30: warning: comparing non-optional value of type 'Color' to 'nil' always returns true
+        #expect(deuteranopia != nil)
+                ~~~~~~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/ColorBlindnessSimulatorTests.swift:110:28: warning: comparing non-optional value of type 'Color' to 'nil' always returns true
+        #expect(protanopia != nil)
+                ~~~~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/ColorBlindnessSimulatorTests.swift:111:28: warning: comparing non-optional value of type 'Color' to 'nil' always returns true
+        #expect(tritanopia != nil)
+                ~~~~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/ColorBlindnessSimulatorTests.swift:120:30: warning: comparing non-optional value of type 'Color' to 'nil' always returns true
+        #expect(deuteranopia != nil)
+                ~~~~~~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/ColorBlindnessSimulatorTests.swift:121:28: warning: comparing non-optional value of type 'Color' to 'nil' always returns true
+        #expect(protanopia != nil)
+                ~~~~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/ColorBlindnessSimulatorTests.swift:122:28: warning: comparing non-optional value of type 'Color' to 'nil' always returns true
+        #expect(tritanopia != nil)
+                ~~~~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/ColorBlindnessSimulatorTests.swift:212:27: warning: comparing non-optional value of type 'ColorBlindnessPreviewContainer<some View>' to 'nil' always returns true
+        #expect(container != nil)
+                ~~~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/ColorBlindnessSimulatorTests.swift:330:17: note: '#expect(_:_:)' will always pass here; use 'Bool(true)' to silence this warning (from macro 'expect')
+        #expect(true, "Simulator should only be available in DEBUG builds")
+                ^~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/ColorBlindnessSimulatorTests.swift:344:24: warning: comparing non-optional value of type 'Color' to 'nil' always returns true
+        #expect(redSim != nil)
+                ~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/ColorBlindnessSimulatorTests.swift:345:26: warning: comparing non-optional value of type 'Color' to 'nil' always returns true
+        #expect(greenSim != nil)
+                ~~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/ColorBlindnessSimulatorTests.swift:346:25: warning: comparing non-optional value of type 'Color' to 'nil' always returns true
+        #expect(blueSim != nil)
+                ~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/ColorBlindnessSimulatorTests.swift:357:24: warning: comparing non-optional value of type 'Color' to 'nil' always returns true
+        #expect(redSim != nil)
+                ~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/ColorBlindnessSimulatorTests.swift:358:26: warning: comparing non-optional value of type 'Color' to 'nil' always returns true
+        #expect(greenSim != nil)
+                ~~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/ColorBlindnessSimulatorTests.swift:368:25: warning: comparing non-optional value of type 'Color' to 'nil' always returns true
+        #expect(blueSim != nil)
+                ~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/ColorBlindnessSimulatorTests.swift:369:27: warning: comparing non-optional value of type 'Color' to 'nil' always returns true
+        #expect(yellowSim != nil)
+                ~~~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/ColorBlindnessSimulatorTests.swift:377:27: warning: comparing non-optional value of type 'Color' to 'nil' always returns true
+        #expect(simulated != nil)
+                ~~~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/ColorBlindnessSimulatorTests.swift:383:27: warning: comparing non-optional value of type 'Color' to 'nil' always returns true
+        #expect(simulated != nil)
+                ~~~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/ColorBlindnessSimulatorTests.swift:389:27: warning: comparing non-optional value of type 'Color' to 'nil' always returns true
+        #expect(simulated != nil)
+                ~~~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/ColorBlindnessSimulatorTests.swift:395:27: warning: comparing non-optional value of type 'Color' to 'nil' always returns true
+        #expect(simulated != nil)
+                ~~~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/HighContrastTests.swift:16:26: warning: comparing non-optional value of type 'HighContrastBorderModifier' to 'nil' always returns true
+        #expect(modifier != nil)
+                ~~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/HighContrastTests.swift:65:26: warning: comparing non-optional value of type 'HighContrastCardModifier' to 'nil' always returns true
+        #expect(modifier != nil)
+                ~~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/HighContrastTests.swift:108:26: warning: comparing non-optional value of type 'HighContrastButtonModifier' to 'nil' always returns true
+        #expect(modifier != nil)
+                ~~~~~~~~ ^  ~~~
+@__swiftmacro_18StressMonitorTests0028HighContrastTestsswift_IxAFhfMX112_8_6expectfMf_.swift:1:52: warning: main actor-isolated conformance of 'HighContrastButtonModifier.ButtonStyle' to 'Equatable' cannot be used in nonisolated context; this is an error in the Swift 6 language mode
+Testing.__checkBinaryOperation(modifier.style,{ $0 == $1() },.primary,expression: .__fromBinaryOperation(.__fromSyntaxNode("modifier.style"),"==",.__fromSyntaxNode(".primary")),comments: [],isRequired: false,sourceLocation: Testing.SourceLocation.__here()).__expected()
+                                                   ^
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/HighContrastTests.swift:113:9: note: in expansion of macro 'expect' here
+        #expect(modifier.style == .primary)
+        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/HighContrastTests.swift:113:9: note: in expansion of macro 'expect' here
+        #expect(modifier.style == .primary)
+        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+@__swiftmacro_18StressMonitorTests0028HighContrastTestsswift_IxAFhfMX117_8_6expectfMf_.swift:1:52: warning: main actor-isolated conformance of 'HighContrastButtonModifier.ButtonStyle' to 'Equatable' cannot be used in nonisolated context; this is an error in the Swift 6 language mode
+Testing.__checkBinaryOperation(modifier.style,{ $0 == $1() },.secondary,expression: .__fromBinaryOperation(.__fromSyntaxNode("modifier.style"),"==",.__fromSyntaxNode(".secondary")),comments: [],isRequired: false,sourceLocation: Testing.SourceLocation.__here()).__expected()
+                                                   ^
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/HighContrastTests.swift:118:9: note: in expansion of macro 'expect' here
+        #expect(modifier.style == .secondary)
+        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/HighContrastTests.swift:118:9: note: in expansion of macro 'expect' here
+        #expect(modifier.style == .secondary)
+        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+@__swiftmacro_18StressMonitorTests0028HighContrastTestsswift_IxAFhfMX122_8_6expectfMf_.swift:1:52: warning: main actor-isolated conformance of 'HighContrastButtonModifier.ButtonStyle' to 'Equatable' cannot be used in nonisolated context; this is an error in the Swift 6 language mode
+Testing.__checkBinaryOperation(modifier.style,{ $0 == $1() },.tertiary,expression: .__fromBinaryOperation(.__fromSyntaxNode("modifier.style"),"==",.__fromSyntaxNode(".tertiary")),comments: [],isRequired: false,sourceLocation: Testing.SourceLocation.__here()).__expected()
+                                                   ^
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/HighContrastTests.swift:123:9: note: in expansion of macro 'expect' here
+        #expect(modifier.style == .tertiary)
+        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/HighContrastTests.swift:123:9: note: in expansion of macro 'expect' here
+        #expect(modifier.style == .tertiary)
+        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+@__swiftmacro_18StressMonitorTests0028HighContrastTestsswift_IxAFhfMX127_8_6expectfMf_.swift:1:52: warning: main actor-isolated conformance of 'HighContrastButtonModifier.ButtonStyle' to 'Equatable' cannot be used in nonisolated context; this is an error in the Swift 6 language mode
+Testing.__checkBinaryOperation(modifier.style,{ $0 == $1() },.primary,expression: .__fromBinaryOperation(.__fromSyntaxNode("modifier.style"),"==",.__fromSyntaxNode(".primary")),comments: [],isRequired: false,sourceLocation: Testing.SourceLocation.__here()).__expected()
+                                                   ^
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/HighContrastTests.swift:128:9: note: in expansion of macro 'expect' here
+        #expect(modifier.style == .primary)
+        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/HighContrastTests.swift:128:9: note: in expansion of macro 'expect' here
+        #expect(modifier.style == .primary)
+        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+@__swiftmacro_18StressMonitorTests0028HighContrastTestsswift_IxAFhfMX112_8_6expectfMf_.swift:1:52: warning: main actor-isolated conformance of 'HighContrastButtonModifier.ButtonStyle' to 'Equatable' cannot be used in nonisolated context; this is an error in the Swift 6 language mode
+Testing.__checkBinaryOperation(modifier.style,{ $0 == $1() },.primary,expression: .__fromBinaryOperation(.__fromSyntaxNode("modifier.style"),"==",.__fromSyntaxNode(".primary")),comments: [],isRequired: false,sourceLocation: Testing.SourceLocation.__here()).__expected()
+                                                   ^
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/HighContrastTests.swift:113:9: note: in expansion of macro 'expect' here
+        #expect(modifier.style == .primary)
+        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/HighContrastTests.swift:113:9: note: in expansion of macro 'expect' here
+        #expect(modifier.style == .primary)
+        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+@__swiftmacro_18StressMonitorTests0028HighContrastTestsswift_IxAFhfMX117_8_6expectfMf_.swift:1:52: warning: main actor-isolated conformance of 'HighContrastButtonModifier.ButtonStyle' to 'Equatable' cannot be used in nonisolated context; this is an error in the Swift 6 language mode
+Testing.__checkBinaryOperation(modifier.style,{ $0 == $1() },.secondary,expression: .__fromBinaryOperation(.__fromSyntaxNode("modifier.style"),"==",.__fromSyntaxNode(".secondary")),comments: [],isRequired: false,sourceLocation: Testing.SourceLocation.__here()).__expected()
+                                                   ^
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/HighContrastTests.swift:118:9: note: in expansion of macro 'expect' here
+        #expect(modifier.style == .secondary)
+        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/HighContrastTests.swift:118:9: note: in expansion of macro 'expect' here
+        #expect(modifier.style == .secondary)
+        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+@__swiftmacro_18StressMonitorTests0028HighContrastTestsswift_IxAFhfMX122_8_6expectfMf_.swift:1:52: warning: main actor-isolated conformance of 'HighContrastButtonModifier.ButtonStyle' to 'Equatable' cannot be used in nonisolated context; this is an error in the Swift 6 language mode
+Testing.__checkBinaryOperation(modifier.style,{ $0 == $1() },.tertiary,expression: .__fromBinaryOperation(.__fromSyntaxNode("modifier.style"),"==",.__fromSyntaxNode(".tertiary")),comments: [],isRequired: false,sourceLocation: Testing.SourceLocation.__here()).__expected()
+                                                   ^
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/HighContrastTests.swift:123:9: note: in expansion of macro 'expect' here
+        #expect(modifier.style == .tertiary)
+        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/HighContrastTests.swift:123:9: note: in expansion of macro 'expect' here
+        #expect(modifier.style == .tertiary)
+        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+@__swiftmacro_18StressMonitorTests0028HighContrastTestsswift_IxAFhfMX127_8_6expectfMf_.swift:1:52: warning: main actor-isolated conformance of 'HighContrastButtonModifier.ButtonStyle' to 'Equatable' cannot be used in nonisolated context; this is an error in the Swift 6 language mode
+Testing.__checkBinaryOperation(modifier.style,{ $0 == $1() },.primary,expression: .__fromBinaryOperation(.__fromSyntaxNode("modifier.style"),"==",.__fromSyntaxNode(".primary")),comments: [],isRequired: false,sourceLocation: Testing.SourceLocation.__here()).__expected()
+                                                   ^
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/HighContrastTests.swift:128:9: note: in expansion of macro 'expect' here
+        #expect(modifier.style == .primary)
+        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/HighContrastTests.swift:128:9: note: in expansion of macro 'expect' here
+        #expect(modifier.style == .primary)
+        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/PatternOverlayTests.swift:48:29: warning: comparing non-optional value of type 'StressPattern' to 'nil' always returns true
+            #expect(pattern != nil, "Category \(category) should have a pattern")
+                    ~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/PatternOverlayTests.swift:65:28: warning: comparing non-optional value of type 'AnyShapeStyle' to 'nil' always returns true
+        #expect(shapeStyle != nil, "Solid pattern should have a shape style")
+                ~~~~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/PatternOverlayTests.swift:70:28: warning: comparing non-optional value of type 'AnyShapeStyle' to 'nil' always returns true
+        #expect(shapeStyle != nil, "Diagonal pattern should have a shape style")
+                ~~~~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/PatternOverlayTests.swift:75:28: warning: comparing non-optional value of type 'AnyShapeStyle' to 'nil' always returns true
+        #expect(shapeStyle != nil, "Dots pattern should have a shape style")
+                ~~~~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/PatternOverlayTests.swift:80:28: warning: comparing non-optional value of type 'AnyShapeStyle' to 'nil' always returns true
+        #expect(shapeStyle != nil, "Crosshatch pattern should have a shape style")
+                ~~~~~~~~~~ ^  ~~~
+@__swiftmacro_18StressMonitorTests0028HighContrastTestsswift_IxAFhfMX112_8_6expectfMf_.swift:1:52: warning: main actor-isolated conformance of 'HighContrastButtonModifier.ButtonStyle' to 'Equatable' cannot be used in nonisolated context; this is an error in the Swift 6 language mode
+Testing.__checkBinaryOperation(modifier.style,{ $0 == $1() },.primary,expression: .__fromBinaryOperation(.__fromSyntaxNode("modifier.style"),"==",.__fromSyntaxNode(".primary")),comments: [],isRequired: false,sourceLocation: Testing.SourceLocation.__here()).__expected()
+                                                   ^
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/HighContrastTests.swift:113:9: note: in expansion of macro 'expect' here
+        #expect(modifier.style == .primary)
+        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/HighContrastTests.swift:113:9: note: in expansion of macro 'expect' here
+        #expect(modifier.style == .primary)
+        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+@__swiftmacro_18StressMonitorTests0028HighContrastTestsswift_IxAFhfMX117_8_6expectfMf_.swift:1:52: warning: main actor-isolated conformance of 'HighContrastButtonModifier.ButtonStyle' to 'Equatable' cannot be used in nonisolated context; this is an error in the Swift 6 language mode
+Testing.__checkBinaryOperation(modifier.style,{ $0 == $1() },.secondary,expression: .__fromBinaryOperation(.__fromSyntaxNode("modifier.style"),"==",.__fromSyntaxNode(".secondary")),comments: [],isRequired: false,sourceLocation: Testing.SourceLocation.__here()).__expected()
+                                                   ^
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/HighContrastTests.swift:118:9: note: in expansion of macro 'expect' here
+        #expect(modifier.style == .secondary)
+        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/HighContrastTests.swift:118:9: note: in expansion of macro 'expect' here
+        #expect(modifier.style == .secondary)
+        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+@__swiftmacro_18StressMonitorTests0028HighContrastTestsswift_IxAFhfMX122_8_6expectfMf_.swift:1:52: warning: main actor-isolated conformance of 'HighContrastButtonModifier.ButtonStyle' to 'Equatable' cannot be used in nonisolated context; this is an error in the Swift 6 language mode
+Testing.__checkBinaryOperation(modifier.style,{ $0 == $1() },.tertiary,expression: .__fromBinaryOperation(.__fromSyntaxNode("modifier.style"),"==",.__fromSyntaxNode(".tertiary")),comments: [],isRequired: false,sourceLocation: Testing.SourceLocation.__here()).__expected()
+                                                   ^
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/HighContrastTests.swift:123:9: note: in expansion of macro 'expect' here
+        #expect(modifier.style == .tertiary)
+        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/HighContrastTests.swift:123:9: note: in expansion of macro 'expect' here
+        #expect(modifier.style == .tertiary)
+        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+@__swiftmacro_18StressMonitorTests0028HighContrastTestsswift_IxAFhfMX127_8_6expectfMf_.swift:1:52: warning: main actor-isolated conformance of 'HighContrastButtonModifier.ButtonStyle' to 'Equatable' cannot be used in nonisolated context; this is an error in the Swift 6 language mode
+Testing.__checkBinaryOperation(modifier.style,{ $0 == $1() },.primary,expression: .__fromBinaryOperation(.__fromSyntaxNode("modifier.style"),"==",.__fromSyntaxNode(".primary")),comments: [],isRequired: false,sourceLocation: Testing.SourceLocation.__here()).__expected()
+                                                   ^
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/HighContrastTests.swift:128:9: note: in expansion of macro 'expect' here
+        #expect(modifier.style == .primary)
+        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Utilities/HighContrastTests.swift:128:9: note: in expansion of macro 'expect' here
+        #expect(modifier.style == .primary)
+        ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Mocks/MockCloudKitManager.swift:8:7: warning: non-final class 'MockCloudKitManager' cannot conform to 'Sendable'; use '@unchecked Sendable'; this is an error in the Swift 6 language mode
+class MockCloudKitManager: CloudKitServiceProtocol {
+      ^
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Mocks/MockCloudKitManager.swift:12:17: warning: stored property 'storedMeasurements' of 'Sendable'-conforming class 'MockCloudKitManager' is mutable; this is an error in the Swift 6 language mode
+    private var storedMeasurements: [CloudKitStressMeasurement] = []
+                ^
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Mocks/MockCloudKitManager.swift:55:30: warning: expression is 'async' but is not marked with 'await'; this is an error in the Swift 6 language mode
+        record["deviceID"] = UIDevice.current.identifierForVendor?.uuidString ?? "test-device"
+                             ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                             await 
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Mocks/MockCloudKitManager.swift:55:30: note: property access is 'async'
+        record["deviceID"] = UIDevice.current.identifierForVendor?.uuidString ?? "test-device"
+                             ^
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Mocks/MockCloudKitManager.swift:55:30: note: property access is 'async'
+        record["deviceID"] = UIDevice.current.identifierForVendor?.uuidString ?? "test-device"
+                             ^
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Mocks/MockCloudKitManager.swift:58:35: warning: main actor-isolated initializer 'init(record:)' cannot be called from outside of the actor; this is an error in the Swift 6 language mode
+        guard let ckMeasurement = CloudKitStressMeasurement(record: record) else {
+                                  ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+                                  await 
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Mocks/MockCloudKitManager.swift:82:36: warning: main actor-isolated property 'timestamp' can not be referenced from a nonisolated context
+                return measurement.timestamp >= since
+                                   ^
+StressMonitor.CloudKitStressMeasurement.timestamp:2:25: note: property declared here
+@MainActor internal let timestamp: Date}
+                        ^
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Mocks/MockCloudKitManager.swift:93:42: warning: main actor-isolated property 'timestamp' can not be referenced from a nonisolated context
+                timestamp: ckMeasurement.timestamp,
+                                         ^
+StressMonitor.CloudKitStressMeasurement.timestamp:2:25: note: property declared here
+@MainActor internal let timestamp: Date}
+                        ^
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Mocks/MockCloudKitManager.swift:94:44: warning: main actor-isolated property 'stressLevel' can not be referenced from a nonisolated context
+                stressLevel: ckMeasurement.stressLevel,
+                                           ^
+StressMonitor.CloudKitStressMeasurement.stressLevel:2:25: note: property declared here
+@MainActor internal let stressLevel: Double}
+                        ^
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Mocks/MockCloudKitManager.swift:95:36: warning: main actor-isolated property 'hrv' can not be referenced from a nonisolated context
+                hrv: ckMeasurement.hrv,
+                                   ^
+StressMonitor.CloudKitStressMeasurement.hrv:2:25: note: property declared here
+@MainActor internal let hrv: Double}
+                        ^
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Mocks/MockCloudKitManager.swift:96:49: warning: main actor-isolated property 'restingHeartRate' can not be referenced from a nonisolated context
+                restingHeartRate: ckMeasurement.restingHeartRate,
+                                                ^
+StressMonitor.CloudKitStressMeasurement.restingHeartRate:2:25: note: property declared here
+@MainActor internal let restingHeartRate: Double}
+                        ^
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Mocks/MockCloudKitManager.swift:97:44: warning: main actor-isolated property 'confidences' can not be referenced from a nonisolated context
+                confidences: ckMeasurement.confidences
+                                           ^
+StressMonitor.CloudKitStressMeasurement.confidences:2:25: note: property declared here
+@MainActor internal let confidences: [Double]}
+                        ^
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Mocks/MockCloudKitManager.swift:80:24: warning: no 'async' operations occur within 'await' expression
+        let filtered = await storedMeasurements.filter { measurement in
+                       ^
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Models/StressBuddyMoodTests.swift:252:29: warning: comparing non-optional value of type 'UIColor' to 'nil' always returns true
+            #expect(uiColor != nil, "Mood '\(mood)' must have valid color")
+                    ~~~~~~~ ^  ~~~
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Components/StressCharacterCardTests.swift:225:13: warning: initialization of immutable value 'expectedValue' was never used; consider replacing with assignment to '_' or removing it
+        let expectedValue = "Stress level: 15"
+        ~~~~^~~~~~~~~~~~~
+        _
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Components/StressCharacterCardTests.swift:225:13: warning: initialization of immutable value 'expectedValue' was never used; consider replacing with assignment to '_' or removing it
+        let expectedValue = "Stress level: 15"
+        ~~~~^~~~~~~~~~~~~
+        _
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/Components/StressCharacterCardTests.swift:225:13: warning: initialization of immutable value 'expectedValue' was never used; consider replacing with assignment to '_' or removing it
+        let expectedValue = "Stress level: 15"
+        ~~~~^~~~~~~~~~~~~
+        _
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/StressViewModelTests.swift:145:9: warning: stored property 'hrvToReturn' of 'Sendable'-conforming class 'MockHealthKitService' is mutable; this is an error in the Swift 6 language mode
+    var hrvToReturn: HRVMeasurement?
+        ^
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/StressViewModelTests.swift:169:9: warning: stored property 'stressToReturn' of 'Sendable'-conforming class 'MockStressAlgorithmService' is mutable; this is an error in the Swift 6 language mode
+    var stressToReturn: StressResult?
+        ^
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/StressViewModelTests.swift:181:9: warning: stored property 'measurementsToReturn' of 'Sendable'-conforming class 'MockStressViewModelRepository' is mutable; this is an error in the Swift 6 language mode
+    var measurementsToReturn: [StressMeasurement] = []
+        ^
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/BaselineCalculatorTests.swift:17:13: warning: call to main actor-isolated initializer 'init(value:timestamp:)' in a synchronous nonisolated context
+            HRVMeasurement(value: Double.random(in: 40...60))
+            ^
+StressMonitor.HRVMeasurement.init:2:21: note: calls to initializer 'init(value:timestamp:)' from outside of its actor context are implicitly asynchronous
+@MainActor internal init(value: Double, timestamp: Date = Date())}
+                    ^
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/BaselineCalculatorTests.swift:22:39: warning: main actor-isolated property 'baselineHRV' can not be referenced from a nonisolated autoclosure
+        XCTAssertGreaterThan(baseline.baselineHRV, 0)
+                                      ^
+StressMonitor.PersonalBaseline.baselineHRV:2:25: note: property declared here
+@MainActor internal var baselineHRV: Double}
+                        ^
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/BaselineCalculatorTests.swift:23:33: warning: main actor-isolated property 'restingHeartRate' can not be referenced from a nonisolated autoclosure
+        XCTAssertEqual(baseline.restingHeartRate, 60)
+                                ^
+StressMonitor.PersonalBaseline.restingHeartRate:2:25: note: property declared here
+@MainActor internal var restingHeartRate: Double}
+                        ^
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/BaselineCalculatorTests.swift:28:13: warning: call to main actor-isolated initializer 'init(value:timestamp:)' in a synchronous nonisolated context
+            HRVMeasurement(value: 50)
+            ^
+StressMonitor.HRVMeasurement.init:2:21: note: calls to initializer 'init(value:timestamp:)' from outside of its actor context are implicitly asynchronous
+@MainActor internal init(value: Double, timestamp: Date = Date())}
+                    ^
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/BaselineCalculatorTests.swift:43:13: warning: call to main actor-isolated initializer 'init(value:timestamp:)' in a synchronous nonisolated context
+            HRVMeasurement(value: Double.random(in: 40...60))
+            ^
+StressMonitor.HRVMeasurement.init:2:21: note: calls to initializer 'init(value:timestamp:)' from outside of its actor context are implicitly asynchronous
+@MainActor internal init(value: Double, timestamp: Date = Date())}
+                    ^
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/BaselineCalculatorTests.swift:51:39: warning: main actor-isolated property 'baselineHRV' can not be referenced from a nonisolated autoclosure
+        XCTAssertGreaterThan(baseline.baselineHRV, 40)
+                                      ^
+StressMonitor.PersonalBaseline.baselineHRV:2:25: note: property declared here
+@MainActor internal var baselineHRV: Double}
+                        ^
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/BaselineCalculatorTests.swift:52:36: warning: main actor-isolated property 'baselineHRV' can not be referenced from a nonisolated autoclosure
+        XCTAssertLessThan(baseline.baselineHRV, 60)
+                                   ^
+StressMonitor.PersonalBaseline.baselineHRV:2:25: note: property declared here
+@MainActor internal var baselineHRV: Double}
+                        ^
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/BaselineCalculatorTests.swift:46:29: warning: main actor-isolated initializer 'init(value:timestamp:)' cannot be called from outside of the actor; this is an error in the Swift 6 language mode
+        measurements.append(HRVMeasurement(value: 200))
+        ~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~
+        await 
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/BaselineCalculatorTests.swift:47:29: warning: main actor-isolated initializer 'init(value:timestamp:)' cannot be called from outside of the actor; this is an error in the Swift 6 language mode
+        measurements.append(HRVMeasurement(value: 5))
+        ~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~
+        await 
+/Users/ddphuong/Projects/next-labs/ios-stress-app/StressMonitor/StressMonitorTests/OnboardingHealthSyncViewModelTests.swift:65:9: warning: stored property 'shouldSucceed' of 'Sendable'-conforming class 'MockOnboardingHealthKitService' is mutable; this is an error in the Swift 6 language mode
+    var shouldSucceed = true
+        ^
+Testing started
+Test suite 'StressMonitorUITestsLaunchTests' started on 'Clone 1 of iPhone 17 Pro - StressMonitorUITests-Runner (15665)'
+Test case 'StressMonitorUITestsLaunchTests.testLaunch()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitorUITests-Runner (15665)' (13.649 seconds)
+Test case 'StressMonitorUITestsLaunchTests.testLaunch()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitorUITests-Runner (15665)' (6.742 seconds)
+Test case 'StressMonitorUITestsLaunchTests.testLaunch()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitorUITests-Runner (15665)' (7.592 seconds)
+Test case 'StressMonitorUITestsLaunchTests.testLaunch()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitorUITests-Runner (15665)' (8.051 seconds)
+Test suite 'StressMonitorUITests' started on 'Clone 1 of iPhone 17 Pro - StressMonitorUITests-Runner (15665)'
+Test case 'StressMonitorUITests.testExample()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitorUITests-Runner (15665)' (4.700 seconds)
+Test case 'StressMonitorUITests.testLaunchPerformance()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitorUITests-Runner (15665)' (70.862 seconds)
+Test suite 'OnboardingBaselineCalibrationViewModelTests' started on 'Clone 2 of iPhone 17 Pro - StressMonitor (16658)'
+Test case 'OnboardingBaselineCalibrationViewModelTests.testCalibrationPhases()' passed on 'Clone 2 of iPhone 17 Pro - StressMonitor (16658)' (0.002 seconds)
+Test case 'OnboardingBaselineCalibrationViewModelTests.testCompleteCalibration()' passed on 'Clone 2 of iPhone 17 Pro - StressMonitor (16658)' (0.001 seconds)
+Test case 'OnboardingBaselineCalibrationViewModelTests.testInitialState()' passed on 'Clone 2 of iPhone 17 Pro - StressMonitor (16658)' (0.000 seconds)
+Test case 'OnboardingBaselineCalibrationViewModelTests.testPersistCalibrationState()' passed on 'Clone 2 of iPhone 17 Pro - StressMonitor (16658)' (0.002 seconds)
+Test case 'OnboardingBaselineCalibrationViewModelTests.testRecordDailyMeasurement()' passed on 'Clone 2 of iPhone 17 Pro - StressMonitor (16658)' (0.033 seconds)
+Test case 'OnboardingBaselineCalibrationViewModelTests.testRecordFinalDayMeasurement()' passed on 'Clone 2 of iPhone 17 Pro - StressMonitor (16658)' (0.002 seconds)
+Test case 'OnboardingBaselineCalibrationViewModelTests.testStartCalibration()' passed on 'Clone 2 of iPhone 17 Pro - StressMonitor (16658)' (0.002 seconds)
+Test suite 'BaselineCalculatorTests' started on 'Clone 2 of iPhone 17 Pro - StressMonitor (16658)'
+Test case 'BaselineCalculatorTests.testCalculateBaselineFiltersOutliers()' passed on 'Clone 2 of iPhone 17 Pro - StressMonitor (16658)' (0.044 seconds)
+Test case 'BaselineCalculatorTests.testCalculateBaselineWithInsufficientSamples()' passed on 'Clone 2 of iPhone 17 Pro - StressMonitor (16658)' (0.002 seconds)
+Test case 'BaselineCalculatorTests.testCalculateBaselineWithValidSamples()' passed on 'Clone 2 of iPhone 17 Pro - StressMonitor (16658)' (0.001 seconds)
+Test case 'BaselineCalculatorTests.testCalculateRestingHeartRate()' passed on 'Clone 2 of iPhone 17 Pro - StressMonitor (16658)' (0.001 seconds)
+Test case 'BaselineCalculatorTests.testCalculateRestingHeartRateWithFewSamples()' passed on 'Clone 2 of iPhone 17 Pro - StressMonitor (16658)' (0.000 seconds)
+Test case 'BaselineCalculatorTests.testFilterOutliers()' passed on 'Clone 2 of iPhone 17 Pro - StressMonitor (16658)' (0.001 seconds)
+Test case 'BaselineCalculatorTests.testFilterOutliersWithSmallDataset()' passed on 'Clone 2 of iPhone 17 Pro - StressMonitor (16658)' (0.000 seconds)
+Test case 'BaselineCalculatorTests.testShouldNotUpdateBaselineRecentlyUpdated()' passed on 'Clone 2 of iPhone 17 Pro - StressMonitor (16658)' (0.000 seconds)
+Test case 'BaselineCalculatorTests.testShouldUpdateBaselineAfterWeek()' passed on 'Clone 2 of iPhone 17 Pro - StressMonitor (16658)' (0.000 seconds)
+Test case 'BaselineCalculatorTests.testShouldUpdateBaselineWithManyNewSamples()' passed on 'Clone 2 of iPhone 17 Pro - StressMonitor (16658)' (0.000 seconds)
+Test suite 'OnboardingWelcomeViewModelTests' started on 'Clone 2 of iPhone 17 Pro - StressMonitor (16658)'
+Test case 'OnboardingWelcomeViewModelTests.testAnimationState()' passed on 'Clone 2 of iPhone 17 Pro - StressMonitor (16658)' (0.001 seconds)
+Test case 'OnboardingWelcomeViewModelTests.testHandleGetStarted()' passed on 'Clone 2 of iPhone 17 Pro - StressMonitor (16658)' (0.008 seconds)
+Test case 'OnboardingWelcomeViewModelTests.testHandleSignIn()' passed on 'Clone 2 of iPhone 17 Pro - StressMonitor (16658)' (0.000 seconds)
+Test case 'OnboardingWelcomeViewModelTests.testInitialState()' passed on 'Clone 2 of iPhone 17 Pro - StressMonitor (16658)' (0.000 seconds)
+Test suite 'StressCalculatorTests' started on 'Clone 2 of iPhone 17 Pro - StressMonitor (16658)'
+Test case 'StressCalculatorTests.testCategoryBoundary_MildToModerate()' passed on 'Clone 2 of iPhone 17 Pro - StressMonitor (16658)' (0.001 seconds)
+Test case 'StressCalculatorTests.testCategoryBoundary_ModerateToHigh()' passed on 'Clone 2 of iPhone 17 Pro - StressMonitor (16658)' (0.001 seconds)
+Test case 'StressCalculatorTests.testCategoryBoundary_RelaxedToMild()' passed on 'Clone 2 of iPhone 17 Pro - StressMonitor (16658)' (0.001 seconds)
+Test case 'StressCalculatorTests.testConcurrentCalculations()' passed on 'Clone 2 of iPhone 17 Pro - StressMonitor (16658)' (0.001 seconds)
+Test case 'StressCalculatorTests.testConfidence_HighHeartRate()' passed on 'Clone 2 of iPhone 17 Pro - StressMonitor (16658)' (0.101 seconds)
+Test case 'StressCalculatorTests.testConfidence_LowHeartRate()' passed on 'Clone 2 of iPhone 17 Pro - StressMonitor (16658)' (0.001 seconds)
+Test case 'StressCalculatorTests.testConfidence_LowHRV()' passed on 'Clone 2 of iPhone 17 Pro - StressMonitor (16658)' (0.001 seconds)
+Test case 'StressCalculatorTests.testConfidence_MultipleReductions()' passed on 'Clone 2 of iPhone 17 Pro - StressMonitor (16658)' (0.001 seconds)
+Test case 'StressCalculatorTests.testConfidence_NormalReading()' passed on 'Clone 2 of iPhone 17 Pro - StressMonitor (16658)' (0.001 seconds)
+Test case 'StressCalculatorTests.testConfidence_SampleCount()' passed on 'Clone 2 of iPhone 17 Pro - StressMonitor (16658)' (0.001 seconds)
+Test case 'StressCalculatorTests.testCustomBaseline()' passed on 'Clone 2 of iPhone 17 Pro - StressMonitor (16658)' (0.001 seconds)
+Test case 'StressCalculatorTests.testExtremeValues()' passed on 'Clone 2 of iPhone 17 Pro - StressMonitor (16658)' (0.001 seconds)
+Test case 'StressCalculatorTests.testHighStressElevatedHeartRate()' passed on 'Clone 2 of iPhone 17 Pro - StressMonitor (16658)' (0.001 seconds)
+Test case 'StressCalculatorTests.testHighStressLowHRV()' passed on 'Clone 2 of iPhone 17 Pro - StressMonitor (16658)' (0.001 seconds)
+Test case 'StressCalculatorTests.testHRComponentWeight()' passed on 'Clone 2 of iPhone 17 Pro - StressMonitor (16658)' (0.001 seconds)
+Test case 'StressCalculatorTests.testHRVComponentWeight()' passed on 'Clone 2 of iPhone 17 Pro - StressMonitor (16658)' (0.001 seconds)
+Test case 'StressCalculatorTests.testNegativeValues()' passed on 'Clone 2 of iPhone 17 Pro - StressMonitor (16658)' (0.001 seconds)
+Test case 'StressCalculatorTests.testNormalStress()' passed on 'Clone 2 of iPhone 17 Pro - StressMonitor (16658)' (0.001 seconds)
+Test case 'StressCalculatorTests.testSevereStress()' passed on 'Clone 2 of iPhone 17 Pro - StressMonitor (16658)' (0.001 seconds)
+Test case 'StressCalculatorTests.testTimestamp()' passed on 'Clone 2 of iPhone 17 Pro - StressMonitor (16658)' (0.001 seconds)
+Test case 'StressCalculatorTests.testZeroHeartRate()' passed on 'Clone 2 of iPhone 17 Pro - StressMonitor (16658)' (0.001 seconds)
+Test case 'StressCalculatorTests.testZeroHRV()' passed on 'Clone 2 of iPhone 17 Pro - StressMonitor (16658)' (0.005 seconds)
+Test suite 'OnboardingSuccessViewModelTests' started on 'Clone 2 of iPhone 17 Pro - StressMonitor (16658)'
+Test case 'OnboardingSuccessViewModelTests.testCompleteOnboarding()' passed on 'Clone 2 of iPhone 17 Pro - StressMonitor (16658)' (0.002 seconds)
+Test case 'OnboardingSuccessViewModelTests.testCompleteOnboardingPersists()' passed on 'Clone 2 of iPhone 17 Pro - StressMonitor (16658)' (0.001 seconds)
+Test case 'OnboardingSuccessViewModelTests.testInitialState()' passed on 'Clone 2 of iPhone 17 Pro - StressMonitor (16658)' (0.000 seconds)
+Test case 'OnboardingSuccessViewModelTests.testLoadBaseline()' passed on 'Clone 2 of iPhone 17 Pro - StressMonitor (16658)' (0.125 seconds)
+Test suite 'HealthKitErrorViewModelTests' started on 'Clone 2 of iPhone 17 Pro - StressMonitor (16658)'
+Test case 'HealthKitErrorViewModelTests.testDismissToWelcome()' passed on 'Clone 2 of iPhone 17 Pro - StressMonitor (16658)' (0.000 seconds)
+Test case 'HealthKitErrorViewModelTests.testOpenSettingsURL()' passed on 'Clone 2 of iPhone 17 Pro - StressMonitor (16658)' (0.028 seconds)
+Test suite 'BreathingExerciseViewTests' started on 'Clone 2 of iPhone 17 Pro - StressMonitor (16658)'
+Test case 'BreathingExerciseViewTests.testBreathingPhaseColors()' passed on 'Clone 2 of iPhone 17 Pro - StressMonitor (16658)' (0.001 seconds)
+Test case 'BreathingExerciseViewTests.testBreathingPhaseDisplayText()' passed on 'Clone 2 of iPhone 17 Pro - StressMonitor (16658)' (0.001 seconds)
+Test case 'BreathingExerciseViewTests.testBreathingPhaseDurations()' passed on 'Clone 2 of iPhone 17 Pro - StressMonitor (16658)' (0.001 seconds)
+Test case 'BreathingExerciseViewTests.testBreathingPhaseIcons()' passed on 'Clone 2 of iPhone 17 Pro - StressMonitor (16658)' (0.000 seconds)
+Test case 'BreathingExerciseViewTests.testBreathingPhaseInstructions()' passed on 'Clone 2 of iPhone 17 Pro - StressMonitor (16658)' (0.000 seconds)
+Test case 'BreathingExerciseViewTests.testCycleCompletion()' passed on 'Clone 2 of iPhone 17 Pro - StressMonitor (16658)' (0.019 seconds)
+Test case 'BreathingExerciseViewTests.testReduceMotionAnimatedCircle()' passed on 'Clone 2 of iPhone 17 Pro - StressMonitor (16658)' (0.009 seconds)
+Test case 'BreathingExerciseViewTests.testReduceMotionStaticCircle()' passed on 'Clone 2 of iPhone 17 Pro - StressMonitor (16658)' (0.001 seconds)
+Test case 'BreathingExerciseViewTests.testSingleCycleDuration()' passed on 'Clone 2 of iPhone 17 Pro - StressMonitor (16658)' (0.000 seconds)
+Test suite 'HapticManagerTests' started on 'Clone 2 of iPhone 17 Pro - StressMonitor (16658)'
+Test case 'HapticManagerTests.testBreathingCueHaptic()' passed on 'Clone 2 of iPhone 17 Pro - StressMonitor (16658)' (0.006 seconds)
+Test case 'HapticManagerTests.testBreathingCueIntensity()' passed on 'Clone 2 of iPhone 17 Pro - StressMonitor (16658)' (0.000 seconds)
+Test case 'HapticManagerTests.testBreathingCuePattern()' passed on 'Clone 2 of iPhone 17 Pro - StressMonitor (16658)' (0.000 seconds)
+Test case 'HapticManagerTests.testButtonPressHaptic()' passed on 'Clone 2 of iPhone 17 Pro - StressMonitor (16658)' (0.001 seconds)
+Test case 'HapticManagerTests.testConcurrentHapticCalls()' passed on 'Clone 2 of iPhone 17 Pro - StressMonitor (16658)' (0.003 seconds)
+Test case 'HapticManagerTests.testErrorHaptic()' passed on 'Clone 2 of iPhone 17 Pro - StressMonitor (16658)' (0.000 seconds)
+Test case 'HapticManagerTests.testGracefulFallbackWhenHapticsUnavailable()' passed on 'Clone 2 of iPhone 17 Pro - StressMonitor (16658)' (0.000 seconds)
+Test case 'HapticManagerTests.testHapticEngineInitialization()' passed on 'Clone 2 of iPhone 17 Pro - StressMonitor (16658)' (0.021 seconds)
+Test case 'HapticManagerTests.testHardwareCapabilitiesDetection()' passed on 'Clone 2 of iPhone 17 Pro - StressMonitor (16658)' (0.003 seconds)
+Test case 'HapticManagerTests.testSharedInstance()' passed on 'Clone 2 of iPhone 17 Pro - StressMonitor (16658)' (0.000 seconds)
+Test case 'HapticManagerTests.testStressBuddyMoodChangeHaptic()' passed on 'Clone 2 of iPhone 17 Pro - StressMonitor (16658)' (0.000 seconds)
+Test case 'HapticManagerTests.testStressLevelChangedToHigh()' passed on 'Clone 2 of iPhone 17 Pro - StressMonitor (16658)' (0.000 seconds)
+Test case 'HapticManagerTests.testStressLevelChangedToMild()' passed on 'Clone 2 of iPhone 17 Pro - StressMonitor (16658)' (0.001 seconds)
+Test case 'HapticManagerTests.testStressLevelChangedToModerate()' passed on 'Clone 2 of iPhone 17 Pro - StressMonitor (16658)' (0.001 seconds)
+Test case 'HapticManagerTests.testStressLevelChangedToRelaxed()' passed on 'Clone 2 of iPhone 17 Pro - StressMonitor (16658)' (0.001 seconds)
+Test case 'HapticManagerTests.testSuccessHaptic()' passed on 'Clone 2 of iPhone 17 Pro - StressMonitor (16658)' (0.000 seconds)
+Test case 'HapticManagerTests.testWarningHaptic()' passed on 'Clone 2 of iPhone 17 Pro - StressMonitor (16658)' (0.000 seconds)
+Test suite 'OnboardingHealthSyncViewModelTests' started on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)'
+Test case 'OnboardingHealthSyncViewModelTests.testFailedAuthorization()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.014 seconds)
+Test case 'OnboardingHealthSyncViewModelTests.testInitialState()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'OnboardingHealthSyncViewModelTests.testLoadingStateClearedAfterAuthorization()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.087 seconds)
+Test case 'OnboardingHealthSyncViewModelTests.testSuccessfulAuthorization()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.001 seconds)
+Test suite 'StressViewModelTests' started on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)'
+Test case 'StressViewModelTests.testCalculateAndSaveStress()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.161 seconds)
+Test case 'StressViewModelTests.testClearError()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'StressViewModelTests.testLoadBaseline()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.001 seconds)
+Test case 'StressViewModelTests.testLoadCurrentStressNoHRVData()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.001 seconds)
+Test case 'StressViewModelTests.testLoadCurrentStressSetsLoadingState()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.001 seconds)
+Test case 'StressViewModelTests.testLoadCurrentStressSuccess()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.059 seconds)
+Test case 'StressViewModelTests.testLoadHistoricalData()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.001 seconds)
+Test suite 'StressRepositoryTests' started on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)'
+Test case 'StressRepositoryTests.testDeleteOlderThan()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.167 seconds)
+Test case 'StressRepositoryTests.testFetchAll()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.007 seconds)
+Test case 'StressRepositoryTests.testFetchRecentOrdersByTimestampDescending()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.005 seconds)
+Test case 'StressRepositoryTests.testFetchRecentReturnsEmpty()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.002 seconds)
+Test case 'StressRepositoryTests.testFetchRecentWithLimit()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.005 seconds)
+Test case 'StressRepositoryTests.testGetBaselineCachesResult()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.004 seconds)
+Test case 'StressRepositoryTests.testGetBaselineWithNoData()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.002 seconds)
+Test case 'StressRepositoryTests.testSaveMeasurement()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.003 seconds)
+Test case 'StressRepositoryTests.testUpdateBaseline()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.002 seconds)
+Test suite 'HealthKitManagerTests' started on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)'
+Test suite 'FontWellnessTypeTests' started on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)'
+Test suite 'AccessibilityLabelsTests' started on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)'
+Test suite 'ReduceMotionModifierIntegrationTests' started on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)'
+Test suite 'StressMonitorTests' started on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)'
+Test suite 'ColorBlindnessSimulatorIntegrationTests' started on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)'
+Test suite 'StressCharacterCardTests' started on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)'
+Test suite 'DynamicTypeScalingTests' started on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)'
+Test suite 'CharacterAnimationModifierTests' started on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)'
+Test suite 'PatternGeometryTests' started on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)'
+Test suite 'HighContrastLayoutTests' started on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)'
+Test suite 'GradientColorMappingTests' started on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)'
+Test suite 'GradientCornerRadiusTests' started on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)'
+Test suite 'StressBuddyMoodTests' started on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)'
+Test suite 'VoiceOverExperienceTests' started on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)'
+Test suite 'PatternOverlayTests' started on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)'
+Test suite 'ColorBlindnessSimulatorTests' started on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)'
+Test suite 'DynamicTypeEnvironmentTests' started on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)'
+Test suite 'AccessoryAnimationModifierTests' started on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)'
+Test suite 'HighContrastEnvironmentTests' started on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)'
+Test suite 'AccessibilityAuditTests' started on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)'
+Test suite 'FontSizeTests' started on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)'
+Test suite 'AnimationWellnessTests' started on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)'
+Test suite 'GradientsTests' started on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)'
+Test suite 'HighContrastTests' started on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)'
+Test case 'DynamicTypeScalingTests/testLimitedDynamicTypeViewExtension()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'DynamicTypeScalingTests/testVariousMinimumScales()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'DynamicTypeScalingTests/testAccessibleDynamicTypeViewExtension()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'DynamicTypeScalingTests/testTextRemainReadableAtMinimumScale()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'DynamicTypeScalingTests/testMinimumScaleFactorApplied()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'DynamicTypeScalingTests/testScalableTextViewExtension()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'DynamicTypeScalingTests/testAdaptiveTextWithAllDesigns()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'DynamicTypeScalingTests/testMultipleDynamicTypeModifiers()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'DynamicTypeScalingTests/testAdaptiveTextWithAllWeights()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'DynamicTypeScalingTests/testVerySmallBaseSize()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'DynamicTypeScalingTests/testDynamicTypeScalingModifierCreates()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'DynamicTypeScalingTests/testAccessibleDynamicTypeModifierCreates()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'GradientColorMappingTests/testStressSpectrumUsesCorrectBaseColor()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'DynamicTypeScalingTests/testScalingAtXSmall()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'GradientColorMappingTests/testBackgroundTintUsesCorrectBaseColor()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'DynamicTypeScalingTests/testScalingAtMedium()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'DynamicTypeScalingTests/testScalingAtAccessibility5()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'DynamicTypeScalingTests/testAccessibleDynamicTypeWithCustomParameters()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'DynamicTypeScalingTests/testAdaptiveTextSizeModifierCreates()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'DynamicTypeScalingTests/testLimitedDynamicTypeMaxIsAccessibility3()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'DynamicTypeScalingTests/testAdaptiveTextSizeWithWeight()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'DynamicTypeScalingTests/testLineWrappingPreventsTruncation()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'DynamicTypeScalingTests/testAdaptiveTextSizeWithAllParameters()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'DynamicTypeScalingTests/testAllDynamicTypeSizes()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'DynamicTypeScalingTests/testDynamicTypeScalingWithCustomScale()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'DynamicTypeScalingTests/testTextScalesUpForAccessibility()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'DynamicTypeScalingTests/testScalableTextWithCustomMinimumScale()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'DynamicTypeScalingTests/testAdaptiveTextSizeViewExtension()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'DynamicTypeScalingTests/testLineWrappingEnabled()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'DynamicTypeScalingTests/testZeroMinimumScale()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'DynamicTypeScalingTests/testLimitedDynamicTypeModifierCreates()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'DynamicTypeScalingTests/testVeryLargeBaseSize()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'GradientCornerRadiusTests/testStressCardHasRoundedCorners()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'DynamicTypeScalingTests/testOneMinimumScale()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'DynamicTypeScalingTests/testDynamicTypeScalingWithDefaultScale()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'GradientCornerRadiusTests/testCornerRadiusConsistency()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'AccessibilityLabelsTests/testDashboardViewHasAccessibilityElements()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'DynamicTypeScalingTests/testScalableTextWithLongContent()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'StressBuddyMoodTests/testExtremelyHighStressLevel()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'StressBuddyMoodTests/testNegativeStressLevel()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'StressBuddyMoodTests/testAccessorySizeRelativeToMainSymbol()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'AccessibilityLabelsTests/testAccessibilityValueReflectsStressLevel()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'StressBuddyMoodTests/testMoodMappingBoundaries()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'StressBuddyMoodTests/testSymbolCalm()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'StressBuddyMoodTests/testMoodMappingWorried()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'StressBuddyMoodTests/testSizeContextsAreOrderedCorrectly()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'AccessibilityLabelsTests/testHistoryListHasAccessibilityLabel()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'PatternOverlayTests/testPatternOverlayModifierApplies()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'AccessibilityLabelsTests/testButtonHasButtonTrait()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'StressBuddyMoodTests/testDashboardSize()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'DynamicTypeScalingTests/testAdaptiveTextSizeWithDesign()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'StressBuddyMoodTests/testColorMappingOverwhelmed()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'StressBuddyMoodTests/testSymbolConcerned()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'AccessibilityLabelsTests/testMeasurementRowCombinesChildren()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'AccessibilityLabelsTests/testMeasurementRowHasAccessibilityHint()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'StressBuddyMoodTests/testDisplayNameFormatting()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'StressBuddyMoodTests/testWidgetSize()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'StressBuddyMoodTests/testAccessibilityDescriptionOverwhelmed()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'AccessibilityLabelsTests/testMeasurementCardAccessibility()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'AccessibilityLabelsTests/testImportantElementsHaveHigherPriority()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'StressBuddyMoodTests/testAllMoodsHaveNonEmptyAccessibilityDescriptions()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'PatternOverlayTests/testAllPatternsWithAllCategories()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'AccessibilityLabelsTests/testMeasurementRowHasAccessibilityLabel()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'StressBuddyMoodTests/testMoodMappingOverwhelmed()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'StressBuddyMoodTests/testWatchOSSize()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'StressBuddyMoodTests/testSymbolSleeping()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'AccessibilityLabelsTests/testStressRingViewHasAccessibilityHint()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'PatternOverlayTests/testDiagonalPatternOverlayCreates()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'StressBuddyMoodTests/testColorMappingCalm()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'StressBuddyMoodTests/testAccessoryOverwhelmedHasDropsAndStars()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'StressBuddyMoodTests/testAccessoryWorriedHasDrops()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'StressBuddyMoodTests/testAccessibilityDescriptionSleeping()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'PatternOverlayTests/testStressPatternViewExtension()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'StressBuddyMoodTests/testColorMappingWorried()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'AccessibilityLabelsTests/testStressRingViewHasAccessibilityLabel()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'PatternOverlayTests/testCrosshatchPatternOverlayCreates()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'PatternOverlayTests/testDiagonalPatternShapeStyle()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'StressBuddyMoodTests/testAllMoodsHaveValidColors()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'StressBuddyMoodTests/testMoodMappingSleeping()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'StressBuddyMoodTests/testColorMappingSleeping()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'AccessibilityLabelsTests/testAllHistoryElementsHaveAccessibilityLabels()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'StressBuddyMoodTests/testSymbolOverwhelmed()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'PatternOverlayTests/testDotsPatternShapeStyle()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'PatternOverlayTests/testPatternMappingForMild()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'PatternOverlayTests/testSolidPatternShapeStyle()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'PatternOverlayTests/testPatternMappingForModerate()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'PatternOverlayTests/testPatternsProvideNonColorDifferentiation()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'PatternOverlayTests/testPatternsDifferentiateStressLevels()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'PatternOverlayTests/testAllStressCategoriesHavePatterns()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'PatternOverlayTests/testDotsPatternOverlayCreates()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'PatternOverlayTests/testCrosshatchPatternShapeStyle()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'PatternOverlayTests/testPatternMappingForRelaxed()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'AccessibilityLabelsTests/testStressRingViewHasAccessibilityValue()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'PatternOverlayTests/testPatternOverlayWithCustomOpacity()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'PatternOverlayTests/testPatternMappingForHigh()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'StressBuddyMoodTests/testMoodMappingCalm()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'StressBuddyMoodTests/testAccessibilityDescriptionCalm()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'AccessibilityLabelsTests/testAccessibilityLabelsAreDescriptive()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'FontWellnessTypeTests/testDynamicTypeSizeRange()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'PatternOverlayTests/testPatternsWithDifferentColors()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'StressBuddyMoodTests/testSymbolWorried()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'StressBuddyMoodTests/testAccessibilityDescriptionConcerned()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'StressBuddyMoodTests/testMoodMappingConcerned()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'PatternOverlayTests/testStressPatternByCategoryViewExtension()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'AccessibilityLabelsTests/testMeasurementRowHasAccessibilityValue()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'StressBuddyMoodTests/testColorMappingConcerned()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'AccessibilityLabelsTests/testErrorAlertAccessibility()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'StressBuddyMoodTests/testAccessoryCalmHasNoAccessories()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'PatternOverlayTests/testPatternOverlayWithDefaultOpacity()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'PatternOverlayTests/testPatternRawValues()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'PatternOverlayTests/testSolidPatternOverlayIsEmpty()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'FontWellnessTypeTests/testVietnameseCharacterSupport()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'PatternOverlayTests/testAllPatternTypesExist()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'StressBuddyMoodTests/testAllCasesCount()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'AccessibilityLabelsTests/testLoadingStateAccessibility()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'AccessibilityLabelsTests/testMeasureButtonHasAccessibilityLabel()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'AccessibilityLabelsTests/testMeasureButtonHasAccessibilityHint()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'FontWellnessTypeTests/testSystemFallbackCaption()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'StressBuddyMoodTests/testAccessoryConcernedHasStars()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'StressBuddyMoodTests/testAccessibilityDescriptionWorried()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'StressBuddyMoodTests/testSendableConformance()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'FontWellnessTypeTests/testSystemFallbackLargeTitle()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'AccessibilityLabelsTests/testStressRingWithCharacterAccessibility()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'AccessibilityLabelsTests/testStressRingIsAccessibilityElement()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'AccessibilityLabelsTests/testHeaderHasHeaderTrait()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'AccessibilityLabelsTests/testEmptyStateAccessibility()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'FontWellnessTypeTests/testMinimumScaleFactorIs70Percent()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'FontWellnessTypeTests/testSystemFallbackBody()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'AccessibilityLabelsTests/testAllDashboardElementsHaveAccessibilityLabels()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'AccessibilityLabelsTests/testHistoryListHasAccessibilityHint()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'StressBuddyMoodTests/testAccessorySleepingHasZZZ()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'AccessibilityLabelsTests/testNavigationTitleIsAccessible()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'FontWellnessTypeTests/testMultiLineModifierExists()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'AccessibilityLabelsTests/testTabItemsHaveAccessibilityLabels()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'AccessibilityLabelsTests/testDisabledButtonAccessibility()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'AccessibilityLabelsTests/testAccessibilityValuesProvideContext()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'FontWellnessTypeTests/testLargeMetricFontCreation()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'AccessibilityLabelsTests/testLoadingButtonAccessibility()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'FontWellnessTypeTests/testSystemFallbackTitle()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'FontWellnessTypeTests/testSystemFallbackTitle2()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'AccessibilityLabelsTests/testHistoryViewHasAccessibilityLabel()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'AccessibilityLabelsTests/testAccessibilityHintsExplainPurpose()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'FontWellnessTypeTests/testSingleLineModifierExists()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'FontWellnessTypeTests/testBodyFontCreation()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'AccessibilityLabelsTests/testAccessibilityValueReflectsCategory()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'FontWellnessTypeTests/testCustomLineCountModifierExists()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'FontWellnessTypeTests/testRalewayFontAvailabilityCheck()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'FontWellnessTypeTests/testAllFontsAvailabilityCheck()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'FontWellnessTypeTests/testCaption2FontCreation()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'FontWellnessTypeTests/testBodyEmphasizedFontCreation()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'FontWellnessTypeTests/testCardTitleFontCreation()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'FontWellnessTypeTests/testHeroNumberFontCreation()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'FontWellnessTypeTests/testLoraFontAvailabilityCheck()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'FontWellnessTypeTests/testCaptionFontCreation()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'DynamicTypeScalingTests/testAccessibleDynamicTypeWithAllParameters()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'StressBuddyMoodTests/testAllSymbolsAreValidSFSymbols()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'FontWellnessTypeTests/testAvailableFamiliesList()' failed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'FontWellnessTypeTests/testFontFallbackToSystemWhenCustomUnavailable()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'FontWellnessTypeTests/testPrintFontStatusDoesNotCrash()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'HealthKitManagerTests/testHealthKitManager_customHealthStore()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'HealthKitManagerTests/testHealthKitManager_initialization()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'GradientsTests/testStressCardIncludesBaseColorAndGradient()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'GradientsTests/testAllStressCategoriesHaveBackgroundTints()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'GradientsTests/testStressBackgroundTintForModerate()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'GradientsTests/testStressSpectrumForHigh()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'GradientsTests/testStressBackgroundTintForRelaxed()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'GradientsTests/testWellnessBackgroundModifier()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'GradientsTests/testStressBackgroundTintForHigh()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'StressMonitorTests/testHeartRateSample_init()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'GradientsTests/testAllStressCategoriesHaveGradients()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'GradientsTests/testStressCardModifierForAllCategories()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'GradientsTests/testGradientOpacityIsSubtle()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'FontWellnessTypeTests/testSectionHeaderFontCreation()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'GradientsTests/testStressBackgroundModifierForAllCategories()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'GradientsTests/testMindfulnessGradientExists()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'GradientsTests/testCalmWellnessGradientExists()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'GradientsTests/testStressSpectrumForMild()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'GradientsTests/testCalmWellnessGradientHasCorrectDirection()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'GradientsTests/testStressSpectrumForModerate()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'GradientsTests/testRelaxationGradientExists()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'StressMonitorTests/testHRVMeasurement_init()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'AnimationWellnessTests/testAccessibleSlideTransitionAllEdges()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'AnimationWellnessTests/testBreathingAnimationIsRepeating()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'StressMonitorTests/testObservableModel_setError()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'StressMonitorTests/testObservableModel_initialState()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'StressMonitorTests/testObservableModel_clearError()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'AnimationWellnessTests/testDizzyAnimationWithReduceMotionEnabled()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'GradientsTests/testGradientsCanBeCombined()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'AnimationWellnessTests/testShakeAnimationWithReduceMotionDisabled()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'AnimationWellnessTests/testAnimateIfMotionAllowedModifier()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'GradientsTests/testStressBackgroundTintForMild()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'AnimationWellnessTests/testAccessibleSlideTransitionWithMotionEnabled()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'AnimationWellnessTests/testWellnessAnimationWithReduceMotionEnabled()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'AnimationWellnessTests/testNegativeDurationWellnessAnimation()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'AnimationWellnessTests/testFidgetAnimationDuration()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'GradientsTests/testStressSpectrumForRelaxed()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'AnimationWellnessTests/testDizzyAnimationDefaultsToMotionEnabled()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'AnimationWellnessTests/testAccessibleScaleTransitionWithMotionEnabled()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'AnimationWellnessTests/testWellnessAnimationWithReduceMotionDisabled()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'AnimationWellnessTests/testBreathingAnimationDefaultsToMotionEnabled()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'AnimationWellnessTests/testShakeAnimationDefaultsToMotionEnabled()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'AnimationWellnessTests/testFidgetAnimationDefaultsToMotionEnabled()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'GradientsTests/testStressCardModifierWithCustomBaseColor()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'AnimationWellnessTests/testBreathingAnimationWithReduceMotionEnabled()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'AnimationWellnessTests/testAccessibleOpacityTransitionWithMotionDisabled()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'AnimationWellnessTests/testAccessibleScaleTransitionWithMotionDisabled()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'AnimationWellnessTests/testCustomWellnessDuration()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'HighContrastTests/testHighContrastCardViewExtension()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'AnimationWellnessTests/testDizzyAnimationIsContinuous()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'AnimationWellnessTests/testFidgetAnimationWithReduceMotionEnabled()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'AnimationWellnessTests/testWellnessAnimationDefaultsToMotionEnabled()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'AnimationWellnessTests/testBreathingAnimationWithReduceMotionDisabled()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'AnimationWellnessTests/testZeroDurationWellnessAnimation()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'HighContrastTests/testHighContrastCardWithDefaultBackground()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'AnimationWellnessTests/testVeryLongDurationWellnessAnimation()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'HighContrastTests/testCardWithDifferentBackgrounds()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'HighContrastTests/testHighContrastBorderWithDefaultParameters()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'HighContrastTests/testHighContrastBorderWithParameters()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'HighContrastTests/testHighContrastCardWithParameters()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'AnimationWellnessTests/testAccessibleSlideTransitionWithMotionDisabled()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'AnimationWellnessTests/testShakeAnimationRepeats()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'HighContrastTests/testHighContrastBorderWithCustomCornerRadius()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'AnimationWellnessTests/testFidgetAnimationWithReduceMotionDisabled()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'HighContrastTests/testHighContrastCardWithContent()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'AnimationWellnessTests/testReduceMotionAwareModifierCreation()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'AnimationWellnessTests/testDizzyAnimationWithReduceMotionDisabled()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'HighContrastTests/testBorderWidthIsTwoPoints()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'HighContrastTests/testNonInteractiveElementsCanSkipBorder()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'HighContrastTests/testHighContrastButtonTertiaryStyle()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'AnimationWellnessTests/testAccessibleOpacityTransitionWithMotionEnabled()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'HighContrastTests/testHighContrastModifiersOnInteractiveElements()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'AnimationWellnessTests/testShakeAnimationWithReduceMotionEnabled()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'HighContrastTests/testHighContrastButtonWithAllStyles()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'HighContrastTests/testVariousCornerRadii()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'AnimationWellnessTests/testWellnessAnimationType()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'HighContrastTests/testHighContrastButtonDefaultsToPrimary()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'HighContrastTests/testCardCornerRadii()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'AnimationWellnessTests/testAllAnimationTypesWorkWithReduceMotion()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'StressMonitorTests/testHRVMeasurement_codable()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'HighContrastTests/testHighContrastCardWithCustomBackground()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'HighContrastTests/testHighContrastBorderModifierCreates()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'HighContrastTests/testHighContrastCardModifierCreates()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'HighContrastTests/testHighContrastButtonPrimaryStyle()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'HighContrastTests/testHighContrastBorderWithNonInteractive()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'HighContrastTests/testHighContrastButtonModifierCreates()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'HighContrastTests/testHighContrastButtonSecondaryStyle()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'HighContrastTests/testHighContrastBorderViewExtension()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'HighContrastTests/testBorderIsVisibleForInteractiveElements()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'HighContrastTests/testBorderColorIsPrimary()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'StressMonitorTests/testHeartRateSample_codable()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'ColorBlindnessSimulatorTests/testSimulateColorBlindnessViewExtension()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'ColorBlindnessSimulatorTests/testSimulatorWithTransparency()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'HighContrastTests/testMultipleHighContrastModifiers()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'HighContrastTests/testHighContrastButtonViewExtension()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'ColorBlindnessSimulatorTests/testSimulatorWithGradients()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'ColorBlindnessSimulatorTests/testTritanopiaSimulation()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'ColorBlindnessSimulatorTests/testSimulateMildColor()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'FontSizeTests/testAccessibility3IsMaximumSupported()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'ColorBlindnessSimulatorTests/testColorBlindnessSimulatorModifierCreates()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'ColorBlindnessSimulatorTests/testSimulateClearColor()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'ColorBlindnessSimulatorTests/testSimulatorOnlyAvailableInDebug()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'ColorBlindnessSimulatorTests/testColorBlindnessPreviewContainerCreates()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'FontSizeTests/testAllDynamicTypeSizesSupported()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'ColorBlindnessSimulatorTests/testSimulateRelaxedColor()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'ColorBlindnessSimulatorTests/testNormalVisionNoIndicator()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'ColorBlindnessSimulatorTests/testSimulatorModifierWithNormalVision()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'ColorBlindnessSimulatorTests/testSimulatorShowsVisualIndicator()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'ColorBlindnessSimulatorTests/testColorBlindnessDisplayNames()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'ColorBlindnessSimulatorTests/testProtanopiaSimulation()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'ColorBlindnessSimulatorTests/testProtanopiaAffectsRedGreen()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'ColorBlindnessSimulatorTests/testAllColorBlindnessTypesExist()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'ColorBlindnessSimulatorTests/testTritanopiaAffectsBlueYellow()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'ColorBlindnessSimulatorTests/testSimulationPreservesAlpha()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'ColorBlindnessSimulatorTests/testSimulateHighColor()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'ColorBlindnessSimulatorTests/testDeuteranopiaAffectsRedGreen()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'ColorBlindnessSimulatorTests/testPreviewContainerShowsAllTypes()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'ColorBlindnessSimulatorTests/testColorBlindnessTypeRawValues()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'ColorBlindnessSimulatorTests/testSimulateBlackColor()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'ColorBlindnessSimulatorTests/testSimulateModerateColor()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'ColorBlindnessSimulatorTests/testSimulateWhiteColor()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'ColorBlindnessSimulatorTests/testDeuteranopiaSimulation()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'ColorBlindnessSimulatorTests/testSimulatorWithComplexView()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'ColorBlindnessSimulatorTests/testNormalVisionNoSimulation()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'ColorBlindnessSimulatorTests/testValidateStressColorsIncludesAllColorBlindnessTypes()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'ColorBlindnessSimulatorTests/testValidateStressColorsReturnsResults()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'ColorBlindnessSimulatorTests/testDesignerCanTestColorBlindness()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'ColorBlindnessSimulatorTests/testValidateStressColorsIncludesAllCategories()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'ColorBlindnessSimulatorTests/testSimulateAllColorBlindnessTypes()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'ColorBlindnessSimulatorTests/testSimulateGrayColor()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'ColorBlindnessSimulatorTests/testSimulatorModifierWithAllTypes()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'ColorBlindnessSimulatorTests/testValidatorHelpsIdentifyIssues()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'ReduceMotionModifierIntegrationTests/testModifierWithNilAnimation()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'ReduceMotionModifierIntegrationTests/testModifierWithEnvironmentValue()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'ColorBlindnessSimulatorIntegrationTests/testSimulatorWithEnvironmentValues()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'PatternGeometryTests/testDiagonalLinesViewCompiles()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'ColorBlindnessSimulatorIntegrationTests/testSimulatorInPreviewEnvironment()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'ReduceMotionModifierIntegrationTests/testModifierWithDifferentValueTypes()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'StressCharacterCardTests/testHRVNotShownWhenNil()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'StressCharacterCardTests/testAccessibilityLabelsForAllMoods()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'StressCharacterCardTests/testMoodColorApplied()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'PatternGeometryTests/testCrosshatchViewCompiles()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'StressCharacterCardTests/testInitFromStressResult()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'HighContrastLayoutTests/testCardClipsShape()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'StressCharacterCardTests/testCardRenderingConcerned()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'StressCharacterCardTests/testFontSizeForDashboard()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'StressCharacterCardTests/testCardRenderingWorried()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'StressCharacterCardTests/testVoiceOverValueFormatting()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'StressCharacterCardTests/testVeryLowHRV()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'PatternGeometryTests/testPatternsWithVariousSizes()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'HighContrastLayoutTests/testButtonBorderOverlaysContent()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'StressCharacterCardTests/testMoodDisplayNameShown()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'StressCharacterCardTests/testCardRenderingCalm()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'PatternGeometryTests/testDotsViewCompiles()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'StressCharacterCardTests/testCardRenderingWithoutHRV()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'StressCharacterCardTests/testCardRenderingWidgetSize()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'StressCharacterCardTests/testStressLevelUsesMonospacedDigits()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'StressCharacterCardTests/testFontSizeForWatchOS()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'StressCharacterCardTests/testVeryHighHRV()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'StressCharacterCardTests/testHRVFormattingWhenPresent()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'StressCharacterCardTests/testInitWithMinimalData()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'StressCharacterCardTests/testFontSizeForWidget()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'StressCharacterCardTests/testCardRenderingAllMoods()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'StressCharacterCardTests/testAccessoriesRenderForSleeping()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'StressChar2026-03-01 23:38:03.926 xcodebuild[14188:23478462] [MT] IDETestOperationsObserverDebug: 525.429 elapsed -- Testing started completed.
+2026-03-01 23:38:03.926 xcodebuild[14188:23478462] [MT] IDETestOperationsObserverDebug: 0.000 sec, +0.000 sec -- start
+2026-03-01 23:38:03.926 xcodebuild[14188:23478462] [MT] IDETestOperationsObserverDebug: 525.429 sec, +525.429 sec -- end
+** TEST FAILED **
+
+acterCardTests/testCharacterAnimationModifierApplied()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'CharacterAnimationModifierTests/testAnimationModifierCreation()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'CharacterAnimationModifierTests/testAnimationModifierAppliedToView()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'StressCharacterCardTests/testCardRenderingDashboardSize()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'StressCharacterCardTests/testNoAccessoriesRenderForCalm()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'StressCharacterCardTests/testDecimalStressLevels()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'StressCharacterCardTests/testCardRenderingAllSizes()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'StressCharacterCardTests/testCardRenderingSleeping()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'StressCharacterCardTests/testCardRenderingWithHRV()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'VoiceOverExperienceTests/testVoiceOverNavigatesTabBar()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'StressCharacterCardTests/testAccessoriesRenderForWorried()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'DynamicTypeEnvironmentTests/testDynamicTypeSizeEnvironmentAccess()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'AccessoryAnimationModifierTests/testAccessoryAnimationAppliedToView()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'StressCharacterCardTests/testZeroStressLevel()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'VoiceOverExperienceTests/testVoiceOverReadingOrder()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'AccessoryAnimationModifierTests/testAccessoryModifierCreation()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'StressCharacterCardTests/testCardRenderingWatchOSSize()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'StressCharacterCardTests/testMaxStressLevel()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'StressCharacterCardTests/testCardRenderingOverwhelmed()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'VoiceOverExperienceTests/testVoiceOverAnnouncesChanges()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'StressCharacterCardTests/testAccessoriesRenderForConcerned()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'AccessoryAnimationModifierTests/testAccessoryModifierWithDifferentIndices()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'DynamicTypeEnvironmentTests/testLimitedDynamicTypeWithEnvironment()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'AccessibilityAuditTests/testAllInteractiveElementsHaveLabels()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'HighContrastLayoutTests/testBorderDoesNotAffectLayout()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'StressCharacterCardTests/testSymbolHierarchicalRenderingMode()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'AccessibilityAuditTests/testAccessibilitySupportsAllStressCategories()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'HighContrastEnvironmentTests/testHighContrastModifiersInDarkMode()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'HighContrastEnvironmentTests/testColorSchemeEnvironmentAccess()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'StressCharacterCardTests/testVoiceOverLabelExists()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'HighContrastEnvironmentTests/testDifferentiateWithoutColorEnvironmentAccess()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'StressCharacterCardTests/testMultipleAccessoriesRenderForOverwhelmed()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'AccessibilityAuditTests/testNoRedundantAccessibilityInfo()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'HighContrastEnvironmentTests/testHighContrastModifiersInLightMode()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'DynamicTypeEnvironmentTests/testDynamicTypeSizeChanges()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'ColorBlindnessSimulatorTests/testPrintValidationResultsExecutes()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test suite 'AccessibleStressTrendChartTests' started on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)'
+Test case 'AccessibleStressTrendChartTests.testChartYAxisScale()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.002 seconds)
+Test case 'AccessibleStressTrendChartTests.testDataTableRowAccessibility()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.008 seconds)
+Test case 'AccessibleStressTrendChartTests.testDataTableWithMultipleMeasurements()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.001 seconds)
+Test case 'AccessibleStressTrendChartTests.testEmptyStateHandling()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.001 seconds)
+Test case 'AccessibleStressTrendChartTests.testMeasurementCategoryMapping()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.001 seconds)
+Test case 'AccessibleStressTrendChartTests.testReduceMotionStaticDataEntry()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.001 seconds)
+Test case 'AccessibleStressTrendChartTests.testStatsCalculation()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.001 seconds)
+Test case 'AccessibleStressTrendChartTests.testStatsWithSingleDataPoint()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.001 seconds)
+Test case 'AccessibleStressTrendChartTests.testTimeRangeAllCases()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.252 seconds)
+Test case 'AccessibleStressTrendChartTests.testTimeRangeDescriptions()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.001 seconds)
+Test case 'AccessibleStressTrendChartTests.testTimeRangeRawValues()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.001 seconds)
+Test suite 'SparklineChartTests' started on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)'
+Test case 'SparklineChartTests.testAccessibilityHintWithSevenDataPoints()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.001 seconds)
+Test case 'SparklineChartTests.testAccessibilityValueForDownwardTrend()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.001 seconds)
+Test case 'SparklineChartTests.testAccessibilityValueForStableTrend()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'SparklineChartTests.testAccessibilityValueForUpwardTrend()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'SparklineChartTests.testDataPointCount()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'SparklineChartTests.testDataPointIdentifiable()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.003 seconds)
+Test case 'SparklineChartTests.testDownwardTrendDescription()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'SparklineChartTests.testEmptyStateHandling()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'SparklineChartTests.testReduceMotionSupport()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'SparklineChartTests.testSparklineChartDimensions()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'SparklineChartTests.testStableTrendDescription()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'SparklineChartTests.testUpwardTrendDescription()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.001 seconds)
+Test case 'SparklineChartTests.testYAxisDomainCalculation()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)
+Test case 'SparklineChartTests.testYAxisDomainWithEmptyData()' passed on 'Clone 1 of iPhone 17 Pro - StressMonitor (16693)' (0.000 seconds)

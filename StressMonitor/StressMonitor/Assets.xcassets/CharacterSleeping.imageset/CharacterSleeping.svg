@@ -1,0 +1,41 @@
+<svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<radialGradient id="bodyGradient" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(128 128) rotate(90) scale(120)">
+<stop offset="0%" stop-color="#86CECD"/>
+<stop offset="100%" stop-color="#6BB5B4"/>
+</radialGradient>
+<radialGradient id="shadowGradient" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(128 230) rotate(0) scale(100 20)">
+<stop offset="0%" stop-color="#000000" stop-opacity="0.1"/>
+<stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+</radialGradient>
+</defs>
+
+<!-- Soft shadow -->
+<ellipse cx="128" cy="230" rx="90" ry="15" fill="url(#shadowGradient)"/>
+
+<!-- Body -->
+<path d="M128 32C75 32 32 75 32 128C32 181 75 224 128 224C181 224 224 181 224 128C224 75 181 32 128 32Z" fill="url(#bodyGradient)"/>
+
+<!-- Highlight/Shine -->
+<path d="M128 40C85 40 50 70 42 110C40 100 100 50 160 50C190 50 210 70 214 90C205 60 170 40 128 40Z" fill="white" fill-opacity="0.2"/>
+
+<!-- Face: Sleeping -->
+<!-- Closed Eyes (U shape inverted) -->
+<path d="M90 120C90 120 95 130 110 120" stroke="#2C3E50" stroke-width="4" stroke-linecap="round"/>
+<path d="M146 120C146 120 151 130 166 120" stroke="#2C3E50" stroke-width="4" stroke-linecap="round"/>
+
+<!-- Mouth (Small gentle curve) -->
+<path d="M118 150C118 150 128 155 138 150" stroke="#2C3E50" stroke-width="3" stroke-linecap="round"/>
+
+<!-- Cheeks -->
+<circle cx="80" cy="135" r="8" fill="#FF9191" fill-opacity="0.4"/>
+<circle cx="176" cy="135" r="8" fill="#FF9191" fill-opacity="0.4"/>
+
+<!-- Zzz Bubble 1 -->
+<path d="M190 80L200 80L190 90L200 90" stroke="#5D6D7E" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" opacity="0.8"/>
+<!-- Zzz Bubble 2 -->
+<path d="M205 60L212 60L205 68L212 68" stroke="#5D6D7E" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" opacity="0.6"/>
+<!-- Zzz Bubble 3 -->
+<path d="M215 45L220 45L215 50L220 50" stroke="#5D6D7E" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity="0.4"/>
+
+</svg>

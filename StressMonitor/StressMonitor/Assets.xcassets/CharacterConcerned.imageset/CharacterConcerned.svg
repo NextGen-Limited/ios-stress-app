@@ -1,0 +1,39 @@
+<svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<radialGradient id="bodyGradient" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(128 128) rotate(90) scale(120)">
+<stop offset="0%" stop-color="#86CECD"/>
+<stop offset="100%" stop-color="#6BB5B4"/>
+</radialGradient>
+<radialGradient id="shadowGradient" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(128 230) rotate(0) scale(100 20)">
+<stop offset="0%" stop-color="#000000" stop-opacity="0.1"/>
+<stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+</radialGradient>
+</defs>
+
+<!-- Soft shadow -->
+<ellipse cx="128" cy="230" rx="90" ry="15" fill="url(#shadowGradient)"/>
+
+<!-- Body -->
+<path d="M128 32C75 32 32 75 32 128C32 181 75 224 128 224C181 224 224 181 224 128C224 75 181 32 128 32Z" fill="url(#bodyGradient)"/>
+
+<!-- Face: Concerned -->
+<!-- Raised Eyebrow -->
+<path d="M80 90C80 90 95 80 110 90" stroke="#2C3E50" stroke-width="3" stroke-linecap="round"/>
+
+<!-- Eyes (Slightly smaller, looking up/side) -->
+<circle cx="95" cy="118" r="7" fill="#2C3E50"/>
+<circle cx="97" cy="116" r="2" fill="white"/>
+<circle cx="161" cy="118" r="7" fill="#2C3E50"/>
+<circle cx="163" cy="116" r="2" fill="white"/>
+
+<!-- Mouth (Flat or slightly downward) -->
+<path d="M115 155H141" stroke="#2C3E50" stroke-width="3" stroke-linecap="round"/>
+
+<!-- Cheeks (Lighter) -->
+<circle cx="80" cy="135" r="7" fill="#FF9191" fill-opacity="0.3"/>
+<circle cx="176" cy="135" r="7" fill="#FF9191" fill-opacity="0.3"/>
+
+<!-- Small sweat drop -->
+<path d="M180 80C180 80 175 95 180 100C185 105 190 100 185 90C185 80 180 80 180 80Z" fill="#87CEEB" opacity="0.6"/>
+
+</svg>

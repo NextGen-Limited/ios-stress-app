@@ -1,0 +1,36 @@
+<svg width="256" height="256" viewBox="0 0 256 256" fill="none" xmlns="http://www.w3.org/2000/svg">
+<defs>
+<radialGradient id="bodyGradient" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(128 128) rotate(90) scale(120)">
+<stop offset="0%" stop-color="#86CECD"/>
+<stop offset="100%" stop-color="#448584"/>
+</radialGradient>
+<radialGradient id="shadowGradient" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(128 230) rotate(0) scale(100 20)">
+<stop offset="0%" stop-color="#000000" stop-opacity="0.2"/>
+<stop offset="100%" stop-color="#000000" stop-opacity="0"/>
+</radialGradient>
+</defs>
+
+<!-- Soft shadow -->
+<ellipse cx="128" cy="230" rx="90" ry="15" fill="url(#shadowGradient)"/>
+
+<!-- Body -->
+<path d="M128 32C75 32 32 75 32 128C32 181 75 224 128 224C181 224 224 181 224 128C224 75 181 32 128 32Z" fill="url(#bodyGradient)"/>
+
+<!-- Face: Overwhelmed -->
+<!-- Eyes (Swirly or Spiral) -->
+<path d="M85 110C85 110 95 105 105 115C115 125 105 135 95 125C85 115 95 110 100 115" stroke="#2C3E50" stroke-width="3" stroke-linecap="round"/>
+<path d="M151 110C151 110 161 105 171 115C181 125 171 135 161 125C151 115 161 110 166 115" stroke="#2C3E50" stroke-width="3" stroke-linecap="round"/>
+
+<!-- Mouth (Open gasp/distressed) -->
+<path d="M115 160C115 160 128 175 141 160C141 160 128 165 115 160Z" fill="#2C3E50" fill-opacity="0.8"/>
+
+<!-- Multiple Sweat Drops and Heat Lines -->
+<path d="M190 60L200 50" stroke="#FF9500" stroke-width="2" stroke-linecap="round" opacity="0.8"/>
+<path d="M210 80L220 75" stroke="#FF9500" stroke-width="2" stroke-linecap="round" opacity="0.6"/>
+<path d="M40 70C40 70 35 85 40 90C45 95 50 90 45 80C45 70 40 70 40 70Z" fill="#87CEEB" opacity="0.8"/>
+<path d="M55 100C55 100 50 110 55 114C60 118 65 114 60 106C60 98 55 100 55 100Z" fill="#87CEEB" opacity="0.6"/>
+
+<!-- Flame icon on top -->
+<path d="M128 20C128 20 120 40 128 50C136 60 148 55 140 40C140 30 128 20 128 20Z" fill="#FF9500" opacity="0.9"/>
+
+</svg>
