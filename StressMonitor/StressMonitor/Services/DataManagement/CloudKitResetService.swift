@@ -27,7 +27,7 @@ final class CloudKitResetService: Sendable {
 
     // MARK: - Initialization
 
-    init(container: CKContainer = .default(), logger: DataManagementLogger = .default) {
+    init(container: CKContainer, logger: DataManagementLogger) {
         self.container = container
         self.privateDatabase = container.privateCloudDatabase
         self.logger = logger
@@ -283,7 +283,7 @@ final class CloudKitResetService: Sendable {
     ) async throws {
         var currentCursor = cursor
         let database = privateDatabase  // Capture non-isolated reference
-        nonisolated(unsafe) let loggerRef = logger
+        let loggerRef = logger
 
         while true {
             let operation = CKQueryOperation(cursor: currentCursor)
@@ -535,5 +535,3 @@ enum CloudKitResetError: Error {
 
 
 // MARK: - CloudKitRecordType Extension
-
-extension CloudKitRecordType: Sendable {}

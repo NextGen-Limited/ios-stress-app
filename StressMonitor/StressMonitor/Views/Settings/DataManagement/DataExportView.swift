@@ -244,9 +244,6 @@ class DataExportViewModel {
     }
 
     var dateRangeDescription: String {
-        let calendar = Calendar.current
-        let now = Date()
-
         switch dateRange {
         case .day:
             return "Last 24 hours"

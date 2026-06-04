@@ -24,7 +24,7 @@ final class LocalDataWipeService: Sendable {
 
     // MARK: - Initialization
 
-    init(modelContext: ModelContext, logger: DataManagementLogger = .default) {
+    init(modelContext: ModelContext, logger: DataManagementLogger) {
         self.modelContext = modelContext
         self.logger = logger
     }

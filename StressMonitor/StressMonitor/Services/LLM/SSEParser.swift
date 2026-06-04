@@ -20,7 +20,7 @@ struct SSEParser {
     /// Parse a single SSE line into an event.
     /// - Parameter line: Raw line from the SSE stream (e.g. "data: {\"choices\":...}")
     /// - Returns: Parsed event, or nil if line is not a data line or unparseable.
-    static func parse(line: String) -> SSEEvent? {
+    nonisolated static func parse(line: String) -> SSEEvent? {
         // Only process lines starting with "data: "
         guard line.hasPrefix("data: ") else { return nil }
 

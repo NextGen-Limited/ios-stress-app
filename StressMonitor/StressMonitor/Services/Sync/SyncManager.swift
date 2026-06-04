@@ -23,7 +23,7 @@ public final class SyncManager {
 
     public init(
         cloudKitManager: CloudKitManager,
-        conflictResolver: ConflictResolver = ConflictResolver()
+        conflictResolver: ConflictResolver
     ) {
         self.cloudKitManager = cloudKitManager
         self.conflictResolver = conflictResolver

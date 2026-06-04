@@ -55,7 +55,7 @@ final class StressRepository: StressRepositoryProtocol {
         }
 
         // Trigger CloudKit sync if available
-        if let cloudKit = cloudKitManager {
+        if cloudKitManager != nil {
             await syncMeasurementToCloudKit(measurement)
         }
     }
@@ -73,7 +73,7 @@ final class StressRepository: StressRepositoryProtocol {
         }
 
         // Trigger CloudKit sync if available
-        if let cloudKit = cloudKitManager {
+        if cloudKitManager != nil {
             await syncBatchToCloudKit(measurements)
         }
     }
@@ -266,7 +266,7 @@ final class StressRepository: StressRepositoryProtocol {
 
     /// Sync all pending measurements to CloudKit
     func syncPendingMeasurements() async throws {
-        guard let cloudKit = cloudKitManager else {
+        guard cloudKitManager != nil else {
             throw RepositoryError.cloudKitUnavailable
         }
 
@@ -363,7 +363,7 @@ final class StressRepository: StressRepositoryProtocol {
     }
 
     private func syncBatchToCloudKit(_ measurements: [StressMeasurement]) async {
-        guard let cloudKit = cloudKitManager else { return }
+        guard cloudKitManager != nil else { return }
 
         onSyncStatusChange?(.syncing(progress: 0.0))
 

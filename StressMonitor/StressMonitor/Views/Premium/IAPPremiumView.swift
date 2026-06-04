@@ -4,7 +4,7 @@ struct IAPPremiumView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var viewModel: PremiumViewModel
 
-    init(storeKit: StoreKitServiceProtocol, premiumState: PremiumState = .shared) {
+    init(storeKit: StoreKitServiceProtocol, premiumState: PremiumState) {
         _viewModel = State(initialValue: PremiumViewModel(storeKit: storeKit, premiumState: premiumState))
     }
 

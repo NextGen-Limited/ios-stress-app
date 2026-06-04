@@ -105,7 +105,17 @@ private extension FontBlaster {
                 return
             }
 
-            if CTFontManagerRegisterGraphicsFont(fontRef, &fontError),
+            if #available(iOS 18, *) {
+                let fontURL = fontFileURL as CFURL
+                if CTFontManagerRegisterFontsForURL(fontURL, .process, &fontError),
+                   let postScriptName = fontRef.postScriptName {
+                    printDebugMessage(message: "Successfully loaded font: '\(postScriptName)'.")
+                    loadedFonts.append(String(postScriptName))
+                } else if let fontError = fontError?.takeRetainedValue() {
+                    let errorDescription = CFErrorCopyDescription(fontError)
+                    printDebugMessage(message: "Failed to load font '\(fontName)': \(String(describing: errorDescription))")
+                }
+            } else if CTFontManagerRegisterGraphicsFont(fontRef, &fontError),
                let postScriptName = fontRef.postScriptName {
                     printDebugMessage(message: "Successfully loaded font: '\(postScriptName)'.")
                     loadedFonts.append(String(postScriptName))

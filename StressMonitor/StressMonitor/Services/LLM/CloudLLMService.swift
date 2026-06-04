@@ -6,6 +6,7 @@ import Moya
 /// LLM service using Moya for endpoint definitions (health check)
 /// and URLSession for SSE streaming (Moya lacks native SSE support).
 /// Falls back gracefully when server is unreachable.
+@MainActor
 final class CloudLLMService: LLMServiceProtocol, @unchecked Sendable {
 
     // MARK: - Properties
@@ -14,17 +15,20 @@ final class CloudLLMService: LLMServiceProtocol, @unchecked Sendable {
 
     // MARK: - Init
 
-    init(provider: MoyaProvider<LLMAPITarget> = MoyaProvider()) {
+    init(provider: MoyaProvider<LLMAPITarget>) {
         self.provider = provider
+    }
+
+    convenience init() {
+        self.init(provider: MoyaProvider())
     }
 
     // MARK: - Availability
 
-    nonisolated func isAvailable() -> Bool {
+    func isAvailable() -> Bool {
         let semaphore = DispatchSemaphore(value: 0)
         var available = false
 
-        // swiftlint:disable:next task_create_async_await_in_nonisolated
         provider.request(.healthCheck) { result in
             if case .success(let response) = result {
                 available = response.statusCode == 200
@@ -47,7 +51,7 @@ final class CloudLLMService: LLMServiceProtocol, @unchecked Sendable {
         allMessages.append(contentsOf: encodedMessages)
 
         return AsyncThrowingStream { (continuation: AsyncThrowingStream<String, Error>.Continuation) in
-            let task = Swift.Task {
+            let task = _Concurrency.Task {
                 do {
                     guard let url = URL(string: "https://hyperpolysyllabically-saronic-mee.ngrok-free.app/v1/chat/completions") else {
                         continuation.finish(throwing: LLMServiceError.unavailable(reason: "Invalid server URL"))

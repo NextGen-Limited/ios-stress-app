@@ -27,8 +27,8 @@ public final class DataManagementService: DataExporter, DataDeleter {
 
     init(
         repository: StressRepositoryProtocol,
-        cloudKitManager: CloudKitManager? = nil,
-        fileManager: FileManager = .default
+        cloudKitManager: CloudKitManager?,
+        fileManager: FileManager
     ) {
         self.repository = repository
         self.cloudKitManager = cloudKitManager
@@ -61,7 +61,7 @@ public final class DataManagementService: DataExporter, DataDeleter {
             do {
                 // Generate CSV content
                 exportProgress = 0.2
-                let csvContent = csvGenerator.generate(from: measurements)
+                _ = csvGenerator.generate(from: measurements)
 
                 // Create export metadata
                 exportProgress = 0.4
@@ -93,10 +93,7 @@ public final class DataManagementService: DataExporter, DataDeleter {
         }
 
         let result = try await task.value
-        guard let fileURL = result as? URL else {
-            throw ExportError.encodingFailed
-        }
-        return fileURL
+        return result
     }
 
     /// Export measurements to JSON format
@@ -164,10 +161,7 @@ public final class DataManagementService: DataExporter, DataDeleter {
         }
 
         let result = try await task.value
-        guard let fileURL = result as? URL else {
-            throw ExportError.encodingFailed
-        }
-        return fileURL
+        return result
     }
 
     /// Generate a report for a date range
@@ -236,10 +230,7 @@ public final class DataManagementService: DataExporter, DataDeleter {
         }
 
         let result = try await task.value
-        guard let fileURL = result as? URL else {
-            throw ExportError.encodingFailed
-        }
-        return fileURL
+        return result
     }
 
     // MARK: - Helper Methods
@@ -458,7 +449,7 @@ extension DataManagementService {
     static func sample() -> DataManagementService {
         let context = ModelContext(try! ModelContainer(for: StressMeasurement.self))
         let repository = StressRepository(modelContext: context)
-        return DataManagementService(repository: repository)
+        return DataManagementService(repository: repository, cloudKitManager: nil, fileManager: .default)
     }
 }
 #endif

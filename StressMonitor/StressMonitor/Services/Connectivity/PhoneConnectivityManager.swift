@@ -28,7 +28,7 @@ final class PhoneConnectivityManager: NSObject, ObservableObject {
     guard
       let stressLevel = userInfo["stressLevel"] as? Double,
       let categoryRaw = userInfo["category"] as? String,
-      let category = StressCategory(rawValue: categoryRaw),
+      let _ = StressCategory(rawValue: categoryRaw),
       let confidence = userInfo["confidence"] as? Double,
       let hrv = userInfo["hrv"] as? Double,
       let heartRate = userInfo["heartRate"] as? Double,

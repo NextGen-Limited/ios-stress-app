@@ -99,10 +99,9 @@ class BreathingSessionViewModel {
 
     private func startCountdown() {
         timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
-            Task { @MainActor in
-                guard let self = self, self.remainingTime > 0 else {
-                    return
-                }
+            Task { @MainActor [weak self] in
+                guard let self else { return }
+                if self.remainingTime <= 0 { return }
 
                 self.remainingTime -= 1
 

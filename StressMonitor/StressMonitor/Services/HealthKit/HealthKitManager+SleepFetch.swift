@@ -44,7 +44,7 @@ extension HealthKitManager {
         }
     }
 
-    private static func aggregateSleepSamples(_ samples: [HKCategorySample], date: Date) -> SleepData {
+    nonisolated private static func aggregateSleepSamples(_ samples: [HKCategorySample], date: Date) -> SleepData {
         var totalSleep: TimeInterval = 0
         var deepSleep: TimeInterval = 0
         var remSleep: TimeInterval = 0

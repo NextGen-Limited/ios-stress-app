@@ -29,9 +29,9 @@ final class DataDeleterService: DataDeleter {
 
     init(
         modelContext: ModelContext,
-        cloudKitContainer: CKContainer = .default(),
+        cloudKitContainer: CKContainer,
         repository: StressRepositoryProtocol,
-        logger: DataManagementLogger = .default
+        logger: DataManagementLogger
     ) {
         self.localWipeService = LocalDataWipeService(modelContext: modelContext, logger: logger)
         self.cloudKitResetService = CloudKitResetService(container: cloudKitContainer, logger: logger)

@@ -61,11 +61,11 @@ public final class DataManagementViewModel: Sendable {
 
     init(
         modelContext: ModelContext,
-        cloudKitContainer: CKContainer = .default(),
+        cloudKitContainer: CKContainer,
         dataManagementService: DataManagementService? = nil,
         dataDeleterService: DataDeleterService? = nil,
         repository: StressRepositoryProtocol? = nil,
-        logger: Logger = .default
+        logger: Logger
     ) {
         self.repository = repository ?? StressRepository(modelContext: modelContext)
         self.logger = logger
@@ -75,7 +75,9 @@ public final class DataManagementViewModel: Sendable {
             self.dataManagementService = service
         } else {
             self.dataManagementService = DataManagementService(
-                repository: self.repository
+                repository: self.repository,
+                cloudKitManager: nil,
+                fileManager: .default
             )
         }
 
@@ -85,7 +87,8 @@ public final class DataManagementViewModel: Sendable {
             self.dataDeleterService = DataDeleterService(
                 modelContext: modelContext,
                 cloudKitContainer: cloudKitContainer,
-                repository: self.repository
+                repository: self.repository,
+                logger: DataManagementLogger()
             )
         }
     }

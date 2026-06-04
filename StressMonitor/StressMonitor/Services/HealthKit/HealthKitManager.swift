@@ -142,7 +142,7 @@ final class HealthKitManager: HealthKitServiceProtocol {
     func observeHeartRateUpdates() -> AsyncStream<HeartRateSample?> {
         return AsyncStream { continuation in
             let query = HKObserverQuery(sampleType: self.heartRateType, predicate: nil) { _, _, error in
-                if let error {
+                if error != nil {
                     continuation.yield(nil)
                     return
                 }

@@ -9,7 +9,7 @@ struct CurvedBottomBackground: View {
             Path { path in
                 let width = geometry.size.width
                 let height = geometry.size.height
-                let cutoutRadius = width * 0.4
+                let _ = width * 0.4
                 let cutoutCenterY = height * 0.35
 
                 // Start from bottom-left

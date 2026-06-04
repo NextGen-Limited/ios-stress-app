@@ -289,6 +289,3 @@ public enum CloudKitError: Error, Sendable {
     }
 }
 
-// MARK: - Sendable Conformance for StressMeasurement
-
-extension StressMeasurement: @unchecked Sendable {}
