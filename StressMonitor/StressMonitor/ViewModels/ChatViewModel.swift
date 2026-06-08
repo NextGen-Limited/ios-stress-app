@@ -46,17 +46,9 @@ final class ChatViewModel {
         self.baseline = baseline
         self.recentHistory = recentHistory
 
-        // Cloud-first strategy: cloud → on-device → unavailable
-        let cloudService = CloudLLMService()
-//        if cloudService.isAvailable() {
-//            self.llmService = cloudService
-//        } else if #available(iOS 26, *) {
-//            self.llmService = AppleIntelligenceService()
-//        } else {
-//            self.llmService = UnavailableLLMService()
-//        }
-        
-        self.llmService = cloudService
+        // Supabase-first strategy: Supabase Edge Function → Apple Intelligence → unavailable
+        let supabaseService = SupabaseLLMService()
+        self.llmService = supabaseService
         self.isAvailable = true
     }
 
@@ -97,6 +89,14 @@ final class ChatViewModel {
             }
         }
 
+        // Build stress context for the backend (backend builds system prompt from this)
+        SupabaseLLMService.currentStressContext = StressContextPayload.build(
+            stressResult: stressResult,
+            baseline: baseline,
+            recentHistory: recentHistory
+        )
+
+        // systemPrompt is ignored by SupabaseLLMService — backend builds it
         let systemPrompt = contextBuilder.buildSystemPrompt(
             stressResult: stressResult,
             baseline: baseline,
