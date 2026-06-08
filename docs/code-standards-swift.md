@@ -3,7 +3,7 @@
 **Framework:** Swift 5.9+ with SwiftUI & SwiftData
 **Architecture:** MVVM + Protocol-Oriented Design
 **Section:** File organization, naming, imports, state management
-**Last Updated:** April 13, 2026
+**Last Updated:** June 7, 2026
 
 ---
 
@@ -306,4 +306,4 @@ var allMeasurements: [StressMeasurement] = loadAll()
 
 **Next:** See `code-standards-patterns.md` for dependency injection, async/await, SwiftData, testing, and error handling patterns.
 **Enforced By:** Code review & automated tests
-**Last Updated:** April 17, 2026
+**Last Updated:** June 7, 2026

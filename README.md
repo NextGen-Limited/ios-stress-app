@@ -15,10 +15,13 @@ StressMonitor measures stress levels using Heart Rate Variability (HRV) and hear
 - **Multi-Factor Stress Score** — HRV, heart rate, sleep, activity, and recovery weighted into a single 0–100 score
 - **AI Stress Coach** — LLM-powered chat with streaming responses, wellness guardrails, and context-aware suggestions
 - **Stress Buddy** — Character system with 5 mood states reflecting current stress level
-- **Breathing Exercises** — Guided box breathing with animated visual circle and session summaries
+- **Breathing Exercises** — Guided box breathing with biofeedback and animated visual circle
+- **Mini Walk** — Walking exercise with circular timer for immediate stress relief
+- **Morning Readiness** — HRV trend analysis for daily readiness assessment
 - **Historical Tracking** — Timeline, trend charts, and distribution analytics
-- **Apple Watch** — Standalone watchOS app with WidgetKit complications
+- **Apple Watch** — Standalone watchOS app with live WidgetKit complications
 - **Home Screen Widgets** — Small, medium, and large widgets for at-a-glance monitoring
+- **IAP Premium** — Subscription paywall with StoreKit integration
 - **Journal** — Mood and stress notes alongside measurements
 - **Data Export** — CSV and JSON export with date filtering
 - **Privacy-First** — Local-first storage, HealthKit read-only, no third-party analytics
@@ -80,22 +83,25 @@ Each factor computes a normalized deviation from personal baseline, then contrib
 
 ```
 StressMonitor/
-├── StressMonitor/                          # iOS App (~210 files, ~24K LOC)
-│   ├── Models/                             # Data models (15+ files)
+├── StressMonitor/                          # iOS App (~225 files, ~28K LOC)
+│   ├── Models/                             # Data models (18+ files)
 │   ├── Services/
 │   │   ├── HealthKit/                      # Health data fetching
 │   │   ├── Algorithm/                      # Multi-factor stress calculation
 │   │   ├── Repository/                     # SwiftData persistence
 │   │   ├── CloudKit/                       # iCloud sync
 │   │   ├── LLM/                            # Cloud LLM + Apple Intelligence
-│   │   ├── Chat/                           # AI coaching chat
+│   │   ├── StoreKit/                       # IAP Premium subscriptions
 │   │   ├── Background/                     # Notifications & tasks
-│   │   └── Connectivity/                   # Watch connectivity
+│   │   ├── Connectivity/                   # Watch connectivity
+│   │   └── Sync/                           # Data synchronization
 │   ├── ViewModels/                         # @Observable state
 │   ├── Views/
 │   │   ├── Dashboard/                      # Main stress display + AI cards
 │   │   ├── Chat/                           # AI coaching interface
 │   │   ├── Breathing/                      # Guided breathing exercises
+│   │   ├── MiniWalk/                       # Walking exercise with timer
+│   │   ├── Premium/                        # IAP subscription screen
 │   │   ├── Journal/                        # Mood & stress notes
 │   │   ├── History/                        # Measurement timeline
 │   │   ├── Trends/                         # Analytics charts
@@ -109,7 +115,7 @@ StressMonitor/
 │   ├── Views/                              # Compact watch UI
 │   └── Complications/                      # WidgetKit complications
 ├── StressMonitorWidget/                    # Home Screen Widgets (7 files, ~1.4K LOC)
-└── StressMonitorTests/                     # Unit & UI tests
+└── StressMonitorTests/                     # Unit & UI tests (5 files)
 ```
 
 ## Architecture
@@ -216,3 +222,4 @@ xcodebuild test -scheme StressMonitor \
 **Created by:** Phuong Doan
 **Version:** 1.0
 **Platform:** iOS 17+ / watchOS 10+
+**Last Updated:** June 7, 2026

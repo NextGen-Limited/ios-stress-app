@@ -27,7 +27,7 @@ This AGENTS.md scopes guidance to `plans`. Parent AGENTS guidance still applies 
 - `0303-0928-daily-timeline-weekly-redesign/`
 - `0303-2212-stress-sources-donut-chart-figma-alignment/`
 - `0307-0809-dashboard-semicircular-gauge-update/`
-- ...and 18 more
+- ...and 24 more
 
 <!-- OMX:AGENTS-INIT:MANUAL:START -->
 ## Local Notes

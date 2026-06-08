@@ -4,7 +4,7 @@
 **Concurrency:** async/await
 **Data Flow:** Unidirectional (Models -> Services -> ViewModels -> Views)
 **Section:** MVVM, data flow, core services, protocols
-**Last Updated:** April 25, 2026
+**Last Updated:** June 7, 2026
 
 ---
 
@@ -460,7 +460,7 @@ final class StubRepository: StressRepositoryProtocol {
 
 | Decision | Rationale | Trade-off |
 |----------|-----------|-----------|
-| **Zero external dependencies** | Privacy, control, reduced bloat | More code to maintain |
+| **13 SPM packages** | Network, UI, and media capabilities | Dependency management overhead |
 | **CloudLLMService gateway** | Provides LLM fallback for pre-iOS 26 devices | Connects to self-hosted FastAPI endpoint; chat context (not raw health data) sent externally |
 | **Local-first architecture** | Works offline, fast responsiveness | Eventual consistency |
 | **MVVM + Protocols** | Testability, loose coupling | More boilerplate |
@@ -472,4 +472,4 @@ final class StubRepository: StressRepositoryProtocol {
 **Next:** See `system-architecture-platform.md` for CloudKit, Watch, widgets, and security details.
 **Maintained By:** Phuong Doan
 **Version:** 1.0 Production
-**Last Updated:** April 25, 2026
+**Last Updated:** June 7, 2026

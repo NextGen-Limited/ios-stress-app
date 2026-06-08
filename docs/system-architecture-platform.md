@@ -3,7 +3,7 @@
 **Pattern:** MVVM + Protocol-Oriented Design
 **Concurrency:** async/await
 **Section:** CloudKit, Watch, widgets, security, extensibility
-**Last Updated:** April 25, 2026
+**Last Updated:** June 7, 2026
 
 ---
 
@@ -329,4 +329,4 @@ BreathingExerciseView (setup)
 **Previous:** See `system-architecture-core.md` for core MVVM and service architecture.
 **Maintained By:** Phuong Doan
 **Version:** 1.0 Production
-**Last Updated:** April 25, 2026
+**Last Updated:** June 7, 2026

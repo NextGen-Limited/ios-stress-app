@@ -12,7 +12,7 @@ This AGENTS.md scopes guidance to `assets`. Parent AGENTS guidance still applies
 ## Current Layout
 
 ### Files
-- `.DS_Store`
+- `Trend.png`
 - `action-selected.pdf`
 - `action.pdf`
 - `daily-timeline-chart.png`
@@ -23,8 +23,8 @@ This AGENTS.md scopes guidance to `assets`. Parent AGENTS guidance still applies
 - `stress-status-view.png`
 - `trend-selected.pdf`
 - `trend.pdf`
-- `Trend.png`
-- ...and 2 more
+- `trends-home-ui.png`
+- `ui-setting.png`
 
 ### Subdirectories
 - None

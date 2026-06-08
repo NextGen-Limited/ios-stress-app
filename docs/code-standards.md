@@ -2,8 +2,8 @@
 
 **Framework:** Swift 5.9+ with SwiftUI & SwiftData
 **Architecture:** MVVM + Protocol-Oriented Design
-**External Dependencies:** AnimatedTabBar (exyte/SPM)
-**Last Updated:** April 13, 2026
+**External Dependencies:** 13 SPM packages (Moya, Alamofire, Kingfisher, SwiftUICharts, AnimatedTabBar, etc.)
+**Last Updated:** June 7, 2026
 
 ---
 
@@ -246,4 +246,4 @@ func startAutoRefresh() {
 ---
 
 **Enforced By:** Code review & automated tests
-**Last Updated:** April 17, 2026
+**Last Updated:** June 7, 2026

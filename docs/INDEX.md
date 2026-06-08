@@ -1,7 +1,7 @@
 # StressMonitor Documentation Index
 
 **Version:** 1.0 (Production)
-**Last Updated:** April 25, 2026
+**Last Updated:** June 7, 2026
 
 Complete documentation for the StressMonitor iOS/watchOS stress monitoring application.
 
@@ -69,18 +69,18 @@ Current status, planned features, timeline, and success metrics.
 
 ## Quick Reference
 
-### Codebase Metrics (as of Apr 2026)
+### Codebase Metrics (as of Jun 2026)
 
 | Metric | Value |
 |--------|-------|
-| **Total Swift Files** | 210 |
-| **Total LOC** | ~25,600 |
-| **iOS App** | 210 files |
+| **Total Swift Files** | 303 |
+| **Total LOC** | ~31,400 |
+| **iOS App** | 225 files |
 | **watchOS App** | 44 files |
 | **Widgets** | 7 files |
-| **Tests** | 3 files (suite pending rewrite) |
-| **External Dependencies** | 0 (system frameworks only) |
-| **CI/CD** | GitHub Actions (macos-15) |
+| **Tests** | 5 files (suite pending rewrite) |
+| **External Dependencies** | 13 SPM packages |
+| **CI/CD** | GitHub Actions (macos-latest, Xcode 26.3) |
 
 ### Documentation Metrics
 
@@ -133,7 +133,7 @@ Current status, planned features, timeline, and success metrics.
 | **@Observable macro** | Modern iOS 17+ reactive |
 | **SwiftData (not Core Data)** | iOS 17+ native, SwiftUI-friendly |
 | **CloudKit E2E encryption** | User privacy guarantee |
-| **Zero external dependencies** | Only Apple system frameworks |
+| **SPM Dependencies** | 13 packages (Moya, Alamofire, Kingfisher, SwiftUICharts, etc.) |
 | **WidgetKit (not ClockKit)** | watchOS 10+ requirement |
 | **async/await throughout** | Modern concurrency |
 | **Foundation Models** | On-device LLM via Apple Intelligence (iOS 26+) |
@@ -213,7 +213,7 @@ SwiftUI Views → @Observable ViewModels → Protocol-based Services
 
 | Version | Release | Status | Notable |
 |---------|---------|--------|---------|
-| **1.0** | Feb 2026 | ✅ Production | AI Chat with SSE streaming (Apr 2026), 3-tab navigation (Apr 2026), CloudLLM hardcoded endpoint (Apr 2026), Box Breathing Figma alignment (Apr 2026) |
+| **1.0** | Feb 2026 | ✅ Production | AI Chat with SSE streaming, 3-tab navigation, CloudLLM hardcoded endpoint, Box Breathing Figma alignment, Mini Walk exercise, IAP Premium screen, Stress History with Activity Correlation, Guided Breathing with Biofeedback, Watch Complications with Live Metrics, Morning Readiness Check |
 | **1.1** | Q2 2026 | 🔄 In Progress | Advanced breathing, stress triggers, weekly reports |
 | **2.0** | Q4 2026 | 🎯 Concept | ML insights, Siri Shortcuts, iPad support |
 
@@ -221,6 +221,6 @@ SwiftUI Views → @Observable ViewModels → Protocol-based Services
 
 **Read the README.md** at project root for quick start and feature overview.
 
-**Last Updated:** April 25, 2026
+**Last Updated:** June 7, 2026
 **Maintained By:** Phuong Doan
 **Generated with:** repomix codebase analysis

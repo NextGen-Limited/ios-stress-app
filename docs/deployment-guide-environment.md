@@ -2,7 +2,7 @@
 
 **Platform:** iOS 17+ / watchOS 10+
 **Section:** Setup, Requirements, Build Instructions
-**Last Updated:** April 17, 2026
+**Last Updated:** June 7, 2026
 
 ---
 

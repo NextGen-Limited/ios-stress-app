@@ -3,7 +3,7 @@
 **Framework:** Swift 5.9+ with SwiftUI & SwiftData
 **Architecture:** MVVM + Protocol-Oriented Design
 **Section:** DI, async/await, SwiftData, testing, error handling
-**Last Updated:** April 17, 2026
+**Last Updated:** June 7, 2026
 
 ---
 
@@ -396,4 +396,4 @@ struct LLMAPITarget {
 
 **Previous:** See `code-standards-swift.md` for formatting and naming conventions.
 **Enforced By:** Code review & automated tests
-**Last Updated:** April 17, 2026
+**Last Updated:** June 7, 2026

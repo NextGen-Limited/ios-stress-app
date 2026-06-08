@@ -3,7 +3,7 @@
 **Pattern:** MVVM + Protocol-Oriented Design
 **Concurrency:** async/await
 **Data Flow:** Unidirectional (Models -> Services -> ViewModels -> Views)
-**Last Updated:** April 25, 2026
+**Last Updated:** June 7, 2026
 
 ---
 
@@ -205,13 +205,20 @@ UI Updates on screen
 - Full local/cloud wipe
 - **UPDATE**: 8 files (~2,173 LOC) including DataManagementService, CSVGenerator, JSONGenerator, DataDeleter, CloudKitResetService, LocalDataWipeService, DataManagementUtilities
 
+### StoreKit Service (Apr 2026)
+- Protocol-based StoreKit abstraction (`StoreKitServiceProtocol`)
+- `PremiumState` - Centralized premium state management singleton
+- `MockStoreKitService` - Mock implementation for development/testing
+- IAP Premium subscription screen with plan selection
+- Subscription card, CTA button, and utility row components
+
 ---
 
 ## Design Decisions
 
 | Decision | Rationale | Trade-off |
 |----------|-----------|-----------|
-| **Zero external dependencies** | Only Apple system frameworks | Maximum privacy, reliability |
+| **13 SPM packages** | Moya, Alamofire, Kingfisher, SwiftUICharts, etc. | Network, UI, and media capabilities |
 | **Local-first architecture** | Works offline, fast responsiveness | Eventual consistency |
 | **MVVM + Protocols** | Testability, loose coupling | More boilerplate |
 | **@Observable macro** | Modern, iOS 17+ reactive | Excludes iOS 16 |
@@ -351,4 +358,4 @@ TriangleShape()
 
 **Maintained By:** Phuong Doan
 **Version:** 1.0 Production
-**Last Updated:** April 25, 2026
+**Last Updated:** June 7, 2026

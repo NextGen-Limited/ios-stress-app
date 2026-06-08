@@ -3,7 +3,7 @@
 **Current Version:** 1.0 (Production)
 **Release Date:** February 2026
 **Maintenance Mode:** Active
-**Last Updated:** April 26, 2026
+**Last Updated:** June 7, 2026
 
 ---
 
@@ -62,13 +62,17 @@
 - ✅ Onboarding flow
 - ✅ HealthKit permission request
 
-#### Recent Completions (April 2026)
-- ✅ **3-Tab Navigation Structure** - Simplified from multi-tab to Home/Action/Trend
-- ✅ **ActionView Implementation** - Quick access to breathing exercises and AI chat
-- ✅ **Streaming AI Chat** - Real-time token streaming with SSEParser and LLMAPITarget
-- ✅ **CloudLLM Endpoint Hardening** - Removed server config UI, hardcoded endpoint
-- ✅ **Box Breathing Figma Alignment** - Enhanced breathing exercise visual design
-- ✅ **ChatViewModel Streaming** - Real-time AI response rendering
+#### Recent Completions (June 2026)
+- ✅ **Stress History Timeline** - Activity correlation with stress measurements
+- ✅ **Guided Breathing with Biofeedback** - Enhanced breathing exercises with real-time feedback
+- ✅ **Apple Watch Complications** - Live stress metrics on watch face (WidgetKit)
+- ✅ **Morning Readiness Check** - HRV trend analysis for daily readiness
+- ✅ **Real-time Stress Score** - HRV analysis with immediate feedback
+- ✅ **Mini Walk Exercise** - Walking exercise with circular timer (Apr 2026)
+- ✅ **IAP Premium Screen** - Subscription paywall with StoreKit (Apr 2026)
+- ✅ **3-Tab Navigation** - Simplified Home/Action/Trend structure (Apr 2026)
+- ✅ **Streaming AI Chat** - Real-time token streaming with SSEParser (Apr 2026)
+- ✅ **Box Breathing Figma Alignment** - Enhanced breathing exercise visuals (Apr 2026)
 
 #### Apple Watch
 - ✅ Standalone watch app
@@ -167,7 +171,7 @@ Accessibility:
 • Haptic feedback
 
 Privacy:
-• Zero external dependencies (system frameworks only)
+• 13 SPM packages (Moya, Alamofire, Kingfisher, SwiftUICharts, etc.)
 • Local-first architecture
 • End-to-end encrypted CloudKit sync
 • No tracking or analytics
@@ -387,15 +391,16 @@ remains on your device or encrypted in iCloud.
 - Improved streaming chat performance
 - Simplified LLM service configuration
 
-**Recently Completed (April 2026):**
-- ✅ **3-Tab Navigation** - Simplified from multi-tab to Home/Action/Trend structure
-- ✅ **ActionView Implementation** - Quick access to breathing exercises and AI chat
-- ✅ **Streaming AI Chat** - Real-time token streaming with SSEParser and LLMAPITarget
-- ✅ **CloudLLM Endpoint Hardening** - Removed server config UI, hardcoded endpoint for simplicity
-- ✅ **Box Breathing Figma Alignment** - Enhanced breathing exercise visual design
-- ✅ **ChatViewModel Streaming** - Real-time AI response rendering
-- ✅ **Mini Walk Exercise** - New walking exercise screen with circular timer (Apr 26, 2026)
-- ✅ **IAP Premium Screen** - Complete subscription paywall with StoreKit service protocol and premium state management (Apr 26, 2026)
+**Recently Completed (June 2026):**
+- ✅ **Stress History Timeline** - Activity correlation with stress data
+- ✅ **Guided Breathing with Biofeedback** - Enhanced breathing with real-time feedback
+- ✅ **Apple Watch Complications** - Live stress metrics on watch face
+- ✅ **Morning Readiness Check** - HRV trend analysis for daily readiness
+- ✅ **Real-time Stress Score** - HRV analysis with immediate feedback
+- ✅ **Mini Walk Exercise** - Walking exercise with circular timer
+- ✅ **IAP Premium Screen** - Subscription paywall with StoreKit
+- ✅ **3-Tab Navigation** - Simplified Home/Action/Trend structure
+- ✅ **Streaming AI Chat** - Real-time token streaming with SSEParser
 
 **Bug Tracking:**
 Use GitHub Issues for bug reports:
@@ -463,14 +468,14 @@ Every release must meet:
 
 ### External Dependency Risks
 
-**Currently:** 0 external dependencies (system frameworks only) ✅
+**Currently:** 13 SPM packages (Moya, Alamofire, Kingfisher, SwiftUICharts, etc.)
 
 **v2.0 Risk Assessment:**
 - **CoreML** (Apple framework, no risk)
 - **SiriKit** (Apple framework, no risk)
 - **HealthKit Expansion** (Apple framework, no risk)
 
-**Decision:** Maintain zero third-party dependencies to preserve:
+**Decision:** Evaluate dependency reduction to preserve:
 - Privacy guarantee
 - App size (<30MB)
 - Launch performance
@@ -568,5 +573,5 @@ Potential features for future consideration:
 ---
 
 **Owner:** Phuong Doan
-**Last Review:** April 25, 2026
-**Next Review:** June 15, 2026
+**Last Review:** June 7, 2026
+**Next Review:** August 2026

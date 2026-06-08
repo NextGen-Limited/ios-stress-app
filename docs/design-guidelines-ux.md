@@ -4,7 +4,7 @@
 **Accessibility:** WCAG AA
 **Section:** Accessibility, haptics, StressBuddy, onboarding, data visualization, chat UX
 **Version:** 1.1
-**Last Updated:** April 25, 2026
+**Last Updated:** June 7, 2026
 
 ---
 
@@ -532,5 +532,5 @@ Xcode → Debug → View Debugging → Accessibility Inspector
 
 **Previous:** See `design-guidelines-visual.md` for colors, typography, and components.
 **Design System Version:** 1.1
-**Last Updated:** April 25, 2026
+**Last Updated:** June 7, 2026
 **Maintained By:** Phuong Doan

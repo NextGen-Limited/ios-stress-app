@@ -3,7 +3,7 @@
 **Version:** 1.0 (Production)
 **Status:** Complete and Shipping
 **Platform:** iOS 17+ / watchOS 10+
-**Last Updated:** April 25, 2026
+**Last Updated:** June 7, 2026
 
 ---
 
@@ -34,6 +34,11 @@ StressMonitor is a **privacy-first stress monitoring application** that uses Hea
 | **Data Management** | Delete by range, category, or full wipe | ✅ Complete |
 | **Box Breathing** | Figma-aligned 4-4-4-4 pattern, 3-min sessions | ✅ Complete |
 | **3-Tab Navigation** | Home (Dashboard), Action (Quick actions/Chat), Trend (Analytics) | ✅ Complete |
+| **Mini Walk Exercise** | Walking exercise with circular timer and Figma-aligned design | ✅ Complete |
+| **IAP Premium Screen** | Subscription paywall with StoreKit service protocol | ✅ Complete |
+| **Stress History Timeline** | Activity correlation with stress measurements | ✅ Complete |
+| **Guided Breathing with Biofeedback** | Enhanced breathing with real-time feedback | ✅ Complete |
+| **Morning Readiness Check** | HRV trend analysis for daily readiness assessment | ✅ Complete |
 | **Home Screen Widgets** | At-a-glance stress display | ✅ Complete |
 | **WCAG AA Accessibility** | Dual coding, VoiceOver, Dynamic Type | ✅ Complete |
 
@@ -292,4 +297,4 @@ All core features complete and shipping.
 
 **Owner:** Phuong Doan
 **Status:** Production v1.0
-**Next Review:** May 2026 (post v1.1 release)
+**Next Review:** July 2026 (post v1.1 release)

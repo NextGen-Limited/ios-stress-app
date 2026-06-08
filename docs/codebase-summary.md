@@ -1,9 +1,9 @@
 # Codebase Summary
 
-**Total Files:** ~570 files (including 210 Swift files)
-**Total Tokens:** ~582,571
+**Total Files:** ~600 files (including 303 Swift files)
+**Total LOC:** ~31,400
 **Architecture:** MVVM + Protocol-Oriented Design
-**Last Updated:** April 26, 2026
+**Last Updated:** June 7, 2026
 
 ---
 
@@ -31,7 +31,7 @@ ios-stress-app/
 
 ---
 
-## iOS App Structure (210 Swift files)
+## iOS App Structure (225 Swift files)
 
 ### Models (18 files, ~969 LOC)
 Core data structures for health metrics and stress calculations.
@@ -56,6 +56,7 @@ Core data structures for health metrics and stress calculations.
 | `WidgetSharedData.swift` | `ComplicationEntry` + `WidgetEntry` widget timeline data |
 | `ExportModels.swift` | CSV/JSON export structures |
 | `ObservableModel.swift` | Base protocol for observable models |
+| `Base/ObservableModel.swift` | Base observable model class |
 
 ### Services (46 files, ~6,900 LOC)
 Business logic and system integrations.
@@ -111,6 +112,11 @@ Business logic and system integrations.
 - `SyncManager.swift` - Data synchronization coordination
 - `ConflictResolver.swift` - Sync conflict resolution
 
+#### StoreKit Services (3 files)
+- `PremiumState.swift` - Centralized premium state management singleton
+- `StoreKitServiceProtocol.swift` - StoreKit abstraction layer
+- `MockStoreKitService.swift` - Mock implementation for development
+
 #### Additional Services
 - `InsightGeneratorService.swift` - AI-powered insights
 - `MockServices.swift` - Development mock data services
@@ -126,6 +132,7 @@ State management layer:
 - `SettingsViewModel.swift` - App configuration state
 - `DataManagementViewModel.swift` - Data management operations
 - `BreathingViewModel.swift` - Breathing exercise state
+- `MiniWalkViewModel.swift` - Mini Walk exercise state
 
 ### Views (~100 files)
 SwiftUI user interface components:
@@ -141,6 +148,8 @@ SwiftUI user interface components:
 - `BreathingView.swift` - Breathing exercise interface
 - `Journal/` - Journaling features
 - `Chat/` - AI chat interface components
+- `MiniWalk/` - Mini Walk exercise with circular timer
+- `Premium/` - IAP Premium subscription screen with plan selection
 
 ### Theme (5 files)
 Design system and styling:
@@ -158,6 +167,9 @@ Reusable UI components:
 - `StressCharacterCard.swift` - Character representation
 - `CharacterAnimationModifier.swift` - Animation utilities
 - `DecorativeTriangleView.swift` - Decorative UI elements
+- `TabBar/TabItem.swift` - Tab bar item definition
+- `TabBar/AnimatedTabButtons.swift` - Animated tab button components
+- `TabBar/TabBarScrollState.swift` - Tab bar scroll state management
 
 ### Utilities (9 files)
 Helper functions and extensions:
@@ -218,7 +230,7 @@ The app uses a simplified 3-tab navigation structure:
 - **Features**: Stress insights, breathing guidance, conversation
 
 ### Dependencies
-- **Zero third-party dependencies** - Uses only Apple system frameworks
+- **13 SPM packages** - Moya, Alamofire, Kingfisher, SwiftUICharts, ReactiveSwift, RxSwift, Chat, Giphy iOS SDK, MediaPicker, ActivityIndicatorView, AnchoredPopup, AnimatedTabBar, LibWebP
 - **Privacy-first design** - All data processed locally when possible
 - **Modular architecture** - Protocol-based dependency injection
 
@@ -253,15 +265,17 @@ The app uses a simplified 3-tab navigation structure:
 
 ---
 
-## Recent Updates (April 2026)
+## Recent Updates (June 2026)
 
-1. **CloudLLMService** - Hardcoded endpoint configuration, removed server config UI
-2. **SSEParser** + **LLMAPITarget** - New SSE streaming infrastructure
-3. **ActionView** - New unified action tab replacing multi-tab layout
-4. **Box Breathing** - Aligned with Figma design specifications
-5. **ChatViewModel** - Streaming LLM responses with real-time updates
-6. **Mini Walk Exercise** - New walking exercise screen with circular timer and Figma-aligned design (Apr 26, 2026)
-7. **IAP Premium Screen** - Complete subscription paywall with StoreKit service protocol, premium state management, and Figma-aligned design (Apr 26, 2026)
+1. **Stress History Timeline** - Activity correlation with stress data
+2. **Guided Breathing with Biofeedback** - Enhanced breathing exercises with real-time feedback
+3. **Apple Watch Complications** - Live stress metrics on watch face
+4. **Morning Readiness Check** - HRV trend analysis for daily readiness
+5. **Real-time Stress Score** - HRV analysis with immediate feedback
+6. **Mini Walk Exercise** - Walking exercise screen with circular timer
+7. **IAP Premium Screen** - Subscription paywall with StoreKit service protocol
+8. **CloudLLMService** - Hardcoded endpoint configuration with SSE streaming
+9. **3-Tab Navigation** - Simplified Home/Action/Trend structure
 
 ## New Files Added (IAP Premium)
 - **PremiumState** - Centralized premium state management singleton
@@ -297,13 +311,13 @@ The app uses a simplified 3-tab navigation structure:
 
 | Metric | Value |
 |--------|-------|
-| **Total Swift Files** | 210 |
-| **Total LOC** | ~25,600 |
-| **External Dependencies** | 0 (system frameworks only) |
+| **Total Swift Files** | 303 |
+| **Total LOC** | ~31,400 |
+| **External Dependencies** | 13 SPM packages |
 | **Average File Size** | <200 LOC |
 | **Font** | Roboto (6 weights) |
 
 ---
 
-**Last Updated:** April 26, 2026
+**Last Updated:** June 7, 2026
 **Maintainers:** Phuong Doan

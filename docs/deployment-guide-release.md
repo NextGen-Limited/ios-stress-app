@@ -2,7 +2,7 @@
 
 **Platform:** iOS 17+ / watchOS 10+
 **Section:** Distribution, Review, Post-Release Monitoring
-**Last Updated:** April 25, 2026
+**Last Updated:** June 7, 2026
 
 ---
 
@@ -391,7 +391,7 @@ Measure app size:
 ls -lh ./build/StressMonitor.xcarchive
 
 # Estimated App Store size (after thinning)
-# Typically: 15-25 MB (zero external dependencies)
+# Typically: 20-35 MB (13 SPM packages)
 ```
 
 ### App Launch Time
@@ -489,4 +489,4 @@ Typical timeline: 4-6 hours
 
 **Previous:** See `deployment-guide-environment.md` for setup instructions.
 **Managed By:** Phuong Doan
-**Last Updated:** April 25, 2026
+**Last Updated:** June 7, 2026

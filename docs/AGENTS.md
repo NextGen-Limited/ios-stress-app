@@ -24,10 +24,13 @@ This AGENTS.md scopes guidance to `docs`. Parent AGENTS guidance still applies u
 - `design-guidelines.md`
 - `INDEX.md`
 - `project-overview-pdr.md`
-- ...and 4 more
+- `project-roadmap.md`
+- `system-architecture-core.md`
+- `system-architecture-platform.md`
+- `system-architecture.md`
 
 ### Subdirectories
-- `assets/`
+- `journals/`
 
 <!-- OMX:AGENTS-INIT:MANUAL:START -->
 ## Local Notes

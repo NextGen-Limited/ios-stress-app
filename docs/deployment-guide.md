@@ -2,7 +2,7 @@
 
 **Platform:** iOS 17+ / watchOS 10+
 **Distribution:** TestFlight -> App Store
-**Last Updated:** April 25, 2026
+**Last Updated:** June 7, 2026
 
 **Note:** Apple Intelligence features (on-device AI Chat) require iOS 26+ and compatible hardware. CloudLLMService with SSE streaming provides fallback chat functionality for older devices.
 
@@ -102,4 +102,4 @@ Once your app is built and tested:
 ---
 
 **Maintained By:** Phuong Doan
-**Last Updated:** April 25, 2026
+**Last Updated:** June 7, 2026

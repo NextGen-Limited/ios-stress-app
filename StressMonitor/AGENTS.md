@@ -12,14 +12,16 @@ This AGENTS.md scopes guidance to `StressMonitor`. Parent AGENTS guidance still 
 ## Current Layout
 
 ### Files
-- `.DS_Store`
-- `build_output.log`
 - `Info.plist`
+- `StressMonitorApp.swift`
+- `StressMonitorSchema.swift`
+- `build_output.log`
 - `test_output.log`
 
 ### Subdirectories
-- `.claude/`
-- `DerivedData/`
+- `.omc/`
+- `Models/`
+- `Services/`
 - `plans/`
 - `StressMonitor/`
 - `StressMonitor.xcodeproj/`
@@ -29,6 +31,7 @@ This AGENTS.md scopes guidance to `StressMonitor`. Parent AGENTS guidance still 
 - `StressMonitorWatch Watch AppTests/`
 - `StressMonitorWatch Watch AppUITests/`
 - `StressMonitorWidget/`
+- `Views/`
 
 <!-- OMX:AGENTS-INIT:MANUAL:START -->
 ## Local Notes
