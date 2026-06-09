@@ -49,7 +49,8 @@ jobs:
 
       - name: Install Dependencies
         run: |
-          bundle config path vendor/bundle
+          bundle config set path vendor/bundle
+          bundle update --bundler
           bundle install --jobs 4 --retry 3
 
       - name: Run SwiftLint
@@ -91,6 +92,7 @@ jobs:
         run: |
           set -o pipefail
           xcodebuild build \
+            -project StressMonitor/StressMonitor.xcodeproj \
             -scheme "StressMonitorWatch Watch App" \
             -destination 'platform=watchOS Simulator,name=Apple Watch Series 9 (45mm),OS=latest' \
             -derivedDataPath build \
