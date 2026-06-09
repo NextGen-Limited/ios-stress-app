@@ -156,3 +156,5 @@ DerivedData/
 .claude/session-state/
 tmp-home/
 .gitnexus
+vendor/bundle
+build/
