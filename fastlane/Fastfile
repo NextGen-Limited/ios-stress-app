@@ -136,7 +136,8 @@ platform :ios do
         app_identifier: APP_IDENTIFIER,
         api_key: api_key
       )
-    rescue
+    rescue => e
+      UI.important("Could not fetch latest TestFlight build number: #{e.message}")
       0
     end
 
@@ -152,7 +153,8 @@ platform :ios do
         version: current_version,
         api_key: api_key
       )
-    rescue
+    rescue => e
+      UI.important("Could not fetch latest App Store build number: #{e.message}")
       0
     end
 
