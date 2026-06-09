@@ -1,0 +1,100 @@
+name: _test  # Reusable — called by ci.yml and deploy.yml
+
+on:
+  workflow_call:
+    inputs:
+      run_tests:
+        description: "Run unit tests?"
+        required: false
+        default: true
+        type: boolean
+
+env:
+  XCODE_VERSION: "16.3"
+  SCHEME: "StressMonitor"
+  LANG: "en_US.UTF-8"
+
+jobs:
+  lint-and-test:
+    name: Lint & Test
+    runs-on: macos-15
+    timeout-minutes: 45
+    strategy:
+      matrix:
+        destination:
+          - "platform=iOS Simulator,name=iPhone 16,OS=latest"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Select Xcode ${{ env.XCODE_VERSION }}
+        run: |
+          sudo xcode-select -s /Applications/Xcode_${{ env.XCODE_VERSION }}.app/Contents/Developer
+          xcodebuild -version
+
+      - name: Cache Ruby Gems
+        uses: actions/cache@v4
+        with:
+          path: vendor/bundle
+          key: gems-${{ runner.os }}-${{ hashFiles('**/Gemfile.lock') }}
+          restore-keys: gems-${{ runner.os }}-
+
+      - name: Cache DerivedData
+        uses: actions/cache@v4
+        with:
+          path: ~/Library/Developer/Xcode/DerivedData
+          key: derived-${{ runner.os }}-${{ hashFiles('StressMonitor/StressMonitor.xcodeproj/project.pbxproj') }}
+          restore-keys: |
+            derived-${{ runner.os }}-${{ hashFiles('StressMonitor/StressMonitor.xcodeproj/project.pbxproj') }}-
+
+      - name: Install Dependencies
+        run: |
+          bundle config path vendor/bundle
+          bundle install --jobs 4 --retry 3
+
+      - name: Run SwiftLint
+        run: |
+          if which swiftlint >/dev/null 2>&1; then
+            swiftlint lint --reporter github-actions-logging
+          else
+            brew install swiftlint
+            swiftlint lint --reporter github-actions-logging
+          fi
+
+      - name: Run Tests (${{ matrix.destination }})
+        if: ${{ inputs.run_tests != false }}
+        run: |
+          bundle exec fastlane test
+
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results
+          path: fastlane/test_output/
+          retention-days: 7
+
+  build-watchos:
+    name: Build watchOS
+    runs-on: macos-15
+    timeout-minutes: 30
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Select Xcode ${{ env.XCODE_VERSION }}
+        run: |
+          sudo xcode-select -s /Applications/Xcode_${{ env.XCODE_VERSION }}.app/Contents/Developer
+          xcodebuild -version
+
+      - name: Build watchOS
+        run: |
+          set -o pipefail
+          xcodebuild build \
+            -scheme "StressMonitorWatch Watch App" \
+            -destination 'platform=watchOS Simulator,name=Apple Watch Series 9 (45mm),OS=latest' \
+            -derivedDataPath build \
+            -skipPackagePluginValidation \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            | xcpretty
