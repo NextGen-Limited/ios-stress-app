@@ -53,6 +53,12 @@ struct DashboardView: View {
         .task {
             if !appeared {
                 appeared = true
+                // Load custom fonts in background — accepted trade-off: <200ms font flash on cold start only
+                // Task {} (not Task.detached) — FontBlaster inferred MainActor in Swift 6 mode
+                Task(priority: .utility) {
+                    FontBlaster.blast()
+                }
+                // Show skeleton immediately, load data async
                 await loadInitialData()
                 viewModel.startAutoRefresh()
             }
@@ -134,7 +140,8 @@ struct DashboardView: View {
     // MARK: - Helpers
 
     private func loadInitialData() async {
-        await viewModel.loadBaseline()
+        // Phase 3: Run baseline + dashboard data in parallel
+        async let _: () = viewModel.loadBaseline()
         await viewModel.loadDashboardData()
         viewModel.observeHeartRate()
 

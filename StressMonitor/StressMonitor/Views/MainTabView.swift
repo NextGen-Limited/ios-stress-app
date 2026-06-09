@@ -8,6 +8,9 @@ struct MainTabView: View {
     @State private var previousTab: TabItem = .home
     @State private var showSettings = false
     @State private var tabBarScrollState = TabBarScrollState()
+    /// Lazily-created repository — avoids re-creating StressRepository on every body evaluation.
+    /// First render creates a temporary instance via `??`; `onAppear` stores the persistent one.
+    @State private var stressRepository: StressRepository?
 
     /// Demo mode: uses SimulatorHealthKitService with dynamic data
     private static var isDemoMode: Bool {
@@ -47,23 +50,24 @@ struct MainTabView: View {
                 Group {
                     switch selectedTab {
                     case .home:
+                        let repo = stressRepository ?? StressRepository(modelContext: modelContext)
                         #if DEBUG
                         if DemoMode.isEnabled {
                             DashboardView(
                                 viewModel: StressViewModel(
                                     healthKit: SimulatorHealthKitService(),
                                     algorithm: MultiFactorStressCalculator(),
-                                    repository: StressRepository(modelContext: modelContext)
+                                    repository: repo
                                 ),
                                 onSettingsTapped: { showSettings = true }
                             )
                         } else {
-                            DashboardView(repository: StressRepository(modelContext: modelContext), onSettingsTapped: {
+                            DashboardView(repository: repo, onSettingsTapped: {
                                 showSettings = true
                             })
                         }
                         #else
-                        DashboardView(repository: StressRepository(modelContext: modelContext), onSettingsTapped: {
+                        DashboardView(repository: repo, onSettingsTapped: {
                             showSettings = true
                         })
                         #endif
@@ -104,6 +108,11 @@ struct MainTabView: View {
                 )
                 .offset(y: tabBarScrollState.isVisible ? 0 : tabBarScrollState.tabBarHeight + 16)
                 .animation(.spring(response: 0.3, dampingFraction: 0.8), value: tabBarScrollState.isVisible)
+            }
+        }
+        .onAppear {
+            if stressRepository == nil {
+                stressRepository = StressRepository(modelContext: modelContext)
             }
         }
         .overlay(alignment: .topTrailing) {

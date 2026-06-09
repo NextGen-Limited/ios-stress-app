@@ -1,6 +1,9 @@
 import Foundation
 import Observation
 import HealthKit
+#if DEBUG
+import os
+#endif
 
 @Observable
 @MainActor
@@ -78,15 +81,32 @@ final class StressViewModel {
     }
 
     func loadCurrentStress() async {
+        #if DEBUG
+        let t0 = CFAbsoluteTimeGetCurrent()
+        os_signpost(.begin, log: OSLog(subsystem: "com.stressmonitor.app", category: "Launch"), name: "LoadCurrentStress")
+        #endif
+
         isLoading = true
-        defer { isLoading = false }
+        defer {
+            isLoading = false
+            #if DEBUG
+            os_signpost(.end, log: OSLog(subsystem: "com.stressmonitor.app", category: "Launch"), name: "LoadCurrentStress")
+            #endif
+        }
 
         do {
             let fetchedBaseline = try? await repository.getBaseline()
             let currentBaseline = baseline ?? fetchedBaseline ?? PersonalBaseline()
 
+            // Phase 3: ALL 5 HealthKit queries in parallel (HRV+HR were already async let,
+            // now sleep/activity/recovery join them)
             async let hrv = healthKit.fetchLatestHRV()
             async let hr = healthKit.fetchHeartRate(samples: 1)
+            async let sleepTask = healthKit.fetchSleepData(for: Date())
+            async let activityTask = healthKit.fetchActivityData(for: Date())
+            async let recoveryTask = healthKit.fetchRecoveryData(for: Date())
+
+            // Await critical data first
             let (hrvData, hrData) = try await (hrv, hr)
 
             guard let hrvValue = hrvData?.value else {
@@ -94,10 +114,10 @@ final class StressViewModel {
                 return
             }
 
-            // Secondary factors fetched with graceful degradation
-            let sleepData = try? await healthKit.fetchSleepData(for: Date())
-            let activityData = try? await healthKit.fetchActivityData(for: Date())
-            let recoveryData = try? await healthKit.fetchRecoveryData(for: Date())
+            // Graceful degradation for secondary factors
+            let sleepData = try? await sleepTask
+            let activityData = try? await activityTask
+            let recoveryData = try? await recoveryTask
 
             let context = StressContext(
                 baseline: currentBaseline,
@@ -119,6 +139,11 @@ final class StressViewModel {
             if let breakdown = result.factorBreakdown {
                 dataQualityInfo = DataQualityInfo(from: breakdown, baseline: currentBaseline)
             }
+
+            #if DEBUG
+            let elapsed = (CFAbsoluteTimeGetCurrent() - t0) * 1000
+            os_signpost(.event, log: OSLog(subsystem: "com.stressmonitor.app", category: "Launch"), name: "StressResult", "Calculated in %.1fms", elapsed)
+            #endif
         } catch let hkError as HKError where hkError.code == .errorAuthorizationDenied {
             isPermissionRequired = true
             currentStress = nil
@@ -148,9 +173,6 @@ final class StressViewModel {
     }
 
     func loadHistoricalData(days: Int) async {
-        isLoading = true
-        defer { isLoading = false }
-
         do {
             historicalData = try await repository.fetchRecent(limit: days * 24)
             errorMessage = nil
@@ -159,32 +181,50 @@ final class StressViewModel {
         }
     }
 
+    /// Load baseline and return quickly. Calibration is deferred to a background Task
+    /// so it doesn't block the critical launch path.
+    /// Uses Task { } (NOT Task.detached) because repository is @MainActor.
     func loadBaseline() async {
-        isLoading = true
-        defer { isLoading = false }
+        #if DEBUG
+        let t0 = CFAbsoluteTimeGetCurrent()
+        os_signpost(.begin, log: OSLog(subsystem: "com.stressmonitor.app", category: "Launch"), name: "LoadBaseline")
+        #endif
 
         do {
-            var loadedBaseline = try await repository.getBaseline()
-
-            // Trigger calibration if we have enough historical data
-            let measurements = try await repository.fetchRecent(limit: 200)
-            if measurements.count >= 30 {
-                let weights = calibrator.calibrate(from: measurements)
-                let hourly = calibrator.calculateHourlyBaseline(from: measurements)
-                loadedBaseline.factorWeights = weights
-                loadedBaseline.hourlyHRVBaseline = hourly
-                loadedBaseline.calibrationDate = Date()
-                try await repository.updateBaseline(loadedBaseline)
-            }
-
+            let loadedBaseline = try await repository.getBaseline()
             baseline = loadedBaseline
             if let breakdown = currentStress?.factorBreakdown {
                 dataQualityInfo = DataQualityInfo(from: breakdown, baseline: loadedBaseline)
             }
             errorMessage = nil
+
+            // Phase 2: Defer calibration — Task (NOT Task.detached) because repository is @MainActor
+            Task { [weak self] in
+                guard let self else { return }
+                do {
+                    let measurements = try await self.repository.fetchRecent(limit: 200)
+                    if measurements.count >= 30 {
+                        var calibrated = loadedBaseline
+                        let weights = self.calibrator.calibrate(from: measurements)
+                        let hourly = self.calibrator.calculateHourlyBaseline(from: measurements)
+                        calibrated.factorWeights = weights
+                        calibrated.hourlyHRVBaseline = hourly
+                        calibrated.calibrationDate = Date()
+                        try await self.repository.updateBaseline(calibrated)
+                        self.baseline = calibrated
+                    }
+                } catch {
+                    // Calibration failure is non-critical — baseline already loaded
+                }
+            }
         } catch {
             errorMessage = error.localizedDescription
         }
+
+        #if DEBUG
+        let elapsed = (CFAbsoluteTimeGetCurrent() - t0) * 1000
+        os_signpost(.end, log: OSLog(subsystem: "com.stressmonitor.app", category: "Launch"), name: "LoadBaseline", "%.1fms", elapsed)
+        #endif
     }
 
     func refreshHealthData() async {
@@ -203,15 +243,21 @@ final class StressViewModel {
         let fetchedBaseline = try? await repository.getBaseline()
         let currentBaseline = baseline ?? fetchedBaseline ?? PersonalBaseline()
 
+        // Phase 3: All 5 queries in parallel
         async let hrv = healthKit.fetchLatestHRV()
         async let hr = healthKit.fetchHeartRate(samples: 1)
+        async let sleepTask = healthKit.fetchSleepData(for: Date())
+        async let activityTask = healthKit.fetchActivityData(for: Date())
+        async let recoveryTask = healthKit.fetchRecoveryData(for: Date())
+
         let (hrvData, hrData) = try await (hrv, hr)
 
         guard let hrvValue = hrvData?.value else { throw StressError.noData }
 
-        let sleepData = try? await healthKit.fetchSleepData(for: Date())
-        let activityData = try? await healthKit.fetchActivityData(for: Date())
-        let recoveryData = try? await healthKit.fetchRecoveryData(for: Date())
+        // Graceful degradation for secondary factors
+        let sleepData = try? await sleepTask
+        let activityData = try? await activityTask
+        let recoveryData = try? await recoveryTask
 
         let context = StressContext(
             baseline: currentBaseline,
@@ -253,13 +299,31 @@ final class StressViewModel {
 
     // MARK: - Dashboard Data Loading
 
-    /// Load all dashboard data in one call
+    /// Load all dashboard data — stress calculation and history run in parallel
     func loadDashboardData() async {
-        await loadCurrentStress()
-        await loadHistoricalData(days: 14)
+        #if DEBUG
+        let t0 = CFAbsoluteTimeGetCurrent()
+        os_signpost(.begin, log: OSLog(subsystem: "com.stressmonitor.app", category: "Launch"), name: "LoadDashboard")
+        #endif
+
+        isLoading = true
+
+        // Phase 3: Run stress calculation and history fetch in parallel
+        async let stressTask: Void = loadCurrentStress()
+        async let historyTask: Void = loadHistoricalData(days: 14)
+        _ = await (stressTask, historyTask)
+
+        // Derived data depends on both completing
         loadTodayMeasurements()
         loadWeeklyComparison()
         generateInsight()
+
+        isLoading = false
+
+        #if DEBUG
+        let elapsed = (CFAbsoluteTimeGetCurrent() - t0) * 1000
+        os_signpost(.end, log: OSLog(subsystem: "com.stressmonitor.app", category: "Launch"), name: "LoadDashboard", "%.1fms", elapsed)
+        #endif
     }
 
     /// Load today's measurements for timeline view
