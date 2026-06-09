@@ -1,84 +1,102 @@
-name: Build & Test
+name: CI
 
 on:
-  push:
-    branches: [ main, develop, 'feature/**' ]
   pull_request:
-    branches: [ main, develop ]
+    branches: [main, develop]
   workflow_dispatch:
     inputs:
       run_tests:
-        description: 'Run unit tests'
+        description: "Run unit tests?"
         required: false
-        default: false
+        default: true
         type: boolean
 
 concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
+  group: ci-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  XCODE_VERSION: "26.3"
+  SCHEME: "StressMonitor"
+  LANG: "en_US.UTF-8"
+
 jobs:
-  build-ios:
-    name: Build iOS (Xcode 26.3)
-    runs-on: macos-latest
+  lint-and-test:
+    name: Lint & Test
+    runs-on: macos-15
+    strategy:
+      matrix:
+        destination:
+          - "platform=iOS Simulator,name=iPhone 16,OS=latest"
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Select Xcode
+      - name: Select Xcode ${{ env.XCODE_VERSION }}
         run: |
-          sudo xcode-select -s /Applications/Xcode_26.3.app/Contents/Developer
+          sudo xcode-select -s /Applications/Xcode_${{ env.XCODE_VERSION }}.app/Contents/Developer
           xcodebuild -version
 
-      - name: Build iOS
-        run: |
-          xcodebuild build \
-            -scheme StressMonitor \
-            -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest' \
-            -derivedDataPath build \
-            -skipPackagePluginValidation \
-            CODE_SIGN_IDENTITY="" \
-            CODE_SIGNING_REQUIRED=NO \
-            | xcpretty
-
-      - name: Run Tests
-        if: ${{ inputs.run_tests == true }}
-        run: |
-          xcodebuild test \
-            -scheme StressMonitor \
-            -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest' \
-            -derivedDataPath build \
-            -skipPackagePluginValidation \
-            CODE_SIGN_IDENTITY="" \
-            CODE_SIGNING_REQUIRED=NO \
-            | xcpretty
-
-      - name: Upload test results
-        uses: actions/upload-artifact@v4
-        if: ${{ inputs.run_tests == true && always() }}
+      - name: Cache Ruby Gems
+        uses: actions/cache@v4
         with:
-          name: test-results-ios
-          path: build/Logs/Test/*.xcresult
+          path: vendor/bundle
+          key: gems-${{ runner.os }}-${{ hashFiles('**/Gemfile.lock') }}
+          restore-keys: gems-${{ runner.os }}-
+
+      - name: Cache DerivedData
+        uses: actions/cache@v4
+        with:
+          path: ~/Library/Developer/Xcode/DerivedData
+          key: derived-${{ runner.os }}-${{ hashFiles('StressMonitor/StressMonitor.xcodeproj/project.pbxproj') }}-${{ github.sha }}
+          restore-keys: |
+            derived-${{ runner.os }}-${{ hashFiles('StressMonitor/StressMonitor.xcodeproj/project.pbxproj') }}-
+
+      - name: Install Dependencies
+        run: |
+          bundle config path vendor/bundle
+          bundle install --jobs 4 --retry 3
+
+      - name: Run SwiftLint
+        run: |
+          if which swiftlint >/dev/null 2>&1; then
+            swiftlint lint --reporter github-actions-logging
+          else
+            brew install swiftlint
+            swiftlint lint --reporter github-actions-logging
+          fi
+
+      - name: Run Tests (${{ matrix.destination }})
+        if: ${{ inputs.run_tests != false }}
+        run: |
+          bundle exec fastlane test
+
+      - name: Upload Test Results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: test-results
+          path: fastlane/test_output/
           retention-days: 7
 
   build-watchos:
-    name: Build watchOS (Xcode 26.3)
-    runs-on: macos-latest
+    name: Build watchOS
+    runs-on: macos-15
     steps:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Select Xcode
+      - name: Select Xcode ${{ env.XCODE_VERSION }}
         run: |
-          sudo xcode-select -s /Applications/Xcode_26.3.app/Contents/Developer
+          sudo xcode-select -s /Applications/Xcode_${{ env.XCODE_VERSION }}.app/Contents/Developer
           xcodebuild -version
 
       - name: Build watchOS
         run: |
           xcodebuild build \
-            -scheme StressMonitorWatchApp \
+            -scheme "StressMonitorWatch Watch App" \
             -destination 'platform=watchOS Simulator,name=Apple Watch Series 9 (45mm),OS=latest' \
-            -derivedDataPath build-watch \
+            -derivedDataPath build \
             -skipPackagePluginValidation \
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \

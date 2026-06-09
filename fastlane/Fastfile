@@ -1,0 +1,200 @@
+# Fastlane for StressMonitor — GitHub Actions + TestFlight CI/CD
+#
+# Usage:
+#   bundle exec fastlane test          — Run unit tests
+#   bundle exec fastlane beta          — Build & deploy to TestFlight
+#   bundle exec fastlane build_only    — Build IPA without uploading
+
+default_platform(:ios)
+
+platform :ios do
+  # ────────────────────── CONFIG ──────────────────────
+  APP_IDENTIFIER = ENV["APP_IDENTIFIER"] || "StressMonitor.StressMonitor"
+  SCHEME = "StressMonitor"
+  PROJECT = "StressMonitor/StressMonitor.xcodeproj"
+
+  def api_key
+    @api_key ||= begin
+      key_path = File.expand_path(ENV["APP_STORE_CONNECT_API_KEY_PATH"] || "~/.appstoreconnect/AuthKey.p8")
+      unless File.exist?(key_path)
+        # Write from env var if file doesn't exist (CI)
+        if ENV["APP_STORE_CONNECT_API_KEY_P8"]
+          dir = File.dirname(key_path)
+          FileUtils.mkdir_p(dir)
+          File.write(key_path, ENV["APP_STORE_CONNECT_API_KEY_P8"])
+        end
+      end
+
+      app_store_connect_api_key(
+        key_id: ENV["APP_STORE_CONNECT_API_KEY_ID"],
+        issuer_id: ENV["APP_STORE_CONNECT_ISSUER_ID"],
+        key_filepath: key_path,
+        duration: 1200, # 20 min token
+        in_house: false
+      )
+    end
+  end
+
+  # ────────────────────── TESTS ──────────────────────
+  desc "Run all tests"
+  lane :test do
+    scan(
+      project: PROJECT,
+      scheme: SCHEME,
+      device: "iPhone 16",
+      clean: true,
+      code_coverage: true,
+      result_bundle: true,
+      output_directory: "fastlane/test_output",
+      xcargs: "-skipPackagePluginValidation -skipMacroValidation",
+      fail_build: true
+    )
+  end
+
+  # ────────────────────── BUILD ONLY ──────────────────────
+  desc "Build IPA without uploading (for CI validation)"
+  lane :build_only do
+    gym(
+      project: PROJECT,
+      scheme: SCHEME,
+      configuration: "Release",
+      export_method: "app-store",
+      include_bitcode: false,
+      include_symbols: true,
+      output_directory: "build/",
+      output_name: "StressMonitor.ipa",
+      archive_path: "build/StressMonitor.xcarchive",
+      skip_package_ipa: false,
+      xcargs: [
+        "-skipPackagePluginValidation",
+        "-skipMacroValidation",
+        "COMPILER_INDEX_STORE_ENABLE=NO"
+      ].join(" "),
+      suppress_xcode_output: false
+    )
+  end
+
+  # ────────────────────── BETA ──────────────────────
+  desc "Build and deploy to TestFlight"
+  lane :beta do
+    # 1. Setup CI keychain (creates temp keychain, avoids prompts)
+    setup_ci
+
+    # 2. Fetch signing assets via match
+    match(
+      type: "appstore",
+      readonly: true, # CI should NOT create new certs/profiles
+      api_key: api_key
+    )
+
+    # 3. Increment build number based on latest TestFlight build
+    increment_build
+
+    # 4. Build the IPA
+    gym(
+      project: PROJECT,
+      scheme: SCHEME,
+      configuration: "Release",
+      export_method: "app-store",
+      include_bitcode: false,
+      include_symbols: true,
+      output_directory: "build/",
+      output_name: "StressMonitor.ipa",
+      archive_path: "build/StressMonitor.xcarchive",
+      xcargs: [
+        "-skipPackagePluginValidation",
+        "-skipMacroValidation",
+        "COMPILER_INDEX_STORE_ENABLE=NO"
+      ].join(" "),
+      suppress_xcode_output: true
+    )
+
+    # 5. Upload to TestFlight
+    pilot(
+      api_key: api_key,
+      app_identifier: APP_IDENTIFIER,
+      distribute_external: (ENV["DISTRIBUTE_EXTERNAL"] || "true") == "true",
+      groups: (ENV["TESTFLIGHT_GROUPS"] || "Core Testers,Public Beta").split(","),
+      changelog: read_changelog,
+      skip_waiting_for_build_processing: false, # MUST be false for external distribution
+      wait_processing_interval: 30,
+      timeout: 7200, # 2 hours max
+      notify_external_testers: true,
+      wait_for_uploaded_build: true
+    )
+
+    # 6. Notify
+    slack_notify
+  end
+
+  # ────────────────────── INCREMENT BUILD NUMBER ──────────────────────
+  desc "Auto-increment build number based on latest TestFlight build"
+  lane :increment_build do
+    # Get latest build number from TestFlight
+    latest_tf = begin
+      latest_testflight_build_number(
+        app_identifier: APP_IDENTIFIER,
+        api_key: api_key
+      )
+    rescue
+      0
+    end
+
+    # Get current App Store build number (if app is live)
+    current_version = get_version_number(
+      xcodeproj: PROJECT,
+      target: "StressMonitor"
+    )
+
+    latest_store = begin
+      app_store_build_number(
+        app_identifier: APP_IDENTIFIER,
+        version: current_version,
+        api_key: api_key
+      )
+    rescue
+      0
+    end
+
+    new_build = [latest_tf, latest_store].max + 1
+
+    UI.message("Setting build number to #{new_build} (TF: #{latest_tf}, Store: #{latest_store})")
+
+    increment_build_number(
+      build_number: new_build.to_s,
+      xcodeproj: PROJECT
+    )
+  end
+
+  # ────────────────────── HELPERS ──────────────────────
+  def read_changelog
+    path = File.join(Dir.pwd, "CHANGELOG.md")
+    if File.exist?(path)
+      content = File.read(path)
+      section = content.split(/^## /)[1]
+      if section
+        lines = section.split("\n").first(10)
+        return lines.join("\n")
+      end
+    end
+    "Build #{Time.now.strftime('%Y-%m-%d %H:%M')} from #{ENV['GITHUB_SHA']&.[](0..6) || 'local'}"
+  end
+
+  def slack_notify
+    return unless ENV["SLACK_WEBHOOK_URL"]
+
+    version = get_version_number(xcodeproj: PROJECT, target: "StressMonitor")
+    build = get_build_number(xcodeproj: PROJECT)
+
+    slack(
+      slack_url: ENV["SLACK_WEBHOOK_URL"],
+      message: "✅ *StressMonitor #{version} (#{build})* deployed to TestFlight!",
+      payload: {
+        "Build" => build,
+        "Version" => version,
+        "Commit" => ENV["GITHUB_SHA"]&.[](0..6) || "N/A",
+        "Run" => ENV["GITHUB_RUN_ID"] ? "<#{ENV['GITHUB_SERVER_URL']}/#{ENV['GITHUB_REPOSITORY']}/actions/runs/#{ENV['GITHUB_RUN_ID']}|View>" : "local"
+      }
+    )
+  end
+end
