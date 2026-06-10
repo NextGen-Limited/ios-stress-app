@@ -32,6 +32,30 @@ jobs:
           sudo xcode-select -s /Applications/Xcode_${{ env.XCODE_VERSION }}.app/Contents/Developer
           xcodebuild -version
 
+      - name: Boot iOS Simulator
+        run: |
+          # List available simulators and boot one for tests
+          echo "Available simulators:"
+          xcrun simctl list devices available | grep -i iphone || echo "No iPhone simulators found"
+          # Boot the first available iPhone simulator
+          SIM_ID=$(xcrun simctl list devices available -j | python3 -c "
+          import json,sys
+          data = json.load(sys.stdin)
+          for runtime, devices in data.get('devices', {}).items():
+            if 'iOS' in runtime:
+              for d in devices:
+                if d.get('isAvailable'):
+                  print(d['udid'])
+                  sys.exit(0)
+          print('')
+          ")
+          if [ -n "$SIM_ID" ]; then
+            echo "Booting simulator: $SIM_ID"
+            xcrun simctl boot "$SIM_ID" 2>/dev/null || true
+          else
+            echo "WARNING: No iOS simulator available, tests may fail"
+          fi
+
       - name: Setup Ruby & Bundler
         uses: ruby/setup-ruby@v1
         with:
