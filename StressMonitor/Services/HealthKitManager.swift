@@ -314,13 +314,13 @@ class HealthKitManager: ObservableObject {
         // Pair HRV and heart rate samples by closest timestamp
         // For simplicity, create readings from HRV samples with the latest HR value
         var readings: [StressReading] = []
-        for (i, hrv) in hrvHistory.enumerated().reversed() {
-            let hr = i < heartRateHistory.count ? heartRateHistory[i] : (heartRateHistory.last ?? 70)
+        for (idx, hrv) in hrvHistory.enumerated().reversed() {
+            let hr = idx < heartRateHistory.count ? heartRateHistory[idx] : (heartRateHistory.last ?? 70)
             let stressLevel = HRVAnalyzer.quickStressScore(hrvSDNN: hrv, heartRate: hr, baselineHRV: predictor.baselineHRV)
 
             let reading = StressReading(
                 id: UUID(),
-                timestamp: Date().addingTimeInterval(-Double(hrvHistory.count - i) * 60),
+                timestamp: Date().addingTimeInterval(-Double(hrvHistory.count - idx) * 60),
                 level: stressLevel,
                 hrv: hrv,
                 heartRate: hr,

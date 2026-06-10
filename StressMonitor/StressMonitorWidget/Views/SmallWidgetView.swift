@@ -1,4 +1,5 @@
 import SwiftUI
+import WidgetKit
 
 /// Small widget view (16x16 modules)
 /// Displays stress ring and current stress level
@@ -130,23 +131,23 @@ extension Color {
         let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
         var int: UInt64 = 0
         Scanner(string: hex).scanHexInt64(&int)
-        let a, r, g, b: UInt64
+        let alphaVal, redVal, greenVal, blueVal: UInt64
         switch hex.count {
         case 3:
-            (a, r, g, b) = (255, (int >> 8) * 17, (int >> 4 & 0xF) * 17, (int & 0xF) * 17)
+            (alphaVal, redVal, greenVal, blueVal) = (255, (int >> 8) * 17, (int >> 4 & 0xF) * 17, (int & 0xF) * 17)
         case 6:
-            (a, r, g, b) = (255, int >> 16, int >> 8 & 0xFF, int & 0xFF)
+            (alphaVal, redVal, greenVal, blueVal) = (255, int >> 16, int >> 8 & 0xFF, int & 0xFF)
         case 8:
-            (a, r, g, b) = (int >> 24, int >> 16 & 0xFF, int >> 8 & 0xFF, int & 0xFF)
+            (alphaVal, redVal, greenVal, blueVal) = (int >> 24, int >> 16 & 0xFF, int >> 8 & 0xFF, int & 0xFF)
         default:
-            (a, r, g, b) = (1, 1, 1, 0)
+            (alphaVal, redVal, greenVal, blueVal) = (1, 1, 1, 0)
         }
         self.init(
             .sRGB,
-            red: Double(r) / 255,
-            green: Double(g) / 255,
-            blue: Double(b) / 255,
-            opacity: Double(a) / 255
+            red: Double(redVal) / 255,
+            green: Double(greenVal) / 255,
+            blue: Double(blueVal) / 255,
+            opacity: Double(alphaVal) / 255
         )
     }
 }
@@ -154,7 +155,7 @@ extension Color {
 // MARK: - Preview
 
 @available(iOS 17.0, *)
-#Preview(as: .systemSmall) {
+#Preview {
     SmallWidgetView(entry: StressEntry(
         date: Date(),
         latestStress: StressData(
@@ -169,19 +170,4 @@ extension Color {
         baseline: (50.0, 60.0),
         isPlaceholder: false
     ))
-} timeline: {
-    StressEntry(
-        date: Date(),
-        latestStress: StressData(
-            level: 35,
-            category: "mild",
-            hrv: 55,
-            heartRate: 68,
-            confidence: 0.85,
-            timestamp: Date()
-        ),
-        history: [],
-        baseline: (50.0, 60.0),
-        isPlaceholder: false
-    )
 }

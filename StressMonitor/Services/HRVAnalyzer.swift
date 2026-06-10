@@ -224,8 +224,8 @@ final class HRVAnalyzer {
     private static func resampleUniform(rrIntervals: [Double], sampleRate: Double) -> [Double] {
         // Build cumulative time axis
         var cumulativeTime: [Double] = [0]
-        for rr in rrIntervals {
-            cumulativeTime.append(cumulativeTime.last! + rr / 1000.0) // Convert ms to seconds
+        for interval in rrIntervals {
+            cumulativeTime.append(cumulativeTime.last! + interval / 1000.0) // Convert ms to seconds
         }
 
         let totalTime = cumulativeTime.last!
@@ -233,23 +233,23 @@ final class HRVAnalyzer {
         guard numSamples > 0 else { return [] }
 
         var resampled: [Double] = []
-        var j = 0
+        var segmentIdx = 0
 
-        for i in 0..<numSamples {
-            let t = Double(i) / sampleRate
+        for sampleIdx in 0..<numSamples {
+            let targetTime = Double(sampleIdx) / sampleRate
 
-            // Find the interval containing time t
-            while j < cumulativeTime.count - 2 && cumulativeTime[j + 1] < t {
-                j += 1
+            // Find the interval containing time targetTime
+            while segmentIdx < cumulativeTime.count - 2 && cumulativeTime[segmentIdx + 1] < targetTime {
+                segmentIdx += 1
             }
 
             // Linear interpolation
-            let t0 = cumulativeTime[j]
-            let t1 = cumulativeTime[j + 1]
-            let rr0 = rrIntervals[j]
-            let rr1 = j + 1 < rrIntervals.count ? rrIntervals[j + 1] : rr0
+            let segStartTime = cumulativeTime[segmentIdx]
+            let segEndTime = cumulativeTime[segmentIdx + 1]
+            let rr0 = rrIntervals[segmentIdx]
+            let rr1 = segmentIdx + 1 < rrIntervals.count ? rrIntervals[segmentIdx + 1] : rr0
 
-            let fraction = t1 > t0 ? (t - t0) / (t1 - t0) : 0
+            let fraction = segEndTime > segStartTime ? (targetTime - segStartTime) / (segEndTime - segStartTime) : 0
             let interpolatedRR = rr0 + fraction * (rr1 - rr0)
 
             // Detrend: subtract local mean (prevents DC bias)
@@ -264,36 +264,36 @@ final class HRVAnalyzer {
     /// Simplified periodogram (magnitude-squared of DFT).
     /// For production use Accelerate vDSP_fft_zrip.
     private static func computePeriodogram(signal: [Double], sampleRate: Double) -> [(frequency: Double, power: Double)] {
-        let n = signal.count
-        guard n > 0 else { return [] }
+        let signalCount = signal.count
+        guard signalCount > 0 else { return [] }
 
         // Use Cooley-Tukey radix-2 FFT for power of 2 lengths
-        let fftLength = nextPowerOf2(n)
+        let fftLength = nextPowerOf2(signalCount)
         var padded = signal
-        padded.append(contentsOf: [Double](repeating: 0, count: fftLength - n))
+        padded.append(contentsOf: [Double](repeating: 0, count: fftLength - signalCount))
 
         // Hann window
-        for i in 0..<fftLength {
-            let window = 0.5 * (1.0 - cos(2.0 * .pi * Double(i) / Double(fftLength - 1)))
-            padded[i] *= window
+        for windowIdx in 0..<fftLength {
+            let window = 0.5 * (1.0 - cos(2.0 * .pi * Double(windowIdx) / Double(fftLength - 1)))
+            padded[windowIdx] *= window
         }
 
         // Compute DFT (simplified O(n²) — replace with FFT for production)
         var psd: [(frequency: Double, power: Double)] = []
         let halfN = fftLength / 2
 
-        for k in 0..<halfN {
+        for freqBin in 0..<halfN {
             var realPart: Double = 0
             var imagPart: Double = 0
 
-            for j in 0..<fftLength {
-                let angle = 2.0 * .pi * Double(k) * Double(j) / Double(fftLength)
-                realPart += padded[j] * cos(angle)
-                imagPart -= padded[j] * sin(angle)
+            for timeIdx in 0..<fftLength {
+                let angle = 2.0 * .pi * Double(freqBin) * Double(timeIdx) / Double(fftLength)
+                realPart += padded[timeIdx] * cos(angle)
+                imagPart -= padded[timeIdx] * sin(angle)
             }
 
             let power = (realPart * realPart + imagPart * imagPart) / Double(fftLength * fftLength)
-            let frequency = Double(k) * sampleRate / Double(fftLength)
+            let frequency = Double(freqBin) * sampleRate / Double(fftLength)
 
             psd.append((frequency: frequency, power: power))
         }
@@ -393,9 +393,9 @@ final class HRVAnalyzer {
     }
 
     private static func nextPowerOf2(_ n: Int) -> Int {
-        var p = 1
-        while p < n { p <<= 1 }
-        return p
+        var power = 1
+        while power < n { power <<= 1 }
+        return power
     }
 
     private static func categorize(score: Double) -> StressCategory {

@@ -1,5 +1,6 @@
 import SwiftUI
 import Charts
+import WidgetKit
 
 /// Medium widget view (32x16 modules)
 /// Displays stress level, HRV trend chart, and quick stats
@@ -243,7 +244,7 @@ struct HRVTrendChart: View {
 // MARK: - Preview
 
 @available(iOS 17.0, *)
-#Preview(as: .systemMedium) {
+#Preview {
     MediumWidgetView(entry: StressEntry(
         date: Date(),
         latestStress: StressData(
@@ -262,23 +263,4 @@ struct HRVTrendChart: View {
         baseline: (50.0, 60.0),
         isPlaceholder: false
     ))
-} timeline: {
-    StressEntry(
-        date: Date(),
-        latestStress: StressData(
-            level: 42,
-            category: "mild",
-            hrv: 52,
-            heartRate: 72,
-            confidence: 0.85,
-            timestamp: Date()
-        ),
-        history: [
-            StressData(level: 35, category: "mild", hrv: 55, heartRate: 68, confidence: 0.85, timestamp: Date().addingTimeInterval(-4 * 3600)),
-            StressData(level: 45, category: "mild", hrv: 48, heartRate: 75, confidence: 0.8, timestamp: Date().addingTimeInterval(-2 * 3600)),
-            StressData(level: 42, category: "mild", hrv: 52, heartRate: 72, confidence: 0.85, timestamp: Date()),
-        ],
-        baseline: (50.0, 60.0),
-        isPlaceholder: false
-    )
 }

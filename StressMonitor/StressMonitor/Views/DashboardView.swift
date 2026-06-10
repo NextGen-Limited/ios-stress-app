@@ -23,7 +23,7 @@ struct DashboardView: View {
             _viewModel = State(initialValue: StressViewModel(
                 healthKit: HealthKitManager(),
                 algorithm: MultiFactorStressCalculator(),
-                repository: StressRepository(modelContext: ModelContext(try! ModelContainer(for: StressMeasurement.self, configurations: ModelConfiguration(isStoredInMemoryOnly: true))))
+                repository: StressRepository(modelContext: ModelContext((try? ModelContainer(for: StressMeasurement.self, configurations: ModelConfiguration(isStoredInMemoryOnly: true)))!))
             ))
         }
         self.onSettingsTapped = onSettingsTapped
@@ -152,7 +152,7 @@ struct DashboardView: View {
 }
 
 #Preview("Dashboard - No Data") {
-    DashboardView(repository: StressRepository(modelContext: ModelContext(try! ModelContainer(for: StressMeasurement.self, configurations: ModelConfiguration(isStoredInMemoryOnly: true)))))
+    DashboardView(repository: StressRepository(modelContext: ModelContext((try? ModelContainer(for: StressMeasurement.self, configurations: ModelConfiguration(isStoredInMemoryOnly: true)))!)))
 }
 
 #Preview("Dashboard - Dark Mode") {

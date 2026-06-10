@@ -12,7 +12,7 @@ struct SettingsView: View {
 
     init() {
         _viewModel = State(initialValue: SettingsViewModel(
-            modelContext: ModelContext(try! ModelContainer(for: StressMeasurement.self, configurations: ModelConfiguration(isStoredInMemoryOnly: true)))
+            modelContext: ModelContext((try? ModelContainer(for: StressMeasurement.self, configurations: ModelConfiguration(isStoredInMemoryOnly: true)))!)
         ))
     }
 

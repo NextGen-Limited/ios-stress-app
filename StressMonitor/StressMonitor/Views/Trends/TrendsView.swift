@@ -9,7 +9,7 @@ struct TrendsView: View {
 
     init() {
         _viewModel = State(initialValue: TrendsViewModel(
-            modelContext: ModelContext(try! ModelContainer(for: StressMeasurement.self, configurations: ModelConfiguration(isStoredInMemoryOnly: true)))
+            modelContext: ModelContext((try? ModelContainer(for: StressMeasurement.self, configurations: ModelConfiguration(isStoredInMemoryOnly: true)))!)
         ))
     }
 

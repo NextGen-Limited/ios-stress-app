@@ -1,7 +1,7 @@
 import SwiftUI
 
 @main
-struct StressMonitorWatch_Watch_AppApp: App {
+struct StressMonitorWatchApp: App {
   var body: some Scene {
     WindowGroup {
       ContentView()

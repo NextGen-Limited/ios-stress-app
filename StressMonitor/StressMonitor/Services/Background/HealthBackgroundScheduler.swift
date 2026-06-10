@@ -33,9 +33,9 @@ final class HealthBackgroundScheduler {
       forTaskWithIdentifier: backgroundTaskIdentifier,
       using: nil
     ) { [weak self] task in
-      guard let self else { return }
+      guard let self, let task = task as? BGAppRefreshTask else { return }
       Task {
-        await self.handleBackgroundRefresh(task: task as! BGAppRefreshTask)
+        await self.handleBackgroundRefresh(task: task)
       }
     }
   }

@@ -84,7 +84,7 @@ struct OnboardingSuccessView: View {
 
 #Preview {
     let repository = StressRepository(
-        modelContext: ModelContext(try! ModelContainer(for: StressMeasurement.self)),
+        modelContext: ModelContext((try? ModelContainer(for: StressMeasurement.self))!),
         baselineCalculator: BaselineCalculator()
     )
     OnboardingSuccessView(repository: repository)
