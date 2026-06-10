@@ -33,11 +33,9 @@ jobs:
           xcodebuild -version
 
       - name: Boot iOS Simulator
+        id: simulator
         run: |
-          # List available simulators and boot one for tests
-          echo "Available simulators:"
-          xcrun simctl list devices available | grep -i iphone || echo "No iPhone simulators found"
-          # Boot the first available iPhone simulator
+          # Find available iPhone simulator
           SIM_ID=$(xcrun simctl list devices available -j | python3 -c "
           import json,sys
           data = json.load(sys.stdin)
@@ -50,10 +48,12 @@ jobs:
           print('')
           ")
           if [ -n "$SIM_ID" ]; then
-            echo "Booting simulator: $SIM_ID"
+            echo "Found simulator: $SIM_ID"
             xcrun simctl boot "$SIM_ID" 2>/dev/null || true
+            echo "sim_id=$SIM_ID" >> $GITHUB_OUTPUT
           else
-            echo "WARNING: No iOS simulator available, tests may fail"
+            echo "WARNING: No iOS simulator available"
+            echo "sim_id=" >> $GITHUB_OUTPUT
           fi
 
       - name: Setup Ruby & Bundler
@@ -91,6 +91,8 @@ jobs:
 
       - name: Run Tests (${{ matrix.destination }})
         if: ${{ inputs.run_tests != false }}
+        env:
+          SCAN_DEVICE: ${{ steps.simulator.outputs.sim_id && format('platform=iOS Simulator,id={0}', steps.simulator.outputs.sim_id) || '' }}
         run: |
           bundle exec fastlane test
 
