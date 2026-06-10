@@ -45,8 +45,8 @@ platform :ios do
   # ────────────────────── TESTS ──────────────────────
   desc "Run iOS unit tests"
   lane :test do
-    # Use destination from ENV or fallback to iPhone 16
-    # CI runners may not have specific simulator names
+    # Use name-based destination from ENV or fallback to generic iPhone
+    # CI runners may have different simulator OS versions
     devices = ENV["SCAN_DEVICE"] ? [ENV["SCAN_DEVICE"]] : ["iPhone 16"]
     scan(
       project: PROJECT,
@@ -63,7 +63,7 @@ platform :ios do
 
   desc "Run watchOS unit tests"
   lane :test_watchos do
-    devices = ENV["SCAN_WATCH_DEVICE"] ? [ENV["SCAN_WATCH_DEVICE"]] : ["Apple Watch Series 10 (46mm)"]
+    devices = ENV["SCAN_WATCH_DEVICE"] ? [ENV["SCAN_WATCH_DEVICE"]] : ["Apple Watch SE (44mm) (2nd generation)"]
     scan(
       project: PROJECT,
       scheme: "StressMonitorWatch Watch App",
@@ -84,7 +84,7 @@ platform :ios do
       project: PROJECT,
       scheme: "StressMonitorUITests",
       devices: devices,
-      clean: true,
+      clean: false,
       result_bundle: true,
       output_directory: "fastlane/test_output_ui",
       xcargs: "-skipPackagePluginValidation -skipMacroValidation",

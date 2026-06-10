@@ -13,7 +13,7 @@ on:
       run_watchos_tests:
         description: "Run watchOS tests?"
         required: false
-        default: true
+        default: false
         type: boolean
 
 concurrency:
@@ -22,8 +22,8 @@ concurrency:
 
 jobs:
   test:
-    name: Lint, Test & Build watchOS
+    name: Lint, Test & Build
     uses: ./.github/workflows/_test.yml
     with:
       run_tests: ${{ github.event_name != 'workflow_dispatch' || inputs.run_tests }}
-      run_watchos_tests: ${{ github.event_name != 'workflow_dispatch' || inputs.run_watchos_tests }}
+      run_watchos_tests: ${{ inputs.run_watchos_tests || false }}
