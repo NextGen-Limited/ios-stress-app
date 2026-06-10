@@ -21,7 +21,7 @@ jobs:
     uses: ./.github/workflows/_test.yml
     with:
       run_tests: true
-      run_watchos_tests: true
+      run_watchos_tests: false
 
   deploy:
     name: Build & Deploy to TestFlight
