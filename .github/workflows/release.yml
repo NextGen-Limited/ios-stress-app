@@ -1,33 +1,26 @@
-name: Distribute to TestFlight
+name: App Store Release
 
 on:
   workflow_dispatch:
     inputs:
-      group:
-        description: "TestFlight group to distribute to"
-        required: true
-        type: choice
-        options:
-          - "Core Testers"
-          - "Extended Beta"
-          - "Public Beta"
-      build_number:
-        description: "Build number to distribute (leave blank = latest processed)"
+      submit_for_review:
+        description: "Submit for App Store review?"
         required: false
-        type: string
+        default: true
+        type: boolean
 
 concurrency:
-  group: distribute-${{ github.ref }}-${{ inputs.group }}
-  cancel-in-progress: false   # never cancel an in-flight distribution
+  group: release-${{ github.ref }}
+  cancel-in-progress: false   # never cancel a release in progress
 
 env:
   LANG: "en_US.UTF-8"
 
 jobs:
-  distribute:
-    name: Distribute to ${{ inputs.group }}
+  release:
+    name: Submit to App Store
     runs-on: macos-15
-    timeout-minutes: 10
+    timeout-minutes: 20
     environment: production
 
     steps:
@@ -46,7 +39,7 @@ jobs:
           bundle config path vendor/bundle
           bundle install --jobs 4 --retry 3
 
-      - name: Distribute via Fastlane
+      - name: Submit for App Store Review
         env:
           APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
           APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
@@ -62,5 +55,8 @@ jobs:
           TEAM_ID: "K2TYLYAWMK"
           ITC_TEAM_ID: "K2TYLYAWMK"
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-          TESTFLIGHT_GROUPS: ${{ inputs.group }}
-        run: bundle exec fastlane distribute_beta
+        run: bundle exec fastlane release
+
+      - name: Notify
+        if: always()
+        run: echo "Release workflow completed. Check App Store Connect for review status."

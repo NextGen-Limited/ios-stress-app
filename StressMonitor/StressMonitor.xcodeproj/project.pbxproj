@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		F211BBDA2FD9112000A6E25D /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F211BBD92FD9111F00A6E25D /* WidgetKit.framework */; };
+		F211BBDC2FD9112000A6E25D /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F211BBDB2FD9112000A6E25D /* SwiftUI.framework */; };
+		F211BBED2FD9112200A6E25D /* StressMonitorWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = F211BBD72FD9111F00A6E25D /* StressMonitorWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		F26965312F5C0A9700B40F0F /* AnimatedTabBar in Frameworks */ = {isa = PBXBuildFile; productRef = F26965302F5C0A9700B40F0F /* AnimatedTabBar */; };
 		F26968812F5DAE2400B40F0F /* SwiftUICharts in Frameworks */ = {isa = PBXBuildFile; productRef = F26968802F5DAE2400B40F0F /* SwiftUICharts */; };
 		F2E2EC392F1CC605000C2B53 /* StressMonitorWatch Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = F2E2EC192F1CC602000C2B53 /* StressMonitorWatch Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
@@ -16,6 +19,13 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		F211BBEB2FD9112200A6E25D /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = F2E2EBE12F1CC553000C2B53 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = F211BBD62FD9111F00A6E25D;
+			remoteInfo = StressMonitorWidgetExtension;
+		};
 		F2E2EBF92F1CC556000C2B53 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = F2E2EBE12F1CC553000C2B53 /* Project object */;
@@ -54,6 +64,17 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXCopyFilesBuildPhase section */
+		F211BBEE2FD9112200A6E25D /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				F211BBED2FD9112200A6E25D /* StressMonitorWidgetExtension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		F2E2EC3D2F1CC605000C2B53 /* Embed Watch Content */ = {
 			isa = PBXCopyFilesBuildPhase;
 			buildActionMask = 2147483647;
@@ -68,6 +89,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		F211BBD72FD9111F00A6E25D /* StressMonitorWidgetExtension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = StressMonitorWidgetExtension.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		F211BBD92FD9111F00A6E25D /* WidgetKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WidgetKit.framework; path = System/Library/Frameworks/WidgetKit.framework; sourceTree = SDKROOT; };
+		F211BBDB2FD9112000A6E25D /* SwiftUI.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = SwiftUI.framework; path = System/Library/Frameworks/SwiftUI.framework; sourceTree = SDKROOT; };
 		F2E2EBE92F1CC553000C2B53 /* StressMonitor.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = StressMonitor.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		F2E2EBF82F1CC556000C2B53 /* StressMonitorTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = StressMonitorTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		F2E2EC022F1CC556000C2B53 /* StressMonitorUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = StressMonitorUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -77,6 +101,13 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
+		F211BBF12FD9112200A6E25D /* Exceptions for "StressMonitorWidget" folder in "StressMonitorWidgetExtension" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = F211BBD62FD9111F00A6E25D /* StressMonitorWidgetExtension */;
+		};
 		F2D098F52F66727C00EC7538 /* Exceptions for "StressMonitor" folder in "StressMonitorWatch Watch App" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -96,6 +127,14 @@
 /* End PBXFileSystemSynchronizedBuildFileExceptionSet section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
+		F211BBDD2FD9112000A6E25D /* StressMonitorWidget */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+				F211BBF12FD9112200A6E25D /* Exceptions for "StressMonitorWidget" folder in "StressMonitorWidgetExtension" target */,
+			);
+			path = StressMonitorWidget;
+			sourceTree = "<group>";
+		};
 		F2E2EBEB2F1CC553000C2B53 /* StressMonitor */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
@@ -132,6 +171,15 @@
 /* End PBXFileSystemSynchronizedRootGroup section */
 
 /* Begin PBXFrameworksBuildPhase section */
+		F211BBD42FD9111F00A6E25D /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F211BBDC2FD9112000A6E25D /* SwiftUI.framework in Frameworks */,
+				F211BBDA2FD9112000A6E25D /* WidgetKit.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		F2E2EBE62F1CC553000C2B53 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
@@ -182,6 +230,15 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		F211BBD82FD9111F00A6E25D /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				F211BBD92FD9111F00A6E25D /* WidgetKit.framework */,
+				F211BBDB2FD9112000A6E25D /* SwiftUI.framework */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
 		F2E2EBE02F1CC553000C2B53 = {
 			isa = PBXGroup;
 			children = (
@@ -191,6 +248,8 @@
 				F2E2EC1A2F1CC602000C2B53 /* StressMonitorWatch Watch App */,
 				F2E2EC282F1CC605000C2B53 /* StressMonitorWatch Watch AppTests */,
 				F2E2EC322F1CC605000C2B53 /* StressMonitorWatch Watch AppUITests */,
+				F211BBDD2FD9112000A6E25D /* StressMonitorWidget */,
+				F211BBD82FD9111F00A6E25D /* Frameworks */,
 				F2E2EBEA2F1CC553000C2B53 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -204,6 +263,7 @@
 				F2E2EC192F1CC602000C2B53 /* StressMonitorWatch Watch App.app */,
 				F2E2EC252F1CC605000C2B53 /* StressMonitorWatch Watch AppTests.xctest */,
 				F2E2EC2F2F1CC605000C2B53 /* StressMonitorWatch Watch AppUITests.xctest */,
+				F211BBD72FD9111F00A6E25D /* StressMonitorWidgetExtension.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -211,6 +271,28 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		F211BBD62FD9111F00A6E25D /* StressMonitorWidgetExtension */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F211BBF22FD9112200A6E25D /* Build configuration list for PBXNativeTarget "StressMonitorWidgetExtension" */;
+			buildPhases = (
+				F211BBD32FD9111F00A6E25D /* Sources */,
+				F211BBD42FD9111F00A6E25D /* Frameworks */,
+				F211BBD52FD9111F00A6E25D /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			fileSystemSynchronizedGroups = (
+				F211BBDD2FD9112000A6E25D /* StressMonitorWidget */,
+			);
+			name = StressMonitorWidgetExtension;
+			packageProductDependencies = (
+			);
+			productName = StressMonitorWidgetExtension;
+			productReference = F211BBD72FD9111F00A6E25D /* StressMonitorWidgetExtension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 		F2E2EBE82F1CC553000C2B53 /* StressMonitor */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = F2E2EC0C2F1CC556000C2B53 /* Build configuration list for PBXNativeTarget "StressMonitor" */;
@@ -219,11 +301,13 @@
 				F2E2EBE62F1CC553000C2B53 /* Frameworks */,
 				F2E2EBE72F1CC553000C2B53 /* Resources */,
 				F2E2EC3D2F1CC605000C2B53 /* Embed Watch Content */,
+				F211BBEE2FD9112200A6E25D /* Embed Foundation Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
 				F2E2EC382F1CC605000C2B53 /* PBXTargetDependency */,
+				F211BBEC2FD9112200A6E25D /* PBXTargetDependency */,
 			);
 			fileSystemSynchronizedGroups = (
 				F2E2EBEB2F1CC553000C2B53 /* StressMonitor */,
@@ -361,9 +445,12 @@
 			isa = PBXProject;
 			attributes = {
 				BuildIndependentTargetsInParallel = 1;
-				LastSwiftUpdateCheck = 2610;
+				LastSwiftUpdateCheck = 2630;
 				LastUpgradeCheck = 2610;
 				TargetAttributes = {
+					F211BBD62FD9111F00A6E25D = {
+						CreatedOnToolsVersion = 26.3;
+					};
 					F2E2EBE82F1CC553000C2B53 = {
 						CreatedOnToolsVersion = 26.1;
 					};
@@ -414,11 +501,19 @@
 				F2E2EC182F1CC602000C2B53 /* StressMonitorWatch Watch App */,
 				F2E2EC242F1CC605000C2B53 /* StressMonitorWatch Watch AppTests */,
 				F2E2EC2E2F1CC605000C2B53 /* StressMonitorWatch Watch AppUITests */,
+				F211BBD62FD9111F00A6E25D /* StressMonitorWidgetExtension */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
+		F211BBD52FD9111F00A6E25D /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		F2E2EBE72F1CC553000C2B53 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -464,6 +559,13 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
+		F211BBD32FD9111F00A6E25D /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 		F2E2EBE52F1CC553000C2B53 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
@@ -509,6 +611,11 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		F211BBEC2FD9112200A6E25D /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = F211BBD62FD9111F00A6E25D /* StressMonitorWidgetExtension */;
+			targetProxy = F211BBEB2FD9112200A6E25D /* PBXContainerItemProxy */;
+		};
 		F2E2EBFA2F1CC556000C2B53 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = F2E2EBE82F1CC553000C2B53 /* StressMonitor */;
@@ -537,6 +644,68 @@
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
+		F211BBEF2FD9112200A6E25D /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = K2TYLYAWMK;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = StressMonitorWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = StressMonitorWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = stress.ai.com.widget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		F211BBF02FD9112200A6E25D /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = K2TYLYAWMK;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = StressMonitorWidget/Info.plist;
+				INFOPLIST_KEY_CFBundleDisplayName = StressMonitorWidget;
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 26.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0;
+				PRODUCT_BUNDLE_IDENTIFIER = stress.ai.com.widget;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 		F2E2EC0A2F1CC556000C2B53 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -995,6 +1164,15 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
+		F211BBF22FD9112200A6E25D /* Build configuration list for PBXNativeTarget "StressMonitorWidgetExtension" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				F211BBEF2FD9112200A6E25D /* Debug */,
+				F211BBF02FD9112200A6E25D /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
 		F2E2EBE42F1CC553000C2B53 /* Build configuration list for PBXProject "StressMonitor" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (

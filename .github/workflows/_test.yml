@@ -8,6 +8,11 @@ on:
         required: false
         default: true
         type: boolean
+      run_watchos_tests:
+        description: "Run watchOS tests?"
+        required: false
+        default: true
+        type: boolean
 
 env:
   XCODE_VERSION: "16.3"
@@ -104,6 +109,45 @@ jobs:
           path: fastlane/test_output/
           retention-days: 7
 
+  test-watchos:
+    name: Test watchOS
+    runs-on: macos-15
+    timeout-minutes: 30
+    if: ${{ inputs.run_watchos_tests != false }}
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Select Xcode ${{ env.XCODE_VERSION }}
+        run: |
+          sudo xcode-select -s /Applications/Xcode_${{ env.XCODE_VERSION }}.app/Contents/Developer
+          xcodebuild -version
+
+      - name: Setup Ruby & Bundler
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: "3.3"
+          bundler-cache: true
+
+      - name: Install watchOS Simulator
+        run: |
+          if ! xcodebuild -showdestinations -scheme "StressMonitorWatch Watch App" -project StressMonitor/StressMonitor.xcodeproj 2>/dev/null | grep -q "watchOS Simulator"; then
+            echo "Installing watchOS Simulator runtime..."
+            xcodebuild -downloadPlatform watchOS
+          fi
+
+      - name: Run watchOS Tests
+        run: |
+          bundle exec fastlane test_watchos
+
+      - name: Upload watchOS Test Results
+        uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: watchos-test-results
+          path: fastlane/test_output_watchos/
+          retention-days: 7
+
   build-watchos:
     name: Build watchOS
     runs-on: macos-15
@@ -129,6 +173,32 @@ jobs:
             -project StressMonitor/StressMonitor.xcodeproj \
             -scheme "StressMonitorWatch Watch App" \
             -destination 'generic/platform=watchOS Simulator' \
+            -derivedDataPath build \
+            -skipPackagePluginValidation \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            | xcpretty
+
+  build-widget:
+    name: Build Widget
+    runs-on: macos-15
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Select Xcode ${{ env.XCODE_VERSION }}
+        run: |
+          sudo xcode-select -s /Applications/Xcode_${{ env.XCODE_VERSION }}.app/Contents/Developer
+          xcodebuild -version
+
+      - name: Build Widget Extension
+        run: |
+          set -o pipefail
+          xcodebuild build \
+            -project StressMonitor/StressMonitor.xcodeproj \
+            -scheme "StressMonitorWidgetExtension" \
+            -destination 'generic/platform=iOS Simulator' \
             -derivedDataPath build \
             -skipPackagePluginValidation \
             CODE_SIGN_IDENTITY="" \
