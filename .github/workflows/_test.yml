@@ -15,7 +15,7 @@ on:
         type: boolean
 
 env:
-  XCODE_VERSION: "16.3"
+  XCODE_VERSION: "26.3"
   SCHEME: "StressMonitor"
   LANG: "en_US.UTF-8"
 
