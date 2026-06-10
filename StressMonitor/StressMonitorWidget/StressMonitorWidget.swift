@@ -1,70 +1,88 @@
+//
+//  StressMonitorWidget.swift
+//  StressMonitorWidget
+//
+//  Created by Phuong Doan Duy on 10/6/26.
+//
+
 import WidgetKit
 import SwiftUI
 
-/// Main widget configuration for Stress Monitor
-/// Configures all supported widget sizes with their respective providers and views
-@main
-public struct StressMonitorWidget: Widget {
-
-    // MARK: - Widget Configuration
-
-    public static let kind: String = "StressMonitorWidget"
-
-    public var body: some WidgetConfiguration {
-        StaticConfiguration(kind: Self.kind, provider: StressWidgetProvider()) { entry in
-            switch entry.family {
-            case .systemSmall:
-                SmallWidgetView(entry: entry)
-            case .systemMedium:
-                MediumWidgetView(entry: entry)
-            case .systemLarge:
-                LargeWidgetView(entry: entry)
-            default:
-                SmallWidgetView(entry: entry)
-            }
-        }
-        .configurationDisplayName("Stress Monitor")
-        .description("Monitor your stress levels, HRV trends, and receive personalized insights.")
-        .supportedFamilies([.systemSmall, .systemMedium, .systemLarge])
+struct Provider: AppIntentTimelineProvider {
+    func placeholder(in context: Context) -> SimpleEntry {
+        SimpleEntry(date: Date(), configuration: ConfigurationAppIntent())
     }
 
-    // MARK: - Initialization
+    func snapshot(for configuration: ConfigurationAppIntent, in context: Context) async -> SimpleEntry {
+        SimpleEntry(date: Date(), configuration: configuration)
+    }
+    
+    func timeline(for configuration: ConfigurationAppIntent, in context: Context) async -> Timeline<SimpleEntry> {
+        var entries: [SimpleEntry] = []
 
-    public init() {}
+        // Generate a timeline consisting of five entries an hour apart, starting from the current date.
+        let currentDate = Date()
+        for hourOffset in 0 ..< 5 {
+            let entryDate = Calendar.current.date(byAdding: .hour, value: hourOffset, to: currentDate)!
+            let entry = SimpleEntry(date: entryDate, configuration: configuration)
+            entries.append(entry)
+        }
+
+        return Timeline(entries: entries, policy: .atEnd)
+    }
+
+//    func relevances() async -> WidgetRelevances<ConfigurationAppIntent> {
+//        // Generate a list containing the contexts this widget is relevant in.
+//    }
 }
 
-// MARK: - Widget Bundle
+struct SimpleEntry: TimelineEntry {
+    let date: Date
+    let configuration: ConfigurationAppIntent
+}
 
-/// Widget bundle for all stress monitoring widgets
-@available(iOS 17.0, *)
-public struct StressMonitorWidgetBundle: WidgetBundle {
+struct StressMonitorWidgetEntryView : View {
+    var entry: Provider.Entry
 
-    public var body: some Widget {
-        StressMonitorWidget()
+    var body: some View {
+        VStack {
+            Text("Time:")
+            Text(entry.date, style: .time)
+
+            Text("Favorite Emoji:")
+            Text(entry.configuration.favoriteEmoji)
+        }
     }
 }
 
-// MARK: - Widget Deep Link Handling
+struct StressMonitorWidget: Widget {
+    let kind: String = "StressMonitorWidget"
 
-/// Helper for deep linking from widget to main app
-@available(iOS 17.0, *)
-public enum WidgetDeepLink {
-
-    case dashboard
-    case history
-    case trends
-    case measurement
-
-    var url: URL {
-        switch self {
-        case .dashboard:
-            return URL(string: "stressmonitor://dashboard")!
-        case .history:
-            return URL(string: "stressmonitor://history")!
-        case .trends:
-            return URL(string: "stressmonitor://trends")!
-        case .measurement:
-            return URL(string: "stressmonitor://measurement")!
+    var body: some WidgetConfiguration {
+        AppIntentConfiguration(kind: kind, intent: ConfigurationAppIntent.self, provider: Provider()) { entry in
+            StressMonitorWidgetEntryView(entry: entry)
+                .containerBackground(.fill.tertiary, for: .widget)
         }
     }
+}
+
+extension ConfigurationAppIntent {
+    fileprivate static var smiley: ConfigurationAppIntent {
+        let intent = ConfigurationAppIntent()
+        intent.favoriteEmoji = "😀"
+        return intent
+    }
+    
+    fileprivate static var starEyes: ConfigurationAppIntent {
+        let intent = ConfigurationAppIntent()
+        intent.favoriteEmoji = "🤩"
+        return intent
+    }
+}
+
+#Preview(as: .systemSmall) {
+    StressMonitorWidget()
+} timeline: {
+    SimpleEntry(date: .now, configuration: .smiley)
+    SimpleEntry(date: .now, configuration: .starEyes)
 }

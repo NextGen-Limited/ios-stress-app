@@ -10,6 +10,11 @@ on:
         required: false
         default: true
         type: boolean
+      run_watchos_tests:
+        description: "Run watchOS tests?"
+        required: false
+        default: true
+        type: boolean
 
 concurrency:
   group: ci-${{ github.ref }}
@@ -21,3 +26,4 @@ jobs:
     uses: ./.github/workflows/_test.yml
     with:
       run_tests: ${{ github.event_name != 'workflow_dispatch' || inputs.run_tests }}
+      run_watchos_tests: ${{ github.event_name != 'workflow_dispatch' || inputs.run_watchos_tests }}

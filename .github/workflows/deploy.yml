@@ -21,6 +21,7 @@ jobs:
     uses: ./.github/workflows/_test.yml
     with:
       run_tests: true
+      run_watchos_tests: true
 
   deploy:
     name: Build & Deploy to TestFlight
@@ -83,8 +84,10 @@ jobs:
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
           MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
           MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
-          # Hardcoded app info
+          # App info — single source of truth
           APP_IDENTIFIER: "stress.ai.com"
+          WATCH_APP_IDENTIFIER: "stress.ai.com.watchkitapp"
+          WIDGET_APP_IDENTIFIER: "stress.ai.com.widget"
           APPLE_ID: "95doanphuong@gmail.com"
           TEAM_ID: "K2TYLYAWMK"
           ITC_TEAM_ID: "K2TYLYAWMK"
