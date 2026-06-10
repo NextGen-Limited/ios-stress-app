@@ -4,20 +4,6 @@ on:
   push:
     branches: [main, release/*]
   workflow_dispatch:
-    inputs:
-      distribute_external:
-        description: "Distribute to external testers?"
-        required: false
-        default: "true"
-        type: choice
-        options:
-          - "true"
-          - "false"
-      testflight_groups:
-        description: "TestFlight groups (comma-separated)"
-        required: false
-        default: "Core Testers,Public Beta"
-        type: string
 
 concurrency:
   group: deploy-${{ github.ref }}
@@ -40,7 +26,7 @@ jobs:
     name: Build & Deploy to TestFlight
     needs: test
     runs-on: macos-15
-    timeout-minutes: 90
+    timeout-minutes: 35
     environment: production # Requires approval gate in GitHub Settings → Environments
     steps:
       - name: Checkout
@@ -65,6 +51,16 @@ jobs:
           restore-keys: |
             derived-${{ runner.os }}-${{ hashFiles('StressMonitor/StressMonitor.xcodeproj/project.pbxproj') }}-
 
+      - name: Cache SPM Packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/Library/Developer/Xcode/DerivedData/**/SourcePackages/checkouts
+            ~/Library/Developer/Xcode/DerivedData/**/SourcePackages/repositories
+          key: spm-${{ runner.os }}-${{ hashFiles('**/Package.resolved') }}
+          restore-keys: |
+            spm-${{ runner.os }}-
+
       - name: Install Dependencies
         run: |
           bundle config path vendor/bundle
@@ -87,17 +83,14 @@ jobs:
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
           MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
           MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
-          # App info
-          APP_IDENTIFIER: ${{ secrets.APP_IDENTIFIER }}
-          APPLE_ID: ${{ secrets.APPLE_ID }}
-          TEAM_ID: ${{ secrets.TEAM_ID }}
-          ITC_TEAM_ID: ${{ secrets.ITC_TEAM_ID }}
-          # Distribution
-          DISTRIBUTE_EXTERNAL: ${{ github.event.inputs.distribute_external || 'true' }}
-          TESTFLIGHT_GROUPS: ${{ github.event.inputs.testflight_groups || 'Core Testers,Public Beta' }}
+          # Hardcoded app info
+          APP_IDENTIFIER: "stress.ai.com"
+          APPLE_ID: "95doanphuong@gmail.com"
+          TEAM_ID: "K2TYLYAWMK"
+          ITC_TEAM_ID: "K2TYLYAWMK"
           # Notifications
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-        run: bundle exec fastlane beta
+        run: bundle exec fastlane upload_beta
 
       - name: Upload Build Artifacts
         uses: actions/upload-artifact@v4

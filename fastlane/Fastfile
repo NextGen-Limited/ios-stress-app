@@ -1,15 +1,17 @@
 # Fastlane for StressMonitor — GitHub Actions + TestFlight CI/CD
 #
 # Usage:
-#   bundle exec fastlane test          — Run unit tests
-#   bundle exec fastlane beta          — Build & deploy to TestFlight
-#   bundle exec fastlane build_only    — Build IPA without uploading
+#   bundle exec fastlane test            — Run unit tests
+#   bundle exec fastlane upload_beta     — Build & upload to TestFlight (no distribution)
+#   bundle exec fastlane distribute_beta — Distribute processed build to TestFlight group
+#   bundle exec fastlane build_only      — Build IPA without uploading
 
 default_platform(:ios)
 
 platform :ios do
   # ────────────────────── CONFIG ──────────────────────
-  APP_IDENTIFIER = ENV["APP_IDENTIFIER"] || "StressMonitor.StressMonitor"
+  APP_IDENTIFIER = ENV["APP_IDENTIFIER"] || "stress.ai.com"
+  WATCH_APP_IDENTIFIER = ENV["WATCH_APP_IDENTIFIER"] || "stress.ai.com.watchkitapp"
   SCHEME = "StressMonitor"
   PROJECT = "StressMonitor/StressMonitor.xcodeproj"
 
@@ -74,23 +76,33 @@ platform :ios do
     )
   end
 
-  # ────────────────────── BETA ──────────────────────
-  desc "Build and deploy to TestFlight"
-  lane :beta do
-    # 1. Setup CI keychain (creates temp keychain, avoids prompts)
+  # ────────────────────── UPLOAD BETA ──────────────────────
+  desc "Build and upload to TestFlight (no distribution)"
+  lane :upload_beta do
     setup_ci
 
-    # 2. Fetch signing assets via match
     match(
       type: "appstore",
-      readonly: true, # CI should NOT create new certs/profiles
+      readonly: true,
       api_key: api_key
     )
 
-    # 3. Increment build number based on latest TestFlight build
     increment_build
 
-    # 4. Build the IPA
+    # Capture changelog at build time (accurate: reflects commits in this build)
+    notes = begin
+      changelog_from_git_commits(
+        merge_commit_filtering: "exclude_merges",
+        commits_count: 20,
+        pretty: "- %s"
+      )
+    rescue => e
+      UI.important("Could not generate changelog: #{e.message}")
+      "Build from #{ENV['GITHUB_SHA']&.[](0..6) || 'local'}"
+    end
+    FileUtils.mkdir_p("build")
+    File.write("build/CHANGELOG.txt", notes)
+
     gym(
       project: PROJECT,
       scheme: SCHEME,
@@ -109,22 +121,39 @@ platform :ios do
       suppress_xcode_output: true
     )
 
-    # 5. Upload to TestFlight
     pilot(
       api_key: api_key,
       app_identifier: APP_IDENTIFIER,
-      distribute_external: (ENV["DISTRIBUTE_EXTERNAL"] || "true") == "true",
-      groups: (ENV["TESTFLIGHT_GROUPS"] || "Core Testers,Public Beta").split(","),
-      changelog: read_changelog,
-      skip_waiting_for_build_processing: false, # MUST be false for external distribution
-      wait_processing_interval: 30,
-      timeout: 7200, # 2 hours max
-      notify_external_testers: true,
-      wait_for_uploaded_build: true
+      skip_submission: true,
+      skip_waiting_for_build_processing: true
     )
 
-    # 6. Notify
-    slack_notify
+    slack_notify("uploaded to TestFlight (processing)")
+  end
+
+  # ────────────────────── DISTRIBUTE BETA ──────────────────────
+  desc "Distribute a processed build to a TestFlight group"
+  lane :distribute_beta do
+    groups = (ENV["TESTFLIGHT_GROUPS"] || "Core Testers").split(",").map(&:strip)
+
+    # Read changelog written during upload_beta (accurate, build-time snapshot)
+    notes = if File.exist?("build/CHANGELOG.txt")
+      File.read("build/CHANGELOG.txt")
+    else
+      "Build from #{ENV['GITHUB_SHA']&.[](0..6) || 'local'}"
+    end
+
+    # pilot auto-selects latest processed build when distribute_only: true
+    pilot(
+      api_key: api_key,
+      app_identifier: APP_IDENTIFIER,
+      distribute_only: true,
+      groups: groups,
+      notify_external_testers: true,
+      changelog: notes
+    )
+
+    slack_notify("distributed to #{groups.join(', ')}")
   end
 
   # ────────────────────── INCREMENT BUILD NUMBER ──────────────────────
@@ -169,33 +198,20 @@ platform :ios do
   end
 
   # ────────────────────── HELPERS ──────────────────────
-  def read_changelog
-    path = File.join(Dir.pwd, "CHANGELOG.md")
-    if File.exist?(path)
-      content = File.read(path)
-      section = content.split(/^## /)[1]
-      if section
-        lines = section.split("\n").first(10)
-        return lines.join("\n")
-      end
-    end
-    "Build #{Time.now.strftime('%Y-%m-%d %H:%M')} from #{ENV['GITHUB_SHA']&.[](0..6) || 'local'}"
-  end
-
-  def slack_notify
+  def slack_notify(action = "deployed")
     return unless ENV["SLACK_WEBHOOK_URL"]
 
     version = get_version_number(xcodeproj: PROJECT, target: "StressMonitor")
-    build = get_build_number(xcodeproj: PROJECT)
+    build   = get_build_number(xcodeproj: PROJECT)
 
     slack(
       slack_url: ENV["SLACK_WEBHOOK_URL"],
-      message: "✅ *StressMonitor #{version} (#{build})* deployed to TestFlight!",
+      message: "📦 *StressMonitor #{version} (#{build})* #{action}",
       payload: {
-        "Build" => build,
+        "Build"   => build,
         "Version" => version,
-        "Commit" => ENV["GITHUB_SHA"]&.[](0..6) || "N/A",
-        "Run" => ENV["GITHUB_RUN_ID"] ? "<#{ENV['GITHUB_SERVER_URL']}/#{ENV['GITHUB_REPOSITORY']}/actions/runs/#{ENV['GITHUB_RUN_ID']}|View>" : "local"
+        "Commit"  => ENV["GITHUB_SHA"]&.[](0..6) || "N/A",
+        "Run"     => ENV["GITHUB_RUN_ID"] ? "<#{ENV['GITHUB_SERVER_URL']}/#{ENV['GITHUB_REPOSITORY']}/actions/runs/#{ENV['GITHUB_RUN_ID']}|View>" : "local"
       }
     )
   end

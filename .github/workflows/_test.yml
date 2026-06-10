@@ -32,12 +32,10 @@ jobs:
           sudo xcode-select -s /Applications/Xcode_${{ env.XCODE_VERSION }}.app/Contents/Developer
           xcodebuild -version
 
-      - name: Cache Ruby Gems
-        uses: actions/cache@v4
+      - name: Setup Ruby & Bundler
+        uses: ruby/setup-ruby@v1
         with:
-          path: vendor/bundle
-          key: gems-${{ runner.os }}-${{ hashFiles('**/Gemfile.lock') }}
-          restore-keys: gems-${{ runner.os }}-
+          bundler-cache: true
 
       - name: Cache DerivedData
         uses: actions/cache@v4
@@ -47,11 +45,15 @@ jobs:
           restore-keys: |
             derived-${{ runner.os }}-${{ hashFiles('StressMonitor/StressMonitor.xcodeproj/project.pbxproj') }}-
 
-      - name: Install Dependencies
-        run: |
-          bundle config set path vendor/bundle
-          bundle update --bundler
-          bundle install --jobs 4 --retry 3
+      - name: Cache SPM Packages
+        uses: actions/cache@v4
+        with:
+          path: |
+            ~/Library/Developer/Xcode/DerivedData/**/SourcePackages/checkouts
+            ~/Library/Developer/Xcode/DerivedData/**/SourcePackages/repositories
+          key: spm-${{ runner.os }}-${{ hashFiles('**/Package.resolved') }}
+          restore-keys: |
+            spm-${{ runner.os }}-
 
       - name: Run SwiftLint
         run: |
