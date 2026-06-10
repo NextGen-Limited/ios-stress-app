@@ -6,6 +6,8 @@ import WidgetKit
 @available(iOS 17.0, *)
 public struct UpdateWidgetIntent: AppIntent {
 
+    public init() {}
+
     public static var title: LocalizedStringResource = "Update Widget"
     public static var description = IntentDescription("Refreshes the stress widget with the latest data.")
 
@@ -23,27 +25,19 @@ public struct UpdateWidgetIntent: AppIntent {
 // MARK: - Update Widget Shortcuts
 
 @available(iOS 17.0, *)
-public struct UpdateStressWidgetShortcut: AppShortcut {
-
-    public static var appItem: AppItem {
-        AppItem(
-            appName: "StressMonitor",
-            appIdentifier: "com.stressmonitor.app"
+public enum UpdateStressWidgetShortcuts: AppShortcutsProvider {
+    public static var appShortcuts: [AppShortcut] {
+        AppShortcut(
+            intent: UpdateWidgetIntent(),
+            phrases: [
+                "Update \(.applicationName) stress widget",
+                "Refresh \(.applicationName) stress widget",
+                "Reload \(.applicationName) stress widget"
+            ],
+            shortTitle: "Update Widget",
+            systemImageName: "arrow.clockwise"
         )
     }
-
-    public static var phrases: [AppShortcutPhrase] {
-        [
-            .init(type: UpdateWidgetIntent.self(), phrases: [
-                "Update stress widget",
-                "Refresh stress widget",
-                "Reload stress widget"
-            ])
-        ]
-    }
-
-    public static var shortTitle: LocalizedStringResource = "Update Widget"
-    public static var systemImageName: String = "arrow.clockwise"
 }
 
 // MARK: - Helper for Main App
@@ -67,7 +61,7 @@ public final class WidgetUpdater {
     }
 
     /// Get all configured widgets
-    public func getConfiguredWidgets() async -> [WidgetInfo] {
-        return await WidgetCenter.shared.currentConfigurations
+    public func getConfiguredWidgets() async throws -> [WidgetInfo] {
+        return try await WidgetCenter.shared.currentConfigurations()
     }
 }

@@ -14,10 +14,10 @@ extension WatchHealthKitManager {
         let sort = NSSortDescriptor(key: HKSampleSortIdentifierStartDate, ascending: true)
 
         return try await withCheckedThrowingContinuation { continuation in
-            var done = false
+            var queryCompleted = false
             let query = HKSampleQuery(sampleType: sleepType, predicate: predicate,
                                       limit: HKObjectQueryNoLimit, sortDescriptors: [sort]) { _, samples, error in
-                guard !done else { return }; done = true
+                guard !queryCompleted else { return }; queryCompleted = true
                 if let error { continuation.resume(throwing: error); return }
                 guard let samples = samples as? [HKCategorySample], !samples.isEmpty else {
                     continuation.resume(returning: nil); return
@@ -38,9 +38,9 @@ extension WatchHealthKitManager {
         async let energy = fetchCumulativeSum(type: activeEnergyType, unit: .kilocalorie(), predicate: predicate)
         async let standTime = fetchCumulativeSum(type: appleStandTimeType, unit: .second(), predicate: predicate)
 
-        let (s, e, st) = try await (steps, energy, standTime)
-        return ActivityData(stepCount: Int(s ?? 0), activeEnergyKcal: e ?? 0,
-                            standHours: Int((st ?? 0) / 3600.0),
+        let (stepsVal, energyVal, standVal) = try await (steps, energy, standTime)
+        return ActivityData(stepCount: Int(stepsVal ?? 0), activeEnergyKcal: energyVal ?? 0,
+                            standHours: Int((standVal ?? 0) / 3600.0),
                             lastWorkoutEndTime: nil, lastWorkoutDurationMinutes: nil, analysisDate: date)
     }
 
@@ -57,10 +57,10 @@ extension WatchHealthKitManager {
 
     private func fetchCumulativeSum(type: HKQuantityType, unit: HKUnit, predicate: NSPredicate) async throws -> Double? {
         try await withCheckedThrowingContinuation { continuation in
-            var done = false
+            var queryCompleted = false
             let query = HKStatisticsQuery(quantityType: type, quantitySamplePredicate: predicate,
-                                          options: .cumulativeSum) { _, stats, error in
-                guard !done else { return }; done = true
+                                           options: .cumulativeSum) { _, stats, error in
+                guard !queryCompleted else { return }; queryCompleted = true
                 if let error { continuation.resume(throwing: error); return }
                 continuation.resume(returning: stats?.sumQuantity()?.doubleValue(for: unit))
             }
@@ -71,9 +71,9 @@ extension WatchHealthKitManager {
     private func fetchLatestSample(type: HKQuantityType, unit: HKUnit) async throws -> Double? {
         let sort = NSSortDescriptor(key: HKSampleSortIdentifierEndDate, ascending: false)
         return try await withCheckedThrowingContinuation { continuation in
-            var done = false
+            var queryCompleted = false
             let query = HKSampleQuery(sampleType: type, predicate: nil, limit: 1, sortDescriptors: [sort]) { _, samples, error in
-                guard !done else { return }; done = true
+                guard !queryCompleted else { return }; queryCompleted = true
                 if let error { continuation.resume(throwing: error); return }
                 continuation.resume(returning: (samples?.first as? HKQuantitySample)?.quantity.doubleValue(for: unit))
             }
@@ -86,22 +86,22 @@ extension WatchHealthKitManager {
         var rem: TimeInterval = 0, core: TimeInterval = 0
         var awakenings = 0, inBed: TimeInterval = 0
 
-        for s in samples {
-            let d = s.endDate.timeIntervalSince(s.startDate)
-            switch s.value {
-            case HKCategoryValueSleepAnalysis.inBed.rawValue: inBed += d
-            case HKCategoryValueSleepAnalysis.asleepDeep.rawValue: deep += d; total += d
-            case HKCategoryValueSleepAnalysis.asleepREM.rawValue: rem += d; total += d
-            case HKCategoryValueSleepAnalysis.asleepCore.rawValue: core += d; total += d
-            case HKCategoryValueSleepAnalysis.asleepUnspecified.rawValue: total += d
+        for sample in samples {
+            let duration = sample.endDate.timeIntervalSince(sample.startDate)
+            switch sample.value {
+            case HKCategoryValueSleepAnalysis.inBed.rawValue: inBed += duration
+            case HKCategoryValueSleepAnalysis.asleepDeep.rawValue: deep += duration; total += duration
+            case HKCategoryValueSleepAnalysis.asleepREM.rawValue: rem += duration; total += duration
+            case HKCategoryValueSleepAnalysis.asleepCore.rawValue: core += duration; total += duration
+            case HKCategoryValueSleepAnalysis.asleepUnspecified.rawValue: total += duration
             case HKCategoryValueSleepAnalysis.awake.rawValue: awakenings += 1
             default: break
             }
         }
 
-        let h = { (t: TimeInterval) in t / 3600.0 }
-        return SleepData(totalSleepHours: h(total), deepSleepHours: h(deep), remSleepHours: h(rem),
-                         coreSleepHours: h(core), awakenings: awakenings, timeInBedHours: h(inBed),
+        let toHours = { (interval: TimeInterval) in interval / 3600.0 }
+        return SleepData(totalSleepHours: toHours(total), deepSleepHours: toHours(deep), remSleepHours: toHours(rem),
+                          coreSleepHours: toHours(core), awakenings: awakenings, timeInBedHours: toHours(inBed),
                          sleepEfficiency: inBed > 0 ? min(1.0, total / inBed) : 0, analysisDate: date)
     }
 }

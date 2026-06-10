@@ -7,7 +7,7 @@ struct MeasurementHistoryView: View {
 
     init() {
         _viewModel = State(initialValue: HistoryViewModel(
-            modelContext: ModelContext(try! ModelContainer(for: StressMeasurement.self, configurations: ModelConfiguration(isStoredInMemoryOnly: true)))
+            modelContext: ModelContext((try? ModelContainer(for: StressMeasurement.self, configurations: ModelConfiguration(isStoredInMemoryOnly: true)))!)
         ))
     }
 

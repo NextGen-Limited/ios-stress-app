@@ -33,9 +33,9 @@ final class FactorCalibrator: Sendable {
     /// Hours with <5 samples are omitted — caller falls back to global baseline.
     func calculateHourlyBaseline(from measurements: [StressMeasurement]) -> [Int: Double] {
         var groups: [Int: [Double]] = [:]
-        for m in measurements {
-            let hour = Calendar.current.component(.hour, from: m.timestamp)
-            groups[hour, default: []].append(m.hrv)
+        for measurement in measurements {
+            let hour = Calendar.current.component(.hour, from: measurement.timestamp)
+            groups[hour, default: []].append(measurement.hrv)
         }
         return groups.compactMapValues { values in
             values.count >= 5 ? values.reduce(0, +) / Double(values.count) : nil

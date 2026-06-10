@@ -35,10 +35,10 @@ struct HRVStressFactor: StressFactor {
     }
 
     private func calculateConfidence(hrv: Double, lastReadingDate: Date?) -> Double {
-        var c = hrv < 20 ? max(0.3, hrv / 20.0) : 1.0
-        if let d = lastReadingDate {
-            c *= max(0.3, 1.0 - (Date().timeIntervalSince(d) / 60.0) / 120.0)
+        var confidence = hrv < 20 ? max(0.3, hrv / 20.0) : 1.0
+        if let lastDate = lastReadingDate {
+            confidence *= max(0.3, 1.0 - (Date().timeIntervalSince(lastDate) / 60.0) / 120.0)
         }
-        return max(0.0, min(1.0, c))
+        return max(0.0, min(1.0, confidence))
     }
 }

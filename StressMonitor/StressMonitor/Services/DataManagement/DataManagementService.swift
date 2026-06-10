@@ -447,7 +447,7 @@ public final class DataManagementService: DataExporter, DataDeleter {
 extension DataManagementService {
     /// Create a sample service for preview/testing
     static func sample() -> DataManagementService {
-        let context = ModelContext(try! ModelContainer(for: StressMeasurement.self))
+        let context = ModelContext((try? ModelContainer(for: StressMeasurement.self))!)
         let repository = StressRepository(modelContext: context)
         return DataManagementService(repository: repository, cloudKitManager: nil, fileManager: .default)
     }

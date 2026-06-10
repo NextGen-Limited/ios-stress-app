@@ -20,6 +20,19 @@ public final class WidgetDataProvider {
         static let latestConfidence = "latest_confidence"
         static let historyData = "stress_history_data"
         static let personalBaseline = "personal_baseline"
+
+        static var allCases: [String] {
+            [
+                latestStressLevel,
+                latestStressCategory,
+                latestHRV,
+                latestHeartRate,
+                latestTimestamp,
+                latestConfidence,
+                historyData,
+                personalBaseline
+            ]
+        }
     }
 
     // MARK: - Shared Instance
@@ -133,7 +146,7 @@ public final class WidgetDataProvider {
     /// Clears all widget data
     public func clearAllData() {
         Keys.allCases.forEach { key in
-            userDefaults.removeObject(forKey: key.rawValue)
+            userDefaults.removeObject(forKey: key)
         }
         userDefaults.removeObject(forKey: "baseline_hrv")
         userDefaults.removeObject(forKey: "baseline_hr")

@@ -14,8 +14,8 @@ import Foundation
 
 final public class FontBlaster {
     fileprivate enum SupportedFontExtensions: String {
-        case TrueTypeFont = ".ttf"
-        case OpenTypeFont = ".otf"
+        case trueTypeFont = ".ttf"
+        case openTypeFont = ".otf"
     }
 
     fileprivate typealias FontPath = String
@@ -151,7 +151,7 @@ private extension FontBlaster {
         for fileName in contents {
             var parsedFont: (FontName, FontExtension)?
 
-            if fileName.contains(SupportedFontExtensions.TrueTypeFont.rawValue) || fileName.contains(FontBlaster.SupportedFontExtensions.OpenTypeFont.rawValue) {
+            if fileName.contains(SupportedFontExtensions.trueTypeFont.rawValue) || fileName.contains(FontBlaster.SupportedFontExtensions.openTypeFont.rawValue) {
                 parsedFont = font(fromName: fileName)
             }
 

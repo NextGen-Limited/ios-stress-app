@@ -128,29 +128,67 @@ final class SimulatorHealthKitService: HealthKitServiceProtocol, @unchecked Send
     // MARK: - Sleep Generation (table-driven)
 
     private func makeSleepData(_ s: Scenario, date: Date) -> SleepData {
-        let (tR, dR, rR, aR, eR): (ClosedRange<Double>, ClosedRange<Double>, ClosedRange<Double>, ClosedRange<Int>, ClosedRange<Double>) = switch s {
-        case .relaxed:    (7.5...8.5, 1.3...1.7, 1.8...2.2, 0...1,  0.90...0.95)
-        case .mild:       (6.0...7.0, 0.8...1.2, 1.3...1.7, 1...2,  0.80...0.90)
-        case .moderate:   (5.0...6.0, 0.3...0.7, 0.8...1.2, 3...5,  0.70...0.80)
-        case .high:       (3.0...5.0, 0.1...0.3, 0.3...0.6, 5...8,  0.55...0.70)
-        case .edgeLowHRV: (4.0...4.0, 0.2...0.2, 0.5...0.5, 6...6,  0.55...0.60)
-        }
-        let total = Double.random(in: tR), deep = Double.random(in: dR), rem = Double.random(in: rR)
-        let eff = Double.random(in: eR)
+        let total = Double.random(in: sleepTotalRange(for: s))
+        let deep = Double.random(in: sleepDeepRange(for: s))
+        let rem = Double.random(in: sleepRemRange(for: s))
+        let eff = Double.random(in: sleepEfficiencyRange(for: s))
         return SleepData(totalSleepHours: total, deepSleepHours: deep, remSleepHours: rem,
-                         coreSleepHours: max(0, total - deep - rem), awakenings: Int.random(in: aR),
+                         coreSleepHours: max(0, total - deep - rem), awakenings: Int.random(in: sleepAwakeningsRange(for: s)),
                          timeInBedHours: total / eff, sleepEfficiency: eff, analysisDate: date)
+    }
+
+    private func sleepTotalRange(for s: Scenario) -> ClosedRange<Double> {
+        switch s {
+        case .relaxed: 7.5...8.5; case .mild: 6.0...7.0; case .moderate: 5.0...6.0
+        case .high: 3.0...5.0; case .edgeLowHRV: 4.0...4.0
+        }
+    }
+
+    private func sleepDeepRange(for s: Scenario) -> ClosedRange<Double> {
+        switch s {
+        case .relaxed: 1.3...1.7; case .mild: 0.8...1.2; case .moderate: 0.3...0.7
+        case .high: 0.1...0.3; case .edgeLowHRV: 0.2...0.2
+        }
+    }
+
+    private func sleepRemRange(for s: Scenario) -> ClosedRange<Double> {
+        switch s {
+        case .relaxed: 1.8...2.2; case .mild: 1.3...1.7; case .moderate: 0.8...1.2
+        case .high: 0.3...0.6; case .edgeLowHRV: 0.5...0.5
+        }
+    }
+
+    private func sleepAwakeningsRange(for s: Scenario) -> ClosedRange<Int> {
+        switch s {
+        case .relaxed: 0...1; case .mild: 1...2; case .moderate: 3...5
+        case .high: 5...8; case .edgeLowHRV: 6...6
+        }
+    }
+
+    private func sleepEfficiencyRange(for s: Scenario) -> ClosedRange<Double> {
+        switch s {
+        case .relaxed: 0.90...0.95; case .mild: 0.80...0.90; case .moderate: 0.70...0.80
+        case .high: 0.55...0.70; case .edgeLowHRV: 0.55...0.60
+        }
     }
 
     // MARK: - Activity Generation (table-driven)
 
     private func makeActivityData(_ s: Scenario, date: Date) -> ActivityData {
-        let (steps, kcal, stand, hasWorkout): (ClosedRange<Int>, ClosedRange<Double>, ClosedRange<Int>, Bool) = switch s {
-        case .relaxed:    (8000...12000, 300...500, 10...12, true)
-        case .mild:       (5000...8000,  200...300, 7...9,   false)
-        case .moderate:   (2000...5000,  100...200, 4...6,   false)
-        case .high:       (500...2000,   50...100,  2...3,   false)
-        case .edgeLowHRV: (0...500,      0...30,    0...1,   false)
+        let steps: ClosedRange<Int> = switch s {
+        case .relaxed: 8000...12000; case .mild: 5000...8000; case .moderate: 2000...5000
+        case .high: 500...2000; case .edgeLowHRV: 0...500
+        }
+        let kcal: ClosedRange<Double> = switch s {
+        case .relaxed: 300...500; case .mild: 200...300; case .moderate: 100...200
+        case .high: 50...100; case .edgeLowHRV: 0...30
+        }
+        let stand: ClosedRange<Int> = switch s {
+        case .relaxed: 10...12; case .mild: 7...9; case .moderate: 4...6
+        case .high: 2...3; case .edgeLowHRV: 0...1
+        }
+        let hasWorkout: Bool = switch s {
+        case .relaxed: true; default: false
         }
         return ActivityData(
             stepCount: Int.random(in: steps), activeEnergyKcal: Double.random(in: kcal),
@@ -164,12 +202,21 @@ final class SimulatorHealthKitService: HealthKitServiceProtocol, @unchecked Send
     // MARK: - Recovery Generation (table-driven)
 
     private func makeRecoveryData(_ s: Scenario, date: Date) -> RecoveryData {
-        let (rr, spo2, rhr, trend): (ClosedRange<Double>, ClosedRange<Double>, ClosedRange<Double>, ClosedRange<Double>) = switch s {
-        case .relaxed:    (14...16, 97...99, 55...62, -3...(-1))
-        case .mild:       (16...18, 96...98, 62...68, -1...1)
-        case .moderate:   (18...20, 95...97, 68...75, 1...3)
-        case .high:       (20...24, 93...96, 75...85, 3...8)
-        case .edgeLowHRV: (20...24, 93...96, 80...90, 5...10)
+        let rr: ClosedRange<Double> = switch s {
+        case .relaxed: 14...16; case .mild: 16...18; case .moderate: 18...20
+        case .high: 20...24; case .edgeLowHRV: 20...24
+        }
+        let spo2: ClosedRange<Double> = switch s {
+        case .relaxed: 97...99; case .mild: 96...98; case .moderate: 95...97
+        case .high: 93...96; case .edgeLowHRV: 93...96
+        }
+        let rhr: ClosedRange<Double> = switch s {
+        case .relaxed: 55...62; case .mild: 62...68; case .moderate: 68...75
+        case .high: 75...85; case .edgeLowHRV: 80...90
+        }
+        let trend: ClosedRange<Double> = switch s {
+        case .relaxed: -3...(-1); case .mild: -1...1; case .moderate: 1...3
+        case .high: 3...8; case .edgeLowHRV: 5...10
         }
         return RecoveryData(
             respiratoryRate: Double.random(in: rr), bloodOxygen: Double.random(in: spo2),

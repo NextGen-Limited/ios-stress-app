@@ -119,10 +119,10 @@ struct MergeBenchmark {
             let windowStart = timestamp.addingTimeInterval(-60)
             let windowEnd = timestamp.addingTimeInterval(60)
             
-            let predicate = #Predicate<StressMeasurement> { m in
-                m.timestamp >= windowStart &&
-                m.timestamp <= windowEnd &&
-                m.deviceID == deviceID
+            let predicate = #Predicate<StressMeasurement> { measurement in
+                measurement.timestamp >= windowStart &&
+                measurement.timestamp <= windowEnd &&
+                measurement.deviceID == deviceID
             }
             
             var descriptor = FetchDescriptor<StressMeasurement>(
@@ -176,9 +176,9 @@ struct MergeBenchmark {
             fetchCount += 1
             
             // Linear scan to find match
-            let match = allMeasurements.first { m in
-                abs(m.timestamp.timeIntervalSince(timestamp)) < 60 &&
-                m.deviceID == deviceID
+            let match = allMeasurements.first { measurement in
+                abs(measurement.timestamp.timeIntervalSince(timestamp)) < 60 &&
+                measurement.deviceID == deviceID
             }
             
             if match == nil {

@@ -14,9 +14,42 @@ excluded:
   - Pods
   - .build
   - fastlane
+  - DerivedData
+  - StressMonitor/StressMonitorWatch Watch AppTests
+  - StressMonitor/StressMonitorWatch Watch AppUITests
 line_length:
   warning: 150
   error: 250
 type_body_length:
   warning: 400
   error: 600
+identifier_name:
+  excluded:
+    - i
+    - j
+    - k
+    - n
+    - x
+    - y
+    - z
+    - r
+    - g
+    - b
+    - a
+    - e
+    - f
+    - t
+    - d
+    - s
+    - v
+    - id
+    - db
+    - ui
+    - dx
+    - dy
+    - dt
+    - hr
+    - hrv
+large_tuple:
+  warning: 5
+  error: 6

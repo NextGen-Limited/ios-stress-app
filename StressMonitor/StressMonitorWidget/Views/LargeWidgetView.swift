@@ -1,5 +1,6 @@
 import SwiftUI
 import Charts
+import WidgetKit
 
 /// Large widget view (32x32 modules)
 /// Displays full stress history, trends, and personalized recommendations
@@ -210,7 +211,7 @@ public struct LargeWidgetView: View {
 
     // MARK: - Recommendations Section
 
-    private var recommendationsSection -> some View {
+    private var recommendationsSection: some View {
         VStack(alignment: .leading, spacing: 6) {
             HStack {
                 Image(systemName: "lightbulb.fill")
@@ -375,7 +376,7 @@ struct StressHistoryChart: View {
 // MARK: - Preview
 
 @available(iOS 17.0, *)
-#Preview(as: .systemLarge) {
+#Preview {
     LargeWidgetView(entry: StressEntry(
         date: Date(),
         latestStress: StressData(
@@ -398,27 +399,4 @@ struct StressHistoryChart: View {
         baseline: (50.0, 60.0),
         isPlaceholder: false
     ))
-} timeline: {
-    StressEntry(
-        date: Date(),
-        latestStress: StressData(
-            level: 38,
-            category: "mild",
-            hrv: 54,
-            heartRate: 70,
-            confidence: 0.85,
-            timestamp: Date()
-        ),
-        history: [
-            StressData(level: 25, category: "relaxed", hrv: 65, heartRate: 62, confidence: 0.9, timestamp: Date().addingTimeInterval(-12 * 3600)),
-            StressData(level: 40, category: "mild", hrv: 52, heartRate: 70, confidence: 0.85, timestamp: Date().addingTimeInterval(-10 * 3600)),
-            StressData(level: 55, category: "moderate", hrv: 42, heartRate: 78, confidence: 0.8, timestamp: Date().addingTimeInterval(-8 * 3600)),
-            StressData(level: 35, category: "mild", hrv: 58, heartRate: 65, confidence: 0.85, timestamp: Date().addingTimeInterval(-6 * 3600)),
-            StressData(level: 30, category: "relaxed", hrv: 62, heartRate: 64, confidence: 0.88, timestamp: Date().addingTimeInterval(-4 * 3600)),
-            StressData(level: 45, category: "mild", hrv: 50, heartRate: 72, confidence: 0.82, timestamp: Date().addingTimeInterval(-2 * 3600)),
-            StressData(level: 38, category: "mild", hrv: 54, heartRate: 70, confidence: 0.85, timestamp: Date()),
-        ],
-        baseline: (50.0, 60.0),
-        isPlaceholder: false
-    )
 }
