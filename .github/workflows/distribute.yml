@@ -1,0 +1,64 @@
+name: Distribute to TestFlight
+
+on:
+  workflow_dispatch:
+    inputs:
+      group:
+        description: "TestFlight group to distribute to"
+        required: true
+        type: choice
+        options:
+          - "Core Testers"
+          - "Extended Beta"
+          - "Public Beta"
+      build_number:
+        description: "Build number to distribute (leave blank = latest processed)"
+        required: false
+        type: string
+
+concurrency:
+  group: distribute-${{ github.ref }}-${{ inputs.group }}
+  cancel-in-progress: false   # never cancel an in-flight distribution
+
+env:
+  LANG: "en_US.UTF-8"
+
+jobs:
+  distribute:
+    name: Distribute to ${{ inputs.group }}
+    runs-on: macos-15
+    timeout-minutes: 10
+    environment: production
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Cache Ruby Gems
+        uses: actions/cache@v4
+        with:
+          path: vendor/bundle
+          key: gems-${{ runner.os }}-${{ hashFiles('**/Gemfile.lock') }}
+          restore-keys: gems-${{ runner.os }}-
+
+      - name: Install Dependencies
+        run: |
+          bundle config path vendor/bundle
+          bundle install --jobs 4 --retry 3
+
+      - name: Distribute via Fastlane
+        env:
+          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          APP_STORE_CONNECT_API_KEY_P8: ${{ secrets.APP_STORE_CONNECT_API_KEY_P8 }}
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+          MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
+          MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
+          # Hardcoded app info
+          APP_IDENTIFIER: "stress.ai.com"
+          APPLE_ID: "95doanphuong@gmail.com"
+          TEAM_ID: "K2TYLYAWMK"
+          ITC_TEAM_ID: "K2TYLYAWMK"
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          TESTFLIGHT_GROUPS: ${{ inputs.group }}
+        run: bundle exec fastlane distribute_beta
