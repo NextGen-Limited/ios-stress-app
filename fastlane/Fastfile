@@ -40,10 +40,13 @@ platform :ios do
   # ────────────────────── TESTS ──────────────────────
   desc "Run all tests"
   lane :test do
+    # Use destination from ENV or fallback to iPhone 16
+    # CI runners may not have specific simulator names
+    devices = ENV["SCAN_DEVICE"] ? [ENV["SCAN_DEVICE"]] : ["iPhone 16"]
     scan(
       project: PROJECT,
       scheme: SCHEME,
-      device: "iPhone 16",
+      devices: devices,
       clean: true,
       code_coverage: true,
       result_bundle: true,
