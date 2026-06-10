@@ -33,31 +33,13 @@ jobs:
           sudo xcode-select -s /Applications/Xcode_${{ env.XCODE_VERSION }}.app/Contents/Developer
           xcodebuild -version
 
-      - name: List Available Simulators
-        id: simulator
+      - name: Install iOS Simulator Runtime
         run: |
-          # Find an eligible iOS simulator by name
-          SIM_NAME=$(xcrun simctl list devices available -j | python3 -c "
-          import json, sys
-          data = json.load(sys.stdin)
-          # Prefer iPhone 16, then any iPhone
-          for runtime, devices in data.get('devices', {}).items():
-            if 'iOS' in runtime:
-              for d in devices:
-                if d.get('isAvailable') and 'iPhone 16' in d.get('name', ''):
-                  print(d['name'])
-                  sys.exit(0)
-          # Fallback to any available iPhone
-          for runtime, devices in data.get('devices', {}).items():
-            if 'iOS' in runtime:
-              for d in devices:
-                if d.get('isAvailable') and 'iPhone' in d.get('name', ''):
-                  print(d['name'])
-                  sys.exit(0)
-          print('')
-          ")
-          echo "sim_name=$SIM_NAME" >> $GITHUB_OUTPUT
-          echo "Using simulator: $SIM_NAME"
+          # Check if an eligible iOS simulator exists for the StressMonitor scheme
+          if ! xcodebuild -showdestinations -scheme StressMonitor -project StressMonitor/StressMonitor.xcodeproj 2>/dev/null | grep -q "iOS Simulator"; then
+            echo "No eligible iOS Simulator found — downloading iOS platform..."
+            xcodebuild -downloadPlatform iOS
+          fi
 
       - name: Setup Ruby & Bundler
         uses: ruby/setup-ruby@v1
@@ -214,6 +196,13 @@ jobs:
         run: |
           sudo xcode-select -s /Applications/Xcode_${{ env.XCODE_VERSION }}.app/Contents/Developer
           xcodebuild -version
+
+      - name: Install iOS Platform
+        run: |
+          if ! xcodebuild -showdestinations -scheme StressMonitorWidgetExtension -project StressMonitor/StressMonitor.xcodeproj 2>/dev/null | grep -q "iOS"; then
+            echo "No eligible iOS platform found — downloading..."
+            xcodebuild -downloadPlatform iOS
+          fi
 
       - name: Build Widget Extension
         run: |

@@ -33,6 +33,13 @@ jobs:
           ruby-version: "3.3"
           bundler-cache: true
 
+      - name: Install iOS Simulator Runtime
+        run: |
+          if ! xcodebuild -showdestinations -scheme StressMonitor -project StressMonitor/StressMonitor.xcodeproj 2>/dev/null | grep -q "iOS Simulator"; then
+            echo "Downloading iOS platform..."
+            xcodebuild -downloadPlatform iOS
+          fi
+
       - name: Boot iOS Simulator
         id: simulator
         run: |
