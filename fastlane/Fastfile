@@ -47,7 +47,7 @@ platform :ios do
   lane :test do
     # Use name-based destination from ENV or fallback to generic iPhone
     # CI runners may have different simulator OS versions
-    devices = ENV["SCAN_DEVICE"] ? [ENV["SCAN_DEVICE"]] : ["iPhone 16"]
+    devices = ENV["SCAN_DEVICE"] ? [ENV["SCAN_DEVICE"]] : ["iPhone 17"]
     scan(
       project: PROJECT,
       scheme: SCHEME,
@@ -79,7 +79,7 @@ platform :ios do
 
   desc "Run iOS UI tests"
   lane :ui_test do
-    devices = ENV["SCAN_DEVICE"] ? [ENV["SCAN_DEVICE"]] : ["iPhone 16"]
+    devices = ENV["SCAN_DEVICE"] ? [ENV["SCAN_DEVICE"]] : ["iPhone 17"]
     scan(
       project: PROJECT,
       scheme: "StressMonitorUITests",
