@@ -103,16 +103,14 @@ platform :ios do
   lane :build_widget do
     gym(
       project: PROJECT,
-      scheme: "StressMonitorWidgetExtension",
+      scheme: SCHEME,
       configuration: "Release",
-      export_method: "app-store",
-      include_bitcode: false,
-      output_directory: "build/",
-      output_name: "StressMonitorWidget",
       skip_package_ipa: true,
       xcargs: [
         "-skipPackagePluginValidation",
-        "-skipMacroValidation"
+        "-skipMacroValidation",
+        "CODE_SIGN_IDENTITY=",
+        "CODE_SIGNING_REQUIRED=NO"
       ].join(" "),
       suppress_xcode_output: false
     )
@@ -121,6 +119,14 @@ platform :ios do
   # ────────────────────── BUILD ONLY ──────────────────────
   desc "Build IPA without uploading (for CI validation)"
   lane :build_only do
+    setup_ci
+
+    match(
+      type: "appstore",
+      readonly: true,
+      api_key: api_key
+    )
+
     gym(
       project: PROJECT,
       scheme: SCHEME,
