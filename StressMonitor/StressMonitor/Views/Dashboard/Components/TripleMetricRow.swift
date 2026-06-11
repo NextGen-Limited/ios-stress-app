@@ -1,33 +1,40 @@
 import SwiftUI
 
-/// Three-column metric row displaying RHR, HRV, and RR
+/// Three-column metric row displaying RHR, HRV, and RR.
+/// Redesigned for the Home tab to match the Ripple / Elemental Creatures palette.
 struct TripleMetricRow: View {
     let rhrValue: String
     let hrvValue: String
     let rrValue: String
 
     var body: some View {
-        HStack(alignment: .top, spacing: 21) {
+        HStack(alignment: .top, spacing: 12) {
             MetricColumn(
-                title: "RHR",
+                title: "Heart",
                 value: rhrValue,
-                unit: "bpm"
+                unit: "bpm",
+                icon: "heart.fill",
+                accent: HomeCharacterDesignTokens.Ember.accent
             )
 
             MetricColumn(
                 title: "HRV",
                 value: hrvValue,
-                unit: "ms"
+                unit: "ms",
+                icon: "waveform.path.ecg",
+                accent: HomeCharacterDesignTokens.Ripple.primary
             )
 
             MetricColumn(
-                title: "RR",
+                title: "Breath",
                 value: rrValue,
-                unit: "brpm"
+                unit: "brpm",
+                icon: "wind",
+                accent: HomeCharacterDesignTokens.Zephyr.accent
             )
         }
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("Resting heart rate: \(rhrValue) bpm, Heart rate variability: \(hrvValue) ms, Respiratory rate: \(rrValue) breaths per minute")
+        .accessibilityLabel("Heart rate: \(rhrValue) bpm, Heart rate variability: \(hrvValue) ms, Respiratory rate: \(rrValue) breaths per minute")
     }
 }
 
@@ -37,52 +44,61 @@ private struct MetricColumn: View {
     let title: String
     let value: String
     let unit: String
-
-    private let cardWidth: CGFloat = 105
-    private let cardHeight: CGFloat = 81
-    private let cornerRadius: CGFloat = 8.928
+    let icon: String
+    let accent: Color
 
     var body: some View {
-        VStack(spacing: 4) {
-            Text(title)
-                .font(.system(size: 14, weight: .bold))
-                .foregroundColor(Color.Wellness.adaptiveSecondaryText)
+        VStack(alignment: .leading, spacing: 8) {
+            HStack(spacing: 6) {
+                ZStack {
+                    Circle()
+                        .fill(accent.opacity(0.16))
+                        .frame(width: 26, height: 26)
+                    Image(systemName: icon)
+                        .font(.system(size: 11, weight: .bold))
+                        .foregroundStyle(accent)
+                }
 
-            Text(value)
-                .font(.system(size: 18, weight: .heavy))
-                .foregroundColor(Color.Wellness.adaptivePrimaryText)
+                Text(title)
+                    .font(.system(size: 12, weight: .bold, design: .rounded))
+                    .foregroundColor(Color.Wellness.adaptiveSecondaryText)
+                    .lineLimit(1)
+            }
 
-            Text(unit)
-                .font(.system(size: 13, weight: .bold))
-                .foregroundColor(Color.Wellness.adaptiveSecondaryText.opacity(0.39))
+            HStack(alignment: .firstTextBaseline, spacing: 3) {
+                Text(value)
+                    .font(.system(size: 22, weight: .heavy, design: .rounded))
+                    .foregroundColor(Color.Wellness.adaptivePrimaryText)
+                    .minimumScaleFactor(0.75)
+                    .lineLimit(1)
+
+                Text(unit)
+                    .font(.system(size: 11, weight: .bold, design: .rounded))
+                    .foregroundColor(Color.Wellness.adaptiveSecondaryText.opacity(0.72))
+                    .lineLimit(1)
+            }
         }
-        .frame(width: cardWidth, height: cardHeight)
-        .background(Color.white)
-        .cornerRadius(cornerRadius)
-        .shadow(
-            color: Color.black.opacity(0.08),
-            radius: 2.85,
-            x: 0,
-            y: 2.85
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(14)
+        .background(Color.Wellness.adaptiveCardBackground.opacity(0.88))
+        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                .stroke(accent.opacity(0.18), lineWidth: 1)
         )
-        .shadow(
-            color: Color.black.opacity(0.04),
-            radius: 5.7,
-            x: 0,
-            y: 5.7
-        )
+        .shadow(color: accent.opacity(0.10), radius: 12, x: 0, y: 8)
     }
 }
 
 #Preview("TripleMetricRow") {
     VStack {
         TripleMetricRow(
-            rhrValue: "62",
-            hrvValue: "45",
+            rhrValue: "72",
+            hrvValue: "65",
             rrValue: "14"
         )
         Spacer()
     }
     .padding()
-    .background(Color.Wellness.adaptiveBackground)
+    .background(HomeCharacterDesignTokens.homeBackground)
 }

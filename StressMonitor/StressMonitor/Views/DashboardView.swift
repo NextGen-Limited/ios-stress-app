@@ -31,16 +31,18 @@ struct DashboardView: View {
 
     var body: some View {
         ScrollView {
-            LazyVStack(spacing: 24) {
+            LazyVStack(spacing: 22) {
                 dashboardContent(viewModel.currentStress)
 
                 Spacer()
                     .frame(height: tabBarScrollState.tabBarHeight + 16)
             }
-            .padding()
+            .padding(.horizontal, 16)
+            .padding(.top, 10)
+            .padding(.bottom, 16)
         }
         .trackScrollOffsetForTabBar(state: tabBarScrollState)
-        .background(Color.Wellness.adaptiveBackground)
+        .background(HomeCharacterDesignTokens.homeBackground.ignoresSafeArea())
         .alert("Error", isPresented: .constant(viewModel.errorMessage != nil)) {
             Button("OK") {
                 viewModel.clearError()

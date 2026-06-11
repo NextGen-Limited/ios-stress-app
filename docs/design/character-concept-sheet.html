@@ -1,0 +1,793 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StressMonitor Character Collection — Concept Sheet</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+  
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  
+  body {
+    font-family: 'Inter', -apple-system, sans-serif;
+    background: #0a0a0f;
+    color: #e0e0e8;
+    padding: 40px;
+    min-height: 100vh;
+  }
+  
+  .header {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+  .header h1 {
+    font-size: 36px;
+    font-weight: 800;
+    background: linear-gradient(135deg, #4FC3F7, #81D4FA, #B3E5FC);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-bottom: 8px;
+  }
+  .header p {
+    font-size: 16px;
+    color: #888;
+  }
+  
+  .section-title {
+    font-size: 24px;
+    font-weight: 700;
+    margin: 40px 0 24px;
+    padding-left: 16px;
+    border-left: 4px solid #4FC3F7;
+  }
+  
+  /* Character Grid */
+  .characters-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 24px;
+    margin-bottom: 48px;
+  }
+  
+  .character-card {
+    background: linear-gradient(180deg, #1a1a2e 0%, #16162a 100%);
+    border-radius: 20px;
+    padding: 24px;
+    text-align: center;
+    border: 1px solid rgba(255,255,255,0.06);
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+  .character-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.4);
+  }
+  
+  .character-svg {
+    width: 140px;
+    height: 140px;
+    margin: 0 auto 16px;
+  }
+  
+  .character-name {
+    font-size: 18px;
+    font-weight: 700;
+    margin-bottom: 4px;
+  }
+  .character-element {
+    font-size: 13px;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 12px;
+  }
+  .character-desc {
+    font-size: 13px;
+    color: #aaa;
+    line-height: 1.5;
+  }
+  
+  /* Stress States */
+  .stress-row {
+    display: flex;
+    gap: 16px;
+    margin-bottom: 48px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  
+  .stress-state {
+    background: #1a1a2e;
+    border-radius: 16px;
+    padding: 20px;
+    text-align: center;
+    border: 1px solid rgba(255,255,255,0.06);
+    width: 160px;
+  }
+  
+  .stress-svg {
+    width: 100px;
+    height: 100px;
+    margin: 0 auto 12px;
+  }
+  
+  .stress-label {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .stress-score {
+    font-size: 11px;
+    color: #888;
+  }
+  
+  /* Evolution */
+  .evolution-row {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 48px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  
+  .evo-stage {
+    background: #1a1a2e;
+    border-radius: 16px;
+    padding: 20px;
+    text-align: center;
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+  
+  .evo-svg {
+    margin: 0 auto 12px;
+  }
+  
+  .evo-name {
+    font-size: 14px;
+    font-weight: 600;
+  }
+  .evo-trigger {
+    font-size: 11px;
+    color: #888;
+    margin-top: 4px;
+  }
+  
+  .evo-arrow {
+    font-size: 24px;
+    color: #4FC3F7;
+  }
+  
+  /* Color Palette */
+  .palette-row {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 48px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  
+  .palette-swatch {
+    text-align: center;
+  }
+  .swatch-circle {
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    margin: 0 auto 8px;
+    border: 2px solid rgba(255,255,255,0.1);
+  }
+  .swatch-label {
+    font-size: 11px;
+    color: #888;
+  }
+  .swatch-hex {
+    font-size: 10px;
+    color: #666;
+    font-family: monospace;
+  }
+  
+  /* Comparison Table */
+  .comparison {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 48px;
+  }
+  .comparison th, .comparison td {
+    padding: 12px 16px;
+    text-align: left;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    font-size: 13px;
+  }
+  .comparison th {
+    color: #4FC3F7;
+    font-weight: 600;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .comparison tr:hover td {
+    background: rgba(255,255,255,0.02);
+  }
+  
+  .tag {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 11px;
+    font-weight: 500;
+  }
+  .tag-free { background: #1b5e20; color: #a5d6a7; }
+  .tag-premium { background: #4a148c; color: #ce93d8; }
+  .tag-unlock { background: #e65100; color: #ffcc80; }
+  
+  /* Footer */
+  .footer {
+    text-align: center;
+    margin-top: 60px;
+    padding-top: 24px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    color: #555;
+    font-size: 12px;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <h1>🌊 StressMonitor Character Collection</h1>
+  <p>"Elemental Creatures" — Hybrid A+B Design System</p>
+  <p style="margin-top:8px; color:#666;">5 Starter Characters × 3 Evolution Stages × 5 Stress States = 75 Illustrations</p>
+</div>
+
+<!-- ========== 5 MAIN CHARACTERS ========== -->
+<div class="section-title">🎯 Character Roster — The Elemental Creatures</div>
+<div class="characters-grid">
+
+  <!-- RIPPLE: Water Otter -->
+  <div class="character-card">
+    <div class="character-svg">
+      <svg viewBox="0 0 140 140" xmlns="http://www.w3.org/2000/svg">
+        <!-- Water wave base -->
+        <ellipse cx="70" cy="120" rx="55" ry="12" fill="#1565C0" opacity="0.3"/>
+        <!-- Body -->
+        <ellipse cx="70" cy="88" rx="38" ry="32" fill="#4FC3F7"/>
+        <!-- Belly -->
+        <ellipse cx="70" cy="95" rx="24" ry="20" fill="#B3E5FC"/>
+        <!-- Shell on belly -->
+        <ellipse cx="70" cy="95" rx="14" ry="12" fill="#E0F7FA" stroke="#80DEEA" stroke-width="1.5"/>
+        <path d="M60,92 Q70,84 80,92" fill="none" stroke="#80DEEA" stroke-width="1"/>
+        <path d="M62,96 Q70,88 78,96" fill="none" stroke="#80DEEA" stroke-width="1"/>
+        <path d="M64,100 Q70,92 76,100" fill="none" stroke="#80DEEA" stroke-width="1"/>
+        <!-- Head -->
+        <circle cx="70" cy="52" r="28" fill="#4FC3F7"/>
+        <!-- Water-drop ears -->
+        <path d="M48,38 Q44,20 52,30" fill="#29B6F6" stroke="#0288D1" stroke-width="1.5"/>
+        <path d="M92,38 Q96,20 88,30" fill="#29B6F6" stroke="#0288D1" stroke-width="1.5"/>
+        <!-- Eyes -->
+        <circle cx="58" cy="48" r="10" fill="#1a1a2e"/>
+        <circle cx="82" cy="48" r="10" fill="#1a1a2e"/>
+        <circle cx="61" cy="45" r="4" fill="white"/>
+        <circle cx="85" cy="45" r="4" fill="white"/>
+        <circle cx="56" cy="50" r="2" fill="white" opacity="0.5"/>
+        <circle cx="80" cy="50" r="2" fill="white" opacity="0.5"/>
+        <!-- Nose -->
+        <ellipse cx="70" cy="56" rx="4" ry="3" fill="#0288D1"/>
+        <!-- Mouth -->
+        <path d="M64,61 Q70,66 76,61" fill="none" stroke="#0288D1" stroke-width="1.5" stroke-linecap="round"/>
+        <!-- Blush -->
+        <circle cx="50" cy="56" r="5" fill="#F48FB1" opacity="0.4"/>
+        <circle cx="90" cy="56" r="5" fill="#F48FB1" opacity="0.4"/>
+        <!-- Arms -->
+        <ellipse cx="38" cy="85" rx="10" ry="6" fill="#4FC3F7" transform="rotate(-20,38,85)"/>
+        <ellipse cx="102" cy="85" rx="10" ry="6" fill="#4FC3F7" transform="rotate(20,102,85)"/>
+        <!-- Feet -->
+        <ellipse cx="55" cy="116" rx="12" ry="6" fill="#29B6F6"/>
+        <ellipse cx="85" cy="116" rx="12" ry="6" fill="#29B6F6"/>
+        <!-- Water sparkles -->
+        <circle cx="30" cy="75" r="2" fill="#E1F5FE" opacity="0.8"/>
+        <circle cx="110" cy="70" r="1.5" fill="#E1F5FE" opacity="0.6"/>
+        <circle cx="45" cy="105" r="1.5" fill="#E1F5FE" opacity="0.7"/>
+      </svg>
+    </div>
+    <div class="character-name" style="color:#4FC3F7;">Ripple</div>
+    <div class="character-element">💧 Water Otter</div>
+    <div class="character-desc">Relaxation & calm. Floats on waves when you're at peace, hides in shell when stressed.</div>
+  </div>
+
+  <!-- BLOSSOM: Forest Fox -->
+  <div class="character-card">
+    <div class="character-svg">
+      <svg viewBox="0 0 140 140" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="70" cy="120" rx="50" ry="10" fill="#2E7D32" opacity="0.2"/>
+        <!-- Tail -->
+        <path d="M95,95 Q120,70 105,55 Q100,65 90,80" fill="#81C784"/>
+        <!-- Body -->
+        <ellipse cx="70" cy="90" rx="32" ry="28" fill="#A5D6A7"/>
+        <!-- Belly -->
+        <ellipse cx="70" cy="96" rx="20" ry="16" fill="#E8F5E9"/>
+        <!-- Leaf pattern on belly -->
+        <path d="M65,90 Q70,82 75,90 Q70,88 65,90" fill="#66BB6A" opacity="0.6"/>
+        <path d="M67,94 Q70,87 73,94" fill="#66BB6A" opacity="0.4"/>
+        <!-- Head -->
+        <circle cx="70" cy="52" r="26" fill="#A5D6A7"/>
+        <!-- Fox ears -->
+        <polygon points="48,40 42,12 58,34" fill="#81C784"/>
+        <polygon points="92,40 98,12 82,34" fill="#81C784"/>
+        <polygon points="50,38 46,20 56,34" fill="#C8E6C9"/>
+        <polygon points="90,38 94,20 84,34" fill="#C8E6C9"/>
+        <!-- Eyes -->
+        <circle cx="59" cy="48" r="9" fill="#1a1a2e"/>
+        <circle cx="81" cy="48" r="9" fill="#1a1a2e"/>
+        <circle cx="62" cy="45" r="3.5" fill="white"/>
+        <circle cx="84" cy="45" r="3.5" fill="white"/>
+        <!-- Nose -->
+        <ellipse cx="70" cy="57" rx="3.5" ry="2.5" fill="#2E7D32"/>
+        <!-- Mouth -->
+        <path d="M65,61 Q70,65 75,61" fill="none" stroke="#2E7D32" stroke-width="1.5" stroke-linecap="round"/>
+        <!-- Blush -->
+        <circle cx="50" cy="55" r="5" fill="#F48FB1" opacity="0.35"/>
+        <circle cx="90" cy="55" r="5" fill="#F48FB1" opacity="0.35"/>
+        <!-- Arms -->
+        <ellipse cx="42" cy="88" rx="9" ry="5" fill="#A5D6A7" transform="rotate(-15,42,88)"/>
+        <ellipse cx="98" cy="88" rx="9" ry="5" fill="#A5D6A7" transform="rotate(15,98,88)"/>
+        <!-- Feet -->
+        <ellipse cx="56" cy="114" rx="11" ry="5" fill="#81C784"/>
+        <ellipse cx="84" cy="114" rx="11" ry="5" fill="#81C784"/>
+        <!-- Leaf particles -->
+        <circle cx="32" cy="68" r="2" fill="#A5D6A7" opacity="0.6"/>
+        <circle cx="108" cy="65" r="1.5" fill="#C8E6C9" opacity="0.5"/>
+      </svg>
+    </div>
+    <div class="character-name" style="color:#81C784;">Blossom</div>
+    <div class="character-element">🌿 Forest Fox</div>
+    <div class="character-desc">Growth & resilience. Leaves perk up with good habits, wilts when you need rest.</div>
+  </div>
+
+  <!-- EMBER: Fire Phoenix-Bird -->
+  <div class="character-card">
+    <div class="character-svg">
+      <svg viewBox="0 0 140 140" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="70" cy="120" rx="45" ry="10" fill="#E65100" opacity="0.15"/>
+        <!-- Flame tail -->
+        <path d="M70,115 Q55,100 60,85 Q65,95 70,90 Q68,80 75,75 Q73,88 78,92 Q80,82 85,78 Q80,95 70,115" fill="#FF8A65" opacity="0.7"/>
+        <!-- Body -->
+        <ellipse cx="70" cy="82" rx="26" ry="28" fill="#FFAB91"/>
+        <!-- Belly -->
+        <ellipse cx="70" cy="90" rx="16" ry="14" fill="#FBE9E7"/>
+        <!-- Flame mark on belly -->
+        <path d="M66,86 Q70,78 74,86 Q70,83 66,86" fill="#FF7043" opacity="0.6"/>
+        <!-- Wings -->
+        <path d="M44,78 Q28,60 40,50 Q44,65 48,72" fill="#FF8A65"/>
+        <path d="M96,78 Q112,60 100,50 Q96,65 92,72" fill="#FF8A65"/>
+        <!-- Head -->
+        <circle cx="70" cy="48" r="22" fill="#FFAB91"/>
+        <!-- Flame crown -->
+        <path d="M58,32 Q55,18 62,25 Q64,14 70,22 Q76,14 78,25 Q85,18 82,32" fill="#FF7043"/>
+        <!-- Eyes -->
+        <circle cx="61" cy="46" r="8" fill="#1a1a2e"/>
+        <circle cx="79" cy="46" r="8" fill="#1a1a2e"/>
+        <circle cx="63" cy="43" r="3" fill="white"/>
+        <circle cx="81" cy="43" r="3" fill="white"/>
+        <!-- Beak -->
+        <polygon points="67,54 70,60 73,54" fill="#E65100"/>
+        <!-- Blush -->
+        <circle cx="52" cy="50" r="4" fill="#F48FB1" opacity="0.35"/>
+        <circle cx="88" cy="50" r="4" fill="#F48FB1" opacity="0.35"/>
+        <!-- Feet -->
+        <path d="M58,108 L54,116 M58,108 L58,117 M58,108 L62,116" stroke="#E65100" stroke-width="2" fill="none"/>
+        <path d="M82,108 L78,116 M82,108 L82,117 M82,108 L86,116" stroke="#E65100" stroke-width="2" fill="none"/>
+        <!-- Sparkles -->
+        <circle cx="35" cy="60" r="2" fill="#FFE0B2" opacity="0.7"/>
+        <circle cx="105" cy="55" r="1.5" fill="#FFE0B2" opacity="0.6"/>
+      </svg>
+    </div>
+    <div class="character-name" style="color:#FF8A65;">Ember</div>
+    <div class="character-element">🔥 Fire Phoenix</div>
+    <div class="character-desc">Energy & motivation. Flames grow with activity, dims when you need recovery.</div>
+  </div>
+
+  <!-- ZEPHYR: Cloud Rabbit -->
+  <div class="character-card">
+    <div class="character-svg">
+      <svg viewBox="0 0 140 140" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="70" cy="118" rx="50" ry="10" fill="#5C6BC0" opacity="0.15"/>
+        <!-- Cloud base -->
+        <ellipse cx="70" cy="108" rx="40" ry="14" fill="#B39DDB" opacity="0.3"/>
+        <!-- Body -->
+        <ellipse cx="70" cy="85" rx="34" ry="28" fill="#D1C4E9"/>
+        <!-- Belly -->
+        <ellipse cx="70" cy="92" rx="20" ry="16" fill="#EDE7F6"/>
+        <!-- Cloud puff on belly -->
+        <circle cx="64" cy="90" r="6" fill="#B39DDB" opacity="0.4"/>
+        <circle cx="76" cy="90" r="5" fill="#B39DDB" opacity="0.3"/>
+        <!-- Head -->
+        <circle cx="70" cy="50" r="24" fill="#D1C4E9"/>
+        <!-- Long rabbit ears -->
+        <ellipse cx="54" cy="20" rx="8" ry="24" fill="#D1C4E9"/>
+        <ellipse cx="86" cy="20" rx="8" ry="24" fill="#D1C4E9"/>
+        <ellipse cx="54" cy="22" rx="5" ry="18" fill="#E1BEE7"/>
+        <ellipse cx="86" cy="22" rx="5" ry="18" fill="#E1BEE7"/>
+        <!-- Eyes -->
+        <circle cx="60" cy="48" r="8" fill="#1a1a2e"/>
+        <circle cx="80" cy="48" r="8" fill="#1a1a2e"/>
+        <circle cx="62" cy="45" r="3" fill="white"/>
+        <circle cx="82" cy="45" r="3" fill="white"/>
+        <!-- Nose -->
+        <ellipse cx="70" cy="54" rx="3" ry="2" fill="#7E57C2"/>
+        <!-- Mouth -->
+        <path d="M66,58 Q70,62 74,58" fill="none" stroke="#7E57C2" stroke-width="1.5" stroke-linecap="round"/>
+        <!-- Whiskers -->
+        <line x1="42" y1="54" x2="54" y2="52" stroke="#B39DDB" stroke-width="1"/>
+        <line x1="42" y1="58" x2="54" y2="56" stroke="#B39DDB" stroke-width="1"/>
+        <line x1="86" y1="52" x2="98" y2="54" stroke="#B39DDB" stroke-width="1"/>
+        <line x1="86" y1="56" x2="98" y2="58" stroke="#B39DDB" stroke-width="1"/>
+        <!-- Blush -->
+        <circle cx="50" cy="54" r="4" fill="#F48FB1" opacity="0.35"/>
+        <circle cx="90" cy="54" r="4" fill="#F48FB1" opacity="0.35"/>
+        <!-- Arms -->
+        <ellipse cx="42" cy="84" rx="9" ry="5" fill="#D1C4E9" transform="rotate(-10,42,84)"/>
+        <ellipse cx="98" cy="84" rx="9" ry="5" fill="#D1C4E9" transform="rotate(10,98,84)"/>
+        <!-- Cloud puffs around -->
+        <circle cx="30" cy="70" r="5" fill="#EDE7F6" opacity="0.5"/>
+        <circle cx="110" cy="65" r="4" fill="#EDE7F6" opacity="0.4"/>
+        <circle cx="38" cy="100" r="3" fill="#EDE7F6" opacity="0.3"/>
+      </svg>
+    </div>
+    <div class="character-name" style="color:#B39DDB;">Zephyr</div>
+    <div class="character-element">🌬️ Cloud Rabbit</div>
+    <div class="character-desc">Breathing & mindfulness. Clouds drift gently when calm, storms when stressed.</div>
+  </div>
+
+  <!-- LUMI: Moon Owl -->
+  <div class="character-card">
+    <div class="character-svg">
+      <svg viewBox="0 0 140 140" xmlns="http://www.w3.org/2000/svg">
+        <ellipse cx="70" cy="118" rx="45" ry="10" fill="#1A237E" opacity="0.2"/>
+        <!-- Body -->
+        <ellipse cx="70" cy="85" rx="32" ry="30" fill="#7986CB"/>
+        <!-- Belly -->
+        <ellipse cx="70" cy="94" rx="18" ry="16" fill="#C5CAE9"/>
+        <!-- Moon crescent on belly -->
+        <circle cx="70" cy="92" r="10" fill="#E8EAF6"/>
+        <circle cx="74" cy="89" r="8" fill="#7986CB"/>
+        <!-- Stars around -->
+        <text x="60" y="88" font-size="5" fill="#FFF9C4">✦</text>
+        <text x="78" y="98" font-size="4" fill="#FFF9C4">✦</text>
+        <!-- Wings -->
+        <path d="M38,80 Q22,68 35,58 Q40,70 42,76" fill="#5C6BC0"/>
+        <path d="M102,80 Q118,68 105,58 Q100,70 98,76" fill="#5C6BC0"/>
+        <!-- Head -->
+        <circle cx="70" cy="48" r="24" fill="#7986CB"/>
+        <!-- Ear tufts -->
+        <polygon points="50,34 44,16 56,30" fill="#5C6BC0"/>
+        <polygon points="90,34 96,16 84,30" fill="#5C6BC0"/>
+        <!-- Eyes (big owl eyes) -->
+        <circle cx="59" cy="46" r="11" fill="#E8EAF6"/>
+        <circle cx="81" cy="46" r="11" fill="#E8EAF6"/>
+        <circle cx="59" cy="46" r="8" fill="#1A237E"/>
+        <circle cx="81" cy="46" r="8" fill="#1A237E"/>
+        <circle cx="61" cy="43" r="3.5" fill="white"/>
+        <circle cx="83" cy="43" r="3.5" fill="white"/>
+        <!-- Beak -->
+        <polygon points="67,56 70,62 73,56" fill="#3949AB"/>
+        <!-- Blush -->
+        <circle cx="48" cy="52" r="4" fill="#F48FB1" opacity="0.3"/>
+        <circle cx="92" cy="52" r="4" fill="#F48FB1" opacity="0.3"/>
+        <!-- Feet -->
+        <path d="M56,112 L52,118 M56,112 L56,119 M56,112 L60,118" stroke="#3949AB" stroke-width="2" fill="none"/>
+        <path d="M84,112 L80,118 M84,112 L84,119 M84,112 L88,118" stroke="#3949AB" stroke-width="2" fill="none"/>
+        <!-- Moon glow -->
+        <circle cx="70" cy="48" r="30" fill="none" stroke="#C5CAE9" stroke-width="0.5" opacity="0.3"/>
+      </svg>
+    </div>
+    <div class="character-name" style="color:#7986CB;">Lumi</div>
+    <div class="character-element">🌙 Moon Owl</div>
+    <div class="character-desc">Sleep & wisdom. Glows bright with good sleep, dims when sleep-deprived.</div>
+  </div>
+
+</div>
+
+<!-- ========== STRESS STATES (RIPPLE as example) ========== -->
+<div class="section-title">🎭 Stress States — Ripley (Water Otter) Example</div>
+<p style="text-align:center;color:#888;margin-bottom:24px;">Each character visually reacts to your real-time stress level</p>
+<div class="stress-row">
+
+  <div class="stress-state" style="border-color:rgba(76,175,80,0.3);">
+    <div class="stress-svg">
+      <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="50" cy="50" r="45" fill="#E8F5E9"/>
+        <circle cx="50" cy="48" r="20" fill="#4FC3F7"/>
+        <circle cx="42" cy="45" r="6" fill="#1a1a2e"/>
+        <circle cx="58" cy="45" r="6" fill="#1a1a2e"/>
+        <line x1="42" y1="45" x2="42" y2="42" stroke="#1a1a2e" stroke-width="5" stroke-linecap="round"/>
+        <line x1="58" y1="45" x2="58" y2="42" stroke="#1a1a2e" stroke-width="5" stroke-linecap="round"/>
+        <path d="M43,56 Q50,62 57,56" fill="none" stroke="#0288D1" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="36" cy="52" r="3" fill="#F48FB1" opacity="0.3"/>
+        <circle cx="64" cy="52" r="3" fill="#F48FB1" opacity="0.3"/>
+        <!-- Peaceful water drops -->
+        <circle cx="28" cy="35" r="2" fill="#B3E5FC" opacity="0.8"/>
+        <circle cx="72" cy="32" r="1.5" fill="#B3E5FC" opacity="0.6"/>
+        <text x="50" y="90" text-anchor="middle" font-size="8" fill="#4CAF50">~zzZ~</text>
+      </svg>
+    </div>
+    <div class="stress-label" style="color:#4CAF50;">Very Calm</div>
+    <div class="stress-score">Stress: 0-20%</div>
+  </div>
+
+  <div class="stress-state" style="border-color:rgba(129,199,132,0.3);">
+    <div class="stress-svg">
+      <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="50" cy="50" r="45" fill="#E3F2FD"/>
+        <circle cx="50" cy="48" r="20" fill="#4FC3F7"/>
+        <circle cx="42" cy="45" r="6" fill="#1a1a2e"/>
+        <circle cx="58" cy="45" r="6" fill="#1a1a2e"/>
+        <circle cx="44" cy="43" r="2.5" fill="white"/>
+        <circle cx="60" cy="43" r="2.5" fill="white"/>
+        <path d="M44,55 Q50,60 56,55" fill="none" stroke="#0288D1" stroke-width="2" stroke-linecap="round"/>
+        <circle cx="36" cy="52" r="3" fill="#F48FB1" opacity="0.35"/>
+        <circle cx="64" cy="52" r="3" fill="#F48FB1" opacity="0.35"/>
+      </svg>
+    </div>
+    <div class="stress-label" style="color:#81C784;">Calm</div>
+    <div class="stress-score">Stress: 20-40%</div>
+  </div>
+
+  <div class="stress-state" style="border-color:rgba(255,183,77,0.3);">
+    <div class="stress-svg">
+      <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="50" cy="50" r="45" fill="#FFF8E1"/>
+        <circle cx="50" cy="48" r="20" fill="#4FC3F7"/>
+        <circle cx="42" cy="44" r="6" fill="#1a1a2e"/>
+        <circle cx="58" cy="44" r="6" fill="#1a1a2e"/>
+        <circle cx="44" cy="42" r="2.5" fill="white"/>
+        <circle cx="60" cy="42" r="2.5" fill="white"/>
+        <ellipse cx="50" cy="54" rx="2" ry="2" fill="#0288D1"/>
+        <path d="M46,57 L54,57" stroke="#0288D1" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+    </div>
+    <div class="stress-label" style="color:#FFB74D;">Neutral</div>
+    <div class="stress-score">Stress: 40-60%</div>
+  </div>
+
+  <div class="stress-state" style="border-color:rgba(255,138,101,0.3);">
+    <div class="stress-svg">
+      <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="50" cy="50" r="45" fill="#FBE9E7"/>
+        <circle cx="50" cy="48" r="20" fill="#4FC3F7"/>
+        <!-- Worried eyes - smaller pupils, raised inner brows -->
+        <circle cx="42" cy="44" r="7" fill="#1a1a2e"/>
+        <circle cx="58" cy="44" r="7" fill="#1a1a2e"/>
+        <circle cx="43" cy="42" r="2" fill="white"/>
+        <circle cx="59" cy="42" r="2" fill="white"/>
+        <!-- Worried mouth -->
+        <path d="M45,58 Q50,55 55,58" fill="none" stroke="#0288D1" stroke-width="2" stroke-linecap="round"/>
+        <!-- Sweat drop -->
+        <ellipse cx="72" cy="38" rx="2" ry="3" fill="#81D4FA" opacity="0.7"/>
+      </svg>
+    </div>
+    <div class="stress-label" style="color:#FF8A65;">Stressed</div>
+    <div class="stress-score">Stress: 60-80%</div>
+  </div>
+
+  <div class="stress-state" style="border-color:rgba(229,57,53,0.3);">
+    <div class="stress-svg">
+      <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="50" cy="50" r="45" fill="#FFEBEE"/>
+        <circle cx="50" cy="48" r="20" fill="#4FC3F7"/>
+        <!-- Shell covering body -->
+        <ellipse cx="50" cy="50" rx="22" ry="18" fill="#E0F7FA" opacity="0.85" stroke="#80DEEA" stroke-width="1.5"/>
+        <path d="M38,47 Q50,38 62,47" fill="none" stroke="#80DEEA" stroke-width="1"/>
+        <path d="M40,52 Q50,43 60,52" fill="none" stroke="#80DEEA" stroke-width="1"/>
+        <path d="M42,57 Q50,48 58,57" fill="none" stroke="#80DEEA" stroke-width="1"/>
+        <!-- Only eyes peeking out -->
+        <circle cx="42" cy="40" r="4" fill="#1a1a2e"/>
+        <circle cx="58" cy="40" r="4" fill="#1a1a2e"/>
+        <circle cx="43" cy="39" r="1.5" fill="white"/>
+        <circle cx="59" cy="39" r="1.5" fill="white"/>
+        <!-- Alert marks -->
+        <text x="28" y="30" font-size="10" fill="#EF5350">!</text>
+        <text x="68" y="30" font-size="10" fill="#EF5350">!</text>
+      </svg>
+    </div>
+    <div class="stress-label" style="color:#E53935;">Critical!</div>
+    <div class="stress-score">Stress: 80-100%</div>
+  </div>
+
+</div>
+
+<!-- ========== EVOLUTION STAGES (RIPPLE) ========== -->
+<div class="section-title">✨ Evolution Stages — Ripley (Water Otter)</div>
+<p style="text-align:center;color:#888;margin-bottom:24px;">Characters evolve as you build consistent healthy habits</p>
+<div class="evolution-row">
+
+  <div class="evo-stage">
+    <div class="evo-svg">
+      <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="60" cy="60" r="50" fill="#E3F2FD"/>
+        <!-- Tiny baby otter -->
+        <ellipse cx="60" cy="68" rx="18" ry="16" fill="#4FC3F7"/>
+        <circle cx="60" cy="46" r="14" fill="#4FC3F7"/>
+        <!-- Tiny water drop ears -->
+        <path d="M48,38 Q46,28 50,32" fill="#29B6F6"/>
+        <path d="M72,38 Q74,28 70,32" fill="#29B6F6"/>
+        <circle cx="54" cy="44" r="4" fill="#1a1a2e"/>
+        <circle cx="66" cy="44" r="4" fill="#1a1a2e"/>
+        <circle cx="55" cy="43" r="1.5" fill="white"/>
+        <circle cx="67" cy="43" r="1.5" fill="white"/>
+        <ellipse cx="60" cy="50" rx="2" ry="1.5" fill="#0288D1"/>
+        <!-- No shell yet, just tiny body -->
+        <ellipse cx="52" cy="74" rx="5" ry="3" fill="#29B6F6"/>
+        <ellipse cx="68" cy="74" rx="5" ry="3" fill="#29B6F6"/>
+      </svg>
+    </div>
+    <div class="evo-name" style="color:#81D4FA;">Droplet</div>
+    <div class="evo-trigger">🌱 Start: 7-day streak</div>
+  </div>
+
+  <div class="evo-arrow">→</div>
+
+  <div class="evo-stage">
+    <div class="evo-svg">
+      <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="60" cy="60" r="50" fill="#E3F2FD"/>
+        <!-- Teen otter -->
+        <ellipse cx="60" cy="70" rx="26" ry="22" fill="#4FC3F7"/>
+        <ellipse cx="60" cy="76" rx="16" ry="14" fill="#B3E5FC"/>
+        <!-- Small shell appearing -->
+        <ellipse cx="60" cy="75" rx="10" ry="8" fill="#E0F7FA" stroke="#80DEEA" stroke-width="1"/>
+        <circle cx="60" cy="48" r="20" fill="#4FC3F7"/>
+        <path d="M44,36 Q40,22 48,28" fill="#29B6F6" stroke="#0288D1" stroke-width="1"/>
+        <path d="M76,36 Q80,22 72,28" fill="#29B6F6" stroke="#0288D1" stroke-width="1"/>
+        <circle cx="52" cy="45" r="7" fill="#1a1a2e"/>
+        <circle cx="68" cy="45" r="7" fill="#1a1a2e"/>
+        <circle cx="54" cy="43" r="2.5" fill="white"/>
+        <circle cx="70" cy="43" r="2.5" fill="white"/>
+        <ellipse cx="60" cy="52" rx="3" ry="2" fill="#0288D1"/>
+        <path d="M55,56 Q60,60 65,56" fill="none" stroke="#0288D1" stroke-width="1.5"/>
+        <!-- Small wave pattern -->
+        <path d="M35,90 Q45,85 55,90 Q65,95 75,90" fill="none" stroke="#81D4FA" stroke-width="1.5" opacity="0.5"/>
+      </svg>
+    </div>
+    <div class="evo-name" style="color:#4FC3F7;">Ripple</div>
+    <div class="evo-trigger">🌊 30-day streak + 5 breathing sessions</div>
+  </div>
+
+  <div class="evo-arrow">→</div>
+
+  <div class="evo-stage">
+    <div class="evo-svg">
+      <svg viewBox="0 0 120 120" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="60" cy="60" r="50" fill="#E3F2FD"/>
+        <!-- Majestic adult otter with wave aura -->
+        <!-- Wave aura -->
+        <path d="M25,55 Q35,45 45,55 Q55,65 65,55 Q75,45 85,55" fill="none" stroke="#81D4FA" stroke-width="2" opacity="0.4"/>
+        <path d="M20,65 Q32,55 44,65 Q56,75 68,65 Q80,55 92,65" fill="none" stroke="#4FC3F7" stroke-width="1.5" opacity="0.3"/>
+        <ellipse cx="60" cy="72" rx="30" ry="24" fill="#4FC3F7"/>
+        <ellipse cx="60" cy="78" rx="18" ry="14" fill="#B3E5FC"/>
+        <!-- Full shell -->
+        <ellipse cx="60" cy="76" rx="13" ry="11" fill="#E0F7FA" stroke="#80DEEA" stroke-width="1.5"/>
+        <path d="M50,73 Q60,65 70,73" fill="none" stroke="#80DEEA" stroke-width="1"/>
+        <path d="M52,77 Q60,69 68,77" fill="none" stroke="#80DEEA" stroke-width="1"/>
+        <path d="M54,81 Q60,73 66,81" fill="none" stroke="#80DEEA" stroke-width="1"/>
+        <circle cx="60" cy="46" r="22" fill="#4FC3F7"/>
+        <!-- Crown water drops -->
+        <path d="M42,32 Q38,16 46,24" fill="#29B6F6" stroke="#0288D1" stroke-width="1.5"/>
+        <path d="M78,32 Q82,16 74,24" fill="#29B6F6" stroke="#0288D1" stroke-width="1.5"/>
+        <path d="M60,28 Q58,14 62,14 Q66,14 64,28" fill="#29B6F6" stroke="#0288D1" stroke-width="1"/>
+        <circle cx="52" cy="43" r="8" fill="#1a1a2e"/>
+        <circle cx="68" cy="43" r="8" fill="#1a1a2e"/>
+        <circle cx="54" cy="41" r="3" fill="white"/>
+        <circle cx="70" cy="41" r="3" fill="white"/>
+        <circle cx="50" cy="44" r="1.5" fill="white" opacity="0.5"/>
+        <circle cx="66" cy="44" r="1.5" fill="white" opacity="0.5"/>
+        <ellipse cx="60" cy="50" rx="3" ry="2" fill="#0288D1"/>
+        <path d="M54,54 Q60,60 66,54" fill="none" stroke="#0288D1" stroke-width="2"/>
+        <circle cx="44" cy="48" r="3.5" fill="#F48FB1" opacity="0.3"/>
+        <circle cx="76" cy="48" r="3.5" fill="#F48FB1" opacity="0.3"/>
+        <!-- Sparkles -->
+        <circle cx="30" cy="40" r="2" fill="#E1F5FE" opacity="0.8"/>
+        <circle cx="90" cy="38" r="2" fill="#E1F5FE" opacity="0.7"/>
+        <circle cx="40" cy="85" r="1.5" fill="#E1F5FE" opacity="0.6"/>
+      </svg>
+    </div>
+    <div class="evo-name" style="color:#0288D1;">Tidal</div>
+    <div class="evo-trigger">⚡ 90-day streak + Resilience Score 80+</div>
+  </div>
+
+</div>
+
+<!-- ========== COLOR PALETTE ========== -->
+<div class="section-title">🎨 Color Palette — Character Stress Gradient</div>
+<div class="palette-row">
+  <div class="palette-swatch">
+    <div class="swatch-circle" style="background:#4CAF50;"></div>
+    <div class="swatch-label">Very Calm</div>
+    <div class="swatch-hex">#4CAF50</div>
+  </div>
+  <div class="palette-swatch">
+    <div class="swatch-circle" style="background:#81C784;"></div>
+    <div class="swatch-label">Calm</div>
+    <div class="swatch-hex">#81C784</div>
+  </div>
+  <div class="palette-swatch">
+    <div class="swatch-circle" style="background:#FFB74D;"></div>
+    <div class="swatch-label">Neutral</div>
+    <div class="swatch-hex">#FFB74D</div>
+  </div>
+  <div class="palette-swatch">
+    <div class="swatch-circle" style="background:#FF8A65;"></div>
+    <div class="swatch-label">Stressed</div>
+    <div class="swatch-hex">#FF8A65</div>
+  </div>
+  <div class="palette-swatch">
+    <div class="swatch-circle" style="background:#E53935;"></div>
+    <div class="swatch-label">Critical</div>
+    <div class="swatch-hex">#E53935</div>
+  </div>
+</div>
+
+<!-- ========== FEATURE COMPARISON ========== -->
+<div class="section-title">📊 Character Feature Matrix</div>
+<table class="comparison">
+  <thead>
+    <tr>
+      <th>Character</th>
+      <th>Element</th>
+      <th>Evolves With</th>
+      <th>Watch Face Style</th>
+      <th>Personality</th>
+      <th>Access</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="color:#4FC3F7;font-weight:600;">🌊 Ripple</td>
+      <td>Water (Otter)</td>
+      <td>Relaxation + consistency</td>
+      <td>Zen wave pool</td>
+      <td>Gentle, playful, shy</td>
+      <td><span class="tag tag-free">FREE</span></td>
+    </tr>
+    <tr>
+      <td style="color:#81C784;font-weight:600;">🌿 Blossom</td>
+      <td>Earth (Fox)</td>
+      <td>Habit building + growth</td>
+      <td>Forest garden</td>
+      <td>Curious, nurturing, warm</td>
+      <td><span class="tag tag-free">FREE</span></td>
+    </tr>
+    <tr>
+      <td style="color:#FF8A65;font-weight:600;">🔥 Ember</td>
+      <td>Fire (Phoenix)</td>
+      <td>Exercise + energy</td>
+      <td>Sunset glow</td>
+      <td>Bold, motivating, fierce</td>
+      <td><span class="tag tag-premium">PREMIUM</span></td>
+    </tr>
+    <tr>
+      <td style="color:#B39DDB;font-weight:600;">🌬️ Zephyr</td>
+      <td>Air (Rabbit)</td>
+      <td>Breathing + mindfulness</td>
+      <td>Sky & clouds</td>
+      <td>Calm, dreamy, soft</td>
+      <td><span class="tag tag-premium">PREMIUM</span></td>
+    </tr>
+    <tr>
+      <td style="color:#7986CB;font-weight:600;">🌙 Lumi</td>
+      <td>Moon (Owl)</td>
+      <td>Sleep quality + wisdom</td>
+      <td>Night sky</td>
+      <td>Wise, serene, mystical</td>
+      <td><span class="tag tag-unlock">UNLOCK: 30-day streak</span></td>
+    </tr>
+  </tbody>
+</table>
+
+<div class="footer">
+  <p>StressMonitor Character Collection — Concept Design Sheet v1.0</p>
+  <p>Generated by Hermes Agent • June 2025</p>
+</div>
+
+</body>
+</html>
