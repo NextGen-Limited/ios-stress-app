@@ -205,8 +205,18 @@ platform :ios do
       xcargs: [
         "-skipPackagePluginValidation",
         "-skipMacroValidation",
-        "COMPILER_INDEX_STORE_ENABLE=NO"
+        "COMPILER_INDEX_STORE_ENABLE=NO",
+        "CODE_SIGN_IDENTITY=iPhone Distribution",
+        "PROVISIONING_PROFILE_SPECIFIER=match AppStore stress.ai.com",
+        "PROVISIONING_PROFILE_SPECIFIER[sdk=watchos*]=match AppStore stress.ai.com.watchkitapp"
       ].join(" "),
+      export_options: {
+        provisioningProfiles: {
+          APP_IDENTIFIER => "match AppStore #{APP_IDENTIFIER}",
+          WATCH_APP_IDENTIFIER => "match AppStore #{WATCH_APP_IDENTIFIER}",
+          WIDGET_APP_IDENTIFIER => "match AppStore #{WIDGET_APP_IDENTIFIER}"
+        }
+      },
       suppress_xcode_output: true
     )
 
