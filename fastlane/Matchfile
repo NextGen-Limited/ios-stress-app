@@ -1,9 +1,9 @@
 git_url(ENV["MATCH_GIT_URL"])
 storage_mode("git")
 type("appstore")
+team_id("K2TYLYAWMK")
 app_identifier([
   "stress.ai.com",
   "stress.ai.com.watchkitapp",
   "stress.ai.com.widget"
 ])
-username(false) # Use API key, not Apple ID login

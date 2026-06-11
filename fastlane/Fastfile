@@ -103,24 +103,41 @@ platform :ios do
   lane :build_widget do
     gym(
       project: PROJECT,
-      scheme: "StressMonitorWidgetExtension",
+      scheme: SCHEME,
       configuration: "Release",
-      export_method: "app-store",
-      include_bitcode: false,
-      output_directory: "build/",
-      output_name: "StressMonitorWidget",
       skip_package_ipa: true,
       xcargs: [
         "-skipPackagePluginValidation",
-        "-skipMacroValidation"
+        "-skipMacroValidation",
+        "CODE_SIGN_IDENTITY=",
+        "CODE_SIGNING_REQUIRED=NO"
       ].join(" "),
       suppress_xcode_output: false
+    )
+  end
+
+  # ────────────────────── SETUP MATCH ──────────────────────
+  desc "One-time local setup: generate certs and profiles into the Match repo"
+  lane :setup_match do
+    match(
+      type: "appstore",
+      readonly: false,
+      force: true,
+      api_key: api_key
     )
   end
 
   # ────────────────────── BUILD ONLY ──────────────────────
   desc "Build IPA without uploading (for CI validation)"
   lane :build_only do
+    setup_ci
+
+    match(
+      type: "appstore",
+      readonly: true,
+      api_key: api_key
+    )
+
     gym(
       project: PROJECT,
       scheme: SCHEME,
@@ -146,11 +163,29 @@ platform :ios do
   lane :upload_beta do
     setup_ci
 
+    # Import Apple WWDR intermediate cert into tmp keychain before match validates
+    sh("curl -fsS 'https://www.apple.com/certificateauthority/AppleWWDRCAG3.cer' -o /tmp/AppleWWDRCAG3.cer 2>/dev/null; security import /tmp/AppleWWDRCAG3.cer -k ~/Library/Keychains/fastlane_tmp_keychain-db 2>/dev/null || true")
+
     match(
       type: "appstore",
       readonly: true,
       api_key: api_key
     )
+
+    {
+      "StressMonitor"              => "match AppStore #{APP_IDENTIFIER}",
+      "StressMonitorWatch Watch App" => "match AppStore #{WATCH_APP_IDENTIFIER}",
+      "StressMonitorWidgetExtension" => "match AppStore #{WIDGET_APP_IDENTIFIER}"
+    }.each do |target, profile_name|
+      update_code_signing_settings(
+        use_automatic_signing: false,
+        path: PROJECT,
+        team_id: "K2TYLYAWMK",
+        code_sign_identity: "iPhone Distribution",
+        targets: target,
+        profile_name: profile_name
+      )
+    end
 
     increment_build
 
@@ -183,6 +218,13 @@ platform :ios do
         "-skipMacroValidation",
         "COMPILER_INDEX_STORE_ENABLE=NO"
       ].join(" "),
+      export_options: {
+        provisioningProfiles: {
+          APP_IDENTIFIER => "match AppStore #{APP_IDENTIFIER}",
+          WATCH_APP_IDENTIFIER => "match AppStore #{WATCH_APP_IDENTIFIER}",
+          WIDGET_APP_IDENTIFIER => "match AppStore #{WIDGET_APP_IDENTIFIER}"
+        }
+      },
       suppress_xcode_output: true
     )
 
