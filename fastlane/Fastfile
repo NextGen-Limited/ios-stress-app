@@ -172,17 +172,17 @@ platform :ios do
       api_key: api_key
     )
 
-    [
-      [APP_IDENTIFIER,    "match AppStore #{APP_IDENTIFIER}"],
-      [WATCH_APP_IDENTIFIER, "match AppStore #{WATCH_APP_IDENTIFIER}"],
-      [WIDGET_APP_IDENTIFIER, "match AppStore #{WIDGET_APP_IDENTIFIER}"]
-    ].each do |bundle_id, profile_name|
+    {
+      "StressMonitor"              => "match AppStore #{APP_IDENTIFIER}",
+      "StressMonitorWatch Watch App" => "match AppStore #{WATCH_APP_IDENTIFIER}",
+      "StressMonitorWidgetExtension" => "match AppStore #{WIDGET_APP_IDENTIFIER}"
+    }.each do |target, profile_name|
       update_code_signing_settings(
         use_automatic_signing: false,
         path: PROJECT,
         team_id: "K2TYLYAWMK",
         code_sign_identity: "iPhone Distribution",
-        bundle_identifier: bundle_id,
+        targets: target,
         profile_name: profile_name
       )
     end
