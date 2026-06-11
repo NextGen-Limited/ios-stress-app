@@ -39,6 +39,7 @@ jobs:
           xcodebuild -version
 
       - name: Install iOS Simulator Runtime
+        if: ${{ inputs.skip_tests != true }}
         run: |
           # Check if an eligible iOS simulator exists for the StressMonitor scheme
           if ! xcodebuild -showdestinations -scheme StressMonitor -project StressMonitor/StressMonitor.xcodeproj 2>/dev/null | grep -q "iOS Simulator"; then
@@ -48,6 +49,7 @@ jobs:
 
       - name: Find iPhone Simulator
         id: iphone_sim
+        if: ${{ inputs.skip_tests != true }}
         run: |
           # Query xcodebuild's own destination list — simctl can lag after platform download
           # and freshly-created simulators are not always recognised by xcodebuild.
