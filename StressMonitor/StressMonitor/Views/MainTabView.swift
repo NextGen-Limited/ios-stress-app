@@ -73,6 +73,8 @@ struct MainTabView: View {
                         #endif
                     case .action:
                         ActionView()
+                    case .characters:
+                        CharacterCollectionView()
                     case .trend:
                         TrendsView()
                     }
@@ -129,5 +131,5 @@ struct MainTabView: View {
 
 #Preview {
     MainTabView()
-        .modelContainer(for: StressMeasurement.self, inMemory: true)
+        .modelContainer(for: [StressMeasurement.self, CharacterUnlock.self], inMemory: true)
 }

@@ -13,7 +13,8 @@ enum DemoMode {
 @main
 struct StressMonitorApp: App {
     static let schema = Schema([
-        StressMeasurement.self
+        StressMeasurement.self,
+        CharacterUnlock.self,
     ])
 
     static let modelConfiguration = ModelConfiguration(
@@ -23,7 +24,9 @@ struct StressMonitorApp: App {
 
     var sharedModelContainer: ModelContainer = {
         do {
-            return try ModelContainer(for: schema, configurations: [modelConfiguration])
+            let container = try ModelContainer(for: schema, configurations: [modelConfiguration])
+            seedDefaultCharacterUnlocks(in: container.mainContext)
+            return container
         } catch {
             fatalError("Could not create ModelContainer: \(error)")
         }
@@ -52,4 +55,27 @@ struct StressMonitorApp: App {
     #if DEBUG
     private static let initTimestamp = CFAbsoluteTimeGetCurrent()
     #endif
+
+    private static func seedDefaultCharacterUnlocks(in context: ModelContext) {
+        let descriptor = FetchDescriptor<CharacterUnlock>()
+        let existing = (try? context.fetch(descriptor)) ?? []
+        let existingIds = Set(existing.map(\.characterId))
+
+        for creature in CharacterCreature.allCharacters where !existingIds.contains(creature.id) {
+            let isFree = creature.unlockType == .free
+            let unlock = CharacterUnlock(
+                characterId: creature.id,
+                isUnlocked: isFree,
+                currentEvolution: .droplet,
+                isActive: creature.id == "ripple"
+            )
+            context.insert(unlock)
+        }
+
+        try? context.save()
+
+        if let ripple = CharacterCreature.find(by: "ripple") {
+            CharacterSelectionSync.shared.saveActiveCharacter(characterId: ripple.id, evolution: .droplet)
+        }
+    }
 }

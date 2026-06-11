@@ -75,18 +75,19 @@ struct CircularComplicationView: View {
 
             // Center content
             VStack(spacing: 0) {
+                Text(entry.entry.character.emoji)
+                    .font(.system(size: 12))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.6)
+
                 if entry.entry.isPlaceholder {
                     Text("--")
-                        .font(.system(size: 20, weight: .bold, design: .rounded))
+                        .font(.system(size: 16, weight: .bold, design: .rounded))
                         .foregroundColor(.gray)
                 } else {
                     Text(entry.entry.stressLevelText)
-                        .font(.system(size: 20, weight: .bold, design: .rounded))
+                        .font(.system(size: 16, weight: .bold, design: .rounded))
                         .foregroundColor(stressColor)
-
-                    Text(entry.entry.categoryText)
-                        .font(.system(size: 8, weight: .medium))
-                        .foregroundColor(.secondary)
                 }
             }
         }
