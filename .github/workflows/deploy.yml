@@ -4,6 +4,12 @@ on:
   push:
     branches: [main, release/*]
   workflow_dispatch:
+    inputs:
+      skip_tests:
+        description: "Skip all tests?"
+        required: false
+        default: false
+        type: boolean
 
 concurrency:
   group: deploy-${{ github.ref }}
@@ -20,6 +26,7 @@ jobs:
     name: Lint, Test & Build watchOS
     uses: ./.github/workflows/_test.yml
     with:
+      skip_tests: ${{ inputs.skip_tests || false }}
       run_tests: true
       run_watchos_tests: false
 

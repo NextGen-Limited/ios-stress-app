@@ -3,6 +3,11 @@ name: _test  # Reusable — called by ci.yml and deploy.yml
 on:
   workflow_call:
     inputs:
+      skip_tests:
+        description: "Skip all tests?"
+        required: false
+        default: false
+        type: boolean
       run_tests:
         description: "Run unit tests?"
         required: false
@@ -123,7 +128,7 @@ jobs:
           fi
 
       - name: Run Tests
-        if: ${{ inputs.run_tests != false }}
+        if: ${{ inputs.skip_tests != true && inputs.run_tests != false }}
         continue-on-error: true
         env:
           SCAN_DEVICE_UDID: ${{ steps.iphone_sim.outputs.sim_udid }}
@@ -142,7 +147,7 @@ jobs:
     name: Test watchOS
     runs-on: macos-15
     timeout-minutes: 30
-    if: ${{ inputs.run_watchos_tests != false }}
+    if: ${{ inputs.skip_tests != true && inputs.run_watchos_tests != false }}
     steps:
       - name: Checkout
         uses: actions/checkout@v4
