@@ -6,4 +6,3 @@ app_identifier([
   "stress.ai.com.watchkitapp",
   "stress.ai.com.widget"
 ])
-username(false) # Use API key, not Apple ID login
