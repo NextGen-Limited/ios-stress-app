@@ -1009,6 +1009,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = StressMonitorWatch;
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "We need access to your health data to monitor stress levels.";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "We need to update your health data with stress measurements.";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKBackgroundModes = fetch;
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = stress.ai.com;
@@ -1047,6 +1048,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_KEY_CFBundleDisplayName = StressMonitorWatch;
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "We need access to your health data to monitor stress levels.";
+				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "We need to update your health data with stress measurements.";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
 				INFOPLIST_KEY_WKBackgroundModes = fetch;
 				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = stress.ai.com;
