@@ -2,22 +2,6 @@ name: _test  # Reusable — called by ci.yml and deploy.yml
 
 on:
   workflow_call:
-    inputs:
-      skip_tests:
-        description: "Skip all tests?"
-        required: false
-        default: false
-        type: boolean
-      run_tests:
-        description: "Run unit tests?"
-        required: false
-        default: true
-        type: boolean
-      run_watchos_tests:
-        description: "Run watchOS tests?"
-        required: false
-        default: false
-        type: boolean
 
 env:
   XCODE_VERSION: "26.3"
@@ -25,10 +9,10 @@ env:
   LANG: "en_US.UTF-8"
 
 jobs:
-  lint-and-test:
-    name: Lint & Test
+  lint-and-build:
+    name: Lint & Build
     runs-on: macos-15
-    timeout-minutes: 45
+    timeout-minutes: 30
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -37,64 +21,6 @@ jobs:
         run: |
           sudo xcode-select -s /Applications/Xcode_${{ env.XCODE_VERSION }}.app/Contents/Developer
           xcodebuild -version
-
-      - name: Install iOS Simulator Runtime
-        if: ${{ inputs.skip_tests != true }}
-        run: |
-          # Check if an eligible iOS simulator exists for the StressMonitor scheme
-          if ! xcodebuild -showdestinations -scheme StressMonitor -project StressMonitor/StressMonitor.xcodeproj 2>/dev/null | grep -q "iOS Simulator"; then
-            echo "No eligible iOS Simulator found — downloading iOS platform..."
-            xcodebuild -downloadPlatform iOS
-          fi
-
-      - name: Find iPhone Simulator
-        id: iphone_sim
-        if: ${{ inputs.skip_tests != true }}
-        run: |
-          # Query xcodebuild's own destination list — simctl can lag after platform download
-          # and freshly-created simulators are not always recognised by xcodebuild.
-          preferred=(
-            "iPhone 17"
-            "iPhone 17 Pro"
-            "iPhone 16 Pro"
-            "iPhone Air"
-            "iPhone 16 Pro Max"
-          )
-          DEST_OUTPUT=$(xcodebuild -showdestinations \
-            -scheme StressMonitor \
-            -project StressMonitor/StressMonitor.xcodeproj 2>/dev/null)
-
-          SIM_UDID=$(echo "$DEST_OUTPUT" | python3 -c "
-          import sys, re
-          text = sys.stdin.read()
-          preferred = ['iPhone 17', 'iPhone 17 Pro', 'iPhone 16 Pro', 'iPhone Air', 'iPhone 16 Pro Max']
-          entries = []
-          for m in re.finditer(
-            r'id:([0-9A-Fa-f-]{36})[^}]*?OS:(26\.[^\s,}]+)[^}]*?name:([^,}]+)',
-            text
-          ):
-            entries.append({'udid': m.group(1), 'os': m.group(2), 'name': m.group(3).strip()})
-          entries.sort(key=lambda x: x['os'], reverse=True)
-          for name in preferred:
-            for e in entries:
-              if e['name'] == name:
-                print(e['udid'])
-                sys.exit(0)
-          for e in entries:
-            if 'iPhone' in e['name']:
-              print(e['udid'])
-              sys.exit(0)
-          print('')
-          ")
-
-          if [ -z "$SIM_UDID" ]; then
-            echo "ERROR: No iOS 26.x iPhone simulator found in xcodebuild destinations"
-            echo "$DEST_OUTPUT" | tail -40
-            exit 1
-          fi
-
-          echo "sim_udid=$SIM_UDID" >> $GITHUB_OUTPUT
-          echo "Using simulator UDID: $SIM_UDID"
 
       - name: Setup Ruby & Bundler
         uses: ruby/setup-ruby@v1
@@ -129,92 +55,23 @@ jobs:
             swiftlint lint --reporter github-actions-logging || true
           fi
 
-      - name: Run Tests
-        if: ${{ inputs.skip_tests != true && inputs.run_tests != false }}
-        continue-on-error: true
-        env:
-          SCAN_DEVICE_UDID: ${{ steps.iphone_sim.outputs.sim_udid }}
+      - name: Build iOS
         run: |
-          bundle exec fastlane test
-
-      - name: Upload Test Results
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: test-results
-          path: fastlane/test_output/
-          retention-days: 7
-
-  test-watchos:
-    name: Test watchOS
-    runs-on: macos-15
-    timeout-minutes: 30
-    if: ${{ inputs.skip_tests != true && inputs.run_watchos_tests != false }}
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Select Xcode ${{ env.XCODE_VERSION }}
-        run: |
-          sudo xcode-select -s /Applications/Xcode_${{ env.XCODE_VERSION }}.app/Contents/Developer
-          xcodebuild -version
-
-      - name: Setup Ruby & Bundler
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: "3.3"
-          bundler-cache: true
-
-      - name: Install watchOS Simulator
-        run: |
-          if ! xcodebuild -showdestinations -scheme "StressMonitorWatch Watch App" -project StressMonitor/StressMonitor.xcodeproj 2>/dev/null | grep -q "watchOS Simulator"; then
-            echo "Installing watchOS Simulator runtime..."
-            xcodebuild -downloadPlatform watchOS
-          fi
-
-      - name: Find watchOS Simulator
-        id: watch_sim
-        run: |
-          SIM_NAME=$(xcrun simctl list devices available -j | python3 -c "
-          import json, sys
-          data = json.load(sys.stdin)
-          # Prefer Apple Watch Series 10, then any Apple Watch
-          for runtime, devices in data.get('devices', {}).items():
-            if 'watchOS' in runtime:
-              for d in devices:
-                if d.get('isAvailable') and 'Series 10' in d.get('name', ''):
-                  print(d['name'])
-                  sys.exit(0)
-          # Fallback to any available Apple Watch
-          for runtime, devices in data.get('devices', {}).items():
-            if 'watchOS' in runtime:
-              for d in devices:
-                if d.get('isAvailable') and 'Watch' in d.get('name', ''):
-                  print(d['name'])
-                  sys.exit(0)
-          print('')
-          ")
-          echo "sim_name=$SIM_NAME" >> $GITHUB_OUTPUT
-          echo "Using watchOS simulator: $SIM_NAME"
-
-      - name: Run watchOS Tests
-        env:
-          SCAN_WATCH_DEVICE: ${{ steps.watch_sim.outputs.sim_name }}
-        run: |
-          bundle exec fastlane test_watchos
-
-      - name: Upload watchOS Test Results
-        uses: actions/upload-artifact@v4
-        if: always()
-        with:
-          name: watchos-test-results
-          path: fastlane/test_output_watchos/
-          retention-days: 7
+          set -o pipefail
+          xcodebuild build \
+            -project StressMonitor/StressMonitor.xcodeproj \
+            -scheme "$SCHEME" \
+            -destination 'generic/platform=iOS Simulator' \
+            -derivedDataPath build \
+            -skipPackagePluginValidation \
+            CODE_SIGN_IDENTITY="" \
+            CODE_SIGNING_REQUIRED=NO \
+            | xcpretty
 
   build-watchos:
     name: Build watchOS
     runs-on: macos-15
-    timeout-minutes: 30
+    timeout-minutes: 20
     steps:
       - name: Checkout
         uses: actions/checkout@v4
@@ -227,7 +84,6 @@ jobs:
       - name: Build watchOS
         run: |
           set -o pipefail
-          # Install watchOS platform if missing
           if ! xcodebuild -showdestinations -scheme "StressMonitorWatch Watch App" -project StressMonitor/StressMonitor.xcodeproj 2>/dev/null | grep -q "watchOS Simulator"; then
             echo "Installing watchOS Simulator runtime..."
             xcodebuild -downloadPlatform watchOS

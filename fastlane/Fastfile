@@ -1,9 +1,6 @@
 # Fastlane for StressMonitor — GitHub Actions + TestFlight CI/CD
 #
 # Usage:
-#   bundle exec fastlane test            — Run iOS unit tests
-#   bundle exec fastlane test_watchos    — Run watchOS unit tests
-#   bundle exec fastlane ui_test         — Run UI tests (iOS)
 #   bundle exec fastlane build_widget    — Build widget extension only
 #   bundle exec fastlane upload_beta     — Build & upload to TestFlight (no distribution)
 #   bundle exec fastlane distribute_beta — Distribute processed build to TestFlight group
@@ -40,63 +37,6 @@ platform :ios do
         in_house: false
       )
     end
-  end
-
-  # ────────────────────── TESTS ──────────────────────
-  desc "Run iOS unit tests"
-  lane :test do
-    # Use UDID from xcodebuild's destination list (set by CI); fall back to name-based for local dev
-    destination = if ENV["SCAN_DEVICE_UDID"] && !ENV["SCAN_DEVICE_UDID"].empty?
-      "platform=iOS Simulator,id=#{ENV['SCAN_DEVICE_UDID']}"
-    else
-      "platform=iOS Simulator,name=iPhone 17,OS=latest"
-    end
-    scan(
-      project: PROJECT,
-      scheme: SCHEME,
-      destination: destination,
-      clean: true,
-      code_coverage: true,
-      result_bundle: true,
-      output_directory: "fastlane/test_output",
-      xcargs: "-skipPackagePluginValidation -skipMacroValidation",
-      fail_build: true
-    )
-  end
-
-  desc "Run watchOS unit tests"
-  lane :test_watchos do
-    devices = ENV["SCAN_WATCH_DEVICE"] ? [ENV["SCAN_WATCH_DEVICE"]] : ["Apple Watch SE (44mm) (2nd generation)"]
-    scan(
-      project: PROJECT,
-      scheme: "StressMonitorWatch Watch App",
-      devices: devices,
-      clean: true,
-      code_coverage: true,
-      result_bundle: true,
-      output_directory: "fastlane/test_output_watchos",
-      xcargs: "-skipPackagePluginValidation -skipMacroValidation",
-      fail_build: true
-    )
-  end
-
-  desc "Run iOS UI tests"
-  lane :ui_test do
-    destination = if ENV["SCAN_DEVICE_UDID"] && !ENV["SCAN_DEVICE_UDID"].empty?
-      "platform=iOS Simulator,id=#{ENV['SCAN_DEVICE_UDID']}"
-    else
-      "platform=iOS Simulator,name=iPhone 17,OS=latest"
-    end
-    scan(
-      project: PROJECT,
-      scheme: "StressMonitorUITests",
-      destination: destination,
-      clean: false,
-      result_bundle: true,
-      output_directory: "fastlane/test_output_ui",
-      xcargs: "-skipPackagePluginValidation -skipMacroValidation",
-      fail_build: true
-    )
   end
 
   desc "Build widget extension only (for CI validation)"

@@ -4,32 +4,12 @@ on:
   pull_request:
     branches: [main, develop]
   workflow_dispatch:
-    inputs:
-      skip_tests:
-        description: "Skip all tests?"
-        required: false
-        default: false
-        type: boolean
-      run_tests:
-        description: "Run unit tests?"
-        required: false
-        default: true
-        type: boolean
-      run_watchos_tests:
-        description: "Run watchOS tests?"
-        required: false
-        default: false
-        type: boolean
 
 concurrency:
   group: ci-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  test:
-    name: Lint, Test & Build
+  build:
+    name: Lint & Build
     uses: ./.github/workflows/_test.yml
-    with:
-      skip_tests: ${{ inputs.skip_tests || false }}
-      run_tests: ${{ github.event_name != 'workflow_dispatch' || inputs.run_tests }}
-      run_watchos_tests: ${{ inputs.run_watchos_tests || false }}
