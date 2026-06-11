@@ -34,7 +34,7 @@ jobs:
     name: Build & Deploy to TestFlight
     needs: test
     runs-on: macos-15
-    timeout-minutes: 35
+    timeout-minutes: 60
     environment: production # Requires approval gate in GitHub Settings → Environments
     steps:
       - name: Checkout
