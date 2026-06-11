@@ -163,21 +163,29 @@ platform :ios do
   lane :upload_beta do
     setup_ci
 
+    # Import Apple WWDR intermediate cert into tmp keychain before match validates
+    sh("curl -fsS 'https://www.apple.com/certificateauthority/AppleWWDRCAG3.cer' -o /tmp/AppleWWDRCAG3.cer 2>/dev/null; security import /tmp/AppleWWDRCAG3.cer -k ~/Library/Keychains/fastlane_tmp_keychain-db 2>/dev/null || true")
+
     match(
       type: "appstore",
       readonly: true,
       api_key: api_key
     )
 
-    # Import WWDR into the tmp keychain so the distribution cert chain validates
-    sh("curl -fsS 'https://www.apple.com/certificateauthority/AppleWWDRCAG3.cer' -o /tmp/AppleWWDRCAG3.cer 2>/dev/null; security import /tmp/AppleWWDRCAG3.cer -k ~/Library/Keychains/fastlane_tmp_keychain-db 2>/dev/null || true")
-
-    update_code_signing_settings(
-      use_automatic_signing: false,
-      path: PROJECT,
-      team_id: "K2TYLYAWMK",
-      code_sign_identity: "iPhone Distribution"
-    )
+    [
+      [APP_IDENTIFIER,    "match AppStore #{APP_IDENTIFIER}"],
+      [WATCH_APP_IDENTIFIER, "match AppStore #{WATCH_APP_IDENTIFIER}"],
+      [WIDGET_APP_IDENTIFIER, "match AppStore #{WIDGET_APP_IDENTIFIER}"]
+    ].each do |bundle_id, profile_name|
+      update_code_signing_settings(
+        use_automatic_signing: false,
+        path: PROJECT,
+        team_id: "K2TYLYAWMK",
+        code_sign_identity: "iPhone Distribution",
+        bundle_identifier: bundle_id,
+        profile_name: profile_name
+      )
+    end
 
     increment_build
 
