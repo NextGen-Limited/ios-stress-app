@@ -1,7 +1,7 @@
 import SwiftUI
 
-/// Day and date header view for dashboard with settings icon
-/// Matches Figma design: 28px bold day, 14px date, gear icon on right
+/// Day and date header view for dashboard with settings icon.
+/// Redesigned for Home tab to match Ripple concept styling.
 struct DateHeaderView: View {
     private let date: Date
     var onSettingsTapped: (() -> Void)?
@@ -24,15 +24,21 @@ struct DateHeaderView: View {
     }
 
     var body: some View {
-        HStack(alignment: .top) {
-            VStack(alignment: .leading, spacing: 4) {
+        HStack(alignment: .center) {
+            VStack(alignment: .leading, spacing: 6) {
+                Text("StressMonitor")
+                    .font(.system(size: 13, weight: .heavy, design: .rounded))
+                    .foregroundStyle(HomeCharacterDesignTokens.Ripple.deep)
+                    .textCase(.uppercase)
+                    .tracking(0.8)
+
                 Text(dayName)
-                    .font(.system(size: 28, weight: .bold))
+                    .font(.system(size: 30, weight: .heavy, design: .rounded))
                     .foregroundStyle(Color.Wellness.adaptivePrimaryText)
 
                 Text(fullDate)
-                    .font(.system(size: 14, weight: .bold))
-                    .foregroundStyle(Color.Wellness.adaptivePrimaryText)
+                    .font(.system(size: 14, weight: .semibold, design: .rounded))
+                    .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
             }
 
             Spacer()
@@ -41,15 +47,17 @@ struct DateHeaderView: View {
                 onSettingsTapped?()
             }) {
                 Image(systemName: "gearshape.fill")
-                    .font(.system(size: 23))
-                    .foregroundStyle(Color.Wellness.adaptivePrimaryText)
+                    .font(.system(size: 18, weight: .bold))
+                    .foregroundStyle(HomeCharacterDesignTokens.Ripple.deep)
+                    .frame(width: 42, height: 42)
+                    .background(HomeCharacterDesignTokens.Ripple.light.opacity(0.42), in: Circle())
+                    .overlay(Circle().stroke(HomeCharacterDesignTokens.Ripple.primary.opacity(0.24), lineWidth: 1))
             }
             .buttonStyle(.plain)
-            .frame(width: 32, height: 32)
             .accessibilityLabel("Settings")
         }
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("\(dayName), \(fullDate). Settings button")
+        .accessibilityLabel("StressMonitor. \(dayName), \(fullDate). Settings button")
     }
 }
 
@@ -59,5 +67,5 @@ struct DateHeaderView: View {
         Spacer()
     }
     .padding()
-    .background(Color.Wellness.adaptiveBackground)
+    .background(HomeCharacterDesignTokens.homeBackground)
 }

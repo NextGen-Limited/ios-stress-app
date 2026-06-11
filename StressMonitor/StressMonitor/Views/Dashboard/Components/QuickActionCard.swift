@@ -1,67 +1,98 @@
 import SwiftUI
 
-// MARK: - Quick Action Card (Figma Design)
+// MARK: - Quick Action Card (Home Redesign)
 
-/// Horizontal scrollable action cards for wellness activities
-/// Figma: 283pt × 98pt, title + description + duration badge + image
+/// Horizontal scrollable action cards for wellness activities.
+/// Redesigned with Elemental Creature colors from the concept sheet.
 struct QuickActionCard<Destination: View>: View {
     let title: String
     let description: String
     let duration: String
     let color: Color
+    let icon: String
     let destination: () -> Destination
+
+    init(
+        title: String,
+        description: String,
+        duration: String,
+        color: Color,
+        icon: String = "figure.mind.and.body",
+        destination: @escaping () -> Destination
+    ) {
+        self.title = title
+        self.description = description
+        self.duration = duration
+        self.color = color
+        self.icon = icon
+        self.destination = destination
+    }
 
     var body: some View {
         NavigationLink(destination: destination()) {
             ZStack(alignment: .topLeading) {
-                // Background
-                color
-                    .cornerRadius(20)
+                RoundedRectangle(cornerRadius: 24, style: .continuous)
+                    .fill(
+                        LinearGradient(
+                            colors: [color.opacity(0.98), color.opacity(0.72), color.darker().opacity(0.96)],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
 
-                // Content
-                HStack(alignment: .top, spacing: 0) {
-                    // Left: Title, description, duration
-                    VStack(alignment: .leading, spacing: 4) {
+                Circle()
+                    .fill(.white.opacity(0.16))
+                    .frame(width: 124, height: 124)
+                    .offset(x: 190, y: -34)
+
+                Circle()
+                    .stroke(.white.opacity(0.16), lineWidth: 1)
+                    .frame(width: 72, height: 72)
+                    .offset(x: 226, y: 42)
+
+                HStack(alignment: .center, spacing: 14) {
+                    VStack(alignment: .leading, spacing: 8) {
+                        HStack(spacing: 6) {
+                            Image(systemName: icon)
+                                .font(.system(size: 12, weight: .bold))
+                            Text(duration)
+                                .font(.system(size: 12, weight: .bold, design: .rounded))
+                        }
+                        .foregroundStyle(.white.opacity(0.92))
+                        .padding(.horizontal, 10)
+                        .padding(.vertical, 5)
+                        .background(.white.opacity(0.16), in: Capsule())
+
                         Text(title)
-                            .font(.custom("Roboto-Bold", size: 16))
+                            .font(.system(size: 18, weight: .heavy, design: .rounded))
                             .foregroundStyle(.white)
                             .tracking(-0.24)
                             .lineLimit(1)
 
                         Text(description)
-                            .font(.custom("Roboto-Regular", size: 11))
-                            .foregroundStyle(.white)
-                            .tracking(-0.165)
+                            .font(.system(size: 12, weight: .medium, design: .rounded))
+                            .foregroundStyle(.white.opacity(0.84))
+                            .tracking(-0.12)
                             .lineLimit(2)
-                            .frame(width: 121, alignment: .leading)
-
-                        // Duration badge
-                        Text(duration)
-                            .font(.custom("Roboto-Bold", size: 12))
-                            .foregroundStyle(.white)
-                            .tracking(-0.18)
-                            .padding(.horizontal, 12)
-                            .padding(.vertical, 2)
-                            .background(color.darker())
-                            .cornerRadius(16.3)
+                            .frame(width: 165, alignment: .leading)
                     }
-                    .padding(.leading, 18)
-                    .padding(.top, 20)
-                    .padding(.bottom, 20)
 
                     Spacer()
 
-                    // Right: Image placeholder
-                    Image(systemName: "figure.mind.and.body")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 114, height: 98)
-                        .foregroundStyle(.white.opacity(0.3))
+                    ZStack {
+                        Circle()
+                            .fill(.white.opacity(0.22))
+                            .frame(width: 56, height: 56)
+                        Image(systemName: icon)
+                            .font(.system(size: 27, weight: .bold))
+                            .foregroundStyle(.white)
+                    }
                 }
+                .padding(18)
             }
-            .frame(width: 283, height: 98)
-            .shadow(color: Color.settingsCardShadowColor.opacity(0.08), radius: 5.71, x: 0, y: 2.85)
-            .shadow(color: Color.settingsCardShadowColor.opacity(0.04), radius: 5.71, x: 0, y: 5.71)
+            .frame(width: 292, height: 118)
+            .shadow(color: color.opacity(0.26), radius: 16, x: 0, y: 12)
+            .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 3)
         }
         .buttonStyle(.plain)
         .accessibilityElement(children: .combine)
@@ -74,7 +105,6 @@ struct QuickActionCard<Destination: View>: View {
 
 private extension Color {
     func darker() -> Color {
-        // Create a darker version of the color for the duration badge
         UIColor(self).darkerColor.map { Color($0) } ?? self.opacity(0.6)
     }
 }
@@ -87,7 +117,7 @@ private extension UIColor {
         var alpha: CGFloat = 0
 
         if getHue(&hue, saturation: &saturation, brightness: &brightness, alpha: &alpha) {
-            return UIColor(hue: hue, saturation: saturation, brightness: brightness * 0.7, alpha: alpha)
+            return UIColor(hue: hue, saturation: saturation, brightness: brightness * 0.74, alpha: alpha)
         }
         return nil
     }
@@ -96,40 +126,39 @@ private extension UIColor {
 // MARK: - Convenience Static Methods
 
 extension QuickActionCard where Destination == PlaceholderDestination {
-    /// Gratitude journaling activity card
     static func gratitude() -> QuickActionCard<PlaceholderDestination> {
         QuickActionCard<PlaceholderDestination>(
             title: "Gratitude",
-            description: "Take a moment to reflect on what you're grateful for",
+            description: "Help Blossom grow with one good note",
             duration: "0:45s",
-            color: Color.Wellness.gratitudePurple,
+            color: HomeCharacterDesignTokens.Blossom.accent,
+            icon: "leaf.fill",
             destination: { PlaceholderDestination(title: "Gratitude") }
         )
     }
-
 }
 
 extension QuickActionCard where Destination == MiniWalkView {
-    /// Mini walk activity card
     static func miniWalk() -> QuickActionCard<MiniWalkView> {
         QuickActionCard<MiniWalkView>(
             title: "Mini Walk",
-            description: "A short walk to refresh your mind and body",
+            description: "Let Ripple reset your nervous system",
             duration: "0:45s",
-            color: Color.Wellness.miniWalkBlue,
+            color: HomeCharacterDesignTokens.Ripple.primary,
+            icon: "figure.walk.circle.fill",
             destination: { MiniWalkView() }
         )
     }
 }
 
 extension QuickActionCard where Destination == BreathingExerciseView {
-    /// Box breathing exercise card
     static func boxBreathing() -> QuickActionCard<BreathingExerciseView> {
         QuickActionCard<BreathingExerciseView>(
             title: "Box Breathing",
-            description: "A calming breathing technique for stress relief",
+            description: "Zephyr guides slow, steady breaths",
             duration: "3 mins",
-            color: Color.Wellness.boxBreathingPurple,
+            color: HomeCharacterDesignTokens.Zephyr.accent,
+            icon: "wind",
             destination: { BreathingExerciseView() }
         )
     }
@@ -137,7 +166,6 @@ extension QuickActionCard where Destination == BreathingExerciseView {
 
 // MARK: - Placeholder Destination
 
-/// Placeholder view for activities not yet implemented
 struct PlaceholderDestination: View {
     let title: String
 
@@ -145,7 +173,7 @@ struct PlaceholderDestination: View {
         VStack(spacing: DesignTokens.Spacing.lg) {
             Image(systemName: "figure.mind.and.body")
                 .font(.system(size: 60))
-                .foregroundStyle(Color.Wellness.calmBlue)
+                .foregroundStyle(HomeCharacterDesignTokens.Ripple.primary)
 
             Text(title)
                 .font(Typography.title2)
@@ -156,7 +184,7 @@ struct PlaceholderDestination: View {
                 .foregroundStyle(.secondary)
         }
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(Color.Wellness.background)
+        .background(HomeCharacterDesignTokens.homeBackground)
         .navigationTitle(title)
         .navigationBarTitleDisplayMode(.inline)
     }
@@ -174,5 +202,6 @@ struct PlaceholderDestination: View {
             }
             .padding()
         }
+        .background(HomeCharacterDesignTokens.homeBackground)
     }
 }

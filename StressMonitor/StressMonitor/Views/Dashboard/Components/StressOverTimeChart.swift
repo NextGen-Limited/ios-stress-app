@@ -46,10 +46,25 @@ struct StressOverTimeChart: View {
                     .overlay(PremiumLockOverlay(onUpgrade: onUpgrade))
             }
         }
-        .padding(16)
-        .frame(width: 358, height: 376)
-        .background(Color.Wellness.adaptiveCardBackground)
-        .cornerRadius(16)
+        .padding(18)
+        .frame(maxWidth: .infinity)
+        .frame(height: 376)
+        .background(
+            LinearGradient(
+                colors: [
+                    Color.Wellness.adaptiveCardBackground.opacity(0.95),
+                    HomeCharacterDesignTokens.Ripple.light.opacity(0.18)
+                ],
+                startPoint: .topLeading,
+                endPoint: .bottomTrailing
+            )
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 24, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 24, style: .continuous)
+                .stroke(HomeCharacterDesignTokens.Ripple.primary.opacity(0.16), lineWidth: 1)
+        )
+        .shadow(color: HomeCharacterDesignTokens.Ripple.deep.opacity(0.10), radius: 18, x: 0, y: 12)
         .accessibilityElement(children: .contain)
         .accessibilityLabel("Stress over time chart")
     }
@@ -134,10 +149,10 @@ struct StressOverTimeChart: View {
     // MARK: - Legend View
 
     private var legendView: some View {
-        HStack(spacing: 16) {
-            legendItem(color: Color(hex: "#00C45A"), label: "Excellent", percent: excellentPercent)
-            legendItem(color: Color(hex: "#F1AE00"), label: "Normal", percent: normalPercent)
-            legendItem(color: Color(hex: "#FA363D"), label: "Stressed", percent: stressedPercent)
+        HStack(spacing: 14) {
+            legendItem(color: HomeCharacterDesignTokens.Blossom.accent, label: "Calm", percent: excellentPercent)
+            legendItem(color: HomeCharacterDesignTokens.Ripple.primary, label: "Mild", percent: normalPercent)
+            legendItem(color: HomeCharacterDesignTokens.Ember.accent, label: "Stressed", percent: stressedPercent)
         }
     }
 
@@ -158,10 +173,12 @@ struct StressOverTimeChart: View {
     private func barColor(for category: StressCategory) -> Color {
         switch category {
         case .relaxed:
-            return Color(hex: "#00C45A")
+            return HomeCharacterDesignTokens.Blossom.accent
         case .mild:
-            return Color(hex: "#F1AE00")
-        case .moderate, .high:
+            return HomeCharacterDesignTokens.Ripple.primary
+        case .moderate:
+            return HomeCharacterDesignTokens.Ember.accent
+        case .high:
             return Color(hex: "#FA363D")
         }
     }
