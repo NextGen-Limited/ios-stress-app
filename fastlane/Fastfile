@@ -169,6 +169,9 @@ platform :ios do
       api_key: api_key
     )
 
+    # Import WWDR into the tmp keychain so the distribution cert chain validates
+    sh("curl -fsS 'https://www.apple.com/certificateauthority/AppleWWDRCAG3.cer' -o /tmp/AppleWWDRCAG3.cer 2>/dev/null; security import /tmp/AppleWWDRCAG3.cer -k ~/Library/Keychains/fastlane_tmp_keychain-db 2>/dev/null || true")
+
     update_code_signing_settings(
       use_automatic_signing: false,
       path: PROJECT,
@@ -205,10 +208,7 @@ platform :ios do
       xcargs: [
         "-skipPackagePluginValidation",
         "-skipMacroValidation",
-        "COMPILER_INDEX_STORE_ENABLE=NO",
-        "CODE_SIGN_IDENTITY=iPhone Distribution",
-        "PROVISIONING_PROFILE_SPECIFIER=match AppStore stress.ai.com",
-        "PROVISIONING_PROFILE_SPECIFIER[sdk=watchos*]=match AppStore stress.ai.com.watchkitapp"
+        "COMPILER_INDEX_STORE_ENABLE=NO"
       ].join(" "),
       export_options: {
         provisioningProfiles: {

@@ -81,11 +81,6 @@ jobs:
           sudo rm -rf /Users/runner/Library/Android 2>/dev/null || true
           df -h /
 
-      - name: Install Apple WWDR Certificate
-        run: |
-          curl -fsS "https://www.apple.com/certificateauthority/AppleWWDRCAG3.cer" -o /tmp/AppleWWDRCAG3.cer
-          sudo security import /tmp/AppleWWDRCAG3.cer -k /Library/Keychains/System.keychain -T /usr/bin/codesign || true
-
       - name: Build & Deploy via Fastlane
         env:
           # App Store Connect API
