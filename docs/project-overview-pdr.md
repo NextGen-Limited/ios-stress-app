@@ -1,9 +1,9 @@
 # StressMonitor: Product Overview & Requirements
 
-**Version:** 1.0 (Production)
-**Status:** Complete and Shipping
+**Version:** 1.0 (Pre-Ship - RC1)
+**Status:** Feature Complete — 3 Blockers Pending
 **Platform:** iOS 17+ / watchOS 10+
-**Last Updated:** June 7, 2026
+**Last Updated:** June 12, 2026
 
 ---
 
@@ -40,7 +40,16 @@ StressMonitor is a **privacy-first stress monitoring application** that uses Hea
 | **Guided Breathing with Biofeedback** | Enhanced breathing with real-time feedback | ✅ Complete |
 | **Morning Readiness Check** | HRV trend analysis for daily readiness assessment | ✅ Complete |
 | **Home Screen Widgets** | At-a-glance stress display | ✅ Complete |
+| **Character Collection UI** | 5 elemental characters with 3-stage evolution, free/premium/streak unlocks, 38 SVG assets | ✅ Complete |
 | **WCAG AA Accessibility** | Dual coding, VoiceOver, Dynamic Type | ✅ Complete |
+
+### Ship Blockers (CRITICAL - must resolve before App Store submission)
+
+| Blocker | Issue | Severity |
+|---------|-------|----------|
+| **B1** | CloudLLMService hardcoded ngrok endpoint | P0 |
+| **B2** | StoreKit implementation is mock-only | P0 |
+| **B3** | Test suite is placeholder | P0 |
 
 ### Planned Features (v1.1)
 
@@ -295,6 +304,14 @@ All core features complete and shipping.
 
 ---
 
+## Ship Status Summary
+
+**Current:** v1.0 Feature Complete (RC1)
+**Blockers:** 3 critical (CloudLLM endpoint, StoreKit real impl, test suite)
+**Next:** Resolve blockers B1/B2/B3, then TestFlight → App Store
+
+---
+
 **Owner:** Phuong Doan
-**Status:** Production v1.0
-**Next Review:** July 2026 (post v1.1 release)
+**Status:** Pre-Ship (RC1) — 3 blockers remaining
+**Next Review:** Post-blocker resolution

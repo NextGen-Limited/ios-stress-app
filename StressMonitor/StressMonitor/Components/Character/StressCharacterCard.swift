@@ -1,15 +1,20 @@
+import SwiftData
 import SwiftUI
 
 // MARK: - Stress Character Card (Home Redesign)
 
 /// Character-based stress visualization for the Home tab.
-/// Uses the Ripple / Water Otter concept colors from `character-concept-sheet.html`.
+/// Uses the Ripple / Elemental Creatures concept colors from `character-concept-sheet.html`.
 struct StressCharacterCard: View {
     let result: StressResult?
     let size: StressBuddyMood.CharacterContext
     var isRequestingAccess: Bool = false
     let onGrantAccess: (() -> Void)?
     let onSettingsTapped: (() -> Void)?
+
+    @State private var showCharacterPicker = false
+    @Query(filter: #Predicate<CharacterUnlock> { $0.isActive })
+    private var activeUnlocks: [CharacterUnlock]
 
     var mood: StressBuddyMood {
         StressBuddyMood.from(stressLevel: result?.level ?? 0)
@@ -18,6 +23,13 @@ struct StressCharacterCard: View {
     var stressLevel: Double { result?.level ?? 0 }
     var hrv: Double? { result?.hrv }
     private var lastUpdated: Date? { result?.timestamp }
+
+    private var activeUnlock: CharacterUnlock? { activeUnlocks.first }
+    private var activeCreature: CharacterCreature {
+        activeUnlock.flatMap { CharacterCreature.find(by: $0.characterId) }
+            ?? CharacterCreature.find(by: "ripple")
+            ?? CharacterCreature.allCharacters[0]
+    }
 
     init(
         result: StressResult?,
@@ -80,7 +92,7 @@ struct StressCharacterCard: View {
                         .foregroundStyle(Color.Wellness.adaptivePrimaryText)
                         .fixedSize(horizontal: false, vertical: true)
 
-                    Text("Ripple reacts to your stress in real time — calm waves mean your body is recovering.")
+                    Text("\(activeCreature.displayName) reacts to your stress in real time — calm waves mean your body is recovering.")
                         .font(.system(size: 13, weight: .medium, design: .rounded))
                         .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
                         .lineLimit(3)
@@ -92,7 +104,7 @@ struct StressCharacterCard: View {
             HStack(spacing: 10) {
                 heroMetric(title: "HRV", value: "\(Int(result.hrv))", unit: "ms", icon: "waveform.path.ecg")
                 heroMetric(title: "Heart", value: "\(result.heartRate)", unit: "bpm", icon: "heart.fill")
-                heroMetric(title: "Buddy", value: "Ripple", unit: "Otter", icon: "drop.fill")
+                heroMetric(title: "Buddy", value: activeCreature.displayName, unit: activeCreature.subtitle, icon: activeCreature.elementIconName)
             }
         }
     }
@@ -103,9 +115,9 @@ struct StressCharacterCard: View {
                 .fill(
                     RadialGradient(
                         colors: [
-                            HomeCharacterDesignTokens.Ripple.light.opacity(0.84),
-                            HomeCharacterDesignTokens.Ripple.primary.opacity(0.22),
-                            .clear
+                            activeCreature.element.secondaryColor.opacity(0.84),
+                            activeCreature.element.primaryColor.opacity(0.22),
+                            .clear,
                         ],
                         center: .center,
                         startRadius: 24,
@@ -115,7 +127,7 @@ struct StressCharacterCard: View {
                 .frame(width: heroSize + 42, height: heroSize + 42)
 
             Circle()
-                .stroke(HomeCharacterDesignTokens.Ripple.light.opacity(0.58), lineWidth: 12)
+                .stroke(activeCreature.element.secondaryColor.opacity(0.58), lineWidth: 12)
                 .frame(width: heroSize + 22, height: heroSize + 22)
 
             Circle()
@@ -123,10 +135,10 @@ struct StressCharacterCard: View {
                 .stroke(
                     AngularGradient(
                         colors: [
-                            HomeCharacterDesignTokens.Ripple.primary,
+                            activeCreature.element.primaryColor,
                             HomeCharacterDesignTokens.Blossom.primary,
                             stressAccent(for: result.category),
-                            HomeCharacterDesignTokens.Ripple.primary
+                            activeCreature.element.primaryColor,
                         ],
                         center: .center
                     ),
@@ -136,7 +148,7 @@ struct StressCharacterCard: View {
                 .rotationEffect(.degrees(-90))
                 .animation(.spring(response: 0.7, dampingFraction: 0.82), value: result.level)
 
-            RippleHomeCharacterGlyph(mood: mood, size: heroSize)
+            characterGlyph
 
             VStack(spacing: 0) {
                 Text("\(Int(result.level))")
@@ -153,13 +165,32 @@ struct StressCharacterCard: View {
             .offset(y: heroSize * 0.55)
         }
         .frame(width: heroSize + 48, height: heroSize + 72)
+        .contentShape(Rectangle())
+        .onTapGesture { showCharacterPicker = true }
+        .sheet(isPresented: $showCharacterPicker) {
+            CharacterPickerSheet()
+        }
+    }
+
+    @ViewBuilder
+    private var characterGlyph: some View {
+        if activeCreature.id == "ripple", activeUnlock == nil || activeUnlock?.evolutionStage == .droplet {
+            RippleHomeCharacterGlyph(mood: mood, size: heroSize)
+        } else {
+            StressBuddyIllustration(
+                characterId: activeCreature.id,
+                evolution: activeUnlock?.evolutionStage ?? .droplet,
+                mood: mood,
+                size: heroSize
+            )
+        }
     }
 
     private func characterBadge(result: StressResult) -> some View {
         HStack(spacing: 8) {
             Image(systemName: result.category.icon)
                 .font(.system(size: 12, weight: .bold))
-            Text("Ripple • \(result.category.rawValue.capitalized)")
+            Text("\(activeCreature.displayName) • \(result.category.rawValue.capitalized)")
                 .font(.system(size: 13, weight: .bold, design: .rounded))
         }
         .foregroundStyle(stressAccent(for: result.category))
@@ -184,10 +215,12 @@ struct StressCharacterCard: View {
                     .font(.system(size: 16, weight: .heavy, design: .rounded))
                     .foregroundStyle(Color.Wellness.adaptivePrimaryText)
                     .lineLimit(1)
+                    .minimumScaleFactor(0.65)
                 Text(unit)
                     .font(.system(size: 10, weight: .bold, design: .rounded))
                     .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
                     .lineLimit(1)
+                    .minimumScaleFactor(0.6)
             }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
@@ -202,13 +235,13 @@ struct StressCharacterCard: View {
     private func heroMessage(for result: StressResult) -> String {
         switch result.category {
         case .relaxed:
-            return "Ripple is floating peacefully."
+            return "\(activeCreature.displayName) is floating peacefully."
         case .mild:
-            return "Ripple sees small ripples — you’re still steady."
+            return "\(activeCreature.displayName) sees small ripples — you’re still steady."
         case .moderate:
-            return "Ripple is getting cautious. Try a short reset."
+            return "\(activeCreature.displayName) is getting cautious. Try a short reset."
         case .high:
-            return "Ripple needs calm water. Start a breathing break."
+            return "\(activeCreature.displayName) needs calm water. Start a breathing break."
         }
     }
 
@@ -244,7 +277,19 @@ struct StressCharacterCard: View {
         let formatter = RelativeDateTimeFormatter()
         formatter.unitsStyle = .abbreviated
         let timeText = "Last updated \(formatter.localizedString(for: result.timestamp, relativeTo: Date()))"
-        return "Ripple character. \(mood.accessibilityDescription). Stress level: \(Int(result.level)). \(timeText)"
+        return "\(activeCreature.displayName) character. \(mood.accessibilityDescription). Stress level: \(Int(result.level)). \(timeText)"
+    }
+}
+
+private extension CharacterCreature {
+    var elementIconName: String {
+        switch element {
+        case .water: return "drop.fill"
+        case .earth: return "leaf.fill"
+        case .fire: return "flame.fill"
+        case .air: return "wind"
+        case .moon: return "moon.stars.fill"
+        }
     }
 }
 
@@ -285,6 +330,7 @@ extension StressCharacterCard {
         .padding()
     }
     .background(HomeCharacterDesignTokens.homeBackground)
+    .modelContainer(for: CharacterUnlock.self, inMemory: true)
 }
 
 #Preview("Permission State") {
@@ -295,4 +341,5 @@ extension StressCharacterCard {
     )
     .padding()
     .background(HomeCharacterDesignTokens.homeBackground)
+    .modelContainer(for: CharacterUnlock.self, inMemory: true)
 }

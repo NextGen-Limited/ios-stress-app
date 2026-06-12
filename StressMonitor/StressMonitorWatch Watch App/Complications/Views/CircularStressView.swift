@@ -8,17 +8,20 @@ struct CircularStressView: View {
     let category: StressCategory
     let showLabel: Bool
     let size: CGFloat
+    let characterEmoji: String?
 
     init(
         stressLevel: Double,
         category: StressCategory,
         showLabel: Bool = true,
-        size: CGFloat = 120
+        size: CGFloat = 120,
+        characterEmoji: String? = nil
     ) {
         self.stressLevel = stressLevel
         self.category = category
         self.showLabel = showLabel
         self.size = size
+        self.characterEmoji = characterEmoji
     }
 
     var body: some View {
@@ -42,6 +45,13 @@ struct CircularStressView: View {
 
             // Center content
             VStack(spacing: verticalSpacing) {
+                if let characterEmoji {
+                    Text(characterEmoji)
+                        .font(.system(size: emojiSize))
+                        .lineLimit(1)
+                        .minimumScaleFactor(0.7)
+                }
+
                 // Stress level number
                 Text(stressLevelText)
                     .font(.system(size: textSize, weight: .bold, design: .rounded))
@@ -64,6 +74,7 @@ struct CircularStressView: View {
     // MARK: - Layout Constants
     private var ringWidth: CGFloat { size * 0.08 }
     private var textSize: CGFloat { size * 0.22 }
+    private var emojiSize: CGFloat { size * 0.18 }
     private var labelSize: CGFloat { size * 0.10 }
     private var verticalSpacing: CGFloat { size * 0.02 }
 

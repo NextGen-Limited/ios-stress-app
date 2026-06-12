@@ -170,7 +170,7 @@ struct TrendsView: View {
 
     private var emptyStatePlaceholder: some View {
         VStack(spacing: 12) {
-            Image(systemName: "chart.xyaxis.slash")
+            Image(systemName: "chart.bar.xaxis")
                 .font(.largeTitle)
                 .foregroundColor(.secondary)
 

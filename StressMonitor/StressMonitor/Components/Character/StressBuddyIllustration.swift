@@ -2,35 +2,47 @@ import SwiftUI
 
 // MARK: - Stress Buddy Character Illustration
 
-/// Character illustration using SVG assets from Figma design
-/// Displays the Stress Buddy mascot with mood-based expressions
-/// Supports animation via CharacterAnimationModifier
+/// Character illustration using SVG assets from the character asset pipeline.
+/// Supports legacy generic buddy assets and new per-character assets.
 struct StressBuddyIllustration: View {
     let mood: StressBuddyMood
     let size: CGFloat
+    let characterId: String?
+    let evolution: EvolutionStage?
+
+    init(mood: StressBuddyMood, size: CGFloat) {
+        self.mood = mood
+        self.size = size
+        self.characterId = nil
+        self.evolution = nil
+    }
+
+    init(characterId: String, evolution: EvolutionStage, mood: StressBuddyMood, size: CGFloat) {
+        self.mood = mood
+        self.size = size
+        self.characterId = characterId
+        self.evolution = evolution
+    }
 
     var body: some View {
-        Image(assetName)
+        Image(resolvedAssetName)
             .resizable()
             .aspectRatio(contentMode: .fit)
             .frame(width: size, height: size)
+            .scaleEffect(evolution?.scaleFactor ?? 1)
             .characterAnimation(for: mood)
     }
 
-    /// Maps mood to corresponding asset name
-    private var assetName: String {
-        switch mood {
-        case .sleeping:
-            return "CharacterSleeping"
-        case .calm:
-            return "CharacterCalm"
-        case .concerned:
-            return "CharacterConcerned"
-        case .worried:
-            return "CharacterWorried"
-        case .overwhelmed:
-            return "CharacterOverwhelmed"
+    private var resolvedAssetName: String {
+        guard let characterId, let evolution else {
+            return CharacterAssetResolver.legacyAssetName(for: mood)
         }
+
+        return CharacterAssetResolver.resolvedAssetName(
+            characterId: characterId,
+            evolution: evolution,
+            mood: mood
+        )
     }
 }
 
@@ -42,6 +54,16 @@ struct StressBuddyIllustration: View {
             VStack {
                 StressBuddyIllustration(mood: mood, size: 120)
             }
+        }
+    }
+    .padding()
+    .background(Color.Wellness.adaptiveBackground)
+}
+
+#Preview("Ripple") {
+    HStack(spacing: 20) {
+        ForEach(StressBuddyMood.allCases, id: \.self) { mood in
+            StressBuddyIllustration(characterId: "ripple", evolution: .droplet, mood: mood, size: 120)
         }
     }
     .padding()

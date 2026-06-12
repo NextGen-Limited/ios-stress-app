@@ -1,9 +1,9 @@
 # Codebase Summary
 
-**Total Files:** ~600 files (including 303 Swift files)
-**Total LOC:** ~31,400
+**Total Files:** ~600 files (including 303+ Swift files)
+**Total LOC:** ~34,000+
 **Architecture:** MVVM + Protocol-Oriented Design
-**Last Updated:** June 7, 2026
+**Last Updated:** June 12, 2026
 
 ---
 
@@ -33,8 +33,8 @@ ios-stress-app/
 
 ## iOS App Structure (225 Swift files)
 
-### Models (18 files, ~969 LOC)
-Core data structures for health metrics and stress calculations.
+### Models (21 files, ~1,100 LOC)
+Core data structures for health metrics, stress calculations, and character system.
 
 | File | Purpose |
 |------|---------|
@@ -57,8 +57,10 @@ Core data structures for health metrics and stress calculations.
 | `ExportModels.swift` | CSV/JSON export structures |
 | `ObservableModel.swift` | Base protocol for observable models |
 | `Base/ObservableModel.swift` | Base observable model class |
+| `CharacterCreature.swift` | Character definition (species, element) |
+| `CharacterUnlock.swift` | Character unlock state + evolution progress |
 
-### Services (46 files, ~6,900 LOC)
+### Services (52 files, ~8,200 LOC)
 Business logic and system integrations.
 
 #### Algorithm Services (10 files)
@@ -85,7 +87,7 @@ Business logic and system integrations.
 - `CloudKitSyncEngine.swift` - Sync conflict resolution
 - `CloudKitSchema.swift` - CloudKit data model definitions
 
-#### LLM Services (7 files)
+#### LLM Services (10 files)
 - `LLMServiceProtocol.swift` - AI service abstraction
 - `AppleIntelligenceService.swift` - On-device AI integration (iOS 26+)
 - `CloudLLMService.swift` - Cloud-based AI fallback with hardcoded endpoint
@@ -93,6 +95,7 @@ Business logic and system integrations.
 - `ChatQuickActions.swift` - Quick response suggestions
 - `SSEParser.swift` - Server-Sent Events streaming parser
 - `LLMAPITarget.swift` - API configuration for cloud LLM
+- Plus 3 additional service classes for LLM infrastructure
 
 #### Data Management Services (8 files)
 - `DataManagementService.swift` - Central data management
@@ -121,7 +124,7 @@ Business logic and system integrations.
 - `InsightGeneratorService.swift` - AI-powered insights
 - `MockServices.swift` - Development mock data services
 
-### ViewModels (4+ files)
+### ViewModels (10 files)
 State management layer:
 
 - `StressViewModel.swift` - Core stress tracking state
@@ -133,23 +136,30 @@ State management layer:
 - `DataManagementViewModel.swift` - Data management operations
 - `BreathingViewModel.swift` - Breathing exercise state
 - `MiniWalkViewModel.swift` - Mini Walk exercise state
+- `CharacterCollectionViewModel.swift` - Character collection state & unlock logic
 
-### Views (~100 files)
+### Views (150+ files)
 SwiftUI user interface components:
 
-#### Main Navigation Structure (3 tabs)
+#### Main Navigation Structure (5 tabs)
 1. **Home** (`DashboardView.swift`) - Main stress monitoring dashboard
-2. **Action** (`ActionView.swift`) - Quick actions, exercises, breathing, AI chat
-3. **Trend** (`TrendsView.swift`) - Historical stress visualization
+2. **Trends** (`TrendsView.swift`) - Historical stress visualization
+3. **Breathing** (`BreathingView.swift`) - Breathing exercises
+4. **Characters** (`CharacterCollectionView.swift`) - Character collection & evolution
+5. **Settings** (`SettingsView.swift`) - App settings
 
 #### Feature Views
-- `HistoryView.swift` - Historical stress data
-- `SettingsView.swift` - App settings and configuration
-- `BreathingView.swift` - Breathing exercise interface
-- `Journal/` - Journaling features
+- `Dashboard/` (26 files) - Dashboard components, cards, metrics, insights
+- `Trends/` (12 files) - Trend charts, heatmaps, statistics
+- `Breathing/` (6 files) - Breathing exercise flow
+- `Characters/` (8 files) - Character collection, detail, picker, celebration
+- `Settings/` (13 files) - Settings screens, data management
+- `History/` (7 files) - Historical data browsing
+- `Onboarding/` (10 files) - Onboarding flow
+- `Premium/` (6 files) - IAP Premium subscription screen
 - `Chat/` - AI chat interface components
+- `Journal/` - Journaling features
 - `MiniWalk/` - Mini Walk exercise with circular timer
-- `Premium/` - IAP Premium subscription screen with plan selection
 
 ### Theme (5 files)
 Design system and styling:
@@ -160,12 +170,20 @@ Design system and styling:
 - `Font+WellnessType.swift` - Typography system
 - `Gradients.swift` - Gradient definitions
 
-### Components (4 files)
+### Components (15+ files)
 Reusable UI components:
 
+#### Character Components
 - `StressBuddyIllustration.swift` - AI companion visual components
 - `StressCharacterCard.swift` - Character representation
 - `CharacterAnimationModifier.swift` - Animation utilities
+- `CharacterGridCard.swift` - Character grid card for collection
+- `EvolutionDots.swift` - Evolution stage indicator
+- `EvolutionTimelineRow.swift` - Evolution timeline visualization
+- `MoodPreviewButton.swift` - Mood preview in character detail
+- `StressBuddyIllustration.swift` (Character variant) - SVG-based character render
+
+#### General Components
 - `DecorativeTriangleView.swift` - Decorative UI elements
 - `TabBar/TabItem.swift` - Tab bar item definition
 - `TabBar/AnimatedTabButtons.swift` - Animated tab button components
@@ -275,7 +293,8 @@ The app uses a simplified 3-tab navigation structure:
 6. **Mini Walk Exercise** - Walking exercise screen with circular timer
 7. **IAP Premium Screen** - Subscription paywall with StoreKit service protocol
 8. **CloudLLMService** - Hardcoded endpoint configuration with SSE streaming
-9. **3-Tab Navigation** - Simplified Home/Action/Trend structure
+9. **5-Tab Navigation** - Home/Trends/Breathing/Characters/Settings structure
+10. **Character Collection UI** - 5 elemental characters with evolution system, unlock types (free/premium/streak-gated), persistent storage, 38 SVG assets
 
 ## New Files Added (IAP Premium)
 - **PremiumState** - Centralized premium state management singleton
@@ -307,17 +326,36 @@ The app uses a simplified 3-tab navigation structure:
 
 ---
 
+## Character System (NEW - June 2026)
+
+### Overview
+- **5 elemental characters**: Ripple (Water/free), Blossom (Earth/free), Ember (Fire/premium), Zephyr (Air/premium), Lumi (Moon/streak-gated)
+- **Evolution system**: 3 stages (Droplet → Ripple → Tidal) triggered by streaks, sessions, resilience scores
+- **Unlock types**: Free, Premium (StoreKit-gated), Streak-gated (30-day)
+- **38 SVG assets**: Named as `{character}_{evolution}_{mood}.svg`
+- **Services**: `CharacterAssetResolver` (maps character+evolution+mood → SVG), `CharacterCollectionViewModel` (state management)
+- **Models**: `CharacterCreature` (definition), `CharacterUnlock` (persistent state in SwiftData)
+- **Views**: CharacterCollectionView (grid), CharacterDetailView, CharacterPickerSheet, EvolutionCelebrationView
+- **Element colors**: Water blue, Earth green, Fire orange, Air purple, Moon indigo
+
+### Asset Naming Convention
+See `/docs/design/ASSET_NAMING.md` for full SVG asset naming specification.
+
+---
+
 ## Key Metrics
 
 | Metric | Value |
 |--------|-------|
-| **Total Swift Files** | 303 |
-| **Total LOC** | ~31,400 |
+| **Total Swift Files** | 303+ |
+| **Total LOC** | ~34,000+ |
+| **iOS App Files** | 225+ |
 | **External Dependencies** | 13 SPM packages |
 | **Average File Size** | <200 LOC |
 | **Font** | Roboto (6 weights) |
+| **Character Assets** | 38 SVG files |
 
 ---
 
-**Last Updated:** June 7, 2026
+**Last Updated:** June 12, 2026
 **Maintainers:** Phuong Doan

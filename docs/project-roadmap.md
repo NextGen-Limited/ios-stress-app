@@ -1,15 +1,15 @@
 # Project Roadmap
 
-**Current Version:** 1.0 (Production)
-**Release Date:** February 2026
-**Maintenance Mode:** Active
-**Last Updated:** June 7, 2026
+**Current Version:** 1.0 (Pre-Ship - RC1)
+**Release Date:** Target July/August 2026
+**Status:** Feature Complete — 3 blockers pending
+**Last Updated:** June 12, 2026
 
 ---
 
-## Version 1.0 (Current - Production)
+## Version 1.0 (Current - Pre-Ship RC1)
 
-**Status:** ✅ Complete & Shipping
+**Status:** ✅ Feature Complete — 3 Blockers Pending (B1/B2/B3)
 
 ### Implemented Features
 
@@ -70,9 +70,10 @@
 - ✅ **Real-time Stress Score** - HRV analysis with immediate feedback
 - ✅ **Mini Walk Exercise** - Walking exercise with circular timer (Apr 2026)
 - ✅ **IAP Premium Screen** - Subscription paywall with StoreKit (Apr 2026)
-- ✅ **3-Tab Navigation** - Simplified Home/Action/Trend structure (Apr 2026)
+- ✅ **5-Tab Navigation** - Home/Trends/Breathing/Characters/Settings structure (May 2026)
 - ✅ **Streaming AI Chat** - Real-time token streaming with SSEParser (Apr 2026)
 - ✅ **Box Breathing Figma Alignment** - Enhanced breathing exercise visuals (Apr 2026)
+- ✅ **Character Collection UI** - 5 elemental characters with evolution system, 38 SVG assets (Jun 2026)
 
 #### Apple Watch
 - ✅ Standalone watch app
@@ -399,8 +400,14 @@ remains on your device or encrypted in iCloud.
 - ✅ **Real-time Stress Score** - HRV analysis with immediate feedback
 - ✅ **Mini Walk Exercise** - Walking exercise with circular timer
 - ✅ **IAP Premium Screen** - Subscription paywall with StoreKit
-- ✅ **3-Tab Navigation** - Simplified Home/Action/Trend structure
+- ✅ **5-Tab Navigation** - Home/Trends/Breathing/Characters/Settings structure
 - ✅ **Streaming AI Chat** - Real-time token streaming with SSEParser
+- ✅ **Character Collection UI** - 5 elemental characters with 3-stage evolution system
+
+**Critical Ship Blockers (June 2026):**
+1. **B1 (P0)** - CloudLLMService hardcoded ngrok endpoint must use production URL
+2. **B2 (P0)** - StoreKit implementation is mock-only, needs real purchase flow
+3. **B3 (P0)** - Test suite is placeholder, needs comprehensive rewrite
 
 **Bug Tracking:**
 Use GitHub Issues for bug reports:
@@ -573,5 +580,5 @@ Potential features for future consideration:
 ---
 
 **Owner:** Phuong Doan
-**Last Review:** June 7, 2026
-**Next Review:** August 2026
+**Last Review:** June 12, 2026
+**Next Review:** Post-blocker resolution (target July 2026)

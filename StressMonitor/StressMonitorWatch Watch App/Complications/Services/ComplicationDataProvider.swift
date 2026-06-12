@@ -48,7 +48,8 @@ final class ComplicationDataProvider {
             category: measurement.category,
             hrv: measurement.hrv,
             heartRate: measurement.heartRate,
-            timestamp: measurement.timestamp
+            timestamp: measurement.timestamp,
+            character: fetchActiveCharacter()
         )
     }
 
@@ -73,13 +74,21 @@ final class ComplicationDataProvider {
     /// Get the next scheduled timeline refresh date
     /// - Returns: Date for next refresh within WidgetKit budget
     func nextRefreshDate() -> Date {
-        // Refresh every 30 minutes to stay within budget
+        // Refresh every 30 minutes to stay within WidgetKit budget
         // WidgetKit allows ~50 refreshes per day per complication
         return Date().addingTimeInterval(30 * 60)
     }
 
+    /// Fetch active character selection shared from the iOS app.
+    func fetchActiveCharacter() -> ComplicationCharacterSnapshot {
+        guard let defaults = defaults else { return .default }
+        let id = defaults.string(forKey: Keys.activeCharacterId) ?? ComplicationCharacterSnapshot.default.id
+        let evolution = defaults.string(forKey: Keys.activeCharacterEvolution) ?? ComplicationCharacterSnapshot.default.evolution
+        return ComplicationCharacterSnapshot(id: id, evolution: evolution)
+    }
+
     /// Check if complications should show placeholder data
-    /// - Returns: Boolean indicating if no data is available
+
     var shouldShowPlaceholder: Bool {
         defaults?.object(forKey: Keys.latestMeasurement) == nil
     }
@@ -97,6 +106,8 @@ final class ComplicationDataProvider {
     enum Keys {
         static let latestMeasurement = "latestStressMeasurement"
         static let deviceID = "complicationDeviceID"
+        static let activeCharacterId = "activeCharacterId"
+        static let activeCharacterEvolution = "activeCharacterEvolution"
     }
 
     /// Codable wrapper for stress measurements
@@ -125,6 +136,7 @@ struct ComplicationEntry {
     let hrv: Double
     let heartRate: Double
     let timestamp: Date
+    var character: ComplicationCharacterSnapshot = .default
 
     /// Placeholder entry when no data is available
     static let placeholder = ComplicationEntry(
@@ -132,7 +144,8 @@ struct ComplicationEntry {
         category: .relaxed,
         hrv: 0,
         heartRate: 0,
-        timestamp: Date()
+        timestamp: Date(),
+        character: .default
     )
 
     /// Boolean indicating if this is placeholder data
@@ -153,5 +166,23 @@ struct ComplicationEntry {
     /// Display text for category
     var categoryText: String {
         isPlaceholder ? "No Data" : category.rawValue.capitalized
+    }
+}
+
+/// Lightweight active-character payload for watch complications.
+struct ComplicationCharacterSnapshot: Codable, Equatable {
+    let id: String
+    let evolution: String
+
+    static let `default` = ComplicationCharacterSnapshot(id: "ripple", evolution: "droplet")
+
+    var emoji: String {
+        switch id {
+        case "blossom": return "🌿"
+        case "ember": return "🔥"
+        case "zephyr": return "🌬️"
+        case "lumi": return "🌙"
+        default: return "💧"
+        }
     }
 }
