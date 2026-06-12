@@ -451,7 +451,18 @@ private func checkVerified<T>(_ result: VerificationResult<T>) throws -> T {
 1. Resolve product ID from `plan.productID` or `catalog.productID(for: plan.period)`.
 2. Throw `.missingProductConfiguration` if no ID exists.
 3. Fetch/cache the product if needed.
-4. Call `try await product.purchase()` for iOS 17 compatibility.
+4. Purchase with availability guard for proper payment sheet presentation:
+
+```swift
+let result: Product.PurchaseResult
+if #available(iOS 18.2, *), let scene = UIApplication.shared.connectedScenes
+    .compactMap({ $0 as? UIWindowScene }).first {
+    result = try await product.purchase(confirmIn: scene)
+} else {
+    result = try await product.purchase()
+}
+```
+
 5. Switch over `Product.PurchaseResult`:
    - `.success(let verification)`:
      - verify transaction,
