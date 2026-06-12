@@ -9,7 +9,7 @@
 
 ## Version 1.0 (Current - Pre-Ship RC1)
 
-**Status:** ✅ Feature Complete — 3 Blockers Pending (B1/B2/B3)
+**Status:** ✅ Feature Complete — 2 Blockers Pending (B2/B3)
 
 ### Implemented Features
 
@@ -86,9 +86,9 @@
 #### Additional Features
 - ✅ AI Chat Mode with Streaming (Apr 2026)
   - Conversational AI via Apple Intelligence Foundation Models (iOS 26+)
-  - **CloudLLMService with SSE streaming** - HTTP/SSE to self-hosted FastAPI gateway (GLM-4.7-flash, no API key)
-  - **SSEParser** and **LLMAPITarget** for streaming infrastructure
-  - **Hardcoded endpoint configuration** - removed server config UI for simplicity
+  - **SupabaseLLMService with SSE streaming** - HTTP/SSE to Supabase Edge Functions
+  - **SSEParser** for streaming infrastructure
+  - **Configurable endpoint** via SupabaseConfig (URL + anonKey)
   - Bottom sheet overlay with native SwiftUI chat UI
   - **Real-time token streaming** - Users see AI response as it's generated
   - Health/stress context injected into system prompt via ChatContextBuilder
@@ -172,7 +172,7 @@ Accessibility:
 • Haptic feedback
 
 Privacy:
-• 13 SPM packages (Moya, Alamofire, Kingfisher, SwiftUICharts, etc.)
+• 11 SPM packages (Kingfisher, SwiftUICharts, ExyteChat, AnimatedTabBar, etc.)
 • Local-first architecture
 • End-to-end encrypted CloudKit sync
 • No tracking or analytics
@@ -405,7 +405,7 @@ remains on your device or encrypted in iCloud.
 - ✅ **Character Collection UI** - 5 elemental characters with 3-stage evolution system
 
 **Critical Ship Blockers (June 2026):**
-1. **B1 (P0)** - CloudLLMService hardcoded ngrok endpoint must use production URL
+1. ~~**B1 (P0)** - CloudLLMService hardcoded ngrok endpoint~~ — **RESOLVED**: Deleted dead code; SupabaseLLMService is the production service
 2. **B2 (P0)** - StoreKit implementation is mock-only, needs real purchase flow
 3. **B3 (P0)** - Test suite is placeholder, needs comprehensive rewrite
 
@@ -475,7 +475,7 @@ Every release must meet:
 
 ### External Dependency Risks
 
-**Currently:** 13 SPM packages (Moya, Alamofire, Kingfisher, SwiftUICharts, etc.)
+**Currently:** 11 SPM packages (Kingfisher, SwiftUICharts, ExyteChat, AnimatedTabBar, etc.)
 
 **v2.0 Risk Assessment:**
 - **CoreML** (Apple framework, no risk)

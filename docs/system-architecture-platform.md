@@ -187,7 +187,7 @@ let lastStress = defaults?.double(forKey: "lastStressLevel") ?? 0
 - User control via export/delete
 
 ### Privacy
-- CloudLLMService sends anonymized chat context to self-hosted gateway; health data stays on-device
+- SupabaseLLMService sends anonymized chat context to Supabase Edge Functions; health data stays on-device
 - No telemetry or analytics
 - Health data never leaves device+iCloud
 - SSE streaming ensures real-time AI responses without persistent data storage
@@ -221,13 +221,13 @@ let lastStress = defaults?.double(forKey: "lastStressLevel") ?? 0
 
 ## Streaming Architecture (LLM Chat)
 
-**UPDATED - Apr 2026:**
+**UPDATED - Jun 2026:**
 
-CloudLLMService uses `AsyncThrowingStream<String, Error>` for SSE token delivery.
+SupabaseLLMService uses `AsyncThrowingStream<String, Error>` for SSE token delivery.
 
 ```
-CloudLLMService.send()
-  → URLRequest to /v1/chat/completions (stream: true) - **HARDCODED ENDPOINT**
+SupabaseLLMService.send()
+  → URLRequest to Supabase Edge Function (stream: true) — configured via SupabaseConfig
   → URLSession.shared.bytes(for:) -- async byte stream
   → Parse SSE lines ("data: {...}")
   → Extract choices[0].delta.content
@@ -238,13 +238,11 @@ CloudLLMService.send()
 
 **SSE Infrastructure:**
 - `SSEParser.swift` - Server-Sent Events parser
-- `LLMAPITarget.swift` - API configuration for cloud LLM endpoints
 
 **Key Details:**
 - OpenAI-compatible SSE format (`data: [DONE]` terminator)
 - `continuation.onTermination` cancels upstream URLSession task
-- **Hardcoded endpoint configuration** (removed server config UI)
-- Health check via synchronous `GET /health` with 3s timeout
+- Configurable endpoint via `SupabaseConfig` (URL + anonKey)
 - Error mapping: 422 (bad request), 502 (provider failure), network errors
 - AppleIntelligenceService uses same `AsyncThrowingStream` interface but via Foundation Models `streamResponse`
 
@@ -296,8 +294,7 @@ BreathingExerciseView (setup)
 | **CloudKit E2E encryption** | User privacy, Apple ecosystem | Requires iCloud account |
 | **WidgetKit (not ClockKit)** | watchOS 10+ requirement | No ClockKit support |
 | **Offline-first sync** | UX resilience | Conflict complexity |
-| **Self-hosted LLM gateway** | No API keys, full control, cloud fallback | Requires ngrok for dev; chat context leaves device |
-| **Hardcoded LLM endpoint** | Simplified configuration, removed UI complexity | Requires deployment updates for endpoint changes |
+| **Self-hosted LLM via Supabase** | Full control, cloud fallback via Edge Functions | Chat context leaves device |
 
 ---
 

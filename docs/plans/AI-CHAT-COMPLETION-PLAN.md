@@ -17,13 +17,13 @@ The AI Chat feature is **80% complete** but has critical blockers preventing shi
 - AppleIntelligenceService (iOS 26+ Foundation Models) — COMPLETE but buggy
 
 ### What's Broken / Missing
-1. **CloudLLMService**: Hardcoded ngrok URL + "Bearer changeme" — WILL BREAK
+1. ~~**CloudLLMService**: Hardcoded ngrok URL + "Bearer changeme" — WILL BREAK~~ — **RESOLVED**: Deleted dead code; SupabaseLLMService is the production service
 2. **ChatViewModel init**: Cloud-first fallback chain is COMMENTED OUT, forces CloudLLMService
 3. **AppleIntelligenceService**: Creates new LanguageModelSession per send() — loses multi-turn context
 4. **ActionView**: Passes nil for stressResult and baseline — chat gives generic advice
-5. **isAvailable()**: Uses DispatchSemaphore (blocking MainActor) — will deadlock
+5. ~~**isAvailable()**: Uses DispatchSemaphore (blocking MainActor) — will deadlock~~ — **RESOLVED**: CloudLLMService deleted
 6. **No LLM backend**: Original llm-gateway Python repo no longer exists
-7. **Moya+Alamofire dependency**: Only used for LLM health check — overkill
+7. ~~**Moya+Alamofire dependency**: Only used for LLM health check — overkill~~ — **RESOLVED**: Moya/Alamofire removed from SPM deps
 
 ---
 
@@ -79,42 +79,17 @@ Key considerations:
 - May need to wrap in an actor or use `@unchecked Sendable` with proper isolation
 - Session should be reset when `clearConversation()` is called (need a `reset()` method on protocol)
 
-### TASK 2: Remove Moya/Alamofire — Use Plain URLSession [CRITICAL]
-**Files:** `Services/LLM/LLMAPITarget.swift`, `Services/LLM/CloudLLMService.swift`
+### TASK 2: ~~Remove Moya/Alamofire — Use Plain URLSession~~ [COMPLETED]
+**Files:** ~~`Services/LLM/LLMAPITarget.swift`, `Services/LLM/CloudLLMService.swift`~~ — Both deleted
 
-Why: Moya+Alamofire are heavy dependencies used only for a health check. The actual streaming already uses plain URLSession. Remove the dependency entirely.
+~~Why: Moya+Alamofire are heavy dependencies used only for a health check. The actual streaming already uses plain URLSession. Remove the dependency entirely.~~
 
-Changes:
-1. Delete `LLMAPITarget.swift` entirely
-2. Move health check into `CloudLLMService` using URLSession
-3. Remove `import Moya` and `import Alamofire` from CloudLLMService
-4. Remove Moya/Alamofire from Package.swift / SPM dependencies
+**Resolution (Jun 2026):** Both files deleted. Moya/Alamofire removed from SPM dependencies. SupabaseLLMService handles all cloud LLM communication.
 
-### TASK 3: Fix CloudLLMService — Configurable Endpoint [CRITICAL]
-**Files:** `Services/LLM/CloudLLMService.swift`
-**Estimate:** 2 hours
+### TASK 3: ~~Fix CloudLLMService — Configurable Endpoint~~ [COMPLETED]
+**Files:** ~~`Services/LLM/CloudLLMService.swift`~~ — Deleted
 
-Changes:
-1. Replace hardcoded ngrok URL with configurable endpoint:
-   ```swift
-   // Read from UserDefaults/AppStorage (configurable in Settings)
-   private let serverURL: String
-   private let apiKey: String
-   
-   init(serverURL: String? = nil, apiKey: String? = nil) {
-       self.serverURL = serverURL ?? UserDefaults.standard.string(forKey: "llm_server_url") ?? ""
-       self.apiKey = apiKey ?? UserDefaults.standard.string(forKey: "llm_api_key") ?? ""
-   }
-   ```
-2. Replace "Bearer changeme" with configurable API key
-3. Fix `isAvailable()` — make it async, remove DispatchSemaphore:
-   ```swift
-   func isAvailable() async -> Bool {
-       guard !serverURL.isEmpty else { return false }
-       // Use async URLSession instead of semaphore
-   }
-   ```
-   NOTE: This changes the protocol signature. `LLMServiceProtocol.isAvailable()` must become `async`.
+**Resolution (Jun 2026):** CloudLLMService was dead code — ChatViewModel already uses SupabaseLLMService with SupabaseConfig for proper endpoint configuration. Deleted the hardcoded service entirely.
 
 ### TASK 4: Fix LLMServiceProtocol — Async isAvailable [CRITICAL]
 **Files:** `Services/LLM/LLMServiceProtocol.swift`

@@ -43,11 +43,10 @@ We DO NOT:
 AI Chat Feature (Apr 2026):
 - Chat messages are processed via streaming AI responses
 - Apple Intelligence (iOS 26+) provides on-device processing
-- CloudLLMService provides fallback via self-hosted gateway (SSE streaming)
+- SupabaseLLMService provides cloud fallback via Supabase Edge Functions (SSE streaming)
 - Only anonymized conversation context is transmitted (no raw health data)
 - Health data remains on your device at all times
-- No API key or account required for chat
-- Hardcoded endpoint configuration ensures privacy
+- Configurable endpoint via SupabaseConfig
 
 All health data is stored locally on your device.
 Optional iCloud sync is end-to-end encrypted.
@@ -336,9 +335,9 @@ Solution: In Xcode
 **Error:** "CloudLLM endpoint connection failed"
 ```
 Solution: Check internet connection
-→ Verify ngrok tunnel is active
+→ Verify Supabase Edge Functions are deployed
 → Test endpoint manually in browser
-→ Check hardcoded endpoint configuration
+→ Check SupabaseConfig for correct URL
 ```
 
 ### TestFlight Issues
@@ -350,17 +349,17 @@ Solution:
 → Check build archive integrity
 → Try uploading again
 → Verify all new features (ActionView, streaming chat) work
-→ Test SSEParser and LLMAPITarget integration
+→ Test SSEParser integration
 ```
 
 **Issue:** "Streaming chat not working"
 ```
 Solution:
-→ Test with CloudLLM hardcoded endpoint
+→ Test with SupabaseLLMService endpoint configuration
 → Verify SSEParser token processing
 → Check network connectivity
 → Test fallback to Apple Intelligence (iOS 26+)
-→ Verify LLMAPITarget configuration
+→ Verify Supabase Edge Functions are deployed and accessible
 ```
 
 ### App Store Review Rejection
@@ -437,7 +436,7 @@ App Store Connect → Performance
 → Hang ratio <0.1%
 → Memory growth acceptable
 → Battery impact minimal
-→ Monitor CloudLLM streaming performance via SSEParser
+→ Monitor SupabaseLLM streaming performance via SSEParser
 ```
 
 ### User Ratings

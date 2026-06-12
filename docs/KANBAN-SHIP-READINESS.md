@@ -6,12 +6,12 @@
 
 ## 🔴 BLOCKER (Must fix before ship)
 
-### B1: AI Chat - Hardcoded Endpoint
-- [ ] Replace ngrok URL `https://hyperpolysyllabically-saronic-mee.ngrok-free.app` with production endpoint
-- [ ] Remove hardcoded `Bearer changeme` auth token
-- [ ] Move API config to Environment / remote config
-- [ ] **Files:** `CloudLLMService.swift`, `LLMAPITarget.swift`
-- **Priority:** P0 | **Effort:** M | **Status:** Backlog
+### B1: AI Chat - Hardcoded Endpoint ~~(RESOLVED)~~
+- [x] ~~Replace ngrok URL `https://hyperpolysyllabically-saronic-mee.ngrok-free.app` with production endpoint~~ — Deleted dead code; SupabaseLLMService is the production service
+- [x] ~~Remove hardcoded `Bearer changeme` auth token~~ — Deleted CloudLLMService.swift
+- [x] ~~Move API config to Environment / remote config~~ — SupabaseLLMService uses SupabaseConfig for proper endpoint configuration
+- **Files:** ~~`CloudLLMService.swift`, `LLMAPITarget.swift`~~ — Both deleted
+- **Priority:** P0 | **Effort:** M | **Status:** ✅ Done
 
 ### B2: IAP / Premium - No Real StoreKit
 - [ ] Implement `StoreKitService` (conform to `StoreKitServiceProtocol`)
@@ -67,9 +67,8 @@
 ### H4: Apple Intelligence Strategy
 - [ ] Uncomment cloud-first strategy in `ChatViewModel` (lines 51-57)
 - [ ] Make Apple Intelligence the default for iOS 26+ devices
-- [ ] Fix `isAvailable()` — remove DispatchSemaphore blocking on MainActor
 - [ ] Add proper async availability check
-- [ ] **Files:** `ChatViewModel.swift`, `CloudLLMService.swift`, `AppleIntelligenceService.swift`
+- [ ] **Files:** `ChatViewModel.swift`, `AppleIntelligenceService.swift`
 - **Priority:** P1 | **Effort:** M | **Status:** Backlog
 
 ### H5: Notifications - Incomplete

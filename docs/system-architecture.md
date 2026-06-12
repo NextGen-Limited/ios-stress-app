@@ -64,7 +64,7 @@ Advanced platform capabilities:
 | **HealthKit** | Health data | Official Apple health API, privacy-first |
 | **WidgetKit** | Widgets & complications | Modern widget framework, watchOS 10+ |
 | **async/await** | Concurrency | Swift 5.9+ native, structured concurrency |
-| **SSE Streaming** | Real-time AI chat | Server-sent events for CloudLLM responses |
+| **SSE Streaming** | Real-time AI chat | Server-sent events for SupabaseLLM responses |
 | **Foundation Models** | On-device LLM | Apple Intelligence (iOS 26+), conversational AI |
 | **Combine** | Async streams | Background health data observation |
 
@@ -88,7 +88,7 @@ System APIs (HealthKit)
 Apple Watch Sensors
 ```
 
-**AI Chat data flow (Apr 2026):**
+**AI Chat data flow (Jun 2026):**
 ```
 ActionView.isChatPresented → .sheet(ChatBottomSheetView)
     ↓
@@ -96,7 +96,7 @@ ChatViewModel (sends messages + receives streaming tokens)
     ↓
 LLMServiceProtocol.send(messages:systemPrompt:) → AsyncThrowingStream<String, Error>
     ↓
-AppleIntelligenceService (iOS 26+ Foundation Models) OR CloudLLMService with SSE streaming
+SupabaseLLMService (Supabase Edge Functions with SSE streaming) OR AppleIntelligenceService (iOS 26+ Foundation Models)
     ↑
 ChatContextBuilder (assembles health/stress context into system prompt)
 ```
@@ -165,18 +165,16 @@ UI Updates on screen
 - `InsightGeneratorService.generateInsight(stress:baseline:history:)`
 - Surfaces patterns and recommendations to `AIInsightCard` on dashboard
 
-### LLM Service (Apr 2026)
+### LLM Service (Apr 2026, updated Jun 2026)
 - Protocol-based LLM abstraction (`LLMServiceProtocol`)
-- `AppleIntelligenceService` -- Apple Foundation Models (iOS 26+), streaming token response
-- `CloudLLMService` -- HTTP/SSE streaming to self-hosted FastAPI gateway (GLM-4.7-flash model)
-  - **Hardcoded endpoint configuration** (no server config UI)
-  - Calls `/v1/chat/completions` endpoint via ngrok-hosted URL
-  - No API key required
-  - Health check via `/health` endpoint
+- `SupabaseLLMService` -- Primary production service using Supabase Edge Functions for SSE streaming
+  - Configurable endpoint via `SupabaseConfig` (URL + anonKey)
+  - Calls Supabase Edge Functions for chat completion
   - SSE streaming: `data: {"token": "..."}` with `[DONE]` sentinel
+  - Health context injection via `StressContextPayload`
   - Graceful fallback when server unreachable
-- `SSEParser` -- New Server-Sent Events parser for streaming responses
-- `LLMAPITarget` -- API configuration for cloud LLM endpoints
+- `AppleIntelligenceService` -- Apple Foundation Models (iOS 26+), streaming token response
+- `SSEParser` -- Server-Sent Events parser for streaming responses
 - `ChatContextBuilder` -- assembles health/stress data into system prompt
 - `ChatQuickActions` -- pre-built prompt suggestions for wellness topics
 - Graceful fallback on pre-iOS 26 devices
@@ -225,7 +223,7 @@ UI Updates on screen
 
 | Decision | Rationale | Trade-off |
 |----------|-----------|-----------|
-| **13 SPM packages** | Moya, Alamofire, Kingfisher, SwiftUICharts, etc. | Network, UI, and media capabilities |
+| **11 SPM packages** | Kingfisher, SwiftUICharts, ExyteChat, AnimatedTabBar, etc. | Network, UI, and media capabilities |
 | **Local-first architecture** | Works offline, fast responsiveness | Eventual consistency |
 | **MVVM + Protocols** | Testability, loose coupling | More boilerplate |
 | **@Observable macro** | Modern, iOS 17+ reactive | Excludes iOS 16 |
@@ -234,7 +232,6 @@ UI Updates on screen
 | **Multi-factor algorithm** | More comprehensive stress assessment | Increased complexity, more data required |
 | **Offline-first sync** | UX resilience, privacy | Conflict resolution complexity |
 | **Protocol-based services** | Testability, extensibility | More abstraction overhead |
-| **Hardcoded LLM endpoint** | Simplified configuration, removed UI complexity | Requires deployment updates for endpoint changes |
 
 ---
 
@@ -301,7 +298,7 @@ let viewModel = StressViewModel(healthKit: MockHealthKitManager())
 - User can export/delete anytime
 
 ### Privacy
-- CloudLLMService sends anonymized chat context to self-hosted gateway (no raw health data)
+- SupabaseLLMService sends anonymized chat context to Supabase Edge Functions; health data stays on-device
 - No telemetry or analytics
 - No third-party analytics services
 - Health data never leaves device+iCloud
