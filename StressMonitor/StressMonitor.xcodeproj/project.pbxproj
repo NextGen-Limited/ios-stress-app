@@ -14,8 +14,6 @@
 		F26968812F5DAE2400B40F0F /* SwiftUICharts in Frameworks */ = {isa = PBXBuildFile; productRef = F26968802F5DAE2400B40F0F /* SwiftUICharts */; };
 		F2E2EC392F1CC605000C2B53 /* StressMonitorWatch Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = F2E2EC192F1CC602000C2B53 /* StressMonitorWatch Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		F2FCD7AF2F8FFBFF000DE6E8 /* ExyteChat in Frameworks */ = {isa = PBXBuildFile; productRef = F2FCD7AE2F8FFBFF000DE6E8 /* ExyteChat */; };
-		F2FCDD102F92421C000DE6E8 /* CombineMoya in Frameworks */ = {isa = PBXBuildFile; productRef = F2FCDD0F2F92421C000DE6E8 /* CombineMoya */; };
-		F2FCDD122F92421C000DE6E8 /* Moya in Frameworks */ = {isa = PBXBuildFile; productRef = F2FCDD112F92421C000DE6E8 /* Moya */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -143,8 +141,6 @@
 			files = (
 				F26965312F5C0A9700B40F0F /* AnimatedTabBar in Frameworks */,
 				F26968812F5DAE2400B40F0F /* SwiftUICharts in Frameworks */,
-				F2FCDD102F92421C000DE6E8 /* CombineMoya in Frameworks */,
-				F2FCDD122F92421C000DE6E8 /* Moya in Frameworks */,
 				F2FCD7AF2F8FFBFF000DE6E8 /* ExyteChat in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -241,8 +237,6 @@
 				F26965302F5C0A9700B40F0F /* AnimatedTabBar */,
 				F26968802F5DAE2400B40F0F /* SwiftUICharts */,
 				F2FCD7AE2F8FFBFF000DE6E8 /* ExyteChat */,
-				F2FCDD0F2F92421C000DE6E8 /* CombineMoya */,
-				F2FCDD112F92421C000DE6E8 /* Moya */,
 			);
 			productName = StressMonitor;
 			productReference = F2E2EBE92F1CC553000C2B53 /* StressMonitor.app */;
@@ -302,7 +296,6 @@
 				F269652F2F5C0A9700B40F0F /* XCRemoteSwiftPackageReference "AnimatedTabBar" */,
 				F269687F2F5DAE2400B40F0F /* XCRemoteSwiftPackageReference "SwiftUICharts" */,
 				F2FCD7AD2F8FFBFE000DE6E8 /* XCRemoteSwiftPackageReference "Chat" */,
-				F2FCDD0E2F92421C000DE6E8 /* XCRemoteSwiftPackageReference "Moya" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = F2E2EBEA2F1CC553000C2B53 /* Products */;
@@ -789,14 +782,6 @@
 				minimumVersion = 3.0.2;
 			};
 		};
-		F2FCDD0E2F92421C000DE6E8 /* XCRemoteSwiftPackageReference "Moya" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/Moya/Moya.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 15.0.3;
-			};
-		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -814,16 +799,6 @@
 			isa = XCSwiftPackageProductDependency;
 			package = F2FCD7AD2F8FFBFE000DE6E8 /* XCRemoteSwiftPackageReference "Chat" */;
 			productName = ExyteChat;
-		};
-		F2FCDD0F2F92421C000DE6E8 /* CombineMoya */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = F2FCDD0E2F92421C000DE6E8 /* XCRemoteSwiftPackageReference "Moya" */;
-			productName = CombineMoya;
-		};
-		F2FCDD112F92421C000DE6E8 /* Moya */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = F2FCDD0E2F92421C000DE6E8 /* XCRemoteSwiftPackageReference "Moya" */;
-			productName = Moya;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

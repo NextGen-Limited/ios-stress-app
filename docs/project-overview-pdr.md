@@ -47,7 +47,7 @@ StressMonitor is a **privacy-first stress monitoring application** that uses Hea
 
 | Blocker | Issue | Severity |
 |---------|-------|----------|
-| **B1** | CloudLLMService hardcoded ngrok endpoint | P0 |
+| ~~**B1**~~ | ~~CloudLLMService hardcoded ngrok endpoint~~ — **RESOLVED** | ~~P0~~ ✅ |
 | **B2** | StoreKit implementation is mock-only | P0 |
 | **B3** | Test suite is placeholder | P0 |
 
@@ -207,10 +207,9 @@ Each measurement includes a confidence value (0-1) based on:
 | Constraint | Impact | Mitigation |
 |-----------|--------|-----------|
 | **iOS 17+ only** | Excludes iOS 16 users | Feature target for modern users |
-| **iOS 26+ for Apple Intelligence** | AI Chat limited to newest iOS | CloudLLM fallback for older devices |
+| **iOS 26+ for Apple Intelligence** | AI Chat limited to newest iOS | SupabaseLLM fallback for older devices |
 | **HealthKit dependency** | Requires health data access | Graceful degradation on denial |
 | **iCloud requirement** | CloudKit sync needs account | Optional feature, not required |
-| **CloudLLM external endpoint** | Chat data sent to ngrok-hosted gateway | Only anonymized context, no raw health data |
 
 ---
 
@@ -218,7 +217,7 @@ Each measurement includes a confidence value (0-1) based on:
 
 ### Privacy-First Design
 - **Local Storage:** SwiftData (encrypted at rest by iOS)
-- **CloudLLM Chat:** Sends anonymized chat context to self-hosted FastAPI gateway (no API key needed); health data stays on-device
+- **CloudLLM Chat:** Sends anonymized chat context to Supabase Edge Functions (no API key needed); health data stays on-device
 - **Read-Only HealthKit:** No writes to Apple Health
 - **CloudKit E2E Encryption:** End-to-end encrypted sync
 - **No Tracking:** No analytics, no advertising IDs
@@ -233,11 +232,10 @@ HealthKit (Sensors) -> HealthKitManager (read-only)
 
 AI Chat (separate path):
 ActionView -> ChatBottomSheetView -> ChatViewModel
--> AppleIntelligenceService (on-device, iOS 26+) OR
-   CloudLLMService (SSE streaming to hardcoded ngrok endpoint with SSEParser)
+-> SupabaseLLMService (SSE streaming to Supabase Edge Functions) OR
+   AppleIntelligenceService (on-device, iOS 26+)
 -> ChatContextBuilder (assembles anonymized context only)
--> SSEParser (NEW) for Server-Sent Events streaming
--> LLMAPITarget (NEW) for API configuration
+-> SSEParser for Server-Sent Events streaming
 ```
 
 ---
@@ -307,11 +305,11 @@ All core features complete and shipping.
 ## Ship Status Summary
 
 **Current:** v1.0 Feature Complete (RC1)
-**Blockers:** 3 critical (CloudLLM endpoint, StoreKit real impl, test suite)
-**Next:** Resolve blockers B1/B2/B3, then TestFlight → App Store
+**Blockers:** 2 critical (StoreKit real impl, test suite)
+**Next:** Resolve blockers B2/B3, then TestFlight → App Store
 
 ---
 
 **Owner:** Phuong Doan
-**Status:** Pre-Ship (RC1) — 3 blockers remaining
+**Status:** Pre-Ship (RC1) — 2 blockers remaining
 **Next Review:** Post-blocker resolution

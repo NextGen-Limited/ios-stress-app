@@ -79,7 +79,7 @@ Current status, planned features, timeline, and success metrics.
 | **watchOS App** | 44 files |
 | **Widgets** | 7 files |
 | **Tests** | 5 files (suite pending rewrite) |
-| **External Dependencies** | 13 SPM packages |
+| **External Dependencies** | 11 SPM packages |
 | **CI/CD** | GitHub Actions (macos-15, Xcode 26.3) |
 | **Character Assets** | 38 SVG files |
 
@@ -134,11 +134,11 @@ Current status, planned features, timeline, and success metrics.
 | **@Observable macro** | Modern iOS 17+ reactive |
 | **SwiftData (not Core Data)** | iOS 17+ native, SwiftUI-friendly |
 | **CloudKit E2E encryption** | User privacy guarantee |
-| **SPM Dependencies** | 13 packages (Moya, Alamofire, Kingfisher, SwiftUICharts, etc.) |
+| **SPM Dependencies** | 11 packages (Kingfisher, SwiftUICharts, ExyteChat, AnimatedTabBar, etc.) |
 | **WidgetKit (not ClockKit)** | watchOS 10+ requirement |
 | **async/await throughout** | Modern concurrency |
 | **Foundation Models** | On-device LLM via Apple Intelligence (iOS 26+) |
-| **CloudLLMService** | Self-hosted FastAPI gateway as fallback LLM |
+| **SupabaseLLMService** | Supabase Edge Functions as cloud LLM service |
 | **GitHub Actions CI** | Automated build + test on macos-15 with SPM caching |
 
 ---
@@ -148,10 +148,9 @@ Current status, planned features, timeline, and success metrics.
 | Constraint | Impact | Mitigation |
 |-----------|--------|-----------|
 | iOS 17+ only | Excludes iOS 16 users | Target modern users |
-| iOS 26+ for Apple Intelligence | AI Chat limited to newest iOS | CloudLLM fallback for older devices |
+| iOS 26+ for Apple Intelligence | AI Chat limited to newest iOS | SupabaseLLM fallback for older devices |
 | HealthKit dependency | Requires permissions | Graceful degradation |
 | iCloud required for sync | CloudKit needs account | Optional feature |
-| External LLM endpoint | CloudLLM sends data to ngrok URL | Health data stays local; only chat context transmitted |
 
 ---
 
@@ -165,7 +164,7 @@ Current status, planned features, timeline, and success metrics.
 - User data ownership (full export/delete)
 
 **Security Measures:**
-- CloudLLMService sends chat messages (not raw health data) to self-hosted gateway
+- SupabaseLLMService sends chat messages (not raw health data) to Supabase Edge Functions
 - No telemetry or analytics
 - HealthKit authorization flow
 - Error handling for denied permissions
@@ -204,7 +203,7 @@ SwiftUI Views → @Observable ViewModels → Protocol-based Services
 | Item | Status | Contact |
 |------|--------|---------|
 | **Active Development** | ✅ v1.0 Pre-Ship RC1 | Phuong Doan |
-| **Blockers** | 🚫 3 critical (B1/B2/B3) | Production URL, StoreKit impl, test suite |
+| **Blockers** | 🚫 2 critical (B2/B3) | StoreKit impl, test suite |
 | **Bug Fixes** | ✅ Ongoing | GitHub Issues |
 | **Feature Requests** | 📋 Roadmap in docs | Roadmap discussion |
 | **Documentation** | ✅ Current | This index |
@@ -215,7 +214,7 @@ SwiftUI Views → @Observable ViewModels → Protocol-based Services
 
 | Version | Release | Status | Notable |
 |---------|---------|--------|---------|
-| **1.0** | Jul/Aug 2026 | 🔄 Pre-Ship RC1 | AI Chat with SSE streaming, 5-tab navigation, Character Collection UI (5 characters, 3-stage evolution, 38 SVG assets), CloudLLM hardcoded endpoint, Box Breathing Figma alignment, Mini Walk exercise, IAP Premium screen (mock), Stress History, Guided Breathing, Watch Complications, Morning Readiness Check. **Blockers:** CloudLLM endpoint, StoreKit real impl, test suite |
+| **1.0** | Jul/Aug 2026 | 🔄 Pre-Ship RC1 | AI Chat with SSE streaming, 5-tab navigation, Character Collection UI (5 characters, 3-stage evolution, 38 SVG assets), SupabaseLLM via Edge Functions, Box Breathing Figma alignment, Mini Walk exercise, IAP Premium screen (mock), Stress History, Guided Breathing, Watch Complications, Morning Readiness Check. **Blockers:** StoreKit real impl, test suite |
 | **1.1** | Q3 2026 | 🔄 Planned | Advanced breathing, stress triggers, weekly reports, localization MVP |
 | **2.0** | Q4 2026 | 🎯 Concept | ML insights, Siri Shortcuts, iPad support |
 
