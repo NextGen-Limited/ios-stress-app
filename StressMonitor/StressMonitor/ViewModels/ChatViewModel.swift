@@ -46,10 +46,11 @@ final class ChatViewModel {
         self.baseline = baseline
         self.recentHistory = recentHistory
 
-        // Supabase-first strategy: Supabase Edge Function → Apple Intelligence → unavailable
+        // Supabase BE strategy: iOS streams through the StressMonitor Supabase Edge Function.
+        // The service requires SUPABASE_ANON_KEY plus a Supabase Auth access token.
         let supabaseService = SupabaseLLMService()
         self.llmService = supabaseService
-        self.isAvailable = true
+        self.isAvailable = supabaseService.isAvailable()
     }
 
     // MARK: - Send Message
@@ -115,7 +116,17 @@ final class ChatViewModel {
             }
 
             if !currentStreamingText.isEmpty {
-                let response = ChatMessage(role: .assistant, content: currentStreamingText)
+                let sessionId = (llmService as? SupabaseLLMService)?.currentSessionId
+                if let lastUserIndex = messages.lastIndex(where: { $0.role == .user }) {
+                    messages[lastUserIndex].sessionId = sessionId
+                    messages[lastUserIndex].isSynced = sessionId != nil
+                }
+                let response = ChatMessage(
+                    role: .assistant,
+                    content: currentStreamingText,
+                    sessionId: sessionId,
+                    isSynced: sessionId != nil
+                )
                 messages.append(response)
             }
         } catch let error as LLMServiceError {
@@ -161,6 +172,7 @@ final class ChatViewModel {
         cancelResponse()
         messages.removeAll()
         errorMessage = nil
+        (llmService as? SupabaseLLMService)?.resetSession()
     }
 }
 

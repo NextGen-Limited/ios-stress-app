@@ -6,10 +6,18 @@ import Foundation
 enum SSEEvent {
     /// Content token received from streaming response
     case content(String)
+    /// Backend metadata received after a successful chat completion
+    case metadata(SSEMetadata)
     /// Stream completed successfully
     case done
     /// Server reported an error
     case error(String)
+}
+
+struct SSEMetadata: Sendable {
+    let sessionId: UUID?
+    let creditsRemaining: Int?
+    let modelUsed: String?
 }
 
 // MARK: - SSE Parser
@@ -38,6 +46,16 @@ struct SSEParser {
         // Check for error in response
         if let errorMsg = json["error"] as? String {
             return .error(errorMsg)
+        }
+
+        // Extract metadata emitted by the StressMonitor Supabase Edge Function.
+        if let type = json["type"] as? String, type == "metadata" {
+            let sessionId = (json["session_id"] as? String).flatMap(UUID.init(uuidString:))
+            return .metadata(SSEMetadata(
+                sessionId: sessionId,
+                creditsRemaining: json["credits_remaining"] as? Int,
+                modelUsed: json["model_used"] as? String
+            ))
         }
 
         // Extract content from OpenAI-compatible format: choices[0].delta.content

@@ -28,12 +28,24 @@ struct StressContextPayload: Codable, Sendable {
     // MARK: - Nested Types
 
     struct FactorBreakdownPayload: Codable, Sendable {
-        let hrvComponent: Double?
-        let hrComponent: Double?
-        let sleepComponent: Double?
-        let activityComponent: Double?
-        let recoveryComponent: Double?
-        let dataCompleteness: Double?
+        let hrv: FactorPayload?
+        let heartRate: FactorPayload?
+        let sleep: FactorPayload?
+        let activity: FactorPayload?
+        let recovery: FactorPayload?
+
+        enum CodingKeys: String, CodingKey {
+            case hrv
+            case heartRate = "heart_rate"
+            case sleep
+            case activity
+            case recovery
+        }
+    }
+
+    struct FactorPayload: Codable, Sendable {
+        let score: Double
+        let weight: Double
     }
 
     // MARK: - Coding Keys (snake_case for JSON)
@@ -67,7 +79,7 @@ struct StressContextPayload: Codable, Sendable {
         baseline: PersonalBaseline?,
         recentHistory: [StressMeasurement] = [],
         language: String = "en",
-        coachingStyle: String = "empathetic"
+        coachingStyle: String = "supportive"
     ) -> StressContextPayload {
         // Trend analysis
         var trend: String? = nil
@@ -81,9 +93,9 @@ struct StressContextPayload: Codable, Sendable {
             if abs(diff) < 5 {
                 trend = "stable"
             } else if diff > 0 {
-                trend = "rising"
+                trend = "increasing"
             } else {
-                trend = "declining"
+                trend = "decreasing"
             }
             trendDelta = String(format: "%+.0f%%", diff)
         }
@@ -91,13 +103,13 @@ struct StressContextPayload: Codable, Sendable {
         // Factor breakdown
         var factorPayload: FactorBreakdownPayload? = nil
         if let fb = stressResult?.factorBreakdown {
+            let defaults = FactorWeights.defaults
             factorPayload = FactorBreakdownPayload(
-                hrvComponent: fb.hrvComponent,
-                hrComponent: fb.hrComponent,
-                sleepComponent: fb.sleepComponent,
-                activityComponent: fb.activityComponent,
-                recoveryComponent: fb.recoveryComponent,
-                dataCompleteness: fb.dataCompleteness
+                hrv: fb.hrvComponent.map { FactorPayload(score: $0, weight: defaults.hrv) },
+                heartRate: fb.hrComponent.map { FactorPayload(score: $0, weight: defaults.heartRate) },
+                sleep: fb.sleepComponent.map { FactorPayload(score: $0, weight: defaults.sleep) },
+                activity: fb.activityComponent.map { FactorPayload(score: $0, weight: defaults.activity) },
+                recovery: fb.recoveryComponent.map { FactorPayload(score: $0, weight: defaults.recovery) }
             )
         }
 

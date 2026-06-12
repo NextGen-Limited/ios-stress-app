@@ -243,11 +243,11 @@ struct ChatBottomSheetView: View {
                 .font(.system(size: 48))
                 .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
 
-            Text("AI Chat requires iOS 26")
+            Text("AI Chat needs backend auth")
                 .font(.title3.weight(.semibold))
                 .foregroundStyle(Color.Wellness.adaptivePrimaryText)
 
-            Text("Update your device to iOS 26 or later and enable Apple Intelligence to chat with AI Kitten.")
+            Text("Connect Supabase Auth and provide SUPABASE_ANON_KEY to stream through the StressMonitor backend.")
                 .font(.body)
                 .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
                 .multilineTextAlignment(.center)

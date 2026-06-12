@@ -18,15 +18,30 @@ struct ChatMessage: Identifiable, Codable, Sendable {
     let content: String
     let timestamp: Date
 
+    // Supabase sync metadata. The backend owns remote IDs, session IDs, and token counts.
+    // Local messages default to unsynced until the Edge Function persists them.
+    var remoteId: UUID?
+    var sessionId: UUID?
+    var isSynced: Bool
+    var tokensUsed: Int?
+
     init(
         id: UUID = UUID(),
         role: ChatRole,
         content: String,
-        timestamp: Date = Date()
+        timestamp: Date = Date(),
+        remoteId: UUID? = nil,
+        sessionId: UUID? = nil,
+        isSynced: Bool = false,
+        tokensUsed: Int? = nil
     ) {
         self.id = id
         self.role = role
         self.content = content
         self.timestamp = timestamp
+        self.remoteId = remoteId
+        self.sessionId = sessionId
+        self.isSynced = isSynced
+        self.tokensUsed = tokensUsed
     }
 }
