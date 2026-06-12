@@ -1,7 +1,7 @@
 # StressMonitor Documentation Index
 
-**Version:** 1.0 (Production)
-**Last Updated:** June 7, 2026
+**Version:** 1.0 (Pre-Ship RC1)
+**Last Updated:** June 12, 2026
 
 Complete documentation for the StressMonitor iOS/watchOS stress monitoring application.
 
@@ -73,14 +73,15 @@ Current status, planned features, timeline, and success metrics.
 
 | Metric | Value |
 |--------|-------|
-| **Total Swift Files** | 303 |
-| **Total LOC** | ~31,400 |
-| **iOS App** | 225 files |
+| **Total Swift Files** | 303+ |
+| **Total LOC** | ~34,000+ |
+| **iOS App** | 225+ files |
 | **watchOS App** | 44 files |
 | **Widgets** | 7 files |
 | **Tests** | 5 files (suite pending rewrite) |
 | **External Dependencies** | 13 SPM packages |
-| **CI/CD** | GitHub Actions (macos-latest, Xcode 26.3) |
+| **CI/CD** | GitHub Actions (macos-15, Xcode 26.3) |
+| **Character Assets** | 38 SVG files |
 
 ### Documentation Metrics
 
@@ -202,7 +203,8 @@ SwiftUI Views → @Observable ViewModels → Protocol-based Services
 
 | Item | Status | Contact |
 |------|--------|---------|
-| **Active Development** | ✅ v1.0 shipping | Phuong Doan |
+| **Active Development** | ✅ v1.0 Pre-Ship RC1 | Phuong Doan |
+| **Blockers** | 🚫 3 critical (B1/B2/B3) | Production URL, StoreKit impl, test suite |
 | **Bug Fixes** | ✅ Ongoing | GitHub Issues |
 | **Feature Requests** | 📋 Roadmap in docs | Roadmap discussion |
 | **Documentation** | ✅ Current | This index |
@@ -213,8 +215,8 @@ SwiftUI Views → @Observable ViewModels → Protocol-based Services
 
 | Version | Release | Status | Notable |
 |---------|---------|--------|---------|
-| **1.0** | Feb 2026 | ✅ Production | AI Chat with SSE streaming, 3-tab navigation, CloudLLM hardcoded endpoint, Box Breathing Figma alignment, Mini Walk exercise, IAP Premium screen, Stress History with Activity Correlation, Guided Breathing with Biofeedback, Watch Complications with Live Metrics, Morning Readiness Check |
-| **1.1** | Q2 2026 | 🔄 In Progress | Advanced breathing, stress triggers, weekly reports |
+| **1.0** | Jul/Aug 2026 | 🔄 Pre-Ship RC1 | AI Chat with SSE streaming, 5-tab navigation, Character Collection UI (5 characters, 3-stage evolution, 38 SVG assets), CloudLLM hardcoded endpoint, Box Breathing Figma alignment, Mini Walk exercise, IAP Premium screen (mock), Stress History, Guided Breathing, Watch Complications, Morning Readiness Check. **Blockers:** CloudLLM endpoint, StoreKit real impl, test suite |
+| **1.1** | Q3 2026 | 🔄 Planned | Advanced breathing, stress triggers, weekly reports, localization MVP |
 | **2.0** | Q4 2026 | 🎯 Concept | ML insights, Siri Shortcuts, iPad support |
 
 ---

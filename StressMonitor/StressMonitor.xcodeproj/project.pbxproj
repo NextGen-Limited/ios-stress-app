@@ -120,24 +120,9 @@
 			path = StressMonitorTests;
 			sourceTree = "<group>";
 		};
-		F2E2EC052F1CC556000C2B53 /* StressMonitorUITests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = StressMonitorUITests;
-			sourceTree = "<group>";
-		};
 		F2E2EC1A2F1CC602000C2B53 /* StressMonitorWatch Watch App */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = "StressMonitorWatch Watch App";
-			sourceTree = "<group>";
-		};
-		F2E2EC282F1CC605000C2B53 /* StressMonitorWatch Watch AppTests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = "StressMonitorWatch Watch AppTests";
-			sourceTree = "<group>";
-		};
-		F2E2EC322F1CC605000C2B53 /* StressMonitorWatch Watch AppUITests */ = {
-			isa = PBXFileSystemSynchronizedRootGroup;
-			path = "StressMonitorWatch Watch AppUITests";
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -188,10 +173,7 @@
 			children = (
 				F2E2EBEB2F1CC553000C2B53 /* StressMonitor */,
 				F2E2EBFB2F1CC556000C2B53 /* StressMonitorTests */,
-				F2E2EC052F1CC556000C2B53 /* StressMonitorUITests */,
 				F2E2EC1A2F1CC602000C2B53 /* StressMonitorWatch Watch App */,
-				F2E2EC282F1CC605000C2B53 /* StressMonitorWatch Watch AppTests */,
-				F2E2EC322F1CC605000C2B53 /* StressMonitorWatch Watch AppUITests */,
 				F211BBDD2FD9112000A6E25D /* StressMonitorWidget */,
 				F211BBD82FD9111F00A6E25D /* Frameworks */,
 				F2E2EBEA2F1CC553000C2B53 /* Products */,

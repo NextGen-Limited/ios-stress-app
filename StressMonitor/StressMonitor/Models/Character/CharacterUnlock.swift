@@ -7,7 +7,7 @@ import SwiftData
 /// Persisted via SwiftData.
 @Model
 final class CharacterUnlock {
-    #Unique< CharacterUnlock>([#characterId])
+    #Unique<CharacterUnlock>([\.characterId])
 
     var characterId: String        // "ripple", "blossom", etc.
     var isUnlocked: Bool

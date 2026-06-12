@@ -63,7 +63,7 @@ extension EmptyStateView {
     )
 
     static let noTrends = EmptyStateView(
-        systemImage: "chart.xyaxis.slash",
+        systemImage: "chart.bar.xaxis",
         title: "Need More Data",
         message: "Continue measuring for 7 days to see trends"
     )

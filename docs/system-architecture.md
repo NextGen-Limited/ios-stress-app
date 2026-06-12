@@ -183,6 +183,13 @@ UI Updates on screen
 - `LLMServiceError` enum covers all failure modes (unavailable, context exceeded, guardrail, rate limit, etc.)
 - Session-only chat persistence (no SwiftData)
 
+### Character System Service (Jun 2026)
+- `CharacterAssetResolver` -- Maps character + evolution stage + mood → SVG asset path
+- 5 elemental characters with dual unlock types (free/premium/streak-gated)
+- Evolution system: 3 stages triggered by streaks, sessions, resilience scores
+- 38 SVG assets following `{character}_{evolution}_{mood}.svg` naming
+- `CharacterUnlock` SwiftData model for persistent unlock progress tracking
+
 ### Repository Service
 - SwiftData CRUD operations
 - Query recent/filtered measurements

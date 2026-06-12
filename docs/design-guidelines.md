@@ -145,6 +145,56 @@ The app uses a simplified 3-tab navigation structure:
 
 ---
 
+## Character Design System (June 2026)
+
+### 5 Elemental Characters
+
+| Character | Element | Color | Rarity | Status |
+|-----------|---------|-------|--------|--------|
+| **Ripple** | Water | Blue (#007AFF) | Free | Default starter character |
+| **Blossom** | Earth | Green (#34C759) | Free | Unlocked early |
+| **Ember** | Fire | Orange (#FF9500) | Premium | StoreKit-gated |
+| **Zephyr** | Air | Purple (#9370DB) | Premium | StoreKit-gated |
+| **Lumi** | Moon | Indigo (#5856D6) | Streak-gated | 30-day streak requirement |
+
+### Evolution System
+
+Each character evolves through 3 stages:
+1. **Stage 1 (Droplet/Bud/Spark/Breeze/Crescent)** - Starter form
+2. **Stage 2 (Ripple/Blossom/Ember/Zephyr/Lumi)** - Mid form (unlocked at 5 sessions or 5-day streak)
+3. **Stage 3 (Tidal/Willow/Inferno/Storm/Eclipse)** - Final form (unlocked at 30 sessions or 30-day streak + high resilience)
+
+### Mood States
+
+Each character has 5 mood expressions tied to stress level:
+- **Relaxed** (0-25) - Happy, peaceful
+- **Mild** (25-50) - Content, neutral
+- **Moderate** (50-75) - Concerned, alert
+- **High** (75-100) - Stressed, worried
+- **Recovery** - Proud, glowing (post-exercise/breathing)
+
+### SVG Asset Naming
+
+All character assets follow strict naming convention: `{character}_{evolution}_{mood}.svg`
+
+**Examples:**
+- `ripple_ripple_relaxed.svg` - Ripple character, Stage 2, relaxed mood
+- `ember_inferno_high.svg` - Ember character, Stage 3, high stress mood
+- `lumi_crescent_mild.svg` - Lumi character, Stage 1, mild stress mood
+
+See `/docs/design/ASSET_NAMING.md` for comprehensive naming specification.
+
+### Color Palettes
+
+Use character element colors consistently in UI:
+- Water (Ripple): `#007AFF` (Apple Blue)
+- Earth (Blossom): `#34C759` (Apple Green)
+- Fire (Ember): `#FF9500` (Apple Orange)
+- Air (Zephyr): `#9370DB` (Purple)
+- Moon (Lumi): `#5856D6` (Apple Indigo)
+
+---
+
 ## Accessibility Standards (WCAG AA)
 
 ### Mandatory Requirements
