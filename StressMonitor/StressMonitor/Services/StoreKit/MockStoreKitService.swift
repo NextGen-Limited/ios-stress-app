@@ -25,5 +25,9 @@ final class MockStoreKitService: StoreKitServiceProtocol {
     func fetchPurchaseHistory() async -> [String] {
         return []
     }
+
+    func refreshEntitlements() async {
+        // No-op for mock
+    }
 }
 #endif

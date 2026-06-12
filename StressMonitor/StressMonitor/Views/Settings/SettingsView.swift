@@ -90,7 +90,7 @@ struct SettingsView: View {
     }
     #else
     private static func makeStoreKitService() -> StoreKitServiceProtocol {
-        fatalError("Live StoreKit service not yet implemented")
+        StoreKitService(premiumState: PremiumState.shared)
     }
     #endif
 

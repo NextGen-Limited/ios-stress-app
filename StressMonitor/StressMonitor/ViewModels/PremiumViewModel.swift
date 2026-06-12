@@ -24,6 +24,13 @@ final class PremiumViewModel {
 
     func loadInitialData() async {
         plans = await storeKit.availablePlans
+
+        // Select annual when present, otherwise first available plan
+        if plans.contains(where: { $0.period == .annual }) {
+            selectedPlan = .annual
+        } else if let first = plans.first {
+            selectedPlan = first.period
+        }
     }
 
     func purchaseSelectedPlan() async {
@@ -37,10 +44,13 @@ final class PremiumViewModel {
                 return
             }
             try await storeKit.purchase(plan)
-            premiumState.isPremiumUser = true
-            showSuccess = true
+            // Derive success from premium state, not from purchase call alone
+            showSuccess = premiumState.isPremiumUser
         } catch StoreKitError.purchaseCancelled {
             // User cancelled — silent
+        } catch StoreKitError.purchasePending {
+            errorMessage = StoreKitError.purchasePending.errorDescription
+            showError = true
         } catch {
             errorMessage = error.localizedDescription
             showError = true
@@ -53,7 +63,12 @@ final class PremiumViewModel {
 
         do {
             try await storeKit.restorePurchases()
-            if premiumState.isPremiumUser { showSuccess = true }
+            if premiumState.isPremiumUser {
+                showSuccess = true
+            }
+        } catch StoreKitError.noActiveSubscription {
+            errorMessage = StoreKitError.noActiveSubscription.errorDescription
+            showError = true
         } catch {
             errorMessage = error.localizedDescription
             showError = true

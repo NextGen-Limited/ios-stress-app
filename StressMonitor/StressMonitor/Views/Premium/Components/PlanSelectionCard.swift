@@ -29,10 +29,21 @@ struct PlanSelectionCard: View {
                             .font(Typography.iapPrice)
                             .foregroundStyle(Color.iapTextPrimary)
 
-                        Text("/month")
+                        Text(plan.periodUnitDisplay)
                             .font(Typography.iapPerMonth)
                             .foregroundStyle(Color.iapTextSecondary)
                     }
+                }
+
+                // Billing summary row (separate line below price)
+                if let billing = plan.billingSummary {
+                    HStack {
+                        Spacer()
+                        Text(billing)
+                            .font(Typography.iapPerMonth)
+                            .foregroundStyle(Color.iapTextSecondary)
+                    }
+                    .padding(.top, 2)
                 }
 
                 // Savings row (annual only)
