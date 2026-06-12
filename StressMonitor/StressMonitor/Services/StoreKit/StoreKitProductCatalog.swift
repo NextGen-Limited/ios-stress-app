@@ -18,7 +18,7 @@ struct StoreKitProductCatalog: Sendable {
 
     /// All non-nil product IDs.
     var allProductIDs: Set<String> {
-        [monthlyProductID, annualProductID].compactMap { $0 } as? Set<String> ?? []
+        Set([monthlyProductID, annualProductID].compactMap { $0 })
     }
 
     /// Returns the product ID for a given subscription period.
@@ -39,7 +39,7 @@ struct StoreKitProductCatalog: Sendable {
     // MARK: - Live (production) initializer
 
     /// Creates a catalog that resolves IDs from Bundle → Environment → UserDefaults.
-    static let live = StoreKitProductCatalog()
+    static let live = StoreKitProductCatalog(bundle: .main)
 
     init(
         bundle: Bundle = .main,

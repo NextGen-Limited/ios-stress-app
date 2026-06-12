@@ -12,11 +12,11 @@ final class StoreKitService: StoreKitServiceProtocol {
     // MARK: - Init / Deinit
 
     init(
-        premiumState: PremiumState = .shared,
-        catalog: StoreKitProductCatalog = .live
+        premiumState: PremiumState? = nil,
+        catalog: StoreKitProductCatalog? = nil
     ) {
-        self.premiumState = premiumState
-        self.catalog = catalog
+        self.premiumState = premiumState ?? .shared
+        self.catalog = catalog ?? .live
         self.transactionUpdatesTask = listenForTransactions()
         Task { await refreshEntitlements() }
     }
@@ -184,7 +184,7 @@ final class StoreKitService: StoreKitServiceProtocol {
                         hasActive = true
                     case .expired, .revoked:
                         break
-                    @unknown default:
+                    default:
                         break
                     }
                 }
@@ -235,7 +235,7 @@ final class StoreKitService: StoreKitServiceProtocol {
         period: SubscriptionPeriod,
         catalog: StoreKitProductCatalog
     ) -> SubscriptionPlan {
-        let pricePerPeriod = Decimal(product.price)
+        let pricePerPeriod = product.price ?? .zero
         let months: Decimal = period == .annual ? 12 : 1
         let pricePerMonth = pricePerPeriod / months
 
