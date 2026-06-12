@@ -15,6 +15,19 @@ struct SubscriptionPlan: Identifiable {
     let isBestValue: Bool
     let subtitle: String?
 
+    // StoreKit-driven fields
+    let productID: String?
+    let displayPrice: String?
+    let billingSummary: String?
+
+    /// Human-readable period unit for display (e.g. "/month", "/year").
+    var periodUnitDisplay: String {
+        switch period {
+        case .monthly: return "/month"
+        case .annual:  return "/year"
+        }
+    }
+
     private static let priceFormatter: NumberFormatter = {
         let f = NumberFormatter()
         f.numberStyle = .currency
@@ -22,8 +35,13 @@ struct SubscriptionPlan: Identifiable {
         return f
     }()
 
+    /// Prefer StoreKit `displayPrice` when available, otherwise format `pricePerPeriod`
+    /// (not `pricePerMonth`) so it aligns with `periodUnitDisplay` ("/month" or "/year").
     var priceDisplay: String {
-        Self.priceFormatter.string(from: pricePerMonth as NSDecimalNumber) ?? "$0.00"
+        if let displayPrice, !displayPrice.isEmpty {
+            return displayPrice
+        }
+        return Self.priceFormatter.string(from: pricePerPeriod as NSDecimalNumber) ?? "$0.00"
     }
 
     var savingsDisplay: String? {
@@ -40,7 +58,10 @@ struct SubscriptionPlan: Identifiable {
             period: .annual,
             savingsPercent: 25,
             isBestValue: true,
-            subtitle: "Best value option"
+            subtitle: "Best value option",
+            productID: nil,
+            displayPrice: nil,
+            billingSummary: "Billed annually"
         ),
         SubscriptionPlan(
             id: .monthly,
@@ -50,7 +71,10 @@ struct SubscriptionPlan: Identifiable {
             period: .monthly,
             savingsPercent: nil,
             isBestValue: false,
-            subtitle: nil
+            subtitle: nil,
+            productID: nil,
+            displayPrice: nil,
+            billingSummary: "Billed monthly"
         )
     ]
 }

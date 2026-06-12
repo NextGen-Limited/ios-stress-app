@@ -7,14 +7,16 @@ import Foundation
 final class PremiumState {
     static let shared = PremiumState()
 
-    private let defaults = UserDefaults.standard
-    private let key = "isPremiumUser"
+    private let defaults: UserDefaults
+    private let key: String
 
     var isPremiumUser: Bool {
         didSet { defaults.set(isPremiumUser, forKey: key) }
     }
 
-    private init() {
-        isPremiumUser = defaults.bool(forKey: key)
+    init(defaults: UserDefaults = .standard, key: String = "isPremiumUser") {
+        self.defaults = defaults
+        self.key = key
+        self.isPremiumUser = defaults.bool(forKey: key)
     }
 }
