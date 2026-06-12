@@ -5,26 +5,26 @@ import Testing
 // MARK: - Fake StoreKit Service
 
 private final class FakeStoreKitService: StoreKitServiceProtocol {
-    var _availablePlans: [SubscriptionPlan] = SubscriptionPlan.defaultPlans
-    var _isPremiumUser: Bool = false
-    var _purchaseResult: (() async throws -> Void)?
-    var _restoreResult: (() async throws -> Void)?
-    var _refreshCalled = false
+    var stubbedPlans: [SubscriptionPlan] = SubscriptionPlan.defaultPlans
+    var stubbedIsPremiumUser: Bool = false
+    var purchaseStub: (() async throws -> Void)?
+    var restoreStub: (() async throws -> Void)?
+    var didCallRefresh = false
 
     var availablePlans: [SubscriptionPlan] {
-        get async { _availablePlans }
+        get async { stubbedPlans }
     }
 
     var isPremiumUser: Bool {
-        get async { _isPremiumUser }
+        get async { stubbedIsPremiumUser }
     }
 
     func purchase(_ plan: SubscriptionPlan) async throws {
-        try await _purchaseResult?()
+        try await purchaseStub?()
     }
 
     func restorePurchases() async throws {
-        try await _restoreResult?()
+        try await restoreStub?()
     }
 
     func fetchPurchaseHistory() async -> [String] {
@@ -32,7 +32,7 @@ private final class FakeStoreKitService: StoreKitServiceProtocol {
     }
 
     func refreshEntitlements() async {
-        _refreshCalled = true
+        didCallRefresh = true
     }
 }
 
@@ -76,7 +76,7 @@ struct PremiumViewModelTests {
     @Test("loadInitialData selects first plan when annual not present")
     func loadInitialDataSelectsFirstWhenNoAnnual() async {
         let service = FakeStoreKitService()
-        service._availablePlans = [
+        service.stubbedPlans = [
             SubscriptionPlan(
                 id: .monthly,
                 displayName: "Monthly",
@@ -110,7 +110,7 @@ struct PremiumViewModelTests {
         await vm.loadInitialData()
 
         // Simulate purchase succeeding but Premium not yet verified
-        service._purchaseResult = { /* no-op, Premium stays false */ }
+        service.purchaseStub = { /* no-op, Premium stays false */ }
 
         await vm.purchaseSelectedPlan()
 
@@ -126,7 +126,7 @@ struct PremiumViewModelTests {
 
         await vm.loadInitialData()
 
-        service._purchaseResult = { [weak state] in
+        service.purchaseStub = { [weak state] in
             state?.isPremiumUser = true
         }
 
@@ -143,7 +143,7 @@ struct PremiumViewModelTests {
 
         await vm.loadInitialData()
 
-        service._purchaseResult = {
+        service.purchaseStub = {
             throw StoreKitError.purchaseCancelled
         }
 
@@ -161,7 +161,7 @@ struct PremiumViewModelTests {
 
         await vm.loadInitialData()
 
-        service._purchaseResult = {
+        service.purchaseStub = {
             throw StoreKitError.purchaseFailed
         }
 
@@ -179,7 +179,7 @@ struct PremiumViewModelTests {
 
         await vm.loadInitialData()
 
-        service._purchaseResult = {
+        service.purchaseStub = {
             throw StoreKitError.purchasePending
         }
 
@@ -198,7 +198,7 @@ struct PremiumViewModelTests {
 
         await vm.loadInitialData()
 
-        service._purchaseResult = {
+        service.purchaseStub = {
             throw StoreKitError.missingProductConfiguration
         }
 
@@ -216,7 +216,7 @@ struct PremiumViewModelTests {
         let state = makeIsolatedState()
         let vm = PremiumViewModel(storeKit: service, premiumState: state)
 
-        service._restoreResult = { [weak state] in
+        service.restoreStub = { [weak state] in
             state?.isPremiumUser = true
         }
 
@@ -231,7 +231,7 @@ struct PremiumViewModelTests {
         let state = makeIsolatedState()
         let vm = PremiumViewModel(storeKit: service, premiumState: state)
 
-        service._restoreResult = {
+        service.restoreStub = {
             throw StoreKitError.noActiveSubscription
         }
 
@@ -248,7 +248,7 @@ struct PremiumViewModelTests {
         let state = makeIsolatedState()
         let vm = PremiumViewModel(storeKit: service, premiumState: state)
 
-        service._restoreResult = {
+        service.restoreStub = {
             throw StoreKitError.restoreFailed
         }
 
