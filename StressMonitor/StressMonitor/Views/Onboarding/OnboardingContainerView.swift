@@ -1,5 +1,6 @@
 import SwiftData
 import SwiftUI
+import HealthKit
 
 // MARK: - Onboarding Container
 // Orchestrates the 3-screen onboarding flow using TabView with PageStyle.
@@ -16,6 +17,10 @@ struct OnboardingContainerView: View {
         Group {
             if hasCompletedOnboarding {
                 MainTabView()
+                    .task {
+                        // Request HealthKit permission on app launch if not yet determined
+                        await requestHealthKitIfNeeded()
+                    }
             } else {
                 onboardingContent
             }
@@ -25,6 +30,28 @@ struct OnboardingContainerView: View {
                 stressRepository = StressRepository(modelContext: modelContext)
             }
         }
+    }
+
+    // MARK: - HealthKit Permission
+
+    @MainActor
+    private func requestHealthKitIfNeeded() async {
+        guard HKHealthStore.isHealthDataAvailable() else { return }
+        let store = HKHealthStore()
+        let hrvType = HKQuantityType.quantityType(forIdentifier: .heartRateVariabilitySDNN)!
+        let status = store.authorizationStatus(for: hrvType)
+        // Only request if not yet determined — if denied, the Settings card handles re-prompting
+        guard status == .notDetermined else { return }
+
+        let types: Set<HKObjectType> = [
+            HKQuantityType.quantityType(forIdentifier: .heartRateVariabilitySDNN)!,
+            HKQuantityType.quantityType(forIdentifier: .heartRate)!,
+            HKQuantityType.quantityType(forIdentifier: .restingHeartRate)!,
+            HKCategoryType(.sleepAnalysis),
+            HKQuantityType.quantityType(forIdentifier: .stepCount)!,
+            HKQuantityType.quantityType(forIdentifier: .activeEnergyBurned)!,
+        ]
+        try? await store.requestAuthorization(toShare: [], read: types)
     }
 
     private var onboardingContent: some View {

@@ -157,7 +157,8 @@ public final class WidgetDataProvider {
 // MARK: - Stress Data Model
 
 /// Simple stress data model for widget transmission
-public struct StressData: Codable, Sendable {
+public struct StressData: Codable, Sendable, Identifiable {
+    public var id: Date { timestamp }
     public let level: Double
     public let category: String
     public let hrv: Double

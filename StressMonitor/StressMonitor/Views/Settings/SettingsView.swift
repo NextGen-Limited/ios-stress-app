@@ -10,6 +10,7 @@ struct SettingsView: View {
     @State private var navigateToDelete = false
     @State private var navigateToPremium = false
     @State private var docsURL: URL? = nil
+    @State private var appearance = AppearanceManager.shared
 
     init() {
         _viewModel = State(initialValue: SettingsViewModel(
@@ -20,11 +21,9 @@ struct SettingsView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: Spacing.settingsCardSpacing) {
-                // Ripple status header
-                SettingsCharacterStatusHeader(stressLevel: viewModel.latestStressLevel) {
-                    dismiss()
-                }
-                .padding(.top, 8)
+                // Profile (appearance + delete data)
+                ProfileCard(onDeleteAllData: { navigateToDelete = true })
+                    .padding(.top, 8)
 
                 // Widget CTA
                 PremiumCard(onTap: { navigateToPremium = true })
