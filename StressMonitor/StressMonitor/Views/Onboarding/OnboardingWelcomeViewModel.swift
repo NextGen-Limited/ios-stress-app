@@ -12,7 +12,8 @@ final class OnboardingWelcomeViewModel {
     var breathPhase3 = false
     var floatOffset = false
 
-    nonisolated private var animationTask: Task<Void, Never>?
+    private var animationTask: Task<Void, Never>?
+    private var floatTask: Task<Void, Never>?
 
     init() {
         startAnimations()
@@ -29,7 +30,6 @@ final class OnboardingWelcomeViewModel {
     func startAnimations() {
         animationTask?.cancel()
         animationTask = Task {
-            // Staggered breathing animation
             while !Task.isCancelled {
                 withAnimation(.easeInOut(duration: 2.0)) { breathPhase = true }
                 try? await Task.sleep(for: .seconds(0.6))
@@ -46,8 +46,8 @@ final class OnboardingWelcomeViewModel {
             }
         }
 
-        // Float animation
-        Task {
+        floatTask?.cancel()
+        floatTask = Task {
             while !Task.isCancelled {
                 withAnimation(.easeInOut(duration: 2.0)) { floatOffset = true }
                 try? await Task.sleep(for: .seconds(2.0))
@@ -57,7 +57,8 @@ final class OnboardingWelcomeViewModel {
         }
     }
 
-    deinit {
+    func stopAnimations() {
         animationTask?.cancel()
+        floatTask?.cancel()
     }
 }
