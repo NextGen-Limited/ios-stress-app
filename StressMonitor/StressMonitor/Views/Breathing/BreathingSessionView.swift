@@ -33,10 +33,10 @@ struct BreathingSessionView: View {
                 Spacer()
 
                 if let viewModel = viewModel {
-                    BreathingCircleView(
+                    RippleBreathingView(
                         phase: viewModel.breathingPhase,
                         scale: viewModel.circleScale,
-                        color: breathingColor
+                        size: 200
                     )
                     .frame(height: 320)
                 }
@@ -104,18 +104,6 @@ struct BreathingSessionView: View {
                 Color(red: 0.97, green: 0.97, blue: 0.98),
                 Color.white
             ]
-        }
-    }
-
-    private var breathingColor: Color {
-        guard let phase = viewModel?.breathingPhase else { return .stressRelaxed }
-        switch phase {
-        case .inhale:
-            return .stressRelaxed
-        case .hold:
-            return .stressMild
-        case .exhale:
-            return .stressRelaxed.opacity(0.6)
         }
     }
 
