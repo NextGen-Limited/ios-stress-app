@@ -4,21 +4,17 @@ import SwiftUI
 // MARK: - Complication Bundle
 /// WidgetKit bundle configuration for watchOS complications.
 ///
-/// Supports 6 families:
+/// Supports 4 families:
 /// - **Accessory Circular** — character face in a ring
 /// - **Accessory Rectangular** — character face + mood label
 /// - **Accessory Inline** — mood word only
 /// - **Accessory Corner** — character emoji (watchOS 10+)
-/// - **Graphic Circular** — full-circle character (legacy mod-based)
-/// - **Graphic Rectangular** — wide character display (legacy mod-based)
 struct ComplicationBundle: WidgetBundle {
     var body: some Widget {
         CircularComplication()
         RectangularComplication()
         InlineComplication()
         CornerComplication()
-        GraphicCircularComplication()
-        GraphicRectangularComplication()
     }
 }
 
@@ -46,7 +42,7 @@ struct CornerComplicationEntry: TimelineEntry {
 
 struct CornerComplicationProvider: TimelineProvider {
     func placeholder(in context: Context) -> CornerComplicationEntry {
-        CornerComplicationEntry(date: Date(), emoji: "💧", accentColor: .blue)
+        CornerComplicationEntry(date: Date(), emoji: "\u{1F4A7}", accentColor: .blue)
     }
 
     func getSnapshot(in context: Context, completion: @escaping (CornerComplicationEntry) -> Void) {
@@ -73,56 +69,5 @@ struct CornerComplicationView: View {
         Text(entry.emoji)
             .font(.system(size: 16))
             .widgetLabel { Text("Ripple") }
-    }
-}
-
-// MARK: - Graphic Circular (legacy mod-based family)
-
-struct GraphicCircularComplication: Widget {
-    let kind: String = "GraphicCircularComplication"
-
-    var body: some WidgetConfiguration {
-        StaticConfiguration(kind: kind, provider: CircularComplicationProvider()) { entry in
-            CircularComplicationView(entry: CircularComplicationEntry(date: entry.date, entry: entry.entry))
-        }
-        .configurationDisplayName("Ripple Ring")
-        .description("Full-circle stress character.")
-        .supportedFamilies([.graphicCircular])
-    }
-}
-
-// MARK: - Graphic Rectangular (legacy mod-based family)
-
-struct GraphicRectangularComplication: Widget {
-    let kind: String = "GraphicRectangularComplication"
-
-    var body: some WidgetConfiguration {
-        StaticConfiguration(kind: kind, provider: RectangularComplicationProvider()) { entry in
-            RectangularStressView(entry: .init(date: entry.date, entry: entry.entry))
-        }
-        .configurationDisplayName("Ripple Detail")
-        .description("Wide stress character display.")
-        .supportedFamilies([.graphicRectangular])
-    }
-}
-
-// MARK: - Supported Families Reference
-extension ComplicationBundle {
-    /// All supported complication families for this app.
-    static var allSupportedFamilies: [WidgetFamily] {
-        [
-            .accessoryCircular,
-            .accessoryRectangular,
-            .accessoryInline,
-            .accessoryCorner,
-            .graphicCircular,
-            .graphicRectangular
-        ]
-    }
-
-    /// WidgetKit timeline refresh policy.
-    /// Complications update every 30 minutes to stay within budget.
-    static var timelinePolicy: TimelineReloadPolicy {
-        .after(Date().addingTimeInterval(30 * 60))
     }
 }
