@@ -6,42 +6,50 @@ struct IAPNavBar: View {
 
     var body: some View {
         HStack {
-            // Back button
+            // Back button — circle style
             Button(action: onBack) {
                 Image(systemName: "chevron.left")
-                    .font(.system(size: 14, weight: .semibold))
-                    .foregroundStyle(Color.iapTextPrimary)
-                    .frame(width: 36, height: 36)
-                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                    .font(.system(size: 16, weight: .bold))
+                    .foregroundStyle(Color.iapTextSecondary)
+                    .frame(width: 38, height: 38)
+                    .background(
+                        Circle()
+                            .fill(Color(light: Color.white.opacity(0.62), dark: Color.white.opacity(0.06)))
+                            .shadow(color: Color.black.opacity(0.04), radius: 4, y: 2)
+                    )
                     .overlay(
-                        RoundedRectangle(cornerRadius: 8)
-                            .stroke(Color.iapIconBorder, lineWidth: 0.75)
+                        Circle()
+                            .stroke(Color.iapIconBorder.opacity(0.3), lineWidth: 1)
                     )
             }
 
             Spacer()
 
-            Text("Premium")
+            Text("StressMonitor Premium")
                 .font(Typography.iapNavTitle)
                 .foregroundStyle(Color.iapTextMuted)
 
             Spacer()
 
-            // Close button
+            // Close button — circle style
             Button(action: onClose) {
                 Image(systemName: "xmark")
-                    .font(.system(size: 13, weight: .medium))
-                    .foregroundStyle(Color.iapTextPrimary)
-                    .frame(width: 36, height: 36)
-                    .clipShape(RoundedRectangle(cornerRadius: 8))
+                    .font(.system(size: 14, weight: .bold))
+                    .foregroundStyle(Color.iapTextSecondary)
+                    .frame(width: 38, height: 38)
+                    .background(
+                        Circle()
+                            .fill(Color(light: Color.white.opacity(0.62), dark: Color.white.opacity(0.06)))
+                            .shadow(color: Color.black.opacity(0.04), radius: 4, y: 2)
+                    )
                     .overlay(
-                        RoundedRectangle(cornerRadius: 8)
-                            .stroke(Color.iapIconBorder, lineWidth: 0.75)
+                        Circle()
+                            .stroke(Color.iapIconBorder.opacity(0.3), lineWidth: 1)
                     )
             }
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 12)
+        .padding(.horizontal, 17)
+        .padding(.vertical, 8)
     }
 }
 
