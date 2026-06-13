@@ -1,8 +1,12 @@
 import SwiftUI
+import HealthKit
 
-/// Health data sync card showing data types and HRV accuracy tips
+/// Health data sync card showing data types, permission status, and HRV accuracy tips.
 struct HealthDataCard: View {
     let onSyncNow: () -> Void
+    @State private var healthAuthStatus: HKAuthorizationStatus = .notDetermined
+    @State private var isRequestingPermission = false
+    @State private var showPermissionDeniedAlert = false
 
     var body: some View {
         SettingsCard {
@@ -14,14 +18,120 @@ struct HealthDataCard: View {
                     color: .primaryGreen
                 )
 
-                // Sync now button
-                syncButton
+                // Permission status row
+                permissionStatusRow
+
+                // Sync now button (only if authorized)
+                if healthAuthStatus == .sharingAuthorized {
+                    syncButton
+                }
 
                 // Data types list
                 dataTypesList
 
                 // HRV accuracy tip banner
                 HRVAccuracyBanner()
+            }
+        }
+        .onAppear { refreshAuthStatus() }
+        .alert("Health Access Needed", isPresented: $showPermissionDeniedAlert) {
+            Button("Open Settings") {
+                if let url = URL(string: UIApplication.openSettingsURLString) {
+                    UIApplication.shared.open(url)
+                }
+            }
+            Button("Not Now", role: .cancel) {}
+        } message: {
+            Text("Ripple needs Health access to read your stress data. Please enable it in Settings → Privacy → Health.")
+        }
+    }
+
+    // MARK: - Permission Status
+
+    private var permissionStatusRow: some View {
+        HStack(spacing: 10) {
+            Circle()
+                .fill(statusColor)
+                .frame(width: 8, height: 8)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Health Access")
+                    .font(.system(size: 15, weight: .regular))
+                    .foregroundColor(.primary)
+                Text(statusText)
+                    .font(.system(size: 12, weight: .regular))
+                    .foregroundColor(.secondary)
+            }
+
+            Spacer()
+
+            if healthAuthStatus != .sharingAuthorized {
+                Button(action: requestPermission) {
+                    HStack(spacing: 4) {
+                        if isRequestingPermission {
+                            ProgressView()
+                                .scaleEffect(0.7)
+                        } else {
+                            Image(systemName: "lock.open.fill")
+                                .font(.system(size: 12))
+                        }
+                        Text("Enable")
+                            .font(.system(size: 13, weight: .medium))
+                    }
+                    .foregroundColor(.accentTeal)
+                }
+                .disabled(isRequestingPermission)
+                .accessibilityLabel("Request Health access")
+            }
+        }
+    }
+
+    private var statusColor: Color {
+        switch healthAuthStatus {
+        case .sharingAuthorized: return .green
+        case .sharingDenied: return .red
+        case .notDetermined: return .orange
+        @unknown default: return .gray
+        }
+    }
+
+    private var statusText: String {
+        switch healthAuthStatus {
+        case .sharingAuthorized: return "Access granted"
+        case .sharingDenied: return "Access denied — tap to enable"
+        case .notDetermined: return "Not requested yet"
+        @unknown default: return "Unknown"
+        }
+    }
+
+    private func refreshAuthStatus() {
+        healthAuthStatus = HKHealthStore().authorizationStatus(for: .quantityType(forIdentifier: .heartRateVariabilitySDNN)!)
+    }
+
+    private func requestPermission() {
+        isRequestingPermission = true
+        guard HKHealthStore.isHealthDataAvailable() else {
+            isRequestingPermission = false
+            return
+        }
+
+        let store = HKHealthStore()
+        let types: Set<HKObjectType> = [
+            HKQuantityType.quantityType(forIdentifier: .heartRateVariabilitySDNN)!,
+            HKQuantityType.quantityType(forIdentifier: .heartRate)!,
+            HKQuantityType.quantityType(forIdentifier: .restingHeartRate)!,
+            HKCategoryType(.sleepAnalysis),
+            HKQuantityType.quantityType(forIdentifier: .stepCount)!,
+            HKQuantityType.quantityType(forIdentifier: .activeEnergyBurned)!,
+        ]
+
+        store.requestAuthorization(toShare: [], read: types) { _, _ in
+            Task { @MainActor in
+                isRequestingPermission = false
+                refreshAuthStatus()
+                if healthAuthStatus == .sharingDenied {
+                    showPermissionDeniedAlert = true
+                }
             }
         }
     }
@@ -81,32 +191,15 @@ struct HRVAccuracyBanner: View {
                         .font(.system(size: 12, weight: .regular))
                         .foregroundColor(.primary)
 
-                    Text("2. Enabling AFib History in the Watch app under Heart section.")
+                    Text("2. Enabling AFib History in the Watch app settings.")
                         .font(.system(size: 12, weight: .regular))
                         .foregroundColor(.primary)
-
-                    VStack(alignment: .leading, spacing: 4) {
-                        Text("Note:")
-                            .font(.system(size: 12, weight: .bold))
-                            .foregroundColor(.primary)
-
-                        Text("• This feature is currently the only way to increase the HRV monitoring frequency of the Apple Watch and will use more battery.")
-                            .font(.system(size: 12, weight: .regular))
-                            .foregroundColor(.primary)
-
-                        Text("• Not available in mainland China.")
-                            .font(.system(size: 12, weight: .regular))
-                            .foregroundColor(.primary)
-                    }
-                    .padding(.top, 2)
                 }
             }
         }
         .padding(12)
         .background(Color.settingsAmberInfo)
         .clipShape(RoundedRectangle(cornerRadius: 10))
-        .shadow(color: Color.settingsCardShadowColor.opacity(0.08), radius: 4, x: 0, y: 2)
-        .accessibilityElement(children: .combine)
     }
 }
 

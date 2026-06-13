@@ -42,6 +42,7 @@ struct StressMonitorApp: App {
     var body: some Scene {
         WindowGroup {
             OnboardingContainerView()
+                .preferredColorScheme(AppearanceManager.shared.colorScheme)
                 #if DEBUG
                 .onAppear {
                     let elapsed = (CFAbsoluteTimeGetCurrent() - Self.initTimestamp) * 1000
