@@ -41,7 +41,7 @@ struct StressMonitorApp: App {
 
     var body: some Scene {
         WindowGroup {
-            MainTabView()
+            OnboardingContainerView()
                 #if DEBUG
                 .onAppear {
                     let elapsed = (CFAbsoluteTimeGetCurrent() - Self.initTimestamp) * 1000
