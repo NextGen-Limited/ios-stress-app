@@ -191,33 +191,19 @@ public struct LargeWidgetView: View {
 
 // MARK: - Preview
 
-private extension StressEntry {
-    static var previewLarge: StressEntry {
-        let now = Date()
-        let latest = StressData(
-            level: 45, category: "moderate", hrv: 48,
-            heartRate: 72, confidence: 0.82, timestamp: now
+#if DEBUG
+@available(iOS 17.0, *)
+struct LargeWidgetPreviewProvider: PreviewProvider {
+    static var previews: some View {
+        let entry = StressEntry(
+            date: Date(),
+            latestStress: nil,
+            history: [],
+            baseline: nil,
+            isPlaceholder: true
         )
-        let history: [StressData] = (0..<12).map { i in
-            StressData(
-                level: Double(30 + Int.random(in: 0...30)),
-                category: "mild", hrv: 50, heartRate: 70,
-                confidence: 0.85,
-                timestamp: now.addingTimeInterval(TimeInterval(-i * 7200))
-            )
-        }
-        return StressEntry(
-            date: now,
-            latestStress: latest,
-            history: history,
-            baseline: (50.0, 60.0),
-            isPlaceholder: false
-        )
+        return LargeWidgetView(entry: entry)
+            .previewContext(WidgetPreviewContext(family: .systemLarge))
     }
 }
-
-@available(iOS 17.0, *)
-#Preview {
-    LargeWidgetView(entry: .previewLarge)
-        .previewContext(WidgetPreviewContext(family: .systemLarge))
-}
+#endif

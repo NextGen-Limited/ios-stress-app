@@ -77,21 +77,19 @@ public struct SmallWidgetView: View {
 
 // MARK: - Preview
 
+#if DEBUG
 @available(iOS 17.0, *)
-#Preview {
-    SmallWidgetView(entry: StressEntry(
-        date: Date(),
-        latestStress: StressData(
-            level: 35,
-            category: "mild",
-            hrv: 55,
-            heartRate: 68,
-            confidence: 0.85,
-            timestamp: Date()
-        ),
-        history: [],
-        baseline: (50.0, 60.0),
-        isPlaceholder: false
-    ))
-    .previewContext(WidgetPreviewContext(family: .systemSmall))
+struct SmallWidgetPreviewProvider: PreviewProvider {
+    static var previews: some View {
+        let entry = StressEntry(
+            date: Date(),
+            latestStress: nil,
+            history: [],
+            baseline: nil,
+            isPlaceholder: true
+        )
+        return SmallWidgetView(entry: entry)
+            .previewContext(WidgetPreviewContext(family: .systemSmall))
+    }
 }
+#endif

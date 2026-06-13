@@ -61,7 +61,7 @@ struct WatchBreatheView: View {
                             .font(.system(size: 30, weight: .bold, design: .rounded)
                                 .monospacedDigit())
                             .foregroundStyle(StressCharacterPalette.ripple)
-                            .contentTransition(.numericText(value: secondsLeft))
+                            .contentTransition(.numericText(value: Double(secondsLeft)))
                     } else {
                         Text("💧")
                             .font(.system(size: 30))

@@ -120,33 +120,19 @@ public struct MediumWidgetView: View {
 
 // MARK: - Preview
 
-private extension StressEntry {
-    static var previewMedium: StressEntry {
-        let now = Date()
-        let latest = StressData(
-            level: 55, category: "moderate", hrv: 42,
-            heartRate: 75, confidence: 0.8, timestamp: now
+#if DEBUG
+@available(iOS 17.0, *)
+struct MediumWidgetPreviewProvider: PreviewProvider {
+    static var previews: some View {
+        let entry = StressEntry(
+            date: Date(),
+            latestStress: nil,
+            history: [],
+            baseline: nil,
+            isPlaceholder: true
         )
-        let history: [StressData] = (0..<8).map { i in
-            StressData(
-                level: Double(40 + i * 3),
-                category: "mild", hrv: 50, heartRate: 70,
-                confidence: 0.85,
-                timestamp: now.addingTimeInterval(TimeInterval(-i * 3600))
-            )
-        }
-        return StressEntry(
-            date: now,
-            latestStress: latest,
-            history: history,
-            baseline: (50.0, 60.0),
-            isPlaceholder: false
-        )
+        return MediumWidgetView(entry: entry)
+            .previewContext(WidgetPreviewContext(family: .systemMedium))
     }
 }
-
-@available(iOS 17.0, *)
-#Preview {
-    MediumWidgetView(entry: .previewMedium)
-        .previewContext(WidgetPreviewContext(family: .systemMedium))
-}
+#endif
