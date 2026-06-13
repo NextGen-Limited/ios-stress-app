@@ -9,6 +9,7 @@ class SettingsViewModel {
     var isDeletingAllData = false
     var cloudKitStatus: CloudKitSyncStatus = .unknown
     var iCloudSyncEnabled: Bool = true
+    var latestStressLevel: Double = 35
 
     private let repository: StressRepositoryProtocol
 
@@ -27,6 +28,11 @@ class SettingsViewModel {
                 restingHeartRate: baseline.restingHeartRate,
                 baselineHRV: baseline.baselineHRV
             )
+        }
+
+        if let recentMeasurements = try? await repository.fetchRecent(limit: 1),
+           let latestMeasurement = recentMeasurements.first {
+            latestStressLevel = latestMeasurement.stressLevel
         }
 
         // Check CloudKit status

@@ -19,7 +19,7 @@ struct AddComplicationButton: View {
             }
             .frame(maxWidth: 277)
             .frame(height: 35.5)
-            .background(Color.accentTeal)
+            .background(Color.settingsRippleBlue)
             .clipShape(Capsule())
             .shadow(AppShadow.settingsCard)
         }
@@ -27,10 +27,12 @@ struct AddComplicationButton: View {
     }
 }
 
-#Preview {
-    AddComplicationButton {
-        print("Add complication tapped")
+struct AddComplicationButton_Previews: PreviewProvider {
+    static var previews: some View {
+        AddComplicationButton {
+            print("Add complication tapped")
+        }
+        .padding()
+        .background(Color.adaptiveSettingsBackground)
     }
-    .padding()
-    .background(Color.adaptiveSettingsBackground)
 }

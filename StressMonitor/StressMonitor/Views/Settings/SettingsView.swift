@@ -4,6 +4,7 @@ import SwiftData
 struct SettingsView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.openURL) private var openURL
+    @Environment(\.dismiss) private var dismiss
     @State private var viewModel: SettingsViewModel
     @State private var navigateToExport = false
     @State private var navigateToDelete = false
@@ -19,9 +20,14 @@ struct SettingsView: View {
     var body: some View {
         ScrollView {
             VStack(spacing: Spacing.settingsCardSpacing) {
+                // Ripple status header
+                SettingsCharacterStatusHeader(stressLevel: viewModel.latestStressLevel) {
+                    dismiss()
+                }
+                .padding(.top, 8)
+
                 // Widget CTA
                 PremiumCard(onTap: { navigateToPremium = true })
-                    .padding(.top, 8)
 
                 // Watch face & Complications
                 WatchFaceCard()
@@ -100,8 +106,10 @@ struct SettingsView: View {
     }
 }
 
-#Preview {
-    NavigationStack {
-        SettingsView()
+struct SettingsView_Previews: PreviewProvider {
+    static var previews: some View {
+        NavigationStack {
+            SettingsView()
+        }
     }
 }

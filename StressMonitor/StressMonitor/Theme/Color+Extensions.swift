@@ -99,10 +99,21 @@ extension Color {
 
     // MARK: - Settings Screen Colors
 
-    /// Settings background (light: #F3F4F8, dark: #1C1C1E)
-    static let settingsBackground = Color(light: Color(hex: "F3F4F8"), dark: Color(hex: "1C1C1E"))
-    /// Accent teal (light: #85C9C9, dark: #6DB3B3)
-    static let accentTeal = Color(light: Color(hex: "85C9C9"), dark: Color(hex: "6DB3B3"))
+    /// Settings background (light: warm cream #FFFDF6, dark canvas #0A0A0F)
+    static let settingsBackground = Color(light: Color(hex: "FFFDF6"), dark: Color(hex: "0A0A0F"))
+    /// Ripple blue accent - #4FC3F7
+    static let settingsRippleBlue = Color(hex: "4FC3F7")
+    /// Accent teal compatibility alias now aligned to Ripple blue.
+    static let accentTeal = Color(hex: "4FC3F7")
+    /// Settings glass card background (light: white, dark: #1A1A2E)
+    static let settingsCardBackground = Color(light: .white, dark: Color(hex: "1A1A2E"))
+    /// Settings card border for refined glass cards.
+    static let settingsCardBorder = Color(light: Color(hex: "E9E4D8"), dark: Color.white.opacity(0.10))
+    /// Settings icon accents.
+    static let settingsIconYellow = Color(hex: "FFD166")
+    static let settingsIconPurple = Color(hex: "A78BFA")
+    /// Amber info banner background for privacy / HRV guidance.
+    static let settingsAmberInfo = Color(light: Color(hex: "FFF4D6"), dark: Color(hex: "3A2A05"))
     /// Premium gold - #FE9901
     static let premiumGold = Color(hex: "FE9901")
     /// Tertiary text - #808080
@@ -115,19 +126,19 @@ extension Color {
     static let widgetBorder = Color(light: Color(hex: "C0C0C0"), dark: Color(hex: "48484A"))
     /// Settings card shadow color - #18274B
     static let settingsCardShadowColor = Color(hex: "18274B")
-    /// Info banner yellow background (light: #FFF9E6, dark: #2A2400)
-    static let bannerYellow = Color(light: Color(hex: "FFF9E6"), dark: Color(hex: "2A2400"))
+    /// Info banner yellow background (light: #FFF4D6, dark: #3A2A05)
+    static let bannerYellow = Color(light: Color(hex: "FFF4D6"), dark: Color(hex: "3A2A05"))
 
     // MARK: - Adaptive Colors for Settings
 
     /// Adaptive background for settings screen
     static var adaptiveSettingsBackground: Color {
-        Color(light: Color(hex: "F3F4F8"), dark: Color(hex: "1C1C1E"))
+        settingsBackground
     }
 
     /// Adaptive card background (white in light, elevated in dark)
     static var adaptiveCardBackground: Color {
-        Color(light: .white, dark: Color(hex: "2C2C2E"))
+        settingsCardBackground
     }
 
         // MARK: - Paywall Redesign Colors

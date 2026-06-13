@@ -8,13 +8,14 @@ struct WatchFaceCard: View {
                 // Header
                 SettingsSectionHeader(
                     iconImage: "watch-icon",
-                    title: "Watch face & Complications"
+                    title: "Watch face & Complications",
+                    color: .settingsRippleBlue
                 )
 
                 // Widgets Row
                 HStack(spacing: 23) {
-                    ComplicationWidget(title: "Circular")
-                    ComplicationWidget(title: "Graphic")
+                    ComplicationWidget(title: "Circular", tier: .good)
+                    ComplicationWidget(title: "Graphic", tier: .balanced)
                 }
                 .padding(.top, 23)
 
@@ -33,8 +34,10 @@ struct WatchFaceCard: View {
     }
 }
 
-#Preview {
-    WatchFaceCard()
-        .padding()
-        .background(Color.adaptiveSettingsBackground)
+struct WatchFaceCard_Previews: PreviewProvider {
+    static var previews: some View {
+        WatchFaceCard()
+            .padding()
+            .background(Color.adaptiveSettingsBackground)
+    }
 }
