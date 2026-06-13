@@ -4,7 +4,7 @@
 **Accessibility:** WCAG AA
 **Section:** Accessibility, haptics, StressBuddy, onboarding, data visualization, chat UX
 **Version:** 1.1
-**Last Updated:** June 7, 2026
+**Last Updated:** June 12, 2026
 
 ---
 
@@ -176,50 +176,63 @@ extension StressBuddyMood {
 
 ---
 
-## Navigation Flow (3-Tab Structure)
+## Navigation Flow (5-Tab Structure)
 
-**Updated - April 2026:**
+**Updated - May 2026:**
 
 ### Tab Navigation Pattern
 
 1. **Home Tab** (`DashboardView.swift`)
    - Primary stress measurement interface
-   - Current stress level visualization
+   - Current stress level visualization with stress ring
    - Quick access to recent measurements
-   - AI insights and chat entry point
+   - Personalized AI insights and chat entry point
+   - Weekly dot-matrix timeline view
 
-2. **Action Tab** (`ActionView.swift` - NEW)
-   - Quick actions for immediate stress relief
-   - Breathing exercises with Figma-aligned UI
-   - AI chat access for conversational support
-   - Wellness activities and tools
+2. **Trends Tab** (`TrendsView.swift`)
+   - Historical stress analysis with multiple charts
+   - Statistical insights (mean, max, min, std dev)
+   - Weekly heatmap visualization
+   - HRV trend analysis
+   - Data visualization cards (scrollable)
 
-3. **Trend Tab** (`TrendsView.swift`)
-   - Historical stress analysis
-   - Statistical insights and patterns
-   - Data visualization charts
+3. **Breathing Tab** (`BreathingView.swift`)
+   - Guided breathing exercises
+   - Box breathing (4-4-4-4 pattern) with Figma alignment
+   - Animated breathing circle with phase guidance
+   - 3-minute session duration
+   - Session history and effectiveness tracking
+   - Before/after HRV measurement
 
-### ActionView UX Patterns
+4. **Characters Tab** (`CharacterCollectionView.swift`)
+   - Character collection display grid
+   - Evolution tracking and stage indicators
+   - Unlock progress visualization
+   - Character detail views with mood previews
+   - Free/premium/streak-gated unlock types
+   - Interactive celebration on evolution
 
-**Quick Actions Layout:**
-- Large, tappable buttons (minimum 60x60 points)
-- Clear icon and label combinations
-- Haptic feedback on interaction
-- Progress indicators for active sessions
-- **NEW**: Context-aware quick action chips based on stress level
+5. **Settings Tab** (`SettingsView.swift`)
+   - App settings and preferences
+   - Data export (CSV, JSON) with date filtering
+   - Data deletion by range or category
+   - CloudKit reset utilities
+   - HealthKit permission management
+   - App information and support
 
-**Breathing Exercise Integration:**
-- Figma-aligned 4-4-4-4 pattern
-- Animated breathing circle with phase guidance
-- 3-minute session duration
-- Before/after HRV comparison
+### AI Chat Integration
 
-**AI Chat Access:**
-- **Enhanced**: Direct access from ActionView with streaming token display
-- **NEW**: Real-time token streaming via SSEParser and LLMAPITarget
-- Context-aware suggestions with quick action chips
-- Session-only message history
-- **NEW**: Hardcoded CloudLLM endpoint for simplified setup
+**Chat Access Points:**
+- **Home Tab**: AI Insights Card with chat button
+- **Quick Action**: Chat icon in dashboard
+- **Bottom Sheet**: Native SwiftUI chat interface
+
+**Streaming Features:**
+- Real-time token streaming via SSEParser
+- Dual-service LLM: Apple Intelligence (iOS 26+) → SupabaseLLMService fallback
+- SupabaseConfig for environment-based endpoint configuration
+- Context-aware health/stress data injection via ChatContextBuilder
+- Session-only message history (no SwiftData persistence)
 
 ---
 

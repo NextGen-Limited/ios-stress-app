@@ -2,7 +2,7 @@
 
 **Platform:** iOS 17+ / watchOS 10+
 **Section:** Distribution, Review, Post-Release Monitoring
-**Last Updated:** June 7, 2026
+**Last Updated:** June 12, 2026
 
 ---
 
@@ -74,15 +74,17 @@ read this data and never write to Apple Health."
 
 Prepare screenshots for each device:
 
-**iPhone 15 (6.1-inch)** - At least 2 screenshots
-1. Dashboard with stress ring
-2. 3-Tab navigation (Home/Action/Trend)
-3. ActionView with breathing exercises
-4. AI chat interface
-5. Trends charts
+**iPhone 15 (6.1-inch)** - At least 5 screenshots
+1. Dashboard with stress ring and insights
+2. 5-Tab navigation structure (Home/Trends/Breathing/Characters/Settings)
+3. Character collection with evolution unlocks
+4. Breathing exercise with animated circle
+5. AI chat with streaming responses (dual service: Apple Intelligence + SupabaseLLM)
+6. Trends view with charts and heatmaps
+7. Real StoreKit 2 premium paywall (optional)
 
 **Apple Watch** - At least 1 screenshot
-1. Watch app with complications
+1. Watch app with stress complications (WidgetKit)
 
 ### 5. Description
 
@@ -90,29 +92,32 @@ Prepare screenshots for each device:
 StressMonitor - Understand Your Stress
 
 Real-time stress monitoring using Heart Rate Variability
-from your Apple Watch. Our 5-factor algorithm adapts
-to your unique physiology over time.
+from your Apple Watch. Our advanced 5-factor algorithm
+adapts to your unique physiology with personal baseline learning.
 
 Features:
 • 5-factor stress measurement (HRV, Heart Rate, Sleep, Activity, Recovery)
-• AI-powered chat with streaming responses (Apple Intelligence + Cloud LLM)
+• Dual AI chat: Apple Intelligence (iOS 26+) + Supabase cloud fallback
+• Real-time token streaming for instant AI responses
 • Personal baseline adaptation (learns over 30 days)
-• 3-tab navigation (Home/Action/Trend) for quick access
-• Quick action tools for immediate stress relief
+• 5-tab navigation (Home/Trends/Breathing/Characters/Settings)
+• 5 Elemental Characters with 3-stage evolution system (38 SVG assets)
+• Guided breathing exercises with Figma-aligned animations
 • Historical tracking with filtering and analytics
-• Trend analysis with interactive charts
-• Box breathing exercises with Figma-aligned animations
-• Apple Watch standalone app with complications
-• CloudKit sync across devices
-• Data export (CSV/JSON)
+• Weekly timeline view (7-day × 7-slot dot-matrix)
+• Trend analysis with interactive charts and heatmaps
+• Apple Watch standalone app with WidgetKit complications
+• CloudKit sync across devices (E2E encrypted)
+• Data export (CSV/JSON with date filtering)
 • Complete data control (export/delete anytime)
+• Real StoreKit 2 subscription management
 
 Privacy-First:
 • All health data stored locally on your device
 • Optional iCloud sync is end-to-end encrypted
 • No third-party analytics or tracking
 • Open data access (export anytime)
-• No API keys required for AI features
+• AI chat health context anonymized (no raw data transmitted)
 ```
 
 ### 6. Keywords

@@ -2,7 +2,7 @@
 
 **Platform:** iOS 17+ / watchOS 10+
 **Section:** Setup, Requirements, Build Instructions
-**Last Updated:** June 7, 2026
+**Last Updated:** June 12, 2026
 
 ---
 
@@ -12,13 +12,15 @@
 
 | Component | Minimum | Recommended |
 |-----------|---------|-------------|
-| **Xcode** | 16.0 | 16.2+ |
+| **Xcode** | 15.0 | 26.3+ |
 | **macOS** | 15.0 Sequoia | 15.3+ |
 | **iOS** | 17.0 | 18.0+ |
 | **watchOS** | 10.0 | 11.0+ |
 | **Swift** | 5.9 | 6.0+ |
 
-**Note:** Apple Intelligence features (on-device AI Chat) require iOS 26+ and compatible hardware.
+**Note:** Apple Intelligence features (on-device AI Chat) require iOS 26+ and compatible hardware. SupabaseLLMService provides cloud fallback for older iOS versions.
+
+**Demo Mode:** Launch with `-demo-mode` argument for simulated HealthKit data (no watch required).
 
 ### Required Accounts
 

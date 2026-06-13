@@ -3,7 +3,7 @@
 **Pattern:** MVVM + Protocol-Oriented Design
 **Concurrency:** async/await
 **Data Flow:** Unidirectional (Models -> Services -> ViewModels -> Views)
-**Last Updated:** June 7, 2026
+**Last Updated:** June 12, 2026
 
 ---
 
@@ -117,15 +117,19 @@ DashboardViewModel.weeklyMeasurements (7-day slice)
 DailyTimelineView (7-day × 7-slot dot-matrix grid)
 ```
 
-**3-Tab Navigation flow (Apr 2026):**
+**5-Tab Navigation flow (May 2026):**
 ```
-MainTabView (3 tabs: Home, Action, Trend)
+MainTabView (5 tabs: Home, Trends, Breathing, Characters, Settings)
     ↓
-Home → DashboardView (stress monitoring)
+Home → DashboardView (stress monitoring, insights)
     ↓
-Action → ActionView (quick actions, breathing, chat - NEW unified tab)
+Trends → TrendsView (analytics, charts, statistics)
     ↓
-Trend → TrendsView (analytics and trends)
+Breathing → BreathingView (breathing exercises)
+    ↓
+Characters → CharacterCollectionView (character collection, evolution)
+    ↓
+Settings → SettingsView (app settings, data management)
 ```
 
 **Reverse for updates:**
@@ -167,13 +171,13 @@ UI Updates on screen
 
 ### LLM Service (Apr 2026, updated Jun 2026)
 - Protocol-based LLM abstraction (`LLMServiceProtocol`)
-- `SupabaseLLMService` -- Primary production service using Supabase Edge Functions for SSE streaming
+- `SupabaseLLMService` -- Primary cloud service using Supabase Edge Functions for SSE streaming
   - Configurable endpoint via `SupabaseConfig` (URL + anonKey)
   - Calls Supabase Edge Functions for chat completion
   - SSE streaming: `data: {"token": "..."}` with `[DONE]` sentinel
   - Health context injection via `StressContextPayload`
   - Graceful fallback when server unreachable
-- `AppleIntelligenceService` -- Apple Foundation Models (iOS 26+), streaming token response
+- `AppleIntelligenceService` -- On-device Apple Foundation Models (iOS 26+), streaming token response
 - `SSEParser` -- Server-Sent Events parser for streaming responses
 - `ChatContextBuilder` -- assembles health/stress data into system prompt
 - `ChatQuickActions` -- pre-built prompt suggestions for wellness topics
@@ -187,6 +191,14 @@ UI Updates on screen
 - Evolution system: 3 stages triggered by streaks, sessions, resilience scores
 - 38 SVG assets following `{character}_{evolution}_{mood}.svg` naming
 - `CharacterUnlock` SwiftData model for persistent unlock progress tracking
+
+### StoreKit Service (Jun 2026 - PR #19)
+- Real App Store product fetching and transaction monitoring
+- `StoreKitService` - real implementation with StoreKit 2 APIs
+- `StoreKitProductCatalog` - resolves product IDs from Info.plist
+- `PremiumState` - singleton for centralized premium/subscription state
+- Transaction listeners, entitlement refresh, receipt validation
+- Graceful fallback when App Store unavailable (uses SubscriptionPlan.defaultPlans)
 
 ### Repository Service
 - SwiftData CRUD operations

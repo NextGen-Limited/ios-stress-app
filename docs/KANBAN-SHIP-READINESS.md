@@ -1,6 +1,6 @@
 # StressMonitor - Ship Readiness Kanban
 
-> Generated: 2026-06-07 | Target: App Store Submission
+> Generated: 2026-06-07 | Updated: 2026-06-12 | Target: App Store Submission
 
 ---
 
@@ -13,16 +13,18 @@
 - **Files:** ~~`CloudLLMService.swift`, `LLMAPITarget.swift`~~ — Both deleted
 - **Priority:** P0 | **Effort:** M | **Status:** ✅ Done
 
-### B2: IAP / Premium - No Real StoreKit
-- [ ] Implement `StoreKitService` (conform to `StoreKitServiceProtocol`)
-- [ ] SKProduct fetching from App Store Connect
-- [ ] Purchase flow with Apple's servers
-- [ ] Receipt validation
-- [ ] Restore purchases flow
-- [ ] Subscription status polling
-- [ ] Remove `MockStoreKitService` from production builds
-- [ ] **Files:** `StoreKitServiceProtocol.swift`, `MockStoreKitService.swift`, `PremiumViewModel.swift`
-- **Priority:** P0 | **Effort:** L | **Status:** Backlog
+### B2: IAP / Premium - Real StoreKit Implementation ✅ RESOLVED
+- [x] Implement real `StoreKitService` with product fetching
+- [x] SKProduct fetching from App Store Connect  
+- [x] Real purchase flow with Apple's servers
+- [x] Transaction monitoring and validation
+- [x] Restore purchases flow
+- [x] Subscription status polling via entitlement refresh
+- [x] PremiumState singleton for centralized state
+- [x] StoreKitProductCatalog for product resolution
+- [x] MockStoreKitService reserved for testing only
+- **Files:** `StoreKitService.swift`, `StoreKitServiceProtocol.swift`, `PremiumState.swift`, `PremiumViewModel.swift`, `StoreKitProductCatalog.swift`
+- **Priority:** P0 | **Effort:** L | **Status:** ✅ Done (merged PR #19, Jun 12, 2026)
 
 ### B3: Test Suite - Placeholder Only
 - [ ] Write tests for `MultiFactorStressCalculator` (5 factor tests)
@@ -161,29 +163,30 @@
 
 | Column | Count |
 |--------|-------|
-| 🔴 BLOCKER | 3 |
+| 🔴 BLOCKER | 1 |
 | 🟡 HIGH | 5 |
 | 🟢 MEDIUM | 5 |
 | ⚪ LOW | 3 |
 | ✅ READY | 7 |
-| **Total** | **23** |
+| **Total** | **21** |
 
 ---
 
 ## Recommended Ship Sequence
 
 ```
-Phase 1 (Week 1): BLOCKERS
-  B1 → H1 → H4 (AI Chat + Onboarding + Apple Intelligence)
+Phase 1 (Week 1): REMAINING BLOCKER
+  B3 (Test suite rewrite - XL effort)
 
-Phase 2 (Week 2): SYNC + NOTIFICATIONS  
-  H2 → H3 → H5 (CloudKit fixes + Notifications)
+Phase 2 (Week 2): HIGH PRIORITY FIXES  
+  H1 → H2 → H3 → H4 → H5 (Onboarding, sync, encryption, Apple Intelligence)
 
-Phase 3 (Week 3): IAP + TESTS
-  B2 → B3 (StoreKit implementation + Test suite)
-
-Phase 4 (Week 4): POLISH
+Phase 3 (Week 3): POLISH
   M1 → M2 → M3 → M4 → M5 (Settings, Watch, Accessibility)
 
-Phase 5 (Post-launch): L1 → L2 → L3
+Phase 4 (Post-launch): LOW PRIORITY
+  L1 → L2 → L3
+
+Status: B1 & B2 RESOLVED (Jun 12, 2026)
+Only B3 (comprehensive test suite) blocks ship.
 ```

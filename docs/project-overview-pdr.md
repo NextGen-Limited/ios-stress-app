@@ -35,21 +35,22 @@ StressMonitor is a **privacy-first stress monitoring application** that uses Hea
 | **Box Breathing** | Figma-aligned 4-4-4-4 pattern, 3-min sessions | ✅ Complete |
 | **3-Tab Navigation** | Home (Dashboard), Action (Quick actions/Chat), Trend (Analytics) | ✅ Complete |
 | **Mini Walk Exercise** | Walking exercise with circular timer and Figma-aligned design | ✅ Complete |
-| **IAP Premium Screen** | Subscription paywall with StoreKit service protocol | ✅ Complete |
+| **Real StoreKit 2 Premium** | Real App Store product fetching + transaction monitoring (PR #19 Jun 12) | ✅ Complete |
 | **Stress History Timeline** | Activity correlation with stress measurements | ✅ Complete |
 | **Guided Breathing with Biofeedback** | Enhanced breathing with real-time feedback | ✅ Complete |
 | **Morning Readiness Check** | HRV trend analysis for daily readiness assessment | ✅ Complete |
 | **Home Screen Widgets** | At-a-glance stress display | ✅ Complete |
 | **Character Collection UI** | 5 elemental characters with 3-stage evolution, free/premium/streak unlocks, 38 SVG assets | ✅ Complete |
+| **5-Tab Navigation** | Home/Trends/Breathing/Characters/Settings structure (May 2026) | ✅ Complete |
 | **WCAG AA Accessibility** | Dual coding, VoiceOver, Dynamic Type | ✅ Complete |
 
 ### Ship Blockers (CRITICAL - must resolve before App Store submission)
 
-| Blocker | Issue | Severity |
-|---------|-------|----------|
-| ~~**B1**~~ | ~~CloudLLMService hardcoded ngrok endpoint~~ — **RESOLVED** | ~~P0~~ ✅ |
-| **B2** | StoreKit implementation is mock-only | P0 |
-| **B3** | Test suite is placeholder | P0 |
+| Blocker | Issue | Status |
+|---------|-------|--------|
+| ~~**B1**~~ | ~~CloudLLMService hardcoded ngrok endpoint~~ | ✅ Resolved (SupabaseLLMService) |
+| ~~**B2**~~ | ~~StoreKit implementation is mock-only~~ | ✅ Resolved (PR #19, Jun 12, 2026) |
+| **B3** | Test suite is placeholder only | 🚫 P0 Blocking (pending rewrite) |
 
 ### Planned Features (v1.1)
 
@@ -217,7 +218,7 @@ Each measurement includes a confidence value (0-1) based on:
 
 ### Privacy-First Design
 - **Local Storage:** SwiftData (encrypted at rest by iOS)
-- **CloudLLM Chat:** Sends anonymized chat context to Supabase Edge Functions (no API key needed); health data stays on-device
+- **Cloud Chat:** Sends anonymized chat context to Supabase Edge Functions via SupabaseLLMService; health data stays on-device
 - **Read-Only HealthKit:** No writes to Apple Health
 - **CloudKit E2E Encryption:** End-to-end encrypted sync
 - **No Tracking:** No analytics, no advertising IDs
@@ -305,11 +306,13 @@ All core features complete and shipping.
 ## Ship Status Summary
 
 **Current:** v1.0 Feature Complete (RC1)
-**Blockers:** 2 critical (StoreKit real impl, test suite)
-**Next:** Resolve blockers B2/B3, then TestFlight → App Store
+**Blockers:** 1 critical remaining (B3 test suite)
+**Resolved:** B1 (Jun 7, SupabaseLLMService), B2 (Jun 12, Real StoreKit 2 - PR #19)
+**Next:** Resolve B3 (test suite), then TestFlight → App Store
 
 ---
 
 **Owner:** Phuong Doan
-**Status:** Pre-Ship (RC1) — 2 blockers remaining
-**Next Review:** Post-blocker resolution
+**Status:** Pre-Ship (RC1) — 1 blocker remaining
+**Last Updated:** June 12, 2026
+**Next Review:** Post-blocker resolution (target July 2026)

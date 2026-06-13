@@ -9,7 +9,7 @@
 
 ## Version 1.0 (Current - Pre-Ship RC1)
 
-**Status:** ✅ Feature Complete — 2 Blockers Pending (B2/B3)
+**Status:** ✅ Feature Complete — 1 Blocker Pending (B3). B1 & B2 Resolved (Jun 12, 2026)
 
 ### Implemented Features
 
@@ -69,11 +69,12 @@
 - ✅ **Morning Readiness Check** - HRV trend analysis for daily readiness
 - ✅ **Real-time Stress Score** - HRV analysis with immediate feedback
 - ✅ **Mini Walk Exercise** - Walking exercise with circular timer (Apr 2026)
-- ✅ **IAP Premium Screen** - Subscription paywall with StoreKit (Apr 2026)
 - ✅ **5-Tab Navigation** - Home/Trends/Breathing/Characters/Settings structure (May 2026)
 - ✅ **Streaming AI Chat** - Real-time token streaming with SSEParser (Apr 2026)
 - ✅ **Box Breathing Figma Alignment** - Enhanced breathing exercise visuals (Apr 2026)
 - ✅ **Character Collection UI** - 5 elemental characters with evolution system, 38 SVG assets (Jun 2026)
+- ✅ **B1 Resolution (Jun 7)** - CloudLLM removed; SupabaseLLMService as production cloud service
+- ✅ **B2 Real StoreKit 2 (Jun 12)** - Real App Store product fetching, transaction monitoring, PremiumState singleton (PR #19)
 
 #### Apple Watch
 - ✅ Standalone watch app
@@ -84,9 +85,10 @@
 - ✅ Independent CloudKit sync
 
 #### Additional Features
-- ✅ AI Chat Mode with Streaming (Apr 2026)
+- ✅ AI Chat Mode with Streaming (Apr 2026, updated Jun 2026)
   - Conversational AI via Apple Intelligence Foundation Models (iOS 26+)
-  - **SupabaseLLMService with SSE streaming** - HTTP/SSE to Supabase Edge Functions
+  - **SupabaseLLMService with SSE streaming** - HTTP/SSE to Supabase Edge Functions (primary cloud fallback)
+  - **AppleIntelligenceService** - On-device Foundation Models for iOS 26+
   - **SSEParser** for streaming infrastructure
   - **Configurable endpoint** via SupabaseConfig (URL + anonKey)
   - Bottom sheet overlay with native SwiftUI chat UI
@@ -190,11 +192,11 @@ remains on your device or encrypted in iCloud.
 
 ---
 
-## Version 1.1 (Planned - Q2 2026)
+## Version 1.1 (Planned - Q3 2026)
 
-**Status:** 🔄 In Progress
+**Status:** 🔄 Planned
 **Estimated Timeline:** 6-8 weeks development
-**Target Release:** April/May 2026
+**Target Release:** Q3 2026 (post-v1.0 release)
 
 ### Proposed Features
 
@@ -404,10 +406,10 @@ remains on your device or encrypted in iCloud.
 - ✅ **Streaming AI Chat** - Real-time token streaming with SSEParser
 - ✅ **Character Collection UI** - 5 elemental characters with 3-stage evolution system
 
-**Critical Ship Blockers (June 2026):**
-1. ~~**B1 (P0)** - CloudLLMService hardcoded ngrok endpoint~~ — **RESOLVED**: Deleted dead code; SupabaseLLMService is the production service
-2. **B2 (P0)** - StoreKit implementation is mock-only, needs real purchase flow
-3. **B3 (P0)** - Test suite is placeholder, needs comprehensive rewrite
+**Critical Ship Blockers (June 2026 - Status Update):**
+1. ✅ **B1 (P0) - RESOLVED (Jun 7)** - CloudLLMService deleted; SupabaseLLMService is production service
+2. ✅ **B2 (P0) - RESOLVED (Jun 12)** - Real StoreKit 2 implementation shipped (PR #19): real product fetching, transaction monitoring, PremiumState singleton
+3. 🚫 **B3 (P0) - BLOCKING** - Test suite is placeholder (4 files, ~532 LOC), needs comprehensive rewrite for >80% coverage
 
 **Bug Tracking:**
 Use GitHub Issues for bug reports:
@@ -580,5 +582,6 @@ Potential features for future consideration:
 ---
 
 **Owner:** Phuong Doan
-**Last Review:** June 12, 2026
+**Last Updated:** June 12, 2026
+**Status:** 1 critical blocker remaining (B3 test suite)
 **Next Review:** Post-blocker resolution (target July 2026)

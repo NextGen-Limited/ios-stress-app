@@ -204,85 +204,101 @@ To test with simulated HealthKit data on simulator:
 
 ## Architecture Overview
 
-This is an **iOS 17+ / watchOS 10+ stress monitoring app** using MVVM with SwiftUI. The app tracks stress via Heart Rate Variability (HRV) from HealthKit.
+**iOS 17+ / watchOS 10+ stress monitoring app** with MVVM + SwiftUI. Tracks stress via multi-factor biometric analysis from HealthKit, with a character/mascot gamification layer and AI chat.
 
 ### Tech Stack
-- **Language**: Swift 5.9+
+- **Language**: Swift 5.9+, strict concurrency (`Sendable` throughout)
 - **UI**: SwiftUI (no UIKit)
-- **Persistence**: SwiftData (iOS 17+ native)
-- **Health Data**: HealthKit
-- **Cloud Sync**: CloudKit
-- **Dependencies**: None - system frameworks only
+- **Persistence**: SwiftData (`StressMeasurement`, `CharacterUnlock`)
+- **Health Data**: HealthKit (HRV, HR, Sleep, Activity, Recovery)
+- **Cloud Sync**: CloudKit + custom `SyncManager`/`ConflictResolver`
+- **AI Chat**: `SupabaseLLMService` (primary) + `AppleIntelligenceService` (fallback), via `LLMServiceProtocol`
+- **IAP**: StoreKit 2 — monthly/annual subscriptions via `StoreKitService` / `MockStoreKitService`
+- **Watch**: Separate watchOS target with `WatchConnectivity` sync
 
 ### Data Flow
 
 ```
-HealthKit (System) → HealthKitService → StressCalculator → StressRepository → SwiftData
-                                      ↓
-                               StressViewModel
-                                      ↓
-                                  SwiftUI Views
+HealthKit → HealthKitManager ──┐
+                               ├─→ StressContext → MultiFactorStressCalculator → StressResult
+                               │         (HRV · HR · Sleep · Activity · Recovery)
+                               └─→ StressViewModel → SwiftUI Views
+
+SwiftData (StressMeasurement) ← StressRepository ← StressViewModel
+CloudKit ↔ CloudKitSyncEngine ↔ SyncManager
+LLMServiceProtocol → ChatViewModel → ChatBottomSheetView
+CharacterUnlock (SwiftData) → CharacterCollectionViewModel → CharacterCollectionView
 ```
 
 ---
 
 ## Core Algorithm
 
-The stress algorithm combines HRV (70% weight) and heart rate (30% weight):
+Two implementations behind `StressAlgorithmServiceProtocol`:
 
+**`MultiFactorStressCalculator`** (primary — uses `StressContext`):
+
+| Factor | Protocol | Default Weight |
+|--------|----------|---------------|
+| HRVStressFactor | `StressFactor` | highest |
+| HeartRateStressFactor | `StressFactor` | medium |
+| SleepStressFactor | `StressFactor` | medium |
+| ActivityStressFactor | `StressFactor` | low |
+| RecoveryStressFactor | `StressFactor` | low |
+
+Missing factors cause automatic weight redistribution. Call via `calculateMultiFactorStress(context:)`.
+
+**`StressCalculator`** (legacy fallback — HRV 70% + HR 30%):
 ```
-Normalized HRV = (Baseline - HRV) / Baseline
-Normalized HR = (HR - Resting HR) / Resting HR
-
-HRV Component = Normalized HRV ^ 0.8
-HR Component = atan(Normalized HR * 2) / (π/2)
-
-Stress Level = (HRV Component * 0.7) + (HR Component * 0.3)
+HRV Component = ((Baseline - HRV) / Baseline) ^ 0.8
+HR Component  = atan((HR - Resting) / Resting * 2) / (π/2)
+Stress Level  = (HRV × 0.7) + (HR × 0.3) × 100
 ```
 
-**Stress Categories** (0-100 scale):
-- 0-25: Relaxed
-- 25-50: Mild Stress
-- 50-75: Moderate Stress
-- 75-100: High Stress
+**Stress Categories** (0-100): Relaxed (0-25) · Mild (25-50) · Moderate (50-75) · High (75-100)
 
-**Confidence scoring** adjusts for:
-- Low HRV readings (< 20ms)
-- Extreme heart rates (< 40 or > 180 bpm)
-- Sample count history
+**Note**: HealthKit provides SDNN-based HRV, not RMSSD. Baseline normalization compensates at the individual level.
 
-See `documentation/references/phase-3-core-algorithm.md` for full implementation.
+See `documentation/references/phase-3-core-algorithm.md` for full details.
 
 ---
 
 ## Key Service Protocols
 
-### HealthKitServiceProtocol
-
 ```swift
+// Services/Protocols/StressAlgorithmServiceProtocol.swift
+protocol StressAlgorithmServiceProtocol: Sendable {
+    func calculateStress(hrv: Double, heartRate: Double) async throws -> StressResult
+    func calculateConfidence(hrv: Double, heartRate: Double, samples: Int, lastReadingDate: Date?) -> Double
+    func calculateMultiFactorStress(context: StressContext) async throws -> StressResult
+}
+
+// Services/Protocols/HealthKitServiceProtocol.swift
 protocol HealthKitServiceProtocol {
     func requestAuthorization() async throws
     func fetchLatestHRV() async throws -> HRVMeasurement?
     func fetchHeartRate(samples: Int) async throws -> [HeartRateSample]
 }
-```
 
-### StressAlgorithmServiceProtocol
-
-```swift
-protocol StressAlgorithmServiceProtocol {
-    func calculateStress(hrv: Double, heartRate: Double) async throws -> StressResult
-    func calculateConfidence(hrv: Double, heartRate: Double, samples: Int) -> Double
-}
-```
-
-### StressRepositoryProtocol
-
-```swift
+// Services/Protocols/StressRepositoryProtocol.swift
 protocol StressRepositoryProtocol {
     func save(_ measurement: StressMeasurement) async throws
     func fetchRecent(limit: Int) async throws -> [StressMeasurement]
     func getBaseline() async throws -> PersonalBaseline
+}
+
+// Services/LLM/LLMServiceProtocol.swift
+protocol LLMServiceProtocol: Sendable {
+    func isAvailable() -> Bool
+    func send(messages: [ChatMessage], systemPrompt: String) async throws -> AsyncThrowingStream<String, Error>
+}
+
+// Services/StoreKit/StoreKitServiceProtocol.swift
+protocol StoreKitServiceProtocol {
+    var availablePlans: [SubscriptionPlan] { get async }
+    var isPremiumUser: Bool { get async }
+    func purchase(_ plan: SubscriptionPlan) async throws
+    func restorePurchases() async throws
 }
 ```
 
@@ -292,29 +308,29 @@ protocol StressRepositoryProtocol {
 
 ```
 StressMonitor/
-├── App/
-│   └── StressMonitorApp.swift
-├── Models/
-│   ├── HRVMeasurement.swift
-│   ├── HeartRateSample.swift
-│   └── StressMeasurement.swift
-├── ViewModels/
-│   └── StressViewModel.swift
-├── Views/
-│   ├── MainTabView.swift
-│   ├── DashboardView.swift
-│   ├── HistoryView.swift
-│   ├── SettingsView.swift
-│   └── Components/
-│       └── StressRingView.swift
-└── Services/
-    ├── HealthKit/
-    │   └── HealthKitManager.swift
-    ├── Algorithm/
-    │   ├── StressCalculator.swift
-    │   └── BaselineCalculator.swift
-    └── Repository/
-        └── StressRepository.swift
+├── StressMonitor/          ← iPhone app target
+│   ├── StressMonitorApp.swift   (entry point — seeds CharacterUnlock, sets up ModelContainer)
+│   ├── Models/             (StressMeasurement @Model, CharacterUnlock @Model, CharacterCreature)
+│   ├── ViewModels/         (StressViewModel, TrendViewModel, ChatViewModel, PremiumViewModel,
+│   │                        CharacterCollectionViewModel)
+│   ├── Views/              (Dashboard, History/Trends, Settings, Chat, Characters,
+│   │                        Breathing, MiniWalk, Onboarding, Premium, DesignSystem)
+│   ├── Services/
+│   │   ├── Algorithm/      (MultiFactorStressCalculator, StressCalculator, 5 StressFactor impls)
+│   │   ├── HealthKit/      (HealthKitManager + extensions for Activity/Recovery/Sleep fetch)
+│   │   ├── LLM/            (SupabaseLLMService, AppleIntelligenceService, ChatContextBuilder)
+│   │   ├── StoreKit/       (StoreKitService, MockStoreKitService, StoreKitProductCatalog)
+│   │   ├── CloudKit/       (CloudKitManager, CloudKitSyncEngine, CloudKitSchema)
+│   │   ├── Sync/           (SyncManager, ConflictResolver)
+│   │   ├── Background/     (HealthBackgroundScheduler, NotificationManager)
+│   │   ├── DataManagement/ (DataExporter CSV/JSON, DataDeleter, LocalDataWipeService)
+│   │   ├── Repository/     (StressRepository)
+│   │   └── Protocols/      (all service protocols)
+│   └── Theme/              (DesignTokens, Color+Extensions, Font+WellnessType, Gradients)
+├── StressMonitorWatch Watch App/  ← watchOS target (mirrors iPhone service structure)
+├── StressMonitorWidget/           ← WidgetKit target (Smart Stack, Live Activities)
+└── StressMonitorTests/            (CharacterAssetResolverTests, StoreKitProductCatalogTests,
+                                    PremiumViewModelTests, CharacterCollectionViewModelTests)
 ```
 
 ---
@@ -458,10 +474,14 @@ Follow `documentation/references/README.md` for phased implementation:
 |------|----------|-----------|
 | Architecture | MVVM with @Observable | Clean state management, testable |
 | Persistence | SwiftData | iOS 17+ native, SwiftUI-friendly |
-| Cloud Sync | CloudKit | End-to-end encrypted, seamless |
+| Cloud Sync | CloudKit + SyncManager/ConflictResolver | End-to-end encrypted, custom merge logic |
 | watchOS Complications | WidgetKit (NOT ClockKit) | Required for watchOS 10+ |
 | Background Tasks | BGAppRefreshTask | System-managed, battery-efficient |
 | Dependencies | None (system only) | Privacy-first, no bloat |
+| AI Chat | SupabaseLLMService (primary) + AppleIntelligenceService (fallback) | On-device privacy when available |
+| IAP | StoreKit 2 — monthly + annual plans | StoreKitProductCatalog resolves IDs from Info.plist/env |
+| Gamification | 5 character creatures with evolution (SwiftData CharacterUnlock) | Engagement via stress-driven character evolution |
+| Algorithm | MultiFactorStressCalculator (5 factors) with StressCalculator fallback (HRV+HR) | Graceful degradation when sensors missing |
 
 ---
 
@@ -493,8 +513,10 @@ Ensure Background Modes enabled in capabilities, verify device not in Low Power 
 - **Implementation Phases**: `documentation/references/README.md`
 - **UI/UX Design System**: `documentation/references/ui-ux-design-system.md`
 - **Algorithm Details**: `documentation/references/phase-3-core-algorithm.md`
+- **Docs folder**: `./docs/` (project-overview-pdr, code-standards, codebase-summary, system-architecture)
 - **Apple HIG**: https://developer.apple.com/design/human-interface-guidelines/
 - **HealthKit**: https://developer.apple.com/documentation/healthkit
+- **StoreKit 2**: https://developer.apple.com/documentation/storekit
 
 <!-- gitnexus:start -->
 # GitNexus — Code Intelligence

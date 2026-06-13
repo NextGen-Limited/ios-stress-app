@@ -15,30 +15,6 @@ For _fastlane_ installation instructions, see [Installing _fastlane_](https://do
 
 ## iOS
 
-### ios test
-
-```sh
-[bundle exec] fastlane ios test
-```
-
-Run iOS unit tests
-
-### ios test_watchos
-
-```sh
-[bundle exec] fastlane ios test_watchos
-```
-
-Run watchOS unit tests
-
-### ios ui_test
-
-```sh
-[bundle exec] fastlane ios ui_test
-```
-
-Run iOS UI tests
-
 ### ios build_widget
 
 ```sh

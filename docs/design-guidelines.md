@@ -110,44 +110,80 @@ Interaction design and accessibility standards:
 
 ---
 
-## Navigation Architecture (3-Tab Structure)
+## Navigation Architecture (5-Tab Structure)
 
-**Updated - April 2026:**
+**Updated - May 2026:**
 
-The app uses a simplified 3-tab navigation structure:
+The app uses a 5-tab navigation structure:
 
 1. **Home** (`DashboardView.swift`)
    - Main stress monitoring dashboard
    - Current stress level with visual ring
    - Recent measurements and timeline
-   - Quick actions and insights
+   - Personalized insights and AI recommendations
 
-2. **Action** (`ActionView.swift`)
-   - **NEW**: Primary access point for quick stress relief
-   - Breathing exercises with Figma-aligned UI
-   - Direct AI chat access for conversational support
-   - Quick action chips for contextual suggestions
-   - Streamlined user experience for immediate intervention
-
-3. **Trend** (`TrendsView.swift`)
+2. **Trends** (`TrendsView.swift`)
    - Historical stress analytics
    - Chart visualizations
    - Statistical insights
    - Trend patterns and correlations
 
+3. **Breathing** (`BreathingView.swift`)
+   - Guided breathing exercises
+   - Figma-aligned breathing circle
+   - 3-minute sessions
+   - Session history and effectiveness
+
+4. **Characters** (`CharacterCollectionView.swift`)
+   - Character collection display
+   - Evolution tracking and progress
+   - Character detail views
+   - Free/premium/streak unlock indicators
+
+5. **Settings** (`SettingsView.swift`)
+   - App settings and preferences
+   - Data export and deletion
+   - HealthKit permission management
+   - About and support information
+
 ### Tab Bar Design Guidelines
 
 - **Corner Radius:** 64pt (pill-shaped)
-- **Spacing:** 50pt between tabs
-- **Explicit horizontal padding**
+- **Spacing:** Equal distribution across 5 tabs
+- **Icon sizing:** 24x24pt selected, 22x22pt unselected
 - **Separate icon assets** for selected / unselected states
-- **Consistent with Apple HIG**
+- **Consistent with Apple HIG and watchOS design**
 
 ---
 
 ## Character Design System (June 2026)
 
-### 5 Elemental Characters
+### 5 Elemental Characters with Evolution
+
+**Character Roster:**
+1. **Ripple** - Water/Otter element (blue - #007AFF)
+2. **Blossom** - Earth/Plant element (green - #34C759)
+3. **Ember** - Fire element (orange - #FF9500)
+4. **Zephyr** - Air/Wind element (purple - #AF52DE)
+5. **Lumi** - Moon element (indigo - #5856D6)
+
+**Evolution System:**
+- 3 evolution stages (Seed → Growth → Flourish)
+- Triggered by user streaks, completed sessions, resilience scores
+- Unique SVG assets per stage and mood state
+- Free/premium/streak-gated unlock types
+
+**Asset Naming:** `{character}_{evolution}_{mood}.svg`
+- Example: `ripple_seed_calm.svg`, `blossom_flourish_overwhelmed.svg`
+
+### Character Mood States
+
+Character moods reflect current stress level:
+- **Calm** (Relaxed 0-25) - Green accent
+- **Concerned** (Mild 25-50) - Blue accent
+- **Worried** (Moderate 50-75) - Yellow accent
+- **Overwhelmed** (High 75-100) - Orange accent
+- **Sleeping** (Rest state) - Gray accent
 
 | Character | Element | Color | Rarity | Status |
 |-----------|---------|-------|--------|--------|

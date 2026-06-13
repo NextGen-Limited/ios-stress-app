@@ -87,15 +87,15 @@ Business logic and system integrations.
 - `CloudKitSyncEngine.swift` - Sync conflict resolution
 - `CloudKitSchema.swift` - CloudKit data model definitions
 
-#### LLM Services (10 files)
+#### LLM Services (8 files)
 - `LLMServiceProtocol.swift` - AI service abstraction
 - `AppleIntelligenceService.swift` - On-device AI integration (iOS 26+)
-- `CloudLLMService.swift` - Cloud-based AI fallback with hardcoded endpoint
+- `SupabaseLLMService.swift` - Cloud LLM via Supabase Edge Functions with SSE streaming
 - `ChatContextBuilder.swift` - Conversation context management
 - `ChatQuickActions.swift` - Quick response suggestions
 - `SSEParser.swift` - Server-Sent Events streaming parser
-- `LLMAPITarget.swift` - API configuration for cloud LLM
-- Plus 3 additional service classes for LLM infrastructure
+- `StressContextPayload.swift` - Health context for LLM system prompt
+- `LLMServiceError.swift` - Typed error handling
 
 #### Data Management Services (8 files)
 - `DataManagementService.swift` - Central data management
@@ -115,10 +115,12 @@ Business logic and system integrations.
 - `SyncManager.swift` - Data synchronization coordination
 - `ConflictResolver.swift` - Sync conflict resolution
 
-#### StoreKit Services (3 files)
-- `PremiumState.swift` - Centralized premium state management singleton
+#### StoreKit Services (5 files)
+- `StoreKitService.swift` - Real StoreKit 2 implementation with App Store product fetching (Jun 12, 2026)
 - `StoreKitServiceProtocol.swift` - StoreKit abstraction layer
-- `MockStoreKitService.swift` - Mock implementation for development
+- `PremiumState.swift` - Centralized premium state management singleton
+- `StoreKitProductCatalog.swift` - Product ID resolution from Info.plist
+- `MockStoreKitService.swift` - Mock implementation for testing only
 
 #### Additional Services
 - `InsightGeneratorService.swift` - AI-powered insights
@@ -215,17 +217,18 @@ Interface definitions:
 
 ## Navigation Structure
 
-### 3-Tab Navigation Architecture
-The app uses a simplified 3-tab navigation structure:
+### 5-Tab Navigation Architecture
+The app uses a 5-tab navigation structure (updated May 2026):
 
-1. **Home** (`DashboardView.swift`) - Main stress monitoring dashboard with current stress levels, recent trends, and quick actions
-2. **Action** (`ActionView.swift`) - Quick access to exercises, breathing techniques, and AI chat
-3. **Trend** (`TrendsView.swift`) - Historical stress visualization and pattern analysis
+1. **Home** (`DashboardView.swift`) - Main stress monitoring dashboard with current stress levels, recent trends, and insights
+2. **Trends** (`TrendsView.swift`) - Historical stress visualization, charts, and pattern analysis
+3. **Breathing** (`BreathingView.swift`) - Guided breathing exercises and techniques
+4. **Characters** (`CharacterCollectionView.swift`) - Character collection, evolution tracking, and unlock progress
+5. **Settings** (`SettingsView.swift`) - App settings, data management, and preferences
 
 ### Secondary Navigation
-- Settings, History, and Data Management are accessible via navigation within respective tabs
-- Settings accessible through Dashboard → Settings icon
-- History accessible through Trends → Historical data views
+- Journal and History accessible via navigation within Dashboard and Trends tabs
+- Data export/delete accessible through Settings
 
 ---
 

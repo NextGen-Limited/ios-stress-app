@@ -4,7 +4,7 @@
 **Concurrency:** async/await
 **Data Flow:** Unidirectional (Models -> Services -> ViewModels -> Views)
 **Section:** MVVM, data flow, core services, protocols
-**Last Updated:** June 7, 2026
+**Last Updated:** June 12, 2026
 
 ---
 
@@ -225,7 +225,7 @@ protocol StressRepositoryProtocol {
 - Data cleanup
 
 #### LLM Service
-**Files:** `Services/LLM/` (7 files, ~500+ LOC)
+**Files:** `Services/LLM/` (8 files, ~500+ LOC)
 
 Protocol-based LLM integration with on-device and cloud backends.
 
@@ -237,18 +237,21 @@ protocol LLMServiceProtocol: Sendable {
 }
 ```
 
-| Implementation | Platform | Transport | Model |
-|---------------|----------|-----------|-------|
-| `AppleIntelligenceService` | iOS 26+ (on-device) | Foundation Models framework | System default |
-| `CloudLLMService` | All iOS (network) | HTTP/SSE to self-hosted FastAPI gateway | glm-4.7-flash |
+| Implementation | Platform | Transport | Status |
+|---------------|----------|-----------|--------|
+| `AppleIntelligenceService` | iOS 26+ (on-device) | Foundation Models framework | Primary for iOS 26+ |
+| `SupabaseLLMService` | All iOS (network) | HTTP/SSE to Supabase Edge Functions | Cloud fallback (Jun 2026) |
 
-**NEW - Apr 2026:**
-- `SSEParser.swift` - Server-Sent Events streaming parser
-- `LLMAPITarget.swift` - API configuration for cloud LLM endpoints
-- **Hardcoded endpoint configuration** (removed server config UI)
+**Updated - Jun 2026:**
+- Removed `CloudLLMService.swift` (dead code with hardcoded ngrok endpoint)
+- Removed `LLMAPITarget.swift` (no longer needed)
+- Implemented `SupabaseLLMService` - Production-ready Supabase integration
+- Configurable via `SupabaseConfig` (URL + anonKey from environment)
 
 **Supporting Types:**
-- `ChatContextBuilder` -- builds system prompts with live health data, "AI Kitten" persona (~600 tokens)
+- `SSEParser.swift` - Server-Sent Events streaming parser
+- `ChatContextBuilder` -- builds system prompts with live health data, "AI Assistant" persona
+- `StressContextPayload` -- health context for LLM system prompt
 - `ChatQuickActions` -- predefined prompt suggestions contextualized by stress level
 - `LLMServiceError` -- typed errors: unavailable, exceededContext, guardrailViolation, rateLimited, refused, concurrentRequests, decodingFailure, cancelled, unknown
 
@@ -257,9 +260,63 @@ protocol LLMServiceProtocol: Sendable {
 ChatViewModel → ChatContextBuilder.buildSystemPrompt(stress:baseline:history:)
              → LLMServiceProtocol.send(messages:systemPrompt:)
              → AsyncThrowingStream<String, Error> (token-by-token streaming)
+                   ↓
+             (Try Apple Intelligence first, fall back to SupabaseLLMService)
 ```
 
 **Persistence:** Chat data is session-only (in-memory `[ChatMessage]` array). No SwiftData persistence. Messages are lost on app restart.
+
+#### StoreKit Service
+**Files:** `Services/StoreKit/` (5 files, ~600+ LOC)
+
+Real StoreKit 2 implementation with App Store product fetching (June 12, 2026 - PR #19).
+
+```swift
+protocol StoreKitServiceProtocol {
+  var availablePlans: [SubscriptionPlan] { get async }
+  var isPremiumUser: Bool { get async }
+  func purchase(_ plan: SubscriptionPlan) async throws
+  func restorePurchases() async throws
+}
+```
+
+**Implementation:**
+- `StoreKitService.swift` - Real App Store integration with StoreKit 2
+- `StoreKitProductCatalog.swift` - Resolves product IDs from Info.plist (StoreKit config)
+- `PremiumState.swift` - Singleton for centralized premium/subscription state
+- `StoreKitServiceProtocol.swift` - Service protocol abstraction
+- `MockStoreKitService.swift` - Mock implementation for testing only
+
+**Features:**
+- Real product fetching from App Store
+- Transaction listeners and monitoring
+- Entitlement refresh for subscription status
+- Receipt validation
+- Graceful fallback to `SubscriptionPlan.defaultPlans` when App Store unavailable
+
+**Data Flow:**
+```
+PremiumViewModel → StoreKitService
+                → Real App Store transactions OR fallback plans
+                → PremiumState (centralized state)
+                → PremiumView (paywall UI)
+```
+
+#### Character System Service
+**Files:** `Services/Character/` (2 files, ~200 LOC)
+
+5 elemental characters with evolution tracking (June 2026).
+
+**Components:**
+- `CharacterAssetResolver.swift` - Maps character + evolution stage + mood → SVG asset path
+- `CharacterUnlock.swift` (@Model) - SwiftData persistence for unlock progress
+
+**Features:**
+- 5 elemental characters: Ripple (water), Blossom (earth), Ember (fire), Zephyr (air), Lumi (moon)
+- Dual unlock types: free, premium, streak-gated
+- Evolution system: 3 stages triggered by user activity
+- 38 SVG assets named `{character}_{evolution}_{mood}.svg`
+- Free/premium asset separation for paywall integration
 
 ---
 

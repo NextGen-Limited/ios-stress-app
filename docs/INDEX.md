@@ -2,6 +2,7 @@
 
 **Version:** 1.0 (Pre-Ship RC1)
 **Last Updated:** June 12, 2026
+**Blocker Status:** 1 critical remaining (B3 - test suite)
 
 Complete documentation for the StressMonitor iOS/watchOS stress monitoring application.
 
@@ -73,14 +74,14 @@ Current status, planned features, timeline, and success metrics.
 
 | Metric | Value |
 |--------|-------|
-| **Total Swift Files** | 303+ |
-| **Total LOC** | ~34,000+ |
-| **iOS App** | 225+ files |
-| **watchOS App** | 44 files |
-| **Widgets** | 7 files |
-| **Tests** | 5 files (suite pending rewrite) |
-| **External Dependencies** | 11 SPM packages |
-| **CI/CD** | GitHub Actions (macos-15, Xcode 26.3) |
+| **Total Swift Files** | 175+ |
+| **Total LOC** | ~33,500 |
+| **iOS App** | 80+ files, ~27,450 LOC |
+| **watchOS App** | 40 files, ~3,224 LOC |
+| **Widgets** | 11 files, ~1,586 LOC |
+| **Tests** | 4 files, ~532 LOC (pending rewrite) |
+| **External Dependencies** | 13 SPM packages |
+| **CI/CD** | GitHub Actions (macos-15, Xcode 26) |
 | **Character Assets** | 38 SVG files |
 
 ### Documentation Metrics
@@ -138,7 +139,10 @@ Current status, planned features, timeline, and success metrics.
 | **WidgetKit (not ClockKit)** | watchOS 10+ requirement |
 | **async/await throughout** | Modern concurrency |
 | **Foundation Models** | On-device LLM via Apple Intelligence (iOS 26+) |
-| **SupabaseLLMService** | Supabase Edge Functions as cloud LLM service |
+| **SupabaseLLMService** | Supabase Edge Functions as cloud LLM fallback service |
+| **Real StoreKit 2** | App Store product fetching + transaction monitoring (PR #19, Jun 12) |
+| **5-Tab Navigation** | Home/Trends/Breathing/Characters/Settings structure |
+| **Character System** | 5 elemental creatures with 3-stage evolution, 38 SVG assets |
 | **GitHub Actions CI** | Automated build + test on macos-15 with SPM caching |
 
 ---
@@ -203,10 +207,11 @@ SwiftUI Views → @Observable ViewModels → Protocol-based Services
 | Item | Status | Contact |
 |------|--------|---------|
 | **Active Development** | ✅ v1.0 Pre-Ship RC1 | Phuong Doan |
-| **Blockers** | 🚫 2 critical (B2/B3) | StoreKit impl, test suite |
+| **Blockers** | 🚫 1 critical (B3 test suite) | Test suite rewrite |
+| **Resolved (Jun 12)** | ✅ B1 & B2 | CloudLLM, StoreKit 2 |
 | **Bug Fixes** | ✅ Ongoing | GitHub Issues |
 | **Feature Requests** | 📋 Roadmap in docs | Roadmap discussion |
-| **Documentation** | ✅ Current | This index |
+| **Documentation** | ✅ Updated Jun 12 | This index |
 
 ---
 
@@ -214,7 +219,7 @@ SwiftUI Views → @Observable ViewModels → Protocol-based Services
 
 | Version | Release | Status | Notable |
 |---------|---------|--------|---------|
-| **1.0** | Jul/Aug 2026 | 🔄 Pre-Ship RC1 | AI Chat with SSE streaming, 5-tab navigation, Character Collection UI (5 characters, 3-stage evolution, 38 SVG assets), SupabaseLLM via Edge Functions, Box Breathing Figma alignment, Mini Walk exercise, IAP Premium screen (mock), Stress History, Guided Breathing, Watch Complications, Morning Readiness Check. **Blockers:** StoreKit real impl, test suite |
+| **1.0** | Jul/Aug 2026 | 🔄 Pre-Ship RC1 | AI Chat with SSE streaming, 5-tab navigation (Home/Trends/Breathing/Characters/Settings), Character Collection UI (5 characters, 3-stage evolution, 38 SVG assets), SupabaseLLM via Edge Functions + Apple Intelligence, Box Breathing Figma alignment, Mini Walk exercise, Real StoreKit 2 (PR #19 Jun 12), Stress History, Guided Breathing, Watch Complications, Morning Readiness Check. **Remaining Blocker:** Test suite rewrite |
 | **1.1** | Q3 2026 | 🔄 Planned | Advanced breathing, stress triggers, weekly reports, localization MVP |
 | **2.0** | Q4 2026 | 🎯 Concept | ML insights, Siri Shortcuts, iPad support |
 
