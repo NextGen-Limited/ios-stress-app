@@ -36,9 +36,13 @@ Once your app is built and tested:
 - [ ] Test 5-tab navigation flow (Home/Trends/Breathing/Characters/Settings)
 - [ ] Test breathing exercises and timers
 - [ ] Test character collection and evolution unlocks
+- [ ] Test dark mode toggle in Settings → ProfileCard
+- [ ] Test appearance picker (Light/Dark/System) persistence
 - [ ] Test AI chat streaming with Apple Intelligence (iOS 26+) and SupabaseLLMService fallback
 - [ ] Verify SupabaseConfig environment setup (URL + anonKey)
 - [ ] Test real StoreKit 2 purchasing flow with real/sandbox products
+- [ ] Test WidgetKit Live Activity (breathing session on lock screen)
+- [ ] Test ControlCenter widget (app launcher)
 
 ### TestFlight
 - [ ] Build & archive for distribution
@@ -50,6 +54,10 @@ Once your app is built and tested:
 - [ ] Verify 5-tab navigation flow and tab transitions
 - [ ] Test character unlock progression on real devices
 - [ ] Verify StoreKit 2 purchases work end-to-end
+- [ ] Test dark mode toggle across all tabs on iOS 16.0+
+- [ ] Verify WidgetKit Live Activity displays breathing session correctly
+- [ ] Verify ControlCenter widget launches app
+- [ ] Test watch complications on actual Apple Watch
 
 ### App Store Submission
 - [ ] Fill app information (privacy, description, keywords)
@@ -79,6 +87,13 @@ Once your app is built and tested:
 - [ ] Stress categorization display
 
 ### New Features (May-Jun 2026)
+- [ ] **AppearanceManager** - Dark mode toggle with Light/Dark/System persistence (Jun 13)
+- [ ] **Settings Redesign** - Ripple UI card-based architecture with ProfileCard (Jun 13)
+- [ ] **Trends Redesign** - Ripple character with dynamic mascot commentary (Jun 13)
+- [ ] **ActionView Redesign** - Dark-canvas theme with Ripple AI Coach (Jun 13)
+- [ ] **Watch Character-Reactive** - 5 stress tier emoji display (no numeric scores) (Jun 13)
+- [ ] **WidgetKit Live Activity** - Breathing session on lock screen + Dynamic Island (Jun 13)
+- [ ] **ControlCenter Widget** - App launcher button in Control Center (Jun 13)
 - [ ] **5-Tab Navigation** - Home/Trends/Breathing/Characters/Settings flow
 - [ ] **Character Collection** - 5 elemental characters with 3-stage evolution, 38 SVG assets
 - [ ] **Streaming AI Chat** - Real-time token rendering via SSEParser
@@ -86,6 +101,7 @@ Once your app is built and tested:
 - [ ] **Real StoreKit 2** - App Store product fetching, transaction monitoring, PremiumState singleton
 - [ ] **Box Breathing Exercises** - Figma-aligned animations with HRV biofeedback
 - [ ] **Weekly Timeline View** - 7-day × 7-slot dot-matrix grid visualization
+- [ ] **Watch Complications** - 4 families (Circular, Rectangular, Inline, Corner)
 
 ### Quality Assurance
 - [ ] Accessibility compliance (WCAG AA)

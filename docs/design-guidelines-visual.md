@@ -3,8 +3,8 @@
 **System:** iOS Human Interface Guidelines compliant
 **Accessibility:** WCAG AA
 **Section:** Colors, typography, spacing, components
-**Version:** 1.1
-**Last Updated:** June 7, 2026
+**Version:** 1.2
+**Last Updated:** June 13, 2026
 
 ---
 
@@ -450,7 +450,94 @@ Xcode → Debug → View Debugging → Core Animation
 
 ---
 
+---
+
+## Ripple UI Design System (NEW - Jun 2026)
+
+### Dark-Canvas Theme (ActionView & Trends)
+
+**Ripple-Specific Color Tokens:**
+- `TrendsPalette.darkCanvas` - Dark background for Trends view card backgrounds
+- `HomeCharacterDesignTokens.darkCard` - Dark card surface for character sections
+- `RippleTrendsKit.bubbleBackground` - Speech bubble background for Ripple commentary
+
+**Settings Card System (Ripple UI):**
+- All cards use unified adaptive background
+- Corner radius: 16pt (updated from 12pt for Settings cards)
+- Shadow: settings-specific depth (color #18274B opacity 0.08)
+- Spacing between card sections: 8pt tight
+
+**MascotSpeechBubbleView (NEW):**
+- Dynamic Ripple character commentary on Trends screen
+- Rounded bubble with tail pointing to character
+- Color-coded by stress tier
+- Updated on stress level changes
+
+---
+
+## Widget & Watch Visual Design (NEW - Jun 2026)
+
+### Widget Visual Guidelines
+
+**No-Numbers Policy:**
+- Widgets display emoji + color-coded mood only
+- Stress numerical scores never shown (privacy + simplicity)
+- Character face used instead of rings or gauges
+- Mood pills use stress category colors (Relaxed/Mild/Moderate/High)
+
+**Widget Color Palette (5 tiers):**
+| Tier | Emoji | Color | Hex |
+|------|-------|-------|-----|
+| Resting | 😴 | Blue | #007AFF |
+| Calm | 😊 | Green | #34C759 |
+| Balanced | 😐 | Indigo | #5856D6 |
+| Tense | 😰 | Orange | #FF9500 |
+| Overwhelmed | 🐚 | Purple | #AF52DE |
+
+**Live Activity (Breathing Session):**
+- Animated breathing circle (same as BreathingView)
+- Session timer (MM:SS format)
+- Cancel button
+- Displays on lock screen + Dynamic Island
+- Real-time updates every 1 second
+
+**Control Center Widget:**
+- Simple app launcher button
+- StressMonitor icon + label
+- Tap to open app directly
+- No data display (action only)
+
+### Watch Complication Visual Design
+
+**Circular Complication:**
+- Full-circle stress gauge (arc)
+- Centered emoji (5 stress tiers)
+- Color-coded by stress level
+- Clean, minimal design
+
+**Rectangular Complication:**
+- Left icon (character mood emoji)
+- Center text (stress category label)
+- Right data (HRV/HR metrics)
+- One-line layout
+
+**Inline Complication:**
+- Text-only format
+- Mood label (e.g. "Calm", "Tense")
+- No emoji or metrics
+- Max character limit
+
+**Corner Complication (watchOS 10+):**
+- Emoji only in corner
+- Color-coded background
+- No text or metrics
+- Tiny form factor optimization
+
+---
+
+---
+
 **Next:** See `design-guidelines-ux.md` for accessibility, haptics, animations, and StressBuddy character.
-**Design System Version:** 1.1
-**Last Updated:** June 7, 2026
+**Design System Version:** 1.2
+**Last Updated:** June 13, 2026
 **Maintained By:** Phuong Doan

@@ -62,11 +62,12 @@ Advanced platform capabilities:
 | **SwiftData** | Local persistence | iOS 17+ native, encrypted at rest |
 | **CloudKit** | Cloud sync | Apple ecosystem, E2E encryption |
 | **HealthKit** | Health data | Official Apple health API, privacy-first |
-| **WidgetKit** | Widgets & complications | Modern widget framework, watchOS 10+ |
+| **WidgetKit** | Widgets & complications | Modern widget framework, watchOS 10+, Live Activities |
 | **async/await** | Concurrency | Swift 5.9+ native, structured concurrency |
 | **SSE Streaming** | Real-time AI chat | Server-sent events for SupabaseLLM responses |
 | **Foundation Models** | On-device LLM | Apple Intelligence (iOS 26+), conversational AI |
 | **Combine** | Async streams | Background health data observation |
+| **AppearanceManager** | Theme management | @Observable singleton for Light/Dark/System mode |
 
 ---
 
@@ -147,6 +148,14 @@ UI Updates on screen
 
 ## Core Services
 
+### AppearanceManager Service (NEW - Jun 2026)
+- **@Observable singleton** for app-wide theme management
+- Manages Light/Dark/System color scheme preference
+- Persists preference to UserDefaults
+- Provides `colorScheme: ColorScheme?` property for SwiftUI environment
+- Integrates with Settings screen's ProfileCard appearance picker
+- Synchronized across all tabs and modals
+
 ### HealthKit Service
 - Request HealthKit authorization
 - Fetch HRV data from Apple Watch  
@@ -211,6 +220,12 @@ UI Updates on screen
 - Persist baseline data
 - Data cleanup operations
 - **UPDATE**: 491 LOC
+
+### Theme & Appearance Service (Jun 2026)
+- `AppearanceManager` - Singleton @Observable for dark mode toggle
+- Light/Dark/System preference management
+- UserDefaults persistence
+- Integration with Settings ProfileCard
 
 ### CloudKit Service
 - Sync measurements to iCloud

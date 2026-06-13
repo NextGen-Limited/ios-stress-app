@@ -65,9 +65,17 @@
 - ✅ HealthKit permission request
 
 #### Recent Completions (June 2026)
+- ✅ **AppearanceManager** - Dark mode preference manager with Light/Dark/System modes (Jun 13)
+- ✅ **Settings Redesign** - Ripple UI card-based architecture with 13 components (Jun 13)
+- ✅ **ProfileCard** - User profile with appearance toggle and Delete All Data CTA (Jun 13)
+- ✅ **Trends Redesign** - Ripple character system with dynamic mascot commentary (Jun 13)
+- ✅ **ActionView Redesign** - Dark-canvas theme with Mood Calendar, Bento grid, Ripple AI Coach (Jun 13)
+- ✅ **Onboarding Integration** - HealthKit permission flow with 3-screen TabView (Jun 13)
+- ✅ **Watch Character-Reactive** - 5 stress tier emoji display (NO numeric scores) (Jun 13)
+- ✅ **WidgetKit Extensions** - Live Activity + ControlCenter launcher, no numeric display (Jun 13)
 - ✅ **Stress History Timeline** - Activity correlation with stress measurements
 - ✅ **Guided Breathing with Biofeedback** - Enhanced breathing exercises with real-time feedback
-- ✅ **Apple Watch Complications** - Live stress metrics on watch face (WidgetKit)
+- ✅ **Apple Watch Complications** - Live stress metrics on watch face (WidgetKit) with 4 families (Circular, Rectangular, Inline, Corner)
 - ✅ **Morning Readiness Check** - HRV trend analysis for daily readiness
 - ✅ **Real-time Stress Score** - HRV analysis with immediate feedback
 - ✅ **Mini Walk Exercise** - Walking exercise with circular timer (Apr 2026)

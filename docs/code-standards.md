@@ -155,8 +155,19 @@ class HealthKitManager {
 }
 
 **Singleton Policy:** Avoid singletons for services, allow for infrastructure/manager objects
-- ✅ Allowed: HapticManager.shared, ConnectivityManager.shared, NotificationManager.shared
+- ✅ Allowed: HapticManager.shared, ConnectivityManager.shared, NotificationManager.shared, AppearanceManager.shared (theme management), PremiumState.shared (IAP state)
 - ❌ Avoid: Service instances with dependencies
+
+**AppearanceManager Singleton Pattern (NEW - Jun 2026):**
+```swift
+// ✅ Allowed for app-wide theme management
+@Observable
+final class AppearanceManager {
+    static let shared = AppearanceManager()
+    var mode: ColorSchemeMode = .system
+    // Persists to UserDefaults, provides global colorScheme environment
+}
+```
 ```
 
 ---
@@ -244,6 +255,41 @@ func startAutoRefresh() {
 - Any `HKObserverQuery` registration that requires background delivery entitlements
 - HealthKit background delivery setup
 - Not required for simple `HKHealthStore` reads (those work in simulator)
+
+---
+
+## WidgetDataProvider Pattern (NEW - Jun 2026)
+
+Use App Groups for cross-app widget data sharing:
+
+```swift
+// WidgetDataProvider.swift - Share data via App Groups
+final class WidgetDataProvider {
+    private let defaults = UserDefaults(suiteName: "group.com.stressmonitor.app")!
+    
+    func updateWidgetData(stress: Double, mood: String) {
+        defaults.set(stress, forKey: "lastStressLevel")
+        defaults.set(mood, forKey: "stressMood")
+    }
+}
+
+// In widget provider
+struct StressWidgetProvider: TimelineProvider {
+    private let dataProvider = WidgetDataProvider()
+    
+    func getTimeline(in context: Context, completion: @escaping (Timeline) -> Void) {
+        let stress = defaults?.double(forKey: "lastStressLevel") ?? 0
+        // Use stress data for widget rendering
+    }
+}
+```
+
+**App Groups Configuration:**
+- iPhone app: `group.com.stressmonitor.app`
+- Watch app: `group.com.stressmonitor.watch`
+- Shared data: Latest stress level, character mood, 24-hour measurements
+
+**Approved Pattern:** WidgetDataProvider as a lightweight coordinator for App Groups data sharing (not a full service, just data persistence layer).
 
 ---
 

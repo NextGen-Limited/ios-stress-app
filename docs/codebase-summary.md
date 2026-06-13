@@ -60,7 +60,7 @@ Core data structures for health metrics, stress calculations, and character syst
 | `CharacterCreature.swift` | Character definition (species, element) |
 | `CharacterUnlock.swift` | Character unlock state + evolution progress |
 
-### Services (52 files, ~8,200 LOC)
+### Services (58 files, ~8,500 LOC)
 Business logic and system integrations.
 
 #### Algorithm Services (10 files)
@@ -122,11 +122,14 @@ Business logic and system integrations.
 - `StoreKitProductCatalog.swift` - Product ID resolution from Info.plist
 - `MockStoreKitService.swift` - Mock implementation for testing only
 
+#### Theme Services (1 file)
+- `AppearanceManager.swift` - Dark mode preference management (@Observable singleton, Light/Dark/System modes, UserDefaults persistence)
+
 #### Additional Services
 - `InsightGeneratorService.swift` - AI-powered insights
 - `MockServices.swift` - Development mock data services
 
-### ViewModels (10 files)
+### ViewModels (11 files)
 State management layer:
 
 - `StressViewModel.swift` - Core stress tracking state
@@ -134,11 +137,12 @@ State management layer:
 - `DashboardViewModel.swift` - Dashboard data aggregation
 - `TrendViewModel.swift` - Historical trend analysis
 - `HistoryViewModel.swift` - Historical data browsing
-- `SettingsViewModel.swift` - App configuration state
+- `SettingsViewModel.swift` - App configuration state (NEW: Jun 2026, manages profile, notifications, theme, iCloud sync)
 - `DataManagementViewModel.swift` - Data management operations
 - `BreathingViewModel.swift` - Breathing exercise state
 - `MiniWalkViewModel.swift` - Mini Walk exercise state
 - `CharacterCollectionViewModel.swift` - Character collection state & unlock logic
+- `PremiumViewModel.swift` - Subscription management & StoreKit state
 
 ### Views (150+ files)
 SwiftUI user interface components:
@@ -152,16 +156,17 @@ SwiftUI user interface components:
 
 #### Feature Views
 - `Dashboard/` (26 files) - Dashboard components, cards, metrics, insights
-- `Trends/` (12 files) - Trend charts, heatmaps, statistics
+- `Trends/` (12 files) - Trend charts, heatmaps, statistics with Ripple character commentary
 - `Breathing/` (6 files) - Breathing exercise flow
 - `Characters/` (8 files) - Character collection, detail, picker, celebration
-- `Settings/` (13 files) - Settings screens, data management
+- `Settings/` (14 files) - Settings screens, data management, ProfileCard (NEW: Jun 2026), appearance picker, dark mode toggle, delete data CTA
 - `History/` (7 files) - Historical data browsing
-- `Onboarding/` (10 files) - Onboarding flow
+- `Onboarding/` (10 files) - Onboarding flow with HealthKit permission integration
 - `Premium/` (6 files) - IAP Premium subscription screen
 - `Chat/` - AI chat interface components
 - `Journal/` - Journaling features
 - `MiniWalk/` - Mini Walk exercise with circular timer
+- `Action/` - Quick stress relief interface with Ripple AI Coach, Bento grid, dark-canvas theme (NEW: Jun 2026)
 
 ### Theme (5 files)
 Design system and styling:
@@ -289,18 +294,22 @@ The app uses a 5-tab navigation structure (updated May 2026):
 
 ## Recent Updates (June 2026)
 
-1. **Stress History Timeline** - Activity correlation with stress data
-2. **Guided Breathing with Biofeedback** - Enhanced breathing exercises with real-time feedback
-3. **Apple Watch Complications** - Live stress metrics on watch face
-4. **Morning Readiness Check** - HRV trend analysis for daily readiness
-5. **Real-time Stress Score** - HRV analysis with immediate feedback
-6. **Mini Walk Exercise** - Walking exercise screen with circular timer
-7. **Real StoreKit 2 Premium** - Real App Store product fetching + transaction monitoring (PR #19, Jun 12)
-8. **SupabaseLLMService** - Production cloud service with SSE streaming (replaces CloudLLMService)
-9. **AppleIntelligenceService** - On-device Foundation Models for iOS 26+ fallback
-10. **5-Tab Navigation** - Home/Trends/Breathing/Characters/Settings structure
-11. **Character Collection UI** - 5 elemental characters with evolution system, unlock types (free/premium/streak-gated), persistent storage, 38 SVG assets
-12. **CloudKit E2E Encryption** - End-to-end encrypted cloud sync (complete)
+1. **AppearanceManager** - Dark mode preference manager (NEW: Jun 13) - @Observable singleton, Light/Dark/System modes, UserDefaults persistence
+2. **Settings Redesign** - Ripple UI card-based architecture (NEW: Jun 13) - 13 card components, ProfileCard with appearance picker
+3. **ProfileCard** - Appearance toggle (Light/Dark/System), Delete All Data button (NEW: Jun 13)
+4. **Trends Redesign** - Ripple character system (NEW: Jun 13) - MascotSpeechBubbleView, HorizontalWeekCalendarView, WeeklyHeatmapView, PatternInsightsSection
+5. **ActionView Redesign** - Ripple dark-canvas theme (NEW: Jun 13) - Mood Calendar, Daily Focus Hero, Ripple AI Coach, Bento Health Grid, Quick Actions
+6. **OnboardingFlow** - HealthKit permission integration (NEW: Jun 13) - 3-screen TabView (Welcome → HealthKit Sync → Success)
+7. **WatchOS Character-Reactive** - Stress tier emoji display (NEW: Jun 13) - 5 stress tiers mapped to emoji + color, NO numeric scores
+8. **WidgetKit Extensions** - Live Activity + ControlCenter launcher (NEW: Jun 13) - SmallWidget, MediumWidget, LargeWidget, no numeric scores, character emoji only
+9. **Stress History Timeline** - Activity correlation with stress data
+10. **Guided Breathing with Biofeedback** - Enhanced breathing exercises with real-time feedback
+11. **Apple Watch Complications** - Live stress metrics on watch face
+12. **Mini Walk Exercise** - Walking exercise screen with circular timer
+13. **Real StoreKit 2 Premium** - Real App Store product fetching + transaction monitoring (PR #19, Jun 12)
+14. **SupabaseLLMService** - Production cloud service with SSE streaming (replaces CloudLLMService)
+15. **5-Tab Navigation** - Home/Trends/Breathing/Characters/Settings structure
+16. **Character Collection UI** - 5 elemental characters with evolution system, unlock types (free/premium/streak-gated), persistent storage, 38 SVG assets
 
 ## New Files Added (IAP Premium)
 - **PremiumState** - Centralized premium state management singleton

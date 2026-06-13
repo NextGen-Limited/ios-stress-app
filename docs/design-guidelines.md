@@ -81,6 +81,25 @@ Interaction design and accessibility standards:
 
 ## Component Library
 
+### Settings Components (NEW - Jun 2026)
+
+**ProfileCard** (full width card)
+- Appearance picker (Light/Dark/System segmented control)
+- Integration with AppearanceManager singleton
+- Delete All Data button
+- User profile information display
+- Located at top of Settings screen in Ripple UI card-based architecture
+
+**SettingsCard Variants** (13 card components)
+- HealthDataCard - HealthKit permission status
+- NotificationsCard - Notification preferences
+- PrivacyCard - Privacy & data handling
+- WatchFaceCard - Watch complication info
+- WidgetCard - Widget configuration
+- AboutCard - App info
+- AppearanceCard - Dark mode toggle (integrated with ProfileCard)
+- And 5+ additional service cards
+
 ### Primary Components
 
 **Stress Ring** (120-200pt diameter)
@@ -276,20 +295,29 @@ Manual Testing:
 
 ---
 
-## Dark Mode
+## Dark Mode & AppearanceManager (NEW - Jun 2026)
 
-All views automatically adapt to dark mode:
+All views automatically adapt to dark mode via **AppearanceManager** singleton:
 
 ```swift
-// Xcode → View → Appearance → Dark
-.preferredColorScheme(.dark)
+// ProfileCard appearance picker controls app-wide theme
+@Environment(\.colorScheme) var systemColorScheme
+let appearanceManager = AppearanceManager.shared
+// Users select: Light / Dark / System (uses device setting)
 ```
+
+**AppearanceManager Integration:**
+- User preference persists to UserDefaults
+- ProfileCard (Settings → Appearance) allows Light/Dark/System selection
+- Applied globally across all tabs via environment modifier
+- Respects Dynamic Light/Dark mode transitions
 
 **Guidelines:**
 - Use `Color.primary` and `Color.secondary` (auto-inverted)
 - Don't use pure white (#FFF) in dark mode
 - Test contrast in both light and dark modes
 - Verify animations visible in both modes
+- Settings card backgrounds use `adaptiveCardBackground` token (auto-switches)
 
 ---
 

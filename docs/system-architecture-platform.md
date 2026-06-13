@@ -3,7 +3,7 @@
 **Pattern:** MVVM + Protocol-Oriented Design
 **Concurrency:** async/await
 **Section:** CloudKit, Watch, widgets, security, extensibility
-**Last Updated:** June 7, 2026
+**Last Updated:** June 13, 2026
 
 ---
 
@@ -91,20 +91,36 @@ Apple Watch
 └── WidgetKit Complications
 ```
 
+### Watch Character-Reactive Design (NEW - Jun 2026)
+
+**5 Stress Tiers mapped to emoji (NO numeric scores):**
+- **0-20:** 😴 Resting → Blue
+- **21-40:** 😊 Calm → Green
+- **41-60:** 😐 Balanced → Indigo
+- **61-80:** 😰 Tense → Orange
+- **81-100:** 🐚 Overwhelmed → Purple
+
+**WatchHomeView** displays Ripple character face with 5 stress tier moods, full-day sparkline, and no numeric stress display.
+
 ### Watch Complications (WidgetKit)
 
-Three families supported:
+Four families supported:
 
 | Family | Size | Use Case |
 |--------|------|----------|
-| **Circular** | Small | Watch face corner |
-| **Rectangular** | Wide | Watch face bar |
-| **Inline** | Narrow | Watch face text |
+| **Circular** | Small | Full-circle stress gauge + emoji center |
+| **Rectangular** | Wide | Icon + stress mood + HRV/HR metrics |
+| **Inline** | Narrow | Text-only mood label |
+| **Corner** | Watchkit 10+ | Emoji in corner (NEW Jun 2026) |
 
 **Data Sources:**
-- `CircularComplicationProvider` - Updates every 5 minutes
-- `RectangularComplicationProvider` - Fetches from CloudKit
-- `InlineComplicationProvider` - Text-only format
+- `CircularComplicationProvider` - Updates every 5 minutes, displays stress gauge + character emoji
+- `RectangularComplicationProvider` - Fetches from CloudKit, shows mood label + health metrics
+- `InlineComplicationProvider` - Text-only mood label (e.g. "Calm")
+- `CornerComplicationProvider` - Emoji-only display (watchOS 10+ feature)
+
+**Data Sharing:**
+- App Groups: `group.com.stressmonitor.watch` for inter-app timeline data sharing
 
 **Timeline Example:**
 ```swift
@@ -124,24 +140,40 @@ func getTimeline(for configuration: ConfigurationIntent, in context: Context, co
 
 ### Widget Families
 
-| Family | Size | Content |
-|--------|------|---------|
-| **Small** | 2x2 | Current stress level + ring |
-| **Medium** | 2x4 | Stress + last 6 hours trend |
-| **Large** | 4x4 | Full day chart + stats |
+| Family | Size | Content | Policy |
+|--------|------|---------|--------|
+| **Small** | 1×1 | Character face + mood label (NO numeric scores) | 15-min iOS refresh |
+| **Medium** | 2×1 | Character + mini sparkline (12-point history) | 15-min iOS refresh |
+| **Large** | 2×2 | Character + 24-hour area chart + mood pills | 15-min iOS refresh |
+| **Lock Screen** | Varies | Rectangular, Circular, Inline variants with emoji | 15-min iOS refresh |
+| **Live Activity** | Dynamic Island | Breathing session counter + progress (NEW Jun 2026) | Real-time updates |
+| **Control** | Control Center | Button → Opens app (NEW Jun 2026) | On-demand |
+
+**Policy:** Dynamic refresh (15min iOS, 30min watchOS), with real-time updates for breathing sessions.
 
 ### Widget Data Access
 
 ```swift
-// Shared via App Groups
-let defaults = UserDefaults(suiteName: "group.com.stressmonitor.widgets")
+// Shared via App Groups (iPhone ↔ Watch)
+let defaults = UserDefaults(suiteName: "group.com.stressmonitor.app")
 let lastStress = defaults?.double(forKey: "lastStressLevel") ?? 0
+
+// Watch-specific data
+let watchDefaults = UserDefaults(suiteName: "group.com.stressmonitor.watch")
 ```
 
 **Data Shared:**
-- Latest stress level
-- Last 24 hours measurements
-- Statistics (avg, min, max)
+- Latest stress level (character emoji + category label, NO numeric score)
+- Last 24 hours measurements (sparkline)
+- Character mood state (5 tiers)
+- Live Activity breathing session progress
+- Control Center app launcher metadata
+
+**Design Policy:**
+- **NO numeric stress scores** in any widget or watch complication
+- All stress display via emoji + color-coded category
+- Character evolution state shown (if applicable)
+- Ripple AI Coach teaser on premium upsell cards
 
 ---
 
@@ -326,4 +358,4 @@ BreathingExerciseView (setup)
 **Previous:** See `system-architecture-core.md` for core MVVM and service architecture.
 **Maintained By:** Phuong Doan
 **Version:** 1.0 Production
-**Last Updated:** June 7, 2026
+**Last Updated:** June 13, 2026
