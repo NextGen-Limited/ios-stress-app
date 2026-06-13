@@ -73,17 +73,29 @@ struct Typography {
         var fontName: String { rawValue }
     }
 
-    // MARK: - IAP Typography (Figma)
+    // MARK: - IAP Typography (Figma — Redesigned Paywall)
 
-    static let iapNavTitle = Font.custom("Lato-Bold", size: 18)
-    static let iapTagline = Font.custom("Lato-Black", size: 21)
-    static let iapSectionHeader = Font.custom("Lato-Bold", size: 16)
-    static let iapPlanName = Font.custom("Lato-Bold", size: 13)
-    static let iapPrice = Font.custom("Lato-Bold", size: 20)
-    static let iapPerMonth = Font.custom("Lato-Regular", size: 11.5)
-    static let iapSavings = Font.custom("Lato-Bold", size: 12)
-    static let iapSubtitle = Font.custom("Lato-Regular", size: 11.5)
-    static let iapCTA = Font.custom("Lato-Bold", size: 14)
-    static let iapUtilityLabel = Font.custom("Lato-Medium", size: 13)
-    static let iapBadge = Font.custom("Lato-Bold", size: 13)
+    static let iapNavTitle = Font.system(size: 13, weight: .bold)
+    static let iapTagline = Font.system(size: 21, weight: .black)
+    static let iapSectionHeader = Font.system(size: 12, weight: .heavy)
+    static let iapPlanName = Font.system(size: 17, weight: .bold)
+    static let iapPlanSubtitle = Font.system(size: 12, weight: .medium)
+    static let iapPrice = Font.system(size: 22, weight: .bold)
+    static let iapPerMonth = Font.system(size: 11, weight: .semibold)
+    static let iapSavings = Font.system(size: 12, weight: .heavy)
+    static let iapSubtitle = Font.system(size: 11, weight: .medium)
+    static let iapCTA = Font.system(size: 16, weight: .heavy)
+    static let iapUtilityLabel = Font.system(size: 11, weight: .bold)
+    static let iapBadge = Font.system(size: 11, weight: .heavy)
+
+    // New paywall redesign tokens
+    static let iapHeroHeadline = Font.system(size: 32, weight: .bold)
+    static let iapHeroSubtitle = Font.system(size: 15, weight: .semibold)
+    static let iapBenefitTitle = Font.system(size: 15, weight: .bold)
+    static let iapBenefitDescription = Font.system(size: 12, weight: .medium)
+    static let iapPillLabel = Font.system(size: 12, weight: .heavy)
+    static let iapTrustLabel = Font.system(size: 10.5, weight: .semibold)
+    static let iapTrustIcon = Font.system(size: 16, weight: .bold)
+    static let iapFinePrint = Font.system(size: 10.8, weight: .medium)
+    static let iapPlanFooter = Font.system(size: 12, weight: .heavy)
 }

@@ -130,7 +130,20 @@ extension Color {
         Color(light: .white, dark: Color(hex: "2C2C2E"))
     }
 
-    // MARK: - IAP Screen Colors (Figma)
+        // MARK: - Paywall Redesign Colors
+
+    /// IAP purple accent (benefit icon) - #8B5CF6
+    static let iapPurple = Color(hex: "8B5CF6")
+    /// IAP warm background - #FFFD6
+    static let iapWarmBackground = Color(hex: "FFFDF6")
+    /// IAP card background (white)
+    static let iapCardBackground = Color.white
+    /// IAP pill background
+    static let iapPillBackground = Color(light: Color.white.opacity(0.66), dark: Color.white.opacity(0.06))
+    /// IAP trust item background
+    static let iapTrustBackground = Color(light: Color.white.opacity(0.58), dark: Color.white.opacity(0.05))
+
+// MARK: - IAP Screen Colors (Figma)
 
     /// IAP section header teal - #158B8B
     static let iapHeaderTeal = Color(hex: "158B8B")
