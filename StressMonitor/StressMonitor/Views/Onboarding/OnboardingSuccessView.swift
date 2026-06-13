@@ -11,8 +11,10 @@ struct OnboardingSuccessView: View {
     var onGoToDashboard: (() -> Void)?
     var onBack: (() -> Void)?
 
-    init(repository: StressRepositoryProtocol) {
+    init(repository: StressRepositoryProtocol, onGoToDashboard: (() -> Void)? = nil, onBack: (() -> Void)? = nil) {
         _viewModel = State(initialValue: OnboardingSuccessViewModel(repository: repository))
+        self.onGoToDashboard = onGoToDashboard
+        self.onBack = onBack
     }
 
     var body: some View {

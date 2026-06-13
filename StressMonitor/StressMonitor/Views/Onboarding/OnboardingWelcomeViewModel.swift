@@ -12,7 +12,7 @@ final class OnboardingWelcomeViewModel {
     var breathPhase3 = false
     var floatOffset = false
 
-    nonisolated(unsafe) private var animationTask: Task<Void, Never>?
+    nonisolated private var animationTask: Task<Void, Never>?
 
     init() {
         startAnimations()
