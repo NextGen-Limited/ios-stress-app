@@ -85,8 +85,8 @@ struct RippleBreathingView: View {
 
     private var moodForPhase: RippleMood {
         switch phase {
-        case .inhale: return .focused
-        case .hold:   return .determined
+        case .inhale: return .serene
+        case .hold:   return .focused
         case .exhale: return .relaxed
         }
     }
