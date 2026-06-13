@@ -50,13 +50,62 @@ class TrendsViewModel {
     var weeklyMeasurements: [StressMeasurement] = []
     var dailyStressData: [DailyStressData] = []
     var stressSources: [StressSource] = [
-        StressSource(name: "Finance", percentage: 35, color: Color(hex: "#00BFA5")),
-        StressSource(name: "Relationship", percentage: 15, color: Color(hex: "#FF9800")),
-        StressSource(name: "Health", percentage: 50, color: Color(hex: "#FFD60A")),
-        StressSource(name: "Family", percentage: 0, color: .stressRelaxed),
-        StressSource(name: "Work", percentage: 0, color: .primaryBlue),
-        StressSource(name: "Environment", percentage: 0, color: .stressSevere)
+        StressSource(name: "Finance", percentage: 35, color: Color(hex: "#F6C453")),
+        StressSource(name: "Relationship", percentage: 15, color: Color(hex: "#B388FF")),
+        StressSource(name: "Health", percentage: 50, color: Color(hex: "#FFB74D")),
+        StressSource(name: "Family", percentage: 0, color: Color(hex: "#81C784")),
+        StressSource(name: "Work", percentage: 0, color: TrendsPalette.rippleBlue),
+        StressSource(name: "Environment", percentage: 0, color: Color(hex: "#66D9A8"))
     ]
+
+    // MARK: - Ripple Trends Helpers
+
+    /// Maps each day (startOfDay) to its StressTier for calendar stress dots.
+    var dailyStressTiers: [Date: StressTier] {
+        let calendar = Calendar.current
+        let grouped = Dictionary(grouping: weeklyMeasurements) {
+            calendar.startOfDay(for: $0.timestamp)
+        }
+        return grouped.mapValues { measurements in
+            let avg = measurements.map { $0.stressLevel }.reduce(0, +) / Double(measurements.count)
+            return StressTier.from(level: avg)
+        }
+    }
+
+    /// Whether average stress is trending down this week (for Ripple's message).
+    var stressTrendingDown: Bool {
+        guard dailyStressData.count >= 2 else { return true }
+        let recent = dailyStressData.suffix(3).map { $0.averageStress }.reduce(0, +) / Double(min(3, dailyStressData.count))
+        let older = dailyStressData.prefix(3).map { $0.averageStress }.reduce(0, +) / Double(min(3, dailyStressData.count))
+        return recent <= older
+    }
+
+    /// Percentage change of recent HRV vs older period (for the "vs Last Month" tile).
+    var hrvChangePercent: Double? {
+        guard hrvData.count >= 4 else { return nil }
+        let mid = hrvData.count / 2
+        let older = hrvData.prefix(mid).map { $0.value }.reduce(0, +) / Double(mid)
+        let recent = hrvData.suffix(hrvData.count - mid).map { $0.value }.reduce(0, +) / Double(hrvData.count - mid)
+        guard older > 0 else { return nil }
+        return ((recent - older) / older) * 100
+    }
+
+    /// Day name with the best (highest) HRV, for the "Best Day" tile.
+    var bestHRVDayLabel: String? {
+        guard let best = hrvData.max(by: { $0.value < $1.value }) else { return nil }
+        let formatter = DateFormatter()
+        formatter.dateFormat = "EEE"
+        return formatter.string(from: best.date)
+    }
+
+    /// Conversational trend badge text for the HRV card.
+    var hrvTrendBadge: String {
+        switch trendDirection {
+        case .up:     return "↗ Improving"
+        case .down:   return "↘ Declining"
+        case .stable: return "→ Steady"
+        }
+    }
 
     private let repository: StressRepositoryProtocol
 

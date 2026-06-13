@@ -20,22 +20,27 @@ struct TrendsView: View {
                 PremiumBannerView(action: { navigateToPremium = true })
                     .padding(.horizontal)
 
-                // Horizontal Week Calendar
+                // Horizontal Week Calendar with stress dots
                 HorizontalWeekCalendarView(
                     selectedDate: $viewModel.selectedDate,
                     onDateSelected: { date in
                         viewModel.selectDate(date)
-                    }
+                    },
+                    dailyTiers: viewModel.dailyStressTiers
                 )
                 .padding(.horizontal)
 
-                // Mascot speech bubble
+                // Ripple speech bubble — dynamic message
                 MascotSpeechBubbleView(
-                    message: "I've been keeping an eye on your days! Want to see how stress changed this week?"
+                    message: MascotSpeechBubbleView.message(
+                        stressTrendingDown: viewModel.stressTrendingDown,
+                        hasData: !viewModel.dailyStressData.isEmpty
+                    ),
+                    tier: speechBubbleTier
                 )
                 .padding(.horizontal)
 
-                // Stress over time bar chart
+                // Character-reactive bar chart
                 StressBarChartView(
                     dailyStress: viewModel.dailyStressData,
                     distribution: viewModel.stressDistribution,
@@ -48,29 +53,32 @@ struct TrendsView: View {
                     }
                 }
 
-                // Daily timeline heatmap
+                // 5-tier heatmap
                 WeeklyHeatmapView(measurements: viewModel.weeklyMeasurements)
                     .padding(.horizontal)
 
-                // HRV Trend chart
+                // Enhanced HRV trend card
                 hrvTrendCard
                     .padding(.horizontal)
 
-                // Stress sources card
-                StressSourcesCard(
+                // Color-coded stress sources
+                TrendsStressSourcesCard(
                     sources: viewModel.stressSources.map {
-                        StressSourcesCard.StressSourceData(
+                        TrendsStressSourcesCard.Source(
                             name: $0.name,
-                            percentage: $0.percentage / 100.0,
+                            percentage: $0.percentage,
                             color: $0.color,
-                            icon: iconForSource($0.name)
+                            emoji: emojiForSource($0.name)
                         )
-                    },
-                    totalDays: 30
+                    }
                 )
                 .padding(.horizontal)
 
-                // Smart Insights teaser
+                // Pattern insights — Ripple as analyst
+                PatternInsightsSection(insights: viewModel.patternInsights)
+                    .padding(.horizontal)
+
+                // Ripple Insights teaser
                 SmartInsightsTeaser()
                     .padding(.horizontal)
 
@@ -80,7 +88,7 @@ struct TrendsView: View {
             .padding(.top, 16)
         }
         .trackScrollOffsetForTabBar(state: tabBarScrollState)
-        .background(Color.backgroundLight)
+        .background(TrendsPalette.darkCanvas)
         .task {
             await viewModel.loadTrendData()
         }
@@ -102,17 +110,40 @@ struct TrendsView: View {
     }
     #endif
 
+    // MARK: - Ripple Speech Bubble Tier
+
+    /// Determines the Ripple character's mood for the speech bubble based on today's data.
+    private var speechBubbleTier: StressTier {
+        guard let todayData = viewModel.dailyStressData.last,
+              todayData.averageStress > 0 else {
+            return .good
+        }
+        return StressTier.from(level: todayData.averageStress)
+    }
+
+    // MARK: - Enhanced HRV Trend Card
+
     private var hrvTrendCard: some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Text("HRV Trend")
-                .font(Typography.title2)
-                .fontWeight(.bold)
+        VStack(alignment: .leading, spacing: 14) {
+            // Header with trend badge
+            HStack {
+                VStack(alignment: .leading, spacing: 4) {
+                    Text("HRV Trend")
+                        .font(.system(size: 20, weight: .bold))
+                        .foregroundColor(.white)
 
-            // Phase 6: subtitle
-            Text("Last 30 days")
-                .font(Typography.caption1)
-                .foregroundColor(.secondary)
+                    Text("Last 30 days")
+                        .font(.system(size: 12, weight: .medium))
+                        .foregroundColor(.white.opacity(0.45))
+                }
 
+                Spacer()
+
+                // Trend badge
+                trendBadge
+            }
+
+            // Chart
             if viewModel.isLoading {
                 loadingPlaceholder
             } else if viewModel.hrvData.isEmpty {
@@ -120,83 +151,137 @@ struct TrendsView: View {
             } else {
                 LineChartView(
                     dataPoints: viewModel.hrvData,
-                    accentColor: .primaryBlue,
+                    accentColor: TrendsPalette.rippleBlue,
                     showGrid: true,
                     showYAxisLabels: true
                 )
-                .frame(height: 200)
+                .frame(height: 180)
             }
 
-            // Phase 6: "Today" label
-            HStack {
-                Spacer()
-                Text("Today")
-                    .font(Typography.caption1)
-                    .foregroundColor(.secondary)
-            }
-
-            if let selectedPoint = viewModel.selectedDataPoint {
-                HStack {
-                    Text("\(Int(selectedPoint.value)) ms")
-                        .font(.system(size: 17, weight: .semibold))
-
-                    Text(selectedPoint.date, style: .time)
-                        .font(Typography.caption1)
-                        .foregroundColor(.secondary)
-                }
-                .padding(.horizontal, 12)
-                .padding(.vertical, 6)
-                .background(Color.secondary.opacity(0.1))
-                .cornerRadius(8)
+            // 3 stat tiles
+            if !viewModel.hrvData.isEmpty {
+                hrvStatTiles
             }
         }
-        .padding(20)
-        .background(Color.adaptiveCardBackground)
-        .clipShape(RoundedRectangle(cornerRadius: Spacing.settingsCardRadius))
-        .shadow(AppShadow.settingsCard)
+        .trendsGlassCard()
+    }
+
+    private var trendBadge: some View {
+        let isUp = viewModel.trendDirection == .up
+        let isDown = viewModel.trendDirection == .down
+        let badgeColor = isUp ? Color(hex: "#4CAF50") : (isDown ? Color(hex: "#FF7043") : TrendsPalette.mutedInk)
+
+        return Text(viewModel.hrvTrendBadge)
+            .font(.system(size: 11, weight: .bold))
+            .foregroundColor(badgeColor)
+            .padding(.horizontal, 12)
+            .padding(.vertical, 6)
+            .background(badgeColor.opacity(0.15))
+            .overlay(Capsule().stroke(badgeColor.opacity(0.3), lineWidth: 1))
+            .clipShape(Capsule())
+    }
+
+    private var hrvStatTiles: some View {
+        HStack(spacing: 10) {
+            statTile(
+                title: "Average HRV",
+                value: "\(Int(viewModel.averageHRV))",
+                unit: "ms"
+            )
+
+            statTile(
+                title: "vs Last Month",
+                value: hrvChangeText,
+                unit: nil
+            )
+
+            statTile(
+                title: "Best Day",
+                value: viewModel.bestHRVDayLabel ?? "—",
+                unit: nil
+            )
+        }
+    }
+
+    private var hrvChangeText: String {
+        guard let pct = viewModel.hrvChangePercent else { return "—" }
+        let sign = pct >= 0 ? "+" : ""
+        return "\(sign)\(Int(pct))%"
+    }
+
+    private func statTile(title: String, value: String, unit: String?) -> some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(title)
+                .font(.system(size: 10, weight: .semibold))
+                .foregroundColor(.white.opacity(0.4))
+
+            HStack(alignment: .firstTextBaseline, spacing: 2) {
+                Text(value)
+                    .font(.system(size: 18, weight: .heavy, design: .rounded))
+                    .foregroundColor(.white)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.6)
+
+                if let unit {
+                    Text(unit)
+                        .font(.system(size: 10, weight: .bold, design: .rounded))
+                        .foregroundColor(.white.opacity(0.45))
+                }
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(10)
+        .background(Color.white.opacity(0.05))
+        .overlay(
+            RoundedRectangle(cornerRadius: 14, style: .continuous)
+                .stroke(Color.white.opacity(0.06), lineWidth: 1)
+        )
+        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
     }
 
     private var loadingPlaceholder: some View {
         VStack(spacing: 12) {
             ProgressView()
+                .tint(TrendsPalette.rippleBlue)
 
             Text("Loading trend data...")
-                .font(Typography.caption1)
-                .foregroundColor(.secondary)
+                .font(.system(size: 12, weight: .medium))
+                .foregroundColor(.white.opacity(0.45))
         }
-        .frame(height: 200)
+        .frame(height: 180)
         .frame(maxWidth: .infinity)
     }
 
     private var emptyStatePlaceholder: some View {
         VStack(spacing: 12) {
-            Image(systemName: "chart.bar.xaxis")
-                .font(.largeTitle)
-                .foregroundColor(.secondary)
+            Image(systemName: "waveform.path.ecg")
+                .font(.system(size: 32))
+                .foregroundColor(.white.opacity(0.25))
 
             Text("Need More Data")
-                .font(Typography.headline)
+                .font(.system(size: 15, weight: .semibold))
+                .foregroundColor(.white.opacity(0.7))
 
             Text("Continue measuring for 7 days to see trends")
-                .font(Typography.caption1)
-                .foregroundColor(.secondary)
+                .font(.system(size: 12, weight: .medium))
+                .foregroundColor(.white.opacity(0.4))
                 .multilineTextAlignment(.center)
         }
-        .frame(height: 200)
+        .frame(height: 180)
         .frame(maxWidth: .infinity)
     }
 
     // MARK: - Helpers
 
-    private func iconForSource(_ name: String) -> String {
+    private func emojiForSource(_ name: String) -> String {
         switch name {
-        case "Finance": return "dollarsign.circle.fill"
-        case "Relationship": return "heart.fill"
-        case "Health": return "cross.case.fill"
-        case "Family": return "house.fill"
-        case "Work": return "briefcase.fill"
-        case "Environment": return "leaf.fill"
-        default: return "circle.fill"
+        case "Finance": return "💰"
+        case "Relationship": return "❤️"
+        case "Health": return "🏥"
+        case "Family": return "🏠"
+        case "Work": return "💼"
+        case "Environment": return "🌿"
+        default: return "✨"
         }
     }
 }

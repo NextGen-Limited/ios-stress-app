@@ -1,11 +1,16 @@
 import SwiftUI
 
-/// Horizontal week calendar for date selection in Trends view
-/// Figma: 7-day horizontal strip with day numbers above abbreviations
-/// States: Selected (teal bg), Today (dashed border), Default
+/// Stress Dots Calendar — horizontal week strip with colored stress-tier dots.
+///
+/// Each day gets a colored dot indicating stress tier.
+/// Selected day = blue gradient background.
+/// Today = dashed border.
+/// Uses Ripple blue accent (#4FC3F7) instead of teal.
 struct HorizontalWeekCalendarView: View {
     @Binding var selectedDate: Date
     var onDateSelected: ((Date) -> Void)?
+    /// Optional day → tier mapping for stress dots.
+    var dailyTiers: [Date: StressTier] = [:]
 
     @State private var weekOffset: Int = 0
 
@@ -14,7 +19,6 @@ struct HorizontalWeekCalendarView: View {
     private var weekStartDate: Date {
         let today = calendar.startOfDay(for: Date())
         let weekday = calendar.component(.weekday, from: today)
-        // Friday is weekday 6 in Gregorian calendar
         let daysToFriday = (weekday >= 6) ? (weekday - 6) : (weekday - 6 + 7)
         let friday = calendar.date(byAdding: .day, value: -daysToFriday, to: today) ?? today
         return calendar.date(byAdding: .weekOfYear, value: weekOffset, to: friday) ?? friday
@@ -32,13 +36,13 @@ struct HorizontalWeekCalendarView: View {
 
     var body: some View {
         VStack(spacing: 10) {
-            // Horizontal week days - 7 days starting from Friday
             HStack(spacing: 13) {
                 ForEach(weekDates, id: \.self) { date in
                     DayCell(
                         date: date,
                         isSelected: calendar.isDate(date, inSameDayAs: selectedDate),
-                        isToday: calendar.isDateInToday(date)
+                        isToday: calendar.isDateInToday(date),
+                        tier: tierFor(date)
                     )
                     .onTapGesture {
                         selectDate(date)
@@ -46,17 +50,21 @@ struct HorizontalWeekCalendarView: View {
                 }
             }
 
-            // "Jump to today" link
             if !isCurrentWeek {
                 Button(action: goToToday) {
                     Text("Jump to today")
-                        .font(.custom("Roboto-Bold", size: 13))
-                        .foregroundColor(.accentTeal)
+                        .font(.system(size: 13, weight: .bold))
+                        .foregroundColor(TrendsPalette.rippleBlue)
                 }
                 .padding(.top, 6)
             }
         }
         .padding(.vertical, 16)
+    }
+
+    private func tierFor(_ date: Date) -> StressTier? {
+        let key = calendar.startOfDay(for: date)
+        return dailyTiers[key]
     }
 
     private func goToToday() {
@@ -79,6 +87,7 @@ private struct DayCell: View {
     let date: Date
     let isSelected: Bool
     let isToday: Bool
+    var tier: StressTier?
 
     private let calendar = Calendar.current
 
@@ -93,30 +102,48 @@ private struct DayCell: View {
     }
 
     var body: some View {
-        VStack(spacing: 2.8) {
+        VStack(spacing: 4) {
             // Day number
             Text(dayNumber)
-                .font(.custom("Roboto-Bold", size: 14))
-                .foregroundColor(isSelected ? .white : Color(hex: "101223"))
+                .font(.system(size: 14, weight: .bold))
+                .foregroundColor(isSelected ? .white : .white.opacity(0.9))
 
             // Day abbreviation
             Text(dayAbbreviation)
-                .font(.custom("Roboto-Regular", size: 12.13))
-                .foregroundColor(isSelected ? .white : Color(hex: "777986"))
+                .font(.system(size: 11, weight: .regular))
+                .foregroundColor(isSelected ? .white.opacity(0.8) : .white.opacity(0.4))
+
+            // Stress tier dot
+            Circle()
+                .fill(tier?.color ?? .clear)
+                .frame(width: 6, height: 6)
         }
-        .frame(width: 21.47, height: 32.27)
-        .padding(9.33)
+        .frame(width: 38, height: 50)
         .background(
             Group {
                 if isSelected {
-                    RoundedRectangle(cornerRadius: 8)
-                        .fill(Color.accentTeal)
-                } else if isToday {
-                    RoundedRectangle(cornerRadius: 8)
-                        .strokeBorder(
-                            style: StrokeStyle(lineWidth: 2, dash: [4, 2])
+                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                        .fill(
+                            LinearGradient(
+                                colors: [TrendsPalette.rippleBlue, TrendsPalette.rippleBlue.opacity(0.7)],
+                                startPoint: .top,
+                                endPoint: .bottom
+                            )
                         )
-                        .foregroundColor(Color.accentTeal)
+                } else {
+                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                        .fill(Color.white.opacity(0.04))
+                }
+            }
+        )
+        .overlay(
+            Group {
+                if isToday && !isSelected {
+                    RoundedRectangle(cornerRadius: 12, style: .continuous)
+                        .strokeBorder(
+                            style: StrokeStyle(lineWidth: 1.5, dash: [4, 3])
+                        )
+                        .foregroundColor(TrendsPalette.rippleBlue)
                 }
             }
         )
@@ -126,10 +153,16 @@ private struct DayCell: View {
 
 // MARK: - Preview
 
-#Preview("HorizontalWeekCalendarView") {
-    @Previewable @State var selectedDate = Date()
-
-    HorizontalWeekCalendarView(selectedDate: $selectedDate)
+struct HorizontalWeekCalendarView_Previews: PreviewProvider {
+    static var previews: some View {
+        HorizontalWeekCalendarView(
+            selectedDate: .constant(Date()),
+            dailyTiers: [
+                Calendar.current.startOfDay(for: Date()): .good,
+                Calendar.current.date(byAdding: .day, value: -1, to: Date())!: .stressed
+            ]
+        )
         .padding()
-        .background(Color.backgroundLight)
+        .background(TrendsPalette.darkCanvas)
+    }
 }
