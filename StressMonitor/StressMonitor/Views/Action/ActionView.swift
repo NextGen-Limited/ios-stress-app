@@ -422,7 +422,7 @@ struct ActionView: View {
                     .font(.system(size: 22))
                     .foregroundStyle(
                         LinearGradient(
-                            colors: [Color(hex: "#FFD700"), .premiumGold],
+                            colors: [Color(hex: "#FFD700"), Color.premiumGold],
                             startPoint: .topLeading, endPoint: .bottomTrailing
                         )
                     )
@@ -430,7 +430,7 @@ struct ActionView: View {
                 VStack(alignment: .leading, spacing: 2) {
                     Text("Go Premium")
                         .font(.system(size: 15, weight: .bold, design: .rounded))
-                        .foregroundStyle(.premiumGold)
+                        .foregroundStyle(Color.premiumGold)
                     Text("Unlock advanced insights & AI coaching")
                         .font(.system(size: 12, weight: .regular))
                         .foregroundStyle(HomeCharacterDesignTokens.mutedInk)
@@ -440,7 +440,7 @@ struct ActionView: View {
 
                 Image(systemName: "chevron.right")
                     .font(.system(size: 13, weight: .bold))
-                    .foregroundStyle(.premiumGold.opacity(0.6))
+                    .foregroundStyle(Color.premiumGold.opacity(0.6))
             }
             .padding(16)
             .background(
