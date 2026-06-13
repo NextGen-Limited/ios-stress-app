@@ -165,7 +165,7 @@ platform :ios do
           WIDGET_APP_IDENTIFIER => "match AppStore #{WIDGET_APP_IDENTIFIER}"
         }
       },
-      suppress_xcode_output: true
+      suppress_xcode_output: false
     )
 
     pilot(
