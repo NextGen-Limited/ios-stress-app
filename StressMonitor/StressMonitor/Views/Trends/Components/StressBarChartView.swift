@@ -77,7 +77,7 @@ struct StressBarChartView: View {
             )
             .foregroundStyle(hasData ? tier.color : Color.white.opacity(0.1))
             .cornerRadius(6)
-            .annotation(position: .top, overflowResolution: .init(y: .extend)) {
+            .annotation(position: .top) {
                 if hasData {
                     RippleMoodFace(
                         tier: tier,
