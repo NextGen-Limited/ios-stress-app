@@ -31,11 +31,12 @@ struct StressMonitorWidgetControl: ControlWidget {
 
 // MARK: - Open App Intent
 
-struct OpenStressMonitorIntent: SetValueIntent {
+struct OpenStressMonitorIntent: AppIntent {
     static let title: LocalizedStringResource = "Open StressMonitor"
     static let description = IntentDescription("Opens StressMonitor to take a stress measurement.")
+    static var openAppWhenRun: Bool = true
 
     func perform() async throws -> some IntentResult {
-        .result(opensIntent: OpenURLIntent(URL(string: "stressmonitor://measure")!))
+        .result()
     }
 }
