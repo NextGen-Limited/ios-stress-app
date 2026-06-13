@@ -1,7 +1,10 @@
 import SwiftUI
 import SwiftData
 
-/// Weekly stress heatmap using circular dots (8 time blocks per day) — matches Figma Daily Timeline
+/// 5-Tier Heatmap — rounded square cells coloured by Ripple stress tier.
+///
+/// No numeric values in cells — colour *is* the indicator.
+/// Includes a gradient legend strip from calm (blue) to overwhelmed (red).
 struct WeeklyHeatmapView: View {
     let measurements: [StressMeasurement]
 
@@ -11,61 +14,90 @@ struct WeeklyHeatmapView: View {
     private let blockCount = 8 // time blocks per day (3-hour intervals)
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 14) {
             HStack {
                 Text("Daily Timeline")
-                    .font(Typography.title2)
-                    .fontWeight(.bold)
+                    .font(.system(size: 20, weight: .bold))
+                    .foregroundColor(.white)
 
                 Spacer()
 
                 Text("Last 7 days")
-                    .font(Typography.caption1)
-                    .foregroundColor(.secondary)
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundColor(.white.opacity(0.45))
             }
 
+            // Heatmap grid
             HStack(alignment: .top, spacing: cellSpacing) {
-                // Day label column (full 3-letter abbreviations)
+                // Day label column
                 VStack(alignment: .trailing, spacing: cellSpacing) {
-                    ForEach(days, id: \.self) { day in
-                        Text(day)
-                            .font(.system(size: 9, weight: .medium))
-                            .foregroundColor(.secondary)
-                            .frame(height: cellSize)
+                    ForEach(days, id: \.self) { _ in
+                        Color.clear
+                            .frame(width: 1, height: cellSize)
                     }
                 }
 
-                // Dot columns (8 time blocks × 7 days)
+                // Cell columns (8 time blocks × 7 days)
                 ForEach(0..<blockCount, id: \.self) { block in
                     VStack(spacing: cellSpacing) {
                         ForEach(0..<7, id: \.self) { dayIndex in
-                            Circle()
+                            RoundedRectangle(cornerRadius: 4, style: .continuous)
                                 .fill(colorFor(day: dayIndex, block: block))
                                 .frame(width: cellSize, height: cellSize)
                         }
                     }
                 }
             }
+
+            // Time-of-day labels
+            HStack {
+                Text("12am")
+                Spacer()
+                Text("12pm")
+                Spacer()
+                Text("11pm")
+            }
+            .font(.system(size: 9, weight: .medium))
+            .foregroundColor(.white.opacity(0.3))
+
+            // Gradient legend strip
+            legendStrip
         }
-        .padding(20)
-        .background(Color.adaptiveCardBackground)
-        .clipShape(RoundedRectangle(cornerRadius: Spacing.settingsCardRadius))
-        .shadow(AppShadow.settingsCard)
+        .trendsGlassCard()
     }
+
+    // MARK: - Legend
+
+    private var legendStrip: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            RoundedRectangle(cornerRadius: 4)
+                .fill(TrendsPalette.tierGradient)
+                .frame(height: 8)
+
+            HStack {
+                Text("Calm")
+                Spacer()
+                Text("Overwhelmed")
+            }
+            .font(.system(size: 10, weight: .medium))
+            .foregroundColor(.white.opacity(0.4))
+        }
+    }
+
+    // MARK: - Cell Colour
 
     private func colorFor(day: Int, block: Int) -> Color {
         guard let stressLevel = stressLevelFor(day: day, block: block) else {
-            return Color.secondary.opacity(0.15)
+            return Color.white.opacity(0.06) // empty cell
         }
-        return Color.stressColor(for: stressLevel)
+        return StressTier.from(level: stressLevel).color.opacity(0.85)
     }
 
-    /// Maps a day index (0=Mon) and block index (0–7) to an average stress level
+    /// Maps a day index (0=Mon) and block index (0–7) to an average stress level.
     private func stressLevelFor(day: Int, block: Int) -> Double? {
         let calendar = Calendar.current
         let now = Date()
         let hoursPerBlock = 24 / blockCount
-        // day 0 = Mon (offset from Sun=6), compute actual offset from today
         let dayOffset = -(6 - day)
 
         guard let dayStart = calendar.date(byAdding: .day, value: dayOffset, to: calendar.startOfDay(for: now)),
@@ -80,8 +112,12 @@ struct WeeklyHeatmapView: View {
     }
 }
 
-#Preview {
-    WeeklyHeatmapView(measurements: [])
-        .padding()
-        .background(Color.backgroundLight)
+// MARK: - Preview
+
+struct WeeklyHeatmapView_Previews: PreviewProvider {
+    static var previews: some View {
+        WeeklyHeatmapView(measurements: [])
+            .padding()
+            .background(TrendsPalette.darkCanvas)
+    }
 }
