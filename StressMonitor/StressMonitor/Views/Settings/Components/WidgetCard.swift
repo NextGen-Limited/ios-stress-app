@@ -8,13 +8,14 @@ struct WidgetCard: View {
                 // Header
                 SettingsSectionHeader(
                     icon: "rectangle.3.group",
-                    title: "Widget"
+                    title: "Widget",
+                    color: .primaryGreen
                 )
 
                 // Widget size previews
                 HStack(spacing: 23) {
-                    ComplicationWidget(title: "Medium", icon: "rectangle.fill")
-                    ComplicationWidget(title: "Small", icon: "square.fill")
+                    ComplicationWidget(title: "Medium", tier: .calm)
+                    ComplicationWidget(title: "Small", tier: .good)
                 }
                 .padding(.top, 23)
 
@@ -50,7 +51,7 @@ private struct AddWidgetButton: View {
             }
             .frame(maxWidth: 277)
             .frame(height: 35.5)
-            .background(Color.accentTeal)
+            .background(Color.settingsRippleBlue)
             .clipShape(Capsule())
             .shadow(AppShadow.settingsCard)
         }
@@ -58,8 +59,10 @@ private struct AddWidgetButton: View {
     }
 }
 
-#Preview {
-    WidgetCard()
-        .padding()
-        .background(Color.adaptiveSettingsBackground)
+struct WidgetCard_Previews: PreviewProvider {
+    static var previews: some View {
+        WidgetCard()
+            .padding()
+            .background(Color.adaptiveSettingsBackground)
+    }
 }

@@ -10,7 +10,8 @@ struct HealthDataCard: View {
                 // Header
                 SettingsSectionHeader(
                     icon: "heart.text.square.fill",
-                    title: "Health Data"
+                    title: "Health Data",
+                    color: .primaryGreen
                 )
 
                 // Sync now button
@@ -39,7 +40,7 @@ struct HealthDataCard: View {
             }
             .frame(maxWidth: .infinity)
             .frame(height: 35.5)
-            .background(Color.accentTeal)
+            .background(Color.settingsRippleBlue)
             .clipShape(Capsule())
         }
         .accessibilityLabel("Sync health data now")
@@ -102,7 +103,7 @@ struct HRVAccuracyBanner: View {
             }
         }
         .padding(12)
-        .background(Color.bannerYellow)
+        .background(Color.settingsAmberInfo)
         .clipShape(RoundedRectangle(cornerRadius: 10))
         .shadow(color: Color.settingsCardShadowColor.opacity(0.08), radius: 4, x: 0, y: 2)
         .accessibilityElement(children: .combine)
@@ -126,10 +127,12 @@ enum HealthDataType: CaseIterable {
     }
 }
 
-#Preview {
-    ScrollView {
-        HealthDataCard(onSyncNow: {})
-            .padding()
+struct HealthDataCard_Previews: PreviewProvider {
+    static var previews: some View {
+        ScrollView {
+            HealthDataCard(onSyncNow: {})
+                .padding()
+        }
+        .background(Color.adaptiveSettingsBackground)
     }
-    .background(Color.adaptiveSettingsBackground)
 }

@@ -19,7 +19,7 @@ struct ShareButton: View {
             }
             .frame(maxWidth: 277)
             .frame(height: 35.5)
-            .background(Color.accentTeal)
+            .background(Color.settingsRippleBlue)
             .clipShape(Capsule())
             .shadow(AppShadow.settingsCard)
         }

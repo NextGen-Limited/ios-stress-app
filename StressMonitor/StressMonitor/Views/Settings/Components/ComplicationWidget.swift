@@ -4,10 +4,12 @@ import SwiftUI
 struct ComplicationWidget: View {
     let title: String
     let icon: String?
+    let tier: StressTier?
 
-    init(title: String, icon: String? = nil) {
+    init(title: String, icon: String? = nil, tier: StressTier? = nil) {
         self.title = title
         self.icon = icon
+        self.tier = tier
     }
 
     var body: some View {
@@ -15,31 +17,29 @@ struct ComplicationWidget: View {
             // Widget preview (85x44)
             ZStack {
                 RoundedRectangle(cornerRadius: 10.9)
-                    .fill(Color.adaptiveCardBackground)
+                    .fill(previewFill)
                     .overlay(
                         RoundedRectangle(cornerRadius: 10.9)
-                            .stroke(Color.widgetBorder, lineWidth: 0.91)
+                            .stroke(Color.settingsCardBorder, lineWidth: 0.91)
                     )
 
-                // Placeholder content
                 VStack(spacing: 4) {
-                    if let iconName = icon {
+                    if let tier {
+                        RippleMoodFace(tier: tier, size: 28, showsRing: true, glow: false)
+
+                        Text("Ripple")
+                            .font(.system(size: 7.5, weight: .bold, design: .rounded))
+                            .foregroundColor(.primary)
+                    } else if let iconName = icon {
                         Image(systemName: iconName)
                             .font(.system(size: 12))
-                            .foregroundColor(.accentTeal)
-                    } else {
-                        Circle()
-                            .fill(Color.widgetBorder)
-                            .frame(width: 21, height: 21)
-                    }
+                            .foregroundColor(.settingsRippleBlue)
 
-                    // Skeleton bars
-                    RoundedRectangle(cornerRadius: 10.9)
-                        .fill(Color.widgetBorder)
-                        .frame(width: 31, height: 3.6)
-                    RoundedRectangle(cornerRadius: 10.9)
-                        .fill(Color.widgetBorder)
-                        .frame(width: 25, height: 3.6)
+                        skeletonBars
+                    } else {
+                        RippleMoodFace(tier: .good, size: 28, showsRing: true, glow: false)
+                        skeletonBars
+                    }
                 }
             }
             .frame(width: 85.6, height: 43.7)
@@ -54,15 +54,32 @@ struct ComplicationWidget: View {
                 .stroke(Color.borderLight, lineWidth: 2)
         )
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("\(title) widget placeholder")
+        .accessibilityLabel("\(title) Ripple preview")
+    }
+
+    private var previewFill: Color {
+        Color(light: Color.white, dark: Color(hex: "101827"))
+    }
+
+    private var skeletonBars: some View {
+        VStack(spacing: 3) {
+            RoundedRectangle(cornerRadius: 10.9)
+                .fill(Color.widgetBorder.opacity(0.7))
+                .frame(width: 31, height: 3.6)
+            RoundedRectangle(cornerRadius: 10.9)
+                .fill(Color.widgetBorder.opacity(0.55))
+                .frame(width: 25, height: 3.6)
+        }
     }
 }
 
-#Preview {
-    HStack(spacing: 23) {
-        ComplicationWidget(title: "Circular")
-        ComplicationWidget(title: "Graphic")
+struct ComplicationWidget_Previews: PreviewProvider {
+    static var previews: some View {
+        HStack(spacing: 23) {
+            ComplicationWidget(title: "Circular", tier: .good)
+            ComplicationWidget(title: "Graphic", tier: .balanced)
+        }
+        .padding()
+        .background(Color.adaptiveSettingsBackground)
     }
-    .padding()
-    .background(Color.adaptiveSettingsBackground)
 }
