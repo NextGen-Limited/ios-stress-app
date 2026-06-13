@@ -1,0 +1,145 @@
+import SwiftUI
+
+// MARK: - StressTier (Widget)
+
+/// Five-band stress representation for the Ripple 💧 character.
+///
+/// **Design rule:** never show a numeric stress score.
+/// The character's facial expression *is* the indicator.
+///
+/// - 0…20  → 😴  "Resting"
+/// - 21…40 → 😊  "Calm"
+/// - 41…60 → 😐  "Balanced"
+/// - 61…80 → 😰  "Tense"
+/// - 81…100→ 🐚  "Overwhelmed"
+enum WidgetStressTier: Int, CaseIterable, Sendable {
+    case resting = 0
+    case calm = 1
+    case balanced = 2
+    case tense = 3
+    case overwhelmed = 4
+
+    static func from(level: Double) -> WidgetStressTier {
+        switch level {
+        case ..<21:   return .resting
+        case ..<41:   return .calm
+        case ..<61:   return .balanced
+        case ..<81:   return .tense
+        default:      return .overwhelmed
+        }
+    }
+
+    var emoji: String {
+        switch self {
+        case .resting:     return "😴"
+        case .calm:        return "😊"
+        case .balanced:    return "😐"
+        case .tense:       return "😰"
+        case .overwhelmed: return "🐚"
+        }
+    }
+
+    var label: String {
+        switch self {
+        case .resting:     return "Resting"
+        case .calm:        return "Calm"
+        case .balanced:    return "Balanced"
+        case .tense:       return "Tense"
+        case .overwhelmed: return "Overwhelmed"
+        }
+    }
+
+    var accent: Color {
+        switch self {
+        case .resting:     return WidgetPalette.ripple
+        case .calm:        return WidgetPalette.blossom
+        case .balanced:    return WidgetPalette.lumi
+        case .tense:       return WidgetPalette.ember
+        case .overwhelmed: return WidgetPalette.zephyr
+        }
+    }
+}
+
+// MARK: - WidgetPalette
+
+/// Colour ramp synced with `HomeCharacterDesignTokens` (iOS) and `StressCharacterPalette` (watch).
+enum WidgetPalette {
+    static let ripple     = Color(hex: "#4FC3F7")
+    static let blossom    = Color(hex: "#A5D6A7")
+    static let lumi       = Color(hex: "#7986CB")
+    static let ember      = Color(hex: "#FFAB91")
+    static let zephyr     = Color(hex: "#B39DDB")
+    static let darkCanvas = Color(hex: "#0A0A0F")
+    static let darkCard   = Color(hex: "#1A1A2E")
+    static let mutedInk   = Color(hex: "#777986")
+}
+
+// MARK: - WidgetCharacterFace
+
+/// Reusable Ripple character face for widgets.
+/// Shows emoji on an accent-coloured ring — **never a numeric score**.
+struct WidgetCharacterFace: View {
+    let tier: WidgetStressTier
+    var size: CGFloat = 64
+    var showsRing: Bool = true
+    var glow: Bool = false
+
+    var body: some View {
+        ZStack {
+            if showsRing {
+                Circle()
+                    .stroke(tier.accent.opacity(0.2), lineWidth: ringWidth)
+
+                Circle()
+                    .trim(from: 0, to: fillFraction)
+                    .stroke(
+                        tier.accent,
+                        style: StrokeStyle(lineWidth: ringWidth, lineCap: .round)
+                    )
+                    .rotationEffect(.degrees(-90))
+            }
+
+            if glow {
+                Circle()
+                    .fill(tier.accent.opacity(0.15))
+                    .frame(width: size * 0.6, height: size * 0.6)
+                    .blur(radius: size * 0.06)
+            }
+
+            Text(tier.emoji)
+                .font(.system(size: emojiSize))
+        }
+        .frame(width: size, height: size)
+        .accessibilityLabel(tier.label)
+    }
+
+    private var ringWidth: CGFloat { max(3, size * 0.05) }
+    private var emojiSize: CGFloat { size * (showsRing ? 0.42 : 0.6) }
+    private var fillFraction: CGFloat {
+        CGFloat(tier.rawValue + 1) / CGFloat(WidgetStressTier.allCases.count)
+    }
+}
+
+// MARK: - Color hex init
+
+extension Color {
+    init(hex: String) {
+        let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
+        var int: UInt64 = 0
+        Scanner(string: hex).scanHexInt64(&int)
+        let a, r, g, b: UInt64
+        switch hex.count {
+        case 3:  (a, r, g, b) = (255, (int >> 8) * 17, (int >> 4 & 0xF) * 17, (int & 0xF) * 17)
+        case 6:  (a, r, g, b) = (255, int >> 16, int >> 8 & 0xFF, int & 0xFF)
+        case 8:  (a, r, g, b) = (int >> 24, int >> 16 & 0xFF, int >> 8 & 0xFF, int & 0xFF)
+        default: (a, r, g, b) = (1, 1, 1, 0)
+        }
+        self.init(
+            .sRGB,
+            red: Double(r) / 255,
+            green: Double(g) / 255,
+            blue: Double(b) / 255,
+            opacity: Double(a) / 255
+        )
+    }
+}

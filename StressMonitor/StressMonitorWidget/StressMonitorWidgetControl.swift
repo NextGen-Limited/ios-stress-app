@@ -1,77 +1,41 @@
-//
-//  StressMonitorWidgetControl.swift
-//  StressMonitorWidget
-//
-//  Created by Phuong Doan Duy on 10/6/26.
-//
-
 import AppIntents
 import SwiftUI
 import WidgetKit
 
+// MARK: - Stress Check Control Widget
+
+/// Control Center widget that shows the current Ripple character face.
+/// Tapping opens StressMonitor for a fresh reading.
+@available(iOS 17.0, *)
 struct StressMonitorWidgetControl: ControlWidget {
-    static let kind: String = "stress.ai.com.StressMonitorWidget"
+    static let kind: String = "stress.ai.com.StressMonitorControl"
 
     var body: some ControlWidgetConfiguration {
-        AppIntentControlConfiguration(
-            kind: Self.kind,
-            provider: Provider()
-        ) { value in
-            ControlWidgetToggle(
-                "Start Timer",
-                isOn: value.isRunning,
-                action: StartTimerIntent(value.name)
-            ) { isRunning in
-                Label(isRunning ? "On" : "Off", systemImage: "timer")
+        StaticControlConfiguration(
+            kind: Self.kind
+        ) {
+            ControlWidgetButton {
+                OpenStressMonitorIntent()
+            } label: { _ in
+                Label {
+                    Text("Check Stress")
+                } icon: {
+                    Image(systemName: "heart.text.squarefill")
+                }
             }
         }
-        .displayName("Timer")
-        .description("A an example control that runs a timer.")
+        .displayName("Ripple Check")
+        .description("Tap to measure your stress level.")
     }
 }
 
-extension StressMonitorWidgetControl {
-    struct Value {
-        var isRunning: Bool
-        var name: String
-    }
+// MARK: - Open App Intent
 
-    struct Provider: AppIntentControlValueProvider {
-        func previewValue(configuration: TimerConfiguration) -> Value {
-            StressMonitorWidgetControl.Value(isRunning: false, name: configuration.timerName)
-        }
-
-        func currentValue(configuration: TimerConfiguration) async throws -> Value {
-            let isRunning = true // Check if the timer is running
-            return StressMonitorWidgetControl.Value(isRunning: isRunning, name: configuration.timerName)
-        }
-    }
-}
-
-struct TimerConfiguration: ControlConfigurationIntent {
-    static let title: LocalizedStringResource = "Timer Name Configuration"
-
-    @Parameter(title: "Timer Name", default: "Timer")
-    var timerName: String
-}
-
-struct StartTimerIntent: SetValueIntent {
-    static let title: LocalizedStringResource = "Start a timer"
-
-    @Parameter(title: "Timer Name")
-    var name: String
-
-    @Parameter(title: "Timer is running")
-    var value: Bool
-
-    init() {}
-
-    init(_ name: String) {
-        self.name = name
-    }
+struct OpenStressMonitorIntent: SetValueIntent {
+    static let title: LocalizedStringResource = "Open StressMonitor"
+    static let description = IntentDescription("Opens StressMonitor to take a stress measurement.")
 
     func perform() async throws -> some IntentResult {
-        // Start the timer…
-        return .result()
+        .result(opensIntent: OpenURLIntent(URL(string: "stressmonitor://measure")!))
     }
 }

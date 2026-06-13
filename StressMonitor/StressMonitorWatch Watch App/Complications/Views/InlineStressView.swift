@@ -33,7 +33,7 @@ struct InlineStressView: View {
             // Stress display text
             if hasData {
                 if showLabel {
-                    Text("Stress: ")
+                    Text("Mood: ")
                         .font(.system(size: 14, weight: .medium))
                         .foregroundColor(.secondary) +
                     Text(stressLevelText)
@@ -46,7 +46,7 @@ struct InlineStressView: View {
                 }
             } else {
                 if showLabel {
-                    Text("Stress: --")
+                    Text("Mood: —")
                         .font(.system(size: 14, weight: .medium))
                         .foregroundColor(.secondary)
                 } else {
@@ -62,7 +62,7 @@ struct InlineStressView: View {
 
     // MARK: - Computed Properties
     private var stressLevelText: String {
-        Int(stressLevel).description
+        StressTier.from(level: stressLevel).label
     }
 
     private var hasData: Bool {

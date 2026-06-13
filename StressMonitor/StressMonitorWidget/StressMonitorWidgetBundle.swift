@@ -1,10 +1,3 @@
-//
-//  StressMonitorWidgetBundle.swift
-//  StressMonitorWidget
-//
-//  Created by Phuong Doan Duy on 10/6/26.
-//
-
 import WidgetKit
 import SwiftUI
 
@@ -12,6 +5,7 @@ import SwiftUI
 struct StressMonitorWidgetBundle: WidgetBundle {
     var body: some Widget {
         StressMonitorWidget()
+        LockScreenStressWidget()
         StressMonitorWidgetControl()
         StressMonitorWidgetLiveActivity()
     }

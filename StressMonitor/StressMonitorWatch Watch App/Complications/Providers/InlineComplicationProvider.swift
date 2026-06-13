@@ -62,11 +62,11 @@ struct InlineComplicationView: View {
 
             // Stress level
             if entry.entry.isPlaceholder {
-                Text("Stress: --")
+                Text("—")
                     .font(.system(size: 14, weight: .semibold, design: .rounded))
                     .foregroundColor(.secondary)
             } else {
-                Text("Stress: \(entry.entry.stressLevelText)")
+                Text("\(entry.entry.stressLevelText)")
                     .font(.system(size: 14, weight: .semibold, design: .rounded))
                     .foregroundColor(stressColor)
             }

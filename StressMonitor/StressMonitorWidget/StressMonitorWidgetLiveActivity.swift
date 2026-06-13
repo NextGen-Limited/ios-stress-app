@@ -1,80 +1,75 @@
-//
-//  StressMonitorWidgetLiveActivity.swift
-//  StressMonitorWidget
-//
-//  Created by Phuong Doan Duy on 10/6/26.
-//
-
 import ActivityKit
 import WidgetKit
 import SwiftUI
 
+// MARK: - Attributes
+
 struct StressMonitorWidgetAttributes: ActivityAttributes {
     public struct ContentState: Codable, Hashable {
-        // Dynamic stateful properties about your activity go here!
         var emoji: String
+        var moodLabel: String
+        var accentHex: String
     }
 
-    // Fixed non-changing properties about your activity go here!
-    var name: String
+    var sessionStart: Date
 }
 
+// MARK: - Live Activity Widget
+
+/// Live Activity shows the Ripple character face during a breathing session.
 struct StressMonitorWidgetLiveActivity: Widget {
     var body: some WidgetConfiguration {
         ActivityConfiguration(for: StressMonitorWidgetAttributes.self) { context in
-            // Lock screen/banner UI goes here
-            VStack {
-                Text("Hello \(context.state.emoji)")
+            // Lock Screen / Banner presentation
+            HStack(spacing: 12) {
+                Text(context.state.emoji)
+                    .font(.system(size: 44))
+
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(context.state.moodLabel)
+                        .font(.system(size: 16, weight: .bold, design: .rounded))
+                    Text("Breathing session active")
+                        .font(.system(size: 12))
+                        .foregroundStyle(.secondary)
+                }
+                Spacer()
             }
-            .activityBackgroundTint(Color.cyan)
-            .activitySystemActionForegroundColor(Color.black)
+            .padding(16)
+            .activityBackgroundTint(Color(hex: context.state.accentHex).opacity(0.12))
+            .activitySystemActionForegroundColor(.primary)
 
         } dynamicIsland: { context in
             DynamicIsland {
-                // Expanded UI goes here.  Compose the expanded UI through
-                // various regions, like leading/trailing/center/bottom
+                // Expanded — leading
                 DynamicIslandExpandedRegion(.leading) {
-                    Text("Leading")
+                    Text(context.state.emoji)
+                        .font(.system(size: 28))
                 }
+                // Expanded — trailing
                 DynamicIslandExpandedRegion(.trailing) {
-                    Text("Trailing")
+                    Text(context.state.moodLabel)
+                        .font(.system(size: 14, weight: .semibold, design: .rounded))
+                        .foregroundStyle(Color(hex: context.state.accentHex))
                 }
+                // Expanded — bottom
                 DynamicIslandExpandedRegion(.bottom) {
-                    Text("Bottom \(context.state.emoji)")
-                    // more content
+                    HStack {
+                        Image(systemName: "wind")
+                            .foregroundStyle(Color(hex: context.state.accentHex))
+                        Text("4·7·8 Breathing in progress")
+                            .font(.system(size: 12))
+                            .foregroundStyle(.secondary)
+                    }
                 }
             } compactLeading: {
-                Text("L")
+                Text(context.state.emoji)
+                    .font(.system(size: 14))
             } compactTrailing: {
-                Text("T \(context.state.emoji)")
+                EmptyView()
             } minimal: {
                 Text(context.state.emoji)
+                    .font(.system(size: 14))
             }
-            .widgetURL(URL(string: "http://www.apple.com"))
-            .keylineTint(Color.red)
         }
     }
-}
-
-extension StressMonitorWidgetAttributes {
-    fileprivate static var preview: StressMonitorWidgetAttributes {
-        StressMonitorWidgetAttributes(name: "World")
-    }
-}
-
-extension StressMonitorWidgetAttributes.ContentState {
-    fileprivate static var smiley: StressMonitorWidgetAttributes.ContentState {
-        StressMonitorWidgetAttributes.ContentState(emoji: "😀")
-     }
-     
-     fileprivate static var starEyes: StressMonitorWidgetAttributes.ContentState {
-         StressMonitorWidgetAttributes.ContentState(emoji: "🤩")
-     }
-}
-
-#Preview("Notification", as: .content, using: StressMonitorWidgetAttributes.preview) {
-   StressMonitorWidgetLiveActivity()
-} contentStates: {
-    StressMonitorWidgetAttributes.ContentState.smiley
-    StressMonitorWidgetAttributes.ContentState.starEyes
 }
