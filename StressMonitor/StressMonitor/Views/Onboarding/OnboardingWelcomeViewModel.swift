@@ -1,4 +1,4 @@
-import Foundation
+import SwiftUI
 
 @MainActor
 @Observable
@@ -12,7 +12,7 @@ final class OnboardingWelcomeViewModel {
     var breathPhase3 = false
     var floatOffset = false
 
-    private var animationTask: Task<Void, Never>?
+    nonisolated(unsafe) private var animationTask: Task<Void, Never>?
 
     init() {
         startAnimations()
