@@ -78,6 +78,13 @@
 			);
 			target = F211BBD62FD9111F00A6E25D /* StressMonitorWidgetExtension */;
 		};
+		F2CD35E02FDD272A000ED536 /* Exceptions for "StressMonitor" folder in "StressMonitor" target */ = {
+			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
+			membershipExceptions = (
+				Info.plist,
+			);
+			target = F2E2EBE82F1CC553000C2B53 /* StressMonitor */;
+		};
 		F2D098F52F66727C00EC7538 /* Exceptions for "StressMonitor" folder in "StressMonitorWatch Watch App" target */ = {
 			isa = PBXFileSystemSynchronizedBuildFileExceptionSet;
 			membershipExceptions = (
@@ -108,6 +115,7 @@
 		F2E2EBEB2F1CC553000C2B53 /* StressMonitor */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			exceptions = (
+				F2CD35E02FDD272A000ED536 /* Exceptions for "StressMonitor" folder in "StressMonitor" target */,
 				F2D098F52F66727C00EC7538 /* Exceptions for "StressMonitor" folder in "StressMonitorWatch Watch App" target */,
 			);
 			path = StressMonitor;
@@ -399,9 +407,11 @@
 			buildSettings = {
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
-				CODE_SIGN_STYLE = Automatic;
+				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+				CODE_SIGN_STYLE = Manual;
 				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = K2TYLYAWMK;
+				DEVELOPMENT_TEAM = "";
+				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = K2TYLYAWMK;
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = StressMonitorWidget/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = StressMonitorWidget;
@@ -415,6 +425,8 @@
 				MARKETING_VERSION = 1.0.0;
 				PRODUCT_BUNDLE_IDENTIFIER = stress.ai.com.widget;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE_SPECIFIER = "";
+				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "match AppStore stress.ai.com.widget";
 				SKIP_INSTALL = YES;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -594,8 +606,10 @@
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = K2TYLYAWMK;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = StressMonitor/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Stress AI Coach";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Camera access allows you to capture photos and videos to share in chat conversations.";
 				INFOPLIST_KEY_NSHealthClinicalHealthRecordsShareUsageDescription = "We need access to your health data to monitor stress levels.";
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "We need access to your health data to monitor stress levels.";
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "We need to update your health data with stress measurements.";
@@ -642,8 +656,10 @@
 				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = K2TYLYAWMK;
 				ENABLE_PREVIEWS = YES;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = StressMonitor/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Stress AI Coach";
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
+				INFOPLIST_KEY_NSCameraUsageDescription = "Camera access allows you to capture photos and videos to share in chat conversations.";
 				INFOPLIST_KEY_NSHealthClinicalHealthRecordsShareUsageDescription = "We need access to your health data to monitor stress levels.";
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "We need access to your health data to monitor stress levels.";
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "We need to update your health data with stress measurements.";

@@ -34,7 +34,13 @@
 		<string>Lato-Black.ttf</string>
 	</array>
 	<key>NSCameraUsageDescription</key>
-	<string>This app does not use the camera.</string>
+	<string>Camera access allows you to capture photos and videos to share in chat conversations.</string>
+	<key>NSMicrophoneUsageDescription</key>
+	<string>Microphone access allows you to record videos to share in chat conversations.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Photo library access allows you to select images and videos to share in chat conversations.</string>
+	<key>NSPhotoLibraryAddUsageDescription</key>
+	<string>Photo library access allows you to save images shared in chat to your photo library.</string>
 	<key>NSHealthShareUsageDescription</key>
 	<string>We need access to your health data to monitor stress levels.</string>
 	<key>NSHealthUpdateUsageDescription</key>
