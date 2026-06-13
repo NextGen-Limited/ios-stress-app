@@ -50,12 +50,12 @@ class TrendsViewModel {
     var weeklyMeasurements: [StressMeasurement] = []
     var dailyStressData: [DailyStressData] = []
     var stressSources: [StressSource] = [
-        StressSource(name: "Finance", percentage: 35, color: TrendsPalette.rippleBlue),
-        StressSource(name: "Relationship", percentage: 15, color: Color(hex: "#FF9800")),
-        StressSource(name: "Health", percentage: 50, color: Color(hex: "#FFD60A")),
-        StressSource(name: "Family", percentage: 0, color: .stressRelaxed),
-        StressSource(name: "Work", percentage: 0, color: .primaryBlue),
-        StressSource(name: "Environment", percentage: 0, color: .stressSevere)
+        StressSource(name: "Finance", percentage: 35, color: Color(hex: "#F6C453")),
+        StressSource(name: "Relationship", percentage: 15, color: Color(hex: "#B388FF")),
+        StressSource(name: "Health", percentage: 50, color: Color(hex: "#FFB74D")),
+        StressSource(name: "Family", percentage: 0, color: Color(hex: "#81C784")),
+        StressSource(name: "Work", percentage: 0, color: TrendsPalette.rippleBlue),
+        StressSource(name: "Environment", percentage: 0, color: Color(hex: "#66D9A8"))
     ]
 
     // MARK: - Ripple Trends Helpers

@@ -61,19 +61,22 @@ struct TrendsView: View {
                 hrvTrendCard
                     .padding(.horizontal)
 
-                // Stress sources card
-                StressSourcesCard(
+                // Color-coded stress sources
+                TrendsStressSourcesCard(
                     sources: viewModel.stressSources.map {
-                        StressSourcesCard.StressSourceData(
+                        TrendsStressSourcesCard.Source(
                             name: $0.name,
-                            percentage: $0.percentage / 100.0,
+                            percentage: $0.percentage,
                             color: $0.color,
-                            icon: iconForSource($0.name)
+                            emoji: emojiForSource($0.name)
                         )
-                    },
-                    totalDays: 30
+                    }
                 )
                 .padding(.horizontal)
+
+                // Pattern insights — Ripple as analyst
+                PatternInsightsSection(insights: viewModel.patternInsights)
+                    .padding(.horizontal)
 
                 // Ripple Insights teaser
                 SmartInsightsTeaser()
@@ -270,15 +273,15 @@ struct TrendsView: View {
 
     // MARK: - Helpers
 
-    private func iconForSource(_ name: String) -> String {
+    private func emojiForSource(_ name: String) -> String {
         switch name {
-        case "Finance": return "dollarsign.circle.fill"
-        case "Relationship": return "heart.fill"
-        case "Health": return "cross.case.fill"
-        case "Family": return "house.fill"
-        case "Work": return "briefcase.fill"
-        case "Environment": return "leaf.fill"
-        default: return "circle.fill"
+        case "Finance": return "💰"
+        case "Relationship": return "❤️"
+        case "Health": return "🏥"
+        case "Family": return "🏠"
+        case "Work": return "💼"
+        case "Environment": return "🌿"
+        default: return "✨"
         }
     }
 }
