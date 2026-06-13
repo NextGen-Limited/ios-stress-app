@@ -124,14 +124,16 @@ public struct MediumWidgetView: View {
 private extension StressEntry {
     static var previewMedium: StressEntry {
         let now = Date()
-        let history = (0..<8).map { i in
-            StressData(
-                level: Double(40 + i * 3),
+        let history: [StressData] = (0..<8).map { i -> StressData in
+            let level = Double(40 + i * 3)
+            let offset = TimeInterval(-i * 3600)
+            return StressData(
+                level: level,
                 category: "mild",
                 hrv: 50,
                 heartRate: 70,
                 confidence: 0.85,
-                timestamp: now.addingTimeInterval(TimeInterval(-i * 3600))
+                timestamp: now.addingTimeInterval(offset)
             )
         }
         return StressEntry(
