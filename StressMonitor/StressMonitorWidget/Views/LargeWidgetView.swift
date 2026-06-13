@@ -75,7 +75,7 @@ public struct LargeWidgetView: View {
 
     @ViewBuilder
     private func historyChartSection(tier: WidgetStressTier) -> some View {
-        Chart(entry.history.suffix(24)) { item in
+        Chart(Array(entry.history.suffix(24)), id: \.timestamp) { item in
             let pTier = WidgetStressTier.from(level: item.level)
             LineMark(
                 x: .value("Time", item.timestamp),

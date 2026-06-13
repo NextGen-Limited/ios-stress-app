@@ -69,7 +69,7 @@ public struct MediumWidgetView: View {
                 .font(.system(size: 9, weight: .semibold))
                 .foregroundColor(.secondary)
 
-            Chart(entry.history.suffix(12)) { item in
+            Chart(Array(entry.history.suffix(12)), id: \.timestamp) { item in
                 let pTier = WidgetStressTier.from(level: item.level)
                 LineMark(
                     x: .value("Time", item.timestamp),

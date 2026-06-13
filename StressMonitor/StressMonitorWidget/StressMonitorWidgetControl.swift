@@ -14,14 +14,8 @@ struct StressMonitorWidgetControl: ControlWidget {
         StaticControlConfiguration(
             kind: Self.kind
         ) {
-            ControlWidgetButton {
-                OpenStressMonitorIntent()
-            } label: { _ in
-                Label {
-                    Text("Check Stress")
-                } icon: {
-                    Image(systemName: "heart.text.squarefill")
-                }
+            ControlWidgetButton(action: OpenStressMonitorIntent()) {
+                Label("Check Stress", systemImage: "heart.text.squarefill")
             }
         }
         .displayName("Ripple Check")
