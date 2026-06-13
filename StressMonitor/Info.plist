@@ -33,6 +33,8 @@
 		<string>Lato-Bold.ttf</string>
 		<string>Lato-Black.ttf</string>
 	</array>
+	<key>NSCameraUsageDescription</key>
+	<string>This app does not use the camera.</string>
 	<key>NSHealthShareUsageDescription</key>
 	<string>We need access to your health data to monitor stress levels.</string>
 	<key>NSHealthUpdateUsageDescription</key>
