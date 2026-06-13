@@ -1,104 +1,135 @@
 import SwiftUI
 
+// MARK: - Permissions Screen (Screen 1)
+// Frictionless: one screen, toggle-based, privacy-first. 4 toggles on one page.
 struct OnboardingHealthSyncView: View {
     @State private var viewModel = OnboardingHealthSyncViewModel()
+    @State private var appearAnimation = false
+
+    var onAuthorize: (() -> Void)?
+    var onBack: (() -> Void)?
 
     var body: some View {
-        VStack(spacing: 24) {
-            // Step indicator
+        VStack(spacing: 0) {
+            // Back button
             HStack {
-                Text("Step 2 of 4")
-                    .font(.system(size: 12))
-                    .foregroundColor(.secondary)
+                Button(action: { onBack?() }) {
+                    HStack(spacing: 4) {
+                        Image(systemName: "chevron.left")
+                            .font(.system(size: 14, weight: .medium))
+                        Text("Back")
+                            .font(.system(size: 14, weight: .medium))
+                    }
+                    .foregroundStyle(HomeCharacterDesignTokens.mutedInk)
+                    .padding(.horizontal, 16)
+                    .padding(.vertical, 8)
+                    .background(
+                        RoundedRectangle(cornerRadius: 10)
+                            .stroke(Color.white.opacity(0.1), lineWidth: 1)
+                    )
+                }
                 Spacer()
             }
-            .accessibilityElement(children: .ignore)
-            .accessibilityLabel("Step 2 of 4")
+            .padding(.top, 20)
+            .padding(.bottom, 8)
 
-            // Hero icon
-            ZStack {
-                Circle()
-                    .fill(Color.primaryBlue.opacity(0.1))
-                    .frame(width: 120, height: 120)
+            ScrollView(showsIndicators: false) {
+                VStack(spacing: 0) {
+                    // Lock icon
+                    Text("🔐")
+                        .font(.system(size: 52))
+                        .shadow(color: HomeCharacterDesignTokens.Ripple.primary.opacity(0.2), radius: 12)
+                        .padding(.top, 32)
+                        .padding(.bottom, 16)
 
-                Image(systemName: "heart.text.square.fill")
-                    .font(.system(size: 56))
-                    .foregroundColor(.primaryBlue)
-            }
-            .accessibilityElement(children: .ignore)
-            .accessibilityLabel("Health data access icon")
+                    // Title
+                    Text("Quick permissions")
+                        .font(.system(size: 24, weight: .heavy, design: .rounded))
+                        .foregroundStyle(Color(hex: "#E8E8F0"))
+                        .multilineTextAlignment(.center)
 
-            // Title and description
-            VStack(spacing: 8) {
-                Text("Health Data Access")
-                    .font(.system(size: 28, weight: .bold))
-                    .accessibilityAddTraits(.isHeader)
+                    // Subtitle
+                    Text("Ripple needs health data to read your stress. Everything stays on your device.")
+                        .font(.system(size: 15, weight: .regular))
+                        .foregroundStyle(HomeCharacterDesignTokens.mutedInk)
+                        .multilineTextAlignment(.center)
+                        .frame(maxWidth: 310)
+                        .padding(.top, 8)
+                        .padding(.bottom, 20)
 
-                Text("We need access to your health data to calculate stress levels")
-                    .font(.system(size: 17))
-                    .foregroundColor(.secondary)
-                    .multilineTextAlignment(.center)
-            }
+                    // Toggle rows
+                    VStack(spacing: 8) {
+                        PermissionToggleRow(
+                            emoji: "❤️",
+                            iconBgColor: Color(hex: "#EF5350").opacity(0.1),
+                            title: "Heart Rate",
+                            subtitle: "Resting & active BPM",
+                            isOn: $viewModel.heartRateEnabled
+                        )
 
-            // Data type cards
-            VStack(spacing: 12) {
-                DataTypeCard(
-                    icon: "heart.fill",
-                    color: .red,
-                    title: "Heart Rate",
-                    description: "Resting and active measurements"
-                )
-                DataTypeCard(
-                    icon: "waveform.path",
-                    color: .purple,
-                    title: "Heart Rate Variability",
-                    description: "Primary stress indicator"
-                )
-                DataTypeCard(
-                    icon: "bed.double.fill",
-                    color: .blue,
-                    title: "Sleep Analysis",
-                    description: "Recovery quality tracking"
-                )
-            }
-            .accessibilityElement(children: .contain)
-            .accessibilityLabel("Health data types we access")
+                        PermissionToggleRow(
+                            emoji: "📈",
+                            iconBgColor: Color(hex: "#7986CB").opacity(0.1),
+                            title: "Heart Rate Variability",
+                            subtitle: "Primary stress indicator",
+                            isOn: $viewModel.hrvEnabled
+                        )
 
-            Spacer()
+                        PermissionToggleRow(
+                            emoji: "😴",
+                            iconBgColor: HomeCharacterDesignTokens.Ripple.primary.opacity(0.1),
+                            title: "Sleep Analysis",
+                            subtitle: "Recovery quality tracking",
+                            isOn: $viewModel.sleepEnabled
+                        )
 
-            // Privacy note
-            HStack(spacing: 8) {
-                Image(systemName: "lock.shield.fill")
-                    .foregroundColor(.stressRelaxed)
-                    .font(.system(size: 12))
-                    .accessibilityHidden(true)
+                        PermissionToggleRow(
+                            emoji: "🏃",
+                            iconBgColor: HomeCharacterDesignTokens.Blossom.primary.opacity(0.1),
+                            title: "Activity & Exercise",
+                            subtitle: "Optional — improves accuracy",
+                            isOn: $viewModel.activityEnabled
+                        )
+                    }
+                    .padding(.bottom, 12)
 
-                Text("Your data stays on your device. We never sell your information.")
-                    .font(.system(size: 13))
-                    .foregroundColor(.secondary)
-            }
-            .accessibilityElement(children: .ignore)
-            .accessibilityLabel("Privacy assurance: Your data stays on your device")
-
-            // Continue button
-            Button(action: { Task { await viewModel.requestHealthKitAuthorization() } }) {
-                if viewModel.isLoading {
-                    ProgressView()
-                        .progressViewStyle(CircularProgressViewStyle(tint: .white))
-                } else {
-                    Text("Authorize & Continue")
-                        .font(.system(size: 17, weight: .semibold))
-                        .foregroundColor(.white)
+                    // Privacy box
+                    privacyBox
+                        .padding(.bottom, 20)
                 }
             }
-            .frame(maxWidth: .infinity)
-            .frame(height: 48)
-            .background(viewModel.isLoading ? Color.gray : Color.primaryBlue)
-            .cornerRadius(12)
+
+            // Authorize CTA — pinned to bottom
+            Button(action: { Task { await authorizeAndContinue() } }) {
+                HStack(spacing: 8) {
+                    if viewModel.isLoading {
+                        ProgressView()
+                            .progressViewStyle(CircularProgressViewStyle(tint: .white))
+                    } else {
+                        Text("Authorize & Continue")
+                            .font(.system(size: 17, weight: .bold, design: .rounded))
+                        Image(systemName: "arrow.right")
+                            .font(.system(size: 15, weight: .bold))
+                    }
+                }
+                .foregroundStyle(.white)
+                .frame(maxWidth: .infinity)
+                .frame(height: 54)
+                .background(
+                    LinearGradient(
+                        colors: [HomeCharacterDesignTokens.Ripple.primary, HomeCharacterDesignTokens.Ripple.deep],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+                .clipShape(RoundedRectangle(cornerRadius: 14))
+                .shadow(color: HomeCharacterDesignTokens.Ripple.primary.opacity(0.28), radius: 12, y: 6)
+            }
             .disabled(viewModel.isLoading)
-            .accessibilityHint("Requests health kit authorization")
+            .padding(.bottom, 48)
         }
-        .padding(24)
+        .padding(.horizontal, 28)
+        .background(HomeCharacterDesignTokens.darkCanvas)
         .alert("Authorization Error", isPresented: .constant(viewModel.authorizationError != nil)) {
             Button("OK") {
                 viewModel.authorizationError = nil
@@ -109,43 +140,92 @@ struct OnboardingHealthSyncView: View {
             }
         }
     }
+
+    // MARK: - Privacy Box
+
+    private var privacyBox: some View {
+        HStack(alignment: .top, spacing: 10) {
+            Text("🔒")
+                .font(.system(size: 16))
+
+            VStack(alignment: .leading, spacing: 0) {
+                Text("Privacy Promise: ")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(HomeCharacterDesignTokens.Ripple.primary)
+                +
+                Text("Zero data collection. No servers. Your health data never leaves this iPhone.")
+                    .font(.system(size: 12, weight: .regular))
+                    .foregroundStyle(HomeCharacterDesignTokens.mutedInk)
+            }
+        }
+        .padding(14)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(
+            RoundedRectangle(cornerRadius: 16)
+                .fill(HomeCharacterDesignTokens.Ripple.primary.opacity(0.05))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16)
+                        .stroke(HomeCharacterDesignTokens.Ripple.primary.opacity(0.1), lineWidth: 1)
+                )
+        )
+    }
+
+    // MARK: - Actions
+
+    private func authorizeAndContinue() async {
+        await viewModel.requestSelectedPermissions()
+        if viewModel.healthKitAuthorized {
+            onAuthorize?()
+        }
+    }
 }
 
-struct DataTypeCard: View {
-    let icon: String
-    let color: Color
+// MARK: - Permission Toggle Row
+
+private struct PermissionToggleRow: View {
+    let emoji: String
+    let iconBgColor: Color
     let title: String
-    let description: String
+    let subtitle: String
+    @Binding var isOn: Bool
 
     var body: some View {
-        HStack(spacing: 16) {
-            Image(systemName: icon)
+        HStack(spacing: 14) {
+            // Icon
+            Text(emoji)
                 .font(.system(size: 20))
-                .foregroundColor(color)
-                .frame(width: 44, height: 44)
-                .background(color.opacity(0.15))
-                .cornerRadius(10)
+                .frame(width: 40, height: 40)
+                .background(iconBgColor)
+                .clipShape(RoundedRectangle(cornerRadius: 12))
 
+            // Text
             VStack(alignment: .leading, spacing: 2) {
                 Text(title)
-                    .font(.system(size: 17, weight: .semibold))
-
-                Text(description)
-                    .font(.system(size: 12))
-                    .foregroundColor(.secondary)
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(Color(hex: "#E8E8F0"))
+                Text(subtitle)
+                    .font(.system(size: 11, weight: .regular))
+                    .foregroundStyle(HomeCharacterDesignTokens.mutedInk)
             }
 
             Spacer()
 
-            Image(systemName: "checkmark.circle.fill")
-                .foregroundColor(.stressRelaxed)
-                .accessibilityHidden(true)
+            // Toggle
+            Toggle("", isOn: $isOn)
+                .labelsHidden()
+                .tint(HomeCharacterDesignTokens.Blossom.primary)
+                .scaleEffect(0.85)
         }
-        .padding(16)
-        .background(Color.secondary.opacity(0.1))
-        .cornerRadius(12)
-        .accessibilityElement(children: .combine)
-        .accessibilityLabel("\(title), \(description)")
+        .padding(.horizontal, 16)
+        .padding(.vertical, 14)
+        .background(
+            RoundedRectangle(cornerRadius: 16)
+                .fill(HomeCharacterDesignTokens.darkCard)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16)
+                        .stroke(Color.white.opacity(0.06), lineWidth: 1)
+                )
+        )
     }
 }
 

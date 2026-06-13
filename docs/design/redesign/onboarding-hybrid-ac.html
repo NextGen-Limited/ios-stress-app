@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StressMonitor — Onboarding A+C Hybrid</title>
+<style>
+:root {
+  --ink:#101223;--dark-canvas:#0A0A0F;--dark-card:#1A1A2E;--dark-card-hover:#252545;
+  --muted-ink:#777986;--faint-divider:rgba(255,255,255,0.06);
+  --water:#4FC3F7;--water-mid:#81D4FA;--water-light:#B3E5FC;--water-deep:#0288D1;
+  --earth:#A5D6A7;--earth-accent:#81C784;--earth-deep:#2E7D32;
+  --fire:#FFAB91;--fire-accent:#FF8A65;
+  --air:#D1C4E9;--air-accent:#B39DDB;
+  --moon:#7986CB;--moon-accent:#5C6BC0;
+  --font-display:'SF Pro Display',-apple-system,system-ui,sans-serif;
+  --font-rounded:'SF Pro Rounded',var(--font-display);
+  --radius-sm:12px;--radius-md:16px;--radius-lg:24px;--radius-xl:28px;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{font-family:var(--font-display);background:var(--dark-canvas);color:#E8E8F0;min-height:100vh;overflow-x:hidden;}
+
+/* ═══ NAV ═══ */
+.screen-nav{position:fixed;top:0;left:0;right:0;z-index:100;display:flex;align-items:center;justify-content:center;gap:10px;padding:14px 20px;background:rgba(10,10,15,0.92);backdrop-filter:blur(24px);border-bottom:1px solid var(--faint-divider);}
+.nav-step{display:flex;align-items:center;gap:10px;}
+.nav-dot{width:32px;height:32px;border-radius:50%;border:2px solid var(--muted-ink);background:transparent;color:var(--muted-ink);font-size:13px;font-weight:700;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .35s;}
+.nav-dot.active{border-color:var(--water);background:var(--water);color:var(--dark-canvas);box-shadow:0 0 24px rgba(79,195,247,0.35);}
+.nav-dot.done{border-color:var(--earth);background:var(--earth);color:var(--dark-canvas);}
+.nav-dot:hover:not(.active){border-color:rgba(79,195,247,0.5);color:var(--water);}
+.nav-line{width:40px;height:2px;background:var(--faint-divider);border-radius:1px;transition:background .35s;}
+.nav-line.filled{background:var(--earth);}
+.nav-label{font-size:11px;color:var(--muted-ink);font-weight:600;margin-left:12px;letter-spacing:0.5px;}
+
+/* ═══ PHONE ═══ */
+.phone{max-width:393px;margin:72px auto 32px;min-height:852px;background:var(--dark-canvas);border-radius:44px;border:3px solid rgba(255,255,255,0.08);overflow:hidden;position:relative;}
+.screen{display:none;min-height:852px;flex-direction:column;padding:0 28px;}
+.screen.active{display:flex;}
+
+/* ═══ TYPOGRAPHY ═══ */
+h1{font-family:var(--font-rounded);font-size:32px;font-weight:800;line-height:1.15;letter-spacing:-0.5px;margin-bottom:10px;}
+h2{font-size:16px;font-weight:400;color:var(--muted-ink);line-height:1.55;margin-bottom:28px;max-width:310px;}
+.center{text-align:center;align-items:center;justify-content:center;}
+.left{text-align:left;}
+
+/* ═══ BUTTONS ═══ */
+.btn-primary{width:100%;padding:17px;border-radius:14px;border:none;font-size:17px;font-weight:700;cursor:pointer;transition:all .3s;font-family:var(--font-rounded);display:flex;align-items:center;justify-content:center;gap:8px;}
+.btn-primary:hover{transform:translateY(-2px);}
+.btn-water{background:linear-gradient(135deg,var(--water),var(--water-deep));color:#fff;box-shadow:0 6px 28px rgba(79,195,247,0.28);}
+.btn-earth{background:linear-gradient(135deg,var(--earth),var(--earth-accent));color:#fff;box-shadow:0 6px 28px rgba(165,214,167,0.28);}
+.btn-mixed{background:linear-gradient(135deg,var(--water),var(--earth));color:#fff;box-shadow:0 6px 28px rgba(79,195,247,0.2);}
+.btn-ghost{background:none;border:none;color:var(--muted-ink);font-size:14px;cursor:pointer;padding:10px;font-family:var(--font-display);transition:color .2s;}
+.btn-ghost:hover{color:#E8E8F0;}
+.btn-back{position:absolute;top:20px;left:28px;background:none;border:1px solid rgba(255,255,255,0.1);color:var(--muted-ink);padding:8px 16px;border-radius:10px;font-size:14px;cursor:pointer;z-index:10;transition:all .2s;}
+.btn-back:hover{border-color:rgba(255,255,255,0.25);color:#E8E8F0;}
+
+/* ═══ SCREEN 0: WELCOME ═══ */
+.welcome-hero{width:240px;height:240px;position:relative;margin-bottom:28px;flex-shrink:0;}
+.welcome-ring{position:absolute;border-radius:50%;animation:breath 4s ease-in-out infinite;}
+.wr-1{inset:0;border:2px solid rgba(79,195,247,0.08);}
+.wr-2{inset:20px;border:2px solid rgba(79,195,247,0.12);animation-delay:.6s;}
+.wr-3{inset:40px;border:2px solid rgba(79,195,247,0.18);animation-delay:1.2s;}
+.wr-glow{inset:30px;background:radial-gradient(circle,rgba(79,195,247,0.18),rgba(165,214,167,0.08),transparent 70%);animation-delay:.3s;}
+.welcome-creature{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:88px;filter:drop-shadow(0 0 48px rgba(79,195,247,0.35));animation:float 4s ease-in-out infinite;}
+@keyframes breath{0%,100%{transform:scale(1);opacity:1}50%{transform:scale(1.06);opacity:.7}}
+@keyframes float{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+
+.welcome-pills{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:28px;}
+.wpill{padding:7px 14px;border-radius:20px;font-size:12px;font-weight:600;background:var(--dark-card);border:1px solid var(--faint-divider);color:#E8E8F0;}
+
+/* ═══ SCREEN 1: PERMISSIONS ═══ */
+.perm-icon{font-size:52px;margin-bottom:16px;margin-top:60px;filter:drop-shadow(0 0 24px rgba(79,195,247,0.2));}
+
+.toggle-row{display:flex;align-items:center;gap:14px;padding:14px 16px;background:var(--dark-card);border-radius:var(--radius-md);margin-bottom:8px;width:100%;border:1px solid var(--faint-divider);transition:all .25s;}
+.toggle-row:hover{background:var(--dark-card-hover);}
+.toggle-row .tr-icon{width:40px;height:40px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:20px;flex-shrink:0;}
+.toggle-row .tr-text{flex:1;text-align:left;}
+.toggle-row .tr-title{font-size:14px;font-weight:600;}
+.toggle-row .tr-sub{font-size:11px;color:var(--muted-ink);margin-top:2px;}
+
+.toggle{width:50px;height:30px;border-radius:15px;background:rgba(255,255,255,0.12);position:relative;cursor:pointer;transition:all .3s;flex-shrink:0;border:none;}
+.toggle.on{background:var(--earth);}
+.toggle::after{content:'';width:24px;height:24px;border-radius:50%;background:#fff;position:absolute;top:3px;left:3px;transition:all .3s cubic-bezier(.4,.0,.2,1);box-shadow:0 1px 4px rgba(0,0,0,0.2);}
+.toggle.on::after{left:23px;}
+
+.privacy-box{display:flex;gap:10px;padding:14px 16px;background:rgba(79,195,247,0.05);border:1px solid rgba(79,195,247,0.1);border-radius:var(--radius-md);width:100%;margin:12px 0 20px;align-items:flex-start;}
+.privacy-box .pb-icon{font-size:16px;flex-shrink:0;margin-top:1px;}
+.privacy-box .pb-text{font-size:12px;color:var(--muted-ink);line-height:1.5;}
+.privacy-box .pb-text strong{color:var(--water);font-weight:600;}
+
+/* ═══ SCREEN 2: FIRST MEASUREMENT + DASHBOARD ═══ */
+.measure-ring-wrap{width:220px;height:220px;position:relative;margin-bottom:24px;flex-shrink:0;}
+.measure-ring-bg{width:100%;height:100%;border-radius:50%;background:radial-gradient(circle,rgba(79,195,247,0.1),rgba(165,214,167,0.05),transparent 70%);border:3px solid rgba(79,195,247,0.1);}
+.measure-ring-wrap svg{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg);}
+.ring-track{fill:none;stroke:var(--dark-card);stroke-width:6;}
+.ring-progress{fill:none;stroke:url(#measureGrad);stroke-width:6;stroke-linecap:round;transition:stroke-dashoffset 1.5s ease;}
+.measure-creature{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:64px;filter:drop-shadow(0 0 32px rgba(79,195,247,0.3));}
+.measure-label{position:absolute;bottom:20px;left:50%;transform:translateX(-50%);background:rgba(10,10,15,0.8);backdrop-filter:blur(12px);padding:6px 16px;border-radius:20px;border:1px solid rgba(79,195,247,0.15);font-size:12px;font-weight:700;color:var(--water);white-space:nowrap;}
+
+.metric-row{display:flex;gap:10px;width:100%;margin-bottom:16px;}
+.metric-box{flex:1;padding:14px 10px;background:var(--dark-card);border-radius:var(--radius-md);text-align:center;border:1px solid var(--faint-divider);}
+.metric-box .mb-val{font-family:var(--font-rounded);font-size:22px;font-weight:800;}
+.metric-box .mb-unit{font-size:10px;color:var(--muted-ink);font-weight:600;}
+.metric-box .mb-label{font-size:10px;color:var(--muted-ink);font-weight:600;text-transform:uppercase;letter-spacing:.5px;margin-top:4px;}
+
+.buddy-card{width:100%;padding:18px;background:var(--dark-card);border-radius:var(--radius-lg);border:1px solid rgba(79,195,247,0.1);margin-bottom:16px;display:flex;align-items:center;gap:14px;}
+.buddy-card .bc-avatar{width:52px;height:52px;border-radius:50%;background:radial-gradient(circle,rgba(79,195,247,0.2),transparent);display:flex;align-items:center;justify-content:center;font-size:28px;flex-shrink:0;border:2px solid rgba(79,195,247,0.15);}
+.buddy-card .bc-info{flex:1;text-align:left;}
+.buddy-card .bc-name{font-size:15px;font-weight:700;}
+.buddy-card .bc-sub{font-size:11px;color:var(--muted-ink);margin-top:2px;}
+.buddy-card .bc-evo{font-size:10px;color:var(--earth);font-weight:700;margin-top:4px;}
+
+.tip-box{width:100%;padding:14px 16px;background:rgba(165,214,167,0.05);border:1px solid rgba(165,214,167,0.1);border-radius:var(--radius-md);text-align:left;margin-bottom:20px;}
+.tip-box .tip-label{font-size:10px;font-weight:700;color:var(--earth);text-transform:uppercase;letter-spacing:.5px;margin-bottom:4px;}
+.tip-box .tip-text{font-size:13px;color:#E8E8F0;line-height:1.45;}
+
+/* ═══ ANIMATIONS ═══ */
+.fade-in{animation:fadeIn .6s ease both;}
+@keyframes fadeIn{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+.stagger-1{animation-delay:.1s}.stagger-2{animation-delay:.2s}.stagger-3{animation-delay:.3s}.stagger-4{animation-delay:.4s}
+
+/* ═══ OPTION BADGE ═══ */
+.option-badge{position:fixed;bottom:16px;left:50%;transform:translateX(-50%);background:rgba(79,195,247,0.08);border:1px solid rgba(79,195,247,0.18);padding:8px 24px;border-radius:24px;font-size:12px;color:var(--water);font-weight:700;z-index:100;white-space:nowrap;backdrop-filter:blur(12px);}
+</style>
+</head>
+<body>
+
+<!-- NAV -->
+<div class="screen-nav">
+  <div class="nav-step">
+    <div class="nav-dot active" onclick="show(0)">1</div>
+    <div class="nav-line" id="line1"></div>
+    <div class="nav-dot" id="dot2" onclick="show(1)">2</div>
+    <div class="nav-line" id="line2"></div>
+    <div class="nav-dot" id="dot3" onclick="show(2)">3</div>
+  </div>
+  <span class="nav-label" id="navLabel">Welcome</span>
+</div>
+
+<div class="phone">
+
+<!-- ═══════════════════════════════════════════════
+     SCREEN 0 — WELCOME (from Option A)
+     Emotional hook: meet Ripple, feel the calm
+     ═══════════════════════════════════════════════ -->
+<div class="screen active center" id="s0">
+  <div style="flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;">
+    <div class="welcome-hero fade-in">
+      <div class="welcome-ring wr-1"></div>
+      <div class="welcome-ring wr-2"></div>
+      <div class="welcome-ring wr-3"></div>
+      <div class="welcome-ring wr-glow"></div>
+      <div class="welcome-creature">🌊</div>
+    </div>
+    <h1 class="fade-in stagger-1">Meet your Stress Buddy</h1>
+    <h2 class="fade-in stagger-2">A tiny creature that lives on your phone and reflects how your body feels — so you can take better care of yourself.</h2>
+    <div class="welcome-pills fade-in stagger-3">
+      <span class="wpill">📊 Real-time Stress</span>
+      <span class="wpill">🧘 Guided Breathing</span>
+      <span class="wpill">📈 HRV Trends</span>
+    </div>
+    <button class="btn-primary btn-water fade-in stagger-4" onclick="show(1)">
+      Get Started — Takes 20 sec
+    </button>
+    <button class="btn-ghost fade-in stagger-4">I already have an account</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SCREEN 1 — PERMISSIONS (from Option C)
+     Frictionless: one screen, toggle-based, privacy-first
+     ═══════════════════════════════════════════════ -->
+<div class="screen" id="s1">
+  <button class="btn-back" onclick="show(0)">← Back</button>
+  <div style="flex:1;display:flex;flex-direction:column;align-items:center;padding-top:64px;">
+    <div class="perm-icon">🔐</div>
+    <h1 class="center" style="font-size:24px">Quick permissions</h1>
+    <h2 class="center" style="margin-bottom:20px">Ripple needs health data to read your stress. Everything stays on your device.</h2>
+
+    <div class="toggle-row">
+      <div class="tr-icon" style="background:rgba(239,83,80,0.1)">❤️</div>
+      <div class="tr-text">
+        <div class="tr-title">Heart Rate</div>
+        <div class="tr-sub">Resting & active BPM</div>
+      </div>
+      <button class="toggle on" onclick="this.classList.toggle('on')"></button>
+    </div>
+
+    <div class="toggle-row">
+      <div class="tr-icon" style="background:rgba(121,134,203,0.1)">📈</div>
+      <div class="tr-text">
+        <div class="tr-title">Heart Rate Variability</div>
+        <div class="tr-sub">Primary stress indicator</div>
+      </div>
+      <button class="toggle on" onclick="this.classList.toggle('on')"></button>
+    </div>
+
+    <div class="toggle-row">
+      <div class="tr-icon" style="background:rgba(79,195,247,0.1)">😴</div>
+      <div class="tr-text">
+        <div class="tr-title">Sleep Analysis</div>
+        <div class="tr-sub">Recovery quality tracking</div>
+      </div>
+      <button class="toggle on" onclick="this.classList.toggle('on')"></button>
+    </div>
+
+    <div class="toggle-row">
+      <div class="tr-icon" style="background:rgba(165,214,167,0.1)">🏃</div>
+      <div class="tr-text">
+        <div class="tr-title">Activity & Exercise</div>
+        <div class="tr-sub">Optional — improves accuracy</div>
+      </div>
+      <button class="toggle" onclick="this.classList.toggle('on')"></button>
+    </div>
+
+    <div class="privacy-box">
+      <span class="pb-icon">🔒</span>
+      <span class="pb-text"><strong>Privacy Promise:</strong> Zero data collection. No servers. Your health data never leaves this iPhone.</span>
+    </div>
+
+    <button class="btn-primary btn-water" onclick="show(2)" style="margin-top:auto;margin-bottom:48px;">
+      Authorize & Continue →
+    </button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════
+     SCREEN 2 — FIRST MEASUREMENT + DASHBOARD PREVIEW
+     Immediate value: measure, meet buddy, see stats
+     ═══════════════════════════════════════════════ -->
+<div class="screen" id="s2" style="padding-top:72px;">
+  <div style="flex:1;display:flex;flex-direction:column;align-items:center;">
+    <!-- Measurement Ring -->
+    <div class="measure-ring-wrap">
+      <div class="measure-ring-bg"></div>
+      <svg viewBox="0 0 220 220">
+        <defs>
+          <linearGradient id="measureGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#4FC3F7"/>
+            <stop offset="100%" stop-color="#A5D6A7"/>
+          </linearGradient>
+        </defs>
+        <circle class="ring-track" cx="110" cy="110" r="100"/>
+        <circle class="ring-progress" cx="110" cy="110" r="100" 
+                stroke-dasharray="628" stroke-dashoffset="220"
+                id="progressRing"/>
+      </svg>
+      <div class="measure-creature">🌊</div>
+      <div class="measure-label">Stress: 28 — Relaxed</div>
+    </div>
+
+    <h1 class="center" style="font-size:22px;margin-bottom:6px">Your first reading is ready</h1>
+    <h2 class="center" style="font-size:14px;margin-bottom:20px">Ripple already sees your calm patterns. Here's your snapshot:</h2>
+
+    <!-- Metrics -->
+    <div class="metric-row">
+      <div class="metric-box">
+        <div class="mb-val" style="color:var(--water)">28</div>
+        <div class="mb-unit">/ 100</div>
+        <div class="mb-label">Stress Score</div>
+      </div>
+      <div class="metric-box">
+        <div class="mb-val" style="color:var(--earth)">62</div>
+        <div class="mb-unit">ms</div>
+        <div class="mb-label">HRV</div>
+      </div>
+      <div class="metric-box">
+        <div class="mb-val" style="color:var(--moon)">68</div>
+        <div class="mb-unit">bpm</div>
+        <div class="mb-label">Heart Rate</div>
+      </div>
+    </div>
+
+    <!-- Buddy Card -->
+    <div class="buddy-card">
+      <div class="bc-avatar">🌊</div>
+      <div class="bc-info">
+        <div class="bc-name">Ripple — Water Otter</div>
+        <div class="bc-sub">Gentle, playful, shy · Calm waves today</div>
+        <div class="bc-evo">🌱 Evolution: Droplet → Ripple in 30 days</div>
+      </div>
+    </div>
+
+    <!-- Tip -->
+    <div class="tip-box">
+      <div class="tip-label">💡 Today's Tip</div>
+      <div class="tip-text">Your stress is low! Try a 3-minute breathing session to keep Ripple's waves calm all day.</div>
+    </div>
+
+    <button class="btn-primary btn-mixed" style="margin-top:auto;margin-bottom:48px;">
+      Go to Dashboard →
+    </button>
+  </div>
+</div>
+
+</div><!-- phone -->
+
+<div class="option-badge">✦ Hybrid A+C — Emotional + Frictionless | 3 screens | ~30 sec</div>
+
+<script>
+const labels = ['Welcome','Permissions','Dashboard'];
+function show(i){
+  document.querySelectorAll('.screen').forEach((s,idx)=>s.classList.toggle('active',idx===i));
+  // Nav dots
+  document.querySelectorAll('.nav-dot').forEach((d,idx)=>{
+    d.classList.remove('active','done');
+    if(idx===i) d.classList.add('active');
+    else if(idx<i) d.classList.add('done');
+  });
+  // Nav lines
+  document.getElementById('line1').classList.toggle('filled',i>=1);
+  document.getElementById('line2').classList.toggle('filled',i>=2);
+  // Label
+  document.getElementById('navLabel').textContent = labels[i];
+  // Animate progress ring on screen 2
+  if(i===2){
+    setTimeout(()=>{
+      document.getElementById('progressRing').style.strokeDashoffset='180';
+    },200);
+  }
+}
+</script>
+</body>
+</html>
