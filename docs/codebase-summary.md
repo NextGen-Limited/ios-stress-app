@@ -1,9 +1,9 @@
 # Codebase Summary
 
-**Total Files:** ~600 files (including 303+ Swift files)
-**Total LOC:** ~34,000+
+**Total Files:** ~600 files (including 331+ Swift files)
+**Total LOC:** ~35,000+
 **Architecture:** MVVM + Protocol-Oriented Design
-**Last Updated:** June 12, 2026
+**Last Updated:** June 13, 2026
 
 ---
 
@@ -31,7 +31,7 @@ ios-stress-app/
 
 ---
 
-## iOS App Structure (225 Swift files)
+## iOS App Structure (250+ Swift files)
 
 ### Models (21 files, ~1,100 LOC)
 Core data structures for health metrics, stress calculations, and character system.
@@ -245,13 +245,14 @@ The app uses a 5-tab navigation structure (updated May 2026):
 - **Widgets**: WidgetKit for watchOS complications
 
 ### AI Integration
-- **Primary**: Apple Intelligence (Foundation Models, iOS 26+)
-- **Fallback**: CloudLLMService with SSE streaming
+- **Primary**: SupabaseLLMService with SSE streaming via Supabase Edge Functions (production cloud service, fully configured)
+- **Fallback**: AppleIntelligenceService with Foundation Models (iOS 26+ on-device)
 - **Architecture**: Server-Sent Events for real-time streaming
 - **Features**: Stress insights, breathing guidance, conversation
+- **Configuration**: SupabaseConfig (URL + anonKey) for cloud endpoints
 
 ### Dependencies
-- **13 SPM packages** - Moya, Alamofire, Kingfisher, SwiftUICharts, ReactiveSwift, RxSwift, Chat, Giphy iOS SDK, MediaPicker, ActivityIndicatorView, AnchoredPopup, AnimatedTabBar, LibWebP
+- **13+ SPM packages** - Moya, Alamofire, Kingfisher, SwiftUICharts, ReactiveSwift, RxSwift, Chat, Giphy iOS SDK, MediaPicker, ActivityIndicatorView, AnchoredPopup, AnimatedTabBar, LibWebP
 - **Privacy-first design** - All data processed locally when possible
 - **Modular architecture** - Protocol-based dependency injection
 
@@ -294,10 +295,12 @@ The app uses a 5-tab navigation structure (updated May 2026):
 4. **Morning Readiness Check** - HRV trend analysis for daily readiness
 5. **Real-time Stress Score** - HRV analysis with immediate feedback
 6. **Mini Walk Exercise** - Walking exercise screen with circular timer
-7. **IAP Premium Screen** - Subscription paywall with StoreKit service protocol
-8. **CloudLLMService** - Hardcoded endpoint configuration with SSE streaming
-9. **5-Tab Navigation** - Home/Trends/Breathing/Characters/Settings structure
-10. **Character Collection UI** - 5 elemental characters with evolution system, unlock types (free/premium/streak-gated), persistent storage, 38 SVG assets
+7. **Real StoreKit 2 Premium** - Real App Store product fetching + transaction monitoring (PR #19, Jun 12)
+8. **SupabaseLLMService** - Production cloud service with SSE streaming (replaces CloudLLMService)
+9. **AppleIntelligenceService** - On-device Foundation Models for iOS 26+ fallback
+10. **5-Tab Navigation** - Home/Trends/Breathing/Characters/Settings structure
+11. **Character Collection UI** - 5 elemental characters with evolution system, unlock types (free/premium/streak-gated), persistent storage, 38 SVG assets
+12. **CloudKit E2E Encryption** - End-to-end encrypted cloud sync (complete)
 
 ## New Files Added (IAP Premium)
 - **PremiumState** - Centralized premium state management singleton
@@ -350,15 +353,17 @@ See `/docs/design/ASSET_NAMING.md` for full SVG asset naming specification.
 
 | Metric | Value |
 |--------|-------|
-| **Total Swift Files** | 303+ |
-| **Total LOC** | ~34,000+ |
-| **iOS App Files** | 225+ |
-| **External Dependencies** | 13 SPM packages |
+| **Total Swift Files** | 331+ |
+| **Total LOC** | ~35,000+ |
+| **iOS App Files** | 250+ |
+| **watchOS App Files** | 46+ |
+| **Widget Files** | 7+ |
+| **External Dependencies** | 13+ SPM packages |
 | **Average File Size** | <200 LOC |
 | **Font** | Roboto (6 weights) |
 | **Character Assets** | 38 SVG files |
 
 ---
 
-**Last Updated:** June 12, 2026
+**Last Updated:** June 13, 2026
 **Maintainers:** Phuong Doan

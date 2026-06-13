@@ -2,7 +2,7 @@
 
 **Platform:** iOS 17+ / watchOS 10+
 **Section:** Setup, Requirements, Build Instructions
-**Last Updated:** June 12, 2026
+**Last Updated:** June 13, 2026
 
 ---
 
@@ -202,8 +202,8 @@ xcodebuild test \
 - [ ] CloudKit reset works
 
 #### Streaming AI Features
-- [ ] CloudLLM streaming chat works with SSEParser
-- [ ] LLMAPITarget hardcoded endpoint configuration
+- [ ] SupabaseLLMService streaming chat works with SSEParser
+- [ ] SupabaseConfig endpoint properly configured (check URL + anonKey)
 - [ ] Fallback to Apple Intelligence (iOS 26+)
 
 #### Accessibility

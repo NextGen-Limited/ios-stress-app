@@ -143,7 +143,7 @@ Data Layer (SwiftData + CloudKit)
 | Health Data | HealthKit (read-only) |
 | Widgets | WidgetKit |
 | Networking | Moya + Alamofire |
-| AI Chat | Cloud LLM (SSE streaming) |
+| AI Chat | SupabaseLLMService (production) + AppleIntelligenceService (iOS 26+ fallback) |
 | Charts | SwiftUICharts |
 
 ## Dependencies
@@ -220,6 +220,7 @@ xcodebuild test -scheme StressMonitor \
 ---
 
 **Created by:** Phuong Doan
-**Version:** 1.0
+**Version:** 1.0 Pre-Ship RC1
 **Platform:** iOS 17+ / watchOS 10+
-**Last Updated:** June 7, 2026
+**Last Updated:** June 13, 2026
+**Ship Status:** B1 ✅ (Jun 7), B2 ✅ (Jun 12), B3 🚫 (test suite pending)

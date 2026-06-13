@@ -70,9 +70,11 @@ StressMonitor/
 │   ├── DataManagement/      # Export/delete operations
 │   ├── HealthKit/           # Health data fetching (~5 files)
 │   ├── LLM/                 # AI chat services with SSE streaming
-│   │   ├── CloudLLMService.swift    # HTTP/SSE streaming service
-│   │   ├── SSEParser.swift          # NEW: Efficient SSE parsing
-│   │   └── LLMAPITarget.swift       # NEW: Hardcoded endpoint config
+│   │   ├── SupabaseLLMService.swift # PRODUCTION: Cloud LLM via Supabase Edge Functions
+│   │   ├── AppleIntelligenceService.swift # iOS 26+ on-device AI fallback
+│   │   ├── SSEParser.swift          # Server-Sent Events streaming parser
+│   │   ├── ChatContextBuilder.swift # System prompt assembly from health data
+│   │   └── LLMServiceProtocol.swift # Service abstraction
 │   ├── Protocols/           # Service interfaces
 │   ├── Repository/          # SwiftData persistence
 │   └── Sync/                # Sync coordination

@@ -1,15 +1,15 @@
 # Project Roadmap
 
 **Current Version:** 1.0 (Pre-Ship - RC1)
-**Release Date:** Target July/August 2026
-**Status:** Feature Complete — 3 blockers pending
-**Last Updated:** June 12, 2026
+**Release Date:** Target late June 2026 (pending B3 test suite)
+**Status:** Feature Complete — 1 blocker pending (B3)
+**Last Updated:** June 13, 2026
 
 ---
 
 ## Version 1.0 (Current - Pre-Ship RC1)
 
-**Status:** ✅ Feature Complete — 1 Blocker Pending (B3). B1 & B2 Resolved (Jun 12, 2026)
+**Status:** ✅ Feature Complete — 1 Blocker Pending (B3 test suite). B1 ✅ Resolved (Jun 7), B2 ✅ Resolved (Jun 12, 2026)
 
 ### Implemented Features
 
@@ -43,10 +43,12 @@
   - Custom shapes: TriangleShape, TeardropShape, FlameShape
   - Full Reduce Motion + VoiceOver support
 - ✅ Settings screen — Figma card-based design (Mar 2026)
-- ✅ **3-Tab Navigation Structure** (Apr 2026)
+- ✅ **5-Tab Navigation Structure** (May 2026)
   - Home: Dashboard with stress monitoring
-  - Action: Quick actions, breathing exercises, AI chat
-  - Trend: Historical analytics and trends
+  - Trends: Historical analytics and trends
+  - Breathing: Breathing exercises
+  - Characters: Character collection with evolution
+  - Settings: App configuration and data management
 - ✅ Trends view — Figma alignment (Mar 2026)
   - Scrollable card list; global NavigationStack/TimeRangePicker removed
   - All cards unified: `adaptiveCardBackground` + `settingsCardRadius` + shadow
@@ -73,8 +75,8 @@
 - ✅ **Streaming AI Chat** - Real-time token streaming with SSEParser (Apr 2026)
 - ✅ **Box Breathing Figma Alignment** - Enhanced breathing exercise visuals (Apr 2026)
 - ✅ **Character Collection UI** - 5 elemental characters with evolution system, 38 SVG assets (Jun 2026)
-- ✅ **B1 Resolution (Jun 7)** - CloudLLM removed; SupabaseLLMService as production cloud service
-- ✅ **B2 Real StoreKit 2 (Jun 12)** - Real App Store product fetching, transaction monitoring, PremiumState singleton (PR #19)
+- ✅ **B1 Resolution (Jun 7)** - CloudLLM removed; SupabaseLLMService deployed as production service
+- ✅ **B2 Real StoreKit 2 (Jun 12)** - Real App Store product fetching, transaction monitoring, PremiumState singleton (PR #19 merged)
 
 #### Apple Watch
 - ✅ Standalone watch app
@@ -85,18 +87,17 @@
 - ✅ Independent CloudKit sync
 
 #### Additional Features
-- ✅ AI Chat Mode with Streaming (Apr 2026, updated Jun 2026)
-  - Conversational AI via Apple Intelligence Foundation Models (iOS 26+)
-  - **SupabaseLLMService with SSE streaming** - HTTP/SSE to Supabase Edge Functions (primary cloud fallback)
-  - **AppleIntelligenceService** - On-device Foundation Models for iOS 26+
-  - **SSEParser** for streaming infrastructure
-  - **Configurable endpoint** via SupabaseConfig (URL + anonKey)
+- ✅ AI Chat Mode with Streaming (Apr 2026, production ready Jun 2026)
+  - **SupabaseLLMService (Production Primary)** - HTTP/SSE to Supabase Edge Functions
+  - **AppleIntelligenceService (iOS 26+ Fallback)** - On-device Foundation Models
+  - **SSEParser** for efficient streaming infrastructure
+  - **Configurable endpoint** via SupabaseConfig (URL + anonKey) for easy provider switching
   - Bottom sheet overlay with native SwiftUI chat UI
   - **Real-time token streaming** - Users see AI response as it's generated
-  - Health/stress context injected into system prompt via ChatContextBuilder
+  - Health/stress context injected into system prompt via ChatContextBuilder (anonymized)
   - Quick action prompt suggestions (ChatQuickActions)
   - Protocol-based LLM service for future cloud provider swap
-  - Graceful fallback on pre-iOS 26 devices
+  - Graceful fallback on pre-iOS 26 devices (uses SupabaseLLM)
   - Session-only persistence (no SwiftData for chat)
 - ✅ **ActionView** - Quick access to wellness tools (Apr 2026)
   - Breathing exercises with Figma-aligned UI

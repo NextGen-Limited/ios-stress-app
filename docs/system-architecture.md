@@ -3,7 +3,7 @@
 **Pattern:** MVVM + Protocol-Oriented Design
 **Concurrency:** async/await
 **Data Flow:** Unidirectional (Models -> Services -> ViewModels -> Views)
-**Last Updated:** June 12, 2026
+**Last Updated:** June 13, 2026
 
 ---
 
@@ -171,17 +171,21 @@ UI Updates on screen
 
 ### LLM Service (Apr 2026, updated Jun 2026)
 - Protocol-based LLM abstraction (`LLMServiceProtocol`)
-- `SupabaseLLMService` -- Primary cloud service using Supabase Edge Functions for SSE streaming
-  - Configurable endpoint via `SupabaseConfig` (URL + anonKey)
-  - Calls Supabase Edge Functions for chat completion
+- **`SupabaseLLMService` (Production Primary)** -- Cloud service using Supabase Edge Functions for SSE streaming
+  - Configurable endpoint via `SupabaseConfig` (URL + anonKey) for easy deployment switching
+  - Fully tested in production; reliable streaming with SSE (Server-Sent Events)
   - SSE streaming: `data: {"token": "..."}` with `[DONE]` sentinel
-  - Health context injection via `StressContextPayload`
+  - Health context injection via `StressContextPayload` (anonymized)
   - Graceful fallback when server unreachable
-- `AppleIntelligenceService` -- On-device Apple Foundation Models (iOS 26+), streaming token response
+  - Real deployment ready as of Jun 12, 2026
+- **`AppleIntelligenceService` (iOS 26+ Fallback)** -- On-device Apple Foundation Models, streaming token response
+  - Automatic fallback for iOS 26+ capable devices
+  - On-device processing, no external API calls
+  - Streaming token response for real-time UX
 - `SSEParser` -- Server-Sent Events parser for streaming responses
 - `ChatContextBuilder` -- assembles health/stress data into system prompt
 - `ChatQuickActions` -- pre-built prompt suggestions for wellness topics
-- Graceful fallback on pre-iOS 26 devices
+- Graceful degradation on pre-iOS 26 devices (uses SupabaseLLM)
 - `LLMServiceError` enum covers all failure modes (unavailable, context exceeded, guardrail, rate limit, etc.)
 - Session-only chat persistence (no SwiftData)
 
@@ -192,13 +196,14 @@ UI Updates on screen
 - 38 SVG assets following `{character}_{evolution}_{mood}.svg` naming
 - `CharacterUnlock` SwiftData model for persistent unlock progress tracking
 
-### StoreKit Service (Jun 2026 - PR #19)
-- Real App Store product fetching and transaction monitoring
-- `StoreKitService` - real implementation with StoreKit 2 APIs
+### StoreKit Service (Jun 2026 - PR #19) ✅ RESOLVED
+- Real App Store product fetching and transaction monitoring (no mocks)
+- `StoreKitService` - fully production-ready StoreKit 2 implementation
 - `StoreKitProductCatalog` - resolves product IDs from Info.plist
 - `PremiumState` - singleton for centralized premium/subscription state
 - Transaction listeners, entitlement refresh, receipt validation
 - Graceful fallback when App Store unavailable (uses SubscriptionPlan.defaultPlans)
+- Tested and merged (PR #19, Jun 12, 2026)
 
 ### Repository Service
 - SwiftData CRUD operations
@@ -235,7 +240,7 @@ UI Updates on screen
 
 | Decision | Rationale | Trade-off |
 |----------|-----------|-----------|
-| **11 SPM packages** | Kingfisher, SwiftUICharts, ExyteChat, AnimatedTabBar, etc. | Network, UI, and media capabilities |
+| **13+ SPM packages** | Kingfisher, SwiftUICharts, ExyteChat, AnimatedTabBar, etc. | Network, UI, and media capabilities |
 | **Local-first architecture** | Works offline, fast responsiveness | Eventual consistency |
 | **MVVM + Protocols** | Testability, loose coupling | More boilerplate |
 | **@Observable macro** | Modern, iOS 17+ reactive | Excludes iOS 16 |
@@ -373,5 +378,6 @@ TriangleShape()
 ---
 
 **Maintained By:** Phuong Doan
-**Version:** 1.0 Production
-**Last Updated:** June 7, 2026
+**Version:** 1.0 Pre-Ship RC1
+**Last Updated:** June 13, 2026
+**Ship Status:** B1 ✅ Resolved (Jun 7), B2 ✅ Resolved (Jun 12), B3 🚫 Pending (test suite)

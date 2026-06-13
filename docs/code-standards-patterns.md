@@ -352,31 +352,36 @@ func sendMessage(_ content: String) async {
 - `continuation.finish(throwing:)` on error
 - `continuation.onTermination` cancels the underlying Task
 
-### SSEParser for Efficient Streaming (Apr 2026)
+### SSEParser for Efficient Streaming (Apr 2026, Production Jun 2026)
 
-**NEW**: SSEParser efficiently processes Server-Sent Events from CloudLLMService:
+**Production-Ready**: SSEParser efficiently processes Server-Sent Events from SupabaseLLMService:
 
 ```swift
-// SSEParser.swift - Handles streaming token parsing
+// SSEParser.swift - Handles streaming token parsing from Supabase Edge Functions
 func parseStream(_ stream: AsyncStream<String>) -> AsyncThrowingStream<String, Error> {
-    // Implementation details for parsing SSE format
-    // Handles: data: {token} lines and event boundaries
+    // Parses SSE format: data: {"token": "..."}
+    // Handles: event boundaries and [DONE] sentinel
+    // Robust error handling for network interruptions
 }
 ```
 
-### LLMAPITarget for Endpoint Configuration (Apr 2026)
+### SupabaseConfig for Endpoint Configuration (Jun 2026)
 
-**NEW**: LLMAPITarget simplifies CloudLLM endpoint management:
+**Production**: SupabaseConfig manages cloud LLM endpoint for easy provider switching:
 
 ```swift
-// LLMAPITarget.swift - Streamlined endpoint configuration
-struct LLMAPITarget {
-    // Hardcoded endpoint for simplicity
-    static let cloudEndpoint = "https://self-hosted-gateway/v1/chat/completions"
+// SupabaseConfig.swift - Configurable endpoint for Supabase Edge Functions
+struct SupabaseConfig {
+    static let url = "https://your-project.supabase.co/functions/v1/chat"
+    static let anonKey = "your-anon-key"
     
-    // Provides simplified API for CloudLLMService
-    func createRequest(messages: [ChatMessage]) -> URLRequest
+    // Enables easy deployment to different Supabase projects
+    // No hardcoded endpoints; fully configurable
 }
+
+// Used by SupabaseLLMService for cloud LLM calls
+let service = SupabaseLLMService()
+let response = try await service.send(messages: messages, systemPrompt: prompt)
 ```
 
 ---

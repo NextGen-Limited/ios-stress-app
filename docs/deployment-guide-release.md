@@ -221,23 +221,26 @@ StressMonitor 1.0
 
 Initial Release:
 • 5-factor stress algorithm (HRV, Heart Rate, Sleep, Activity, Recovery)
-• AI Chat with streaming responses (Apple Intelligence + Cloud LLM with SSE)
+• AI Chat with streaming responses (SupabaseLLMService primary + Apple Intelligence iOS 26+ fallback with SSE)
 • Personal baseline adaptation over 30 days
-• 3-tab navigation (Home/Action/Trend) for improved user flow
-• ActionView with quick stress relief tools
+• 5-tab navigation (Home/Trends/Breathing/Characters/Settings) for improved user flow
+• Real-time stress measurement with confidence scoring
 • Apple Watch standalone app with complications
 • CloudKit sync across devices with end-to-end encryption
 • Historical tracking with comprehensive trends analysis
 • Box breathing exercises with Figma-aligned animations
+• Character collection system with 5 elemental creatures and 3-stage evolution
 • Data export and management capabilities
+• Real StoreKit 2 premium subscriptions
 • Comprehensive accessibility features (WCAG AA)
 
-New Features (Apr 2026):
-• Real-time streaming AI chat responses
-• Simplified 3-tab navigation structure
-• Quick access to breathing exercises and AI support
+Recent Updates (May-Jun 2026):
+• Real-time streaming AI chat responses via SupabaseLLMService
+• 5-tab navigation structure (Home/Trends/Breathing/Characters/Settings)
+• Character evolution system with 38 SVG assets
+• Real StoreKit 2 product fetching and purchase flow (PR #19)
 • Enhanced breathing exercise visual design
-• Improved streaming chat performance
+• Improved streaming chat performance and reliability
 
 Thank you for using StressMonitor!
 ```
@@ -337,12 +340,13 @@ Solution: In Xcode
 → Match configured App ID in Apple Developer
 ```
 
-**Error:** "CloudLLM endpoint connection failed"
+**Error:** "Supabase LLM endpoint connection failed"
 ```
 Solution: Check internet connection
-→ Verify Supabase Edge Functions are deployed
-→ Test endpoint manually in browser
-→ Check SupabaseConfig for correct URL
+→ Verify Supabase Edge Functions are deployed and accessible
+→ Test endpoint manually in browser (check SupabaseConfig.url)
+→ Check anonKey in SupabaseConfig matches Supabase project
+→ Verify Supabase project is not in paused state
 ```
 
 ### TestFlight Issues

@@ -1,8 +1,9 @@
 # StressMonitor Documentation Index
 
 **Version:** 1.0 (Pre-Ship RC1)
-**Last Updated:** June 12, 2026
-**Blocker Status:** 1 critical remaining (B3 - test suite)
+**Last Updated:** June 13, 2026
+**Blocker Status:** 1 critical remaining (B3 - comprehensive test suite rewrite)
+**Resolved Blockers:** B1 ✅ (Jun 7), B2 ✅ (Jun 12)
 
 Complete documentation for the StressMonitor iOS/watchOS stress monitoring application.
 
@@ -21,9 +22,9 @@ Product vision, requirements, features, algorithm specifications, and success me
 ### 2. **[Codebase Summary](./codebase-summary.md)**
 File structure, organization, component breakdown, and code metrics.
 - High-level project structure
-- iOS app architecture (208 files)
-- watchOS app architecture (44 files)
-- Widget architecture (7 files)
+- iOS app architecture (250+ files, ~28K LOC)
+- watchOS app architecture (46+ files, ~3.2K LOC)
+- Widget architecture (7+ files, ~1.4K LOC)
 - Component responsibilities and file metrics
 
 ### 3. **[Code Standards](./code-standards.md)** (Overview)
@@ -70,17 +71,17 @@ Current status, planned features, timeline, and success metrics.
 
 ## Quick Reference
 
-### Codebase Metrics (as of Jun 2026)
+### Codebase Metrics (as of Jun 13, 2026)
 
 | Metric | Value |
 |--------|-------|
-| **Total Swift Files** | 175+ |
-| **Total LOC** | ~33,500 |
-| **iOS App** | 80+ files, ~27,450 LOC |
-| **watchOS App** | 40 files, ~3,224 LOC |
-| **Widgets** | 11 files, ~1,586 LOC |
-| **Tests** | 4 files, ~532 LOC (pending rewrite) |
-| **External Dependencies** | 13 SPM packages |
+| **Total Swift Files** | 331+ |
+| **Total LOC** | ~35,000+ |
+| **iOS App** | 250+ files, ~28K LOC |
+| **watchOS App** | 46+ files, ~3.2K LOC |
+| **Widgets** | 7+ files, ~1.4K LOC |
+| **Tests** | 5+ files (placeholder - pending B3 rewrite) |
+| **External Dependencies** | 13+ SPM packages |
 | **CI/CD** | GitHub Actions (macos-15, Xcode 26) |
 | **Character Assets** | 38 SVG files |
 
@@ -135,11 +136,11 @@ Current status, planned features, timeline, and success metrics.
 | **@Observable macro** | Modern iOS 17+ reactive |
 | **SwiftData (not Core Data)** | iOS 17+ native, SwiftUI-friendly |
 | **CloudKit E2E encryption** | User privacy guarantee |
-| **SPM Dependencies** | 11 packages (Kingfisher, SwiftUICharts, ExyteChat, AnimatedTabBar, etc.) |
+| **SPM Dependencies** | 13+ packages (Kingfisher, SwiftUICharts, ExyteChat, AnimatedTabBar, etc.) |
 | **WidgetKit (not ClockKit)** | watchOS 10+ requirement |
 | **async/await throughout** | Modern concurrency |
 | **Foundation Models** | On-device LLM via Apple Intelligence (iOS 26+) |
-| **SupabaseLLMService** | Supabase Edge Functions as cloud LLM fallback service |
+| **SupabaseLLMService** | Supabase Edge Functions as cloud LLM **production** service (B1 resolved Jun 7) |
 | **Real StoreKit 2** | App Store product fetching + transaction monitoring (PR #19, Jun 12) |
 | **5-Tab Navigation** | Home/Trends/Breathing/Characters/Settings structure |
 | **Character System** | 5 elemental creatures with 3-stage evolution, 38 SVG assets |
@@ -211,7 +212,7 @@ SwiftUI Views → @Observable ViewModels → Protocol-based Services
 | **Resolved (Jun 12)** | ✅ B1 & B2 | CloudLLM, StoreKit 2 |
 | **Bug Fixes** | ✅ Ongoing | GitHub Issues |
 | **Feature Requests** | 📋 Roadmap in docs | Roadmap discussion |
-| **Documentation** | ✅ Updated Jun 12 | This index |
+| **Documentation** | ✅ Updated Jun 13 | This index |
 
 ---
 
@@ -227,6 +228,6 @@ SwiftUI Views → @Observable ViewModels → Protocol-based Services
 
 **Read the README.md** at project root for quick start and feature overview.
 
-**Last Updated:** June 7, 2026
+**Last Updated:** June 13, 2026
 **Maintained By:** Phuong Doan
-**Generated with:** repomix codebase analysis
+**Generated with:** repomix codebase analysis + manual documentation review

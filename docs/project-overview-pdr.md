@@ -1,9 +1,9 @@
 # StressMonitor: Product Overview & Requirements
 
 **Version:** 1.0 (Pre-Ship - RC1)
-**Status:** Feature Complete — 3 Blockers Pending
+**Status:** Feature Complete — 1 Blocker Pending (B3 test suite)
 **Platform:** iOS 17+ / watchOS 10+
-**Last Updated:** June 12, 2026
+**Last Updated:** June 13, 2026
 
 ---
 
@@ -26,14 +26,14 @@ StressMonitor is a **privacy-first stress monitoring application** that uses Hea
 | **Historical Tracking** | Timeline view with date/category filtering | ✅ Complete |
 | **Trend Analytics** | Line charts, bar charts, heatmap, distribution stats -- Figma-aligned | ✅ Complete |
 | **AI-Powered Insights** | Personalized insights via InsightGeneratorService | ✅ Complete |
-| **AI Chat** | Conversational AI via Apple Intelligence (iOS 26+) or CloudLLM fallback with SSE streaming | ✅ Complete |
+| **AI Chat** | Conversational AI via SupabaseLLMService (primary) + Apple Intelligence (iOS 26+ fallback) with SSE streaming | ✅ Complete |
 | **Weekly Dot-Matrix Timeline** | 7-day x 7-slot dot grid replacing 24h scatter chart | ✅ Complete |
 | **Apple Watch Standalone App** | Independent stress monitoring with WidgetKit complications | ✅ Complete |
 | **CloudKit Sync** | E2E encrypted offline-first cloud sync | ✅ Complete |
 | **Data Export** | CSV/JSON export with date filtering | ✅ Complete |
 | **Data Management** | Delete by range, category, or full wipe | ✅ Complete |
 | **Box Breathing** | Figma-aligned 4-4-4-4 pattern, 3-min sessions | ✅ Complete |
-| **3-Tab Navigation** | Home (Dashboard), Action (Quick actions/Chat), Trend (Analytics) | ✅ Complete |
+| **5-Tab Navigation** | Home/Trends/Breathing/Characters/Settings structure (May 2026) | ✅ Complete |
 | **Mini Walk Exercise** | Walking exercise with circular timer and Figma-aligned design | ✅ Complete |
 | **Real StoreKit 2 Premium** | Real App Store product fetching + transaction monitoring (PR #19 Jun 12) | ✅ Complete |
 | **Stress History Timeline** | Activity correlation with stress measurements | ✅ Complete |
@@ -48,9 +48,9 @@ StressMonitor is a **privacy-first stress monitoring application** that uses Hea
 
 | Blocker | Issue | Status |
 |---------|-------|--------|
-| ~~**B1**~~ | ~~CloudLLMService hardcoded ngrok endpoint~~ | ✅ Resolved (SupabaseLLMService) |
-| ~~**B2**~~ | ~~StoreKit implementation is mock-only~~ | ✅ Resolved (PR #19, Jun 12, 2026) |
-| **B3** | Test suite is placeholder only | 🚫 P0 Blocking (pending rewrite) |
+| ~~**B1**~~ | ~~CloudLLMService hardcoded ngrok endpoint~~ | ✅ Resolved Jun 7 (SupabaseLLMService) |
+| ~~**B2**~~ | ~~StoreKit implementation is mock-only~~ | ✅ Resolved Jun 12 (Real StoreKit 2 - PR #19) |
+| **B3** | Test suite is placeholder only | 🚫 P0 Blocking (comprehensive rewrite pending) |
 
 ### Planned Features (v1.1)
 
@@ -306,13 +306,16 @@ All core features complete and shipping.
 ## Ship Status Summary
 
 **Current:** v1.0 Feature Complete (RC1)
-**Blockers:** 1 critical remaining (B3 test suite)
-**Resolved:** B1 (Jun 7, SupabaseLLMService), B2 (Jun 12, Real StoreKit 2 - PR #19)
-**Next:** Resolve B3 (test suite), then TestFlight → App Store
+**Blockers:** 1 critical remaining (B3: comprehensive test suite rewrite)
+**Resolved:** B1 (Jun 7, SupabaseLLMService) ✅ | B2 (Jun 12, Real StoreKit 2 - PR #19) ✅
+**Next Steps:** 
+1. Resolve B3 (test suite) — estimated 1-2 weeks
+2. TestFlight beta validation
+3. App Store submission
 
 ---
 
 **Owner:** Phuong Doan
-**Status:** Pre-Ship (RC1) — 1 blocker remaining
-**Last Updated:** June 12, 2026
-**Next Review:** Post-blocker resolution (target July 2026)
+**Status:** Pre-Ship (RC1) — Feature-complete, 1 blocker
+**Last Updated:** June 13, 2026
+**Target Ship Date:** Post-blocker resolution (target late June 2026)
