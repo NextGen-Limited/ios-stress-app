@@ -1,57 +1,33 @@
 import SwiftUI
 
+/// Root watch UI: a swipeable page tab view across the three screens.
+///
+/// - **Home** — character-reactive face (no score)
+/// - **Breathe** — 4-7-8 guided breathing
+/// - **History** — last 7 days, colour-coded
 struct ContentView: View {
   @State private var viewModel = WatchStressViewModel()
 
   var body: some View {
-    NavigationStack {
-      VStack(spacing: WatchDesignTokens.standardSpacing) {
-        if let stress = viewModel.currentStress {
-          CompactStressView(stressLevel: stress.level, category: stress.category)
-        } else {
-          CompactStressView(stressLevel: 0, category: .relaxed)
-            .opacity(0.5)
-        }
+    TabView {
+      WatchHomeView(viewModel: viewModel)
+        .tag(0)
 
-        Button(action: {
-          Task {
-            await viewModel.measureStress()
-          }
-        }) {
-          HStack {
-            if viewModel.isLoading {
-              ProgressView()
-                .progressViewStyle(.circular)
-            } else {
-              Image(systemName: "heart.fill")
-              Text("Measure")
-            }
-          }
-          .frame(maxWidth: .infinity)
-          .frame(height: WatchDesignTokens.buttonHeight)
-          .background(Color.blue)
-          .foregroundStyle(.white)
-          .cornerRadius(WatchDesignTokens.buttonCornerRadius)
-        }
-        .disabled(viewModel.isLoading)
+      WatchBreatheView()
+        .tag(1)
 
-        if let errorMessage = viewModel.errorMessage {
-          Text(errorMessage)
-            .font(.system(size: WatchDesignTokens.captionSize))
-            .foregroundStyle(.red)
-            .multilineTextAlignment(.center)
-        }
+      NavigationStack {
+        WatchHistoryView(viewModel: viewModel)
       }
-      .padding()
-      .navigationTitle("Stress")
-      .task {
-        await viewModel.requestAuthorization()
-        await viewModel.loadLatestStress()
-      }
+      .tag(2)
     }
+    .tabViewStyle(.page)
+    .background(StressCharacterPalette.darkCanvas.ignoresSafeArea())
   }
 }
 
+#if DEBUG
 #Preview {
   ContentView()
 }
+#endif

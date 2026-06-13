@@ -1,8 +1,9 @@
 import SwiftUI
 import WidgetKit
 
-/// Small widget view (16x16 modules)
-/// Displays stress ring and current stress level
+/// Small widget view — **character-reactive face only, no numeric score**.
+///
+/// The Ripple 💧 character's expression and accent ring *are* the stress indicator.
 @available(iOS 17.0, *)
 public struct SmallWidgetView: View {
 
@@ -25,68 +26,33 @@ public struct SmallWidgetView: View {
         .containerBackground(.fill.tertiary, for: .widget)
     }
 
-    // MARK: - Stress Content
+    // MARK: - Character-Reactive Content
 
     @ViewBuilder
     private func stressContent(stress: StressData) -> some View {
-        VStack(spacing: 4) {
-            // Stress ring
-            ZStack {
-                Circle()
-                    .stroke(Color.secondary.opacity(0.2), lineWidth: 6)
+        let tier = WidgetStressTier.from(level: stress.level)
 
-                Circle()
-                    .trim(from: 0, to: stress.level / 100)
-                    .stroke(
-                        colorForLevel(stress.level),
-                        style: StrokeStyle(lineWidth: 6, lineCap: .round)
-                    )
-                    .rotationEffect(.degrees(-90))
-                    .animation(.easeInOut(duration: 0.5), value: stress.level)
+        VStack(spacing: 6) {
+            WidgetCharacterFace(tier: tier, size: 68, showsRing: true, glow: true)
 
-                // Category icon
-                Image(systemName: stress.stressCategory.icon)
-                    .font(.system(size: 20))
-                    .foregroundColor(colorForLevel(stress.level))
-            }
-            .frame(width: 52, height: 52)
-
-            // Stress level
-            Text("\(Int(stress.level))")
-                .font(.system(size: 28, weight: .bold, design: .rounded))
-                .foregroundColor(.primary)
-
-            // Category label
-            Text(stress.stressCategory.displayName.uppercased())
-                .font(.system(size: 9, weight: .semibold))
-                .foregroundColor(.secondary)
-                .tracking(0.5)
+            Text(tier.label)
+                .font(.system(size: 12, weight: .semibold, design: .rounded))
+                .foregroundColor(tier.accent)
+                .contentTransition(.opacity)
         }
         .padding(12)
+        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 
-    // MARK: - Placeholder View
+    // MARK: - Placeholder
 
     private var placeholderView: some View {
-        VStack(spacing: 4) {
-            ZStack {
-                Circle()
-                    .stroke(Color.secondary.opacity(0.2), lineWidth: 6)
-
-                Image(systemName: "waveform.path")
-                    .font(.system(size: 18))
-                    .foregroundColor(.secondary)
-            }
-            .frame(width: 52, height: 52)
-
-            Text("--")
-                .font(.system(size: 28, weight: .bold, design: .rounded))
+        VStack(spacing: 6) {
+            WidgetCharacterFace(tier: .balanced, size: 60, showsRing: true)
+                .opacity(0.5)
+            Text("StressMonitor")
+                .font(.system(size: 10, weight: .medium))
                 .foregroundColor(.secondary)
-
-            Text("LOADING")
-                .font(.system(size: 9, weight: .semibold))
-                .foregroundColor(.secondary)
-                .tracking(0.5)
         }
         .padding(12)
     }
@@ -95,14 +61,11 @@ public struct SmallWidgetView: View {
 
     private var emptyStateView: some View {
         VStack(spacing: 8) {
-            Image(systemName: "heart.text.square.fill")
-                .font(.system(size: 24))
-                .foregroundColor(.accentColor)
-
+            Text("💧")
+                .font(.system(size: 32))
             Text("No Data")
                 .font(.system(size: 12, weight: .medium))
                 .foregroundColor(.primary)
-
             Text("Open app to measure")
                 .font(.system(size: 9))
                 .foregroundColor(.secondary)
@@ -110,64 +73,23 @@ public struct SmallWidgetView: View {
         }
         .padding(12)
     }
-
-    // MARK: - Helpers
-
-    private func colorForLevel(_ level: Double) -> Color {
-        switch level {
-        case 0...25: return Color(hex: "#34C759")
-        case 26...50: return Color(hex: "#007AFF")
-        case 51...75: return Color(hex: "#FFD60A")
-        case 76...100: return Color(hex: "#FF9500")
-        default: return .secondary
-        }
-    }
-}
-
-// MARK: - Color Extension for Widget
-
-extension Color {
-    init(hex: String) {
-        let hex = hex.trimmingCharacters(in: CharacterSet.alphanumerics.inverted)
-        var int: UInt64 = 0
-        Scanner(string: hex).scanHexInt64(&int)
-        let alphaVal, redVal, greenVal, blueVal: UInt64
-        switch hex.count {
-        case 3:
-            (alphaVal, redVal, greenVal, blueVal) = (255, (int >> 8) * 17, (int >> 4 & 0xF) * 17, (int & 0xF) * 17)
-        case 6:
-            (alphaVal, redVal, greenVal, blueVal) = (255, int >> 16, int >> 8 & 0xFF, int & 0xFF)
-        case 8:
-            (alphaVal, redVal, greenVal, blueVal) = (int >> 24, int >> 16 & 0xFF, int >> 8 & 0xFF, int & 0xFF)
-        default:
-            (alphaVal, redVal, greenVal, blueVal) = (1, 1, 1, 0)
-        }
-        self.init(
-            .sRGB,
-            red: Double(redVal) / 255,
-            green: Double(greenVal) / 255,
-            blue: Double(blueVal) / 255,
-            opacity: Double(alphaVal) / 255
-        )
-    }
 }
 
 // MARK: - Preview
 
+#if DEBUG
 @available(iOS 17.0, *)
-#Preview {
-    SmallWidgetView(entry: StressEntry(
-        date: Date(),
-        latestStress: StressData(
-            level: 35,
-            category: "mild",
-            hrv: 55,
-            heartRate: 68,
-            confidence: 0.85,
-            timestamp: Date()
-        ),
-        history: [],
-        baseline: (50.0, 60.0),
-        isPlaceholder: false
-    ))
+struct SmallWidgetPreviewProvider: PreviewProvider {
+    static var previews: some View {
+        let entry = StressEntry(
+            date: Date(),
+            latestStress: nil,
+            history: [],
+            baseline: nil,
+            isPlaceholder: true
+        )
+        return SmallWidgetView(entry: entry)
+            .previewContext(WidgetPreviewContext(family: .systemSmall))
+    }
 }
+#endif

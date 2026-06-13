@@ -84,7 +84,7 @@ struct CircularStressView: View {
     }
 
     private var stressLevelText: String {
-        Int(stressLevel).description
+        StressTier.from(level: stressLevel).label
     }
 }
 

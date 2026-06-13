@@ -123,7 +123,7 @@ struct RectangularStressView: View {
 
     // MARK: - Computed Properties
     private var stressLevelText: String {
-        hasData ? Int(stressLevel).description : "--"
+        hasData ? StressTier.from(level: stressLevel).label : "—"
     }
 
     private var hrvText: String {

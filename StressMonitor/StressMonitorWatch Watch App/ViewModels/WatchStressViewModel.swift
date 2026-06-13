@@ -8,21 +8,34 @@ final class WatchStressViewModel {
   var isLoading = false
   var errorMessage: String?
 
+  /// Convenience access to the current 0–100 level used by the character face.
+  /// Falls back to the last reading in the shared store so the Home face is
+  /// expressive even before the first in-session measurement.
+  var currentLevel: Double {
+    currentStress?.level ?? WatchSharedDataStore.shared.latest?.level ?? 30
+  }
+
   private let healthKit: WatchHealthKitManager
   private let algorithm: StressAlgorithmServiceProtocol
   private let connectivity: WatchConnectivityManager
   private let complicationProvider: ComplicationDataProvider
+  private let sharedStore: WatchSharedDataStore
 
   init(
     healthKit: WatchHealthKitManager = WatchHealthKitManager(),
     algorithm: StressAlgorithmServiceProtocol = MultiFactorStressCalculator(),
     connectivity: WatchConnectivityManager = .shared,
-    complicationProvider: ComplicationDataProvider = .shared
+    complicationProvider: ComplicationDataProvider = .shared,
+    sharedStore: WatchSharedDataStore = .shared
   ) {
     self.healthKit = healthKit
     self.algorithm = algorithm
     self.connectivity = connectivity
     self.complicationProvider = complicationProvider
+    self.sharedStore = sharedStore
+    // Seed demo readings so the character face + history are expressive on
+    // first launch, before any real HealthKit data is available.
+    sharedStore.seedDemoDataIfNeeded()
   }
 
   func requestAuthorization() async {
@@ -70,6 +83,7 @@ final class WatchStressViewModel {
       currentStress = result
       syncToPhone(result: result)
       syncToComplications(result: result)
+      syncToSharedStore(result: result)
     } catch {
       errorMessage = error.localizedDescription
     }
@@ -98,6 +112,7 @@ final class WatchStressViewModel {
         heartRate: heartRate,
         timestamp: timestamp
       )
+      sharedStore.save(SharedReading(level: level, timestamp: timestamp))
     }
 
     isLoading = false
@@ -118,5 +133,9 @@ final class WatchStressViewModel {
 
   private func syncToComplications(result: StressResult) {
     complicationProvider.saveMeasurement(result)
+  }
+
+  private func syncToSharedStore(result: StressResult) {
+    sharedStore.save(SharedReading(level: result.level, timestamp: result.timestamp))
   }
 }

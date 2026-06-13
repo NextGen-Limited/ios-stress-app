@@ -153,9 +153,10 @@ struct ComplicationEntry {
         stressLevel == 0 && hrv == 0 && heartRate == 0
     }
 
-    /// Display text for stress level
+    /// Display text for stress level — **never a numeric score**.
+    /// Returns the Ripple character's mood word instead.
     var stressLevelText: String {
-        isPlaceholder ? "--" : "\(Int(stressLevel))"
+        isPlaceholder ? "—" : StressTier.from(level: stressLevel).label
     }
 
     /// Display text for HRV value
