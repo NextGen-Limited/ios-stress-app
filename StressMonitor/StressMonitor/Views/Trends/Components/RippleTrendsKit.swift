@@ -13,53 +13,53 @@ import SwiftUI
 /// - 61…80  → 😰  "Stressed"
 /// - 81…100 → 🐌  "Overwhelmed"
 enum StressTier: Int, CaseIterable, Sendable {
-    case calm = 0
-    case good = 1
-    case balanced = 2
+    case veryCalm = 0
+    case calm = 1
+    case neutral = 2
     case stressed = 3
-    case overwhelmed = 4
+    case critical = 4
 
     /// Resolve the tier directly from a 0–100 stress level.
     static func from(level: Double) -> StressTier {
         switch level {
-        case ..<21:   return .calm
-        case ..<41:   return .good
-        case ..<61:   return .balanced
+        case ..<21:   return .veryCalm
+        case ..<41:   return .calm
+        case ..<61:   return .neutral
         case ..<81:   return .stressed
-        default:      return .overwhelmed
+        default:      return .critical
         }
     }
 
     /// Emoji face used wherever the character appears — never a score.
     var emoji: String {
         switch self {
-        case .calm:        return "😴"
-        case .good:        return "😊"
-        case .balanced:    return "😐"
-        case .stressed:    return "😰"
-        case .overwhelmed: return "🐌"
+        case .veryCalm: return "😴"
+        case .calm:     return "😊"
+        case .neutral:  return "😐"
+        case .stressed: return "😰"
+        case .critical: return "🐌"
         }
     }
 
     /// Short, non-numeric mood word.
     var label: String {
         switch self {
-        case .calm:        return "Calm"
-        case .good:        return "Good"
-        case .balanced:    return "Balanced"
-        case .stressed:    return "Stressed"
-        case .overwhelmed: return "Overwhelmed"
+        case .veryCalm: return "Very Calm"
+        case .calm:     return "Calm"
+        case .neutral:  return "Neutral"
+        case .stressed: return "Stressed"
+        case .critical: return "Critical"
         }
     }
 
-    /// Tier colour: calm = blue → overwhelmed = red ramp.
+    /// Tier colour: veryCalm (green) → critical (red) ramp.
     var color: Color {
         switch self {
-        case .calm:        return TrendsPalette.tierCalm
-        case .good:        return TrendsPalette.tierGood
-        case .balanced:    return TrendsPalette.tierBalanced
-        case .stressed:    return TrendsPalette.tierStressed
-        case .overwhelmed: return TrendsPalette.tierOverwhelmed
+        case .veryCalm: return TrendsPalette.tierVeryCalm
+        case .calm:     return TrendsPalette.tierCalm
+        case .neutral:  return TrendsPalette.tierNeutral
+        case .stressed: return TrendsPalette.tierStressed
+        case .critical: return TrendsPalette.tierCritical
         }
     }
 }
@@ -73,17 +73,17 @@ enum TrendsPalette {
     static let rippleBlue = Color(hex: "#4FC3F7")
     static let mutedInk   = Color(hex: "#777986")
 
-    /// 5-tier ramp: calm (blue) → overwhelmed (red)
-    static let tierCalm        = Color(hex: "#4FC3F7")
-    static let tierGood        = Color(hex: "#A5D6A7")
-    static let tierBalanced    = Color(hex: "#7986CB")
-    static let tierStressed    = Color(hex: "#FFAB91")
-    static let tierOverwhelmed = Color(hex: "#EF5350")
+    /// 5-tier ramp: veryCalm (green) → critical (red)
+    static let tierVeryCalm = Color(hex: "#4CAF50")
+    static let tierCalm     = Color(hex: "#81C784")
+    static let tierNeutral  = Color(hex: "#FFB74D")
+    static let tierStressed = Color(hex: "#FF8A65")
+    static let tierCritical = Color(hex: "#E53935")
 
     /// Linear gradient across all five tiers (for legend strips).
     static var tierGradient: LinearGradient {
         LinearGradient(
-            colors: [tierCalm, tierGood, tierBalanced, tierStressed, tierOverwhelmed],
+            colors: [tierVeryCalm, tierCalm, tierNeutral, tierStressed, tierCritical],
             startPoint: .leading,
             endPoint: .trailing
         )

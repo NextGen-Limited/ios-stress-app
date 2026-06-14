@@ -158,7 +158,7 @@ struct HorizontalWeekCalendarView_Previews: PreviewProvider {
         HorizontalWeekCalendarView(
             selectedDate: .constant(Date()),
             dailyTiers: [
-                Calendar.current.startOfDay(for: Date()): .good,
+                Calendar.current.startOfDay(for: Date()): .calm,
                 Calendar.current.date(byAdding: .day, value: -1, to: Date())!: .stressed
             ]
         )

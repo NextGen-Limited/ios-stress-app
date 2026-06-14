@@ -29,18 +29,11 @@ struct SmartInsightsCard: View {
                     .cornerRadius(8)
             }
 
-            // Cat mascot placeholder
-            Circle()
-                .fill(Color.gray.opacity(0.2))
-                .frame(width: 80, height: 80)
-                .overlay(
-                    Image(systemName: "cat.fill")
-                        .font(.system(size: 40))
-                        .foregroundStyle(Color(hex: "#333333"))
-                )
+            // Ripple water-droplet mascot
+            RippleCharacterView(mood: .happy, size: 56)
         }
         .padding(16)
-        .background(Color.white)
+        .background(Color.Wellness.adaptiveCardBackground)
         .cornerRadius(16)
         .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 3)
     }

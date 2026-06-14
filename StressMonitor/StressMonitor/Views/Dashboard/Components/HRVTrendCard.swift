@@ -59,7 +59,7 @@ struct HRVTrendCard: View {
         }
         .padding(16)
         .frame(width: 358, height: 406)
-        .background(Color.white)
+        .background(Color.Wellness.adaptiveCardBackground)
         .cornerRadius(16)
         .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 3)
     }
@@ -71,6 +71,7 @@ struct HRVTrendCard: View {
             ForEach([150, 100, 50, 0], id: \.self) { value in
                 Text("\(value)")
                     .font(.system(size: 10, weight: .regular, design: .rounded))
+                    .monospacedDigit()
                     .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
                     .frame(height: 60, alignment: .top)
             }

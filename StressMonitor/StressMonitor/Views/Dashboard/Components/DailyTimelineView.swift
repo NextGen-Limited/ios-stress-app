@@ -126,7 +126,7 @@ struct DailyTimelineView: View {
 #Preview("Weekly - Empty") {
     DailyTimelineView(measurements: [])
         .padding()
-        .background(Color.backgroundLight)
+        .background(Color.Wellness.adaptiveBackground)
 }
 
 #Preview("Weekly - With Data") {
@@ -142,5 +142,5 @@ struct DailyTimelineView: View {
     }
     return DailyTimelineView(measurements: measurements)
         .padding()
-        .background(Color.backgroundLight)
+        .background(Color.Wellness.adaptiveBackground)
 }

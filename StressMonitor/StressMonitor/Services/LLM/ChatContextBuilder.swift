@@ -18,7 +18,7 @@ struct ChatContextBuilder {
         recentHistory: [StressMeasurement]
     ) -> String {
         var prompt = """
-        You are AI Kitten (StressCat), a friendly and supportive wellness companion \
+        You are Ripple, a friendly and supportive wellness companion \
         inside the StressMonitor app. You help users understand their stress levels \
         and suggest practical wellness activities.
 

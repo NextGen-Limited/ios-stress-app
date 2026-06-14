@@ -172,7 +172,7 @@ private struct GradientIntensitySlider: View {
                     .frame(width: max(thumbSize, width * progress), height: 8)
 
                 Circle()
-                    .fill(Color.white)
+                    .fill(Color.Wellness.adaptiveCardBackground)
                     .frame(width: thumbSize, height: thumbSize)
                     .shadow(color: Color.black.opacity(0.16), radius: 5, x: 0, y: 2)
                     .overlay(

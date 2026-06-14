@@ -55,7 +55,7 @@ struct IAPNavBar: View {
 
 #Preview {
     ZStack {
-        Color.white.ignoresSafeArea()
+        Color.Wellness.adaptiveBackground.ignoresSafeArea()
         IAPNavBar(
             onBack: { print("Back tapped") },
             onClose: { print("Close tapped") }

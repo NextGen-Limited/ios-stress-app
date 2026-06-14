@@ -11,8 +11,7 @@ struct RecommendationsCard: View {
             // White background card
             Color.white
                 .cornerRadius(20)
-                .shadow(color: Color.settingsCardShadowColor.opacity(0.08), radius: 5.71, x: 0, y: 2.85)
-                .shadow(color: Color.settingsCardShadowColor.opacity(0.04), radius: 5.71, x: 0, y: 5.71)
+                .settingsCardDoubleShadow()
 
             // Content
             VStack(alignment: .leading, spacing: 11) {
@@ -42,7 +41,7 @@ struct RecommendationsCard: View {
                 }
             }
             .padding(.leading, 29)
-            .padding(.top, 24.24)
+            .padding(.top, 24)
             .frame(width: 300.714, alignment: .leading)
 
             // FAQ link (bottom right)
@@ -59,7 +58,7 @@ struct RecommendationsCard: View {
             }
             .buttonStyle(.plain)
             .frame(maxWidth: .infinity, maxHeight: .infinity, alignment: .bottomTrailing)
-            .padding(.bottom, 19.24)
+            .padding(.bottom, 20)
             .padding(.trailing, 16)
         }
         .frame(width: 358, height: 234)

@@ -87,7 +87,7 @@ struct HealthDataItem: View {
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, DesignTokens.Spacing.md)
-        .background(Color.white)
+        .background(Color.Wellness.adaptiveCardBackground)
         .clipShape(RoundedRectangle(cornerRadius: 20))
         .shadow(color: Color(red: 0.094, green: 0.153, blue: 0.294).opacity(0.04), radius: 5.7, y: 5.7)
         .shadow(color: Color(red: 0.094, green: 0.153, blue: 0.294).opacity(0.08), radius: 2.85, y: 2.85)

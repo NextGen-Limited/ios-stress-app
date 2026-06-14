@@ -126,8 +126,8 @@ extension Color {
     static let widgetBorder = Color(light: Color(hex: "C0C0C0"), dark: Color(hex: "48484A"))
     /// Settings card shadow color - #18274B
     static let settingsCardShadowColor = Color(hex: "18274B")
-    /// Info banner yellow background (light: #FFF4D6, dark: #3A2A05)
-    static let bannerYellow = Color(light: Color(hex: "FFF4D6"), dark: Color(hex: "3A2A05"))
+    /// Info banner yellow background — alias of settingsAmberInfo
+    static var bannerYellow: Color { settingsAmberInfo }
 
     // MARK: - Adaptive Colors for Settings
 
@@ -158,8 +158,8 @@ extension Color {
 
     /// IAP section header teal - #158B8B
     static let iapHeaderTeal = Color(hex: "158B8B")
-    /// IAP CTA button teal - #85C9C9 (matches accentTeal)
-    static let iapCTATeal = Color(hex: "85C9C9")
+    /// IAP CTA button - Ripple blue #4FC3F7 (matches accentTeal)
+    static let iapCTATeal = Color(hex: "4FC3F7")
     /// IAP plan selected border amber - #FFAE3B
     static let iapAmber = Color(hex: "FFAE3B")
     /// IAP savings green - #4FC01B
@@ -168,8 +168,8 @@ extension Color {
     static let iapTextPrimary = Color(hex: "111827")
     /// IAP secondary text - #6B7280
     static let iapTextSecondary = Color(hex: "6B7280")
-    /// IAP muted text (nav title) - #808080
-    static let iapTextMuted = Color(hex: "808080")
+    /// IAP muted text (nav title) — alias of textTertiary (#808080)
+    static var iapTextMuted: Color { textTertiary }
     /// IAP chevron/icon gray - #9CA3AF
     static let iapChevronGray = Color(hex: "9CA3AF")
     /// IAP icon border - #9EA7B8

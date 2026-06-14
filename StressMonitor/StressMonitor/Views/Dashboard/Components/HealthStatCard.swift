@@ -11,7 +11,7 @@ struct HealthStatCard: View {
     let secondaryUnit: String?
 
     var body: some View {
-        VStack(spacing: 14.599) {
+        VStack(spacing: 16) {
             // Icon + Title
             HStack(spacing: 4) {
                 Image(iconAsset)
@@ -26,7 +26,7 @@ struct HealthStatCard: View {
             }
 
             // Value
-            HStack(alignment: .firstTextBaseline, spacing: 7.299) {
+            HStack(alignment: .firstTextBaseline, spacing: 8) {
                 Text(value)
                     .font(.system(size: 24, weight: .bold, design: .rounded))
                     .foregroundStyle(Color.Wellness.adaptivePrimaryText)
@@ -58,12 +58,11 @@ struct HealthStatCard: View {
             }
         }
         .frame(width: 169, height: 108.579)
-        .padding(.horizontal, 21.898)
-        .padding(.vertical, 10.949)
-        .background(Color.white)
+        .padding(.horizontal, 20)
+        .padding(.vertical, 12)
+        .background(Color.Wellness.adaptiveCardBackground)
         .cornerRadius(20)
-        .shadow(color: Color.settingsCardShadowColor.opacity(0.08), radius: 5.71, x: 0, y: 2.85)
-        .shadow(color: Color.settingsCardShadowColor.opacity(0.04), radius: 5.71, x: 0, y: 5.71)
+        .settingsCardDoubleShadow()
         .accessibilityElement(children: .combine)
         .accessibilityLabel("\(title): \(value)\(unit ?? "")\(secondaryValue.map { " / \($0)\(secondaryUnit ?? "")" } ?? "")")
     }
@@ -74,8 +73,8 @@ struct HealthStatCard: View {
 /// 2×2 grid of health stat cards
 struct HealthStatsGrid: View {
     var body: some View {
-        VStack(spacing: 10.6) {
-            HStack(spacing: 10.6) {
+        VStack(spacing: 12) {
+            HStack(spacing: 12) {
                 HealthStatCard(
                     iconAsset: "tabler-flower-filled",
                     title: "Mindfulness",
@@ -95,7 +94,7 @@ struct HealthStatsGrid: View {
                 )
             }
 
-            HStack(spacing: 10.6) {
+            HStack(spacing: 12) {
                 HealthStatCard(
                     iconAsset: "tabler-sun-filled",
                     title: "Daylight",

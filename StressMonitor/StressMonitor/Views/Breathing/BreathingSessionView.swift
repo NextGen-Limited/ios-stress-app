@@ -89,6 +89,7 @@ struct BreathingSessionView: View {
                 // Time remaining
                 Text(timeRemainingText)
                     .font(.system(size: 56, weight: .light, design: .rounded))
+                    .monospacedDigit()
                     .foregroundStyle(rippleLight)
                     .monospacedDigit()
                     .padding(.top, 20)

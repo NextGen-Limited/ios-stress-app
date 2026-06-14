@@ -45,6 +45,7 @@ struct CompactStressHeaderBar: View {
             Text("\(Int(stressLevel))")
         }
         .font(.system(size: 13, weight: .semibold))
+        .monospacedDigit()
         .foregroundStyle(.white)
         .padding(.horizontal, 12)
         .padding(.vertical, 6)

@@ -17,7 +17,7 @@ struct WatchMetricCard: View {
     }
 
     var body: some View {
-        HStack(spacing: 14.599) {
+        HStack(spacing: 16) {
             // Left: Icon with time
             VStack(spacing: 0) {
                 // Icon
@@ -80,13 +80,12 @@ struct WatchMetricCard: View {
             }
             .frame(maxWidth: .infinity)
         }
-        .padding(.horizontal, 21.898)
-        .padding(.vertical, 14.599)
+        .padding(.horizontal, 20)
+        .padding(.vertical, 16)
         .frame(width: 358, height: 110)
-        .background(Color.white)
+        .background(Color.Wellness.adaptiveCardBackground)
         .cornerRadius(20)
-        .shadow(color: Color.settingsCardShadowColor.opacity(0.08), radius: 5.71, x: 0, y: 2.85)
-        .shadow(color: Color.settingsCardShadowColor.opacity(0.04), radius: 5.71, x: 0, y: 5.71)
+        .settingsCardDoubleShadow()
         .accessibilityElement(children: .combine)
     }
 }
