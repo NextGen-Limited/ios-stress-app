@@ -608,6 +608,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = StressMonitor/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Stress AI Coach";
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
 				INFOPLIST_KEY_NSCameraUsageDescription = "Camera access allows you to capture photos and videos to share in chat conversations.";
 				INFOPLIST_KEY_NSHealthClinicalHealthRecordsShareUsageDescription = "We need access to your health data to monitor stress levels.";
@@ -658,6 +659,7 @@
 				GENERATE_INFOPLIST_FILE = YES;
 				INFOPLIST_FILE = StressMonitor/Info.plist;
 				INFOPLIST_KEY_CFBundleDisplayName = "Stress AI Coach";
+				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
 				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
 				INFOPLIST_KEY_NSCameraUsageDescription = "Camera access allows you to capture photos and videos to share in chat conversations.";
 				INFOPLIST_KEY_NSHealthClinicalHealthRecordsShareUsageDescription = "We need access to your health data to monitor stress levels.";
