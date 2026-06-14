@@ -1,0 +1,653 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>StressMonitor — Character Deep-Dive</title>
+<style>
+:root {
+  --bg: #0A0A0F;
+  --surface: #12121F;
+  --card: #1A1A2E;
+  --card-hi: #20203A;
+  --border: #2A2A4A;
+  --text: #E0E0E0;
+  --muted: #777986;
+  --radius: 16px;
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Text', sans-serif;
+  background: var(--bg); color: var(--text); line-height: 1.6;
+  overflow-x: hidden;
+}
+
+/* ── Tab Bar ── */
+.tab-bar {
+  position: sticky; top: 0; z-index: 100;
+  display: flex; gap: 4px; padding: 10px 16px;
+  background: rgba(10,10,15,0.92); backdrop-filter: blur(20px);
+  border-bottom: 1px solid var(--border);
+  overflow-x: auto; -webkit-overflow-scrolling: touch;
+}
+.tab-btn {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  padding: 8px 16px; border-radius: 12px; border: 1px solid transparent;
+  background: transparent; color: var(--muted); cursor: pointer;
+  transition: all 0.25s; white-space: nowrap; min-width: 72px;
+}
+.tab-btn .emoji { font-size: 1.4rem; }
+.tab-btn .name { font-size: 0.72rem; font-weight: 600; }
+.tab-btn:hover { background: var(--card); color: var(--text); }
+.tab-btn.active { background: var(--card-hi); border-color: var(--accent); color: var(--accent); }
+
+/* ── Character Section ── */
+.char-section { display: none; max-width: 800px; margin: 0 auto; padding: 24px 16px 80px; }
+.char-section.active { display: block; animation: fadeIn 0.4s ease; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+/* ── Hero ── */
+.hero {
+  text-align: center; padding: 32px 20px; margin-bottom: 24px;
+  background: var(--card); border-radius: var(--radius);
+  border: 1px solid var(--border); position: relative; overflow: hidden;
+}
+.hero::before {
+  content: ''; position: absolute; top: -50%; left: -50%;
+  width: 200%; height: 200%;
+  background: radial-gradient(circle, var(--glow) 0%, transparent 50%);
+  opacity: 0.15; pointer-events: none;
+}
+.hero svg { width: 140px; height: 140px; position: relative; z-index: 1; }
+.hero h1 { font-size: 2rem; font-weight: 800; margin-top: 12px; }
+.hero .subtitle { color: var(--muted); font-size: 1rem; margin-bottom: 12px; }
+.hero .tags {
+  display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin-bottom: 16px;
+}
+.hero .tag {
+  padding: 4px 12px; border-radius: 20px; font-size: 0.78rem; font-weight: 600;
+  background: var(--accent-dim); color: var(--accent);
+}
+.hero blockquote {
+  font-style: italic; font-size: 1.05rem; color: var(--text);
+  border-left: 3px solid var(--accent); padding: 8px 16px;
+  max-width: 400px; margin: 0 auto; opacity: 0.9;
+}
+
+/* ── Section Block ── */
+.block {
+  background: var(--card); border-radius: var(--radius); padding: 24px;
+  border: 1px solid var(--border); margin-bottom: 16px;
+}
+.block h2 {
+  font-size: 1.2rem; font-weight: 700; margin-bottom: 16px;
+  display: flex; align-items: center; gap: 8px;
+}
+.block p { margin-bottom: 12px; font-size: 0.92rem; color: #C0C0D0; line-height: 1.7; }
+
+/* ── Favorites ── */
+.favorites {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+  gap: 8px; margin-top: 16px;
+}
+.fav-item {
+  background: var(--surface); border-radius: 10px; padding: 10px 12px;
+  display: flex; align-items: center; gap: 8px; font-size: 0.82rem;
+}
+.fav-item .fav-icon { font-size: 1.1rem; }
+.fav-item .fav-label { color: var(--muted); font-size: 0.72rem; display: block; }
+.fav-item .fav-value { color: var(--text); font-weight: 500; }
+
+/* ── Evolution ── */
+.evo-timeline {
+  display: flex; gap: 8px; flex-wrap: wrap; align-items: stretch;
+}
+.evo-stage {
+  flex: 1; min-width: 160px; background: var(--surface); border-radius: 12px;
+  padding: 16px; border: 1px solid var(--border); position: relative;
+  transition: all 0.2s;
+}
+.evo-stage:hover { border-color: var(--accent-dim); transform: translateY(-2px); }
+.evo-stage .evo-icon { font-size: 1.6rem; margin-bottom: 4px; }
+.evo-stage .evo-name { font-weight: 700; font-size: 0.95rem; }
+.evo-stage .evo-trigger { color: var(--muted); font-size: 0.78rem; margin-top: 4px; }
+.evo-stage .evo-desc { font-size: 0.82rem; margin-top: 6px; color: #B0B0C0; }
+.evo-arrow { display: flex; align-items: center; color: var(--muted); font-size: 1.2rem; }
+
+/* ── Stress Reactions ── */
+.reactions-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+  gap: 8px;
+}
+.reaction {
+  background: var(--surface); border-radius: 12px; padding: 16px 8px;
+  text-align: center; border: 1px solid var(--border); transition: all 0.2s;
+}
+.reaction:hover { border-color: var(--accent-dim); }
+.reaction svg { width: 48px; height: 48px; margin-bottom: 4px; }
+.reaction .r-level { font-size: 0.72rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+.reaction .r-range { font-size: 0.7rem; color: var(--muted); }
+
+/* ── Color Palette ── */
+.palette-grid { display: flex; gap: 8px; flex-wrap: wrap; }
+.color-token {
+  flex: 1; min-width: 100px; border-radius: 12px; overflow: hidden;
+  border: 1px solid var(--border);
+}
+.color-swatch { height: 60px; }
+.color-info { padding: 8px; background: var(--surface); }
+.color-info .c-name { font-size: 0.72rem; font-weight: 700; }
+.color-info .c-hex { font-size: 0.7rem; color: var(--muted); font-family: monospace; }
+
+/* ── Interactive Slider ── */
+.slider-section {
+  background: var(--card); border-radius: var(--radius); padding: 24px;
+  border: 1px solid var(--border); margin-bottom: 16px;
+}
+.slider-display {
+  display: flex; flex-direction: column; align-items: center; gap: 12px;
+  padding: 24px 0;
+}
+.slider-display svg { width: 120px; height: 120px; transition: filter 0.3s; }
+.slider-label {
+  font-size: 0.9rem; font-weight: 600; color: var(--accent);
+  padding: 4px 16px; border-radius: 20px; background: var(--accent-dim);
+}
+.slider-wrap { width: 100%; max-width: 400px; margin: 0 auto; }
+input[type="range"] {
+  -webkit-appearance: none; width: 100%; height: 8px; border-radius: 4px;
+  background: linear-gradient(90deg, #4FC3F7, #A5D6A7, #FFE082, #FFAB91, #EF5350);
+  outline: none;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none; width: 28px; height: 28px; border-radius: 50%;
+  background: var(--text); border: 3px solid var(--bg); cursor: pointer;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.4);
+}
+input[type="range"]::-moz-range-thumb {
+  width: 28px; height: 28px; border-radius: 50%;
+  background: var(--text); border: 3px solid var(--bg); cursor: pointer;
+}
+
+/* ── Responsive ── */
+@media (max-width: 600px) {
+  .evo-timeline { flex-direction: column; }
+  .evo-arrow { transform: rotate(90deg); justify-content: center; }
+  .hero svg { width: 100px; height: 100px; }
+  .hero h1 { font-size: 1.5rem; }
+}
+</style>
+</head>
+<body>
+
+<!-- ═══ Tab Bar ═══ -->
+<div class="tab-bar" id="tabBar"></div>
+
+<!-- ═══ Character Sections (generated by JS) ═══ -->
+<div id="sections"></div>
+
+<script>
+// ═══════════════════════════════════════════════
+// CHARACTER DATA
+// ═══════════════════════════════════════════════
+const CHARACTERS = [
+  {
+    id: 'ripple', name: 'Ripple', subtitle: 'Water Otter', emoji: '💧',
+    element: 'water',
+    personality: ['Gentle', 'Playful', 'Shy'],
+    quote: 'Even the deepest waters find their calm.',
+    unlock: 'Free — Available from start',
+    colors: { primary: '#4FC3F7', secondary: '#B3E5FC', light: '#E1F5FE', accent: '#0288D1', deep: '#01579B' },
+    lore: [
+      'Born in the deepest pool of the Sapphire Springs, Ripple could feel every drop of water tell a story. While other otters splashed and played, Ripple sat still, watching concentric circles ripple outward when a leaf touched the surface. The water always knew the truth of how you felt.',
+      'One day, a storm churned the springs into chaos. The other otters hid in their shells, but Ripple dove deep — discovering that beneath the turbulence, the water was perfectly still. This became Ripple\u2019s gift: finding calm beneath the storm, the quiet center that exists in every heart, no matter how choppy the surface.',
+      'Now Ripple travels between surface and depths, appearing when someone\u2019s internal waters grow restless. A gentle nudge, a soft ripple, and suddenly the surface smooths again. Ripple doesn\u2019t fight the waves — Ripple floats on them, teaching that acceptance is the first step to peace.'
+    ],
+    favorites: [
+      { icon: '🔊', label: 'Sound', value: 'Rain on water' },
+      { icon: '🌅', label: 'Time', value: 'Dawn mist' },
+      { icon: '🍃', label: 'Food', value: 'Kelp crisps' },
+      { icon: '🪨', label: 'Hobby', value: 'Pebble skipping' }
+    ],
+    evolution: [
+      { icon: '🌱', name: 'Droplet', trigger: '7-day streak', desc: 'A tiny water drop. shy and uncertain, just beginning to feel the ripples.' },
+      { icon: '🌊', name: 'Ripple', trigger: '30-day streak + 5 breathing sessions', desc: 'Full otter form. Glides through emotions with growing confidence and grace.' },
+      { icon: '⚡', name: 'Tidal', trigger: '90-day streak + Resilience Score 80+', desc: 'Majestic water guardian. Commands the tides of stress, turning storms into gentle waves.' }
+    ],
+    stressReactions: [
+      { level: 'Resting', range: '0-20', emoji: '😴', desc: 'Floats peacefully on still water, eyes closed' },
+      { level: 'Calm', range: '21-40', emoji: '😊', desc: 'Gentle ripples around body, soft smile, relaxed' },
+      { level: 'Balanced', range: '41-60', emoji: '😐', desc: 'Small waves, alert but composed' },
+      { level: 'Tense', range: '61-80', emoji: '😰', desc: 'Choppy water, wide eyes, hugging shell' },
+      { level: 'Overwhelmed', range: '81+', emoji: '🐚', desc: 'Hides entirely in shell, stormy waters around' }
+    ]
+  },
+  {
+    id: 'blossom', name: 'Blossom', subtitle: 'Forest Fox', emoji: '🌿',
+    element: 'earth',
+    personality: ['Curious', 'Nurturing', 'Warm'],
+    quote: 'Every season has its purpose — even the fall.',
+    unlock: 'Free — Available from start',
+    colors: { primary: '#A5D6A7', secondary: '#C8E6C9', light: '#F1F8E9', accent: '#2E7D32', deep: '#1B5E20' },
+    lore: [
+      'In the Verdant Vale, where every creature carries a piece of the forest within, Blossom was born with seeds woven into her fur. Each emotion made different flowers bloom — daisies for joy, lavender for calm, wilting vines for exhaustion. She was a walking garden, and her heart was the soil.',
+      'The elder foxes warned that Blossom\u2019s flowers would eventually stop growing if she didn\u2019t learn to rest. She pushed through endless springs, blooming magnificently but burning through her roots. A harsh winter taught her the lesson no spring could: even forests need to shed their leaves. Dormancy is not death — it\u2019s preparation.',
+      'Now Blossom tends an invisible garden for every heart she meets. When you\u2019re growing well, her leaves perk up and flowers bloom. When you need rest, she sheds gently, showing that letting go is part of cycle. Her roots run deep, and her patience is the patience of ancient trees.'
+    ],
+    favorites: [
+      { icon: '🔊', label: 'Sound', value: 'Wind through leaves' },
+      { icon: '🌅', label: 'Time', value: 'Golden hour' },
+      { icon: '🫐', label: 'Food', value: 'Sun-warmed berries' },
+      { icon: '🌷', label: 'Hobby', value: 'Garden tending' }
+    ],
+    evolution: [
+      { icon: '🌱', name: 'Sprout', trigger: '7-day streak', desc: 'A tiny seedling with two leaves. Just beginning to reach for the light.' },
+      { icon: '🌿', name: 'Blossom', trigger: '30-day streak + 10 journal entries', desc: 'Full fox form with blooming fur. Flowers bloom and wilt with your stress journey.' },
+      { icon: '⚡', name: 'Evergreen', trigger: '90-day streak + Resilience Score 80+', desc: 'Ancient forest guardian. Deep roots, eternal bloom, weatherer of all seasons.' }
+    ],
+    stressReactions: [
+      { level: 'Resting', range: '0-20', emoji: '😴', desc: 'Curled up like a seed, flowers closed, peacefully dormant' },
+      { level: 'Calm', range: '21-40', emoji: '😊', desc: 'Full bloom, daisies in fur, tail wagging gently' },
+      { level: 'Balanced', range: '41-60', emoji: '😐', desc: 'Some flowers open, some closed, alert ears' },
+      { level: 'Tense', range: '61-80', emoji: '😰', desc: 'Leaves drooping, wilting petals, anxious posture' },
+      { level: 'Overwhelmed', range: '81+', emoji: '🐚', desc: 'Leaves shed, bare branches, curled protectively' }
+    ]
+  },
+  {
+    id: 'ember', name: 'Ember', subtitle: 'Fire Phoenix', emoji: '🔥',
+    element: 'fire',
+    personality: ['Bold', 'Motivating', 'Fierce'],
+    quote: 'The strongest fire knows when to rest.',
+    unlock: 'Premium — Requires subscription',
+    colors: { primary: '#FFAB91', secondary: '#FBE9E7', light: '#FFF3E0', accent: '#E65100', deep: '#BF360C' },
+    lore: [
+      'In the volcanic ridges of the Ember Expanse, a single spark refused to die. It gathered ash and heat until it formed wings — Ember, the phoenix who burns brightest when others need light. She was born from pure willpower, a flame that chose to live.',
+      'For years, Ember flew higher and hotter, convinced that intensity was the only way to help. She burned through her energy reserves, her flames turning blue and dangerous. A wise old salamander taught her that fire needs space: smothering kills it, but so does burning without pause. The strongest flames flicker — they don\u2019t roar constantly.',
+      'Now Ember channels her fire strategically. She appears when motivation is needed, burns bright to inspire action, then gently dims to remind you that recovery is where the real growth happens. Her feathers glow with the warmth of balanced energy, not the fury of unchecked ambition.'
+    ],
+    favorites: [
+      { icon: '🔊', label: 'Sound', value: 'Crackling embers' },
+      { icon: '🌅', label: 'Time', value: 'Sunset' },
+      { icon: '🍯', label: 'Food', value: 'Spiced nectar' },
+      { icon: '⛅', label: 'Hobby', value: 'Sky dancing' }
+    ],
+    evolution: [
+      { icon: '🌱', name: 'Spark', trigger: '7-day streak', desc: 'A flickering flame, full of potential but easily extinguished.' },
+      { icon: '🔥', name: 'Ember', trigger: '30-day streak + 20 workouts', desc: 'Full phoenix form. Wings of fire, burning with purpose and energy.' },
+      { icon: '⚡', name: 'Inferno', trigger: '90-day streak + Resilience Score 80+', desc: 'Eternal flame guardian. Master of controlled burn — power without destruction.' }
+    ],
+    stressReactions: [
+      { level: 'Resting', range: '0-20', emoji: '😴', desc: 'Dim glow like banked coals, resting wings folded' },
+      { level: 'Calm', range: '21-40', emoji: '😊', desc: 'Warm golden flames, feathers spread comfortably' },
+      { level: 'Balanced', range: '41-60', emoji: '😐', desc: 'Steady orange flame, alert and ready' },
+      { level: 'Tense', range: '61-80', emoji: '😰', desc: 'Flickering erratically, sparks flying, feathers ruffled' },
+      { level: 'Overwhelmed', range: '81+', emoji: '🐚', desc: 'Blue flame (dangerous burnout), smoke, wings collapsing' }
+    ]
+  },
+  {
+    id: 'zephyr', name: 'Zephyr', subtitle: 'Cloud Rabbit', emoji: '🌬️',
+    element: 'air',
+    personality: ['Calm', 'Dreamy', 'Soft'],
+    quote: 'Breathe in the calm, breathe out the storm.',
+    unlock: 'Premium — Requires subscription',
+    colors: { primary: '#D1C4E9', secondary: '#EDE7F6', light: '#F3E5F5', accent: '#7E57C2', deep: '#4A148C' },
+    lore: [
+      'Above the Whispering Plains, where clouds take shapes of their choosing, a small puff decided it wanted to be a rabbit. Zephyr was born — soft as morning mist, light as a sigh, drifting wherever the wind carried a worried heart. She was a cloud that learned to breathe.',
+      'Zephyr discovered that breath is the bridge between mind and body. She studied the art of breathing from the wind itself: inhale the calm, exhale the storm. Her cloud-form would billow and shrink with each breath she witnessed, creating a visual rhythm for those who couldn\u2019t find their own. She became a mirror for the breathless.',
+      'Now Zephyr appears as a gentle guide during breathing exercises. Her cloud-body shapes itself to your breath — expanding on the inhale, softening on the exhale. When stress builds, she transforms into a thunderhead, reminding you that even storms pass with time. And they always pass.'
+    ],
+    favorites: [
+      { icon: '🔊', label: 'Sound', value: 'Wind chimes' },
+      { icon: '🌅', label: 'Time', value: 'Twilight' },
+      { icon: '💧', label: 'Food', value: 'Dew drops' },
+      { icon: '☁️', label: 'Hobby', value: 'Cloud watching' }
+    ],
+    evolution: [
+      { icon: '🌱', name: 'Wisp', trigger: '7-day streak', desc: 'A tiny wisp of cloud, barely visible, learning to take shape.' },
+      { icon: '🌬️', name: 'Zephyr', trigger: '30-day streak + 15 mindfulness sessions', desc: 'Full cloud rabbit form. Billows with your breath, drifts on your calm.' },
+      { icon: '⚡', name: 'Tempest', trigger: '90-day streak + Resilience Score 80+', desc: 'Sky guardian. Commands wind and cloud, transforms storms into gentle breezes.' }
+    ],
+    stressReactions: [
+      { level: 'Resting', range: '0-20', emoji: '😴', desc: 'Flat calm cloud, barely moving, peaceful mist' },
+      { level: 'Calm', range: '21-40', emoji: '😊', desc: 'Fluffy white cloud, gentle billowing, soft ears perked' },
+      { level: 'Balanced', range: '41-60', emoji: '😐', desc: 'Grey-white cloud, slightly turbulent, alert' },
+      { level: 'Tense', range: '61-80', emoji: '😰', desc: 'Dark grey cloud, swirling, ears flat, trembling' },
+      { level: 'Overwhelmed', range: '81+', emoji: '🐚', desc: 'Thunderstorm cloud, lightning crackling, dissolving at edges' }
+    ]
+  },
+  {
+    id: 'lumi', name: 'Lumi', subtitle: 'Moon Owl', emoji: '🌙',
+    element: 'moon',
+    personality: ['Wise', 'Serene', 'Mystical'],
+    quote: 'The moon doesn\u2019t fight the night — it lights it.',
+    unlock: 'Streak-Gated — 30-day streak required',
+    colors: { primary: '#7986CB', secondary: '#C5CAE9', light: '#E8EAF6', accent: '#3949AB', deep: '#1A237E' },
+    lore: [
+      'In the Moonlit Canopy, where the trees grow so tall they touch the stars, Lumi was hatched under a blue moon. Her feathers absorbed the moonlight, giving her a soft silver glow that could calm even the most restless creature. She was a creature of the night, but not of darkness — of the gentle light that makes darkness safe.',
+      'Lumi spent years studying the science of sleep — the cycles, the rhythms, the deep healing that happens in the dark. She discovered that many hearts carry their heaviest burdens at night, when the world goes quiet and worries echo loudest. She made it her mission to be a light in that darkness, a soft presence that whispers: you are safe, you can rest.',
+      'Now Lumi watches over nighttime recovery. When your sleep is deep and restorative, her glow is bright and steady. When sleep eludes you, she dims and ruffles her feathers, a gentle reminder that tomorrow\u2019s moon will rise again. She doesn\u2019t force sleep — she invites it, the way moonlight invites the tide.'
+    ],
+    favorites: [
+      { icon: '🔊', label: 'Sound', value: 'Distant waves at night' },
+      { icon: '🌅', label: 'Time', value: '3 AM stillness' },
+      { icon: '🌺', label: 'Food', value: 'Moonflower nectar' },
+      { icon: '⭐', label: 'Hobby', value: 'Star mapping' }
+    ],
+    evolution: [
+      { icon: '🌱', name: 'Glimmer', trigger: '7-day streak', desc: 'A faint glow in the dark, a baby owl learning to shine.' },
+      { icon: '🌙', name: 'Lumi', trigger: '30-day streak + 20 good sleep nights', desc: 'Full moon owl form. Silver glow, wise eyes, guardian of restful nights.' },
+      { icon: '⚡', name: 'Eclipse', trigger: '90-day streak + Resilience Score 80+', desc: 'Cosmic guardian. Controls the cycles of rest and recovery, master of all moons.' }
+    ],
+    stressReactions: [
+      { level: 'Resting', range: '0-20', emoji: '😴', desc: 'Bright silver glow, head tucked under wing, deep peaceful sleep' },
+      { level: 'Calm', range: '21-40', emoji: '😊', desc: 'Soft blue glow, feathers smooth, gentle watchful eyes' },
+      { level: 'Balanced', range: '41-60', emoji: '😐', desc: 'Steady indigo glow, alert posture, scanning the night' },
+      { level: 'Tense', range: '61-80', emoji: '😰', desc: 'Dim flickering glow, feathers ruffled, wide anxious eyes' },
+      { level: 'Overwhelmed', range: '81+', emoji: '🐚', desc: 'No glow, dark silhouette, head buried, silent and still' }
+    ]
+  }
+];
+
+// ═══════════════════════════════════════════════
+// SVG CHARACTER GENERATOR
+// ═══════════════════════════════════════════════
+function stressTier(level) {
+  if (level <= 20) return 0; // resting
+  if (level <= 40) return 1; // calm
+  if (level <= 60) return 2; // balanced
+  if (level <= 80) return 3; // tense
+  return 4;                   // overwhelmed
+}
+
+const STRESS_LABELS = [
+  { name: 'Resting', emoji: '😴', color: '#4FC3F7' },
+  { name: 'Calm', emoji: '😊', color: '#A5D6A7' },
+  { name: 'Balanced', emoji: '😐', color: '#FFE082' },
+  { name: 'Tense', emoji: '😰', color: '#FFAB91' },
+  { name: 'Overwhelmed', emoji: '🐚', color: '#EF5350' }
+];
+
+function genCharSVG(element, stressLevel, size) {
+  size = size || 120;
+  const tier = stressTier(stressLevel);
+  const colors = getElementColors(element);
+  const cx = size / 2;
+  const r = size * 0.32;
+
+  // Body shape (slight wobble when stressed)
+  const wobble = tier >= 3 ? (Math.random() - 0.5) * 4 : 0;
+
+  // Eyes
+  let eyes;
+  if (tier === 0) { // sleeping
+    eyes = `
+      <path d="M${cx-18},${r*1.2} q6,-6 12,0" stroke="${colors.deep}" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <path d="M${cx+6},${r*1.2} q6,-6 12,0" stroke="${colors.deep}" stroke-width="2.5" fill="none" stroke-linecap="round"/>`;
+  } else if (tier === 4) { // overwhelmed — X eyes
+    eyes = `
+      <g stroke="${colors.deep}" stroke-width="2.5" stroke-linecap="round">
+        <line x1="${cx-20}" y1="${r*1.1}" x2="${cx-10}" y2="${r*1.3}"/>
+        <line x1="${cx-10}" y1="${r*1.1}" x2="${cx-20}" y2="${r*1.3}"/>
+        <line x1="${cx+10}" y1="${r*1.1}" x2="${cx+20}" y2="${r*1.3}"/>
+        <line x1="${cx+20}" y1="${r*1.1}" x2="${cx+10}" y2="${r*1.3}"/>
+      </g>`;
+  } else {
+    const eyeR = tier === 3 ? 7 : 6; // wider when tense
+    const pupilR = tier === 3 ? 2.5 : 3.5; // smaller pupils when tense
+    eyes = `
+      <circle cx="${cx-14}" cy="${r*1.2}" r="${eyeR}" fill="white"/>
+      <circle cx="${cx+14}" cy="${r*1.2}" r="${eyeR}" fill="white"/>
+      <circle cx="${cx-14}" cy="${r*1.2}" r="${pupilR}" fill="${colors.deep}"/>
+      <circle cx="${cx+14}" cy="${r*1.2}" r="${pupilR}" fill="${colors.deep}"/>
+      ${tier === 1 ? `<circle cx="${cx-12}" cy="${r*1.18}" r="1.5" fill="white"/><circle cx="${cx+16}" cy="${r*1.18}" r="1.5" fill="white"/>` : ''}`;
+  }
+
+  // Mouth
+  let mouth;
+  if (tier === 0) { // sleeping — small O
+    mouth = `<ellipse cx="${cx}" cy="${r*1.7}" rx="4" ry="3" fill="${colors.deep}" opacity="0.6"/>`;
+  } else if (tier === 1) { // calm — big smile
+    mouth = `<path d="M${cx-12},${r*1.6} Q${cx},${r*1.8} ${cx+12},${r*1.6}" stroke="${colors.deep}" stroke-width="2.5" fill="none" stroke-linecap="round"/>`;
+  } else if (tier === 2) { // balanced — straight
+    mouth = `<line x1="${cx-8}" y1="${r*1.7}" x2="${cx+8}" y2="${r*1.7}" stroke="${colors.deep}" stroke-width="2.5" stroke-linecap="round"/>`;
+  } else if (tier === 3) { // tense — wavy
+    mouth = `<path d="M${cx-10},${r*1.7} q5,-4 10,0 q5,4 10,0" stroke="${colors.deep}" stroke-width="2.5" fill="none" stroke-linecap="round"/>`;
+  } else { // overwhelmed — frown
+    mouth = `<path d="M${cx-12},${r*1.8} Q${cx},${r*1.5} ${cx+12},${r*1.8}" stroke="${colors.deep}" stroke-width="2.5" fill="none" stroke-linecap="round"/>`;
+  }
+
+  // Element decorations
+  let decor = '';
+  if (element === 'water') {
+    // Droplet on top + shell when overwhelmed
+    decor += `<path d="M${cx},${size*0.08} Q${cx-8},${size*0.15} ${cx},${size*0.2} Q${cx+8},${size*0.15} ${cx},${size*0.08} Z" fill="${colors.secondary}" opacity="0.8"/>`;
+    if (tier === 4) {
+      decor += `<ellipse cx="${cx}" cy="${r*1.5}" rx="${r*1.1}" ry="${r*1.3}" fill="${colors.deep}" opacity="0.3"/>`;
+    }
+    // Water ripples
+    if (tier <= 1) {
+      decor += `<path d="M${cx-r*0.8},${r*2.2} q8,4 16,0" stroke="${colors.secondary}" stroke-width="1.5" fill="none" opacity="0.5"/>`;
+      decor += `<path d="M${cx-r*0.6},${r*2.5} q6,3 12,0" stroke="${colors.secondary}" stroke-width="1" fill="none" opacity="0.3"/>`;
+    }
+  } else if (element === 'earth') {
+    // Leaf ears
+    decor += `<ellipse cx="${cx-r*0.7}" cy="${r*0.5}" rx="6" ry="12" fill="${colors.accent}" transform="rotate(-30 ${cx-r*0.7} ${r*0.5})" opacity="0.8"/>`;
+    decor += `<ellipse cx="${cx+r*0.7}" cy="${r*0.5}" rx="6" ry="12" fill="${colors.accent}" transform="rotate(30 ${cx+r*0.7} ${r*0.5})" opacity="0.8"/>`;
+    // Flower when calm
+    if (tier <= 1) {
+      decor += `<circle cx="${cx}" cy="${r*0.3}" r="4" fill="${colors.secondary}"/>`;
+      decor += `<circle cx="${cx-5}" cy="${r*0.25}" r="3" fill="${colors.secondary}" opacity="0.7"/>`;
+      decor += `<circle cx="${cx+5}" cy="${r*0.25}" r="3" fill="${colors.secondary}" opacity="0.7"/>`;
+    }
+  } else if (element === 'fire') {
+    // Flame crest
+    const flameH = tier >= 3 ? 16 : 20;
+    decor += `<path d="M${cx},${size*0.04} Q${cx-10},${size*0.12} ${cx-4},${size*0.18} Q${cx},${size*0.1} ${cx+4},${size*0.18} Q${cx+10},${size*0.12} ${cx},${size*0.04} Z" fill="${colors.accent}" opacity="0.9"/>`;
+    if (tier >= 4) {
+      // Smoke when overwhelmed
+      decor += `<circle cx="${cx-8}" cy="${size*0.05}" r="3" fill="#666" opacity="0.4"/>`;
+      decor += `<circle cx="${cx+6}" cy="${size*0.03}" r="4" fill="#666" opacity="0.3"/>`;
+    }
+  } else if (element === 'air') {
+    // Cloud wisps
+    decor += `<ellipse cx="${cx-r}" cy="${r*1.3}" rx="10" ry="6" fill="${colors.secondary}" opacity="0.5"/>`;
+    decor += `<ellipse cx="${cx+r}" cy="${r*1.3}" rx="10" ry="6" fill="${colors.secondary}" opacity="0.5"/>`;
+    if (tier >= 3) {
+      // Jagged cloud when tense
+      decor += `<path d="M${cx-15},${r*0.4} L${cx-8},${r*0.2} L${cx},${r*0.4} L${cx+8},${r*0.2} L${cx+15},${r*0.4}" stroke="${colors.accent}" stroke-width="1.5" fill="none" opacity="0.4"/>`;
+    }
+  } else if (element === 'moon') {
+    // Crescent moon mark
+    decor += `<path d="M${cx-r*0.4},${r*0.4} a6,6 0 1,0 8,-2 a4,4 0 1,1 -8,2 Z" fill="${colors.secondary}" opacity="0.7"/>`;
+    // Stars around
+    if (tier <= 1) {
+      decor += `<text x="${cx-r*1.3}" y="${r*0.8}" font-size="8" opacity="0.6">\u2728</text>`;
+      decor += `<text x="${cx+r*0.9}" y="${r*0.6}" font-size="6" opacity="0.4">\u2728</text>`;
+    }
+    // Glow effect
+    const glowOpacity = tier === 0 ? 0.4 : (4-tier) * 0.08;
+    decor += `<circle cx="${cx}" cy="${r*1.4}" r="${r*1.3}" fill="${colors.secondary}" opacity="${glowOpacity}"/>`;
+  }
+
+  // Body
+  const bodyScale = tier === 4 ? 0.85 : (tier === 0 ? 0.95 : 1.0);
+  const bodyR = r * bodyScale;
+
+  return `
+  <svg width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" xmlns="http://www.w3.org/2000/svg">
+    <!-- Shadow -->
+    <ellipse cx="${cx}" cy="${size*0.92}" rx="${bodyR*0.7}" ry="${bodyR*0.12}" fill="#000" opacity="0.2"/>
+    <!-- Body -->
+    <ellipse cx="${cx + wobble}" cy="${r*1.4}" rx="${bodyR}" ry="${bodyR*1.05}" fill="${colors.primary}" opacity="0.9"/>
+    <!-- Belly highlight -->
+    <ellipse cx="${cx + wobble}" cy="${r*1.5}" rx="${bodyR*0.6}" ry="${bodyR*0.7}" fill="${colors.secondary}" opacity="0.3"/>
+    <!-- Decorations -->
+    ${decor}
+    <!-- Face -->
+    ${eyes}
+    ${mouth}
+    <!-- Cheeks when calm -->
+    ${tier <= 1 ? `<circle cx="${cx-22}" cy="${r*1.5}" r="5" fill="${colors.accent}" opacity="0.2"/><circle cx="${cx+22}" cy="${r*1.5}" r="5" fill="${colors.accent}" opacity="0.2"/>` : ''}
+  </svg>`;
+}
+
+function getElementColors(element) {
+  const map = {
+    water: { primary: '#4FC3F7', secondary: '#B3E5FC', accent: '#0288D1', deep: '#01579B' },
+    earth: { primary: '#A5D6A7', secondary: '#C8E6C9', accent: '#2E7D32', deep: '#1B5E20' },
+    fire:  { primary: '#FFAB91', secondary: '#FBE9E7', accent: '#E65100', deep: '#BF360C' },
+    air:   { primary: '#D1C4E9', secondary: '#EDE7F6', accent: '#7E57C2', deep: '#4A148C' },
+    moon:  { primary: '#7986CB', secondary: '#C5CAE9', accent: '#3949AB', deep: '#1A237E' }
+  };
+  return map[element] || map.water;
+}
+
+// ═══════════════════════════════════════════════
+// HTML GENERATION
+// ═══════════════════════════════════════════════
+function buildCharacterSection(char) {
+  const c = char.colors;
+
+  // Reactions grid
+  const reactionsHTML = char.stressReactions.map((r, i) => `
+    <div class="reaction">
+      ${genCharSVG(char.element, i * 20 + 10, 48)}
+      <div class="r-level" style="color:${STRESS_LABELS[i].color}">${r.level}</div>
+      <div class="r-range">${r.range}</div>
+    </div>
+  `).join('');
+
+  // Palette
+  const paletteHTML = [
+    { name: 'Primary', hex: c.primary },
+    { name: 'Secondary', hex: c.secondary },
+    { name: 'Light', hex: c.light },
+    { name: 'Accent', hex: c.accent },
+    { name: 'Deep', hex: c.deep }
+  ].map(t => `
+    <div class="color-token">
+      <div class="color-swatch" style="background:${t.hex}"></div>
+      <div class="color-info">
+        <div class="c-name">${t.name}</div>
+        <div class="c-hex">${t.hex}</div>
+      </div>
+    </div>
+  `).join('');
+
+  // Evolution timeline
+  const evoHTML = char.evolution.map((e, i) => {
+    const arrow = i < char.evolution.length - 1 ? '<div class="evo-arrow">→</div>' : '';
+    return `
+      <div class="evo-stage">
+        <div class="evo-icon">${e.icon}</div>
+        <div class="evo-name">${e.name}</div>
+        <div class="evo-trigger">${e.trigger}</div>
+        <div class="evo-desc">${e.desc}</div>
+      </div>
+      ${arrow}
+    `;
+  }).join('');
+
+  // Favorites
+  const favHTML = char.favorites.map(f => `
+    <div class="fav-item">
+      <span class="fav-icon">${f.icon}</span>
+      <div><span class="fav-label">${f.label}</span><span class="fav-value">${f.value}</span></div>
+    </div>
+  `).join('');
+
+  return `
+  <div class="char-section" id="char-${char.id}" style="--accent:${c.primary}; --accent-dim:${c.primary}33; --glow:${c.primary};">
+    <!-- Hero -->
+    <div class="hero">
+      ${genCharSVG(char.element, 25, 140)}
+      <h1>${char.name}</h1>
+      <p class="subtitle">${char.subtitle} · ${char.emoji}</p>
+      <div class="tags">
+        ${char.personality.map(p => `<span class="tag">${p}</span>`).join('')}
+      </div>
+      <blockquote>"${char.quote}"</blockquote>
+      <p style="margin-top:12px;font-size:0.78rem;color:var(--muted)">🔓 ${char.unlock}</p>
+    </div>
+
+    <!-- Backstory -->
+    <div class="block">
+      <h2>📖 Backstory</h2>
+      ${char.lore.map(p => `<p>${p}</p>`).join('')}
+      <div class="favorites">${favHTML}</div>
+    </div>
+
+    <!-- Evolution -->
+    <div class="block">
+      <h2>✨ Evolution Journey</h2>
+      <div class="evo-timeline">${evoHTML}</div>
+    </div>
+
+    <!-- Stress Reactions -->
+    <div class="block">
+      <h2>🎭 Stress Reactions</h2>
+      <p style="margin-bottom:12px;color:var(--muted);font-size:0.82rem">Character IS the indicator — no numbers, just expressions.</p>
+      <div class="reactions-grid">${reactionsHTML}</div>
+    </div>
+
+    <!-- Color Palette -->
+    <div class="block">
+      <h2>🎨 Color Palette</h2>
+      <div class="palette-grid">${paletteHTML}</div>
+    </div>
+
+    <!-- Interactive Slider -->
+    <div class="slider-section">
+      <h2 style="margin-bottom:0">⚡ Interactive Stress Slider</h2>
+      <p style="margin-bottom:8px;color:var(--muted);font-size:0.82rem">Drag to see ${char.name} react in real-time</p>
+      <div class="slider-display">
+        <div id="slider-svg-${char.id}">${genCharSVG(char.element, 20, 120)}</div>
+        <div class="slider-label" id="slider-label-${char.id}" style="color:${STRESS_LABELS[0].color};background:${STRESS_LABELS[0].color}33">${STRESS_LABELS[0].emoji} ${STRESS_LABELS[0].name}</div>
+      </div>
+      <div class="slider-wrap">
+        <input type="range" min="0" max="100" value="20" id="slider-${char.id}"
+               oninput="updateSlider('${char.id}','${char.element}', this.value)">
+      </div>
+    </div>
+  </div>`;
+}
+
+// ═══════════════════════════════════════════════
+// INITIALIZATION
+// ═══════════════════════════════════════════════
+
+// Build tabs
+const tabBar = document.getElementById('tabBar');
+tabBar.innerHTML = CHARACTERS.map((c, i) => `
+  <button class="tab-btn ${i === 0 ? 'active' : ''}" data-char="${c.id}" onclick="selectChar('${c.id}')">
+    <span class="emoji">${c.emoji}</span>
+    <span class="name">${c.name}</span>
+  </button>
+`).join('');
+
+// Build sections
+document.getElementById('sections').innerHTML = CHARACTERS.map(buildCharacterSection).join('');
+
+// Show first character
+document.getElementById('char-' + CHARACTERS[0].id).classList.add('active');
+
+function selectChar(id) {
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.toggle('active', b.dataset.char === id));
+  document.querySelectorAll('.char-section').forEach(s => s.classList.toggle('active', s.id === 'char-' + id));
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function updateSlider(charId, element, value) {
+  const v = parseInt(value);
+  const tier = stressTier(v);
+  const label = STRESS_LABELS[tier];
+
+  document.getElementById('slider-svg-' + charId).innerHTML = genCharSVG(element, v, 120);
+  const labelEl = document.getElementById('slider-label-' + charId);
+  labelEl.textContent = `${label.emoji} ${label.name}`;
+  labelEl.style.color = label.color;
+  labelEl.style.background = label.color + '33';
+}
+</script>
+</body>
+</html>
