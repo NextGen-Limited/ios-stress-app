@@ -20,7 +20,7 @@ struct WeekCalendarStrip: View {
     }
 
     var body: some View {
-        HStack(spacing: 13.067) {
+        HStack(spacing: 12) {
             ForEach(weekDates, id: \.self) { date in
                 DayCell(
                     date: date,
@@ -71,7 +71,7 @@ private struct DayCell: View {
                 .foregroundStyle(isSelected ? .white : Color(hex: "777986"))
         }
         .frame(width: 21.467, height: 32.267)
-        .padding(9.333)
+        .padding(8)
         .background(
             Group {
                 if isSelected {

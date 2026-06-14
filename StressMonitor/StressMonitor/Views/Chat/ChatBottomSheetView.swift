@@ -33,7 +33,7 @@ struct ChatBottomSheetView: View {
                     unavailableView
                 }
             }
-            .navigationTitle("AI Kitten")
+            .navigationTitle("Ripple")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
@@ -127,12 +127,9 @@ struct ChatBottomSheetView: View {
 
     private var welcomeMessage: some View {
         VStack(spacing: 12) {
-            Image("AIKitten")
-                .resizable()
-                .scaledToFit()
-                .frame(width: 80, height: 80)
+            RippleCharacterView(mood: .serene, size: 80)
 
-            Text("Hi! I'm AI Kitten 🐱")
+            Text("Hi! I'm Ripple 💧")
                 .font(.headline)
                 .foregroundStyle(Color.Wellness.adaptivePrimaryText)
 
@@ -151,13 +148,10 @@ struct ChatBottomSheetView: View {
         HStack {
             VStack(alignment: .leading, spacing: 4) {
                 HStack(spacing: 4) {
-                    Image("AIKitten")
-                        .resizable()
-                        .scaledToFit()
-                        .frame(width: 20, height: 20)
+                    RippleCharacterView(mood: .serene, size: 20)
                         .clipShape(Circle())
 
-                    Text("AI Kitten")
+                    Text("Ripple")
                         .font(.caption2)
                         .foregroundStyle(.secondary)
                 }
@@ -208,7 +202,7 @@ struct ChatBottomSheetView: View {
 
     private var chatInputBar: some View {
         HStack(spacing: 12) {
-            TextField("Ask AI Kitten...", text: $inputText, axis: .vertical)
+            TextField("Ask Ripple...", text: $inputText, axis: .vertical)
                 .textFieldStyle(.plain)
                 .lineLimit(1...4)
                 .padding(.horizontal, 12)
@@ -291,13 +285,10 @@ private struct MessageBubbleView: View {
             VStack(alignment: message.role == .user ? .trailing : .leading, spacing: 4) {
                 if message.role == .assistant {
                     HStack(spacing: 4) {
-                        Image("AIKitten")
-                            .resizable()
-                            .scaledToFit()
-                            .frame(width: 20, height: 20)
+                        RippleCharacterView(mood: .serene, size: 20)
                             .clipShape(Circle())
 
-                        Text("AI Kitten")
+                        Text("Ripple")
                             .font(.caption2)
                             .foregroundStyle(.secondary)
 

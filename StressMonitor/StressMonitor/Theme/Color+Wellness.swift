@@ -83,8 +83,8 @@ extension Color {
         /// Elevated badge accent (yellow-gold)
         static let elevatedBadge = Color(hex: "#FDD57A")
 
-        /// Teal card accent
-        static let tealCard = Color(hex: "#85C9C9")
+        /// Ripple blue card accent
+        static let tealCard = Color(hex: "#4FC3F7")
 
         /// Exercise cyan accent
         static let exerciseCyan = Color(hex: "#86CECD")

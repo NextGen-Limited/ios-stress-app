@@ -77,7 +77,7 @@ struct IAPUtilityRow: View {
             }
             .padding(.horizontal, 14)
             .frame(height: 48)
-            .background(Color.white)
+            .background(Color.Wellness.adaptiveCardBackground)
             .clipShape(RoundedRectangle(cornerRadius: 20))
         }
         .buttonStyle(.plain)

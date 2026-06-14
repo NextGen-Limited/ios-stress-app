@@ -50,5 +50,5 @@ struct IAPCTAButton: View {
         IAPCTAButton(isLoading: true, action: {})
     }
     .padding(.horizontal, 17)
-    .background(Color.white)
+    .background(Color.Wellness.adaptiveBackground)
 }

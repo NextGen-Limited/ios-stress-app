@@ -14,10 +14,7 @@ struct PremiumBannerView: View {
 
             // Cat mascot anchored bottom-left
             HStack(alignment: .bottom) {
-                Image("CharacterCalm")
-                    .resizable()
-                    .scaledToFit()
-                    .frame(height: 120)
+                RippleCharacterView(mood: .celebrating, size: 110)
 
                 Spacer()
             }
@@ -56,5 +53,5 @@ struct PremiumBannerView: View {
 #Preview {
     PremiumBannerView()
         .padding()
-        .background(Color.backgroundLight)
+        .background(Color.Wellness.adaptiveBackground)
 }

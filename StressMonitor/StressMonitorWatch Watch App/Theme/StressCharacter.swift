@@ -10,70 +10,70 @@ import SwiftUI
 /// accompanies it.
 ///
 /// Mapping (per product spec):
-/// - 0…20  → 😴  "Resting"
+/// - 0…20  → 😴  "Very Calm"
 /// - 21…40 → 😊  "Calm"
-/// - 41…60 → 😐  "Balanced"
-/// - 61…80 → 😰  "Tense"
-/// - 81…100→ 🐚  "Overwhelmed"
+/// - 41…60 → 😐  "Neutral"
+/// - 61…80 → 😰  "Stressed"
+/// - 81…100→ 🐚  "Critical"
 enum StressTier: Int, CaseIterable, Sendable {
-    case resting = 0      // 😴
+    case veryCalm = 0     // 😴
     case calm = 1         // 😊
-    case balanced = 2     // 😐
-    case tense = 3        // 😰
-    case overwhelmed = 4  // 🐚
+    case neutral = 2      // 😐
+    case stressed = 3     // 😰
+    case critical = 4     // 🐚
 
     /// Resolve the tier directly from a 0–100 stress level.
     static func from(level: Double) -> StressTier {
         switch level {
-        case ..<21:   return .resting
+        case ..<21:   return .veryCalm
         case ..<41:   return .calm
-        case ..<61:   return .balanced
-        case ..<81:   return .tense
-        default:      return .overwhelmed
+        case ..<61:   return .neutral
+        case ..<81:   return .stressed
+        default:      return .critical
         }
     }
 
     /// Emoji face used wherever the character appears (app, complications).
     var emoji: String {
         switch self {
-        case .resting:     return "😴"
-        case .calm:        return "😊"
-        case .balanced:    return "😐"
-        case .tense:       return "😰"
-        case .overwhelmed: return "🐚"
+        case .veryCalm: return "😴"
+        case .calm:     return "😊"
+        case .neutral:  return "😐"
+        case .stressed: return "😰"
+        case .critical: return "🐚"
         }
     }
 
     /// Short, non-numeric mood word (safe to display — never a score).
     var label: String {
         switch self {
-        case .resting:     return "Resting"
-        case .calm:        return "Calm"
-        case .balanced:    return "Balanced"
-        case .tense:       return "Tense"
-        case .overwhelmed: return "Overwhelmed"
+        case .veryCalm: return "Very Calm"
+        case .calm:     return "Calm"
+        case .neutral:  return "Neutral"
+        case .stressed: return "Stressed"
+        case .critical: return "Critical"
         }
     }
 
-    /// Accent colour sourced from the `HomeCharacterDesignTokens` palette.
+    /// Accent colour for this stress tier (spec ramp: green → red).
     var accent: Color {
         switch self {
-        case .resting:     return StressCharacterPalette.ripple
-        case .calm:        return StressCharacterPalette.blossom
-        case .balanced:    return StressCharacterPalette.lumi
-        case .tense:       return StressCharacterPalette.ember
-        case .overwhelmed: return StressCharacterPalette.zephyr
+        case .veryCalm: return StressCharacterPalette.tierVeryCalm
+        case .calm:     return StressCharacterPalette.tierCalm
+        case .neutral:  return StressCharacterPalette.tierNeutral
+        case .stressed: return StressCharacterPalette.tierStressed
+        case .critical: return StressCharacterPalette.tierCritical
         }
     }
 
     /// VoiceOver description of the character's current state.
     var accessibilityLabel: String {
         switch self {
-        case .resting:     return "Ripple is resting peacefully. Very low stress."
-        case .calm:        return "Ripple is calm. Low stress."
-        case .balanced:    return "Ripple feels balanced. Moderate stress."
-        case .tense:       return "Ripple feels tense. Elevated stress."
-        case .overwhelmed: return "Ripple is overwhelmed. High stress."
+        case .veryCalm: return "Ripple is resting peacefully. Very low stress."
+        case .calm:     return "Ripple is calm. Low stress."
+        case .neutral:  return "Ripple feels balanced. Moderate stress."
+        case .stressed: return "Ripple feels tense. Elevated stress."
+        case .critical: return "Ripple is overwhelmed. High stress."
         }
     }
 }
@@ -95,6 +95,13 @@ enum StressCharacterPalette {
     static let darkCanvas = Color(hex: "#0A0A0F") // darkCanvas
     static let darkCard   = Color(hex: "#1A1A2E") // darkCard
     static let mutedInk   = Color(hex: "#777986") // mutedInk
+
+    // MARK: - Stress tier accent ramp (spec: green → red)
+    static let tierVeryCalm = Color(hex: "#4CAF50")
+    static let tierCalm     = Color(hex: "#81C784")
+    static let tierNeutral  = Color(hex: "#FFB74D")
+    static let tierStressed = Color(hex: "#FF8A65")
+    static let tierCritical = Color(hex: "#E53935")
 }
 
 // MARK: - CharacterFaceView

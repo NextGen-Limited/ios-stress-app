@@ -30,7 +30,7 @@ struct MeasurementDetailView: View {
             }
             .padding(.vertical, 20)
         }
-        .background(Color.backgroundLight)
+        .background(Color.Wellness.adaptiveBackground)
         .navigationBarHidden(true)
         .overlay(navigationBar)
         .task {

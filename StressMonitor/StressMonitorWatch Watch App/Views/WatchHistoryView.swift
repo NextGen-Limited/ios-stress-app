@@ -38,7 +38,7 @@ struct WatchHistoryView: View {
 
     private var emptyState: some View {
         VStack(spacing: 8) {
-            CharacterFaceView(tier: .resting, size: 70, glow: true)
+            CharacterFaceView(tier: .veryCalm, size: 70, glow: true)
             Text("No readings yet")
                 .font(.system(size: 12, weight: .semibold))
                 .foregroundStyle(.white)

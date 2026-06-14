@@ -32,10 +32,9 @@ struct WidgetPromoCard: View {
             .padding(.horizontal, 25)
             .padding(.vertical, 20)
             .frame(width: 358, height: 86)
-            .background(Color.white)
+            .background(Color.Wellness.adaptiveCardBackground)
             .cornerRadius(20)
-            .shadow(color: Color.settingsCardShadowColor.opacity(0.08), radius: 5.71, x: 0, y: 2.85)
-            .shadow(color: Color.settingsCardShadowColor.opacity(0.04), radius: 5.71, x: 0, y: 5.71)
+            .settingsCardDoubleShadow()
         }
         .buttonStyle(.plain)
         .accessibilityElement(children: .combine)

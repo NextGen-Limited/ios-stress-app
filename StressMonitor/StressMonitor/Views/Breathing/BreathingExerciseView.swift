@@ -155,6 +155,7 @@ struct BreathingExerciseView: View {
                         .foregroundStyle(isActive ? ripplePrimary : .white.opacity(0.4))
                     Text("\(Int(phaseDuration))s")
                         .font(.system(size: 11, design: .rounded))
+                        .monospacedDigit()
                         .foregroundStyle(.white.opacity(0.35))
                 }
                 .frame(maxWidth: .infinity)
@@ -219,6 +220,7 @@ struct BreathingExerciseView: View {
                             .foregroundStyle(rippleMid)
                         Text("\(Int(phaseDuration))s")
                             .font(.system(size: 12, design: .rounded))
+                            .monospacedDigit()
                             .foregroundStyle(.white.opacity(0.4))
                     }
                     .frame(maxWidth: .infinity)

@@ -33,7 +33,7 @@ struct SelfNoteCard: View {
                         .foregroundStyle(.white)
                         .tracking(-0.24)
                 }
-                .padding(.leading, 24.105)
+                .padding(.leading, 24)
 
                 Spacer()
 
@@ -43,15 +43,14 @@ struct SelfNoteCard: View {
                     .foregroundStyle(.white)
                     .rotationEffect(.degrees(90))
             }
-            .padding(.leading, 26.783)
-            .padding(.trailing, 17.855)
+            .padding(.leading, 28)
+            .padding(.trailing, 16)
             .padding(.top, 20)
-            .padding(.bottom, 17.855)
+            .padding(.bottom, 16)
             .frame(width: 358, height: 80)
             .background(Color.accentTeal)
             .cornerRadius(20)
-            .shadow(color: Color.settingsCardShadowColor.opacity(0.08), radius: 5.71, x: 0, y: 2.85)
-            .shadow(color: Color.settingsCardShadowColor.opacity(0.04), radius: 5.71, x: 0, y: 5.71)
+            .settingsCardDoubleShadow()
         }
         .buttonStyle(.plain)
         .accessibilityElement(children: .combine)

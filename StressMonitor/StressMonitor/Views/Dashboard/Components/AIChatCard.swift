@@ -7,11 +7,8 @@ struct AIChatCard: View {
 
     var body: some View {
         ZStack(alignment: .topTrailing) {
-            // Cat mascot — positioned top-right, overlapping text area
-            Image("AIKitten")
-                .resizable()
-                .scaledToFit()
-                .frame(width: 128, height: 128)
+            // Ripple water-droplet mascot — positioned top-right, overlapping text area
+            RippleCharacterView(mood: .serene, size: 128)
                 .offset(x: 8, y: 40)
 
             // Content column
@@ -25,7 +22,7 @@ struct AIChatCard: View {
                     .padding(.leading, 28)
 
                 // Subtitle
-                Text("Talk with AI Kitten")
+                Text("Talk with Ripple")
                     .font(Font.system(size: 14, weight: .regular, design: .rounded))
                     .foregroundStyle(Color(hex: "808080"))
                     .tracking(-0.21)
@@ -33,7 +30,7 @@ struct AIChatCard: View {
                     .padding(.leading, 28)
 
                 // Description
-                Text("\"It's always better to talk to your support group. If you need, Kitten is here for you!\"")
+                Text("\"It's always better to talk to your support group. If you need, Ripple is here for you!\"")
                     .font(Font.system(size: 13, weight: .regular, design: .rounded))
                     .foregroundStyle(Color(hex: "808080"))
                     .tracking(-0.195)
@@ -48,7 +45,7 @@ struct AIChatCard: View {
                         Image(systemName: "bubble.left.and.bubble.right.fill")
                             .font(.system(size: 11))
 
-                        Text("Chat with StressCat")
+                        Text("Chat with Ripple")
                             .font(Font.system(size: 14, weight: .medium, design: .rounded))
                             .tracking(-0.21)
                     }
@@ -80,12 +77,12 @@ struct AIChatCard: View {
             }
         }
         .frame(width: 358, height: 258)
-        .background(Color.white)
+        .background(Color.Wellness.adaptiveCardBackground)
         .clipShape(RoundedRectangle(cornerRadius: 20))
         .shadow(color: Color.settingsCardShadowColor.opacity(0.04), radius: 5.7, x: 0, y: 5.7)
         .shadow(color: Color.settingsCardShadowColor.opacity(0.08), radius: 2.85, x: 0, y: 2.85)
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("AI Chat. Talk with AI Kitten")
+        .accessibilityLabel("AI Chat. Talk with Ripple")
         .accessibilityHint("Double tap to start chatting")
     }
 }

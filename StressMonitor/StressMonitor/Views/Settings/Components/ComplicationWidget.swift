@@ -37,7 +37,7 @@ struct ComplicationWidget: View {
 
                         skeletonBars
                     } else {
-                        RippleMoodFace(tier: .good, size: 28, showsRing: true, glow: false)
+                        RippleMoodFace(tier: .calm, size: 28, showsRing: true, glow: false)
                         skeletonBars
                     }
                 }
@@ -76,8 +76,8 @@ struct ComplicationWidget: View {
 struct ComplicationWidget_Previews: PreviewProvider {
     static var previews: some View {
         HStack(spacing: 23) {
-            ComplicationWidget(title: "Circular", tier: .good)
-            ComplicationWidget(title: "Graphic", tier: .balanced)
+            ComplicationWidget(title: "Circular", tier: .calm)
+            ComplicationWidget(title: "Graphic", tier: .neutral)
         }
         .padding()
         .background(Color.adaptiveSettingsBackground)

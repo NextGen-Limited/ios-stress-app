@@ -61,15 +61,15 @@ struct SettingsCharacterStatusHeader: View {
 
     private var settingsMoodTitle: String {
         switch tier {
-        case .calm:
+        case .veryCalm:
             return "Rested & Calm"
-        case .good:
+        case .calm:
             return "Calm & Content"
-        case .balanced:
+        case .neutral:
             return "Steady & Aware"
         case .stressed:
             return "Needs a Breather"
-        case .overwhelmed:
+        case .critical:
             return "Moving Slowly"
         }
     }

@@ -5,15 +5,8 @@ import SwiftUI
 struct IntroMessageCard: View {
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
-            // Cat mascot placeholder
-            Circle()
-                .fill(Color.gray.opacity(0.2))
-                .frame(width: 60, height: 60)
-                .overlay(
-                    Image(systemName: "cat.fill")
-                        .font(.system(size: 30))
-                        .foregroundStyle(Color(hex: "#333333"))
-                )
+            // Ripple water-droplet mascot
+            RippleCharacterView(mood: .relaxed, size: 44)
 
             // Speech bubble
             VStack(alignment: .leading, spacing: 0) {
@@ -23,7 +16,7 @@ struct IntroMessageCard: View {
                     .fixedSize(horizontal: false, vertical: false)
             }
             .padding(12)
-            .background(Color.white)
+            .background(Color.Wellness.adaptiveCardBackground)
             .cornerRadius(12)
             .shadow(color: Color.black.opacity(0.05), radius: 3, x: 0, y: 2)
             // Speech bubble tail would be added with custom shape
@@ -31,7 +24,7 @@ struct IntroMessageCard: View {
             Spacer()
         }
         .padding(16)
-        .background(Color.white)
+        .background(Color.Wellness.adaptiveCardBackground)
         .cornerRadius(16)
         .shadow(color: Color.black.opacity(0.05), radius: 5, x: 0, y: 3)
     }

@@ -116,7 +116,7 @@ struct TrendsView: View {
     private var speechBubbleTier: StressTier {
         guard let todayData = viewModel.dailyStressData.last,
               todayData.averageStress > 0 else {
-            return .good
+            return .calm
         }
         return StressTier.from(level: todayData.averageStress)
     }

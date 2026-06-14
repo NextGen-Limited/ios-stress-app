@@ -93,7 +93,7 @@ struct IAPHeroSection: View {
 
 #Preview {
     ZStack {
-        Color.white.ignoresSafeArea()
+        Color.Wellness.adaptiveBackground.ignoresSafeArea()
         IAPHeroSection()
             .padding(.top, 20)
     }

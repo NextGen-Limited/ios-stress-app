@@ -155,7 +155,7 @@ private struct ArcShape: Shape {
         SemicircularGaugeView(stressLevel: 65, result: nil)
     }
     .padding()
-    .background(Color.backgroundLight)
+    .background(Color.Wellness.adaptiveBackground)
 }
 
 #Preview("No Data") {
@@ -163,5 +163,5 @@ private struct ArcShape: Shape {
         SemicircularGaugeView(stressLevel: 0, result: nil)
     }
     .padding()
-    .background(Color.backgroundLight)
+    .background(Color.Wellness.adaptiveBackground)
 }

@@ -26,7 +26,7 @@ struct MeasurementHistoryView: View {
                 }
             }
         }
-        .background(Color.backgroundLight)
+        .background(Color.Wellness.adaptiveBackground)
         .task {
             await viewModel.fetchMeasurements()
         }
@@ -95,7 +95,7 @@ struct MeasurementHistoryView: View {
                             .foregroundColor(.secondary)
                             .frame(maxWidth: .infinity, alignment: .leading)
                             .padding(.horizontal, 16)
-                            .background(Color.backgroundLight)
+                            .background(Color.Wellness.adaptiveCardBackground)
                     }
                 }
             }

@@ -14,8 +14,8 @@ struct WidgetCard: View {
 
                 // Widget size previews
                 HStack(spacing: 23) {
-                    ComplicationWidget(title: "Medium", tier: .calm)
-                    ComplicationWidget(title: "Small", tier: .good)
+                    ComplicationWidget(title: "Medium", tier: .veryCalm)
+                    ComplicationWidget(title: "Small", tier: .calm)
                 }
                 .padding(.top, 23)
 

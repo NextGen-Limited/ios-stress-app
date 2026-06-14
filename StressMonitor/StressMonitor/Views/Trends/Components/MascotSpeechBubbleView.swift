@@ -7,7 +7,7 @@ import SwiftUI
 /// Glass card style on the dark canvas.
 struct MascotSpeechBubbleView: View {
     let message: String
-    var tier: StressTier = .good
+    var tier: StressTier = .calm
     var size: CGFloat = 52
 
     var body: some View {
@@ -72,7 +72,7 @@ struct MascotSpeechBubbleView_Previews: PreviewProvider {
         VStack(spacing: 16) {
             MascotSpeechBubbleView(
                 message: MascotSpeechBubbleView.message(stressTrendingDown: true, hasData: true),
-                tier: .good
+                tier: .calm
             )
             MascotSpeechBubbleView(
                 message: MascotSpeechBubbleView.message(stressTrendingDown: false, hasData: true),

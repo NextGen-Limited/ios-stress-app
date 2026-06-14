@@ -14,8 +14,8 @@ struct WatchFaceCard: View {
 
                 // Widgets Row
                 HStack(spacing: 23) {
-                    ComplicationWidget(title: "Circular", tier: .good)
-                    ComplicationWidget(title: "Graphic", tier: .balanced)
+                    ComplicationWidget(title: "Circular", tier: .calm)
+                    ComplicationWidget(title: "Graphic", tier: .neutral)
                 }
                 .padding(.top, 23)
 

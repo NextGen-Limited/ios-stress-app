@@ -39,6 +39,7 @@ struct StressRingView: View {
 
                 Text("\(Int(stressLevel))")
                     .font(.system(size: 72, weight: .bold, design: .rounded))
+                    .monospacedDigit()
                     .foregroundColor(.primary)
                     .contentTransition(
                         reduceMotion

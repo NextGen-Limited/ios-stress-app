@@ -85,4 +85,11 @@ extension View {
     func buttonShadow() -> some View {
         self.shadow(AppShadow.button)
     }
+
+    /// Double-layer settings card shadow per Figma spec (0.08 + 0.04 opacity).
+    func settingsCardDoubleShadow() -> some View {
+        self
+            .shadow(color: Color.settingsCardShadowColor.opacity(0.08), radius: 5.71, x: 0, y: 2.85)
+            .shadow(color: Color.settingsCardShadowColor.opacity(0.04), radius: 5.71, x: 0, y: 5.71)
+    }
 }
