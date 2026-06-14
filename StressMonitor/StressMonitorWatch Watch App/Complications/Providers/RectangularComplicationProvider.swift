@@ -146,7 +146,12 @@ struct RectangularComplication: Widget {
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: kind, provider: RectangularComplicationProvider()) { entry in
             RectangularComplicationView(entry: entry)
-                .containerBackground(.fill.tertiary, for: .widget)
+                .containerBackground(for: .widget) {
+                    WatchFaceBackgroundView(
+                        style: WatchFacePreferences.backgroundStyle,
+                        theme: WatchFacePreferences.theme
+                    )
+                }
         }
         .configurationDisplayName("Stress & HRV")
         .description("Shows your current stress level and HRV measurement")

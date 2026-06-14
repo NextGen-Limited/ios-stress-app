@@ -27,6 +27,12 @@ struct CornerComplication: Widget {
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: kind, provider: CornerComplicationProvider()) { entry in
             CornerComplicationView(entry: entry)
+                .containerBackground(for: .widget) {
+                    WatchFaceBackgroundView(
+                        style: WatchFacePreferences.backgroundStyle,
+                        theme: WatchFacePreferences.theme
+                    )
+                }
         }
         .configurationDisplayName("Ripple")
         .description("Your stress character in the watch face corner.")

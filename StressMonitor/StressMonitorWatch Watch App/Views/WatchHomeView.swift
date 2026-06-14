@@ -46,7 +46,17 @@ struct WatchHomeView: View {
         }
         .padding(.horizontal, 6)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(StressCharacterPalette.darkCanvas.ignoresSafeArea())
+        .background(
+            ZStack {
+                StressCharacterPalette.darkCanvas
+                WatchFaceBackgroundView(
+                    style: WatchFacePreferences.backgroundStyle,
+                    theme: WatchFacePreferences.theme
+                )
+                .opacity(0.6)
+            }
+            .ignoresSafeArea()
+        )
         .task {
             await viewModel.requestAuthorization()
             await viewModel.loadLatestStress()

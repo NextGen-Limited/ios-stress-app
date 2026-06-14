@@ -92,7 +92,12 @@ struct InlineComplication: Widget {
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: kind, provider: InlineComplicationProvider()) { entry in
             InlineComplicationView(entry: entry)
-                .containerBackground(.fill.tertiary, for: .widget)
+                .containerBackground(for: .widget) {
+                    WatchFaceBackgroundView(
+                        style: WatchFacePreferences.backgroundStyle,
+                        theme: WatchFacePreferences.theme
+                    )
+                }
         }
         .configurationDisplayName("Stress Level")
         .description("Shows your current stress level at a glance")
