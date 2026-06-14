@@ -46,12 +46,14 @@ final class StoreKitService: StoreKitServiceProtocol {
                     productsByID[product.id] = product
                 }
 
-                // Map to SubscriptionPlan, sorted annual first
+                // Map to SubscriptionPlan, sorted annual first, then monthly, then weekly
                 let plans = products.compactMap { [catalog] product -> SubscriptionPlan? in
                     guard let period = catalog.period(for: product.id) else { return nil }
                     return Self.planFromProduct(product, period: period, catalog: catalog)
                 }
-                .sorted { $0.period == .annual && $1.period != .annual }
+                .sorted { lhs, rhs in
+                    Self.periodSortOrder(lhs.period) < Self.periodSortOrder(rhs.period)
+                }
 
                 return plans.isEmpty ? SubscriptionPlan.defaultPlans : plans
             } catch {
@@ -236,13 +238,24 @@ final class StoreKitService: StoreKitServiceProtocol {
         catalog: StoreKitProductCatalog
     ) -> SubscriptionPlan {
         let pricePerPeriod = product.price ?? .zero
-        let months: Decimal = period == .annual ? 12 : 1
+        // Months per billing cycle for pricePerMonth normalization
+        let months: Decimal
+        switch period {
+        case .annual:  months = 12
+        case .monthly: months = 1
+        case .weekly:  months = 12.0 / 52.0  // ~0.23 months per week
+        }
         let pricePerMonth = pricePerPeriod / months
 
         let isAnnual = period == .annual
-        let billingSummary: String? = isAnnual ? "Billed annually" : "Billed monthly"
+        let billingSummary: String? = {
+            switch period {
+            case .annual:  return "Billed annually"
+            case .monthly: return "Billed monthly"
+            case .weekly:  return "Billed weekly"
+            }
+        }()
 
-        // Calculate savings if both products are available
         var savingsPercent: Int?
         // We'd need both prices for savings calc; skip if only one product loaded
         // The savings will be computed at display time or left nil
@@ -260,5 +273,14 @@ final class StoreKitService: StoreKitServiceProtocol {
             displayPrice: product.displayPrice,
             billingSummary: billingSummary
         )
+    }
+
+    /// Display sort order: annual (0) -> monthly (1) -> weekly (2).
+    private static func periodSortOrder(_ period: SubscriptionPeriod) -> Int {
+        switch period {
+        case .annual:  0
+        case .monthly: 1
+        case .weekly:  2
+        }
     }
 }

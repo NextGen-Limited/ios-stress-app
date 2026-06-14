@@ -47,43 +47,50 @@ struct StoreKitProductCatalogTests {
 
     // MARK: - Explicit values
 
-    @Test("Explicit monthly/annual/group values are returned")
+    @Test("Explicit weekly/monthly/annual/group values are returned")
     func explicitValuesAreReturned() {
         let catalog = StoreKitProductCatalog(
+            weeklyProductID: "com.example.app.premium.weekly",
             monthlyProductID: "com.example.app.premium.monthly",
             annualProductID: "com.example.app.premium.annual",
             subscriptionGroupID: "premium"
         )
+        #expect(catalog.weeklyProductID == "com.example.app.premium.weekly")
         #expect(catalog.monthlyProductID == "com.example.app.premium.monthly")
         #expect(catalog.annualProductID == "com.example.app.premium.annual")
         #expect(catalog.subscriptionGroupID == "premium")
-        #expect(catalog.allProductIDs.count == 2)
+        #expect(catalog.allProductIDs.count == 3)
+        #expect(catalog.allProductIDs.contains("com.example.app.premium.weekly"))
         #expect(catalog.allProductIDs.contains("com.example.app.premium.monthly"))
         #expect(catalog.allProductIDs.contains("com.example.app.premium.annual"))
     }
 
     // MARK: - productID(for:) mapping
 
-    @Test("productID(for:) maps periods correctly")
+    @Test("productID(for:) maps periods correctly including weekly")
     func productIDForPeriod() {
         let catalog = StoreKitProductCatalog(
+            weeklyProductID: "weekly.id",
             monthlyProductID: "monthly.id",
             annualProductID: "annual.id",
             subscriptionGroupID: nil
         )
+        #expect(catalog.productID(for: .weekly) == "weekly.id")
         #expect(catalog.productID(for: .monthly) == "monthly.id")
         #expect(catalog.productID(for: .annual) == "annual.id")
     }
 
     // MARK: - period(for:) mapping
 
-    @Test("period(for:) maps product IDs back to periods")
+    @Test("period(for:) maps product IDs back to periods including weekly")
     func periodForProductID() {
         let catalog = StoreKitProductCatalog(
+            weeklyProductID: "weekly.id",
             monthlyProductID: "monthly.id",
             annualProductID: "annual.id",
             subscriptionGroupID: nil
         )
+        #expect(catalog.period(for: "weekly.id") == .weekly)
         #expect(catalog.period(for: "monthly.id") == .monthly)
         #expect(catalog.period(for: "annual.id") == .annual)
         #expect(catalog.period(for: "unknown.id") == nil)
@@ -91,25 +98,28 @@ struct StoreKitProductCatalogTests {
 
     // MARK: - Injectable sources
 
-    @Test("Catalog resolves from injected environment dictionary")
+    @Test("Catalog resolves from injected environment dictionary including weekly")
     func resolvesFromInjectedEnvironment() {
         let catalog = StoreKitProductCatalog(
             bundle: Bundle.main,
             environment: [
+                "STOREKIT_PREMIUM_WEEKLY_PRODUCT_ID": "env.weekly",
                 "STOREKIT_PREMIUM_MONTHLY_PRODUCT_ID": "env.monthly",
                 "STOREKIT_PREMIUM_ANNUAL_PRODUCT_ID": "env.annual",
                 "STOREKIT_PREMIUM_SUBSCRIPTION_GROUP_ID": "env.group"
             ],
             defaults: nil
         )
+        #expect(catalog.weeklyProductID == "env.weekly")
         #expect(catalog.monthlyProductID == "env.monthly")
         #expect(catalog.annualProductID == "env.annual")
         #expect(catalog.subscriptionGroupID == "env.group")
     }
 
-    @Test("Catalog resolves from injected UserDefaults")
+    @Test("Catalog resolves from injected UserDefaults including weekly")
     func resolvesFromInjectedDefaults() {
         let defaults = UserDefaults(suiteName: "StoreKitProductCatalogTests")!
+        defaults.set("defaults.weekly", forKey: "storeKitPremiumWeeklyProductID")
         defaults.set("defaults.monthly", forKey: "storeKitPremiumMonthlyProductID")
         defaults.set("defaults.annual", forKey: "storeKitPremiumAnnualProductID")
         defaults.set("defaults.group", forKey: "storeKitPremiumSubscriptionGroupID")
@@ -123,9 +133,26 @@ struct StoreKitProductCatalogTests {
             environment: [:],
             defaults: defaults
         )
+        #expect(catalog.weeklyProductID == "defaults.weekly")
         #expect(catalog.monthlyProductID == "defaults.monthly")
         #expect(catalog.annualProductID == "defaults.annual")
         #expect(catalog.subscriptionGroupID == "defaults.group")
+    }
+
+    // MARK: - Weekly-only edge case
+
+    @Test("Catalog with only weekly product still works")
+    func weeklyOnlyCatalog() {
+        let catalog = StoreKitProductCatalog(
+            weeklyProductID: "weekly.only",
+            monthlyProductID: nil,
+            annualProductID: nil,
+            subscriptionGroupID: nil
+        )
+        #expect(catalog.allProductIDs.count == 1)
+        #expect(catalog.productID(for: .weekly) == "weekly.only")
+        #expect(catalog.productID(for: .monthly) == nil)
+        #expect(catalog.period(for: "weekly.only") == .weekly)
     }
 
     // MARK: - Bundle Info.plist takes priority over environment

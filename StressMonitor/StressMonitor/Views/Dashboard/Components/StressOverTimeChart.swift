@@ -18,6 +18,12 @@ struct StressOverTimeChart: View {
     @State private var selectedRange: LocalChartTimeRange = .sevenDays
     var onUpgrade: (() -> Void)? = nil
 
+    /// Soft paywall logic: 7-day history stays FREE (core monitoring).
+    /// 30-day and 90-day trends are premium-only.
+    private var shouldLockChart: Bool {
+        !PremiumState.shared.isPremiumUser && selectedRange != .sevenDays
+    }
+
     // Mock data for chart visualization
     private let chartData: [StressDataPoint] = [
         StressDataPoint(day: "D1", value: 35, category: .mild),
@@ -39,11 +45,16 @@ struct StressOverTimeChart: View {
             // Header with title and dropdown
             headerView
 
-            if PremiumState.shared.isPremiumUser {
+            // Soft paywall: 7-day history is FREE (core monitoring).
+            // Only 30-day and 90-day trends require premium.
+            if shouldLockChart {
                 chartContent
+                    .overlay(PremiumLockOverlay(
+                        lockedFeatureLabel: "Unlock \(selectedRange.rawValue) trends",
+                        onUpgrade: onUpgrade
+                    ))
             } else {
                 chartContent
-                    .overlay(PremiumLockOverlay(onUpgrade: onUpgrade))
             }
         }
         .padding(18)

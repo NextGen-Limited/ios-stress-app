@@ -6,7 +6,11 @@ struct PlanSelectionCard: View {
     let onSelect: () -> Void
 
     private var title: String {
-        plan.period == .annual ? "Annual" : plan.displayName
+        switch plan.period {
+        case .annual:  return "Annual"
+        case .weekly:  return plan.displayName
+        case .monthly: return plan.displayName
+        }
     }
 
     private var subtitle: String {
@@ -15,14 +19,16 @@ struct PlanSelectionCard: View {
     }
 
     private var priceText: String {
-        if plan.period == .annual {
+        switch plan.period {
+        case .annual:
             return Self.currencyFormatter.string(from: plan.pricePerMonth as NSDecimalNumber) ?? "$14.99"
+        case .monthly, .weekly:
+            return plan.priceDisplay
         }
-        return plan.priceDisplay
     }
 
     private var periodText: String {
-        "/month"
+        plan.periodUnitDisplay
     }
 
     private var rightFooterText: String {
@@ -31,6 +37,8 @@ struct PlanSelectionCard: View {
             return "\(Self.currencyFormatter.string(from: plan.pricePerPeriod as NSDecimalNumber) ?? "$179.88") billed yearly"
         case .monthly:
             return plan.billingSummary ?? "Billed monthly"
+        case .weekly:
+            return plan.billingSummary ?? "Billed weekly"
         }
     }
 
@@ -40,6 +48,8 @@ struct PlanSelectionCard: View {
             return plan.savingsDisplay ?? "Save 25%"
         case .monthly:
             return "No commitment"
+        case .weekly:
+            return "Cancel anytime"
         }
     }
 
