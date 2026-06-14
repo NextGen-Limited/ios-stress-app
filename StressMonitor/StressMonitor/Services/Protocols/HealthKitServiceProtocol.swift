@@ -17,4 +17,8 @@ extension HealthKitServiceProtocol {
     func fetchSleepData(for date: Date) async throws -> SleepData? { nil }
     func fetchActivityData(for date: Date) async throws -> ActivityData? { nil }
     func fetchRecoveryData(for date: Date) async throws -> RecoveryData? { nil }
+
+    /// User's date of birth components from HealthKit. Default returns nil;
+    /// concrete implementation overrides via HKHealthStore.
+    var dateOfBirthComponents: DateComponents? { nil }
 }

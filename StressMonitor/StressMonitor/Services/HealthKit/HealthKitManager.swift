@@ -20,6 +20,12 @@ final class HealthKitManager: HealthKitServiceProtocol {
         self.healthStore = healthStore
     }
 
+    var dateOfBirthComponents: DateComponents? {
+        HKHealthStore.isHealthDataAvailable()
+            ? try? healthStore.dateOfBirthComponents()
+            : nil
+    }
+
     func requestAuthorization() async throws {
         let readTypes: Set<HKObjectType> = [
             hrvType, heartRateType, sleepType,

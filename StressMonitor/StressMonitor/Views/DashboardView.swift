@@ -110,6 +110,12 @@ struct DashboardView: View {
         )
         .opacity(appearAnimation ? 1 : 0)
 
+        if let bioAge = viewModel.bioAgeResult {
+            BioAgeCardView(result: bioAge)
+                .opacity(appearAnimation ? 1 : 0)
+                .transition(.opacity.combined(with: .scale(scale: 0.95)))
+        }
+
         SelfNoteCard()
             .opacity(appearAnimation ? 1 : 0)
 
