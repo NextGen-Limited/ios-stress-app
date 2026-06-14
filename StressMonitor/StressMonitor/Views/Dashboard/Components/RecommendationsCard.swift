@@ -18,7 +18,7 @@ struct RecommendationsCard: View {
             VStack(alignment: .leading, spacing: 11) {
                 // Title
                 Text("Recommendations:")
-                    .font(.custom("Roboto-Bold", size: 23.723))
+                    .font(.system(size: 23.723, weight: .bold, design: .rounded))
                     .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
                     .tracking(-0.3558)
 
@@ -27,12 +27,12 @@ struct RecommendationsCard: View {
                     ForEach(recommendations, id: \.self) { recommendation in
                         HStack(alignment: .top, spacing: 0) {
                             Text("•")
-                                .font(.custom("Roboto-Regular", size: 14))
+                                .font(.system(size: 14, weight: .regular, design: .rounded))
                                 .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
                                 .frame(width: 21, alignment: .leading)
 
                             Text(recommendation)
-                                .font(.custom("Roboto-Regular", size: 14))
+                                .font(.system(size: 14, weight: .regular, design: .rounded))
                                 .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
                                 .tracking(-0.21)
                                 .frame(maxWidth: .infinity, alignment: .leading)
@@ -49,7 +49,7 @@ struct RecommendationsCard: View {
             Button(action: { onFAQTap?() }) {
                 HStack(spacing: 6) {
                     Text("FAQ")
-                        .font(.custom("Roboto-Bold", size: 14.599))
+                        .font(.system(size: 14.599, weight: .bold, design: .rounded))
                         .foregroundStyle(.black.opacity(0.39))
 
                     Image(systemName: "chevron.right")

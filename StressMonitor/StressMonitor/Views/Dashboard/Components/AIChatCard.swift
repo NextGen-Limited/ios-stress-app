@@ -18,7 +18,7 @@ struct AIChatCard: View {
             VStack(alignment: .leading, spacing: 0) {
                 // Title
                 Text("AI Chat")
-                    .font(Font.custom("Roboto-Bold", size: 24))
+                    .font(Font.system(size: 24, weight: .bold, design: .rounded))
                     .foregroundStyle(Color(hex: "777986"))
                     .tracking(-0.36)
                     .padding(.top, 19)
@@ -26,7 +26,7 @@ struct AIChatCard: View {
 
                 // Subtitle
                 Text("Talk with AI Kitten")
-                    .font(Font.custom("Roboto-Regular", size: 14))
+                    .font(Font.system(size: 14, weight: .regular, design: .rounded))
                     .foregroundStyle(Color(hex: "808080"))
                     .tracking(-0.21)
                     .padding(.top, 7)
@@ -34,7 +34,7 @@ struct AIChatCard: View {
 
                 // Description
                 Text("\"It's always better to talk to your support group. If you need, Kitten is here for you!\"")
-                    .font(Font.custom("Roboto-Regular", size: 13))
+                    .font(Font.system(size: 13, weight: .regular, design: .rounded))
                     .foregroundStyle(Color(hex: "808080"))
                     .tracking(-0.195)
                     .frame(width: 203, alignment: .leading)
@@ -49,7 +49,7 @@ struct AIChatCard: View {
                             .font(.system(size: 11))
 
                         Text("Chat with StressCat")
-                            .font(Font.custom("Roboto-Medium", size: 14))
+                            .font(Font.system(size: 14, weight: .medium, design: .rounded))
                             .tracking(-0.21)
                     }
                     .foregroundStyle(.white)
@@ -66,12 +66,12 @@ struct AIChatCard: View {
                 // Disclaimer
                 VStack(spacing: 2) {
                     Text("For informational purposes only.")
-                        .font(Font.custom("Roboto-Light", size: 10))
+                        .font(Font.system(size: 10, weight: .light, design: .rounded))
                         .foregroundStyle(Color(hex: "808080"))
                         .tracking(-0.15)
 
                     Text("Tap here if you need medical or therapy resource")
-                        .font(Font.custom("Roboto-Light", size: 10))
+                        .font(Font.system(size: 10, weight: .light, design: .rounded))
                         .foregroundStyle(Color(hex: "808080"))
                         .tracking(-0.15)
                 }

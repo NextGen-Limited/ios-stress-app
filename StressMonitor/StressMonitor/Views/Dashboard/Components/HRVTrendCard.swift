@@ -11,11 +11,11 @@ struct HRVTrendCard: View {
             HStack {
                 VStack(alignment: .leading, spacing: 0) {
                     Text("HRV Trend")
-                        .font(.custom("Roboto-Bold", size: 18))
+                        .font(.system(size: 18, weight: .bold, design: .rounded))
                         .foregroundStyle(Color.Wellness.adaptivePrimaryText)
 
                     Text("Last 30 days")
-                        .font(.custom("Roboto-Regular", size: 12))
+                        .font(.system(size: 12, weight: .regular, design: .rounded))
                         .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
                 }
 
@@ -29,7 +29,7 @@ struct HRVTrendCard: View {
                 } label: {
                     HStack(spacing: 4) {
                         Text(selectedRange)
-                            .font(.custom("Roboto-Regular", size: 12))
+                            .font(.system(size: 12, weight: .regular, design: .rounded))
                             .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
 
                         Image(systemName: "chevron.down")
@@ -70,7 +70,7 @@ struct HRVTrendCard: View {
         VStack(alignment: .trailing, spacing: 0) {
             ForEach([150, 100, 50, 0], id: \.self) { value in
                 Text("\(value)")
-                    .font(.custom("Roboto-Regular", size: 10))
+                    .font(.system(size: 10, weight: .regular, design: .rounded))
                     .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
                     .frame(height: 60, alignment: .top)
             }
@@ -130,7 +130,7 @@ struct HRVTrendCard: View {
                 HStack {
                     Spacer()
                     Text("Today")
-                        .font(.custom("Roboto-Regular", size: 10))
+                        .font(.system(size: 10, weight: .regular, design: .rounded))
                         .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
                 }
             }

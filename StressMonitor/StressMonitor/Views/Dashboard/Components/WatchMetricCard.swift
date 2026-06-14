@@ -35,7 +35,7 @@ struct WatchMetricCard: View {
 
                 // Duration below icon
                 Text(duration)
-                    .font(.custom("Roboto-Bold", size: 12))
+                    .font(.system(size: 12, weight: .bold, design: .rounded))
                     .foregroundStyle(tintColor)
                     .tracking(-0.18)
             }
@@ -50,7 +50,7 @@ struct WatchMetricCard: View {
                         .foregroundStyle(Color.Wellness.adaptivePrimaryText)
 
                     Text(title)
-                        .font(.custom("Roboto-Bold", size: 14))
+                        .font(.system(size: 14, weight: .bold, design: .rounded))
                         .foregroundStyle(Color.Wellness.adaptivePrimaryText)
                         .tracking(-0.21)
                 }
@@ -60,12 +60,12 @@ struct WatchMetricCard: View {
                     ForEach(Array(metrics.enumerated()), id: \.offset) { index, metric in
                         VStack(alignment: .center, spacing: 0) {
                             Text(metric.label)
-                                .font(.custom("Roboto-Bold", size: 11))
+                                .font(.system(size: 11, weight: .bold, design: .rounded))
                                 .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
                                 .tracking(-0.165)
 
                             Text(metric.value)
-                                .font(.custom("Roboto-Bold", size: 14))
+                                .font(.system(size: 14, weight: .bold, design: .rounded))
                                 .foregroundStyle(metric.valueColor)
                                 .tracking(-0.21)
                         }

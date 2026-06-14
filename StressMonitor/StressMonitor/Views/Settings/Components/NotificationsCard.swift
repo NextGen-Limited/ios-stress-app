@@ -164,7 +164,7 @@ private struct GradientIntensitySlider: View {
                 Capsule()
                     .fill(
                         LinearGradient(
-                            colors: [Color(hex: "85C9C9"), Color.settingsRippleBlue],
+                            colors: [Color(hex: "4FC3F7"), Color.settingsRippleBlue],
                             startPoint: .leading,
                             endPoint: .trailing
                         )

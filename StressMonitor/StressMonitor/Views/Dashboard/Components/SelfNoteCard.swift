@@ -13,7 +13,7 @@ struct SelfNoteCard: View {
                     Circle()
                         .fill(
                             LinearGradient(
-                                colors: [Color(hex: "B5FFC9"), Color(hex: "85C9C9")],
+                                colors: [Color(hex: "B5FFC9"), Color(hex: "4FC3F7")],
                                 startPoint: .topLeading,
                                 endPoint: .bottomTrailing
                             )
@@ -24,12 +24,12 @@ struct SelfNoteCard: View {
                 // Text content
                 VStack(alignment: .leading, spacing: 0) {
                     Text("How do you feel?")
-                        .font(.custom("Roboto-Regular", size: 13))
+                        .font(.system(size: 13, weight: .regular, design: .rounded))
                         .foregroundStyle(.white)
                         .tracking(-0.195)
 
                     Text("Tell me about it")
-                        .font(.custom("Roboto-Bold", size: 16))
+                        .font(.system(size: 16, weight: .bold, design: .rounded))
                         .foregroundStyle(.white)
                         .tracking(-0.24)
                 }

@@ -63,11 +63,11 @@ private struct DayCell: View {
     var body: some View {
         VStack(spacing: 2.8) {
             Text(dayNumber)
-                .font(.custom("Roboto-Bold", size: 14))
+                .font(.system(size: 14, weight: .bold, design: .rounded))
                 .foregroundStyle(isSelected ? .white : Color(hex: "101223"))
 
             Text(dayAbbreviation)
-                .font(.custom("Roboto-Medium", size: 12.13))
+                .font(.system(size: 12.13, weight: .medium, design: .rounded))
                 .foregroundStyle(isSelected ? .white : Color(hex: "777986"))
         }
         .frame(width: 21.467, height: 32.267)
