@@ -23,13 +23,17 @@ final class SupabaseLLMService: LLMServiceProtocol, @unchecked Sendable {
     private(set) var modelUsed: String?
     var currentSessionId: UUID? { sessionId }
 
-    private static let accessTokenDefaultsKey = "supabaseAccessToken"
+    private static let keychainService = "com.stressmonitor.app"
+    private static let keychainTokenAccount = "supabaseAccessToken"
     private static let sessionIdDefaultsKey = "supabaseChatSessionId"
 
     // MARK: - Init
 
     init(accessToken: String? = nil) {
-        self.accessToken = accessToken ?? UserDefaults.standard.string(forKey: Self.accessTokenDefaultsKey)
+        self.accessToken = accessToken ?? KeychainService.retrieve(
+            service: Self.keychainService,
+            account: Self.keychainTokenAccount
+        )
         if let storedSessionId = UserDefaults.standard.string(forKey: Self.sessionIdDefaultsKey) {
             self.sessionId = UUID(uuidString: storedSessionId)
         }
@@ -39,9 +43,9 @@ final class SupabaseLLMService: LLMServiceProtocol, @unchecked Sendable {
     func setAccessToken(_ token: String?) {
         self.accessToken = token
         if let token, !token.isEmpty {
-            UserDefaults.standard.set(token, forKey: Self.accessTokenDefaultsKey)
+            try? KeychainService.save(token, service: Self.keychainService, account: Self.keychainTokenAccount)
         } else {
-            UserDefaults.standard.removeObject(forKey: Self.accessTokenDefaultsKey)
+            try? KeychainService.delete(service: Self.keychainService, account: Self.keychainTokenAccount)
         }
     }
 
