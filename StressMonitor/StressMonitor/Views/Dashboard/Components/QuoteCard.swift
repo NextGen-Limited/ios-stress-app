@@ -9,7 +9,7 @@ struct QuoteCard: View {
     var body: some View {
         VStack(spacing: 8) {
             Text("\"\(quote)\"")
-                .font(.custom("Roboto-Italic", size: 14))
+                .font(.system(size: 14, weight: .regular, design: .rounded))
                 .italic()
                 .foregroundStyle(Color(hex: "796038"))
                 .tracking(-0.21)
@@ -17,7 +17,7 @@ struct QuoteCard: View {
                 .frame(width: 312)
 
             Text(author)
-                .font(.custom("Roboto-ExtraBold", size: 14))
+                .font(.system(size: 14, weight: .heavy, design: .rounded))
                 .foregroundStyle(Color(hex: "796038"))
                 .tracking(-0.21)
         }

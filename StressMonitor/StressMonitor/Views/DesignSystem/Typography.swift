@@ -44,18 +44,17 @@ struct Typography {
     static let dataMedium = Font.system(size: 34, weight: .semibold, design: .rounded)
     static let dataSmall = Font.system(size: 28, weight: .bold, design: .rounded)
 
-    // MARK: - Custom Fonts (Roboto)
+    // MARK: - SF Pro Rounded
 
-    /// Custom Roboto-Bold font. Use for special branding elements.
-    /// Font file: Roboto-Bold.ttf (loaded via FontBlaster)
+    /// SF Pro Rounded bold font. Use for special branding elements.
     static func roboto(size: CGFloat) -> Font {
-        .custom("Roboto-Bold", size: size)
+        .system(size: size, weight: .bold, design: .rounded)
     }
 
-    static let robotoTitle = Font.custom("Roboto-Bold", size: 24)
-    static let robotoHeadline = Font.custom("Roboto-Bold", size: 17)
-    static let robotoBody = Font.custom("Roboto-Bold", size: 16)
-    static let robotoCaption = Font.custom("Roboto-Bold", size: 12)
+    static let robotoTitle = Font.system(size: 24, weight: .bold, design: .rounded)
+    static let robotoHeadline = Font.system(size: 17, weight: .bold, design: .rounded)
+    static let robotoBody = Font.system(size: 16, weight: .bold, design: .rounded)
+    static let robotoCaption = Font.system(size: 12, weight: .bold, design: .rounded)
 
     // MARK: - Custom Fonts (Lato - IAP Screen)
 

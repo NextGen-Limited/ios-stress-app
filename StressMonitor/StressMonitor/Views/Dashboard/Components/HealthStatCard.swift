@@ -20,7 +20,7 @@ struct HealthStatCard: View {
                     .frame(width: 18.249, height: 18.249)
 
                 Text(title)
-                    .font(.custom("Roboto-Bold", size: 14))
+                    .font(.system(size: 14, weight: .bold, design: .rounded))
                     .foregroundStyle(Color.Wellness.adaptivePrimaryText)
                     .tracking(-0.21)
             }
@@ -28,13 +28,13 @@ struct HealthStatCard: View {
             // Value
             HStack(alignment: .firstTextBaseline, spacing: 7.299) {
                 Text(value)
-                    .font(.custom("Roboto-Bold", size: 24))
+                    .font(.system(size: 24, weight: .bold, design: .rounded))
                     .foregroundStyle(Color.Wellness.adaptivePrimaryText)
                     .tracking(-0.36)
 
                 if let unit = unit {
                     Text(unit)
-                        .font(.custom("Roboto-Bold", size: 23.723))
+                        .font(.system(size: 23.723, weight: .bold, design: .rounded))
                         .foregroundStyle(Color(hex: "707070"))
                 }
             }
@@ -43,16 +43,16 @@ struct HealthStatCard: View {
             if let secondaryValue = secondaryValue, let secondaryUnit = secondaryUnit {
                 HStack(alignment: .firstTextBaseline, spacing: 0) {
                     Text(secondaryValue)
-                        .font(.custom("Roboto-Bold", size: 24))
+                        .font(.system(size: 24, weight: .bold, design: .rounded))
                         .foregroundStyle(Color.Wellness.adaptivePrimaryText)
                         .tracking(-0.36)
 
                     Text("/")
-                        .font(.custom("Roboto-Bold", size: 24))
+                        .font(.system(size: 24, weight: .bold, design: .rounded))
                         .foregroundStyle(Color.lightGrey)
 
                     Text(secondaryUnit)
-                        .font(.custom("Roboto-Bold", size: 16))
+                        .font(.system(size: 16, weight: .bold, design: .rounded))
                         .foregroundStyle(Color.lightGrey)
                 }
             }
