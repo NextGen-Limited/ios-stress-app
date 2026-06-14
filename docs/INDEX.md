@@ -67,6 +67,11 @@ Current status, planned features, timeline, and success metrics.
 ### 8. **Project Changelog**
 *Not yet created — tracked in git history.*
 
+### 9. **Community & Growth**
+Niche community engagement strategy and product positioning for sharing in communities.
+- **[Community Niche Strategy](./community/niche-strategy.md)** — Engagement playbook for ME/CFS, ADHD, and burnout communities (positioning, Reddit posting guidelines, content calendar, metrics)
+- **[App Positioning One-Pager](./community/app-positioning.md)** — Niche elevator pitches, feature-relevance matrix, and StressWatch comparison table for community sharing
+
 ---
 
 ## Quick Reference
