@@ -72,6 +72,11 @@ Niche community engagement strategy and product positioning for sharing in commu
 - **[Community Niche Strategy](./community/niche-strategy.md)** — Engagement playbook for ME/CFS, ADHD, and burnout communities (positioning, Reddit posting guidelines, content calendar, metrics)
 - **[App Positioning One-Pager](./community/app-positioning.md)** — Niche elevator pitches, feature-relevance matrix, and StressWatch comparison table for community sharing
 
+### 10. **App Store & ASO**
+App Store editorial preparation, ASO keyword strategy, and submission-ready copy.
+- **[Apple Editorial Checklist](./aso/apple-editorial-checklist.md)** — Comprehensive prep guide: ASO keywords, screenshot specs, privacy messaging, accessibility audit, App Review map, editorial pitch, submission gate
+- **[App Store Description](./aso/app-description.md)** — Submission-ready description (title, subtitle, 100-char keywords, promotional text, release notes) with keyword-integration audit
+
 ---
 
 ## Quick Reference
