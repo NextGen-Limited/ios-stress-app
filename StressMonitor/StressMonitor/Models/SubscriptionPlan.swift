@@ -3,6 +3,7 @@ import Foundation
 enum SubscriptionPeriod: String, CaseIterable {
     case annual
     case monthly
+    case weekly
 }
 
 struct SubscriptionPlan: Identifiable {
@@ -20,9 +21,10 @@ struct SubscriptionPlan: Identifiable {
     let displayPrice: String?
     let billingSummary: String?
 
-    /// Human-readable period unit for display (e.g. "/month", "/year").
+    /// Human-readable period unit for display (e.g. "/week", "/month", "/year").
     var periodUnitDisplay: String {
         switch period {
+        case .weekly:  return "/week"
         case .monthly: return "/month"
         case .annual:  return "/year"
         }
@@ -75,6 +77,19 @@ struct SubscriptionPlan: Identifiable {
             productID: nil,
             displayPrice: nil,
             billingSummary: "Billed monthly"
+        ),
+        SubscriptionPlan(
+            id: .weekly,
+            displayName: "Weekly",
+            pricePerMonth: 30.39,
+            pricePerPeriod: 6.99,
+            period: .weekly,
+            savingsPercent: nil,
+            isBestValue: false,
+            subtitle: "Try it out, cancel anytime",
+            productID: nil,
+            displayPrice: nil,
+            billingSummary: "Billed weekly"
         )
     ]
 }

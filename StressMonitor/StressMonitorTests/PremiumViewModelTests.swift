@@ -59,7 +59,7 @@ struct PremiumViewModelTests {
 
         await vm.loadInitialData()
 
-        #expect(vm.plans.count == 2)
+        #expect(vm.plans.count == 3)
     }
 
     @Test("loadInitialData selects annual when present")
