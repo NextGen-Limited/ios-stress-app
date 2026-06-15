@@ -33,6 +33,15 @@ final class StressViewModel {
     var aiInsight: AIInsight?
     var dataQualityInfo: DataQualityInfo?
 
+    // MARK: - Bio Age Properties
+
+    /// Estimated biological age result — nil until enough data accumulates
+    var bioAgeResult: BioAgeResult?
+    /// User's chronological age — defaults to 35 when date of birth unavailable
+    var userAge: Int = 35
+    /// Whether there's enough data for a bio age estimate
+    var hasSufficientBioAgeData: Bool = false
+
     // MARK: - Permission State
 
     /// Set exclusively when HKError.errorAuthorizationDenied is caught — NOT a proxy for currentStress == nil.
@@ -61,6 +70,7 @@ final class StressViewModel {
     private let algorithm: StressAlgorithmServiceProtocol
     private let repository: StressRepositoryProtocol
     private let calibrator = FactorCalibrator()
+    private let bioAgeCalculator = BioAgeCalculator()
 
     /// Stored Task for heart rate observation cancellation
     private var heartRateTask: Task<Void, Never>?
@@ -317,6 +327,7 @@ final class StressViewModel {
         loadTodayMeasurements()
         loadWeeklyComparison()
         generateInsight()
+        calculateBioAge()
 
         isLoading = false
 
@@ -360,6 +371,44 @@ final class StressViewModel {
             return
         }
         aiInsight = InsightGenerator.generate(from: stress, history: historicalData)
+    }
+
+    // MARK: - Bio Age Calculation
+
+    /// Calculate biological age from current health data and measurement history.
+    /// Requires 7+ days of data for a reliable estimate.
+    func calculateBioAge() {
+        // Determine chronological age from HealthKit date of birth or fallback
+        let calendar = Calendar.current
+        if let dobComponent = healthKit.dateOfBirthComponents,
+           let dob = calendar.date(from: dobComponent) {
+            let ageComponents = calendar.dateComponents([.year], from: dob, to: Date())
+            userAge = ageComponents.year ?? 35
+        }
+
+        // Check data sufficiency
+        hasSufficientBioAgeData = bioAgeCalculator.hasEnoughData(measurements: historicalData)
+
+        guard hasSufficientBioAgeData else {
+            bioAgeResult = nil
+            return
+        }
+
+        // Use 7-day average HRV and RHR for stability
+        let recent = historicalData.suffix(7)
+        let avgHRV = recent.map(\.hrv).reduce(0, +) / Double(recent.count)
+        let avgRHR = recent.map(\.restingHeartRate).reduce(0, +) / Double(recent.count)
+
+        // Sleep efficiency from latest context if available
+        let sleepEfficiency: Double? = nil
+
+        bioAgeResult = bioAgeCalculator.calculate(
+            chronologicalAge: userAge,
+            hrv: avgHRV,
+            restingHeartRate: avgRHR,
+            sleepEfficiency: sleepEfficiency,
+            previousResult: bioAgeResult
+        )
     }
 
     // MARK: - Auto-Refresh with HKObserverQuery
