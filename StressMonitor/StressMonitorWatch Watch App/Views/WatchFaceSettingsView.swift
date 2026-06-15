@@ -47,10 +47,8 @@ struct WatchFaceSettingsView: View {
 
     private var previewCard: some View {
         ZStack {
-            RoundedRectangle(cornerRadius: 16)
-                .fill(
-                    WatchFaceBackgroundView(style: style, theme: theme)
-                )
+            WatchFaceBackgroundView(style: style, theme: theme)
+                .clipShape(RoundedRectangle(cornerRadius: 16))
                 .overlay(
                     RoundedRectangle(cornerRadius: 16)
                         .stroke(Color.white.opacity(0.06), lineWidth: 1)
@@ -101,11 +99,9 @@ struct WatchFaceSettingsView: View {
         } label: {
             HStack(spacing: 10) {
                 ZStack {
-                    RoundedRectangle(cornerRadius: 8)
-                        .fill(
-                            WatchFaceBackgroundView(style: option, theme: theme)
-                        )
+                    WatchFaceBackgroundView(style: option, theme: theme)
                         .frame(width: 32, height: 32)
+                        .clipShape(RoundedRectangle(cornerRadius: 8))
                         .overlay(
                             RoundedRectangle(cornerRadius: 8)
                                 .stroke(Color.white.opacity(0.1), lineWidth: 1)
