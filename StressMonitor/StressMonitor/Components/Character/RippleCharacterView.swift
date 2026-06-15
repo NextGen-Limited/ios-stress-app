@@ -360,12 +360,12 @@ struct RippleCharacterView: View {
 
     private var determinedMouth: some View {
         // Wavy determined mouth — slight grimace
-        Path { p in
-            let w: CGFloat = size * 0.16
-            let h: CGFloat = size * 0.03
-            p.move(to: CGPoint(x: -w / 2, y: 0))
-            p.addQuadCurve(to: CGPoint(x: 0, y: -h), control: CGPoint(x: -w * 0.25, y: -h))
-            p.addQuadCurve(to: CGPoint(x: w / 2, y: 0), control: CGPoint(x: w * 0.25, y: -h))
+        Path { path in
+            let waveWidth: CGFloat = size * 0.16
+            let waveHeight: CGFloat = size * 0.03
+            path.move(to: CGPoint(x: -waveWidth / 2, y: 0))
+            path.addQuadCurve(to: CGPoint(x: 0, y: -waveHeight), control: CGPoint(x: -waveWidth * 0.25, y: -waveHeight))
+            path.addQuadCurve(to: CGPoint(x: waveWidth / 2, y: 0), control: CGPoint(x: waveWidth * 0.25, y: -waveHeight))
         }
         .stroke(ink, style: StrokeStyle(lineWidth: max(1.5, size * 0.020), lineCap: .round))
         .frame(width: size * 0.16, height: size * 0.06)
@@ -456,29 +456,29 @@ struct RippleCharacterView: View {
 private struct WaterDropletBody: Shape {
     func path(in rect: CGRect) -> Path {
         var path = Path()
-        let w = rect.width
-        let h = rect.height
+        let dropletWidth = rect.width
+        let dropletHeight = rect.height
         let midX = rect.midX
-        let top = rect.minY + h * 0.06   // slight rounding at very top
+        let top = rect.minY + dropletHeight * 0.06   // slight rounding at very top
         let bot = rect.maxY
 
         // Pointed top → rounded bottom
         path.move(to: CGPoint(x: midX, y: top))
         path.addQuadCurve(
-            to: CGPoint(x: rect.maxX, y: rect.minY + h * 0.50),
-            control: CGPoint(x: rect.maxX, y: rect.minY + h * 0.15)
+            to: CGPoint(x: rect.maxX, y: rect.minY + dropletHeight * 0.50),
+            control: CGPoint(x: rect.maxX, y: rect.minY + dropletHeight * 0.15)
         )
         path.addQuadCurve(
             to: CGPoint(x: midX, y: bot),
-            control: CGPoint(x: rect.maxX, y: bot - h * 0.08)
+            control: CGPoint(x: rect.maxX, y: bot - dropletHeight * 0.08)
         )
         path.addQuadCurve(
-            to: CGPoint(x: rect.minX, y: rect.minY + h * 0.50),
-            control: CGPoint(x: rect.minX, y: bot - h * 0.08)
+            to: CGPoint(x: rect.minX, y: rect.minY + dropletHeight * 0.50),
+            control: CGPoint(x: rect.minX, y: bot - dropletHeight * 0.08)
         )
         path.addQuadCurve(
             to: CGPoint(x: midX, y: top),
-            control: CGPoint(x: rect.minX, y: rect.minY + h * 0.15)
+            control: CGPoint(x: rect.minX, y: rect.minY + dropletHeight * 0.15)
         )
         return path
     }

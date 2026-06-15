@@ -20,6 +20,11 @@ struct ContentView: View {
         WatchHistoryView(viewModel: viewModel)
       }
       .tag(2)
+
+      NavigationStack {
+        WatchFaceSettingsView()
+      }
+      .tag(3)
     }
     .tabViewStyle(.page)
     .background(StressCharacterPalette.darkCanvas.ignoresSafeArea())

@@ -64,7 +64,20 @@ extension WatchConnectivityManager: WCSessionDelegate {
   // MARK: - Message handling
 
   func session(_ session: WCSession, didReceiveMessage message: [String: Any]) {
-    // Handle incoming messages from iPhone
-    // Can be extended to process specific message types
+    // Apply watch face preferences pushed from iPhone.
+    if !message.isEmpty {
+      WatchFacePreferences.apply(payload: message)
+    }
+  }
+
+  // MARK: - UserInfo (queued, reliable delivery)
+
+  func session(
+    _ session: WCSession,
+    didReceiveUserInfo userInfo: [String: Any] = [:]
+  ) {
+    DispatchQueue.main.async {
+      WatchFacePreferences.apply(payload: userInfo)
+    }
   }
 }

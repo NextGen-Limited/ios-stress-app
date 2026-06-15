@@ -116,7 +116,12 @@ struct CircularComplication: Widget {
     var body: some WidgetConfiguration {
         StaticConfiguration(kind: kind, provider: CircularComplicationProvider()) { entry in
             CircularComplicationView(entry: entry)
-                .containerBackground(.fill.tertiary, for: .widget)
+                .containerBackground(for: .widget) {
+                    WatchFaceBackgroundView(
+                        style: WatchFacePreferences.backgroundStyle,
+                        theme: WatchFacePreferences.theme
+                    )
+                }
         }
         .configurationDisplayName("Stress Ring")
         .description("Shows your current stress level as a color-coded ring")
