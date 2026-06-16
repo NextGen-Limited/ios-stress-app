@@ -9,6 +9,7 @@ struct SettingsView: View {
     @State private var navigateToExport = false
     @State private var navigateToDelete = false
     @State private var navigateToPremium = false
+    @State private var navigateToCharacters = false
     @State private var docsURL: URL? = nil
     @State private var appearance = AppearanceManager.shared
 
@@ -27,6 +28,9 @@ struct SettingsView: View {
 
                 // Widget CTA
                 PremiumCard(onTap: { navigateToPremium = true })
+
+                // Characters collection
+                CharactersCard(onTap: { navigateToCharacters = true })
 
                 // Watch face & Complications
                 WatchFaceCard()
@@ -80,6 +84,9 @@ struct SettingsView: View {
         }
         .navigationDestination(isPresented: $navigateToPremium) {
             IAPPremiumView(storeKit: Self.makeStoreKitService(), premiumState: PremiumState.shared)
+        }
+        .navigationDestination(isPresented: $navigateToCharacters) {
+            CharacterCollectionView()
         }
         .sheet(item: $docsURL) { url in
             SafariView(url: url)

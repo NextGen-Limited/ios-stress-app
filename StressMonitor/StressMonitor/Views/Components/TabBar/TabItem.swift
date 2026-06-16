@@ -1,12 +1,11 @@
 import SwiftUI
 
-/// Tab bar items matching Figma design
-/// Includes the character collection as a first-class app destination.
+/// Tab bar items matching Figma design.
+/// Characters moved to Settings for a cleaner tab bar.
 enum TabItem: Int, CaseIterable, Identifiable {
     case home = 0
     case action = 1
-    case characters = 2
-    case trend = 3
+    case trend = 2
 
     // MARK: - Identifiable
     var id: Int { rawValue }
@@ -17,7 +16,6 @@ enum TabItem: Int, CaseIterable, Identifiable {
         switch self {
         case .home:       return "Home"
         case .action:     return "Action"
-        case .characters: return "Characters"
         case .trend:      return "Trend"
         }
     }
@@ -27,7 +25,6 @@ enum TabItem: Int, CaseIterable, Identifiable {
         switch self {
         case .home:       return "home"
         case .action:     return "action"
-        case .characters: return "character"
         case .trend:      return "trend"
         }
     }
@@ -42,7 +39,6 @@ enum TabItem: Int, CaseIterable, Identifiable {
         switch self {
         case .home:       return "Home tab, current stress level"
         case .action:     return "Action tab, quick actions and exercises"
-        case .characters: return "Characters tab, your character collection"
         case .trend:      return "Trend tab, trends and insights"
         }
     }
@@ -51,7 +47,6 @@ enum TabItem: Int, CaseIterable, Identifiable {
         switch self {
         case .home:       return "Double tap to view current stress measurement"
         case .action:     return "Double tap to access quick actions and exercises"
-        case .characters: return "Double tap to view your character collection"
         case .trend:      return "Double tap to view stress trends and history"
         }
     }
@@ -60,7 +55,6 @@ enum TabItem: Int, CaseIterable, Identifiable {
         switch self {
         case .home:       return "HomeTab"
         case .action:     return "ActionTab"
-        case .characters: return "CharactersTab"
         case .trend:      return "TrendTab"
         }
     }

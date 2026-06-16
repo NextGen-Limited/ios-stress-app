@@ -73,8 +73,6 @@ struct MainTabView: View {
                         #endif
                     case .action:
                         ActionView()
-                    case .characters:
-                        CharacterCollectionView()
                     case .trend:
                         TrendsView()
                     }
