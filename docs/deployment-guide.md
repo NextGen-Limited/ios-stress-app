@@ -2,7 +2,7 @@
 
 **Platform:** iOS 17+ / watchOS 10+
 **Distribution:** TestFlight -> App Store
-**Last Updated:** June 7, 2026
+**Last Updated:** June 17, 2026
 
 **Note:** Apple Intelligence features (on-device AI Chat) require iOS 26+ and compatible hardware. SupabaseLLMService with SSE streaming provides cloud fallback for older devices.
 
@@ -33,16 +33,20 @@ Once your app is built and tested:
 - [ ] Run unit tests
 - [ ] Complete manual testing on device
 - [ ] Verify accessibility compliance
-- [ ] Test 5-tab navigation flow (Home/Trends/Breathing/Characters/Settings)
-- [ ] Test breathing exercises and timers
-- [ ] Test character collection and evolution unlocks
+- [ ] Test 3-tab navigation flow (Home/Action/Trend)
+- [ ] Test Settings screen access via button/chevron
+- [ ] Test biological age card display and calculation
+- [ ] Test breathing exercises and timers in Action tab
+- [ ] Test character collection access via CharactersCard in Settings
+- [ ] Test character evolution unlocks
 - [ ] Test dark mode toggle in Settings → ProfileCard
 - [ ] Test appearance picker (Light/Dark/System) persistence
 - [ ] Test AI chat streaming with Apple Intelligence (iOS 26+) and SupabaseLLMService fallback
 - [ ] Verify SupabaseConfig environment setup (URL + anonKey)
-- [ ] Test real StoreKit 2 purchasing flow with real/sandbox products
+- [ ] Test real StoreKit 2 purchasing flow (monthly/annual/weekly) with real/sandbox products
 - [ ] Test WidgetKit Live Activity (breathing session on lock screen)
 - [ ] Test ControlCenter widget (app launcher)
+- [ ] Test watch face background personalization
 
 ### TestFlight
 - [ ] Build & archive for distribution
@@ -51,23 +55,26 @@ Once your app is built and tested:
 - [ ] Monitor crash logs
 - [ ] Review feedback
 - [ ] Specifically test streaming chat performance (both backends)
-- [ ] Verify 5-tab navigation flow and tab transitions
+- [ ] Verify 3-tab navigation flow and tab transitions
+- [ ] Test Settings access and CharactersCard → character collection flow
+- [ ] Test biological age card calculation and display on Dashboard
 - [ ] Test character unlock progression on real devices
-- [ ] Verify StoreKit 2 purchases work end-to-end
-- [ ] Test dark mode toggle across all tabs on iOS 16.0+
+- [ ] Verify StoreKit 2 purchases work end-to-end (weekly/monthly/annual)
+- [ ] Test dark mode toggle across all tabs on iOS 17+
 - [ ] Verify WidgetKit Live Activity displays breathing session correctly
 - [ ] Verify ControlCenter widget launches app
+- [ ] Test watch face background personalization on actual Apple Watch
 - [ ] Test watch complications on actual Apple Watch
 
 ### App Store Submission
 - [ ] Fill app information (privacy, description, keywords)
 - [ ] Configure HealthKit settings and permissions
-- [ ] Upload screenshots (5-tab structure, AI chat, character collection)
-- [ ] Create release notes highlighting real StoreKit 2 and character system
-- [ ] Configure StoreKit products and subscription info in App Store Connect
+- [ ] Upload screenshots (3-tab structure, biological age, AI chat, character collection)
+- [ ] Create release notes highlighting biological age calculator, watch personalization, weekly billing, and character system
+- [ ] Configure StoreKit products and subscription info in App Store Connect (monthly/annual/weekly)
 - [ ] Submit for review
 - [ ] Monitor review status
-- [ ] Highlight new 5-tab navigation, character evolution, and real StoreKit 2 features
+- [ ] Highlight new 3-tab navigation, biological age feature, watch face personalization, weekly billing tier, character evolution, and real StoreKit 2 features
 
 ### Post-Release
 - [ ] Monitor crash rates
@@ -94,7 +101,11 @@ Once your app is built and tested:
 - [ ] **Watch Character-Reactive** - 5 stress tier emoji display (no numeric scores) (Jun 13)
 - [ ] **WidgetKit Live Activity** - Breathing session on lock screen + Dynamic Island (Jun 13)
 - [ ] **ControlCenter Widget** - App launcher button in Control Center (Jun 13)
-- [ ] **5-Tab Navigation** - Home/Trends/Breathing/Characters/Settings flow
+- [ ] **3-Tab Navigation** - Home/Action/Trend flow with non-tab Settings (Jun 17)
+- [ ] **Biological Age Calculator** - Biological age estimation from HRV, resting HR, sleep (Jun 17)
+- [ ] **BioAgeCardView** - Dashboard card showing age differential with color coding (Jun 17)
+- [ ] **Watch Face Personalization** - Background style selection synced via WatchConnectivity (Jun 17)
+- [ ] **Weekly Billing Option** - SubscriptionPeriod.weekly added to StoreKit products (Jun 17)
 - [ ] **Character Collection** - 5 elemental characters with 3-stage evolution, 38 SVG assets
 - [ ] **Streaming AI Chat** - Real-time token rendering via SSEParser
 - [ ] **Dual LLM Services** - Apple Intelligence (iOS 26+) + SupabaseLLMService fallback
@@ -124,4 +135,4 @@ Once your app is built and tested:
 ---
 
 **Maintained By:** Phuong Doan
-**Last Updated:** June 12, 2026
+**Last Updated:** June 17, 2026

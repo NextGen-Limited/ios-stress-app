@@ -3,7 +3,7 @@
 **Pattern:** MVVM + Protocol-Oriented Design
 **Concurrency:** async/await
 **Data Flow:** Unidirectional (Models -> Services -> ViewModels -> Views)
-**Last Updated:** June 13, 2026
+**Last Updated:** June 17, 2026
 
 ---
 
@@ -118,19 +118,18 @@ DashboardViewModel.weeklyMeasurements (7-day slice)
 DailyTimelineView (7-day × 7-slot dot-matrix grid)
 ```
 
-**5-Tab Navigation flow (May 2026):**
+**3-Tab Navigation flow (Jun 2026):**
 ```
-MainTabView (5 tabs: Home, Trends, Breathing, Characters, Settings)
+MainTabView (3 tabs: Home, Action, Trend)
     ↓
-Home → DashboardView (stress monitoring, insights)
+Home → DashboardView (stress monitoring, bio age card, insights)
     ↓
-Trends → TrendsView (analytics, charts, statistics)
+Action → ActionView (breathing exercises, AI chat, quick actions)
     ↓
-Breathing → BreathingView (breathing exercises)
+Trend → TrendsView (analytics, charts, heatmaps, statistics)
     ↓
-Characters → CharacterCollectionView (character collection, evolution)
-    ↓
-Settings → SettingsView (app settings, data management)
+Settings Button → SettingsView (non-tab, accessed via button/chevron)
+    → CharactersCard (entry point to CharacterCollectionView)
 ```
 
 **Reverse for updates:**
@@ -172,6 +171,13 @@ UI Updates on screen
 - FactorCalibrator for adjusting weights based on data quality
 - StressFactor protocol for extensibility
 - Updated algorithm: HRV (70% dynamic), HR (30% dynamic), Sleep, Activity, Recovery weights redistribute based on data availability
+
+### Biological Age Calculator Service (NEW - Jun 17)
+- `BioAgeCalculator` — Estimates biological age from HRV (SDNN), resting HR, sleep efficiency using age-group norm tables
+- Requires ≥7 days of baseline data for accuracy
+- Returns `BioAgeResult` with estimatedAge, chronologicalAge, difference, BioAgeTrend enum
+- Follows `MultiFactorStressCalculator` pattern (Sendable, struct-based)
+- Graceful degradation when insufficient data
 
 ### Insight Service
 - Generate AI-powered personalized insights from measurement history

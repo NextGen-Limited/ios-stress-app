@@ -172,12 +172,13 @@ protocol HealthKitServiceProtocol {
 - Handle authorization errors
 
 #### Algorithm Service
-**Files:** `Services/Algorithm/` (10 files, 656 LOC)
+**Files:** `Services/Algorithm/` (11 files, ~750+ LOC)
 - `MultiFactorStressCalculator.swift` (104 LOC) - Orchestrates 5 factors
 - `StressCalculator.swift` (118 LOC) - Legacy 2-factor calculator
 - `BaselineCalculator.swift` (97 LOC) - 30-day baseline adaptation
 - `StressFactor.swift` (22 LOC) - Protocol for individual factors
 - `FactorCalibrator.swift` (56 LOC) - Weight adjustment
+- `BioAgeCalculator.swift` (NEW - Jun 17) - Biological age estimation from HRV + health metrics
 - `HRVStressFactor.swift`, `HeartRateStressFactor.swift`, `SleepStressFactor.swift`, `ActivityStressFactor.swift`, `RecoveryStressFactor.swift`
 
 ```swift

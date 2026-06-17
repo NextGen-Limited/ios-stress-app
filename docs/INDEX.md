@@ -1,7 +1,7 @@
 # StressMonitor Documentation Index
 
 **Version:** 1.0 (Pre-Ship RC1)
-**Last Updated:** June 13, 2026
+**Last Updated:** June 17, 2026
 **Blocker Status:** 1 critical remaining (B3 - comprehensive test suite rewrite)
 **Resolved Blockers:** B1 ✅ (Jun 7), B2 ✅ (Jun 12)
 
@@ -81,19 +81,20 @@ App Store editorial preparation, ASO keyword strategy, and submission-ready copy
 
 ## Quick Reference
 
-### Codebase Metrics (as of Jun 13, 2026)
+### Codebase Metrics (as of Jun 17, 2026)
 
 | Metric | Value |
 |--------|-------|
 | **Total Swift Files** | 331+ |
-| **Total LOC** | ~35,000+ |
-| **iOS App** | 250+ files, ~28K LOC |
-| **watchOS App** | 46+ files, ~3.2K LOC |
+| **Total LOC** | ~36,000+ |
+| **iOS App** | 250+ files, ~28.5K LOC |
+| **watchOS App** | 46+ files, ~3.5K LOC |
 | **Widgets** | 7+ files, ~1.4K LOC |
 | **Tests** | 5+ files (placeholder - pending B3 rewrite) |
 | **External Dependencies** | 13+ SPM packages |
 | **CI/CD** | GitHub Actions (macos-15, Xcode 26) |
 | **Character Assets** | 38 SVG files |
+| **New (Jun 17)** | BioAgeCalculator, BioAgeCardView, WatchFacePreferences, CharacterIllustrationExporter |
 
 ### Documentation Metrics
 

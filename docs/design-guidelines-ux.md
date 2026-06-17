@@ -176,28 +176,48 @@ extension StressBuddyMood {
 
 ---
 
-## Navigation Flow (5-Tab Structure)
+## Navigation Flow (3-Tab Structure)
 
-**Updated - May 2026:**
+**Updated - June 17, 2026:**
 
 ### Tab Navigation Pattern
 
 1. **Home Tab** (`DashboardView.swift`)
    - Primary stress measurement interface
    - Current stress level visualization with stress ring
+   - **Biological Age Card** — Shows estimated age, difference from chronological age, color-coded trend
    - Quick access to recent measurements
    - Personalized AI insights and chat entry point
    - Weekly dot-matrix timeline view
 
-2. **Trends Tab** (`TrendsView.swift`)
+2. **Action Tab** (`ActionView.swift`)
+   - **Breathing exercises** — Guided box breathing with 4-4-4-4 pattern
+   - **Ripple AI Coach** — Personalized stress relief guidance
+   - **Bento Grid** — Quick action cards for wellness tools
+   - **Dark canvas theme** — Calming visual design
+   - Entry point to AI chat for conversational support
+
+3. **Trend Tab** (`TrendsView.swift`)
    - Historical stress analysis with multiple charts
    - Statistical insights (mean, max, min, std dev)
    - Weekly heatmap visualization
    - HRV trend analysis
    - Data visualization cards (scrollable)
 
-3. **Breathing Tab** (`BreathingView.swift`)
-   - Guided breathing exercises
+### Secondary Navigation (Settings - Non-Tab)
+
+Accessed via button/chevron from Home tab:
+
+**Settings Screen** (`SettingsView.swift`)
+   - **ProfileCard** — Appearance picker (Light/Dark/System), Delete All Data
+   - **CharactersCard** — Gateway to character collection and evolution
+     - Tap to open CharacterCollectionView
+     - Shows all 5 elemental characters with unlock status
+     - Evolution timeline and mood preview
+   - Data management cards (export, reset)
+   - Watch face preferences (if applicable)
+   - CloudKit sync toggle
+   - About and help
    - Box breathing (4-4-4-4 pattern) with Figma alignment
    - Animated breathing circle with phase guidance
    - 3-minute session duration

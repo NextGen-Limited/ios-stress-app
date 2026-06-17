@@ -2,7 +2,7 @@
 
 **Platform:** iOS 17+ / watchOS 10+
 **Section:** Distribution, Review, Post-Release Monitoring
-**Last Updated:** June 12, 2026
+**Last Updated:** June 17, 2026
 
 ---
 

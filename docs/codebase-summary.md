@@ -1,9 +1,9 @@
 # Codebase Summary
 
-**Total Files:** ~600 files (including 331+ Swift files)
-**Total LOC:** ~35,000+
+**Total Files:** ~650+ files (including 331+ Swift files)
+**Total LOC:** ~36,000+
 **Architecture:** MVVM + Protocol-Oriented Design
-**Last Updated:** June 13, 2026
+**Last Updated:** June 17, 2026
 
 ---
 
@@ -33,7 +33,7 @@ ios-stress-app/
 
 ## iOS App Structure (250+ Swift files)
 
-### Models (21 files, ~1,100 LOC)
+### Models (23 files, ~1,300 LOC)
 Core data structures for health metrics, stress calculations, and character system.
 
 | File | Purpose |
@@ -59,11 +59,12 @@ Core data structures for health metrics, stress calculations, and character syst
 | `Base/ObservableModel.swift` | Base observable model class |
 | `CharacterCreature.swift` | Character definition (species, element) |
 | `CharacterUnlock.swift` | Character unlock state + evolution progress |
+| `BioAgeResult.swift` | Biological age calculation output with trend (NEW: Jun 17) |
 
 ### Services (58 files, ~8,500 LOC)
 Business logic and system integrations.
 
-#### Algorithm Services (10 files)
+#### Algorithm Services (11 files)
 - `StressCalculator.swift` - Main stress calculation orchestration
 - `MultiFactorStressCalculator.swift` - Advanced multi-factor stress analysis
 - `StressFactor.swift` - Base stress factor protocol
@@ -74,6 +75,7 @@ Business logic and system integrations.
 - `RecoveryStressFactor.swift` - Recovery capacity assessment
 - `FactorCalibrator.swift` - Stress factor weight calibration
 - `BaselineCalculator.swift` - Individual baseline computation
+- `BioAgeCalculator.swift` - Biological age estimation from HRV and health metrics (NEW: Jun 17)
 
 #### HealthKit Services (5 files)
 - `HealthKitManager.swift` - Core HealthKit integration
@@ -97,7 +99,7 @@ Business logic and system integrations.
 - `StressContextPayload.swift` - Health context for LLM system prompt
 - `LLMServiceError.swift` - Typed error handling
 
-#### Data Management Services (8 files)
+#### Data Management Services (9 files)
 - `DataManagementService.swift` - Central data management
 - `DataExporter.swift` - Data export functionality
 - `DataDeleter.swift` - Data cleanup and management
@@ -106,6 +108,7 @@ Business logic and system integrations.
 - `CloudKitResetService.swift` - CloudKit data reset utilities
 - `LocalDataWipeService.swift` - Local data cleanup
 - `DataManagementUtilities.swift` - Data management helpers
+- `CharacterIllustrationExporter.swift` - Renders character × evolution × mood combinations to PNG + ZIP (NEW: In-progress Jun 17)
 
 #### Background Services (2 files)
 - `HealthBackgroundScheduler.swift` - Background health data collection
@@ -155,18 +158,18 @@ SwiftUI user interface components:
 5. **Settings** (`SettingsView.swift`) - App settings
 
 #### Feature Views
-- `Dashboard/` (26 files) - Dashboard components, cards, metrics, insights
+- `Dashboard/` (27 files) - Dashboard components, cards, metrics, insights, BioAgeCardView (NEW: Jun 17)
 - `Trends/` (12 files) - Trend charts, heatmaps, statistics with Ripple character commentary
 - `Breathing/` (6 files) - Breathing exercise flow
-- `Characters/` (8 files) - Character collection, detail, picker, celebration
-- `Settings/` (14 files) - Settings screens, data management, ProfileCard (NEW: Jun 2026), appearance picker, dark mode toggle, delete data CTA
+- `Characters/` (9 files) - Character collection, detail, picker, celebration, CharacterIllustrationExportView (NEW: In-progress Jun 17)
+- `Settings/` (14 files) - Settings screens, data management, ProfileCard, appearance picker, dark mode toggle, delete data CTA
 - `History/` (7 files) - Historical data browsing
 - `Onboarding/` (10 files) - Onboarding flow with HealthKit permission integration
 - `Premium/` (6 files) - IAP Premium subscription screen
 - `Chat/` - AI chat interface components
 - `Journal/` - Journaling features
 - `MiniWalk/` - Mini Walk exercise with circular timer
-- `Action/` - Quick stress relief interface with Ripple AI Coach, Bento grid, dark-canvas theme (NEW: Jun 2026)
+- `Action/` - Quick stress relief interface with Ripple AI Coach, Bento grid, dark-canvas theme
 
 ### Theme (5 files)
 Design system and styling:
@@ -222,16 +225,16 @@ Interface definitions:
 
 ## Navigation Structure
 
-### 5-Tab Navigation Architecture
-The app uses a 5-tab navigation structure (updated May 2026):
+### 3-Tab Navigation Architecture (Updated June 17, 2026)
+The app uses a 3-tab navigation structure:
 
-1. **Home** (`DashboardView.swift`) - Main stress monitoring dashboard with current stress levels, recent trends, and insights
-2. **Trends** (`TrendsView.swift`) - Historical stress visualization, charts, and pattern analysis
-3. **Breathing** (`BreathingView.swift`) - Guided breathing exercises and techniques
-4. **Characters** (`CharacterCollectionView.swift`) - Character collection, evolution tracking, and unlock progress
-5. **Settings** (`SettingsView.swift`) - App settings, data management, and preferences
+1. **Home** (`DashboardView.swift`) - Main stress monitoring dashboard with current stress levels, recent trends, biological age card, and insights
+2. **Action** (`ActionView.swift`) - Quick stress relief with breathing exercises, Ripple AI Coach, and bento grid of quick actions
+3. **Trend** (`TrendsView.swift`) - Historical stress visualization, charts, heatmaps, and pattern analysis
 
 ### Secondary Navigation
+- **Settings** (accessed via button/chevron from Dashboard, not a tab) - App settings, data management, preferences, character collection access via CharactersCard
+- Characters now accessible via **CharactersCard** component in Settings screen (previously Tab 4)
 - Journal and History accessible via navigation within Dashboard and Trends tabs
 - Data export/delete accessible through Settings
 
@@ -308,8 +311,13 @@ The app uses a 5-tab navigation structure (updated May 2026):
 12. **Mini Walk Exercise** - Walking exercise screen with circular timer
 13. **Real StoreKit 2 Premium** - Real App Store product fetching + transaction monitoring (PR #19, Jun 12)
 14. **SupabaseLLMService** - Production cloud service with SSE streaming (replaces CloudLLMService)
-15. **5-Tab Navigation** - Home/Trends/Breathing/Characters/Settings structure
+15. **3-Tab Navigation** - Home/Action/Trend structure with Settings moved to non-tab screen (Jun 17)
 16. **Character Collection UI** - 5 elemental characters with evolution system, unlock types (free/premium/streak-gated), persistent storage, 38 SVG assets
+17. **Biological Age Calculator** - `BioAgeCalculator` with estimatedAge, chronologicalAge, difference, BioAgeTrend; 7-day min data req (NEW: Jun 17)
+18. **BioAgeCardView** - Dark glass card on Dashboard showing bio age diff + character expression, color-coded (NEW: Jun 17)
+19. **Watch Face Personalization** - Background style selection, synced via WatchConnectivityManager (NEW: Jun 17)
+20. **Weekly Billing Option** - `SubscriptionPeriod.weekly` added to premium tier alongside monthly/annual (NEW: Jun 17)
+21. **CharacterIllustrationExporter** - @MainActor service rendering character PNG combinations to ZIP (NEW: In-progress Jun 17)
 
 ## New Files Added (IAP Premium)
 - **PremiumState** - Centralized premium state management singleton

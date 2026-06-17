@@ -3,7 +3,7 @@
 **Pattern:** MVVM + Protocol-Oriented Design
 **Concurrency:** async/await
 **Section:** CloudKit, Watch, widgets, security, extensibility
-**Last Updated:** June 13, 2026
+**Last Updated:** June 17, 2026
 
 ---
 
@@ -88,8 +88,24 @@ Apple Watch
 ├── WatchStressCalculator
 ├── SwiftData (local storage)
 ├── CloudKit (E2E sync)
-└── WidgetKit Complications
+├── WidgetKit Complications
+├── WatchFacePreferences (background personalization)
+└── WatchConnectivityManager (sync with iPhone)
 ```
+
+### Watch Face Background Personalization (NEW - Jun 17)
+
+**Files:**
+- `WatchFacePreferences.swift` - Persists background style selection
+- `WatchFaceBackgroundStyle.swift` - Enum of available backgrounds
+- `WatchFaceSettingsView.swift` - Settings UI in Watch app
+- `WatchHomeView.swift` - Applies selected background style
+- `WatchConnectivityManager.swift` - Syncs preferences with iPhone
+
+**Features:**
+- User-selectable background styles stored in SwiftData
+- Synced to iPhone via WatchConnectivity for cross-device consistency
+- Persists across app launches and device reboots
 
 ### Watch Character-Reactive Design (NEW - Jun 2026)
 

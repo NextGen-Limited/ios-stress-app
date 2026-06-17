@@ -3,7 +3,7 @@
 **Version:** 1.0 (Pre-Ship - RC1)
 **Status:** Feature Complete — 1 Blocker Pending (B3 test suite)
 **Platform:** iOS 17+ / watchOS 10+
-**Last Updated:** June 13, 2026
+**Last Updated:** June 17, 2026
 
 ---
 
@@ -41,7 +41,10 @@ StressMonitor is a **privacy-first stress monitoring application** that uses Hea
 | **Morning Readiness Check** | HRV trend analysis for daily readiness assessment | ✅ Complete |
 | **Home Screen Widgets** | At-a-glance stress display | ✅ Complete |
 | **Character Collection UI** | 5 elemental characters with 3-stage evolution, free/premium/streak unlocks, 38 SVG assets | ✅ Complete |
-| **5-Tab Navigation** | Home/Trends/Breathing/Characters/Settings structure (May 2026) | ✅ Complete |
+| **3-Tab Navigation** | Home/Action/Trend structure with Settings non-tab (Jun 17) | ✅ Complete |
+| **Biological Age Calculator** | Estimates biological age from HRV, resting HR, sleep; 7-day min requirement | ✅ Complete |
+| **Watch Face Personalization** | Background style selection synced via WatchConnectivity | ✅ Complete |
+| **Weekly Billing Option** | Added `SubscriptionPeriod.weekly` to premium tier | ✅ Complete |
 | **WCAG AA Accessibility** | Dual coding, VoiceOver, Dynamic Type | ✅ Complete |
 
 ### Ship Blockers (CRITICAL - must resolve before App Store submission)

@@ -3,7 +3,7 @@
 **Current Version:** 1.0 (Pre-Ship - RC1)
 **Release Date:** Target late June 2026 (pending B3 test suite)
 **Status:** Feature Complete — 1 blocker pending (B3)
-**Last Updated:** June 13, 2026
+**Last Updated:** June 17, 2026
 
 ---
 
@@ -43,12 +43,11 @@
   - Custom shapes: TriangleShape, TeardropShape, FlameShape
   - Full Reduce Motion + VoiceOver support
 - ✅ Settings screen — Figma card-based design (Mar 2026)
-- ✅ **5-Tab Navigation Structure** (May 2026)
-  - Home: Dashboard with stress monitoring
-  - Trends: Historical analytics and trends
-  - Breathing: Breathing exercises
-  - Characters: Character collection with evolution
-  - Settings: App configuration and data management
+- ✅ **3-Tab Navigation Structure** (Jun 17, 2026)
+  - Home: Dashboard with stress monitoring, biological age card
+  - Action: Breathing exercises, AI Coach, quick actions
+  - Trend: Historical analytics and trends
+  - Settings: Non-tab, accessed via button/chevron; CharactersCard for character collection
 - ✅ Trends view — Figma alignment (Mar 2026)
   - Scrollable card list; global NavigationStack/TimeRangePicker removed
   - All cards unified: `adaptiveCardBackground` + `settingsCardRadius` + shadow
@@ -79,7 +78,10 @@
 - ✅ **Morning Readiness Check** - HRV trend analysis for daily readiness
 - ✅ **Real-time Stress Score** - HRV analysis with immediate feedback
 - ✅ **Mini Walk Exercise** - Walking exercise with circular timer (Apr 2026)
-- ✅ **5-Tab Navigation** - Home/Trends/Breathing/Characters/Settings structure (May 2026)
+- ✅ **3-Tab Navigation** - Home/Action/Trend structure, Settings non-tab (Jun 17, 2026)
+- ✅ **Biological Age Calculator** - Biological age estimation from HRV, resting HR, sleep (Jun 17)
+- ✅ **Watch Face Personalization** - Background style selection synced via WatchConnectivity (Jun 17)
+- ✅ **Weekly Billing Option** - Added SubscriptionPeriod.weekly to premium tier (Jun 17)
 - ✅ **Streaming AI Chat** - Real-time token streaming with SSEParser (Apr 2026)
 - ✅ **Box Breathing Figma Alignment** - Enhanced breathing exercise visuals (Apr 2026)
 - ✅ **Character Collection UI** - 5 elemental characters with evolution system, 38 SVG assets (Jun 2026)

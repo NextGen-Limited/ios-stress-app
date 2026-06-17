@@ -129,25 +129,45 @@ Interaction design and accessibility standards:
 
 ---
 
-## Navigation Architecture (5-Tab Structure)
+## Navigation Architecture (3-Tab Structure)
 
-**Updated - May 2026:**
+**Updated - June 17, 2026:**
 
-The app uses a 5-tab navigation structure:
+The app uses a 3-tab navigation structure:
 
 1. **Home** (`DashboardView.swift`)
    - Main stress monitoring dashboard
    - Current stress level with visual ring
+   - Biological age card showing age differential
    - Recent measurements and timeline
    - Personalized insights and AI recommendations
 
-2. **Trends** (`TrendsView.swift`)
+2. **Action** (`ActionView.swift`)
+   - Quick stress relief with breathing exercises
+   - Ripple AI Coach for personalized guidance
+   - Bento grid of quick actions
+   - Chat entry point for conversational support
+
+3. **Trend** (`TrendsView.swift`)
    - Historical stress analytics
    - Chart visualizations
    - Statistical insights
    - Trend patterns and correlations
 
-3. **Breathing** (`BreathingView.swift`)
+### Secondary Navigation
+
+4. **Settings** (Non-tab, accessed via button/chevron from Dashboard)
+   - App settings and preferences
+   - ProfileCard with appearance picker (Light/Dark/System)
+   - Data management (export, delete)
+   - **CharactersCard** — Entry point to CharacterCollectionView (character collection, evolution tracking)
+   - Watch face preferences (watchOS)
+   - CloudKit sync preferences
+   - About and help
+
+### Removed Navigation
+- **Breathing Tab** — Moved to Action tab as primary focus
+- **Characters Tab** — Relocated to Settings via CharactersCard component
    - Guided breathing exercises
    - Figma-aligned breathing circle
    - 3-minute sessions
