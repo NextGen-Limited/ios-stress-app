@@ -6,6 +6,7 @@ struct CharacterCollectionView: View {
     @State private var viewModel = CharacterCollectionViewModel()
     @State private var selectedCharacter: CharacterCreature?
     @State private var selectedElement: CharacterElement?
+    @State private var navigateToExport = false
 
     // MARK: - Computed
 
@@ -63,6 +64,20 @@ struct CharacterCollectionView: View {
         .background(Color.Wellness.adaptiveBackground.ignoresSafeArea())
         .navigationTitle("Characters")
         .navigationBarTitleDisplayMode(.large)
+        .toolbar {
+            ToolbarItem(placement: .topBarTrailing) {
+                Button {
+                    navigateToExport = true
+                } label: {
+                    Image(systemName: "square.and.arrow.up")
+                        .foregroundStyle(Color.primaryBlue)
+                }
+                .accessibilityLabel("Export all character illustrations")
+            }
+        }
+        .navigationDestination(isPresented: $navigateToExport) {
+            CharacterIllustrationExportView()
+        }
         .sheet(item: $selectedCharacter) { creature in
             CharacterDetailView(
                 creature: creature,
