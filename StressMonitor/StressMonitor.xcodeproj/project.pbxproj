@@ -10,7 +10,6 @@
 		F211BBDA2FD9112000A6E25D /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F211BBD92FD9111F00A6E25D /* WidgetKit.framework */; };
 		F211BBDC2FD9112000A6E25D /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F211BBDB2FD9112000A6E25D /* SwiftUI.framework */; };
 		F211BBED2FD9112200A6E25D /* StressMonitorWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = F211BBD72FD9111F00A6E25D /* StressMonitorWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		F26965312F5C0A9700B40F0F /* AnimatedTabBar in Frameworks */ = {isa = PBXBuildFile; productRef = F26965302F5C0A9700B40F0F /* AnimatedTabBar */; };
 		F26968812F5DAE2400B40F0F /* SwiftUICharts in Frameworks */ = {isa = PBXBuildFile; productRef = F26968802F5DAE2400B40F0F /* SwiftUICharts */; };
 		F2E2EC392F1CC605000C2B53 /* StressMonitorWatch Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = F2E2EC192F1CC602000C2B53 /* StressMonitorWatch Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		F2FCD7AF2F8FFBFF000DE6E8 /* ExyteChat in Frameworks */ = {isa = PBXBuildFile; productRef = F2FCD7AE2F8FFBFF000DE6E8 /* ExyteChat */; };
@@ -147,7 +146,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F26965312F5C0A9700B40F0F /* AnimatedTabBar in Frameworks */,
 				F26968812F5DAE2400B40F0F /* SwiftUICharts in Frameworks */,
 				F2FCD7AF2F8FFBFF000DE6E8 /* ExyteChat in Frameworks */,
 			);
@@ -243,7 +241,6 @@
 			);
 			name = StressMonitor;
 			packageProductDependencies = (
-				F26965302F5C0A9700B40F0F /* AnimatedTabBar */,
 				F26968802F5DAE2400B40F0F /* SwiftUICharts */,
 				F2FCD7AE2F8FFBFF000DE6E8 /* ExyteChat */,
 			);
@@ -302,7 +299,6 @@
 			mainGroup = F2E2EBE02F1CC553000C2B53;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				F269652F2F5C0A9700B40F0F /* XCRemoteSwiftPackageReference "AnimatedTabBar" */,
 				F269687F2F5DAE2400B40F0F /* XCRemoteSwiftPackageReference "SwiftUICharts" */,
 				F2FCD7AD2F8FFBFE000DE6E8 /* XCRemoteSwiftPackageReference "Chat" */,
 			);
@@ -821,14 +817,6 @@
 /* End XCConfigurationList section */
 
 /* Begin XCRemoteSwiftPackageReference section */
-		F269652F2F5C0A9700B40F0F /* XCRemoteSwiftPackageReference "AnimatedTabBar" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/exyte/AnimatedTabBar.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 1.0.0;
-			};
-		};
 		F269687F2F5DAE2400B40F0F /* XCRemoteSwiftPackageReference "SwiftUICharts" */ = {
 			isa = XCRemoteSwiftPackageReference;
 			repositoryURL = "https://github.com/willdale/SwiftUICharts.git";
@@ -848,11 +836,6 @@
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		F26965302F5C0A9700B40F0F /* AnimatedTabBar */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = F269652F2F5C0A9700B40F0F /* XCRemoteSwiftPackageReference "AnimatedTabBar" */;
-			productName = AnimatedTabBar;
-		};
 		F26968802F5DAE2400B40F0F /* SwiftUICharts */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = F269687F2F5DAE2400B40F0F /* XCRemoteSwiftPackageReference "SwiftUICharts" */;

@@ -3,7 +3,6 @@ import SwiftData
 
 struct TrendsView: View {
     @Environment(\.modelContext) private var modelContext
-    @Environment(TabBarScrollState.self) private var tabBarScrollState
     @State private var viewModel: TrendsViewModel
     @State private var navigateToPremium = false
 
@@ -82,12 +81,9 @@ struct TrendsView: View {
                 SmartInsightsTeaser()
                     .padding(.horizontal)
 
-                Spacer()
-                    .frame(height: tabBarScrollState.tabBarHeight + 16)
             }
             .padding(.top, 16)
         }
-        .trackScrollOffsetForTabBar(state: tabBarScrollState)
         .background(TrendsPalette.darkCanvas)
         .task {
             await viewModel.loadTrendData()

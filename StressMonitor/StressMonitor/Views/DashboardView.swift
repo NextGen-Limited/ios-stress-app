@@ -3,7 +3,6 @@ import SwiftData
 
 struct DashboardView: View {
     @Environment(\.modelContext) private var modelContext
-    @Environment(TabBarScrollState.self) private var tabBarScrollState
     @State private var viewModel: StressViewModel
     @Environment(\.scenePhase) private var scenePhase
     @State private var appeared = false
@@ -34,14 +33,11 @@ struct DashboardView: View {
             LazyVStack(spacing: 22) {
                 dashboardContent(viewModel.currentStress)
 
-                Spacer()
-                    .frame(height: tabBarScrollState.tabBarHeight + 16)
             }
             .padding(.horizontal, 16)
             .padding(.top, 10)
             .padding(.bottom, 16)
         }
-        .trackScrollOffsetForTabBar(state: tabBarScrollState)
         .background(HomeCharacterDesignTokens.homeBackground.ignoresSafeArea())
         .alert("Error", isPresented: .constant(viewModel.errorMessage != nil)) {
             Button("OK") {

@@ -5,7 +5,6 @@ import SwiftUI
 // 8 sections: Calendar → Daily Focus → Ripple Coach → Bento Health → Quick Actions → Recommendations → Premium → Chat CTA
 
 struct ActionView: View {
-    @Environment(TabBarScrollState.self) private var tabBarScrollState
     @State private var selectedDay: Int = 6 // Today (last in week array)
     @State private var currentDate = Date()
     @State private var isChatPresented = false
@@ -41,14 +40,10 @@ struct ActionView: View {
                     // 7. Premium Card (consistent with Settings)
                     premiumCard
 
-                    // Bottom padding for tab bar
-                    Spacer()
-                        .frame(height: tabBarScrollState.tabBarHeight + 16)
                 }
                 .padding(.horizontal, 16)
                 .padding(.top, 8)
             }
-            .trackScrollOffsetForTabBar(state: tabBarScrollState)
             .background(HomeCharacterDesignTokens.darkCanvas)
             .navigationTitle("Action")
             .navigationBarTitleDisplayMode(.inline)
@@ -500,11 +495,9 @@ extension ActionView {
 
 #Preview {
     ActionView()
-        .environment(TabBarScrollState())
 }
 
 #Preview("Dark Mode") {
     ActionView()
         .preferredColorScheme(.dark)
-        .environment(TabBarScrollState())
 }
