@@ -382,5 +382,5 @@ See `/docs/design/ASSET_NAMING.md` for full SVG asset naming specification.
 
 ---
 
-**Last Updated:** June 13, 2026
+**Last Updated:** June 19, 2026
 **Maintainers:** Phuong Doan

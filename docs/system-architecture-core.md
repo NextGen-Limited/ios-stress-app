@@ -105,9 +105,11 @@ Orchestrates business logic, manages UI state.
 | `DashboardViewModel.swift` | Dashboard data aggregation |
 | `TrendViewModel.swift` | Historical trend analysis |
 | `HistoryViewModel.swift` | Historical data browsing |
-| `SettingsViewModel.swift` | App configuration state |
+| `SettingsViewModel.swift` | App configuration state (profile, notifications, theme, iCloud sync) |
 | `DataManagementViewModel.swift` | Export, delete, reset operations |
 | `BreathingViewModel.swift` | Breathing exercise state |
+| `PremiumViewModel.swift` | Subscription management & StoreKit state |
+| `CharacterCollectionViewModel.swift` | Character collection state & unlock logic |
 
 **Responsibilities:**
 - Manage @Observable state
@@ -224,6 +226,41 @@ protocol StressRepositoryProtocol {
 - Query recent/filtered measurements
 - Baseline persistence
 - Data cleanup
+
+#### AppearanceManager Service
+**File:** `Services/AppearanceManager.swift` (NEW - Jun 13)
+
+@Observable singleton for dark mode preference management:
+
+**Features:**
+- Light/Dark/System theme modes
+- UserDefaults persistence
+- @Observable for reactive UI updates
+- Single source of truth for appearance state
+
+**Usage:**
+```swift
+@Environment(\.colorScheme) var systemColorScheme
+let appearanceManager = AppearanceManager.shared
+// appearanceManager.selectedAppearance: AppearanceMode
+```
+
+#### KeychainService
+**File:** `Services/KeychainService.swift` (NEW - Jun 2026)
+
+Security Framework wrapper for sensitive credential storage:
+
+**Features:**
+- Save/retrieve/delete operations via Security framework
+- `kSecAttrAccessibleWhenUnlockedThisDeviceOnly` (no cloud migration)
+- Typed error handling for access failures
+- Used for API tokens and authentication credentials
+
+**Responsibilities:**
+- Secure storage of API tokens (SupabaseLLM, etc)
+- Encryption at rest (handled by iOS Security framework)
+- No backup/migration to other devices
+- Graceful error handling on access denied
 
 #### LLM Service
 **Files:** `Services/LLM/` (8 files, ~500+ LOC)
@@ -530,4 +567,4 @@ final class StubRepository: StressRepositoryProtocol {
 **Next:** See `system-architecture-platform.md` for CloudKit, Watch, widgets, and security details.
 **Maintained By:** Phuong Doan
 **Version:** 1.0 Production
-**Last Updated:** June 7, 2026
+**Last Updated:** June 19, 2026

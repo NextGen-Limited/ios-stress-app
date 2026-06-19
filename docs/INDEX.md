@@ -153,7 +153,7 @@ App Store editorial preparation, ASO keyword strategy, and submission-ready copy
 | **Foundation Models** | On-device LLM via Apple Intelligence (iOS 26+) |
 | **SupabaseLLMService** | Supabase Edge Functions as cloud LLM **production** service (B1 resolved Jun 7) |
 | **Real StoreKit 2** | App Store product fetching + transaction monitoring (PR #19, Jun 12) |
-| **5-Tab Navigation** | Home/Trends/Breathing/Characters/Settings structure |
+| **3-Tab Navigation** | Home/Action/Trend structure with Settings non-tab (Jun 17, 2026) |
 | **Character System** | 5 elemental creatures with 3-stage evolution, 38 SVG assets |
 | **GitHub Actions CI** | Automated build + test on macos-15 with SPM caching |
 
@@ -239,6 +239,6 @@ SwiftUI Views → @Observable ViewModels → Protocol-based Services
 
 **Read the README.md** at project root for quick start and feature overview.
 
-**Last Updated:** June 13, 2026
+**Last Updated:** June 19, 2026
 **Maintained By:** Phuong Doan
 **Generated with:** repomix codebase analysis + manual documentation review

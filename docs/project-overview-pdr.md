@@ -33,7 +33,6 @@ StressMonitor is a **privacy-first stress monitoring application** that uses Hea
 | **Data Export** | CSV/JSON export with date filtering | ✅ Complete |
 | **Data Management** | Delete by range, category, or full wipe | ✅ Complete |
 | **Box Breathing** | Figma-aligned 4-4-4-4 pattern, 3-min sessions | ✅ Complete |
-| **5-Tab Navigation** | Home/Trends/Breathing/Characters/Settings structure (May 2026) | ✅ Complete |
 | **Mini Walk Exercise** | Walking exercise with circular timer and Figma-aligned design | ✅ Complete |
 | **Real StoreKit 2 Premium** | Real App Store product fetching + transaction monitoring (PR #19 Jun 12) | ✅ Complete |
 | **Stress History Timeline** | Activity correlation with stress measurements | ✅ Complete |
@@ -320,5 +319,5 @@ All core features complete and shipping.
 
 **Owner:** Phuong Doan
 **Status:** Pre-Ship (RC1) — Feature-complete, 1 blocker
-**Last Updated:** June 13, 2026
+**Last Updated:** June 19, 2026
 **Target Ship Date:** Post-blocker resolution (target late June 2026)

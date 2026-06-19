@@ -234,6 +234,12 @@ let watchDefaults = UserDefaults(suiteName: "group.com.stressmonitor.watch")
 - No hardcoded secrets
 - User control via export/delete
 
+### Credential Management (KeychainService)
+- API tokens stored via Security framework (Keychain)
+- `kSecAttrAccessibleWhenUnlockedThisDeviceOnly` access level (no cloud migration)
+- Used for SupabaseLLM authentication and external API tokens
+- Graceful error handling on access denied or keychain unavailable
+
 ### Privacy
 - SupabaseLLMService sends anonymized chat context to Supabase Edge Functions; health data stays on-device
 - No telemetry or analytics
@@ -374,4 +380,4 @@ BreathingExerciseView (setup)
 **Previous:** See `system-architecture-core.md` for core MVVM and service architecture.
 **Maintained By:** Phuong Doan
 **Version:** 1.0 Production
-**Last Updated:** June 13, 2026
+**Last Updated:** June 19, 2026
