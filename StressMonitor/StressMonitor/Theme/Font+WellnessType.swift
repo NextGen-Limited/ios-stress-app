@@ -2,52 +2,39 @@ import SwiftUI
 
 // MARK: - Wellness Typography System
 extension Font {
-    /// Wellness-themed custom fonts with fallbacks to SF Pro
+    /// Wellness-themed type styles backed by SF Pro.
+    ///
+    /// Public API is unchanged from the prior Roboto-backed implementation;
+    /// internals now resolve to system fonts (SF Pro / SF Pro Rounded) so the
+    /// app ships without bundled font assets.
     struct WellnessType {
-        // MARK: - Google Fonts Constants
+        // MARK: - Heading Fonts (SF Pro Rounded / SF Pro)
 
-        private static let robotoFontName = "Roboto"
+        /// Hero number for stress ring center (SF Pro Rounded 72pt bold)
+        static var heroNumber: Font { .system(size: 72, weight: .bold, design: .rounded) }
 
-        // MARK: - Heading Fonts (Roboto - Modern, clean, wellness vibe)
+        /// Large metric display (SF Pro Rounded 48pt bold)
+        static var largeMetric: Font { .system(size: 48, weight: .bold, design: .rounded) }
 
-        /// Hero number for stress ring center
-        static let heroNumber = custom(robotoFontName + "-Bold", size: 72, weight: .bold)
+        /// Card titles (SF Pro 28pt bold)
+        static var cardTitle: Font { .system(size: 28, weight: .bold, design: .default) }
 
-        /// Large metric display
-        static let largeMetric = custom(robotoFontName + "-Bold", size: 48, weight: .bold)
+        /// Section headers (SF Pro 22pt semibold)
+        static var sectionHeader: Font { .system(size: 22, weight: .semibold, design: .default) }
 
-        /// Card titles
-        static let cardTitle = custom(robotoFontName + "-Bold", size: 28, weight: .bold)
+        // MARK: - Body Fonts (SF Pro)
 
-        /// Section headers
-        static let sectionHeader = custom(robotoFontName + "-Medium", size: 22, weight: .semibold)
+        /// Primary content (SF Pro 17pt regular)
+        static var body: Font { .system(size: 17, weight: .regular, design: .default) }
 
-        // MARK: - Body Fonts (Roboto - Elegant simplicity, accessible)
+        /// Emphasized text (SF Pro 17pt semibold)
+        static var bodyEmphasized: Font { .system(size: 17, weight: .semibold, design: .default) }
 
-        /// Primary content
-        static let body = custom(robotoFontName + "-Regular", size: 17, weight: .regular)
+        /// Captions and labels (SF Pro 13pt regular)
+        static var caption: Font { .system(size: 13, weight: .regular, design: .default) }
 
-        /// Emphasized text
-        static let bodyEmphasized = custom(robotoFontName + "-Medium", size: 17, weight: .semibold)
-
-        /// Captions and labels
-        static let caption = custom(robotoFontName + "-Regular", size: 13, weight: .regular)
-
-        /// Tiny text
-        static let caption2 = custom(robotoFontName + "-Regular", size: 11, weight: .regular)
-
-        // MARK: - Helper Function
-
-        /// Create custom font with fallback to SF Pro
-        private static func custom(_ name: String, size: CGFloat, weight: Font.Weight) -> Font {
-            // Try to use custom font first
-            if UIFont.familyNames.contains(where: { $0.contains("Roboto") }) {
-                return .custom(name, size: size)
-            }
-
-            // Fallback to SF Pro system font with same weight
-            return .system(size: size, weight: weight, design: .default)
-        }
+        /// Tiny text (SF Pro 11pt regular)
+        static var caption2: Font { .system(size: 11, weight: .regular, design: .default) }
     }
 }
 
@@ -105,10 +92,9 @@ extension Font {
 // MARK: - Font Registration Helper
 /// Helper to check if custom fonts are loaded
 struct WellnessFontLoader {
-    /// Check if Roboto font family is available
-    static var isRobotoAvailable: Bool {
-        UIFont.familyNames.contains { $0.contains("Roboto") }
-    }
+    /// Roboto is no longer bundled; wellness styles resolve to SF Pro.
+    /// Kept for compatibility with existing call sites that gate on font availability.
+    static var isRobotoAvailable: Bool { false }
 
     /// Check if Lora font family is available (legacy compatibility)
     static var isLoraAvailable: Bool {

@@ -35,7 +35,8 @@ struct StressResult: Identifiable, Codable, Sendable {
         case 0..<25: return .relaxed
         case 25..<50: return .mild
         case 50..<75: return .moderate
-        default: return .high
+        case 75..<90: return .high
+        default: return .severe
         }
     }
 }

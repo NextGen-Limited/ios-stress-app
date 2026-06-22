@@ -96,6 +96,7 @@ struct ChatContextBuilder {
         case .mild: return "Mild Stress"
         case .moderate: return "Moderate Stress"
         case .high: return "High Stress"
+        case .severe: return "Severe Stress"
         }
     }
 }

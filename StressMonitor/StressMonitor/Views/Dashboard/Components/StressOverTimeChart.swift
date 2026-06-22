@@ -191,6 +191,8 @@ struct StressOverTimeChart: View {
             return HomeCharacterDesignTokens.Ember.accent
         case .high:
             return Color(hex: "#FA363D")
+        case .severe:
+            return Color.stressSevere
         }
     }
 }

@@ -21,6 +21,7 @@ public enum StressPattern: String, CaseIterable {
         case .mild: return .diagonal
         case .moderate: return .dots
         case .high: return .crosshatch
+        case .severe: return .solid
         }
     }
 

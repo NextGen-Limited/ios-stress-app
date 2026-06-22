@@ -36,6 +36,7 @@ public enum WatchStressCategory: Int, Sendable {
     case mild = 25
     case moderate = 50
     case high = 75
+    case severe = 90
 
     public var rawValue: String {
         switch self {
@@ -43,6 +44,7 @@ public enum WatchStressCategory: Int, Sendable {
         case .mild: return "mild"
         case .moderate: return "moderate"
         case .high: return "high"
+        case .severe: return "severe"
         }
     }
 }

@@ -5,7 +5,7 @@ import SwiftUI
 /// Applies mood-specific animation to Stress Buddy character
 /// All animations respect Reduce Motion accessibility setting
 struct CharacterAnimationModifier: ViewModifier {
-    let mood: StressBuddyMood
+    let mood: RippleMood
     @Environment(\.accessibilityReduceMotion) var reduceMotion
 
     @State private var breathingScale: CGFloat = 1.0
@@ -16,10 +16,10 @@ struct CharacterAnimationModifier: ViewModifier {
 
     func body(content: Content) -> some View {
         content
-            .scaleEffect(mood == .sleeping ? breathingScale : 1.0)
-            .offset(mood == .concerned ? fidgetOffset : .zero)
+            .scaleEffect(mood == .relaxed ? breathingScale : 1.0)
+            .offset(mood == .focused ? fidgetOffset : .zero)
             .rotationEffect(mood == .worried ? .degrees(shakeRotation) : .zero)
-            .rotationEffect(mood == .overwhelmed ? .degrees(dizzyRotation) : .zero)
+            .rotationEffect((mood == .determined || mood == .tired) ? .degrees(dizzyRotation) : .zero)
             .onDisappear {
                 fidgetTimer?.invalidate()
                 fidgetTimer = nil
@@ -35,16 +35,18 @@ struct CharacterAnimationModifier: ViewModifier {
 
     private func applyAnimation() {
         switch mood {
-        case .sleeping:
+        case .relaxed:
+            // Breathing animation that previously fired for the legacy `sleeping` mood.
+            // `RippleMood.relaxed` is the canonical mapping for very low stress (0–10).
             startBreathing()
-        case .calm:
-            // No animation for calm state
+        case .serene, .happy, .celebrating:
+            // Calm/positive states: no ambient motion.
             break
-        case .concerned:
+        case .focused:
             startFidget()
         case .worried:
             startShake()
-        case .overwhelmed:
+        case .determined, .tired:
             startDizzy()
         }
     }
@@ -107,9 +109,9 @@ struct CharacterAnimationModifier: ViewModifier {
 extension View {
     /// Apply character animation based on mood
     /// Respects Reduce Motion accessibility setting
-    /// - Parameter mood: Stress Buddy mood
+    /// - Parameter mood: Ripple mood
     /// - Returns: View with animation applied
-    func characterAnimation(for mood: StressBuddyMood) -> some View {
+    func characterAnimation(for mood: RippleMood) -> some View {
         modifier(CharacterAnimationModifier(mood: mood))
     }
 }

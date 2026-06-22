@@ -5,6 +5,7 @@ public enum StressCategory: String, CaseIterable, Codable, Sendable {
     case mild
     case moderate
     case high
+    case severe
 
     // MARK: - Dual Coding: Color
 
@@ -19,6 +20,8 @@ public enum StressCategory: String, CaseIterable, Codable, Sendable {
             return Color(hex: "#FFD60A")
         case .high:
             return Color(light: Color(hex: "#FF9500"), dark: Color(hex: "#FF9F0A"))
+        case .severe:
+            return Color(light: Color(hex: "#FF3B30"), dark: Color(hex: "#FF453A"))
         }
     }
 
@@ -31,6 +34,7 @@ public enum StressCategory: String, CaseIterable, Codable, Sendable {
         case .mild: return "circle.fill"
         case .moderate: return "triangle.fill"
         case .high: return "square.fill"
+        case .severe: return "exclamationmark.octagon.fill"
         }
     }
 
@@ -43,6 +47,7 @@ public enum StressCategory: String, CaseIterable, Codable, Sendable {
         case .mild: return "diagonal lines"
         case .moderate: return "dots pattern"
         case .high: return "crosshatch"
+        case .severe: return "solid warning"
         }
     }
 

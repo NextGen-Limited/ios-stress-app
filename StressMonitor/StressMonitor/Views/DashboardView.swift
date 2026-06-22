@@ -7,9 +7,8 @@ struct DashboardView: View {
     @Environment(\.scenePhase) private var scenePhase
     @State private var appeared = false
     @State private var appearAnimation = false
-    var onSettingsTapped: (() -> Void)?
 
-    init(viewModel: StressViewModel? = nil, repository: StressRepository? = nil, onSettingsTapped: (() -> Void)? = nil) {
+    init(viewModel: StressViewModel? = nil, repository: StressRepository? = nil) {
         if let viewModel = viewModel {
             _viewModel = State(initialValue: viewModel)
         } else if let repository = repository {
@@ -25,7 +24,6 @@ struct DashboardView: View {
                 repository: StressRepository(modelContext: ModelContext((try? ModelContainer(for: StressMeasurement.self, configurations: ModelConfiguration(isStoredInMemoryOnly: true)))!))
             ))
         }
-        self.onSettingsTapped = onSettingsTapped
     }
 
     var body: some View {
@@ -79,8 +77,7 @@ struct DashboardView: View {
             result: stress,
             size: .dashboard,
             isRequestingAccess: viewModel.isRequestingAccess,
-            onGrantAccess: { Task { await viewModel.requestHealthKitAccess() } },
-            onSettingsTapped: onSettingsTapped
+            onGrantAccess: { Task { await viewModel.requestHealthKitAccess() } }
         )
 
         if let qualityInfo = viewModel.dataQualityInfo {

@@ -1,14 +1,13 @@
 import SwiftUI
 
-/// Day and date header view for dashboard with settings icon.
-/// Redesigned for Home tab to match Ripple concept styling.
+/// Day and date header view for the Home tab.
+/// Settings is reachable from the dedicated Settings tab, so the header
+/// no longer renders an in-card gear button.
 struct DateHeaderView: View {
     private let date: Date
-    var onSettingsTapped: (() -> Void)?
 
-    init(date: Date = Date(), onSettingsTapped: (() -> Void)? = nil) {
+    init(date: Date = Date()) {
         self.date = date
-        self.onSettingsTapped = onSettingsTapped
     }
 
     private var dayName: String {
@@ -42,22 +41,9 @@ struct DateHeaderView: View {
             }
 
             Spacer()
-
-            Button(action: {
-                onSettingsTapped?()
-            }) {
-                Image(systemName: "gearshape.fill")
-                    .font(.system(size: 18, weight: .bold))
-                    .foregroundStyle(HomeCharacterDesignTokens.Ripple.deep)
-                    .frame(width: 42, height: 42)
-                    .background(HomeCharacterDesignTokens.Ripple.light.opacity(0.42), in: Circle())
-                    .overlay(Circle().stroke(HomeCharacterDesignTokens.Ripple.primary.opacity(0.24), lineWidth: 1))
-            }
-            .buttonStyle(.plain)
-            .accessibilityLabel("Settings")
         }
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("StressMonitor. \(dayName), \(fullDate). Settings button")
+        .accessibilityLabel("StressMonitor. \(dayName), \(fullDate).")
     }
 }
 

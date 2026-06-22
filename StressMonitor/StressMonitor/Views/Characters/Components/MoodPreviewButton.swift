@@ -1,7 +1,7 @@
 import SwiftUI
 
 struct MoodPreviewButton: View {
-    let mood: StressBuddyMood
+    let mood: RippleMood
     let isSelected: Bool
     let color: Color
     let action: () -> Void

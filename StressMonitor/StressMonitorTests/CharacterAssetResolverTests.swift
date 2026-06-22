@@ -7,21 +7,21 @@ struct CharacterAssetResolverTests {
         let name = CharacterAssetResolver.assetName(
             characterId: "ripple",
             evolution: .droplet,
-            mood: .calm
+            mood: .serene
         )
 
-        #expect(name == "ripple_droplet_calm")
+        #expect(name == "ripple_droplet_serene")
     }
 
-    @Test("Resolves tidal overwhelmed asset")
-    func resolvesTidalOverwhelmed() {
+    @Test("Resolves tidal worried asset")
+    func resolvesTidalWorried() {
         let name = CharacterAssetResolver.assetName(
             characterId: "ember",
             evolution: .tidal,
-            mood: .overwhelmed
+            mood: .worried
         )
 
-        #expect(name == "ember_tidal_overwhelmed")
+        #expect(name == "ember_tidal_worried")
     }
 
     @Test("Returns character calm fallback when exact asset is missing")
@@ -32,6 +32,9 @@ struct CharacterAssetResolverTests {
             mood: .worried
         )
 
+        // Bundled placeholder assets use the legacy `calm` slug for the
+        // droplet-stage fallback, so the resolver returns that name even
+        // though the requested mood was `worried`.
         #expect(name == "lumi_droplet_calm")
     }
 
@@ -39,7 +42,7 @@ struct CharacterAssetResolverTests {
     func allCharactersValidNaming() {
         for creature in CharacterCreature.allCharacters {
             for evolution in EvolutionStage.allCases {
-                for mood in StressBuddyMood.allCases {
+                for mood in RippleMood.allCases {
                     let name = CharacterAssetResolver.assetName(
                         characterId: creature.id,
                         evolution: evolution,

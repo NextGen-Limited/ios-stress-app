@@ -5,19 +5,19 @@ import SwiftUI
 /// Character illustration using SVG assets from the character asset pipeline.
 /// Supports legacy generic buddy assets and new per-character assets.
 struct StressBuddyIllustration: View {
-    let mood: StressBuddyMood
+    let mood: RippleMood
     let size: CGFloat
     let characterId: String?
     let evolution: EvolutionStage?
 
-    init(mood: StressBuddyMood, size: CGFloat) {
+    init(mood: RippleMood, size: CGFloat) {
         self.mood = mood
         self.size = size
         self.characterId = nil
         self.evolution = nil
     }
 
-    init(characterId: String, evolution: EvolutionStage, mood: StressBuddyMood, size: CGFloat) {
+    init(characterId: String, evolution: EvolutionStage, mood: RippleMood, size: CGFloat) {
         self.mood = mood
         self.size = size
         self.characterId = characterId
@@ -50,7 +50,7 @@ struct StressBuddyIllustration: View {
 
 #Preview("All Moods") {
     HStack(spacing: 20) {
-        ForEach(StressBuddyMood.allCases, id: \.self) { mood in
+        ForEach(RippleMood.allCases, id: \.self) { mood in
             VStack {
                 StressBuddyIllustration(mood: mood, size: 120)
             }
@@ -62,7 +62,7 @@ struct StressBuddyIllustration: View {
 
 #Preview("Ripple") {
     HStack(spacing: 20) {
-        ForEach(StressBuddyMood.allCases, id: \.self) { mood in
+        ForEach(RippleMood.allCases, id: \.self) { mood in
             StressBuddyIllustration(characterId: "ripple", evolution: .droplet, mood: mood, size: 120)
         }
     }
@@ -72,7 +72,7 @@ struct StressBuddyIllustration: View {
 
 #Preview("Dark Mode") {
     HStack(spacing: 20) {
-        ForEach(StressBuddyMood.allCases, id: \.self) { mood in
+        ForEach(RippleMood.allCases, id: \.self) { mood in
             VStack {
                 StressBuddyIllustration(mood: mood, size: 120)
             }

@@ -4,7 +4,6 @@ import SwiftData
 struct MainTabView: View {
     @Environment(\.modelContext) private var modelContext
     @State private var selectedTab: TabItem = .home
-    @State private var showSettings = false
     @State private var stressRepository: StressRepository?
 
     var body: some View {
@@ -12,18 +11,23 @@ struct MainTabView: View {
             Tab(value: TabItem.home) {
                 NavigationStack {
                     homeView
-                        .navigationDestination(isPresented: $showSettings) {
-                            SettingsView()
-                        }
                 }
             } label: {
-                tabLabel(for: .home)
+                Label {
+                    Text(TabItem.home.title)
+                } icon: {
+                    Image(systemName: tabSymbol(for: .home))
+                }
             }
 
             Tab(value: TabItem.action) {
                 ActionView()
             } label: {
-                tabLabel(for: .action)
+                Label {
+                    Text(TabItem.action.title)
+                } icon: {
+                    Image(systemName: tabSymbol(for: .action))
+                }
             }
 
             Tab(value: TabItem.trend) {
@@ -31,7 +35,23 @@ struct MainTabView: View {
                     TrendsView()
                 }
             } label: {
-                tabLabel(for: .trend)
+                Label {
+                    Text(TabItem.trend.title)
+                } icon: {
+                    Image(systemName: tabSymbol(for: .trend))
+                }
+            }
+
+            Tab(value: TabItem.settings) {
+                NavigationStack {
+                    SettingsView()
+                }
+            } label: {
+                Label {
+                    Text(TabItem.settings.title)
+                } icon: {
+                    Image(systemName: tabSymbol(for: .settings))
+                }
             }
         }
         .tabBarMinimizeOnScroll()
@@ -64,29 +84,21 @@ struct MainTabView: View {
                         healthKit: SimulatorHealthKitService(),
                         algorithm: MultiFactorStressCalculator(),
                         repository: repo
-                    ),
-                    onSettingsTapped: { showSettings = true }
+                    )
                 )
             } else {
-                DashboardView(repository: repo, onSettingsTapped: { showSettings = true })
+                DashboardView(repository: repo)
             }
             #else
-            DashboardView(repository: repo, onSettingsTapped: { showSettings = true })
+            DashboardView(repository: repo)
             #endif
         }
         // Empty until onAppear fills stressRepository (avoids throwaway repo on first body eval)
     }
 
-    private func tabLabel(for tab: TabItem) -> some View {
-        Label {
-            Text(tab.title)
-        } icon: {
-            Image(selectedTab == tab ? "\(tab.iconName)-selected" : tab.iconName)
-                .renderingMode(.original)
-                .resizable()
-                .scaledToFit()
-                .frame(width: 28, height: 28)
-        }
+    /// SF Symbol for a tab, switching to the filled variant when selected.
+    private func tabSymbol(for tab: TabItem) -> String {
+        selectedTab == tab ? tab.sfSymbolActive : tab.sfSymbol
     }
 }
 

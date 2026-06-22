@@ -2,7 +2,10 @@ import SwiftUI
 
 /// Mood states for the Ripple water-droplet character used in Action subscreens.
 /// Each mood drives visibly different eyes/mouth and an associated body tint.
-enum RippleMood: String, CaseIterable, Sendable {
+///
+/// Canonical mood type for the StressMonitor character system. Legacy
+/// `StressBuddyMood` values map to `RippleMood` via their `.rippleMood` bridge.
+public enum RippleMood: String, CaseIterable, Sendable {
     case serene
     case focused
     case relaxed
@@ -11,6 +14,26 @@ enum RippleMood: String, CaseIterable, Sendable {
     case worried
     case determined
     case tired
+
+    // MARK: - Stress Level Mapping
+
+    /// Map a stress level (0–100) to the closest character mood.
+    static func from(stressLevel: Double) -> RippleMood {
+        switch stressLevel {
+        case ..<10:
+            return .relaxed
+        case 10..<25:
+            return .serene
+        case 25..<50:
+            return .focused
+        case 50..<75:
+            return .worried
+        case 75..<90:
+            return .tired
+        default:
+            return .determined
+        }
+    }
 
     /// VoiceOver-friendly description of the character's state.
     var accessibilityLabel: String {
@@ -26,6 +49,9 @@ enum RippleMood: String, CaseIterable, Sendable {
         }
     }
 
+    /// VoiceOver description (alias used by migrated call sites).
+    var accessibilityDescription: String { accessibilityLabel }
+
     /// Base body tint — slightly shifts the water-droplet fill per mood.
     var bodyTint: Color {
         switch self {
@@ -40,8 +66,31 @@ enum RippleMood: String, CaseIterable, Sendable {
         }
     }
 
+    /// SF Symbol representative of this mood (for legend/icon UI).
+    var symbol: String {
+        switch self {
+        case .serene:       return "figure.mind.and.body"
+        case .focused:      return "figure.walk.circle"
+        case .relaxed:      return "moon.zzz.fill"
+        case .happy:        return "face.smiling.fill"
+        case .celebrating:  return "sparkles"
+        case .worried:      return "exclamationmark.triangle.fill"
+        case .determined:   return "flame.fill"
+        case .tired:        return "tortoise.fill"
+        }
+    }
+
     /// Display name for legends and labels.
     var displayName: String {
         rawValue.capitalized
     }
+}
+
+// MARK: - Character Display Context
+
+/// Context in which the character is rendered, used to pick a size.
+public enum CharacterDisplayContext: Sendable {
+    case dashboard
+    case widget
+    case watchOS
 }

@@ -1,13 +1,39 @@
 import SwiftUI
 
-/// Stress Buddy character mood states mapped to stress levels
-/// Part of Phase 2: Character System with WCAG-compliant dual coding
+/// Legacy character mood states mapped to stress levels.
+///
+/// Superseded by ``RippleMood`` (8 cases) as the canonical mood type.
+/// Existing call sites should migrate to `RippleMood` directly. Use
+/// ``rippleMood`` to bridge a legacy value to its canonical equivalent
+/// during the migration.
+@available(*, deprecated, renamed: "RippleMood", message: "Migrate to RippleMood. Use .rippleMood to bridge legacy values.")
 public enum StressBuddyMood: String, CaseIterable, Sendable {
     case sleeping     // 0-10: very relaxed
     case calm         // 10-25: relaxed
     case concerned    // 25-50: mild stress
     case worried      // 50-75: moderate stress
     case overwhelmed  // 75-100: high stress
+
+    // MARK: - Migration Bridge
+
+    /// Canonical `RippleMood` equivalent of this legacy mood.
+    ///
+    /// Mapping is product-confirmed:
+    /// - `sleeping` → `.relaxed`
+    /// - `calm` → `.serene`
+    /// - `concerned` → `.focused`
+    /// - `worried` → `.worried`
+    /// - `overwhelmed` → `.worried` (overwhelmed is an anxious/worried expression)
+    @available(*, deprecated, message: "Migrate the call site to RippleMood directly.")
+    public var rippleMood: RippleMood {
+        switch self {
+        case .sleeping:     return .relaxed
+        case .calm:         return .serene
+        case .concerned:    return .focused
+        case .worried:      return .worried
+        case .overwhelmed:  return .worried
+        }
+    }
 
     // MARK: - Stress Level Mapping
 

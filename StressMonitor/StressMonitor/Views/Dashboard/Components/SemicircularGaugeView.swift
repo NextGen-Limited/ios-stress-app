@@ -19,8 +19,8 @@ struct SemicircularGaugeView: View {
         stressLevel > 0
     }
 
-    private var mood: StressBuddyMood {
-        StressBuddyMood.from(stressLevel: stressLevel)
+    private var mood: RippleMood {
+        RippleMood.from(stressLevel: stressLevel)
     }
 
     var body: some View {
@@ -43,7 +43,7 @@ struct SemicircularGaugeView: View {
                         .font(.system(size: 24, weight: .bold))
                         .foregroundStyle(Color(hex: "FF3B30")) // Red #FF3B30
 
-                    StressBuddyIllustration(mood: .sleeping, size: characterSize * 0.8)
+                    StressBuddyIllustration(mood: .relaxed, size: characterSize * 0.8)
                         .padding(.top, 8)
                 }
             }
@@ -58,14 +58,16 @@ struct SemicircularGaugeView: View {
     private var moodColor: Color {
         guard hasData else { return Color.gray }
         switch mood {
-        case .sleeping, .calm:
+        case .relaxed, .serene:
             return Color.Wellness.exerciseCyan
-        case .concerned:
+        case .focused:
             return Color.Wellness.daylightYellow
         case .worried:
             return Color.stressModerate
-        case .overwhelmed:
+        case .determined, .tired:
             return Color.stressHigh
+        case .happy, .celebrating:
+            return Color.Wellness.exerciseCyan
         }
     }
 }

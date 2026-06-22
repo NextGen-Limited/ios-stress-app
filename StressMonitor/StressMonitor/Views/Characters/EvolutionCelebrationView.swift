@@ -50,7 +50,7 @@ struct EvolutionCelebrationView: View {
                         StressBuddyIllustration(
                             characterId: creature.id,
                             evolution: newStage,
-                            mood: .calm,
+                            mood: .serene,
                             size: 165
                         )
                         .transition(.scale.combined(with: .opacity))

@@ -17,7 +17,7 @@ struct CharacterIllustrationExportView: View {
 
     // MARK: - Filtering
 
-    private var filteredIllustrations: [(creature: CharacterCreature, evolution: EvolutionStage, mood: StressBuddyMood)] {
+    private var filteredIllustrations: [(creature: CharacterCreature, evolution: EvolutionStage, mood: RippleMood)] {
         CharacterIllustrationExporter.allIllustrations.filter { item in
             let matchesElement = selectedElement == nil || item.creature.element == selectedElement
             let matchesEvolution = selectedEvolution == nil || item.evolution == selectedEvolution
@@ -191,7 +191,7 @@ struct CharacterIllustrationExportView: View {
 
     private func characterSection(
         creature: CharacterCreature,
-        items: [(creature: CharacterCreature, evolution: EvolutionStage, mood: StressBuddyMood)]
+        items: [(creature: CharacterCreature, evolution: EvolutionStage, mood: RippleMood)]
     ) -> some View {
         VStack(alignment: .leading, spacing: 12) {
             // Section header
@@ -247,7 +247,7 @@ struct CharacterIllustrationExportView: View {
     private func illustrationCell(
         creature: CharacterCreature,
         evolution: EvolutionStage,
-        mood: StressBuddyMood
+        mood: RippleMood
     ) -> some View {
         VStack(spacing: 6) {
             ZStack {

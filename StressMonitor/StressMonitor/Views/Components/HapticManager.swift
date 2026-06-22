@@ -37,13 +37,20 @@ final class HapticManager {
             warning()
         case .high:
             error()
+        case .severe:
+            error()
         }
     }
 
-    func stressBuddyMoodChange(to mood: StressBuddyMood) {
+    /// Haptic feedback when the Ripple character's mood changes.
+    /// Not yet invoked from any mood-transition site; wire it to the point where
+    /// `RippleMood.from(stressLevel:)` produces a new mood in a later change.
+    /// `.worried` (the canonical mapping for the former `overwhelmed`) fires a heavy impact.
+    func rippleMoodChange(to mood: RippleMood) {
         guard supportsHaptics else { return }
 
-        let generator = UIImpactFeedbackGenerator(style: .medium)
+        let style: UIImpactFeedbackGenerator.FeedbackStyle = (mood == .worried) ? .heavy : .medium
+        let generator = UIImpactFeedbackGenerator(style: style)
         generator.impactOccurred()
     }
 

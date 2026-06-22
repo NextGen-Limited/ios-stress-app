@@ -39,12 +39,7 @@ struct StressBadge: View {
 
 extension StressCategory {
     init(from level: Double) {
-        switch level {
-        case 0...25: self = .relaxed
-        case 26...50: self = .mild
-        case 51...75: self = .moderate
-        default: self = .high
-        }
+        self = StressResult.category(for: level)
     }
 
     var displayName: String {
@@ -53,6 +48,7 @@ extension StressCategory {
         case .mild: return "Mild"
         case .moderate: return "Elevated"
         case .high: return "High"
+        case .severe: return "Severe"
         }
     }
 }

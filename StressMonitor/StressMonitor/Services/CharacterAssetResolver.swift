@@ -12,6 +12,12 @@ import UIKit
 /// 3. Legacy generic mood asset (`CharacterCalm`, etc.)
 /// 4. Legacy generic calm asset
 public enum CharacterAssetResolver {
+    /// Canonical droplet-stage fallback mood used when a more specific asset
+    /// is missing. The bundled placeholder assets are named with the legacy
+    /// `calm` slug, so the fallback references that slug directly rather than
+    /// regenerating from a `RippleMood` value.
+    private static let fallbackDropletSlug = "calm"
+
     private static let placeholderCharacterAssets: Set<String> = [
         "ripple_droplet_calm",
         "blossom_droplet_calm",
@@ -32,7 +38,7 @@ public enum CharacterAssetResolver {
     static func assetName(
         characterId: String,
         evolution: EvolutionStage,
-        mood: StressBuddyMood
+        mood: RippleMood
     ) -> String {
         "\(characterId)_\(evolution.rawValue)_\(mood.rawValue)"
     }
@@ -41,7 +47,7 @@ public enum CharacterAssetResolver {
     static func resolvedAssetName(
         characterId: String,
         evolution: EvolutionStage,
-        mood: StressBuddyMood,
+        mood: RippleMood,
         bundle: Bundle = .main
     ) -> String {
         let exact = assetName(characterId: characterId, evolution: evolution, mood: mood)
@@ -49,7 +55,7 @@ public enum CharacterAssetResolver {
             return exact
         }
 
-        let characterFallback = assetName(characterId: characterId, evolution: .droplet, mood: .calm)
+        let characterFallback = "\(characterId)_\(EvolutionStage.droplet.rawValue)_\(fallbackDropletSlug)"
         if assetExists(named: characterFallback, in: bundle) {
             return characterFallback
         }
@@ -62,13 +68,16 @@ public enum CharacterAssetResolver {
         return "CharacterCalm"
     }
 
-    static func legacyAssetName(for mood: StressBuddyMood) -> String {
+    static func legacyAssetName(for mood: RippleMood) -> String {
         switch mood {
-        case .sleeping: return "CharacterSleeping"
-        case .calm: return "CharacterCalm"
-        case .concerned: return "CharacterConcerned"
-        case .worried: return "CharacterWorried"
-        case .overwhelmed: return "CharacterOverwhelmed"
+        case .relaxed:      return "CharacterSleeping"
+        case .serene:       return "CharacterCalm"
+        case .focused:      return "CharacterConcerned"
+        case .worried:      return "CharacterWorried"
+        case .celebrating:  return "CharacterOverwhelmed"
+        case .happy:        return "CharacterCalm"
+        case .determined:   return "CharacterOverwhelmed"
+        case .tired:        return "CharacterSleeping"
         }
     }
 

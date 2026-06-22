@@ -21,7 +21,7 @@ struct CharacterGridCard: View {
                     StressBuddyIllustration(
                         characterId: creature.id,
                         evolution: currentStage,
-                        mood: .calm,
+                        mood: .serene,
                         size: 64
                     )
                 } else {

@@ -182,6 +182,7 @@ public struct StressData: Codable, Sendable, Identifiable {
         case "mild": return .mild
         case "moderate": return .moderate
         case "high": return .high
+        case "severe": return .severe
         default: return .mild
         }
     }
@@ -194,6 +195,7 @@ public enum StressCategory: String, Codable, Sendable {
     case mild
     case moderate
     case high
+    case severe
 
     public var color: String {
         switch self {
@@ -201,6 +203,7 @@ public enum StressCategory: String, Codable, Sendable {
         case .mild: return "#007AFF"
         case .moderate: return "#FFD60A"
         case .high: return "#FF9500"
+        case .severe: return "#FF3B30"
         }
     }
 
@@ -210,6 +213,7 @@ public enum StressCategory: String, Codable, Sendable {
         case .mild: return "circle.fill"
         case .moderate: return "triangle.fill"
         case .high: return "exclamationmark.triangle.fill"
+        case .severe: return "exclamationmark.octagon.fill"
         }
     }
 
@@ -219,6 +223,7 @@ public enum StressCategory: String, Codable, Sendable {
         case .mild: return "Mild"
         case .moderate: return "Moderate"
         case .high: return "High"
+        case .severe: return "Severe"
         }
     }
 }

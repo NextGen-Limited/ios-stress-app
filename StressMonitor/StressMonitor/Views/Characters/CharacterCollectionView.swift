@@ -121,7 +121,7 @@ struct CharacterCollectionView: View {
                         StressBuddyIllustration(
                             characterId: creature.id,
                             evolution: activeUnlock?.evolutionStage ?? .droplet,
-                            mood: .calm,
+                            mood: .serene,
                             size: 56
                         )
                     } else {
@@ -234,7 +234,7 @@ struct CharacterCollectionView: View {
                             StressBuddyIllustration(
                                 characterId: creature.id,
                                 evolution: unlock.evolutionStage,
-                                mood: .calm,
+                                mood: .serene,
                                 size: 56
                             )
                         }

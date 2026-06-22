@@ -46,7 +46,7 @@ struct CharacterPickerSheet: View {
                 StressBuddyIllustration(
                     characterId: creature.id,
                     evolution: unlock.evolutionStage,
-                    mood: .calm,
+                    mood: .serene,
                     size: 52
                 )
 

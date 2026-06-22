@@ -121,7 +121,7 @@ class DetailViewModel {
 
     private func generateRecommendations() -> [Recommendation] {
         switch category {
-        case .high:
+        case .high, .severe:
             return [
                 Recommendation(
                     title: "Breathing Exercise",
@@ -195,6 +195,7 @@ func categoryTitle(_ category: StressCategory) -> String {
     case .mild: return "Mild"
     case .moderate: return "Elevated"
     case .high: return "High"
+    case .severe: return "Severe"
     }
 }
 

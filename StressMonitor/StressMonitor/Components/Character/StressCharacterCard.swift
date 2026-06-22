@@ -7,17 +7,16 @@ import SwiftUI
 /// Uses the Ripple / Elemental Creatures concept colors from `character-concept-sheet.html`.
 struct StressCharacterCard: View {
     let result: StressResult?
-    let size: StressBuddyMood.CharacterContext
+    let size: CharacterDisplayContext
     var isRequestingAccess: Bool = false
     let onGrantAccess: (() -> Void)?
-    let onSettingsTapped: (() -> Void)?
 
     @State private var showCharacterPicker = false
     @Query(filter: #Predicate<CharacterUnlock> { $0.isActive })
     private var activeUnlocks: [CharacterUnlock]
 
-    var mood: StressBuddyMood {
-        StressBuddyMood.from(stressLevel: result?.level ?? 0)
+    var mood: RippleMood {
+        RippleMood.from(stressLevel: result?.level ?? 0)
     }
 
     var stressLevel: Double { result?.level ?? 0 }
@@ -32,21 +31,19 @@ struct StressCharacterCard: View {
 
     init(
         result: StressResult?,
-        size: StressBuddyMood.CharacterContext,
+        size: CharacterDisplayContext,
         isRequestingAccess: Bool = false,
-        onGrantAccess: (() -> Void)? = nil,
-        onSettingsTapped: (() -> Void)? = nil
+        onGrantAccess: (() -> Void)? = nil
     ) {
         self.result = result
         self.size = size
         self.isRequestingAccess = isRequestingAccess
         self.onGrantAccess = onGrantAccess
-        self.onSettingsTapped = onSettingsTapped
     }
 
     var body: some View {
         VStack(spacing: 18) {
-            DateHeaderView(date: lastUpdated ?? Date(), onSettingsTapped: onSettingsTapped)
+            DateHeaderView(date: lastUpdated ?? Date())
 
             if let result {
                 redesignedHero(result: result)
@@ -216,6 +213,8 @@ struct StressCharacterCard: View {
             return "\(activeCreature.displayName) is getting cautious. Try a short reset."
         case .high:
             return "\(activeCreature.displayName) needs calm water. Start a breathing break."
+        case .severe:
+            return "\(activeCreature.displayName) is overwhelmed. Take a breathing break now."
         }
     }
 
@@ -225,6 +224,7 @@ struct StressCharacterCard: View {
         case .mild: return HomeCharacterDesignTokens.Ripple.primary
         case .moderate: return HomeCharacterDesignTokens.Ember.accent
         case .high: return Color(hex: "#FA363D")
+        case .severe: return Color.stressSevere
         }
     }
 
@@ -268,13 +268,11 @@ struct StressCharacterCard: View {
 extension StressCharacterCard {
     init(
         result: StressResult,
-        size: StressBuddyMood.CharacterContext,
-        onSettingsTapped: (() -> Void)? = nil
+        size: CharacterDisplayContext
     ) {
         self.init(
             result: result as StressResult?,
-            size: size,
-            onSettingsTapped: onSettingsTapped
+            size: size
         )
     }
 }
@@ -288,7 +286,7 @@ extension StressCharacterCard {
                 StressCharacterCard(
                     result: StressResult(
                         level: level,
-                        category: StressBuddyMood.from(stressLevel: level) == .overwhelmed ? .high : (level > 50 ? .moderate : (level > 25 ? .mild : .relaxed)),
+                        category: level > 90 ? .severe : (level > 75 ? .high : (level > 50 ? .moderate : (level > 25 ? .mild : .relaxed))),
                         confidence: 0.9,
                         hrv: 65,
                         heartRate: 72

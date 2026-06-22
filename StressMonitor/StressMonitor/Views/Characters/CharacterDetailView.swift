@@ -6,7 +6,7 @@ struct CharacterDetailView: View {
     var onSelect: (() -> Void)? = nil
 
     @Environment(\.dismiss) private var dismiss
-    @State private var previewMood: StressBuddyMood = .calm
+    @State private var previewMood: RippleMood = .serene
 
     private var isUnlocked: Bool { unlock?.isUnlocked ?? false }
     private var isActive: Bool { unlock?.isActive ?? false }
@@ -80,7 +80,7 @@ struct CharacterDetailView: View {
 
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: Spacing.sm) {
-                    ForEach(StressBuddyMood.allCases, id: \.self) { mood in
+                    ForEach(RippleMood.allCases, id: \.self) { mood in
                         MoodPreviewButton(
                             mood: mood,
                             isSelected: previewMood == mood,

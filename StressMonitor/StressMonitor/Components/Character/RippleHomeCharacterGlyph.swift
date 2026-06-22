@@ -3,7 +3,7 @@ import SwiftUI
 /// SwiftUI vector interpretation of Ripple from the concept sheet.
 /// This avoids blocking the Home redesign on the future 75-SVG asset pipeline.
 struct RippleHomeCharacterGlyph: View {
-    let mood: StressBuddyMood
+    let mood: RippleMood
     let size: CGFloat
 
     var body: some View {
@@ -86,16 +86,14 @@ struct RippleHomeCharacterGlyph: View {
     @ViewBuilder
     private var face: some View {
         switch mood {
-        case .sleeping:
+        case .relaxed, .tired:
             sleepingFace
-        case .calm:
+        case .serene, .happy, .celebrating:
             calmFace
-        case .concerned:
+        case .focused, .determined:
             concernedFace
         case .worried:
             worriedFace
-        case .overwhelmed:
-            overwhelmedFace
         }
     }
 
@@ -148,24 +146,6 @@ struct RippleHomeCharacterGlyph: View {
                 .stroke(Color(hex: "#3B3028"), style: StrokeStyle(lineWidth: max(1.5, size * 0.016), lineCap: .round))
                 .frame(width: size * 0.16, height: size * 0.08)
                 .offset(y: size * 0.10)
-        }
-    }
-
-    private var overwhelmedFace: some View {
-        ZStack {
-            Text("×")
-                .font(.system(size: size * 0.16, weight: .heavy, design: .rounded))
-                .foregroundStyle(Color(hex: "#3B3028"))
-                .offset(x: -size * 0.14, y: -size * 0.08)
-            Text("×")
-                .font(.system(size: size * 0.16, weight: .heavy, design: .rounded))
-                .foregroundStyle(Color(hex: "#3B3028"))
-                .offset(x: size * 0.14, y: -size * 0.08)
-            nose
-            Circle()
-                .stroke(Color(hex: "#3B3028"), lineWidth: max(1.5, size * 0.016))
-                .frame(width: size * 0.10, height: size * 0.10)
-                .offset(y: size * 0.09)
         }
     }
 
@@ -246,7 +226,7 @@ private struct ArcMouthShape: Shape {
 
 #Preview("Ripple Moods") {
     HStack {
-        ForEach(StressBuddyMood.allCases, id: \.self) { mood in
+        ForEach(RippleMood.allCases, id: \.self) { mood in
             RippleHomeCharacterGlyph(mood: mood, size: 100)
         }
     }

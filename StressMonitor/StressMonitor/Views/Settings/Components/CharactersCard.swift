@@ -43,7 +43,7 @@ struct CharactersCard: View {
                         StressBuddyIllustration(
                             characterId: activeCreature.id,
                             evolution: activeEvolution,
-                            mood: .calm,
+                            mood: .serene,
                             size: 44
                         )
                     }

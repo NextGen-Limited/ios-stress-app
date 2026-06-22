@@ -97,6 +97,7 @@ extension StressCategory {
         case .mild: return "Mild"
         case .moderate: return "Moderate"
         case .high: return "High"
+        case .severe: return "Severe"
         }
     }
 }

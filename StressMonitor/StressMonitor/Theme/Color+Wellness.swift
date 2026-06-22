@@ -146,6 +146,8 @@ extension Color {
                 return Color(hex: "#FFA500") // Orange (not yellow for better contrast)
             case .high:
                 return Color(hex: "#CC0000") // Dark red
+            case .severe:
+                return Color(hex: "#FF3B30") // Severe tier (canonical app red)
             }
         }
 

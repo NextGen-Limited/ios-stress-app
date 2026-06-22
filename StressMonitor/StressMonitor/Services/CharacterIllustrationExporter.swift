@@ -12,11 +12,11 @@ final class CharacterIllustrationExporter {
     private(set) var completedItems: Int = 0
 
     /// All (character, evolution, mood) tuples that will be exported.
-    static let allIllustrations: [(creature: CharacterCreature, evolution: EvolutionStage, mood: StressBuddyMood)] = {
-        var items: [(creature: CharacterCreature, evolution: EvolutionStage, mood: StressBuddyMood)] = []
+    static let allIllustrations: [(creature: CharacterCreature, evolution: EvolutionStage, mood: RippleMood)] = {
+        var items: [(creature: CharacterCreature, evolution: EvolutionStage, mood: RippleMood)] = []
         for creature in CharacterCreature.allCharacters {
             for evolution in EvolutionStage.allCases {
-                for mood in StressBuddyMood.allCases {
+                for mood in RippleMood.allCases {
                     items.append((creature: creature, evolution: evolution, mood: mood))
                 }
             }
@@ -28,7 +28,7 @@ final class CharacterIllustrationExporter {
     var exportSize: CGFloat = 512
 
     /// Generate a filename slug for a given illustration.
-    static func fileName(creature: CharacterCreature, evolution: EvolutionStage, mood: StressBuddyMood) -> String {
+    static func fileName(creature: CharacterCreature, evolution: EvolutionStage, mood: RippleMood) -> String {
         "\(creature.id)_\(evolution.rawValue)_\(mood.rawValue).png"
     }
 
@@ -95,7 +95,7 @@ final class CharacterIllustrationExporter {
     private func renderIllustrationPNG(
         creature: CharacterCreature,
         evolution: EvolutionStage,
-        mood: StressBuddyMood,
+        mood: RippleMood,
         size: CGFloat
     ) -> Data {
         let view = StressBuddyIllustration(
