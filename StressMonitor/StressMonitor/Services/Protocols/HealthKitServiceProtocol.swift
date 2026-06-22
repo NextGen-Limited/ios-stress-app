@@ -18,6 +18,11 @@ extension HealthKitServiceProtocol {
     func fetchActivityData(for date: Date) async throws -> ActivityData? { nil }
     func fetchRecoveryData(for date: Date) async throws -> RecoveryData? { nil }
 
+    /// Latest respiratory rate (breaths/min). Default returns nil so mock and
+    /// simulator services compile without their own implementation; the live
+    /// HealthKitManager overrides with a real query.
+    func fetchRespiratoryRate() async throws -> Double? { nil }
+
     /// User's date of birth components from HealthKit. Default returns nil;
     /// concrete implementation overrides via HKHealthStore.
     var dateOfBirthComponents: DateComponents? { nil }

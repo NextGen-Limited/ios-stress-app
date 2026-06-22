@@ -24,6 +24,16 @@ extension HealthKitManager {
         )
     }
 
+    /// Latest respiratory rate in breaths/min, or nil when no sample exists.
+    /// On the simulator HealthKit returns no RR data, so callers must treat nil
+    /// as the normal case (the dashboard hides the slot).
+    func fetchRespiratoryRate() async throws -> Double? {
+        try await fetchLatestQuantitySample(
+            type: respiratoryRateType,
+            unit: .count().unitDivided(by: .minute())
+        )
+    }
+
     func fetchLatestQuantitySample(type: HKQuantityType, unit: HKUnit) async throws -> Double? {
         let sortDescriptor = NSSortDescriptor(key: HKSampleSortIdentifierEndDate, ascending: false)
 

@@ -1,98 +1,60 @@
 import SwiftUI
 import SwiftData
 
+// MARK: - TrendsView (Light Theme Redesign)
+//
+// Six sections matching `06-trends.html`:
+//   1. Editorial summary — computed from this week's daily stress
+//   2. Daily stress bars (7d) — reuses StressBarChartView
+//   3. Distribution stacked bar — DistributionBar (sums to 100%)
+//   4. Calendar heatmap — MonthlyCalendarHeatmap (current month, today outlined)
+//   5. HRV trend line — HRVTrendChart (52 ms reference)
+//   6. Editorial insight — inline Text
+
 struct TrendsView: View {
     @Environment(\.modelContext) private var modelContext
     @State private var viewModel: TrendsViewModel
     @State private var navigateToPremium = false
 
+    /// Allocated once, not per view re-evaluation. `.task` swaps in the real
+    /// environment `modelContext` on first appearance.
+    private static let placeholderContext: ModelContext = {
+        let container = try? ModelContainer(
+            for: StressMeasurement.self,
+            configurations: ModelConfiguration(isStoredInMemoryOnly: true)
+        )
+        return ModelContext(container!)
+    }()
+
     init() {
-        _viewModel = State(initialValue: TrendsViewModel(
-            modelContext: ModelContext((try? ModelContainer(for: StressMeasurement.self, configurations: ModelConfiguration(isStoredInMemoryOnly: true)))!)
-        ))
+        _viewModel = State(initialValue: TrendsViewModel(modelContext: Self.placeholderContext))
     }
 
     var body: some View {
-        ScrollView {
-            VStack(spacing: 16) {
-                // Premium banner
-                PremiumBannerView(action: { navigateToPremium = true })
-                    .padding(.horizontal)
-
-                // Horizontal Week Calendar with stress dots
-                HorizontalWeekCalendarView(
-                    selectedDate: $viewModel.selectedDate,
-                    onDateSelected: { date in
-                        viewModel.selectDate(date)
-                    },
-                    dailyTiers: viewModel.dailyStressTiers
-                )
-                .padding(.horizontal)
-
-                // Ripple speech bubble — dynamic message
-                MascotSpeechBubbleView(
-                    message: MascotSpeechBubbleView.message(
-                        stressTrendingDown: viewModel.stressTrendingDown,
-                        hasData: !viewModel.dailyStressData.isEmpty
-                    ),
-                    tier: speechBubbleTier
-                )
-                .padding(.horizontal)
-
-                // Character-reactive bar chart
-                StressBarChartView(
-                    dailyStress: viewModel.dailyStressData,
-                    distribution: viewModel.stressDistribution,
-                    selectedTimeRange: $viewModel.selectedTimeRange
-                )
-                .padding(.horizontal)
-                .onChange(of: viewModel.selectedTimeRange) { _, _ in
-                    Task {
-                        await viewModel.loadTrendData()
-                    }
+        NavigationStack {
+            ScrollView {
+                VStack(alignment: .leading, spacing: 16) {
+                    editorialHeader
+                    dailyBars
+                    distributionCard
+                    calendarCard
+                    hrvCard
+                    editorialInsight
                 }
-
-                // 5-tier heatmap
-                WeeklyHeatmapView(measurements: viewModel.weeklyMeasurements)
-                    .padding(.horizontal)
-
-                // Enhanced HRV trend card
-                hrvTrendCard
-                    .padding(.horizontal)
-
-                // Color-coded stress sources
-                TrendsStressSourcesCard(
-                    sources: viewModel.stressSources.map {
-                        TrendsStressSourcesCard.Source(
-                            name: $0.name,
-                            percentage: $0.percentage,
-                            color: $0.color,
-                            emoji: emojiForSource($0.name)
-                        )
-                    }
-                )
-                .padding(.horizontal)
-
-                // Pattern insights — Ripple as analyst
-                PatternInsightsSection(insights: viewModel.patternInsights)
-                    .padding(.horizontal)
-
-                // Ripple Insights teaser
-                SmartInsightsTeaser()
-                    .padding(.horizontal)
-
+                .padding(.horizontal, 16)
+                .padding(.top, 12)
+                .padding(.bottom, 24)
             }
-            .padding(.top, 16)
-        }
-        .background(TrendsPalette.darkCanvas)
-        .task {
-            await viewModel.loadTrendData()
-        }
-        .onAppear {
-            viewModel = TrendsViewModel(modelContext: modelContext)
-        }
-        .navigationDestination(isPresented: $navigateToPremium) {
-            IAPPremiumView(storeKit: Self.makeStoreKitService(), premiumState: PremiumState.shared)
+            .background(HomeCharacterDesignTokens.homeBackground.ignoresSafeArea())
+            .navigationTitle("Trends")
+            .navigationBarTitleDisplayMode(.inline)
+            .task {
+                viewModel = TrendsViewModel(modelContext: modelContext)
+                await viewModel.loadTrendData()
+            }
+            .navigationDestination(isPresented: $navigateToPremium) {
+                IAPPremiumView(storeKit: Self.makeStoreKitService(), premiumState: PremiumState.shared)
+            }
         }
     }
 
@@ -106,178 +68,100 @@ struct TrendsView: View {
     }
     #endif
 
-    // MARK: - Ripple Speech Bubble Tier
+    // MARK: - 1. Editorial Summary
 
-    /// Determines the Ripple character's mood for the speech bubble based on today's data.
-    private var speechBubbleTier: StressTier {
-        guard let todayData = viewModel.dailyStressData.last,
-              todayData.averageStress > 0 else {
-            return .calm
-        }
-        return StressTier.from(level: todayData.averageStress)
-    }
-
-    // MARK: - Enhanced HRV Trend Card
-
-    private var hrvTrendCard: some View {
-        VStack(alignment: .leading, spacing: 14) {
-            // Header with trend badge
-            HStack {
-                VStack(alignment: .leading, spacing: 4) {
-                    Text("HRV Trend")
-                        .font(.system(size: 20, weight: .bold))
-                        .foregroundColor(.white)
-
-                    Text("Last 30 days")
-                        .font(.system(size: 12, weight: .medium))
-                        .foregroundColor(.white.opacity(0.45))
-                }
-
-                Spacer()
-
-                // Trend badge
-                trendBadge
-            }
-
-            // Chart
-            if viewModel.isLoading {
-                loadingPlaceholder
-            } else if viewModel.hrvData.isEmpty {
-                emptyStatePlaceholder
-            } else {
-                LineChartView(
-                    dataPoints: viewModel.hrvData,
-                    accentColor: TrendsPalette.rippleBlue,
-                    showGrid: true,
-                    showYAxisLabels: true
-                )
-                .frame(height: 180)
-            }
-
-            // 3 stat tiles
-            if !viewModel.hrvData.isEmpty {
-                hrvStatTiles
-            }
-        }
-        .trendsGlassCard()
-    }
-
-    private var trendBadge: some View {
-        let isUp = viewModel.trendDirection == .up
-        let isDown = viewModel.trendDirection == .down
-        let badgeColor = isUp ? Color(hex: "#4CAF50") : (isDown ? Color(hex: "#FF7043") : TrendsPalette.mutedInk)
-
-        return Text(viewModel.hrvTrendBadge)
-            .font(.system(size: 11, weight: .bold))
-            .foregroundColor(badgeColor)
-            .padding(.horizontal, 12)
-            .padding(.vertical, 6)
-            .background(badgeColor.opacity(0.15))
-            .overlay(Capsule().stroke(badgeColor.opacity(0.3), lineWidth: 1))
-            .clipShape(Capsule())
-    }
-
-    private var hrvStatTiles: some View {
-        HStack(spacing: 10) {
-            statTile(
-                title: "Average HRV",
-                value: "\(Int(viewModel.averageHRV))",
-                unit: "ms"
-            )
-
-            statTile(
-                title: "vs Last Month",
-                value: hrvChangeText,
-                unit: nil
-            )
-
-            statTile(
-                title: "Best Day",
-                value: viewModel.bestHRVDayLabel ?? "—",
-                unit: nil
-            )
-        }
-    }
-
-    private var hrvChangeText: String {
-        guard let pct = viewModel.hrvChangePercent else { return "—" }
-        let sign = pct >= 0 ? "+" : ""
-        return "\(sign)\(Int(pct))%"
-    }
-
-    private func statTile(title: String, value: String, unit: String?) -> some View {
+    private var editorialHeader: some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text(title)
-                .font(.system(size: 10, weight: .semibold))
-                .foregroundColor(.white.opacity(0.4))
+            Text("Your week")
+                .font(.system(size: 11, weight: .heavy, design: .rounded))
+                .tracking(1.0)
+                .foregroundStyle(HomeCharacterDesignTokens.Ripple.primary)
 
-            HStack(alignment: .firstTextBaseline, spacing: 2) {
-                Text(value)
-                    .font(.system(size: 18, weight: .heavy, design: .rounded))
-                    .foregroundColor(.white)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.6)
-
-                if let unit {
-                    Text(unit)
-                        .font(.system(size: 10, weight: .bold, design: .rounded))
-                        .foregroundColor(.white.opacity(0.45))
-                }
-            }
+            Text(viewModel.editorialSummary)
+                .font(.system(size: 17, weight: .semibold, design: .rounded))
+                .foregroundStyle(Color.Wellness.adaptivePrimaryText)
+                .lineSpacing(3)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(10)
-        .background(Color.white.opacity(0.05))
-        .overlay(
-            RoundedRectangle(cornerRadius: 14, style: .continuous)
-                .stroke(Color.white.opacity(0.06), lineWidth: 1)
+        .padding(.top, 4)
+    }
+
+    // MARK: - 2. Daily Stress Bars (7d)
+
+    private var dailyBars: some View {
+        StressBarChartView(
+            dailyStress: viewModel.dailyStressData,
+            distribution: viewModel.stressDistribution,
+            selectedTimeRange: $viewModel.selectedTimeRange
         )
-        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
-    }
-
-    private var loadingPlaceholder: some View {
-        VStack(spacing: 12) {
-            ProgressView()
-                .tint(TrendsPalette.rippleBlue)
-
-            Text("Loading trend data...")
-                .font(.system(size: 12, weight: .medium))
-                .foregroundColor(.white.opacity(0.45))
-        }
-        .frame(height: 180)
-        .frame(maxWidth: .infinity)
-    }
-
-    private var emptyStatePlaceholder: some View {
-        VStack(spacing: 12) {
-            Image(systemName: "waveform.path.ecg")
-                .font(.system(size: 32))
-                .foregroundColor(.white.opacity(0.25))
-
-            Text("Need More Data")
-                .font(.system(size: 15, weight: .semibold))
-                .foregroundColor(.white.opacity(0.7))
-
-            Text("Continue measuring for 7 days to see trends")
-                .font(.system(size: 12, weight: .medium))
-                .foregroundColor(.white.opacity(0.4))
-                .multilineTextAlignment(.center)
-        }
-        .frame(height: 180)
-        .frame(maxWidth: .infinity)
-    }
-
-    // MARK: - Helpers
-
-    private func emojiForSource(_ name: String) -> String {
-        switch name {
-        case "Finance": return "💰"
-        case "Relationship": return "❤️"
-        case "Health": return "🏥"
-        case "Family": return "🏠"
-        case "Work": return "💼"
-        case "Environment": return "🌿"
-        default: return "✨"
+        .onChange(of: viewModel.selectedTimeRange) { _, _ in
+            Task { await viewModel.loadTrendData() }
         }
     }
+
+    // MARK: - 3. Distribution
+
+    private var distributionCard: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("Distribution")
+                .font(.system(size: 16, weight: .bold, design: .rounded))
+                .foregroundStyle(Color.Wellness.adaptivePrimaryText)
+            let d = viewModel.distribution
+            DistributionBar(
+                relaxedPercent: d.relaxed,
+                mixedPercent: d.mixed,
+                highPercent: d.high
+            )
+        }
+    }
+
+    // MARK: - 4. Monthly Calendar Heatmap
+
+    private var calendarCard: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            Text("This month")
+                .font(.system(size: 16, weight: .bold, design: .rounded))
+                .foregroundStyle(Color.Wellness.adaptivePrimaryText)
+            MonthlyCalendarHeatmap(dailyLevels: viewModel.monthlyCalendar)
+        }
+    }
+
+    // MARK: - 5. HRV Trend
+
+    private var hrvCard: some View {
+        VStack(alignment: .leading, spacing: 12) {
+            HRVTrendChart(dataPoints: viewModel.hrvData, referenceValue: viewModel.hrvAvg)
+        }
+    }
+
+    // MARK: - 6. Editorial Insight
+
+    private var editorialInsight: some View {
+        VStack(alignment: .leading, spacing: 10) {
+            HStack(spacing: 8) {
+                Image(systemName: "sparkles")
+                    .font(.system(size: 14, weight: .bold))
+                    .foregroundStyle(HomeCharacterDesignTokens.Ripple.primary)
+                Text("Insight")
+                    .font(.system(size: 14, weight: .bold, design: .rounded))
+                    .foregroundStyle(HomeCharacterDesignTokens.Ripple.primary)
+            }
+            Text(viewModel.weeklyInsight ?? "Keep measuring daily. Patterns surface after seven days of data.")
+                .font(.system(size: 14, weight: .medium))
+                .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
+                .lineSpacing(3)
+        }
+        .padding(18)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color.Wellness.adaptiveCardBackground)
+        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 20, style: .continuous)
+                .stroke(HomeCharacterDesignTokens.Ripple.primary.opacity(0.16), lineWidth: 1)
+        )
+    }
+}
+
+#Preview("Trends") {
+    TrendsView()
 }

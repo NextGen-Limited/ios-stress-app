@@ -33,6 +33,14 @@ final class StressViewModel {
     var aiInsight: AIInsight?
     var dataQualityInfo: DataQualityInfo?
 
+    // MARK: - Dashboard Vitals State
+
+    /// Latest respiratory rate in breaths/min. Nil when unavailable (simulator, or
+    /// no Apple Watch data) — the vitals row renders `--` in that case.
+    var respiratoryRate: Double?
+    /// Latest self-reported mood from the Home check-in.
+    var mood: MoodEntry?
+
     // MARK: - Bio Age Properties
 
     /// Estimated biological age result — nil until enough data accumulates
@@ -129,6 +137,10 @@ final class StressViewModel {
             let activityData = try? await activityTask
             let recoveryData = try? await recoveryTask
 
+            // RR is best-effort: returns nil on simulator or when no Apple Watch
+            // breathing data exists. Failure here must never break stress calc.
+            let rrValue = try? await healthKit.fetchRespiratoryRate()
+
             let context = StressContext(
                 baseline: currentBaseline,
                 hrv: hrvValue,
@@ -141,6 +153,7 @@ final class StressViewModel {
 
             let result = try await algorithm.calculateMultiFactorStress(context: context)
             currentStress = result
+            respiratoryRate = rrValue
             isPermissionRequired = false
             baseline = currentBaseline
             lastRefresh = Date()
@@ -305,6 +318,12 @@ final class StressViewModel {
 
     func clearError() {
         errorMessage = nil
+    }
+
+    /// Record a subjective mood from the Home check-in. Replacing the same-day
+    /// entry keeps the dashboard's "current mood" chip accurate.
+    func setMood(_ level: MoodLevel) {
+        mood = MoodEntry(level: level)
     }
 
     // MARK: - Dashboard Data Loading

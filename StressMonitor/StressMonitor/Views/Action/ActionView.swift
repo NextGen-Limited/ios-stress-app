@@ -1,503 +1,273 @@
 import SwiftUI
+import SwiftData
 
-// MARK: - ActionView (Ripple Redesign)
-// Dark-canvas redesign with Ripple character as AI coach.
-// 8 sections: Calendar → Daily Focus → Ripple Coach → Bento Health → Quick Actions → Recommendations → Premium → Chat CTA
+// MARK: - ActionView (Light Theme Redesign)
+//
+// Six sections matching `05-action.html`:
+//   1. Header "What helps right now" — stress level + time eyebrow
+//   2. Ripple recommendation hero
+//   3. Breathe group → BreathingExerciseView
+//   4. Move group → MiniWalkView
+//   5. Reflect group → NoteEntryView (Journal) + Chat sheet
+//   6. Today's habits — 3× HabitLogRow (Hydration / Sunlight AUTO, Caffeine LOG)
 
 struct ActionView: View {
-    @State private var selectedDay: Int = 6 // Today (last in week array)
-    @State private var currentDate = Date()
+    @Environment(\.modelContext) private var modelContext
+    @State private var habitViewModel: HabitViewModel?
     @State private var isChatPresented = false
+    @State private var isJournalPresented = false
 
-    private let calendar = Calendar.current
-
-    /// Mock mood data — each day gets a stress level that maps to a color.
-    /// In production this would come from a ViewModel.
-    private let weekMoods: [MoodLevel] = [.calm, .calm, .balanced, .stressed, .calm, .balanced, .calm]
+    /// Live stress level passed in from the Home tab. Defaults to nil
+    /// (no data) — the recommendation card handles that case gracefully.
+    var stressLevel: Double? = nil
 
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(spacing: 20) {
-                    // 1. Week Calendar with Mood Dots
-                    moodCalendar
-
-                    // 2. Daily Focus Hero (replaces Quote Card)
-                    dailyFocusHero
-
-                    // 3. Ripple AI Coach (replaces AIChatCard)
-                    rippleCoachCard
-
-                    // 4. Bento Health Grid (replaces 2 healthCard rows)
-                    bentoHealthGrid
-
-                    // 5. Quick Actions (upgraded — 4 cards)
-                    quickActionsSection
-
-                    // 6. Ripple's Recommendations (replaces lorem ipsum)
-                    recommendationsSection
-
-                    // 7. Premium Card (consistent with Settings)
-                    premiumCard
-
+                VStack(alignment: .leading, spacing: 22) {
+                    sectionHeader
+                    RippleRecommendationCard(stressLevel: stressLevel) {
+                        isChatPresented = true
+                    }
+                    breatheGroup
+                    moveGroup
+                    reflectGroup
+                    habitsSection
                 }
                 .padding(.horizontal, 16)
-                .padding(.top, 8)
+                .padding(.top, 12)
+                .padding(.bottom, 24)
             }
-            .background(HomeCharacterDesignTokens.darkCanvas)
+            .background(HomeCharacterDesignTokens.homeBackground.ignoresSafeArea())
             .navigationTitle("Action")
             .navigationBarTitleDisplayMode(.inline)
-            .toolbarColorScheme(.dark, for: .navigationBar)
             .sheet(isPresented: $isChatPresented) {
                 ChatBottomSheetView(stressResult: nil, baseline: nil)
             }
+            .sheet(isPresented: $isJournalPresented) {
+                NoteEntryView(isPresented: $isJournalPresented)
+            }
         }
-    }
-
-    // MARK: - 1. Mood Calendar
-
-    private var moodCalendar: some View {
-        HStack(spacing: 6) {
-            ForEach(0..<7, id: \.self) { index in
-                VStack(spacing: 6) {
-                    Text(weekdayLetter(for: index))
-                        .font(.system(size: 12, weight: .medium, design: .rounded))
-                        .foregroundStyle(isSelected(index) ? .white : HomeCharacterDesignTokens.mutedInk)
-
-                    Text(dayNumber(for: index))
-                        .font(.system(size: 16, weight: isSelected(index) ? .bold : .semibold, design: .rounded))
-                        .foregroundStyle(isSelected(index) ? .white : Color(hex: "#E8E8F0"))
-
-                    // Mood dot
-                    Circle()
-                        .fill(weekMoods[index].color)
-                        .frame(width: 7, height: 7)
-                        .opacity(isSelected(index) ? 1.0 : 0.6)
-                }
-                .frame(width: 38, height: 64)
-                .background(
-                    RoundedRectangle(cornerRadius: 12)
-                        .fill(isSelected(index) ? HomeCharacterDesignTokens.Ripple.primary.opacity(0.2) : .clear)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 12)
-                                .stroke(isSelected(index) ? HomeCharacterDesignTokens.Ripple.primary.opacity(0.6) : .clear, lineWidth: 1.5)
-                        )
-                )
-                .onTapGesture {
-                    withAnimation(.easeInOut(duration: 0.2)) {
-                        selectedDay = index
-                    }
-                }
+        .onAppear {
+            if habitViewModel == nil {
+                habitViewModel = HabitViewModel(modelContext: modelContext)
+            } else {
+                habitViewModel?.loadToday()
             }
         }
     }
 
-    // MARK: - 2. Daily Focus Hero
+    // MARK: - 1. Header
 
-    private var dailyFocusHero: some View {
-        ZStack(alignment: .topTrailing) {
-            // Ghosted Ripple in background
-            Text("💧")
-                .font(.system(size: 120))
-                .opacity(0.06)
-                .offset(x: 20, y: -20)
-
-            VStack(alignment: .leading, spacing: 10) {
-                // Label
-                HStack(spacing: 6) {
-                    Image(systemName: "sparkles")
-                        .font(.system(size: 11, weight: .bold))
-                    Text("DAILY FOCUS")
-                        .font(.system(size: 11, weight: .bold, design: .rounded))
-                        .tracking(1.0)
-                }
+    private var sectionHeader: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text(timeEyebrow.uppercased())
+                .font(.system(size: 11, weight: .heavy, design: .rounded))
+                .tracking(1.0)
                 .foregroundStyle(HomeCharacterDesignTokens.Ripple.primary)
-                .padding(.horizontal, 10)
-                .padding(.vertical, 5)
-                .background(HomeCharacterDesignTokens.Ripple.primary.opacity(0.12), in: Capsule())
 
-                // Insight text
-                Text("Ripple noticed your stress peaked at 3 PM yesterday")
-                    .font(.system(size: 15, weight: .medium, design: .rounded))
-                    .foregroundStyle(Color(hex: "#E8E8F0"))
-                    .lineSpacing(3)
+            Text("What helps right now")
+                .font(.system(size: 26, weight: .heavy, design: .rounded))
+                .foregroundStyle(Color.Wellness.adaptivePrimaryText)
 
-                // Suggested action
-                HStack(spacing: 10) {
-                    Image(systemName: "wind")
-                        .font(.system(size: 18, weight: .semibold))
-                        .foregroundStyle(.white)
-                        .frame(width: 40, height: 40)
-                        .background(
-                            LinearGradient(
-                                colors: [HomeCharacterDesignTokens.Ripple.primary, HomeCharacterDesignTokens.Ripple.deep],
-                                startPoint: .topLeading, endPoint: .bottomTrailing
-                            ),
-                            in: RoundedRectangle(cornerRadius: 12)
-                        )
-
-                    VStack(alignment: .leading, spacing: 2) {
-                        Text("Box Breathing 4-4-4-4")
-                            .font(.system(size: 15, weight: .bold, design: .rounded))
-                            .foregroundStyle(.white)
-                        Text("2 min · Calms nervous system")
-                            .font(.system(size: 12, weight: .regular, design: .rounded))
-                            .foregroundStyle(HomeCharacterDesignTokens.mutedInk)
-                    }
-
-                    Spacer()
-
-                    Image(systemName: "arrow.right")
-                        .font(.system(size: 13, weight: .bold))
-                        .foregroundStyle(HomeCharacterDesignTokens.Ripple.primary)
-                }
-                .padding(12)
-                .background(Color.white.opacity(0.04), in: RoundedRectangle(cornerRadius: 14))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 14)
-                        .stroke(Color.white.opacity(0.06), lineWidth: 1)
-                )
+            if let level = stressLevel {
+                Text("Stress \(Int(level.rounded()))/100")
+                    .font(.system(size: 13, weight: .medium))
+                    .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
             }
-            .padding(18)
-        }
-        .background(HomeCharacterDesignTokens.darkCard, in: RoundedRectangle(cornerRadius: 20))
-        .overlay(
-            RoundedRectangle(cornerRadius: 20)
-                .stroke(Color.white.opacity(0.05), lineWidth: 1)
-        )
-    }
-
-    // MARK: - 3. Ripple AI Coach Card
-
-    private var rippleCoachCard: some View {
-        Button(action: { isChatPresented = true }) {
-            HStack(spacing: 14) {
-                // Ripple avatar with online pulse
-                ZStack {
-                    Circle()
-                        .fill(HomeCharacterDesignTokens.Ripple.primary.opacity(0.15))
-                        .frame(width: 52, height: 52)
-
-                    Text("💧")
-                        .font(.system(size: 28))
-
-                    // Online pulse
-                    Circle()
-                        .fill(Color.green)
-                        .frame(width: 10, height: 10)
-                        .overlay(Circle().stroke(HomeCharacterDesignTokens.darkCard, lineWidth: 2))
-                        .offset(x: 18, y: 18)
-                }
-
-                VStack(alignment: .leading, spacing: 3) {
-                    Text("Ripple")
-                        .font(.system(size: 16, weight: .bold, design: .rounded))
-                        .foregroundStyle(.white)
-
-                    Text("Your HRV improved 8% this week!")
-                        .font(.system(size: 13, weight: .medium))
-                        .foregroundStyle(HomeCharacterDesignTokens.mutedInk)
-                        .lineLimit(1)
-                }
-
-                Spacer()
-
-                Image(systemName: "bubble.left.fill")
-                    .font(.system(size: 16))
-                    .foregroundStyle(HomeCharacterDesignTokens.Ripple.primary.opacity(0.8))
-            }
-            .padding(16)
-            .background(HomeCharacterDesignTokens.darkCard, in: RoundedRectangle(cornerRadius: 18))
-            .overlay(
-                RoundedRectangle(cornerRadius: 18)
-                    .stroke(Color.white.opacity(0.05), lineWidth: 1)
-            )
-        }
-        .buttonStyle(.plain)
-    }
-
-    // MARK: - 4. Bento Health Grid
-
-    private var bentoHealthGrid: some View {
-        LazyVGrid(columns: [
-            GridItem(.flexible(), spacing: 10),
-            GridItem(.flexible(), spacing: 10),
-            GridItem(.flexible(), spacing: 10),
-        ], spacing: 10) {
-            // Sleep — wide tile spanning all columns
-            bentoSleepTile
-                .gridCellColumns(3)
-
-            // Exercise
-            bentoTile(icon: "figure.run", title: "Exercise", value: "45m", subtitle: "Goal", color: HomeCharacterDesignTokens.Blossom.accent)
-
-            // Mindfulness
-            bentoTile(icon: "leaf.fill", title: "Mindful", value: "25m", subtitle: "Today", color: HomeCharacterDesignTokens.Lumi.accent)
-
-            // Steps
-            bentoTile(icon: "figure.walk", title: "Steps", value: "4,500", subtitle: "Goal 10k", color: HomeCharacterDesignTokens.Ripple.primary)
-
-            // Daylight — spans 2 columns
-            bentoTile(icon: "sun.max.fill", title: "Daylight", value: "45m", subtitle: "Outside", color: HomeCharacterDesignTokens.Ember.accent)
-                .gridCellColumns(2)
-        }
-    }
-
-    private var bentoSleepTile: some View {
-        HStack(spacing: 12) {
-            // Icon
-            Image(systemName: "moon.fill")
-                .font(.system(size: 18))
-                .foregroundStyle(HomeCharacterDesignTokens.Ripple.light)
-                .frame(width: 38, height: 38)
-                .background(HomeCharacterDesignTokens.Ripple.primary.opacity(0.12), in: RoundedRectangle(cornerRadius: 10))
-
-            VStack(alignment: .leading, spacing: 2) {
-                Text("Sleep")
-                    .font(.system(size: 13, weight: .medium, design: .rounded))
-                    .foregroundStyle(HomeCharacterDesignTokens.mutedInk)
-                Text("8h 30m · RHR 58")
-                    .font(.system(size: 15, weight: .bold, design: .rounded))
-                    .foregroundStyle(.white)
-            }
-
-            Spacer()
-
-            // Progress bar
-            VStack(alignment: .trailing, spacing: 4) {
-                Text("92%")
-                    .font(.system(size: 14, weight: .bold, design: .rounded))
-                    .foregroundStyle(HomeCharacterDesignTokens.Blossom.primary)
-                ProgressView(value: 0.92)
-                    .frame(width: 70)
-                    .tint(HomeCharacterDesignTokens.Blossom.primary)
-            }
-        }
-        .padding(14)
-        .background(HomeCharacterDesignTokens.darkCard, in: RoundedRectangle(cornerRadius: 16))
-        .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.white.opacity(0.05), lineWidth: 1))
-    }
-
-    private func bentoTile(icon: String, title: String, value: String, subtitle: String, color: Color) -> some View {
-        VStack(alignment: .leading, spacing: 8) {
-            Image(systemName: icon)
-                .font(.system(size: 16))
-                .foregroundStyle(color)
-                .frame(width: 30, height: 30)
-                .background(color.opacity(0.12), in: RoundedRectangle(cornerRadius: 8))
-
-            Text(value)
-                .font(.system(size: 18, weight: .bold, design: .rounded))
-                .foregroundStyle(.white)
-
-            Text(title)
-                .font(.system(size: 11, weight: .medium))
-                .foregroundStyle(HomeCharacterDesignTokens.mutedInk)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
-        .padding(12)
-        .background(HomeCharacterDesignTokens.darkCard, in: RoundedRectangle(cornerRadius: 16))
-        .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.white.opacity(0.05), lineWidth: 1))
+        .padding(.top, 4)
     }
 
-    // MARK: - 5. Quick Actions (upgraded — 4 cards)
+    private var timeEyebrow: String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "EEEE • h:mm a"
+        return formatter.string(from: Date())
+    }
 
-    private var quickActionsSection: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Text("Quick Actions")
-                .font(.system(size: 16, weight: .bold, design: .rounded))
-                .foregroundStyle(.white)
+    // MARK: - 3. Breathe Group
 
-            LazyVGrid(columns: [
-                GridItem(.flexible(), spacing: 10),
-                GridItem(.flexible(), spacing: 10),
-            ], spacing: 10) {
-                actionCard(icon: "wind", title: "Box Breathing", duration: "2 min", streak: 3, color: HomeCharacterDesignTokens.Ripple.primary)
-                actionCard(icon: "figure.walk", title: "Mini Walk", duration: "5 min", streak: 1, color: HomeCharacterDesignTokens.Blossom.accent)
-                actionCard(icon: "heart.fill", title: "Gratitude", duration: "1 min", streak: 5, color: HomeCharacterDesignTokens.Lumi.accent)
-                actionCard(icon: "moon.zzz.fill", title: "Wind Down", duration: "10 min", streak: 0, color: HomeCharacterDesignTokens.Zephyr.accent)
+    private var breatheGroup: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            groupLabel("Breathe")
+            VStack(spacing: 8) {
+                ActionGroupRow(
+                    icon: "wind",
+                    title: "Box Breathing",
+                    subtitle: "4-4-4-4 · 2 min",
+                    tint: HomeCharacterDesignTokens.Ripple.primary,
+                    destination: { BreathingExerciseView() }
+                )
+                ActionGroupRow(
+                    icon: "leaf.fill",
+                    title: "Calm Breathing",
+                    subtitle: "4-7-8 · 3 min",
+                    tint: HomeCharacterDesignTokens.Zephyr.accent,
+                    destination: { BreathingExerciseView() }
+                )
             }
         }
     }
 
-    private func actionCard(icon: String, title: String, duration: String, streak: Int, color: Color) -> some View {
-        VStack(alignment: .leading, spacing: 10) {
-            HStack {
-                Image(systemName: icon)
-                    .font(.system(size: 18, weight: .semibold))
-                    .foregroundStyle(.white)
-                    .frame(width: 38, height: 38)
-                    .background(color.gradient, in: RoundedRectangle(cornerRadius: 10))
+    // MARK: - 4. Move Group
 
-                Spacer()
+    private var moveGroup: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            groupLabel("Move")
+            ActionGroupRow(
+                icon: "figure.walk",
+                title: "Mini Walk",
+                subtitle: "5 min nervous-system reset",
+                tint: HomeCharacterDesignTokens.Blossom.accent,
+                destination: { MiniWalkView() }
+            )
+        }
+    }
 
-                // Streak dots
-                if streak > 0 {
-                    HStack(spacing: 3) {
-                        ForEach(0..<min(streak, 5), id: \.self) { _ in
-                            Circle()
-                                .fill(color.opacity(0.7))
-                                .frame(width: 5, height: 5)
+    // MARK: - 5. Reflect Group
+
+    private var reflectGroup: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            groupLabel("Reflect")
+            VStack(spacing: 8) {
+                // NoteEntryView is sheet-presented by design (its own
+                // NavigationStack + dismiss binding), so we open it as a sheet
+                // rather than pushing onto this stack.
+                Button {
+                    HapticManager.shared.buttonPress()
+                    isJournalPresented = true
+                } label: {
+                    journalRow
+                }
+                .buttonStyle(.plain)
+
+                Button {
+                    HapticManager.shared.buttonPress()
+                    isChatPresented = true
+                } label: {
+                    reflectChatRow
+                }
+                .buttonStyle(.plain)
+            }
+        }
+    }
+
+    private var journalRow: some View {
+        HStack(spacing: 14) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    .fill(HomeCharacterDesignTokens.Lumi.accent.opacity(0.14))
+                Image(systemName: "note.text")
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundStyle(HomeCharacterDesignTokens.Lumi.accent)
+            }
+            .frame(width: 38, height: 38)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Journal")
+                    .font(.system(size: 15, weight: .semibold, design: .rounded))
+                    .foregroundStyle(Color.Wellness.adaptivePrimaryText)
+                Text("Capture one stressor")
+                    .font(.system(size: 12, weight: .regular))
+                    .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
+                    .lineLimit(1)
+            }
+            Spacer(minLength: 0)
+            Image(systemName: "chevron.right")
+                .font(.system(size: 12, weight: .bold))
+                .foregroundStyle(Color.Wellness.adaptiveSecondaryText.opacity(0.6))
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 12)
+        .background(Color.Wellness.adaptiveCardBackground)
+        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .stroke(Color.Wellness.adaptiveSecondaryText.opacity(0.10), lineWidth: 1)
+        )
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("Journal. Capture one stressor.")
+        .accessibilityHint("Double tap to write a reflection")
+    }
+
+    private var reflectChatRow: some View {
+        HStack(spacing: 14) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 10, style: .continuous)
+                    .fill(HomeCharacterDesignTokens.Ripple.primary.opacity(0.14))
+                Image(systemName: "bubble.left.fill")
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundStyle(HomeCharacterDesignTokens.Ripple.primary)
+            }
+            .frame(width: 38, height: 38)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Talk to Ripple")
+                    .font(.system(size: 15, weight: .semibold, design: .rounded))
+                    .foregroundStyle(Color.Wellness.adaptivePrimaryText)
+                Text("AI coach for what's on your mind")
+                    .font(.system(size: 12, weight: .regular))
+                    .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
+                    .lineLimit(1)
+            }
+            Spacer(minLength: 0)
+            Image(systemName: "chevron.right")
+                .font(.system(size: 12, weight: .bold))
+                .foregroundStyle(Color.Wellness.adaptiveSecondaryText.opacity(0.6))
+        }
+        .padding(.horizontal, 14)
+        .padding(.vertical, 12)
+        .background(Color.Wellness.adaptiveCardBackground)
+        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .stroke(Color.Wellness.adaptiveSecondaryText.opacity(0.10), lineWidth: 1)
+        )
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("Talk to Ripple. AI coach for what's on your mind.")
+        .accessibilityHint("Double tap to open chat")
+    }
+
+    // MARK: - 6. Today's Habits
+
+    private var habitsSection: some View {
+        VStack(alignment: .leading, spacing: 8) {
+            groupLabel("Today's habits")
+            VStack(spacing: 8) {
+                ForEach(HabitType.allCases) { type in
+                    if let habit = habitViewModel?.habit(for: type) {
+                        HabitLogRow(habit: habit) {
+                            habitViewModel?.logManual(type)
+                        }
+                    } else {
+                        HabitLogRow(habit: Habit(type: type)) {
+                            habitViewModel?.logManual(type)
                         }
                     }
                 }
             }
-
-            Text(title)
-                .font(.system(size: 14, weight: .bold, design: .rounded))
-                .foregroundStyle(.white)
-
-            Text(duration)
-                .font(.system(size: 12, weight: .medium, design: .rounded))
-                .foregroundStyle(HomeCharacterDesignTokens.mutedInk)
         }
-        .padding(14)
-        .background(HomeCharacterDesignTokens.darkCard, in: RoundedRectangle(cornerRadius: 16))
-        .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.white.opacity(0.05), lineWidth: 1))
-    }
-
-    // MARK: - 6. Ripple's Recommendations
-
-    private var recommendationsSection: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            HStack(spacing: 6) {
-                Text("💧")
-                    .font(.system(size: 16))
-                Text("Ripple's Recommendations")
-                    .font(.system(size: 16, weight: .bold, design: .rounded))
-                    .foregroundStyle(.white)
-            }
-
-            VStack(spacing: 8) {
-                recommendationRow(icon: "sun.max.fill", title: "Afternoon Sun Break", description: "10 min outside to reset cortisol", tag: "Energy", color: HomeCharacterDesignTokens.Ember.accent)
-                recommendationRow(icon: "bed.double.fill", title: "Earlier Wind-Down", description: "Aim for bed by 10:30 PM tonight", tag: "Sleep", color: HomeCharacterDesignTokens.Ripple.light)
-                recommendationRow(icon: "drop.fill", title: "Hydration Check", description: "You're 3 glasses below target", tag: "Body", color: HomeCharacterDesignTokens.Ripple.primary)
-            }
-        }
-    }
-
-    private func recommendationRow(icon: String, title: String, description: String, tag: String, color: Color) -> some View {
-        HStack(spacing: 12) {
-            Image(systemName: icon)
-                .font(.system(size: 15))
-                .foregroundStyle(color)
-                .frame(width: 34, height: 34)
-                .background(color.opacity(0.1), in: RoundedRectangle(cornerRadius: 9))
-
-            VStack(alignment: .leading, spacing: 2) {
-                Text(title)
-                    .font(.system(size: 14, weight: .semibold, design: .rounded))
-                    .foregroundStyle(.white)
-                Text(description)
-                    .font(.system(size: 12, weight: .regular))
-                    .foregroundStyle(HomeCharacterDesignTokens.mutedInk)
-            }
-
-            Spacer()
-
-            Text(tag)
-                .font(.system(size: 10, weight: .bold, design: .rounded))
-                .tracking(0.5)
-                .foregroundStyle(color)
-                .padding(.horizontal, 8)
-                .padding(.vertical, 4)
-                .background(color.opacity(0.1), in: Capsule())
-        }
-        .padding(12)
-        .background(HomeCharacterDesignTokens.darkCard, in: RoundedRectangle(cornerRadius: 14))
-        .overlay(RoundedRectangle(cornerRadius: 14).stroke(Color.white.opacity(0.05), lineWidth: 1))
-    }
-
-    // MARK: - 7. Premium Card
-
-    private var premiumCard: some View {
-        Button(action: {}) {
-            HStack(spacing: 14) {
-                Image(systemName: "crown.fill")
-                    .font(.system(size: 22))
-                    .foregroundStyle(
-                        LinearGradient(
-                            colors: [Color(hex: "#FFD700"), Color.premiumGold],
-                            startPoint: .topLeading, endPoint: .bottomTrailing
-                        )
-                    )
-
-                VStack(alignment: .leading, spacing: 2) {
-                    Text("Go Premium")
-                        .font(.system(size: 15, weight: .bold, design: .rounded))
-                        .foregroundStyle(Color.premiumGold)
-                    Text("Unlock advanced insights & AI coaching")
-                        .font(.system(size: 12, weight: .regular))
-                        .foregroundStyle(HomeCharacterDesignTokens.mutedInk)
-                }
-
-                Spacer()
-
-                Image(systemName: "chevron.right")
-                    .font(.system(size: 13, weight: .bold))
-                    .foregroundStyle(Color.premiumGold.opacity(0.6))
-            }
-            .padding(16)
-            .background(
-                LinearGradient(
-                    colors: [
-                        Color(hex: "#1A1A2E"),
-                        Color(hex: "#1E1A14"), // Warm tint for gold
-                    ],
-                    startPoint: .topLeading, endPoint: .bottomTrailing
-                ),
-                in: RoundedRectangle(cornerRadius: 18)
-            )
-            .overlay(
-                RoundedRectangle(cornerRadius: 18)
-                    .stroke(Color(hex: "#FFD700").opacity(0.12), lineWidth: 1)
-            )
-        }
-        .buttonStyle(.plain)
     }
 
     // MARK: - Helpers
 
-    private func isSelected(_ index: Int) -> Bool {
-        index == selectedDay
-    }
-
-    private func weekdayLetter(for index: Int) -> String {
-        let letters = ["S", "M", "T", "W", "T", "F", "S"]
-        return letters[index]
-    }
-
-    private func dayNumber(for index: Int) -> String {
-        guard let date = calendar.date(byAdding: .day, value: index - 6, to: currentDate) else { return "" }
-        return "\(calendar.component(.day, from: date))"
-    }
-}
-
-// MARK: - Mood Level
-
-extension ActionView {
-    enum MoodLevel {
-        case calm
-        case balanced
-        case stressed
-
-        var color: Color {
-            switch self {
-            case .calm:     return HomeCharacterDesignTokens.Blossom.primary // Green
-            case .balanced: return HomeCharacterDesignTokens.Ripple.primary   // Blue
-            case .stressed: return HomeCharacterDesignTokens.Ember.primary    // Orange
-            }
-        }
+    @ViewBuilder
+    private func groupLabel(_ title: String) -> some View {
+        Text(title.uppercased())
+            .font(.system(size: 11, weight: .heavy, design: .rounded))
+            .tracking(0.8)
+            .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
+            .padding(.leading, 4)
     }
 }
 
 // MARK: - Previews
 
 #Preview {
-    ActionView()
+    ActionView(stressLevel: 62)
 }
 
-#Preview("Dark Mode") {
+#Preview("No Stress Data") {
     ActionView()
-        .preferredColorScheme(.dark)
 }

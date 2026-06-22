@@ -1,0 +1,85 @@
+import Foundation
+import SwiftData
+
+/// Where a habit's value comes from: HealthKit auto-feed or user entry.
+enum HabitSource: String, Codable, Sendable {
+    case auto
+    case manual
+}
+
+/// The three habits tracked on the Action tab.
+enum HabitType: String, CaseIterable, Codable, Sendable, Identifiable {
+    case hydration
+    case caffeine
+    case sunlight
+
+    var id: String { rawValue }
+
+    var displayName: String {
+        switch self {
+        case .hydration: return "Hydration"
+        case .caffeine:  return "Caffeine"
+        case .sunlight:  return "Sunlight"
+        }
+    }
+
+    var icon: String {
+        switch self {
+        case .hydration: return "drop.fill"
+        case .caffeine:  return "cup.and.saucer.fill"
+        case .sunlight:  return "sun.max.fill"
+        }
+    }
+
+    /// AUTO habits read from HealthKit; LOG habits are user-entered.
+    /// Matches the Action tab pill styling: hydration + sunlight AUTO, caffeine LOG.
+    var source: HabitSource {
+        switch self {
+        case .hydration, .sunlight: return .auto
+        case .caffeine:             return .manual
+        }
+    }
+
+    var unit: String {
+        switch self {
+        case .hydration: return "cups"
+        case .caffeine:  return "cups"
+        case .sunlight:  return "min"
+        }
+    }
+
+    var goal: Double {
+        switch self {
+        case .hydration: return 8
+        case .caffeine:  return 4
+        case .sunlight:  return 30
+        }
+    }
+}
+
+/// Persisted daily habit log. One row per habit per day.
+@Model
+final class Habit {
+    var id: UUID
+    var type: HabitType
+    var currentValue: Double
+    var goalValue: Double
+    var source: HabitSource
+    var date: Date
+
+    init(
+        id: UUID = UUID(),
+        type: HabitType,
+        currentValue: Double = 0,
+        goalValue: Double? = nil,
+        source: HabitSource? = nil,
+        date: Date = Date()
+    ) {
+        self.id = id
+        self.type = type
+        self.currentValue = currentValue
+        self.goalValue = goalValue ?? type.goal
+        self.source = source ?? type.source
+        self.date = date
+    }
+}

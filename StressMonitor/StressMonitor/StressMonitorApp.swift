@@ -12,10 +12,48 @@ enum DemoMode {
 
 @main
 struct StressMonitorApp: App {
-    static let schema = Schema([
-        StressMeasurement.self,
-        CharacterUnlock.self,
-    ])
+    // MARK: - Versioned Schema (V1 → V2 adds Habit)
+    //
+    // SwiftData can silently wipe an existing store on iOS 17.0–17.3 when the
+    // model set changes without an explicit migration plan. We declare V1 (the
+    // shipping schema through Phase 2) and V2 (adds Habit) plus a lightweight
+    // stage so the on-disk store is migrated in place rather than reset.
+
+    enum AppSchemaV1: VersionedSchema {
+        static var versionIdentifier: Schema.Version { Schema.Version(1, 0, 0) }
+
+        static var models: [any PersistentModel.Type] {
+            [StressMeasurement.self, CharacterUnlock.self]
+        }
+
+        static func modelProvider() -> Schema {
+            Schema(models)
+        }
+    }
+
+    enum AppSchemaV2: VersionedSchema {
+        static var versionIdentifier: Schema.Version { Schema.Version(2, 0, 0) }
+
+        static var models: [any PersistentModel.Type] {
+            [StressMeasurement.self, CharacterUnlock.self, Habit.self]
+        }
+
+        static func modelProvider() -> Schema {
+            Schema(models)
+        }
+    }
+
+    enum AppMigrationPlan: SchemaMigrationPlan {
+        static var schemas: [any VersionedSchema.Type] {
+            [AppSchemaV1.self, AppSchemaV2.self]
+        }
+
+        static var stages: [MigrationStage] {
+            [MigrationStage.lightweight(fromVersion: AppSchemaV1.self, toVersion: AppSchemaV2.self)]
+        }
+    }
+
+    static let schema: Schema = AppSchemaV2.modelProvider()
 
     static let modelConfiguration = ModelConfiguration(
         schema: schema,
@@ -24,7 +62,11 @@ struct StressMonitorApp: App {
 
     var sharedModelContainer: ModelContainer = {
         do {
-            let container = try ModelContainer(for: schema, configurations: [modelConfiguration])
+            let container = try ModelContainer(
+                for: schema,
+                migrationPlan: AppMigrationPlan.self,
+                configurations: [modelConfiguration]
+            )
             seedDefaultCharacterUnlocks(in: container.mainContext)
             return container
         } catch {

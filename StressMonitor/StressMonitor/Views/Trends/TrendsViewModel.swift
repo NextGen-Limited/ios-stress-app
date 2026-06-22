@@ -107,6 +107,59 @@ class TrendsViewModel {
         }
     }
 
+    // MARK: - Derived Trend Aggregates
+
+    /// Three-band distribution collapsed from the four-band `stressDistribution`.
+    /// - relaxed = relaxed only
+    /// - mixed   = normal + elevated
+    /// - high    = high
+    /// Values are rounded percentages; the DistributionBar view enforces the
+    /// exact 100% sum, so this property is allowed to be off by ±1 from
+    /// rounding.
+    var distribution: (relaxed: Double, mixed: Double, high: Double) {
+        let d = stressDistribution
+        let relaxed = d.relaxed
+        let mixed = d.normal + d.elevated
+        let high = d.high
+        return (relaxed, mixed, high)
+    }
+
+    /// Day-of-month → average stress level for the current month. Used by the
+    /// MonthlyCalendarHeatmap to color each cell.
+    var monthlyCalendar: [Date: Double] {
+        let calendar = Calendar.current
+        let now = Date()
+        guard let monthStart = calendar.date(from: calendar.dateComponents([.year, .month], from: now)) else {
+            return [:]
+        }
+        let monthMeasurements = weeklyMeasurements.filter { $0.timestamp >= monthStart }
+        let grouped = Dictionary(grouping: monthMeasurements) {
+            calendar.startOfDay(for: $0.timestamp)
+        }
+        return grouped.mapValues { measurements in
+            measurements.map { $0.stressLevel }.reduce(0, +) / Double(measurements.count)
+        }
+    }
+
+    /// Personal HRV baseline used as the chart reference line. Defaults to 52 ms
+    /// when there is not enough data to compute a real average.
+    var hrvAvg: Double {
+        let computed = averageHRV
+        return computed > 0 ? computed : 52
+    }
+
+    /// Editorial one-liner derived from the current week's data. Falls back to a
+    /// neutral prompt when there isn't enough data yet.
+    var editorialSummary: String {
+        guard let hardest = dailyStressData.max(by: { $0.averageStress < $1.averageStress }),
+              let best = dailyStressData.min(by: { $0.averageStress < $1.averageStress }),
+              !dailyStressData.isEmpty else {
+            return "Track for a full week to unlock your trends story."
+        }
+        let calmerPct = max(0, Int(100 - hardest.averageStress))
+        return "You're \(calmerPct)% calmer on your best day. Hardest day: \(hardest.dayLabel) (\(Int(hardest.averageStress))). Best: \(best.dayLabel) (\(Int(best.averageStress)))."
+    }
+
     private let repository: StressRepositoryProtocol
 
     init(modelContext: ModelContext, baselineCalculator: BaselineCalculator? = nil) {
