@@ -177,16 +177,38 @@ struct MeasurementDetailView: View {
             Text("Contributing Factors")
                 .font(Typography.headline)
 
-            VStack(spacing: 16) {
-                ForEach(viewModel?.contributingFactors ?? [], id: \.name) { factor in
-                    FactorProgressBar(factor: factor)
-                }
+            VStack(spacing: 14) {
+                FactorBreakdownRow(factor: .hrv, value: factorBreakdown.hrvComponent, detailText: "\(Int(measurement.hrv)) ms")
+                FactorBreakdownRow(factor: .heartRate, value: factorBreakdown.hrComponent, detailText: "\(Int(measurement.restingHeartRate)) bpm")
+                FactorBreakdownRow(factor: .sleep, value: factorBreakdown.sleepComponent)
+                FactorBreakdownRow(factor: .activity, value: factorBreakdown.activityComponent)
+                FactorBreakdownRow(factor: .recovery, value: factorBreakdown.recoveryComponent)
+            }
+
+            if factorBreakdown.dataCompleteness < 1.0 {
+                Text("Some factors were unavailable for this measurement.")
+                    .font(.system(size: 12, weight: .regular))
+                    .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
             }
         }
         .padding(20)
         .background(
             RoundedRectangle(cornerRadius: 16)
                 .fill(Color.secondary.opacity(0.1))
+        )
+    }
+
+    /// Builds a `FactorBreakdown` from the measurement's individual component fields.
+    /// Older measurements with no multi-factor data resolve to all-nil components,
+    /// which `FactorBreakdownRow` renders as greyed-out "—" rows.
+    private var factorBreakdown: FactorBreakdown {
+        FactorBreakdown(
+            hrvComponent: measurement.hrvComponent,
+            hrComponent: measurement.hrComponent,
+            sleepComponent: measurement.sleepComponent,
+            activityComponent: measurement.activityComponent,
+            recoveryComponent: measurement.recoveryComponent,
+            dataCompleteness: measurement.dataCompleteness ?? 0
         )
     }
 

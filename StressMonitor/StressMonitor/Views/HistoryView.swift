@@ -5,6 +5,17 @@ struct HistoryView: View {
     @Environment(\.modelContext) private var modelContext
     @Query(sort: \StressMeasurement.timestamp, order: .reverse) private var measurements: [StressMeasurement]
     @State private var appeared = false
+    @State private var dateRange: DateRangeFilter = .thirtyDays
+    @State private var selectedCategories: Set<StressCategory> = []
+
+    private var filteredMeasurements: [StressMeasurement] {
+        let cutoff = dateRange.cutoff()
+        return measurements.filter { measurement in
+            if let cutoff, measurement.timestamp < cutoff { return false }
+            if selectedCategories.isEmpty { return true }
+            return selectedCategories.contains(measurement.category)
+        }
+    }
 
     var body: some View {
         Group {
@@ -20,21 +31,59 @@ struct HistoryView: View {
             HapticManager.shared.success()
         }
         .accessibilityAction(named: "Refresh") {
-            // Trigger refresh action
             HapticManager.shared.success()
         }
     }
 
     private var listContent: some View {
-        List {
-            ForEach(measurements) { measurement in
-                HistoryRow(measurement: measurement)
-                    .accessibilityElement(children: .combine)
+        VStack(spacing: 0) {
+            filterBar
+            List {
+                if filteredMeasurements.isEmpty {
+                    Section {
+                        Text("No measurements match these filters.")
+                            .font(.system(size: 13))
+                            .foregroundStyle(Color.secondary)
+                    }
+                } else {
+                    ForEach(filteredMeasurements) { measurement in
+                        NavigationLink {
+                            MeasurementDetailView(measurement: measurement)
+                        } label: {
+                            HistoryRow(measurement: measurement)
+                        }
+                        .accessibilityElement(children: .combine)
+                    }
+                }
+            }
+            .listStyle(.insetGrouped)
+            .accessibilityLabel("Stress measurements list")
+            .accessibilityHint("\(filteredMeasurements.count) measurements available")
+        }
+    }
+
+    private var filterBar: some View {
+        VStack(spacing: 8) {
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 8) {
+                    ForEach(DateRangeFilter.allCases) { range in
+                        DateFilterChip(range: range, selected: $dateRange)
+                    }
+                }
+                .padding(.horizontal, 16)
+            }
+
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 8) {
+                    ForEach(StressCategory.allCases, id: \.self) { category in
+                        CategoryFilterChip(category: category, selected: $selectedCategories)
+                    }
+                }
+                .padding(.horizontal, 16)
             }
         }
-        .listStyle(.insetGrouped)
-        .accessibilityLabel("Stress measurements list")
-        .accessibilityHint("\(measurements.count) measurements available")
+        .padding(.vertical, 10)
+        .background(Color.Wellness.adaptiveCardBackground.opacity(0.6))
     }
 
     private var emptyState: some View {
@@ -51,6 +100,9 @@ struct HistoryRow: View {
 
     var body: some View {
         HStack(spacing: DesignTokens.Spacing.md) {
+            StressGaugeMini(level: measurement.stressLevel, category: measurement.category)
+                .accessibilityHidden(true)
+
             VStack(alignment: .leading, spacing: DesignTokens.Spacing.xs) {
                 Text(formattedTime)
                     .font(.system(size: DesignTokens.Typography.body))
@@ -70,14 +122,10 @@ struct HistoryRow: View {
                         .foregroundColor(Color.stressColor(for: measurement.category))
                         .accessibilityHidden(true)
 
-                    Text("\(Int(measurement.stressLevel))")
-                        .font(.system(size: DesignTokens.Typography.headline, weight: .semibold))
-                        .foregroundColor(Color.stressColor(for: measurement.category))
+                    Text("\(Int(measurement.hrv)) ms")
+                        .font(.system(size: DesignTokens.Typography.caption, weight: .semibold))
+                        .foregroundColor(.secondary)
                 }
-
-                Text("\(Int(measurement.hrv)) ms")
-                    .font(.system(size: DesignTokens.Typography.caption))
-                    .foregroundColor(.secondary)
             }
         }
         .accessibilityElement(children: .combine)
@@ -97,4 +145,5 @@ struct HistoryRow: View {
     NavigationStack {
         HistoryView()
     }
+    .modelContainer(for: StressMeasurement.self, inMemory: true)
 }

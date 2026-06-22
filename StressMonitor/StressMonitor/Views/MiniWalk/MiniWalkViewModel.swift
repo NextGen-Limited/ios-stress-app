@@ -71,6 +71,18 @@ final class MiniWalkViewModel {
         return String(format: "%.1f", caloriesBurned)
     }
 
+    /// Estimated walking pace in mph from elapsed time and step count.
+    /// Roughly 2.1 ft per step. Returns nil until enough data exists.
+    var paceDisplay: String? {
+        guard elapsedSeconds > 0, stepCount > 0 else { return nil }
+        let feet = Double(stepCount) * 2.1
+        let miles = feet / 5280.0
+        let hours = Double(elapsedSeconds) / 3600.0
+        guard hours > 0 else { return nil }
+        let mph = miles / hours
+        return String(format: "%.1f mph", mph)
+    }
+
     // MARK: - Private
 
     private var timer: Timer?

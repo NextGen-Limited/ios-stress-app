@@ -13,10 +13,10 @@ struct MiniWalkView: View {
             VStack(spacing: 0) {
                 headerSection
                 Spacer(minLength: 8)
-                MiniWalkTimerRing(
+                WalkTimer(
                     progress: viewModel.progress,
-                    timeDisplay: viewModel.timeDisplay,
-                    isRunning: viewModel.isRunning
+                    stepCount: viewModel.stepCount,
+                    paceDisplay: viewModel.paceDisplay
                 )
                 MiniWalkInstructionCard(progress: viewModel.progress)
                     .padding(.top, 20)

@@ -58,10 +58,10 @@ struct BreathingSummaryView: View {
                 // Stat grid
                 statGrid
 
-                // HRV bar chart
-                BeforeAfterChart(
-                    beforeValue: result.preSessionHRV,
-                    afterValue: result.postSessionHRV
+                // HRV before/after comparison
+                BeforeAfterHRVChart(
+                    before: result.preSessionHRV,
+                    after: result.postSessionHRV
                 )
                 .padding(.horizontal, 24)
 

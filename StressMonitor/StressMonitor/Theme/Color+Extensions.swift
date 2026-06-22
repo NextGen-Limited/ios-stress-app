@@ -99,6 +99,10 @@ extension Color {
 
     // MARK: - Settings Screen Colors
 
+    /// App-wide grouped-list background (#F2F2F7 in light, system black in dark).
+    /// Matches iOS Settings canvas.
+    static let appBackground = Color(light: Color(hex: "F2F2F7"), dark: Color(hex: "000000"))
+
     /// Settings background (light: warm cream #FFFDF6, dark canvas #0A0A0F)
     static let settingsBackground = Color(light: Color(hex: "FFFDF6"), dark: Color(hex: "0A0A0F"))
     /// Ripple blue accent - #4FC3F7

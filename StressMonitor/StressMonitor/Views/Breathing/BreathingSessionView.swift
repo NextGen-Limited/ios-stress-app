@@ -54,37 +54,32 @@ struct BreathingSessionView: View {
 
                 Spacer()
 
-                // Ripple breathing view — HUGE, fills screen
+                // Breathing orb driven by the single box-phase state machine.
+                // Ripple character overlaid at center to keep its breathing mood.
                 if let viewModel = viewModel {
-                    RippleBreathingView(
-                        phase: viewModel.breathingPhase,
-                        scale: viewModel.circleScale,
-                        size: 200
-                    )
+                    ZStack {
+                        BreathingCircle(phase: viewModel.boxPhase, size: 200)
+                        RippleCharacterView(mood: rippleMood(for: viewModel.boxPhase), size: 120)
+                            .accessibilityLabel("Ripple is guiding your breathing, phase: \(viewModel.boxPhase.label)")
+                    }
                     .frame(height: 300)
-                    .accessibilityLabel("Ripple is guiding your breathing, phase: \(phaseDisplayName(viewModel.breathingPhase))")
+                    .animation(.easeInOut(duration: 0.4), value: viewModel.boxPhase)
                 } else {
                     Color.clear.frame(height: 300)
                 }
 
                 Spacer()
 
-                // Phase text
-                Text(phaseText)
-                    .font(.system(size: 36, weight: .bold, design: .rounded))
-                    .foregroundStyle(phaseColor)
-                    .animation(.easeInOut(duration: 0.4), value: viewModel?.breathingPhase)
-
-                // Phase subtitle
-                Text(subtitleText)
-                    .font(.system(size: 15, weight: .regular, design: .rounded))
-                    .foregroundStyle(.white.opacity(0.45))
-                    .padding(.top, 6)
-                    .animation(.easeInOut(duration: 0.4), value: viewModel?.breathingPhase)
-
-                // Phase progress dots
-                phaseProgressDots
-                    .padding(.top, 16)
+                // Box-phase countdown (4-4-4-4) — the single phase driver
+                if let viewModel = viewModel {
+                    PhaseLabel(
+                        phase: viewModel.boxPhase,
+                        secondsRemaining: viewModel.secondsRemaining,
+                        tint: phaseColor
+                    )
+                    .padding(.top, 12)
+                    .animation(.easeInOut(duration: 0.3), value: viewModel.boxPhase)
+                }
 
                 // Time remaining
                 Text(timeRemainingText)
@@ -133,7 +128,7 @@ struct BreathingSessionView: View {
         .onDisappear {
             viewModel?.endSession()
         }
-        .onChange(of: viewModel?.breathingPhase) {
+        .onChange(of: viewModel?.boxPhase) {
             triggerHaptic()
         }
         .onChange(of: viewModel?.remainingTime) {
@@ -174,68 +169,24 @@ struct BreathingSessionView: View {
         .accessibilityElement(children: .combine)
     }
 
-    // MARK: - Phase Progress Dots
-
-    private var phaseProgressDots: some View {
-        let phases: [BreathingSessionViewModel.BreathingPhase] = [.inhale, .hold, .exhale]
-        let currentPhase = viewModel?.breathingPhase ?? .inhale
-
-        return HStack(spacing: 10) {
-            ForEach(phases, id: \.self) { phase in
-                let isActive = phase == currentPhase
-                Capsule()
-                    .fill(isActive ? ripplePrimary : Color.white.opacity(0.15))
-                    .frame(width: isActive ? 24 : 8, height: 8)
-                    .animation(.easeInOut(duration: 0.3), value: currentPhase)
-            }
-        }
-        .accessibilityElement()
-        .accessibilityLabel("Breathing phase progress")
-        .accessibilityValue("Phase \(phaseIndex(currentPhase) + 1) of 3")
-    }
-
     // MARK: - Phase Helpers
-
-    private var phaseText: String {
-        guard let viewModel = viewModel else { return "Ready" }
-        switch viewModel.breathingPhase {
-        case .inhale: return "Inhale"
-        case .hold: return "Hold"
-        case .exhale: return "Exhale"
-        }
-    }
-
-    private var subtitleText: String {
-        guard let viewModel = viewModel else { return "" }
-        switch viewModel.breathingPhase {
-        case .inhale: return "Deeply through your nose"
-        case .hold: return "Gently hold"
-        case .exhale: return "Slowly out through your mouth"
-        }
-    }
 
     private var phaseColor: Color {
         guard let viewModel = viewModel else { return ripplePrimary }
-        switch viewModel.breathingPhase {
-        case .inhale: return ripplePrimary   // #4FC3F7
-        case .hold: return rippleMid         // #81D4FA
-        case .exhale: return exhaleColor     // #26C6DA
+        switch viewModel.boxPhase {
+        case .inhale:  return ripplePrimary   // #4FC3F7
+        case .holdIn:  return rippleMid       // #81D4FA
+        case .exhale:  return exhaleColor     // #26C6DA
+        case .holdOut: return rippleLight     // #B3E5FC
         }
     }
 
-    private func phaseDisplayName(_ phase: BreathingSessionViewModel.BreathingPhase) -> String {
+    private func rippleMood(for phase: BoxBreathingPhase) -> RippleMood {
         switch phase {
-        case .inhale: return "inhale"
-        case .hold: return "hold"
-        case .exhale: return "exhale"
-        }
-    }
-
-    private func phaseIndex(_ phase: BreathingSessionViewModel.BreathingPhase) -> Int {
-        switch phase {
-        case .inhale: return 0
-        case .hold: return 1
-        case .exhale: return 2
+        case .inhale:  return .serene
+        case .holdIn:  return .focused
+        case .exhale:  return .relaxed
+        case .holdOut: return .focused
         }
     }
 

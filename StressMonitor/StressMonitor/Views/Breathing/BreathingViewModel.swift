@@ -6,14 +6,17 @@ import SwiftData
 class BreathingSessionViewModel {
     var sessionDuration: TimeInterval = 120
     var remainingTime: TimeInterval = 120
-    var breathingPhase: BreathingPhase = .inhale
-    var circleScale: Double = 1.0
     var isActive = false
     var sessionResult: BreathingSessionResult?
 
+    /// Single source of truth for the 4-4-4-4 box-breathing phase.
+    var boxPhase: BoxBreathingPhase = .inhale
+    /// Seconds remaining in the current 4-second box phase.
+    var secondsRemaining: Int = 4
+
     private let healthKit: HealthKitServiceProtocol
     private var timer: Timer?
-    private var breathingTimer: Timer?
+    private var phaseTickTimer: Timer?
     private var preSessionHRV: Double?
     private var postSessionHRV: Double?
 
@@ -34,7 +37,8 @@ class BreathingSessionViewModel {
     func startSession() {
         isActive = true
         remainingTime = sessionDuration
-        circleScale = 1.0
+        boxPhase = .inhale
+        secondsRemaining = BoxBreathingPhase.inhale.durationSeconds
 
         Task {
             if let hrv = try? await healthKit.fetchLatestHRV() {
@@ -42,14 +46,15 @@ class BreathingSessionViewModel {
             }
         }
 
-        startBreathingCycle()
+        startBoxPhaseTicks()
         startCountdown()
     }
 
     func endSession() {
         isActive = false
         timer?.invalidate()
-        breathingTimer?.invalidate()
+        phaseTickTimer?.invalidate()
+        phaseTickTimer = nil
 
         Task {
             if let hrv = try? await healthKit.fetchLatestHRV() {
@@ -61,40 +66,37 @@ class BreathingSessionViewModel {
                     preSessionHRV: pre,
                     postSessionHRV: post,
                     duration: sessionDuration - remainingTime,
-                    cyclesCompleted: Int((sessionDuration - remainingTime) / 10)
+                    cyclesCompleted: Int((sessionDuration - remainingTime) / 16)
                 )
             }
         }
     }
 
-    private func startBreathingCycle() {
+    /// Steps the 4-4-4-4 box-breathing phase every second, advancing through
+    /// inhale → holdIn → exhale → holdOut → inhale.
+    private func startBoxPhaseTicks() {
         guard isActive else { return }
-
-        breathingPhase = .inhale
-        animateCircle(to: 1.4, duration: 4.0)
-
-        DispatchQueue.main.asyncAfter(deadline: .now() + 4.0) { [weak self] in
-            guard let self = self, self.isActive else { return }
-
-            self.breathingPhase = .hold
-
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) { [weak self] in
-                guard let self = self, self.isActive else { return }
-
-                self.breathingPhase = .exhale
-                self.animateCircle(to: 0.6, duration: 6.0)
-
-                DispatchQueue.main.asyncAfter(deadline: .now() + 6.0) { [weak self] in
-                    self?.startBreathingCycle()
+        phaseTickTimer?.invalidate()
+        phaseTickTimer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { [weak self] _ in
+            Task { @MainActor [weak self] in
+                guard let self, self.isActive else { return }
+                if self.secondsRemaining > 1 {
+                    self.secondsRemaining -= 1
+                } else {
+                    self.advanceBoxPhase()
                 }
             }
         }
     }
 
-    private func animateCircle(to scale: Double, duration: TimeInterval) {
-        withAnimation(.easeInOut(duration: duration)) {
-            circleScale = scale
+    private func advanceBoxPhase() {
+        switch boxPhase {
+        case .inhale:  boxPhase = .holdIn
+        case .holdIn:  boxPhase = .exhale
+        case .exhale:  boxPhase = .holdOut
+        case .holdOut: boxPhase = .inhale
         }
+        secondsRemaining = boxPhase.durationSeconds
     }
 
     private func startCountdown() {
