@@ -1,7 +1,8 @@
 import SwiftUI
 
 // MARK: - Permissions Screen (Screen 1)
-// Frictionless: one screen, toggle-based, privacy-first. 4 toggles on one page.
+// Frictionless: one screen, read-only data types list, privacy-first.
+// "Connect Apple Health" CTA triggers HealthKit authorization via the shared VM.
 struct OnboardingHealthSyncView: View {
     @State private var viewModel = OnboardingHealthSyncViewModel()
     @State private var appearAnimation = false
@@ -43,13 +44,13 @@ struct OnboardingHealthSyncView: View {
                         .padding(.bottom, 16)
 
                     // Title
-                    Text("Quick permissions")
+                    Text("Connect Apple Health")
                         .font(.system(size: 24, weight: .heavy, design: .rounded))
                         .foregroundStyle(Color(hex: "#E8E8F0"))
                         .multilineTextAlignment(.center)
 
                     // Subtitle
-                    Text("Ripple needs health data to read your stress. Everything stays on your device.")
+                    Text("Ripple reads these data types to calculate your stress. Nothing is shared.")
                         .font(.system(size: 15, weight: .regular))
                         .foregroundStyle(HomeCharacterDesignTokens.mutedInk)
                         .multilineTextAlignment(.center)
@@ -57,44 +58,40 @@ struct OnboardingHealthSyncView: View {
                         .padding(.top, 8)
                         .padding(.bottom, 20)
 
-                    // Toggle rows
+                    // Read-only data types list
                     VStack(spacing: 8) {
-                        PermissionToggleRow(
-                            emoji: "❤️",
-                            iconBgColor: Color(hex: "#EF5350").opacity(0.1),
-                            title: "Heart Rate",
-                            subtitle: "Resting & active BPM",
-                            isOn: $viewModel.heartRateEnabled
-                        )
-
-                        PermissionToggleRow(
+                        PermissionDataTypeRow(
                             emoji: "📈",
                             iconBgColor: Color(hex: "#7986CB").opacity(0.1),
                             title: "Heart Rate Variability",
-                            subtitle: "Primary stress indicator",
-                            isOn: $viewModel.hrvEnabled
+                            subtitle: "Primary stress indicator"
                         )
 
-                        PermissionToggleRow(
+                        PermissionDataTypeRow(
+                            emoji: "❤️",
+                            iconBgColor: Color(hex: "#EF5350").opacity(0.1),
+                            title: "Heart Rate",
+                            subtitle: "Resting & active BPM"
+                        )
+
+                        PermissionDataTypeRow(
                             emoji: "😴",
                             iconBgColor: HomeCharacterDesignTokens.Ripple.primary.opacity(0.1),
                             title: "Sleep Analysis",
-                            subtitle: "Recovery quality tracking",
-                            isOn: $viewModel.sleepEnabled
+                            subtitle: "Recovery quality tracking"
                         )
 
-                        PermissionToggleRow(
-                            emoji: "🏃",
+                        PermissionDataTypeRow(
+                            emoji: "👟",
                             iconBgColor: HomeCharacterDesignTokens.Blossom.primary.opacity(0.1),
-                            title: "Activity & Exercise",
-                            subtitle: "Optional — improves accuracy",
-                            isOn: $viewModel.activityEnabled
+                            title: "Steps",
+                            subtitle: "Activity context for accuracy"
                         )
                     }
-                    .padding(.bottom, 12)
+                    .padding(.bottom, 16)
 
-                    // Privacy box
-                    privacyBox
+                    // ON-DEVICE privacy pill
+                    onDevicePill
                         .padding(.bottom, 20)
                 }
             }
@@ -106,10 +103,10 @@ struct OnboardingHealthSyncView: View {
                         ProgressView()
                             .progressViewStyle(CircularProgressViewStyle(tint: .white))
                     } else {
-                        Text("Authorize & Continue")
+                        Image(systemName: "heart.text.square.fill")
+                            .font(.system(size: 17, weight: .bold))
+                        Text("Connect Apple Health")
                             .font(.system(size: 17, weight: .bold, design: .rounded))
-                        Image(systemName: "arrow.right")
-                            .font(.system(size: 15, weight: .bold))
                     }
                 }
                 .foregroundStyle(.white)
@@ -141,37 +138,32 @@ struct OnboardingHealthSyncView: View {
         }
     }
 
-    // MARK: - Privacy Box
+    // MARK: - ON-DEVICE privacy pill
 
-    private var privacyBox: some View {
-        HStack(alignment: .top, spacing: 10) {
-            Text("🔒")
-                .font(.system(size: 16))
-
-            VStack(alignment: .leading, spacing: 0) {
-                Text("Privacy Promise: ")
-                    .font(.system(size: 12, weight: .semibold))
-                    .foregroundStyle(HomeCharacterDesignTokens.Ripple.primary)
-                +
-                Text("Zero data collection. No servers. Your health data never leaves this iPhone.")
-                    .font(.system(size: 12, weight: .regular))
-                    .foregroundStyle(HomeCharacterDesignTokens.mutedInk)
-            }
+    private var onDevicePill: some View {
+        HStack(spacing: 6) {
+            Image(systemName: "iphone.gen3")
+                .font(.system(size: 11, weight: .bold))
+            Text("ON-DEVICE")
+                .font(.system(size: 11, weight: .heavy))
+                .kerning(0.8)
         }
-        .padding(14)
-        .frame(maxWidth: .infinity, alignment: .leading)
+        .foregroundStyle(HomeCharacterDesignTokens.Ripple.primary)
+        .padding(.horizontal, 14)
+        .padding(.vertical, 7)
         .background(
-            RoundedRectangle(cornerRadius: 16)
-                .fill(HomeCharacterDesignTokens.Ripple.primary.opacity(0.05))
+            Capsule()
+                .fill(HomeCharacterDesignTokens.Ripple.primary.opacity(0.1))
                 .overlay(
-                    RoundedRectangle(cornerRadius: 16)
-                        .stroke(HomeCharacterDesignTokens.Ripple.primary.opacity(0.1), lineWidth: 1)
+                    Capsule()
+                        .stroke(HomeCharacterDesignTokens.Ripple.primary.opacity(0.25), lineWidth: 1)
                 )
         )
     }
 
     // MARK: - Actions
 
+    /// Triggers HealthKit authorization via the shared service, then advances on success.
     private func authorizeAndContinue() async {
         await viewModel.requestSelectedPermissions()
         if viewModel.healthKitAuthorized {
@@ -180,14 +172,13 @@ struct OnboardingHealthSyncView: View {
     }
 }
 
-// MARK: - Permission Toggle Row
+// MARK: - Permission Data Type Row (read-only)
 
-private struct PermissionToggleRow: View {
+private struct PermissionDataTypeRow: View {
     let emoji: String
     let iconBgColor: Color
     let title: String
     let subtitle: String
-    @Binding var isOn: Bool
 
     var body: some View {
         HStack(spacing: 14) {
@@ -210,11 +201,11 @@ private struct PermissionToggleRow: View {
 
             Spacer()
 
-            // Toggle
-            Toggle("", isOn: $isOn)
-                .labelsHidden()
-                .tint(HomeCharacterDesignTokens.Blossom.primary)
-                .scaleEffect(0.85)
+            // Read-only badge
+            Image(systemName: "checkmark.circle.fill")
+                .font(.system(size: 16))
+                .foregroundStyle(HomeCharacterDesignTokens.Ripple.primary.opacity(0.7))
+                .accessibilityHidden(true)
         }
         .padding(.horizontal, 16)
         .padding(.vertical, 14)
@@ -226,6 +217,8 @@ private struct PermissionToggleRow: View {
                         .stroke(Color.white.opacity(0.06), lineWidth: 1)
                 )
         )
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("\(title). \(subtitle)")
     }
 }
 

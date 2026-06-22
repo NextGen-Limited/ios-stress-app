@@ -58,7 +58,11 @@ struct OnboardingSuccessView: View {
                         .foregroundStyle(HomeCharacterDesignTokens.mutedInk)
                         .multilineTextAlignment(.center)
                         .padding(.top, 6)
-                        .padding(.bottom, 20)
+                        .padding(.bottom, 16)
+
+                    // Free trial banner
+                    freeTrialBanner
+                        .padding(.bottom, 16)
 
                     // Metric boxes row
                     metricsRow
@@ -74,13 +78,13 @@ struct OnboardingSuccessView: View {
                 }
             }
 
-            // Go to Dashboard CTA — pinned bottom
+            // Start Tracking CTA — pinned bottom
             Button(action: {
                 viewModel.completeOnboarding()
                 onGoToDashboard?()
             }) {
                 HStack(spacing: 8) {
-                    Text("Go to Dashboard")
+                    Text("Start Tracking")
                         .font(.system(size: 17, weight: .bold, design: .rounded))
                     Image(systemName: "arrow.right")
                         .font(.system(size: 15, weight: .bold))
@@ -110,6 +114,39 @@ struct OnboardingSuccessView: View {
                 }
             }
         }
+    }
+
+    // MARK: - Free Trial Banner
+
+    private var freeTrialBanner: some View {
+        HStack(spacing: 10) {
+            Image(systemName: "sparkles")
+                .font(.system(size: 16, weight: .bold))
+                .foregroundStyle(HomeCharacterDesignTokens.Blossom.primary)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text("7-day free trial included")
+                    .font(.system(size: 13, weight: .bold))
+                    .foregroundStyle(Color(hex: "#E8E8F0"))
+                Text("No charge until your trial ends. Cancel anytime.")
+                    .font(.system(size: 11, weight: .regular))
+                    .foregroundStyle(HomeCharacterDesignTokens.mutedInk)
+            }
+
+            Spacer(minLength: 0)
+        }
+        .padding(14)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(
+            RoundedRectangle(cornerRadius: 16)
+                .fill(HomeCharacterDesignTokens.Blossom.primary.opacity(0.08))
+                .overlay(
+                    RoundedRectangle(cornerRadius: 16)
+                        .stroke(HomeCharacterDesignTokens.Blossom.primary.opacity(0.2), lineWidth: 1)
+                )
+        )
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("7-day free trial included. No charge until your trial ends. Cancel anytime.")
     }
 
     // MARK: - Measurement Ring
@@ -151,9 +188,8 @@ struct OnboardingSuccessView: View {
                 .frame(width: 220, height: 220)
                 .rotationEffect(.degrees(-90))
 
-            // Creature
-            Text("🌊")
-                .font(.system(size: 64))
+            // Creature — celebrating mood for the success moment
+            RippleCharacterView(mood: .celebrating, size: 96)
                 .shadow(color: HomeCharacterDesignTokens.Ripple.primary.opacity(0.3), radius: 16)
 
             // Stress label badge
@@ -210,8 +246,7 @@ struct OnboardingSuccessView: View {
                         Circle()
                             .stroke(HomeCharacterDesignTokens.Ripple.primary.opacity(0.15), lineWidth: 2)
                     )
-                Text("🌊")
-                    .font(.system(size: 28))
+                RippleCharacterView(mood: .celebrating, size: 40)
             }
 
             // Info

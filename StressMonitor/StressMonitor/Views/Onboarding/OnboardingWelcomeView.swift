@@ -44,7 +44,7 @@ struct OnboardingWelcomeView: View {
             // Primary CTA
             Button(action: { onGetStarted?() }) {
                 HStack(spacing: 8) {
-                    Text("Get Started — Takes 20 sec")
+                    Text("Get Started")
                         .font(.system(size: 17, weight: .bold, design: .rounded))
                 }
                 .foregroundStyle(.white)
@@ -125,9 +125,8 @@ struct OnboardingWelcomeView: View {
                 .frame(width: 180, height: 180)
                 .scaleEffect(viewModel.breathPhase2 ? 1.06 : 1.0)
 
-            // Creature emoji
-            Text("🌊")
-                .font(.system(size: 88))
+            // Ripple character — happy mood to introduce the buddy
+            RippleCharacterView(mood: .happy, size: 120)
                 .shadow(color: HomeCharacterDesignTokens.Ripple.primary.opacity(0.35), radius: 24)
                 .offset(y: viewModel.floatOffset ? -10 : 0)
         }
@@ -136,40 +135,66 @@ struct OnboardingWelcomeView: View {
         .accessibilityLabel("Ripple the Water Otter creature with animated breathing rings")
     }
 
-    // MARK: - Feature pills
+    // MARK: - Value props
 
     private var featurePills: some View {
-        HStack(spacing: 8) {
-            FeaturePill(emoji: "📊", text: "Real-time Stress")
-            FeaturePill(emoji: "🧘", text: "Guided Breathing")
-            FeaturePill(emoji: "📈", text: "HRV Trends")
+        VStack(spacing: 10) {
+            ValuePropRow(
+                icon: "waveform.path.ecg",
+                title: "Real-time stress score",
+                subtitle: "HRV and heart rate, translated into a number you understand."
+            )
+            ValuePropRow(
+                icon: "leaf.fill",
+                title: "Calm in minutes",
+                subtitle: "Guided breathing and mini-walks whenever tension rises."
+            )
+            ValuePropRow(
+                icon: "chart.xyaxis.line",
+                title: "See your patterns",
+                subtitle: "Trends and bio-age insights from data already on your phone."
+            )
         }
         .opacity(appearAnimation ? 1 : 0)
         .offset(y: appearAnimation ? 0 : 12)
     }
 }
 
-// MARK: - Feature Pill Component
+// MARK: - Value Prop Row
 
-private struct FeaturePill: View {
-    let emoji: String
-    let text: String
+private struct ValuePropRow: View {
+    let icon: String
+    let title: String
+    let subtitle: String
 
     var body: some View {
-        HStack(spacing: 4) {
-            Text(emoji)
-                .font(.system(size: 12))
-            Text(text)
-                .font(.system(size: 12, weight: .semibold))
-                .foregroundStyle(Color(hex: "#E8E8F0"))
+        HStack(spacing: 14) {
+            Image(systemName: icon)
+                .font(.system(size: 18, weight: .semibold))
+                .foregroundStyle(HomeCharacterDesignTokens.Ripple.primary)
+                .frame(width: 40, height: 40)
+                .background(HomeCharacterDesignTokens.Ripple.primary.opacity(0.12))
+                .clipShape(RoundedRectangle(cornerRadius: 12))
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text(title)
+                    .font(.system(size: 15, weight: .semibold))
+                    .foregroundStyle(Color(hex: "#E8E8F0"))
+                Text(subtitle)
+                    .font(.system(size: 12, weight: .regular))
+                    .foregroundStyle(HomeCharacterDesignTokens.mutedInk)
+                    .multilineTextAlignment(.leading)
+            }
+
+            Spacer(minLength: 0)
         }
-        .padding(.horizontal, 14)
-        .padding(.vertical, 7)
+        .padding(.horizontal, 16)
+        .padding(.vertical, 12)
         .background(
-            RoundedRectangle(cornerRadius: 20)
+            RoundedRectangle(cornerRadius: 16)
                 .fill(HomeCharacterDesignTokens.darkCard)
                 .overlay(
-                    RoundedRectangle(cornerRadius: 20)
+                    RoundedRectangle(cornerRadius: 16)
                         .stroke(Color.white.opacity(0.06), lineWidth: 1)
                 )
         )

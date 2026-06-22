@@ -27,14 +27,14 @@ struct DashboardView: View {
     }
 
     var body: some View {
-        ScrollView {
-            LazyVStack(spacing: 22) {
-                dashboardContent(viewModel.currentStress)
-
+        Group {
+            if viewModel.isPermissionRequired {
+                permissionStateView
+            } else if viewModel.isLoading && viewModel.currentStress == nil {
+                readingStateView
+            } else {
+                readyStateView
             }
-            .padding(.horizontal, 16)
-            .padding(.top, 10)
-            .padding(.bottom, 16)
         }
         .background(HomeCharacterDesignTokens.homeBackground.ignoresSafeArea())
         .alert("Error", isPresented: .constant(viewModel.errorMessage != nil)) {
@@ -66,6 +66,59 @@ struct DashboardView: View {
             if newPhase == .active && viewModel.isPermissionRequired {
                 Task { await viewModel.loadCurrentStress() }
             }
+        }
+    }
+
+    // MARK: - Permission Required (HealthKit notDetermined / denied)
+
+    private var permissionStateView: some View {
+        ScrollView {
+            VStack(spacing: 16) {
+                PermissionCardView(
+                    permissionType: .healthKit,
+                    isLoading: viewModel.isRequestingAccess,
+                    onGrantAccess: { Task { await viewModel.requestHealthKitAccess() } }
+                )
+                .padding(.horizontal, 16)
+                .padding(.top, 24)
+            }
+            .frame(maxWidth: .infinity)
+        }
+    }
+
+    // MARK: - Reading / Loading Skeleton
+
+    private var readingStateView: some View {
+        ScrollView {
+            VStack(spacing: 16) {
+                NoDataCard(dataType: .stress, onAction: { Task { await viewModel.loadCurrentStress() } })
+                    .padding(.horizontal, 16)
+                    .padding(.top, 24)
+
+                SkeletonBlock(height: 180)
+                    .padding(.horizontal, 16)
+                SkeletonBlock(height: 90)
+                    .padding(.horizontal, 16)
+                SkeletonBlock(height: 90)
+                    .padding(.horizontal, 16)
+                SkeletonBlock(height: 140)
+                    .padding(.horizontal, 16)
+            }
+            .padding(.bottom, 16)
+        }
+    }
+
+    // MARK: - Ready Dashboard Content
+
+    private var readyStateView: some View {
+        ScrollView {
+            LazyVStack(spacing: 22) {
+                dashboardContent(viewModel.currentStress)
+
+            }
+            .padding(.horizontal, 16)
+            .padding(.top, 10)
+            .padding(.bottom, 16)
         }
     }
 
