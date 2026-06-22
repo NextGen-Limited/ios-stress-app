@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>01 · Welcome — StressMonitor</title>
+  <link rel="stylesheet" href="../css/app.css" />
+  <style>
+    .welcome-stage {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      padding: 60px 32px 32px;
+      background:
+        radial-gradient(80% 60% at 50% 20%, rgba(79,195,247,0.18) 0%, transparent 60%),
+        radial-gradient(60% 50% at 50% 90%, rgba(165,214,167,0.16) 0%, transparent 60%),
+        var(--bg);
+    }
+    .brand {
+      display: flex; align-items: center; gap: 8px;
+      font-family: var(--font-rounded);
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      font-size: 16px;
+    }
+    .brand-dot {
+      width: 28px; height: 28px;
+      border-radius: 8px;
+      background: linear-gradient(135deg, var(--ripple), var(--blossom));
+      display: grid; place-items: center;
+      color: #fff;
+      box-shadow: 0 6px 14px -6px rgba(79,195,247,0.6);
+    }
+    .hero-stack { display: flex; flex-direction: column; align-items: center; text-align: center; gap: 28px; }
+    .hero-art { width: 220px; height: 220px; position: relative; }
+    .hero-art .ripple-svg { width: 100%; height: 100%; filter: drop-shadow(0 12px 24px rgba(79,195,247,0.35)); animation: bob 4s ease-in-out infinite; }
+    @keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+    .hero-text h1 {
+      font-family: var(--font-rounded);
+      font-size: 36px;
+      line-height: 1.1;
+      letter-spacing: -0.024em;
+      font-weight: 700;
+      margin: 0 0 12px;
+    }
+    .hero-text .gradient {
+      background: linear-gradient(135deg, var(--ripple), var(--blossom));
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+    .hero-text p {
+      font-size: 17px;
+      line-height: 1.45;
+      color: var(--fg-secondary);
+      max-width: 30ch;
+      margin: 0 auto;
+    }
+    .feature-list { display: flex; flex-direction: column; gap: 12px; width: 100%; }
+    .feature-row {
+      display: grid;
+      grid-template-columns: 32px 1fr;
+      gap: 14px;
+      align-items: center;
+      padding: 14px 16px;
+      background: rgba(255,255,255,0.7);
+      border: 1px solid var(--separator);
+      border-radius: 14px;
+      backdrop-filter: blur(8px);
+      -webkit-backdrop-filter: blur(8px);
+    }
+    .feature-row .sf {
+      width: 32px; height: 32px;
+      border-radius: 9px;
+      display: grid; place-items: center;
+      color: #fff;
+    }
+    .feature-row .sf svg { width: 18px; height: 18px; }
+    .feature-row .ftitle { font-size: 15px; font-weight: 600; }
+    .feature-row .fsub { font-size: 13px; color: var(--muted); margin-top: 1px; }
+    .cta-stack { display: flex; flex-direction: column; gap: 8px; width: 100%; }
+  </style>
+</head>
+<body>
+  <div class="stage">
+    <div class="caption"><strong>STRESSMONITOR</strong> · 01 Welcome</div>
+
+    <div class="device" data-od-id="device">
+      <span class="btn-rail left-1" aria-hidden></span>
+      <span class="btn-rail left-2" aria-hidden></span>
+      <span class="btn-rail left-3" aria-hidden></span>
+      <span class="btn-rail right-1" aria-hidden></span>
+      <span class="island" aria-hidden></span>
+
+      <div class="screen">
+        <div class="statusbar">
+          <span class="num">9:41</span>
+          <span class="right">
+            <svg viewBox="0 0 17 11" aria-hidden><rect x="0" y="7" width="3" height="4" rx="0.6"/><rect x="4" y="5" width="3" height="6" rx="0.6"/><rect x="8" y="3" width="3" height="8" rx="0.6"/><rect x="12" y="0" width="3" height="11" rx="0.6"/></svg>
+            <svg viewBox="0 0 17 11" aria-hidden><path d="M8.5 1.5C5.5 1.5 2.7 2.6 0.5 4.6L2 6.1C3.8 4.5 6.1 3.6 8.5 3.6c2.4 0 4.7 0.9 6.5 2.5l1.5-1.5c-2.2-2-5-3.1-8-3.1zM3.5 7.6L5 9.1c1-0.9 2.2-1.4 3.5-1.4 1.3 0 2.5 0.5 3.5 1.4l1.5-1.5c-1.4-1.3-3.1-2-5-2-1.9 0-3.6 0.7-5 2zM6.5 10.6l2 2 2-2c-0.5-0.5-1.2-0.8-2-0.8s-1.5 0.3-2 0.8z"/></svg>
+            <svg class="battery" viewBox="0 0 25 11" aria-hidden><rect x="0.5" y="0.5" width="21" height="10" rx="2.5" fill="none" stroke="currentColor" stroke-opacity="0.45"/><rect x="22" y="3.5" width="1.5" height="4" rx="0.4" fill="currentColor" fill-opacity="0.45"/><rect x="2" y="2" width="18" height="7" rx="1.4"/></svg>
+          </span>
+        </div>
+
+        <main class="content" style="padding: 0;" data-od-id="content">
+          <div class="welcome-stage">
+            <div class="brand">
+              <span class="brand-dot">
+                <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7-4.5-7-11a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 6.5-7 11-7 11z"/></svg>
+              </span>
+              StressMonitor
+            </div>
+
+            <div class="hero-stack">
+              <div class="hero-art">
+                <!-- Ripple — Water Otter, soft rounded full body -->
+                <svg class="ripple-svg" viewBox="0 0 220 220" xmlns="http://www.w3.org/2000/svg">
+                  <ellipse cx="110" cy="190" rx="68" ry="10" fill="rgba(2,136,209,0.18)"/>
+                  <!-- water ripples -->
+                  <path d="M40 178 Q70 172 100 178 T160 178 T200 178" stroke="rgba(79,195,247,0.5)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+                  <path d="M55 188 Q85 184 115 188 T175 188" stroke="rgba(79,195,247,0.35)" stroke-width="2" fill="none" stroke-linecap="round"/>
+                  <!-- body -->
+                  <ellipse cx="110" cy="120" rx="55" ry="58" fill="#4FC3F7"/>
+                  <ellipse cx="110" cy="135" rx="38" ry="42" fill="#B3E5FC"/>
+                  <!-- head -->
+                  <circle cx="110" cy="78" r="42" fill="#4FC3F7"/>
+                  <circle cx="110" cy="86" r="30" fill="#E1F5FE"/>
+                  <!-- ears -->
+                  <circle cx="84" cy="48" r="11" fill="#4FC3F7"/>
+                  <circle cx="136" cy="48" r="11" fill="#4FC3F7"/>
+                  <circle cx="84" cy="50" r="6" fill="#FFAB91"/>
+                  <circle cx="136" cy="50" r="6" fill="#FFAB91"/>
+                  <!-- eyes -->
+                  <circle cx="95" cy="80" r="6.5" fill="#101223"/>
+                  <circle cx="125" cy="80" r="6.5" fill="#101223"/>
+                  <circle cx="97" cy="78" r="2" fill="#fff"/>
+                  <circle cx="127" cy="78" r="2" fill="#fff"/>
+                  <!-- cheeks -->
+                  <circle cx="82" cy="92" r="6" fill="#FFCDD2" opacity="0.7"/>
+                  <circle cx="138" cy="92" r="6" fill="#FFCDD2" opacity="0.7"/>
+                  <!-- nose + smile -->
+                  <ellipse cx="110" cy="93" rx="3" ry="2.2" fill="#101223"/>
+                  <path d="M100 100 Q110 108 120 100" stroke="#101223" stroke-width="2" fill="none" stroke-linecap="round"/>
+                  <!-- water drop on chest -->
+                  <path d="M110 140 Q100 156 110 168 Q120 156 110 140 Z" fill="#0288D1"/>
+                  <circle cx="106" cy="150" r="2" fill="#fff" opacity="0.8"/>
+                  <!-- arms -->
+                  <ellipse cx="60" cy="130" rx="14" ry="22" fill="#4FC3F7" transform="rotate(-20 60 130)"/>
+                  <ellipse cx="160" cy="130" rx="14" ry="22" fill="#4FC3F7" transform="rotate(20 160 130)"/>
+                </svg>
+              </div>
+              <div class="hero-text">
+                <h1>Meet <span class="gradient">Ripple</span>.<br/>Your stress companion.</h1>
+                <p>Ripple reads your heart's signals and turns stress data into calm, one breath at a time.</p>
+              </div>
+            </div>
+
+            <div class="feature-list">
+              <div class="feature-row">
+                <span class="sf" style="background: var(--ripple);">
+                  <svg viewBox="0 0 24 24"><path d="M3 12h4l2-6 4 12 2-6h6"/></svg>
+                </span>
+                <div>
+                  <div class="ftitle">HRV-based stress score</div>
+                  <div class="fsub">5-factor analysis every measurement</div>
+                </div>
+              </div>
+              <div class="feature-row">
+                <span class="sf" style="background: var(--blossom);">
+                  <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+                </span>
+                <div>
+                  <div class="ftitle">Breathing &amp; Mini Walk</div>
+                  <div class="fsub">2-minute interventions that work</div>
+                </div>
+              </div>
+              <div class="feature-row">
+                <span class="sf" style="background: var(--purple);">
+                  <svg viewBox="0 0 24 24"><path d="M12 2l2.4 5 5.6.8-4 4 1 5.6L12 19.8 6.4 18.4l1-5.6-4-4 5.6-.8z"/></svg>
+                </span>
+                <div>
+                  <div class="ftitle">5 elemental companions</div>
+                  <div class="fsub">Evolve as you build streaks</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="cta-stack">
+              <a href="02-health-permission.html" class="btn-primary">Get Started</a>
+              <p class="footnote" style="text-align: center;">Free · No account needed · Works with Apple Watch</p>
+            </div>
+          </div>
+        </main>
+
+        <div class="home-indicator" aria-hidden></div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

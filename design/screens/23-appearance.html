@@ -1,0 +1,263 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>23 · Appearance — StressMonitor</title>
+  <link rel="stylesheet" href="../css/app.css" />
+  <style>
+    .app-stage { padding: 0 16px 24px; display: flex; flex-direction: column; gap: 18px; }
+    .preview-frame {
+      background: linear-gradient(135deg, #F2F2F7, #FFFFFF);
+      border-radius: 20px;
+      padding: 20px 16px;
+      display: flex; flex-direction: column; gap: 10px; align-items: center;
+      border: 1px solid var(--separator);
+    }
+    .preview-frame .pf-label { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--muted); }
+    .preview-frame .pf-mock {
+      width: 100%;
+      background: var(--surface);
+      border-radius: 14px;
+      padding: 16px;
+      display: flex; align-items: center; gap: 14px;
+      box-shadow: 0 4px 12px -4px rgba(0,0,0,0.06);
+    }
+    .preview-frame .pf-mock .pf-ring {
+      width: 64px; height: 64px;
+      border-radius: 50%;
+      background: conic-gradient(var(--stress-mild) 0% 42%, rgba(60,60,67,0.10) 42% 100%);
+      display: grid; place-items: center;
+      flex: 0 0 64px;
+    }
+    .preview-frame .pf-mock .pf-ring .inner {
+      width: 50px; height: 50px;
+      border-radius: 50%;
+      background: var(--surface);
+      display: grid; place-items: center;
+      font-family: var(--font-rounded);
+      font-weight: 700;
+      font-size: 18px;
+      color: var(--stress-mild);
+    }
+    .preview-frame .pf-mock .pf-body { flex: 1; }
+    .preview-frame .pf-mock .pf-title { font-family: var(--font-rounded); font-size: 17px; font-weight: 700; }
+    .preview-frame .pf-mock .pf-sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+
+    .seg-card { background: var(--surface); border-radius: var(--radius-card); padding: 4px; }
+    .seg-row {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px;
+      background: rgba(60,60,67,0.06);
+      border-radius: 12px;
+      padding: 3px;
+    }
+    .seg-pill {
+      text-align: center;
+      padding: 8px 4px;
+      border-radius: 9px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--fg-secondary);
+      cursor: pointer;
+    }
+    .seg-pill.active { background: var(--surface); color: var(--fg); box-shadow: 0 1px 3px rgba(0,0,0,0.06); }
+
+    .text-size-card { background: var(--surface); border-radius: var(--radius-card); padding: 16px; }
+    .text-size-card h3 { font-size: 13px; font-weight: 600; color: var(--fg-secondary); margin: 0 0 10px; }
+    .text-slider {
+      width: 100%; height: 4px;
+      background: rgba(60,60,67,0.10);
+      border-radius: 999px;
+      position: relative;
+      margin: 30px 0 24px;
+    }
+    .text-slider .track { position: absolute; left: 0; top: 0; bottom: 0; width: 50%; background: var(--accent-strong); border-radius: 999px; }
+    .text-slider .knob {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+    }
+    .text-marks {
+      position: absolute;
+      top: -28px;
+      left: 0; right: 0;
+      display: flex; justify-content: space-between;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+    .text-preview {
+      background: rgba(60,60,67,0.04);
+      border-radius: 12px;
+      padding: 14px;
+      text-align: center;
+    }
+    .text-preview .pp-title { font-family: var(--font-rounded); font-size: 17px; font-weight: 700; }
+    .text-preview .pp-body { font-size: 14px; color: var(--fg-secondary); margin-top: 4px; }
+
+    .grouped-row .label { font-size: 15px; }
+  </style>
+</head>
+<body>
+  <div class="stage">
+    <div class="caption"><a href="10-settings.html" class="nav-back">‹ Settings</a> <strong>STRESSMONITOR</strong> · 23 Appearance</div>
+
+    <div class="device" data-od-id="device">
+      <span class="btn-rail left-1" aria-hidden></span>
+      <span class="btn-rail left-2" aria-hidden></span>
+      <span class="btn-rail left-3" aria-hidden></span>
+      <span class="btn-rail right-1" aria-hidden></span>
+      <span class="island" aria-hidden></span>
+
+      <div class="screen cream">
+        <div class="statusbar">
+          <span class="num">9:41</span>
+          <span class="right">
+            <svg viewBox="0 0 17 11" aria-hidden><rect x="0" y="7" width="3" height="4" rx="0.6"/><rect x="4" y="5" width="3" height="6" rx="0.6"/><rect x="8" y="3" width="3" height="8" rx="0.6"/><rect x="12" y="0" width="3" height="11" rx="0.6"/></svg>
+            <svg viewBox="0 0 17 11" aria-hidden><path d="M8.5 1.5C5.5 1.5 2.7 2.6 0.5 4.6L2 6.1C3.8 4.5 6.1 3.6 8.5 3.6c2.4 0 4.7 0.9 6.5 2.5l1.5-1.5c-2.2-2-5-3.1-8-3.1zM3.5 7.6L5 9.1c1-0.9 2.2-1.4 3.5-1.4 1.3 0 2.5 0.5 3.5 1.4l1.5-1.5c-1.4-1.3-3.1-2-5-2-1.9 0-3.6 0.7-5 2zM6.5 10.6l2 2 2-2c-0.5-0.5-1.2-0.8-2-0.8s-1.5 0.3-2 0.8z"/></svg>
+            <svg class="battery" viewBox="0 0 25 11" aria-hidden><rect x="0.5" y="0.5" width="21" height="10" rx="2.5" fill="none" stroke="currentColor" stroke-opacity="0.45"/><rect x="22" y="3.5" width="1.5" height="4" rx="0.4" fill="currentColor" fill-opacity="0.45"/><rect x="2" y="2" width="18" height="7" rx="1.4"/></svg>
+          </span>
+        </div>
+
+        <main class="content" data-od-id="content">
+          <div class="nav">
+            <a href="10-settings.html" class="nav-btn"><svg viewBox="0 0 14 20"><path d="M11 2L3 10l8 8"/></svg></a>
+            <span class="nav-title">Appearance</span>
+            <button class="nav-action"></button>
+          </div>
+
+          <div class="app-stage">
+            <div class="preview-frame">
+              <span class="pf-label">Live preview</span>
+              <div class="pf-mock">
+                <div class="pf-ring"><div class="inner">42</div></div>
+                <div class="pf-body">
+                  <div class="pf-title">Mild · Focused</div>
+                  <div class="pf-sub">9:32 AM · confidence 96%</div>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <p class="grouped-label">Theme</p>
+              <div class="grouped">
+                <div style="padding: 12px 12px 8px;">
+                  <div class="seg-row">
+                    <div class="seg-pill">Light</div>
+                    <div class="seg-pill active">System</div>
+                    <div class="seg-pill">Dark</div>
+                  </div>
+                </div>
+                <div class="grouped-row" style="grid-template-columns: 28px 1fr auto;">
+                  <span class="icon-sf" style="background: var(--fg);">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M4 4l2 2M18 18l2 2M4 20l2-2M18 6l2-2"/></svg>
+                  </span>
+                  <span class="label">Match iOS</span>
+                  <span class="value">On</span>
+                </div>
+              </div>
+              <p class="grouped-label">Dark mode keeps stress colors accurate — only surfaces and chrome invert.</p>
+            </div>
+
+            <div>
+              <p class="grouped-label">Text size</p>
+              <div class="text-size-card">
+                <h3>StressMonitor follows Dynamic Type</h3>
+                <div class="text-slider">
+                  <div class="track"></div>
+                  <div class="knob"></div>
+                  <div class="text-marks">
+                    <span>XS</span><span>S</span><span>M</span><span>L</span><span>XL</span><span>XXL</span>
+                  </div>
+                </div>
+                <div class="text-preview">
+                  <div class="pp-title">Ripple says hi.</div>
+                  <div class="pp-body">Sample body text in your current size.</div>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <p class="grouped-label">Sound &amp; haptics</p>
+              <div class="grouped">
+                <div class="grouped-row">
+                  <span class="icon-sf" style="background: var(--gold);">
+                    <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 4V5L7 9H3zM16 9a4 4 0 0 1 0 6"/></svg>
+                  </span>
+                  <span class="label">Haptics on transitions</span>
+                  <span class="toggle"><span class="ios-toggle on"></span></span>
+                </div>
+                <div class="grouped-row">
+                  <span class="icon-sf" style="background: var(--purple);">
+                    <svg viewBox="0 0 24 24"><path d="M3 9v6h4l5 4V5L7 9H3z"/></svg>
+                  </span>
+                  <span class="label">Soft audio tones</span>
+                  <span class="toggle"><span class="ios-toggle on"></span></span>
+                </div>
+                <div class="grouped-row">
+                  <span class="icon-sf" style="background: var(--accent);">
+                    <svg viewBox="0 0 24 24"><path d="M12 2v6M12 16v6M2 12h6M16 12h6"/></svg>
+                  </span>
+                  <span class="label">Ambient rain on breathe</span>
+                  <span class="toggle"><span class="ios-toggle"></span></span>
+                </div>
+              </div>
+              <p class="grouped-label">Recommended for sleep-friendly wind-downs.</p>
+            </div>
+
+            <div>
+              <p class="grouped-label">Accessibility</p>
+              <div class="grouped">
+                <div class="grouped-row">
+                  <span class="icon-sf" style="background: var(--success);">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="5" r="2"/><path d="M5 9h14M12 9v6M9 21l3-6 3 6"/></svg>
+                  </span>
+                  <span class="label">Larger stress labels</span>
+                  <span class="toggle"><span class="ios-toggle on"></span></span>
+                </div>
+                <div class="grouped-row">
+                  <span class="icon-sf" style="background: var(--danger);">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M7 12h10"/></svg>
+                  </span>
+                  <span class="label">Reduce motion</span>
+                  <span class="toggle"><span class="ios-toggle"></span></span>
+                </div>
+                <div class="grouped-row">
+                  <span class="icon-sf" style="background: var(--fg-secondary);">
+                    <svg viewBox="0 0 24 24"><path d="M3 12h18M3 6h18M3 18h18"/></svg>
+                  </span>
+                  <span class="label">High contrast</span>
+                  <span class="toggle"><span class="ios-toggle"></span></span>
+                </div>
+              </div>
+            </div>
+
+            <div>
+              <p class="grouped-label">Language</p>
+              <div class="grouped">
+                <a href="#" class="grouped-row" style="text-decoration: none; color: var(--fg);">
+                  <span class="icon-sf" style="background: var(--accent);">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3a13 13 0 0 1 0 18M12 3a13 13 0 0 0 0 18"/></svg>
+                  </span>
+                  <span class="label">Language</span>
+                  <span class="value">English (US)</span>
+                  <span class="chev"><svg viewBox="0 0 9 14"><path d="M1 1l6 6-6 6"/></svg></span>
+                </a>
+              </div>
+            </div>
+          </div>
+        </main>
+
+        <div class="home-indicator" aria-hidden></div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

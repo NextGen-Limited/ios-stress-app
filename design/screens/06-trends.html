@@ -1,0 +1,500 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>06 · Trends — StressMonitor</title>
+  <link rel="stylesheet" href="../css/app.css" />
+  <style>
+    /* ─── Trends · Apple HIG redesign (per Stresswatch §3.3 research) ─── */
+
+    /* Editorial summary — replaces stat-tile pattern (no giant 38px number box) */
+    .summary-card {
+      margin: 0 16px 14px;
+      padding: 14px 16px;
+      background: var(--surface);
+      border-radius: var(--radius-card);
+    }
+    .summary-card .sc-eyebrow {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+    }
+    .summary-card .sc-line {
+      font-size: 17px;
+      font-weight: 500;
+      line-height: 1.35;
+      letter-spacing: -0.01em;
+      margin-top: 6px;
+      color: var(--fg);
+    }
+    .summary-card .sc-delta { color: var(--success); font-weight: 600; }
+
+    .chart-card {
+      margin: 0 16px 14px;
+      padding: 16px;
+      background: var(--surface);
+      border-radius: var(--radius-card);
+    }
+    .chart-card .cc-head {
+      display: flex;
+      align-items: baseline;
+      justify-content: space-between;
+      margin-bottom: 14px;
+    }
+    .chart-card .cc-title {
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--fg);
+      letter-spacing: -0.01em;
+    }
+    .chart-card .cc-meta {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--muted);
+    }
+
+    /* Daily stress bars — colored by tier, today outlined */
+    .stress-bars {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
+      align-items: end;
+    }
+    .sb-col { display: flex; flex-direction: column; align-items: center; gap: 5px; }
+    .sb-track {
+      width: 100%;
+      height: 104px;
+      background: rgba(60,60,67,0.05);
+      border-radius: 4px;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+    }
+    .sb-fill { width: 100%; }
+    .sb-col.today .sb-track { box-shadow: inset 0 0 0 2px var(--accent-strong); }
+    .sb-col.today .sb-day { color: var(--accent-strong); font-weight: 700; }
+    .sb-day {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      color: var(--muted);
+      letter-spacing: 0.06em;
+    }
+    .sb-date {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      color: var(--muted);
+      opacity: 0.55;
+      margin-top: -2px;
+    }
+
+    /* Distribution stacked bar — NEW per Stresswatch §3.3 */
+    .dist-bar {
+      height: 28px;
+      border-radius: 6px;
+      overflow: hidden;
+      display: flex;
+      margin: 4px 0 14px;
+    }
+    .dist-seg {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 0.02em;
+    }
+    .dist-seg.moderate { color: rgba(0,0,0,0.65); }
+    .dist-legend {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px 16px;
+      font-size: 12px;
+    }
+    .dist-legend .row {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: var(--fg-secondary);
+    }
+    .dist-legend .row .swatch {
+      width: 10px;
+      height: 10px;
+      border-radius: 3px;
+      flex-shrink: 0;
+    }
+    .dist-legend .row .pct {
+      margin-left: auto;
+      font-family: var(--font-mono);
+      color: var(--muted);
+    }
+    .dist-comment {
+      font-size: 12px;
+      color: var(--fg-secondary);
+      line-height: 1.45;
+      margin-top: 12px;
+    }
+
+    /* Calendar heatmap — monthly view per Stresswatch §3.3 */
+    .cal-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 5px;
+    }
+    .cal-head {
+      font-family: var(--font-mono);
+      font-size: 9px;
+      color: var(--muted);
+      text-align: center;
+      letter-spacing: 0.06em;
+      padding-bottom: 2px;
+    }
+    .cal-cell {
+      aspect-ratio: 1;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 10px;
+      font-family: var(--font-mono);
+      color: rgba(0,0,0,0.55);
+      background: rgba(60,60,67,0.06);
+    }
+    .cal-cell.relaxed { background: var(--stress-relaxed); color: #fff; }
+    .cal-cell.mild { background: var(--stress-mild); color: #fff; }
+    .cal-cell.moderate { background: var(--stress-moderate); color: rgba(0,0,0,0.7); }
+    .cal-cell.high { background: var(--stress-high); color: #fff; }
+    .cal-cell.empty { background: transparent; color: transparent; }
+    .cal-cell.future {
+      background: rgba(60,60,67,0.04);
+      color: rgba(60,60,67,0.32);
+    }
+    .cal-cell.today {
+      box-shadow: 0 0 0 2px var(--accent-strong);
+    }
+    .cal-legend {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin-top: 12px;
+      font-size: 11px;
+      color: var(--muted);
+      flex-wrap: wrap;
+    }
+    .cal-legend .swatch {
+      display: inline-block;
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      margin-right: 4px;
+      vertical-align: middle;
+    }
+
+    /* HRV line chart — avg reference line + endpoint annotation */
+    .hrv-summary {
+      display: flex;
+      align-items: baseline;
+      gap: 8px;
+      margin-bottom: 8px;
+    }
+    .hrv-summary .hs-val {
+      font-family: var(--font-rounded);
+      font-size: 22px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      color: var(--hrv-color);
+    }
+    .hrv-summary .hs-unit {
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .hrv-summary .hs-delta {
+      margin-left: auto;
+      font-size: 11px;
+      color: var(--success);
+      font-weight: 600;
+    }
+    .hrv-chart {
+      height: 110px;
+      position: relative;
+    }
+    .hrv-chart svg { width: 100%; height: 100%; }
+    .hrv-anno {
+      position: absolute;
+      top: 0;
+      right: 4px;
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--hrv-color);
+      background: var(--surface);
+      padding: 0 4px;
+      z-index: 2;
+    }
+
+    /* Editorial insight — replaces icon-wrap teaser + dark premium strip */
+    .insight-card {
+      margin: 0 16px 24px;
+      padding: 16px;
+      background: var(--surface);
+      border-radius: var(--radius-card);
+    }
+    .insight-card .ic-eyebrow {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin-bottom: 6px;
+    }
+    .insight-card .ic-title {
+      font-size: 16px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      color: var(--fg);
+      margin-bottom: 6px;
+    }
+    .insight-card .ic-body {
+      font-size: 13px;
+      line-height: 1.45;
+      color: var(--fg-secondary);
+    }
+    .insight-card .ic-body strong { color: var(--fg); font-weight: 600; }
+    .insight-card .ic-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      margin-top: 12px;
+      font-size: 13px;
+      font-weight: 600;
+      color: var(--accent-strong);
+      text-decoration: none;
+    }
+    .insight-card .ic-link svg {
+      width: 12px;
+      height: 12px;
+      stroke: currentColor;
+      fill: none;
+      stroke-width: 2.4;
+    }
+  </style>
+</head>
+<body>
+  <div class="stage">
+    <div class="caption"><strong>STRESSMONITOR</strong> · 06 Trends</div>
+
+    <div class="device" data-od-id="device">
+      <span class="btn-rail left-1" aria-hidden></span>
+      <span class="btn-rail left-2" aria-hidden></span>
+      <span class="btn-rail left-3" aria-hidden></span>
+      <span class="btn-rail right-1" aria-hidden></span>
+      <span class="island" aria-hidden></span>
+
+      <div class="screen">
+        <div class="statusbar">
+          <span class="num">9:41</span>
+          <span class="right">
+            <svg viewBox="0 0 17 11" aria-hidden><rect x="0" y="7" width="3" height="4" rx="0.6"/><rect x="4" y="5" width="3" height="6" rx="0.6"/><rect x="8" y="3" width="3" height="8" rx="0.6"/><rect x="12" y="0" width="3" height="11" rx="0.6"/></svg>
+            <svg viewBox="0 0 17 11" aria-hidden><path d="M8.5 1.5C5.5 1.5 2.7 2.6 0.5 4.6L2 6.1C3.8 4.5 6.1 3.6 8.5 3.6c2.4 0 4.7 0.9 6.5 2.5l1.5-1.5c-2.2-2-5-3.1-8-3.1zM3.5 7.6L5 9.1c1-0.9 2.2-1.4 3.5-1.4 1.3 0 2.5 0.5 3.5 1.4l1.5-1.5c-1.4-1.3-3.1-2-5-2-1.9 0-3.6 0.7-5 2zM6.5 10.6l2 2 2-2c-0.5-0.5-1.2-0.8-2-0.8s-1.5 0.3-2 0.8z"/></svg>
+            <svg class="battery" viewBox="0 0 25 11" aria-hidden><rect x="0.5" y="0.5" width="21" height="10" rx="2.5" fill="none" stroke="currentColor" stroke-opacity="0.45"/><rect x="22" y="3.5" width="1.5" height="4" rx="0.4" fill="currentColor" fill-opacity="0.45"/><rect x="2" y="2" width="18" height="7" rx="1.4"/></svg>
+          </span>
+        </div>
+
+        <main class="content" data-od-id="content" style="padding-top: 8px;">
+          <div class="large-header">
+            <p class="eyebrow">Apr 16 – 22 · Week 17</p>
+            <h1>Trends</h1>
+          </div>
+
+          <div class="chip-row" style="padding-bottom: 14px;">
+            <span class="chip active">Week</span>
+            <span class="chip">Month</span>
+            <span class="chip">3 Months</span>
+            <span class="chip">Year</span>
+          </div>
+
+          <!-- 1. Editorial summary — story-driven, replaces stat-tile pattern -->
+          <div class="summary-card" data-od-id="period-summary">
+            <p class="sc-eyebrow">Vs last week</p>
+            <p class="sc-line">
+              You're <span class="sc-delta">18% calmer</span>.
+              Hardest day was Sat (62), best was Mon (18).
+            </p>
+          </div>
+
+          <!-- 2. Daily stress — 7 bars colored by tier, today outlined -->
+          <!-- Math verified: 58+48+36+62+24+18+42 = 288 / 7 = 41.14 → avg 41 -->
+          <div class="chart-card" data-od-id="daily-stress">
+            <div class="cc-head">
+              <span class="cc-title">Daily stress</span>
+              <span class="cc-meta">avg 41 · 0-100</span>
+            </div>
+            <div class="stress-bars">
+              <div class="sb-col">
+                <div class="sb-track"><div class="sb-fill" style="height: 58%; background: var(--stress-moderate);"></div></div>
+                <span class="sb-day">WED</span>
+                <span class="sb-date">16</span>
+              </div>
+              <div class="sb-col">
+                <div class="sb-track"><div class="sb-fill" style="height: 48%; background: var(--stress-mild);"></div></div>
+                <span class="sb-day">THU</span>
+                <span class="sb-date">17</span>
+              </div>
+              <div class="sb-col">
+                <div class="sb-track"><div class="sb-fill" style="height: 36%; background: var(--stress-mild);"></div></div>
+                <span class="sb-day">FRI</span>
+                <span class="sb-date">18</span>
+              </div>
+              <div class="sb-col">
+                <div class="sb-track"><div class="sb-fill" style="height: 62%; background: var(--stress-moderate);"></div></div>
+                <span class="sb-day">SAT</span>
+                <span class="sb-date">19</span>
+              </div>
+              <div class="sb-col">
+                <div class="sb-track"><div class="sb-fill" style="height: 24%; background: var(--stress-relaxed);"></div></div>
+                <span class="sb-day">SUN</span>
+                <span class="sb-date">20</span>
+              </div>
+              <div class="sb-col">
+                <div class="sb-track"><div class="sb-fill" style="height: 18%; background: var(--stress-relaxed);"></div></div>
+                <span class="sb-day">MON</span>
+                <span class="sb-date">21</span>
+              </div>
+              <div class="sb-col today">
+                <div class="sb-track"><div class="sb-fill" style="height: 42%; background: var(--stress-mild);"></div></div>
+                <span class="sb-day">TUE</span>
+                <span class="sb-date">22</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- 3. Distribution — NEW per Stresswatch §3.3 (stress distribution chart) -->
+          <!-- Math verified: 2 relaxed + 3 mild + 2 moderate = 7 days. 29+43+28 = 100% -->
+          <div class="chart-card" data-od-id="distribution">
+            <div class="cc-head">
+              <span class="cc-title">Time spent by tier</span>
+              <span class="cc-meta">7 days</span>
+            </div>
+            <div class="dist-bar">
+              <div class="dist-seg" style="width: 29%; background: var(--stress-relaxed);">29%</div>
+              <div class="dist-seg" style="width: 43%; background: var(--stress-mild);">43%</div>
+              <div class="dist-seg moderate" style="width: 28%; background: var(--stress-moderate);">28%</div>
+            </div>
+            <div class="dist-legend">
+              <div class="row"><span class="swatch" style="background: var(--stress-relaxed);"></span>Relaxed<span class="pct">2 days</span></div>
+              <div class="row"><span class="swatch" style="background: var(--stress-mild);"></span>Mild<span class="pct">3 days</span></div>
+              <div class="row"><span class="swatch" style="background: var(--stress-moderate);"></span>Moderate<span class="pct">2 days</span></div>
+              <div class="row" style="opacity: 0.45;"><span class="swatch" style="background: var(--stress-high);"></span>High<span class="pct">0 days</span></div>
+            </div>
+            <p class="dist-comment">Most days landed in Mild — your baseline is shifting in the right direction.</p>
+          </div>
+
+          <!-- 4. Calendar heatmap — monthly view per Stresswatch §3.3 -->
+          <!-- App fiction: Apr 22 = Tuesday (per home screen consistency) -->
+          <!-- Visual story: high-stress crunch early April → gradual recovery → calm current week -->
+          <div class="chart-card" data-od-id="calendar">
+            <div class="cc-head">
+              <span class="cc-title">April 2026</span>
+              <span class="cc-meta">daily score</span>
+            </div>
+            <div class="cal-grid">
+              <span class="cal-head">M</span><span class="cal-head">T</span><span class="cal-head">W</span><span class="cal-head">T</span><span class="cal-head">F</span><span class="cal-head">S</span><span class="cal-head">S</span>
+
+              <!-- Week 1: Apr 1 (Tue) – 5 — quarter-close crunch -->
+              <span class="cal-cell empty"></span><span class="cal-cell high">1</span><span class="cal-cell high">2</span><span class="cal-cell moderate">3</span><span class="cal-cell moderate">4</span><span class="cal-cell mild">5</span><span class="cal-cell mild">6</span>
+              <!-- Week 2: Apr 7 – 13 — stabilizing -->
+              <span class="cal-cell moderate">7</span><span class="cal-cell moderate">8</span><span class="cal-cell moderate">9</span><span class="cal-cell mild">10</span><span class="cal-cell mild">11</span><span class="cal-cell relaxed">12</span><span class="cal-cell relaxed">13</span>
+              <!-- Week 3: Apr 14 – 20 — recovery -->
+              <span class="cal-cell mild">14</span><span class="cal-cell mild">15</span><span class="cal-cell moderate">16</span><span class="cal-cell mild">17</span><span class="cal-cell mild">18</span><span class="cal-cell moderate">19</span><span class="cal-cell relaxed">20</span>
+              <!-- Week 4: Apr 21 – 27 — current week (22 = today) -->
+              <span class="cal-cell relaxed">21</span><span class="cal-cell today mild">22</span><span class="cal-cell future">23</span><span class="cal-cell future">24</span><span class="cal-cell future">25</span><span class="cal-cell future">26</span><span class="cal-cell future">27</span>
+              <!-- Week 5: Apr 28 – 30 -->
+              <span class="cal-cell future">28</span><span class="cal-cell future">29</span><span class="cal-cell future">30</span><span class="cal-cell empty"></span><span class="cal-cell empty"></span><span class="cal-cell empty"></span><span class="cal-cell empty"></span>
+            </div>
+            <div class="cal-legend">
+              <span><span class="swatch" style="background: var(--stress-relaxed);"></span>Relaxed</span>
+              <span><span class="swatch" style="background: var(--stress-mild);"></span>Mild</span>
+              <span><span class="swatch" style="background: var(--stress-moderate);"></span>Moderate</span>
+              <span><span class="swatch" style="background: var(--stress-high);"></span>High</span>
+              <span><span class="swatch" style="background: rgba(60,60,67,0.18);"></span>Upcoming</span>
+            </div>
+          </div>
+
+          <!-- 5. HRV trend — line chart with avg reference line + endpoint annotation -->
+          <div class="chart-card" data-od-id="hrv-trend">
+            <div class="cc-head">
+              <span class="cc-title">HRV trend</span>
+              <span class="cc-meta">ms · 7 days</span>
+            </div>
+            <div class="hrv-summary">
+              <span class="hs-val">52</span>
+              <span class="hs-unit">ms avg</span>
+              <span class="hs-delta">+8 vs last week</span>
+            </div>
+            <div class="hrv-chart">
+              <span class="hrv-anno">today · 56ms</span>
+              <svg viewBox="0 0 280 100" preserveAspectRatio="none">
+                <defs>
+                  <linearGradient id="hrvGrad" x1="0" x2="0" y1="0" y2="1">
+                    <stop offset="0%" stop-color="#34D399" stop-opacity="0.32"/>
+                    <stop offset="100%" stop-color="#34D399" stop-opacity="0"/>
+                  </linearGradient>
+                </defs>
+                <!-- 52ms baseline reference (dashed) -->
+                <line x1="0" y1="48" x2="280" y2="48" stroke="rgba(60,60,67,0.28)" stroke-width="1" stroke-dasharray="3 3"/>
+                <!-- HRV line — upward trend -->
+                <path d="M0 72 L40 62 L80 78 L120 56 L160 66 L200 42 L240 52 L280 28" stroke="#34D399" stroke-width="2.4" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+                <!-- Area fill -->
+                <path d="M0 72 L40 62 L80 78 L120 56 L160 66 L200 42 L240 52 L280 28 L280 100 L0 100 Z" fill="url(#hrvGrad)"/>
+                <!-- Endpoint halo + dot -->
+                <circle cx="280" cy="28" r="8" fill="#34D399" fill-opacity="0.2"/>
+                <circle cx="280" cy="28" r="4" fill="#34D399"/>
+              </svg>
+            </div>
+          </div>
+
+          <!-- 6. Editorial insight — replaces icon-wrap teaser + dark premium strip -->
+          <div class="insight-card" data-od-id="insight">
+            <p class="ic-eyebrow">Pattern detected</p>
+            <p class="ic-title">Tuesday stand-ups run hot</p>
+            <p class="ic-body">
+              Stress peaks 11am on Tue/Thu — right when the engineering sync lands.
+              Walking meetings last week saved <strong>14 HRV ms</strong> on average.
+              Try one tomorrow.
+            </p>
+            <a class="ic-link" href="09-chat.html">
+              Ask Ripple for a plan
+              <svg viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </a>
+          </div>
+        </main>
+
+        <nav class="tabbar" data-od-id="tabbar">
+          <a class="tab" href="04-home.html">
+            <svg viewBox="0 0 24 24"><path d="M12 3 L20 10 V21 H14 V15 H10 V21 H4 V10 Z"/></svg>
+            Home
+          </a>
+          <a class="tab" href="05-action.html">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v10M7 12h10"/></svg>
+            Action
+          </a>
+          <a class="tab active" href="06-trends.html" aria-current="page">
+            <svg viewBox="0 0 24 24" class="fill-active"><rect x="2.25" y="11" width="3" height="8" rx="0.5"/><rect x="7.75" y="5" width="3" height="14" rx="0.5"/><rect x="13.25" y="9" width="3" height="10" rx="0.5"/><rect x="18.75" y="13" width="3" height="6" rx="0.5"/></svg>
+            Trends
+          </a>
+          <a class="tab" href="10-settings.html">
+            <svg viewBox="0 0 24 24"><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/><circle cx="12" cy="12" r="3"/></svg>
+            Settings
+          </a>
+        </nav>
+
+        <div class="home-indicator" aria-hidden></div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

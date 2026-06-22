@@ -1,0 +1,1458 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>StressMonitor — Design System</title>
+<link rel="stylesheet" href="css/app.css" />
+<style>
+  /* ─── Documentation chrome (overrides app.css body) ─────────────
+     This page is a desktop reference, not an app screen. Reset the
+     app.css `body { display:grid; place-items:center }` centering
+     and radial gradient that frames the iPhone, then build the doc
+     layout with a sticky sidebar + scrollable content column. */
+  body {
+    display: block;
+    background: var(--bg);
+    padding: 0;
+    text-align: left;
+  }
+
+  .doc-shell {
+    display: grid;
+    grid-template-columns: 248px 1fr;
+    max-width: 1320px;
+    margin: 0 auto;
+    min-height: 100vh;
+  }
+
+  /* ─── Sidebar ─────────────────────────────────────────────────── */
+  .sidebar {
+    position: sticky;
+    top: 0;
+    align-self: start;
+    height: 100vh;
+    overflow-y: auto;
+    padding: 32px 20px 32px 28px;
+    border-right: 0.5px solid var(--separator);
+    background: color-mix(in srgb, var(--bg) 92%, #fff);
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+  }
+  .sidebar .brand {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 28px;
+  }
+  .sidebar .brand-mark {
+    width: 32px; height: 32px;
+    border-radius: 9px;
+    background: var(--accent);
+    display: grid; place-items: center;
+    color: #fff;
+  }
+  .sidebar .brand-mark svg { width: 18px; height: 18px; stroke: currentColor; fill: none; stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+  .sidebar .brand-text {
+    font-family: var(--font-display);
+    font-size: 15px;
+    font-weight: 600;
+    letter-spacing: -0.015em;
+    color: var(--fg);
+  }
+  .sidebar .brand-sub {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+  .sidebar .back-link {
+    display: inline-flex; align-items: center; gap: 6px;
+    margin-bottom: 24px;
+    padding: 6px 10px;
+    margin-left: -10px;
+    border-radius: 7px;
+    font-family: var(--font-mono);
+    font-size: 10.5px;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-decoration: none;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+  .sidebar .back-link:hover { background: var(--accent-soft); color: var(--accent-strong); }
+  .sidebar .back-link svg { width: 11px; height: 11px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+  .sidebar nav h4 {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted-2);
+    margin: 22px 0 8px;
+    font-weight: 500;
+  }
+  .sidebar nav a {
+    display: block;
+    padding: 6px 10px;
+    margin: 0 -10px;
+    border-radius: 7px;
+    color: var(--fg-secondary);
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 500;
+    text-decoration: none;
+    letter-spacing: -0.005em;
+    line-height: 1.3;
+  }
+  .sidebar nav a:hover { background: var(--accent-soft); color: var(--accent-strong); }
+
+  /* ─── Content ─────────────────────────────────────────────────── */
+  .doc-content {
+    padding: 56px 64px 96px;
+    max-width: 920px;
+  }
+  .doc-section {
+    padding-top: 48px;
+    border-top: 0.5px solid var(--separator);
+    margin-top: 48px;
+  }
+  .doc-section:first-child { border-top: 0; margin-top: 0; padding-top: 0; }
+  .doc-section .doc-eyebrow {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent-strong);
+    margin: 0 0 8px;
+  }
+  .doc-section h2 {
+    font-family: var(--font-display);
+    font-size: 32px;
+    font-weight: 700;
+    letter-spacing: -0.022em;
+    line-height: 1.1;
+    margin: 0 0 12px;
+    color: var(--fg);
+  }
+  .doc-section .doc-lede {
+    font-family: var(--font-body);
+    font-size: 17px;
+    line-height: 1.5;
+    color: var(--fg-secondary);
+    max-width: 65ch;
+    margin: 0 0 28px;
+  }
+
+  /* ─── Doc hero ────────────────────────────────────────────────── */
+  .doc-hero {
+    padding-bottom: 40px;
+    border-bottom: 0.5px solid var(--separator);
+    margin-bottom: 0;
+  }
+  .doc-hero .meta-row {
+    display: flex; align-items: center; gap: 12px;
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 16px;
+  }
+  .doc-hero .meta-row .dot { width: 4px; height: 4px; border-radius: 50%; background: currentColor; opacity: 0.4; }
+  .doc-hero h1 {
+    font-family: var(--font-display);
+    font-size: 52px;
+    font-weight: 700;
+    letter-spacing: -0.028em;
+    line-height: 1.04;
+    margin: 0 0 16px;
+    color: var(--fg);
+  }
+  .doc-hero p {
+    font-family: var(--font-body);
+    font-size: 19px;
+    line-height: 1.5;
+    color: var(--fg-secondary);
+    max-width: 60ch;
+    margin: 0;
+  }
+
+  /* ─── Demo block ──────────────────────────────────────────────── */
+  .demo {
+    background: var(--surface);
+    border-radius: 14px;
+    border: 0.5px solid var(--separator);
+    padding: 28px;
+    margin: 16px 0;
+  }
+  .demo-tinted { background: var(--bg); }
+  .demo-label {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin: 0 0 14px;
+    font-weight: 500;
+  }
+  .demo-row {
+    display: flex; align-items: center; gap: 16px;
+    flex-wrap: wrap;
+  }
+  .demo-stack {
+    display: flex; flex-direction: column; gap: 14px;
+  }
+
+  /* ─── Token tables ────────────────────────────────────────────── */
+  .token-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 14px;
+    margin-top: 14px;
+  }
+  .swatch {
+    background: var(--surface);
+    border-radius: 10px;
+    border: 0.5px solid var(--separator);
+    overflow: hidden;
+  }
+  .swatch .chip {
+    height: 64px;
+    border-bottom: 0.5px solid var(--separator);
+  }
+  .swatch .body {
+    padding: 10px 12px 12px;
+  }
+  .swatch .name {
+    font-family: var(--font-body);
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--fg);
+    letter-spacing: -0.005em;
+    line-height: 1.2;
+  }
+  .swatch .var {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--muted);
+    margin-top: 2px;
+    letter-spacing: 0.01em;
+  }
+  .swatch .hex {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--fg-secondary);
+    margin-top: 6px;
+    letter-spacing: 0.01em;
+  }
+
+  /* ─── Type specimen ───────────────────────────────────────────── */
+  .specimen {
+    background: var(--surface);
+    border-radius: 14px;
+    border: 0.5px solid var(--separator);
+    padding: 24px 28px;
+    margin-top: 14px;
+  }
+  .specimen-row {
+    display: grid;
+    grid-template-columns: 110px 1fr;
+    gap: 24px;
+    padding: 14px 0;
+    border-top: 0.5px solid var(--separator);
+    align-items: baseline;
+  }
+  .specimen-row:first-of-type { border-top: 0; padding-top: 4px; }
+  .specimen-meta {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    text-transform: uppercase;
+  }
+  .specimen-meta strong {
+    display: block;
+    color: var(--fg-secondary);
+    font-weight: 500;
+    margin-top: 3px;
+    text-transform: none;
+    letter-spacing: 0.01em;
+    font-family: var(--font-body);
+    font-size: 11px;
+  }
+
+  /* ─── Mini device frame for inline demos ──────────────────────── */
+  .mini-frame {
+    width: 280px;
+    height: 580px;
+    background: var(--bg);
+    border-radius: 36px;
+    border: 0.5px solid var(--separator);
+    overflow: hidden;
+    display: flex; flex-direction: column;
+    box-shadow: 0 14px 36px -16px rgba(0,0,0,0.18), 0 2px 8px -2px rgba(0,0,0,0.08);
+    flex: 0 0 auto;
+  }
+  .mini-frame .mini-status {
+    height: 36px;
+    padding: 14px 18px 0;
+    display: flex; align-items: center; justify-content: space-between;
+    font-family: var(--font-body);
+    font-size: 11px; font-weight: 600;
+    color: var(--fg);
+    flex: 0 0 36px;
+  }
+  .mini-frame .mini-status .right { display: inline-flex; gap: 4px; align-items: center; }
+  .mini-frame .mini-status svg { width: 12px; height: 8px; fill: currentColor; }
+  .mini-frame .mini-content { flex: 1; padding: 12px 16px; overflow: hidden; }
+  .mini-frame .mini-home {
+    height: 22px;
+    display: grid; place-items: center;
+    flex: 0 0 22px;
+  }
+  .mini-frame .mini-home::after {
+    content: ''; width: 90px; height: 4px;
+    background: var(--fg); opacity: 0.6; border-radius: 999px;
+  }
+
+  /* ─── Misc doc helpers ────────────────────────────────────────── */
+  .footnote-doc {
+    font-family: var(--font-mono);
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 0.04em;
+    line-height: 1.5;
+    margin-top: 14px;
+  }
+  .callout-doc {
+    background: var(--accent-soft);
+    border-radius: 12px;
+    padding: 14px 18px;
+    margin: 16px 0;
+    font-family: var(--font-body);
+    font-size: 14px;
+    line-height: 1.45;
+    color: var(--accent-strong);
+  }
+  .callout-doc strong { font-weight: 600; }
+
+  /* ─── Responsive ──────────────────────────────────────────────── */
+  @media (max-width: 880px) {
+    .doc-shell { grid-template-columns: 1fr; }
+    .sidebar { position: static; height: auto; border-right: 0; border-bottom: 0.5px solid var(--separator); }
+    .doc-content { padding: 32px 24px 64px; }
+    .doc-hero h1 { font-size: 38px; }
+    .doc-section h2 { font-size: 26px; }
+  }
+</style>
+</head>
+<body data-od-id="doc-root">
+
+<div class="doc-shell">
+
+  <!-- ═══ Sidebar ═══════════════════════════════════════════════ -->
+  <aside class="sidebar" data-od-id="doc-sidebar">
+    <div class="brand">
+      <div class="brand-mark" aria-hidden="true">
+        <!-- heart pulse — StressMonitor mark -->
+        <svg viewBox="0 0 24 24"><path d="M3 12h4l1.5-4 2.5 8 2-6 1.5 2H21"/></svg>
+      </div>
+      <div>
+        <div class="brand-text">StressMonitor</div>
+        <div class="brand-sub">Design System · v1.4</div>
+      </div>
+    </div>
+
+    <a class="back-link" href="index.html" data-od-id="ds-back-link">
+      <svg viewBox="0 0 24 24"><path d="M15 18l-6-6 6-6"/></svg>
+      Back to screens
+    </a>
+
+    <nav>
+      <h4>Foundations</h4>
+      <a href="#colors">01 · Color</a>
+      <a href="#typography">02 · Typography</a>
+      <a href="#spacing">03 · Spacing &amp; radii</a>
+
+      <h4>Scaffold</h4>
+      <a href="#frame">04 · iPhone frame</a>
+      <a href="#navigation">05 · Navigation</a>
+      <a href="#tabbar">06 · Tab bar</a>
+
+      <h4>Components</h4>
+      <a href="#buttons">07 · Buttons</a>
+      <a href="#cards">08 · Cards &amp; lists</a>
+      <a href="#forms">09 · Forms &amp; pills</a>
+      <a href="#stress">10 · Stress primitives</a>
+      <a href="#characters">11 · Characters</a>
+      <a href="#charts">12 · Charts</a>
+      <a href="#surfaces">13 · Glass &amp; surfaces</a>
+
+      <h4>Reference</h4>
+      <a href="#motion">14 · Motion</a>
+      <a href="#a11y">15 · Accessibility</a>
+    </nav>
+  </aside>
+
+  <!-- ═══ Content ══════════════════════════════════════════════ -->
+  <main class="doc-content">
+
+    <!-- ═══ Hero ═══════════════════════════════════════════════ -->
+    <section class="doc-section doc-hero" id="top" data-od-id="doc-hero">
+      <div class="meta-row">
+        <span>Apple HIG</span><span class="dot"></span>
+        <span>SF Pro · SF Symbols</span><span class="dot"></span>
+        <span>iOS 17+</span><span class="dot"></span>
+        <span>iPhone 14 Pro · 393 × 852</span>
+      </div>
+      <h1>StressMonitor<br/>Design System</h1>
+      <p>The shared visual language powering 25 screens — five elemental companion characters, a five-level stress scale, instrument-panel precision for data, and Apple HIG chrome throughout. Every component here is extracted from production screens, not designed in isolation.</p>
+    </section>
+
+    <!-- ═══ 01 Color ═══════════════════════════════════════════ -->
+    <section class="doc-section" id="colors" data-od-id="sec-colors">
+      <p class="doc-eyebrow">01 · Foundations</p>
+      <h2>Color</h2>
+      <p class="doc-lede">Six neutral surfaces carry 80% of pixels. One accent (Ripple blue) appears at most twice per screen. The five-step stress scale is semantic, always paired with an icon or label. The character palette borrows from the stress scale where it can — Blossom's green echoes "Relaxed", Ember's coral echoes "High".</p>
+
+      <h3 style="font-family:var(--font-display);font-size:17px;font-weight:600;letter-spacing:-0.01em;margin:32px 0 4px;color:var(--fg);">Neutral surfaces &amp; ink</h3>
+      <div class="token-grid">
+        <div class="swatch"><div class="chip" style="background:var(--bg)"></div><div class="body"><div class="name">Grouped bg</div><div class="var">--bg</div><div class="hex">#F2F2F7</div></div></div>
+        <div class="swatch"><div class="chip" style="background:var(--surface)"></div><div class="body"><div class="name">Surface</div><div class="var">--surface</div><div class="hex">#FFFFFF</div></div></div>
+        <div class="swatch"><div class="chip" style="background:var(--surface-2)"></div><div class="body"><div class="name">Surface 2</div><div class="var">--surface-2</div><div class="hex">#FBFBFD</div></div></div>
+        <div class="swatch"><div class="chip" style="background:var(--settings-bg)"></div><div class="body"><div class="name">Settings cream</div><div class="var">--settings-bg</div><div class="hex">#FFFDF6</div></div></div>
+        <div class="swatch"><div class="chip" style="background:var(--fg)"></div><div class="body"><div class="name">Ink</div><div class="var">--fg</div><div class="hex">#101223</div></div></div>
+        <div class="swatch"><div class="chip" style="background:var(--fg-secondary)"></div><div class="body"><div class="name">Ink 2</div><div class="var">--fg-secondary</div><div class="hex">#3C3C43</div></div></div>
+        <div class="swatch"><div class="chip" style="background:var(--muted)"></div><div class="body"><div class="name">Muted</div><div class="var">--muted</div><div class="hex">#777986</div></div></div>
+        <div class="swatch"><div class="chip" style="background:var(--separator)"></div><div class="body"><div class="name">Separator</div><div class="var">--separator</div><div class="hex">rgba(60,60,67,.12)</div></div></div>
+      </div>
+
+      <h3 style="font-family:var(--font-display);font-size:17px;font-weight:600;letter-spacing:-0.01em;margin:32px 0 4px;color:var(--fg);">Ripple accent</h3>
+      <div class="token-grid">
+        <div class="swatch"><div class="chip" style="background:var(--accent)"></div><div class="body"><div class="name">Accent</div><div class="var">--accent</div><div class="hex">#4FC3F7</div></div></div>
+        <div class="swatch"><div class="chip" style="background:var(--accent-strong)"></div><div class="body"><div class="name">Accent strong</div><div class="var">--accent-strong</div><div class="hex">#0288D1</div></div></div>
+        <div class="swatch"><div class="chip" style="background:var(--accent-soft)"></div><div class="body"><div class="name">Accent soft</div><div class="var">--accent-soft</div><div class="hex">rgba(79,195,247,.14)</div></div></div>
+      </div>
+
+      <h3 style="font-family:var(--font-display);font-size:17px;font-weight:600;letter-spacing:-0.01em;margin:32px 0 4px;color:var(--fg);">Stress 5-level scale</h3>
+      <p class="footnote-doc" style="margin-top:4px;">Always paired with an icon or text label. Never color-only.</p>
+      <div class="token-grid">
+        <div class="swatch"><div class="chip" style="background:var(--stress-relaxed)"></div><div class="body"><div class="name">Relaxed · 0–25</div><div class="var">--stress-relaxed</div><div class="hex">#34C759</div></div></div>
+        <div class="swatch"><div class="chip" style="background:var(--stress-mild)"></div><div class="body"><div class="name">Mild · 26–50</div><div class="var">--stress-mild</div><div class="hex">#007AFF</div></div></div>
+        <div class="swatch"><div class="chip" style="background:var(--stress-moderate)"></div><div class="body"><div class="name">Moderate · 51–75</div><div class="var">--stress-moderate</div><div class="hex">#FFD60A</div></div></div>
+        <div class="swatch"><div class="chip" style="background:var(--stress-high)"></div><div class="body"><div class="name">High · 76–100</div><div class="var">--stress-high</div><div class="hex">#FF9500</div></div></div>
+        <div class="swatch"><div class="chip" style="background:var(--stress-severe)"></div><div class="body"><div class="name">Severe · 100+</div><div class="var">--stress-severe</div><div class="hex">#FF3B30</div></div></div>
+      </div>
+
+      <h3 style="font-family:var(--font-display);font-size:17px;font-weight:600;letter-spacing:-0.01em;margin:32px 0 4px;color:var(--fg);">Character palette</h3>
+      <div class="token-grid">
+        <div class="swatch"><div class="chip" style="background:var(--ripple)"></div><div class="body"><div class="name">Ripple · Otter</div><div class="var">--ripple</div><div class="hex">#4FC3F7 · Free</div></div></div>
+        <div class="swatch"><div class="chip" style="background:var(--blossom)"></div><div class="body"><div class="name">Blossom · Sprite</div><div class="var">--blossom</div><div class="hex">#A5D6A7 · Free</div></div></div>
+        <div class="swatch"><div class="chip" style="background:var(--ember)"></div><div class="body"><div class="name">Ember · Fox</div><div class="var">--ember</div><div class="hex">#FFAB91 · Plus</div></div></div>
+        <div class="swatch"><div class="chip" style="background:var(--zephyr)"></div><div class="body"><div class="name">Zephyr · Wisp</div><div class="var">--zephyr</div><div class="hex">#D1C4E9 · Plus</div></div></div>
+        <div class="swatch"><div class="chip" style="background:var(--lumi)"></div><div class="body"><div class="name">Lumi · Owl</div><div class="var">--lumi</div><div class="hex">#7986CB · Streak</div></div></div>
+      </div>
+
+      <h3 style="font-family:var(--font-display);font-size:17px;font-weight:600;letter-spacing:-0.01em;margin:32px 0 4px;color:var(--fg);">Semantic &amp; metrics</h3>
+      <div class="token-grid">
+        <div class="swatch"><div class="chip" style="background:var(--success)"></div><div class="body"><div class="name">Success</div><div class="var">--success</div><div class="hex">#34C759</div></div></div>
+        <div class="swatch"><div class="chip" style="background:var(--warn)"></div><div class="body"><div class="name">Warn</div><div class="var">--warn</div><div class="hex">#FF9500</div></div></div>
+        <div class="swatch"><div class="chip" style="background:var(--danger)"></div><div class="body"><div class="name">Danger</div><div class="var">--danger</div><div class="hex">#FF3B30</div></div></div>
+        <div class="swatch"><div class="chip" style="background:var(--hrv-color)"></div><div class="body"><div class="name">HRV</div><div class="var">--hrv-color</div><div class="hex">#34D399</div></div></div>
+        <div class="swatch"><div class="chip" style="background:var(--hr-color)"></div><div class="body"><div class="name">Heart rate</div><div class="var">--hr-color</div><div class="hex">#F87171</div></div></div>
+        <div class="swatch"><div class="chip" style="background:var(--purple)"></div><div class="body"><div class="name">Coach</div><div class="var">--purple</div><div class="hex">#8B5CF6</div></div></div>
+        <div class="swatch"><div class="chip" style="background:var(--gold)"></div><div class="body"><div class="name">Gold</div><div class="var">--gold</div><div class="hex">#FE9901</div></div></div>
+      </div>
+
+      <div class="callout-doc">
+        <strong>Accent budget.</strong> Ripple blue appears at most twice per screen — typically one chip plus one primary CTA. Stress colors are semantic: they encode a level, never decorate.
+      </div>
+    </section>
+
+    <!-- ═══ 02 Typography ═══════════════════════════════════════ -->
+    <section class="doc-section" id="typography" data-od-id="sec-type">
+      <p class="doc-eyebrow">02 · Foundations</p>
+      <h2>Typography</h2>
+      <p class="doc-lede">Three SF Pro families do all the work: <strong>Display</strong> for headlines, <strong>Text</strong> for body, <strong>Rounded</strong> reserved for character moments and big numbers (the otter speaks in rounded numerals). SF Mono carries tracked-uppercase metadata and tabular numerics. Letter-spacing is negative on display sizes (tightens big type), positive on uppercase meta (prevents counters from colliding).</p>
+
+      <div class="specimen">
+        <div class="specimen-row">
+          <div class="specimen-meta">Large title<strong>--fs-large-title · 34px</strong></div>
+          <div style="font-family:var(--font-display);font-size:34px;font-weight:700;letter-spacing:-0.022em;line-height:1.1;color:var(--fg);">What helps right now</div>
+        </div>
+        <div class="specimen-row">
+          <div class="specimen-meta">Title 1<strong>--fs-title1 · 28px</strong></div>
+          <div style="font-family:var(--font-display);font-size:28px;font-weight:700;letter-spacing:-0.02em;line-height:1.12;color:var(--fg);">Biological age</div>
+        </div>
+        <div class="specimen-row">
+          <div class="specimen-meta">Title 2<strong>--fs-title2 · 22px</strong></div>
+          <div style="font-family:var(--font-display);font-size:22px;font-weight:700;letter-spacing:-0.018em;line-height:1.15;color:var(--fg);">Today's measurements</div>
+        </div>
+        <div class="specimen-row">
+          <div class="specimen-meta">Title 3<strong>--fs-title3 · 20px</strong></div>
+          <div style="font-family:var(--font-display);font-size:20px;font-weight:600;letter-spacing:-0.012em;line-height:1.2;color:var(--fg);">Stress trends</div>
+        </div>
+        <div class="specimen-row">
+          <div class="specimen-meta">Headline<strong>--fs-headline · 17px</strong></div>
+          <div style="font-size:17px;font-weight:600;line-height:1.3;letter-spacing:-0.01em;color:var(--fg);">Your week was 18% calmer</div>
+        </div>
+        <div class="specimen-row">
+          <div class="specimen-meta">Body<strong>--fs-body · 17px</strong></div>
+          <div style="font-size:17px;line-height:1.45;color:var(--fg);">HRV held at 52 ms all morning — your highest all week.</div>
+        </div>
+        <div class="specimen-row">
+          <div class="specimen-meta">Subhead<strong>--fs-subhead · 15px</strong></div>
+          <div style="font-size:15px;line-height:1.4;color:var(--fg-secondary);">Before your 3 PM stand-up, two minutes of box breath.</div>
+        </div>
+        <div class="specimen-row">
+          <div class="specimen-meta">Footnote<strong>--fs-footnote · 13px</strong></div>
+          <div style="font-size:13px;color:var(--muted);line-height:1.35;">Cancel anytime · Family Sharing supported</div>
+        </div>
+        <div class="specimen-row">
+          <div class="specimen-meta">Meta · mono<strong>uppercase · 11px · 0.08em</strong></div>
+          <div class="meta">Tuesday · April 22</div>
+        </div>
+        <div class="specimen-row">
+          <div class="specimen-meta">Rounded<strong>--font-rounded · character moments</strong></div>
+          <div style="font-family:var(--font-rounded);font-size:32px;font-weight:600;letter-spacing:-0.02em;color:var(--accent-strong);">42 · Mild</div>
+        </div>
+        <div class="specimen-row">
+          <div class="specimen-meta">Mono · numeric<strong>tabular-nums · --font-mono</strong></div>
+          <div class="num" style="font-size:17px;color:var(--fg);">52 ms · 68 bpm · 14 / min</div>
+        </div>
+      </div>
+
+      <div class="callout-doc">
+        <strong>Letter-spacing contract.</strong> Display 32px+ gets <code>−0.02em</code> to <code>−0.028em</code>. Uppercase meta gets <code>+0.06em</code> to <code>+0.1em</code>. Skipping either is the most reliable AI-slop tell.
+      </div>
+    </section>
+
+    <!-- ═══ 03 Spacing ══════════════════════════════════════════ -->
+    <section class="doc-section" id="spacing" data-od-id="sec-spacing">
+      <p class="doc-eyebrow">03 · Foundations</p>
+      <h2>Spacing &amp; radii</h2>
+      <p class="doc-lede">The 20px content gutter (iOS standard) anchors every screen. Cards stack with 16px gaps. Grouped lists indent their margins by 16px from the screen edge. Hairline separators are 0.5px — Apple's UIScreen-accurate pixel weight — never 1px.</p>
+
+      <div class="demo">
+        <p class="demo-label">Spacing scale</p>
+        <div class="demo-stack">
+          <div style="display:grid;grid-template-columns:100px 1fr;gap:20px;align-items:center;">
+            <div class="meta">4 xs</div><div style="height:4px;background:var(--accent);border-radius:2px;width:4px;"></div>
+          </div>
+          <div style="display:grid;grid-template-columns:100px 1fr;gap:20px;align-items:center;">
+            <div class="meta">8 sm</div><div style="height:8px;background:var(--accent);border-radius:2px;width:8px;"></div>
+          </div>
+          <div style="display:grid;grid-template-columns:100px 1fr;gap:20px;align-items:center;">
+            <div class="meta">12 md</div><div style="height:12px;background:var(--accent);border-radius:2px;width:12px;"></div>
+          </div>
+          <div style="display:grid;grid-template-columns:100px 1fr;gap:20px;align-items:center;">
+            <div class="meta">16 lg · card stack</div><div style="height:16px;background:var(--accent);border-radius:2px;width:16px;"></div>
+          </div>
+          <div style="display:grid;grid-template-columns:100px 1fr;gap:20px;align-items:center;">
+            <div class="meta">20 xl · content pad</div><div style="height:20px;background:var(--accent);border-radius:2px;width:20px;"></div>
+          </div>
+          <div style="display:grid;grid-template-columns:100px 1fr;gap:20px;align-items:center;">
+            <div class="meta">24 2xl</div><div style="height:24px;background:var(--accent);border-radius:2px;width:24px;"></div>
+          </div>
+          <div style="display:grid;grid-template-columns:100px 1fr;gap:20px;align-items:center;">
+            <div class="meta">32 3xl · section</div><div style="height:32px;background:var(--accent);border-radius:2px;width:32px;"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="demo">
+        <p class="demo-label">Radii</p>
+        <div class="demo-row">
+          <div style="text-align:center;">
+            <div style="width:80px;height:80px;background:var(--accent);border-radius:12px;margin:0 auto 8px;"></div>
+            <div class="meta">12 control</div>
+          </div>
+          <div style="text-align:center;">
+            <div style="width:80px;height:80px;background:var(--accent);border-radius:14px;margin:0 auto 8px;"></div>
+            <div class="meta">14 button</div>
+          </div>
+          <div style="text-align:center;">
+            <div style="width:80px;height:80px;background:var(--accent);border-radius:18px;margin:0 auto 8px;"></div>
+            <div class="meta">18 card</div>
+          </div>
+          <div style="text-align:center;">
+            <div style="width:80px;height:80px;background:var(--accent);border-radius:22px;margin:0 auto 8px;"></div>
+            <div class="meta">22 card-lg</div>
+          </div>
+          <div style="text-align:center;">
+            <div style="width:80px;height:80px;background:var(--accent);border-radius:50%;margin:0 auto 8px;"></div>
+            <div class="meta">pill</div>
+          </div>
+          <div style="text-align:center;">
+            <div style="width:80px;height:80px;background:var(--fg);border-radius:56px;margin:0 auto 8px;"></div>
+            <div class="meta">56 device</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="demo">
+        <p class="demo-label">Grids</p>
+        <div class="demo-row">
+          <div style="flex:1;min-width:200px;">
+            <div class="grid-2" style="background:var(--bg);padding:10px;border-radius:10px;">
+              <div style="height:48px;background:var(--accent-soft);border-radius:8px;"></div>
+              <div style="height:48px;background:var(--accent-soft);border-radius:8px;"></div>
+            </div>
+            <div class="meta" style="margin-top:8px;">grid-2 · vitals pair</div>
+          </div>
+          <div style="flex:1;min-width:200px;">
+            <div class="grid-3" style="background:var(--bg);padding:10px;border-radius:10px;">
+              <div style="height:48px;background:var(--accent-soft);border-radius:8px;"></div>
+              <div style="height:48px;background:var(--accent-soft);border-radius:8px;"></div>
+              <div style="height:48px;background:var(--accent-soft);border-radius:8px;"></div>
+            </div>
+            <div class="meta" style="margin-top:8px;">grid-3 · vitals triplet</div>
+          </div>
+          <div style="flex:1;min-width:200px;">
+            <div class="grid-4" style="background:var(--bg);padding:10px;border-radius:10px;">
+              <div style="height:48px;background:var(--accent-soft);border-radius:8px;"></div>
+              <div style="height:48px;background:var(--accent-soft);border-radius:8px;"></div>
+              <div style="height:48px;background:var(--accent-soft);border-radius:8px;"></div>
+              <div style="height:48px;background:var(--accent-soft);border-radius:8px;"></div>
+            </div>
+            <div class="meta" style="margin-top:8px;">grid-4 · week dots</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ 04 Frame ════════════════════════════════════════════ -->
+    <section class="doc-section" id="frame" data-od-id="sec-frame">
+      <p class="doc-eyebrow">04 · Scaffold</p>
+      <h2>iPhone frame</h2>
+      <p class="doc-lede">Every screen ships inside the same iPhone 14 Pro frame — 393 × 852pt, Dynamic Island, side-button rails, real SVG status-bar glyphs (signal/wifi/battery), and a home indicator. The frame is presentation chrome: it must stay pixel-identical across all 25 screens so a reviewer can diff layout without diffing chrome.</p>
+
+      <div class="demo demo-tinted">
+        <div class="demo-row" style="align-items:flex-start;gap:32px;">
+          <!-- Mini frame: status + content + tab + home -->
+          <div class="mini-frame">
+            <div class="mini-status">
+              <span>9:41</span>
+              <span class="right">
+                <svg viewBox="0 0 18 10"><rect x="0" y="6" width="2" height="4" rx="0.4"/><rect x="3" y="4" width="2" height="6" rx="0.4"/><rect x="6" y="2" width="2" height="8" rx="0.4"/><rect x="9" y="0" width="2" height="10" rx="0.4"/></svg>
+                <svg viewBox="0 0 16 11"><path d="M8 2C5 2 2.5 3 0.5 5L2 6.5C3.5 5 5.5 4 8 4s4.5 1 6 2.5L15.5 5C13.5 3 11 2 8 2zm0 4C6 6 4.5 7 3 8l1.5 1.5C5.5 8.5 6.5 8 8 8s2.5 0.5 3.5 1.5L13 8C11.5 7 10 6 8 6zm0 3.5a1 1 0 100 2 1 1 0 000-2z"/></svg>
+                <svg viewBox="0 0 25 11"><rect x="0.5" y="0.5" width="22" height="10" rx="2.5" fill="none" stroke="currentColor" stroke-opacity="0.4"/><rect x="2" y="2" width="17" height="7" rx="1.5"/><rect x="23" y="3.5" width="1.5" height="4" rx="0.5" fill="currentColor" fill-opacity="0.4"/></svg>
+              </span>
+            </div>
+            <div class="mini-content">
+              <div style="font-family:var(--font-display);font-size:22px;font-weight:700;letter-spacing:-0.02em;color:var(--fg);line-height:1.1;margin-bottom:6px;">Tuesday<br/>April 22</div>
+              <div class="meta" style="margin-bottom:18px;">9:41 am · cupertino</div>
+              <div style="background:var(--surface);border-radius:14px;padding:14px;border:0.5px solid rgba(0,122,255,0.18);">
+                <div style="display:flex;align-items:center;gap:10px;">
+                  <div style="width:14px;height:88px;background:rgba(60,60,67,0.08);border-radius:7px;position:relative;overflow:hidden;flex:0 0 14px;">
+                    <div style="position:absolute;left:0;right:0;bottom:0;height:42%;background:linear-gradient(to top,var(--stress-relaxed),var(--stress-mild),var(--stress-moderate));border-radius:7px;"></div>
+                  </div>
+                  <div style="flex:1;">
+                    <div class="meta" style="font-size:9px;">Mild · 42</div>
+                    <div style="font-family:var(--font-rounded);font-size:24px;font-weight:600;color:var(--accent-strong);letter-spacing:-0.02em;">42</div>
+                    <div style="font-size:10px;color:var(--muted);">out of 100</div>
+                  </div>
+                </div>
+              </div>
+              <div style="margin-top:12px;background:var(--surface);border-radius:12px;padding:12px;font-size:11px;color:var(--fg-secondary);line-height:1.4;">
+                <strong style="color:var(--accent-strong);">Ripple.</strong> HRV held at 52 ms all morning — your highest all week.
+              </div>
+            </div>
+            <div style="display:grid;grid-template-columns:repeat(4,1fr);border-top:0.5px solid var(--separator);background:color-mix(in srgb,var(--surface) 88%,transparent);">
+              <div style="display:flex;flex-direction:column;align-items:center;padding:6px 2px;color:var(--accent-strong);font-size:8px;font-weight:500;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 3l9 7v11h-6v-7H9v7H3V10z"/></svg>
+                Home
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:center;padding:6px 2px;color:var(--muted-2);font-size:8px;font-weight:500;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>
+                Action
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:center;padding:6px 2px;color:var(--muted-2);font-size:8px;font-weight:500;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="3" y="13" width="4" height="7" rx="1"/><rect x="9" y="9" width="4" height="11" rx="1"/><rect x="15" y="6" width="4" height="14" rx="1"/></svg>
+                Trends
+              </div>
+              <div style="display:flex;flex-direction:column;align-items:center;padding:6px 2px;color:var(--muted-2);font-size:8px;font-weight:500;">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M5 19l2-2M17 7l2-2"/></svg>
+                Settings
+              </div>
+            </div>
+            <div class="mini-home"></div>
+          </div>
+
+          <div style="flex:1;min-width:280px;">
+            <p class="demo-label">Anatomy</p>
+            <div class="demo-stack">
+              <div style="display:grid;grid-template-columns:24px 1fr;gap:14px;align-items:start;">
+                <span class="num" style="font-size:13px;color:var(--accent-strong);">01</span>
+                <div><strong style="font-size:14px;color:var(--fg);">Dynamic Island</strong><div class="footnote-doc" style="margin-top:2px;">125 × 36 pill, 22px from top, z-index 5 above status bar.</div></div>
+              </div>
+              <div style="display:grid;grid-template-columns:24px 1fr;gap:14px;align-items:start;">
+                <span class="num" style="font-size:13px;color:var(--accent-strong);">02</span>
+                <div><strong style="font-size:14px;color:var(--fg);">Status bar</strong><div class="footnote-doc" style="margin-top:2px;">54px tall. Real SVG glyphs for signal / wifi / battery — never text or emoji.</div></div>
+              </div>
+              <div style="display:grid;grid-template-columns:24px 1fr;gap:14px;align-items:start;">
+                <span class="num" style="font-size:13px;color:var(--accent-strong);">03</span>
+                <div><strong style="font-size:14px;color:var(--fg);">Content</strong><div class="footnote-doc" style="margin-top:2px;">flex 1, scrollable. 20px horizontal gutter. Hides its scrollbar.</div></div>
+              </div>
+              <div style="display:grid;grid-template-columns:24px 1fr;gap:14px;align-items:start;">
+                <span class="num" style="font-size:13px;color:var(--accent-strong);">04</span>
+                <div><strong style="font-size:14px;color:var(--fg);">Tab bar</strong><div class="footnote-doc" style="margin-top:2px;">49px tall, frosted 20px blur · 180% sat. 4 tabs, hairline top border.</div></div>
+              </div>
+              <div style="display:grid;grid-template-columns:24px 1fr;gap:14px;align-items:start;">
+                <span class="num" style="font-size:13px;color:var(--accent-strong);">05</span>
+                <div><strong style="font-size:14px;color:var(--fg);">Home indicator</strong><div class="footnote-doc" style="margin-top:2px;">28px tall, 134 × 5 bar, 0.85 opacity, flips white on dark screens.</div></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ 05 Navigation ═══════════════════════════════════════ -->
+    <section class="doc-section" id="navigation" data-od-id="sec-nav">
+      <p class="doc-eyebrow">05 · Scaffold</p>
+      <h2>Navigation</h2>
+      <p class="doc-lede">Two navigation archetypes. <strong>Tab roots</strong> (Home, Action, Trends, Settings) use a large title header with optional eyebrow. <strong>Pushed screens</strong> use an inline nav row — back chevron on the left, centered title, optional trailing action. Sheets and modals add a grabber and lead with an inline title.</p>
+
+      <div class="demo">
+        <p class="demo-label">Large title header (tab roots)</p>
+        <div class="large-header" style="padding:8px 0 12px;">
+          <div class="eyebrow">Tab 3 · This week</div>
+          <h1>Trends</h1>
+        </div>
+      </div>
+
+      <div class="demo">
+        <p class="demo-label">Inline nav (pushed screens)</p>
+        <div class="nav" style="background:var(--surface);border-radius:10px;">
+          <button class="nav-btn" aria-label="Back">
+            <svg viewBox="0 0 12 20"><path d="M10 2L2 10l8 8"/></svg>
+          </button>
+          <span class="nav-title">Measurement detail</span>
+          <button class="nav-action">Share</button>
+        </div>
+      </div>
+
+      <div class="demo">
+        <p class="demo-label">Section head (inside content)</p>
+        <div class="section-head" style="padding:16px 0 8px;">
+          <h2>Today's measurements</h2>
+          <span class="meta">3 logged</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ 06 Tab bar ══════════════════════════════════════════ -->
+    <section class="doc-section" id="tabbar" data-od-id="sec-tabbar">
+      <p class="doc-eyebrow">06 · Scaffold</p>
+      <h2>Tab bar</h2>
+      <p class="doc-lede">Four roots, never more. Inactive tabs render a thin outline glyph in muted gray; the active tab fills the glyph in accent-strong and tints its label. Icons follow the SF Symbol <code>.fill</code> convention: every tab must ship a <code>.fill-active</code> variant that swaps to a solid silhouette on selection.</p>
+
+      <div class="demo">
+        <p class="demo-label">4-tab bar · all states</p>
+        <div class="tabbar" style="--tabs:4;border-radius:14px;border:0.5px solid var(--separator);">
+          <a class="tab active" href="#" onclick="return false;">
+            <svg class="fill-active" viewBox="0 0 24 24"><path d="M12 3l9 7v11h-6v-7H9v7H3V10z"/></svg>
+            Home
+          </a>
+          <a class="tab" href="#" onclick="return false;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg>
+            Action
+          </a>
+          <a class="tab" href="#" onclick="return false;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="13" width="4" height="7" rx="1"/><rect x="9" y="9" width="4" height="11" rx="1"/><rect x="15" y="6" width="4" height="14" rx="1"/></svg>
+            Trends
+          </a>
+          <a class="tab" href="#" onclick="return false;">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M5 19l2-2M17 7l2-2"/></svg>
+            Settings
+          </a>
+        </div>
+        <p class="footnote-doc">SF Symbol lineage: house · plus.circle · chart.bar · gearshape. Stroke 1.7 inactive, fill on active.</p>
+      </div>
+    </section>
+
+    <!-- ═══ 07 Buttons ═════════════════════════════════════════ -->
+    <section class="doc-section" id="buttons" data-od-id="sec-buttons">
+      <p class="doc-eyebrow">07 · Components</p>
+      <h2>Buttons</h2>
+      <p class="doc-lede">Four button archetypes. <strong>Primary</strong> fills with Ripple blue and carries the screen's one decisive action. <strong>Secondary</strong> uses surface-2 with accent text for cancel/skip flows. <strong>Text</strong> is bare accent for inline links. <strong>Pill</strong> lives inside cards and lists for inline CTAs. Every button is at least 50px tall — above Apple's 44px tap target minimum.</p>
+
+      <div class="demo">
+        <p class="demo-label">Primary · secondary · text</p>
+        <div class="demo-stack" style="max-width:320px;">
+          <button class="btn-primary">Start 7-day free trial</button>
+          <button class="btn-primary fill-strong">Restore purchases</button>
+          <button class="btn-secondary">Maybe later</button>
+          <button class="btn-text" style="text-align:left;padding-left:0;">Restore purchases ›</button>
+        </div>
+      </div>
+
+      <div class="demo">
+        <p class="demo-label">Pill buttons (inline CTAs)</p>
+        <div class="demo-row">
+          <button class="btn-pill">Start Box Breath</button>
+          <button class="btn-pill">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            Begin
+          </button>
+          <button class="btn-pill" style="background:rgba(52,199,89,0.14);color:var(--success);">Resume walk</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ 08 Cards ═══════════════════════════════════════════ -->
+    <section class="doc-section" id="cards" data-od-id="sec-cards">
+      <p class="doc-eyebrow">08 · Components</p>
+      <h2>Cards &amp; lists</h2>
+      <p class="doc-lede">Two surfaces carry every layout. <strong>Card</strong> is a single 18px-radius tile for hero moments, insights, and character stages. <strong>Grouped list</strong> is the iOS Settings workhorse — 16px side margins, hairline-separated rows, 28px SF Symbol icon well on the left, value or chevron on the right.</p>
+
+      <div class="demo">
+        <p class="demo-label">Card variants</p>
+        <div class="demo-stack" style="max-width:380px;">
+          <div class="card">
+            <div class="meta" style="margin-bottom:6px;">Ripple insight</div>
+            <p class="body">HRV held at 52 ms all morning — your highest all week. Before your 3 PM stand-up, two minutes of box breath.</p>
+          </div>
+          <div class="card flat">
+            <p class="body">Flat variant — no background, hairline top. Used for stacked editorial rows.</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="demo">
+        <p class="demo-label">Grouped list (iOS Settings lineage)</p>
+        <div class="grouped" style="margin:0;">
+          <div class="grouped-row">
+            <span class="icon-sf" style="background:var(--accent);">
+              <svg viewBox="0 0 24 24"><path d="M12 21s-7-4.5-7-10a4 4 0 017-2.65A4 4 0 0119 11c0 5.5-7 10-7 10z"/></svg>
+            </span>
+            <span class="label">Active companion</span>
+            <span class="value">Ripple</span>
+          </div>
+          <div class="grouped-row">
+            <span class="icon-sf" style="background:var(--success);">
+              <svg viewBox="0 0 24 24"><path d="M3 12h4l2-7 4 14 2-7h6"/></svg>
+            </span>
+            <span class="label">Apple Health</span>
+            <span class="chev"><svg viewBox="0 0 8 14"><path d="M2 1l5 6-5 6" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          </div>
+          <div class="grouped-row">
+            <span class="icon-sf" style="background:var(--purple);">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+            </span>
+            <span class="label">Stress alerts</span>
+            <span class="toggle"><span class="ios-toggle on"></span></span>
+          </div>
+          <div class="grouped-row">
+            <span class="icon-sf" style="background:var(--gold);">
+              <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="4"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3M5 5l2 2M17 17l2 2M5 19l2-2M17 7l2-2"/></svg>
+            </span>
+            <span class="label">Sunlight today</span>
+            <span class="value">42 min · AUTO</span>
+          </div>
+        </div>
+        <p class="footnote-doc">Icon wells: 28×28, 7px radius, semantic SF Symbol background. Hairline separator 0.5px between rows.</p>
+      </div>
+    </section>
+
+    <!-- ═══ 09 Forms ═══════════════════════════════════════════ -->
+    <section class="doc-section" id="forms" data-od-id="sec-forms">
+      <p class="doc-eyebrow">09 · Components</p>
+      <h2>Forms, pills &amp; chips</h2>
+      <p class="doc-lede">iOS toggle is the canonical on/off — 51 × 31, success-green fill, 27px knob with 2px shadow. Stress-tier pills tint to their level. Source pills distinguish auto-captured (blue AUTO) from user-logged (gray LOG) data — a small semantic tag that solves a real disambiguation problem.</p>
+
+      <div class="demo">
+        <p class="demo-label">iOS toggle</p>
+        <div class="demo-row" style="gap:32px;">
+          <div style="text-align:center;">
+            <span class="ios-toggle"></span>
+            <div class="meta" style="margin-top:8px;">Off · #E9E9EA</div>
+          </div>
+          <div style="text-align:center;">
+            <span class="ios-toggle on"></span>
+            <div class="meta" style="margin-top:8px;">On · success</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="demo">
+        <p class="demo-label">Stress pills (semantic)</p>
+        <div class="demo-row">
+          <span class="pill stress-relaxed">Relaxed · 18</span>
+          <span class="pill stress-mild">Mild · 42</span>
+          <span class="pill stress-moderate">Moderate · 62</span>
+          <span class="pill stress-high">High · 78</span>
+          <span class="pill stress-severe">Severe · 95</span>
+        </div>
+      </div>
+
+      <div class="demo">
+        <p class="demo-label">Source pills (data provenance)</p>
+        <div class="demo-row">
+          <span class="pill" style="background:rgba(0,122,255,0.14);color:var(--stress-mild);">AUTO · Apple Health</span>
+          <span class="pill" style="background:var(--surface-2);color:var(--muted);border:0.5px solid var(--separator);">LOG · manual entry</span>
+          <span class="pill" style="background:rgba(52,199,89,0.14);color:var(--success);">AUTO · Daylight</span>
+        </div>
+      </div>
+
+      <div class="demo">
+        <p class="demo-label">Filter chips + tags</p>
+        <div class="demo-row">
+          <span class="chip active">7 days</span>
+          <span class="chip">30 days</span>
+          <span class="chip">Year</span>
+          <span style="width:1px;height:24px;background:var(--separator);"></span>
+          <span class="tag active">All</span>
+          <span class="tag">Mild</span>
+          <span class="tag">High</span>
+        </div>
+      </div>
+
+      <div class="demo">
+        <p class="demo-label">Mood check-in glyphs</p>
+        <div class="demo-row">
+          <span class="chip" style="color:var(--stress-relaxed);border-color:rgba(52,199,89,0.3);">◌ Relaxed</span>
+          <span class="chip" style="color:var(--stress-mild);border-color:rgba(0,122,255,0.3);">◎ Mild</span>
+          <span class="chip" style="color:#B59400;border-color:rgba(255,214,10,0.4);">◐ Moderate</span>
+          <span class="chip" style="color:var(--stress-high);border-color:rgba(255,149,0,0.3);">◑ High</span>
+          <span class="chip" style="color:var(--stress-severe);border-color:rgba(255,59,48,0.3);">● Severe</span>
+        </div>
+        <p class="footnote-doc">Unicode glyphs ◌ ◎ ◐ ◑ ● mirror the tide gauge fill vocabulary — same visual language across data and input.</p>
+      </div>
+
+      <div class="demo">
+        <p class="demo-label">Progress bar</p>
+        <div class="demo-stack">
+          <div class="progress"><span style="width:70%;"></span></div>
+          <div class="progress"><span style="width:42%;background:var(--stress-mild);"></span></div>
+          <div class="progress"><span style="width:88%;background:var(--success);"></span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ═══ 10 Stress primitives ═══════════════════════════════ -->
+    <section class="doc-section" id="stress" data-od-id="sec-stress">
+      <p class="doc-eyebrow">10 · Components</p>
+      <h2>Stress primitives</h2>
+      <p class="doc-lede">The vertical tide gauge is the app's signature data viz — an 18px-wide column with a multi-stop gradient fill (Relaxed → Mild → Moderate), a horizontal tick mark that points to the current score, and 25/50/75 scale ticks etched into the track. It reads as instrument, not decoration. The ring variant is reserved for the Measurement result screen.</p>
+
+      <div class="demo">
+        <p class="demo-label">Tide gauge · 5 states</p>
+        <div class="demo-row" style="gap:48px;">
+          <!-- 18 Relaxed -->
+          <div style="text-align:center;">
+            <div style="display:flex;align-items:flex-end;gap:14px;height:120px;">
+              <div class="tide-gauge" style="height:100px;">
+                <div class="fill" style="height:18%;background:var(--stress-relaxed);"></div>
+                <div class="tick" style="bottom:18%;"></div>
+              </div>
+              <div style="font-family:var(--font-rounded);font-size:32px;font-weight:600;color:var(--stress-relaxed);letter-spacing:-0.02em;line-height:1;">18</div>
+            </div>
+            <div class="meta" style="margin-top:12px;">Relaxed</div>
+          </div>
+          <!-- 42 Mild -->
+          <div style="text-align:center;">
+            <div style="display:flex;align-items:flex-end;gap:14px;height:120px;">
+              <div class="tide-gauge" style="height:100px;">
+                <div class="fill" style="height:42%;"></div>
+                <div class="tick" style="bottom:42%;"></div>
+              </div>
+              <div style="font-family:var(--font-rounded);font-size:32px;font-weight:600;color:var(--stress-mild);letter-spacing:-0.02em;line-height:1;">42</div>
+            </div>
+            <div class="meta" style="margin-top:12px;">Mild</div>
+          </div>
+          <!-- 62 Moderate -->
+          <div style="text-align:center;">
+            <div style="display:flex;align-items:flex-end;gap:14px;height:120px;">
+              <div class="tide-gauge" style="height:100px;">
+                <div class="fill" style="height:62%;"></div>
+                <div class="tick" style="bottom:62%;"></div>
+              </div>
+              <div style="font-family:var(--font-rounded);font-size:32px;font-weight:600;color:#B59400;letter-spacing:-0.02em;line-height:1;">62</div>
+            </div>
+            <div class="meta" style="margin-top:12px;">Moderate</div>
+          </div>
+          <!-- 78 High -->
+          <div style="text-align:center;">
+            <div style="display:flex;align-items:flex-end;gap:14px;height:120px;">
+              <div class="tide-gauge" style="height:100px;">
+                <div class="fill" style="height:78%;background:linear-gradient(to top,var(--stress-relaxed),var(--stress-mild),var(--stress-moderate),var(--stress-high));"></div>
+                <div class="tick" style="bottom:78%;"></div>
+              </div>
+              <div style="font-family:var(--font-rounded);font-size:32px;font-weight:600;color:var(--stress-high);letter-spacing:-0.02em;line-height:1;">78</div>
+            </div>
+            <div class="meta" style="margin-top:12px;">High</div>
+          </div>
+          <!-- 95 Severe -->
+          <div style="text-align:center;">
+            <div style="display:flex;align-items:flex-end;gap:14px;height:120px;">
+              <div class="tide-gauge" style="height:100px;">
+                <div class="fill" style="height:95%;background:linear-gradient(to top,var(--stress-relaxed),var(--stress-mild),var(--stress-moderate),var(--stress-high),var(--stress-severe));"></div>
+                <div class="tick" style="bottom:95%;"></div>
+              </div>
+              <div style="font-family:var(--font-rounded);font-size:32px;font-weight:600;color:var(--stress-severe);letter-spacing:-0.02em;line-height:1;">95</div>
+            </div>
+            <div class="meta" style="margin-top:12px;">Severe</div>
+          </div>
+        </div>
+        <p class="footnote-doc">Fill gradient extends as score climbs — the visual language literally fills with warmer hues as stress rises.</p>
+      </div>
+
+      <div class="demo">
+        <p class="demo-label">Ring (Measurement result only)</p>
+        <div class="demo-row">
+          <div class="ring-wrap" style="width:120px;height:120px;">
+            <svg width="120" height="120" viewBox="0 0 120 120">
+              <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(60,60,67,0.10)" stroke-width="10"/>
+              <circle cx="60" cy="60" r="50" fill="none" stroke="var(--stress-mild)" stroke-width="10" stroke-linecap="round" stroke-dasharray="314" stroke-dashoffset="182"/>
+            </svg>
+            <div class="ring-label">
+              <div>
+                <div style="font-family:var(--font-rounded);font-size:36px;font-weight:600;color:var(--stress-mild);letter-spacing:-0.02em;line-height:1;">42</div>
+                <div class="meta" style="text-align:center;margin-top:4px;">Mild</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="demo">
+        <p class="demo-label">Oval gauge · horizontal pill · 5 states</p>
+        <div class="demo-row" style="gap:48px;align-items:flex-start;flex-direction:column;flex-wrap:wrap;">
+          <!-- 18 Relaxed -->
+          <div style="display:flex;align-items:center;gap:16px;">
+            <div class="oval-gauge">
+              <div class="fill" style="width:18%;background:var(--stress-relaxed);"></div>
+              <div class="scale" style="left:25%;"></div>
+              <div class="scale" style="left:50%;"></div>
+              <div class="scale" style="left:75%;"></div>
+              <div class="tick" style="left:18%;"></div>
+            </div>
+            <div style="font-family:var(--font-rounded);font-size:28px;font-weight:600;color:var(--stress-relaxed);letter-spacing:-0.02em;line-height:1;min-width:42px;">18</div>
+            <div class="meta" style="min-width:68px;">Relaxed</div>
+          </div>
+          <!-- 42 Mild -->
+          <div style="display:flex;align-items:center;gap:16px;">
+            <div class="oval-gauge">
+              <div class="fill" style="width:42%;"></div>
+              <div class="scale" style="left:25%;"></div>
+              <div class="scale" style="left:50%;"></div>
+              <div class="scale" style="left:75%;"></div>
+              <div class="tick" style="left:42%;"></div>
+            </div>
+            <div style="font-family:var(--font-rounded);font-size:28px;font-weight:600;color:var(--stress-mild);letter-spacing:-0.02em;line-height:1;min-width:42px;">42</div>
+            <div class="meta" style="min-width:68px;">Mild</div>
+          </div>
+          <!-- 62 Moderate -->
+          <div style="display:flex;align-items:center;gap:16px;">
+            <div class="oval-gauge">
+              <div class="fill" style="width:62%;background:linear-gradient(to right,#34C759,#007AFF,#FFD60A);"></div>
+              <div class="scale" style="left:25%;"></div>
+              <div class="scale" style="left:50%;"></div>
+              <div class="scale" style="left:75%;"></div>
+              <div class="tick" style="left:62%;"></div>
+            </div>
+            <div style="font-family:var(--font-rounded);font-size:28px;font-weight:600;color:#B59400;letter-spacing:-0.02em;line-height:1;min-width:42px;">62</div>
+            <div class="meta" style="min-width:68px;">Moderate</div>
+          </div>
+          <!-- 78 High -->
+          <div style="display:flex;align-items:center;gap:16px;">
+            <div class="oval-gauge">
+              <div class="fill" style="width:78%;background:linear-gradient(to right,#34C759,#007AFF,#FFD60A,#FF9500);"></div>
+              <div class="scale" style="left:25%;"></div>
+              <div class="scale" style="left:50%;"></div>
+              <div class="scale" style="left:75%;"></div>
+              <div class="tick" style="left:78%;"></div>
+            </div>
+            <div style="font-family:var(--font-rounded);font-size:28px;font-weight:600;color:var(--stress-high);letter-spacing:-0.02em;line-height:1;min-width:42px;">78</div>
+            <div class="meta" style="min-width:68px;">High</div>
+          </div>
+          <!-- 95 Severe -->
+          <div style="display:flex;align-items:center;gap:16px;">
+            <div class="oval-gauge">
+              <div class="fill" style="width:95%;background:linear-gradient(to right,#34C759,#007AFF,#FFD60A,#FF9500,#FF3B30);"></div>
+              <div class="scale" style="left:25%;"></div>
+              <div class="scale" style="left:50%;"></div>
+              <div class="scale" style="left:75%;"></div>
+              <div class="tick" style="left:95%;"></div>
+            </div>
+            <div style="font-family:var(--font-rounded);font-size:28px;font-weight:600;color:var(--stress-severe);letter-spacing:-0.02em;line-height:1;min-width:42px;">95</div>
+            <div class="meta" style="min-width:68px;">Severe</div>
+          </div>
+        </div>
+        <p class="footnote-doc">Same fill/tick vocabulary as the tide gauge — but reads left-to-right instead of bottom-to-top. Better for horizontal cards where vertical space is tight.</p>
+      </div>
+
+      <div class="demo">
+        <p class="demo-label">Semicircle gauge · half-arc · 5 states</p>
+        <div class="demo-row" style="gap:48px;">
+          <!-- 18 Relaxed -->
+          <div style="text-align:center;">
+            <svg width="120" height="70" viewBox="0 0 140 75">
+              <!-- 180° semicircle track · r=55 · arc length = π·55 ≈ 172.78 -->
+              <path d="M 15 65 A 55 55 0 0 1 125 65" fill="none" stroke="rgba(60,60,67,0.10)" stroke-width="10" stroke-linecap="round"/>
+              <!-- Fill 18% · dashoffset = 172.78 × 0.82 = 141.68 -->
+              <path d="M 15 65 A 55 55 0 0 1 125 65" fill="none" stroke="#34C759" stroke-width="10" stroke-linecap="round" stroke-dasharray="172.78" stroke-dashoffset="141.68"/>
+            </svg>
+            <div style="font-family:var(--font-rounded);font-size:28px;font-weight:600;color:var(--stress-relaxed);letter-spacing:-0.02em;line-height:1;margin-top:-4px;">18</div>
+            <div class="meta" style="margin-top:6px;">Relaxed</div>
+          </div>
+          <!-- 42 Mild -->
+          <div style="text-align:center;">
+            <svg width="120" height="70" viewBox="0 0 140 75">
+              <path d="M 15 65 A 55 55 0 0 1 125 65" fill="none" stroke="rgba(60,60,67,0.10)" stroke-width="10" stroke-linecap="round"/>
+              <!-- Fill 42% · dashoffset = 172.78 × 0.58 = 100.21 -->
+              <path d="M 15 65 A 55 55 0 0 1 125 65" fill="none" stroke="#007AFF" stroke-width="10" stroke-linecap="round" stroke-dasharray="172.78" stroke-dashoffset="100.21"/>
+              <defs>
+                <linearGradient id="semi42" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0" stop-color="#34C759"/>
+                  <stop offset="1" stop-color="#007AFF"/>
+                </linearGradient>
+              </defs>
+            </svg>
+            <div style="font-family:var(--font-rounded);font-size:28px;font-weight:600;color:var(--stress-mild);letter-spacing:-0.02em;line-height:1;margin-top:-4px;">42</div>
+            <div class="meta" style="margin-top:6px;">Mild</div>
+          </div>
+          <!-- 62 Moderate -->
+          <div style="text-align:center;">
+            <svg width="120" height="70" viewBox="0 0 140 75">
+              <path d="M 15 65 A 55 55 0 0 1 125 65" fill="none" stroke="rgba(60,60,67,0.10)" stroke-width="10" stroke-linecap="round"/>
+              <!-- Fill 62% · dashoffset = 172.78 × 0.38 = 65.66 -->
+              <defs>
+                <linearGradient id="semi62" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0" stop-color="#34C759"/>
+                  <stop offset="0.5" stop-color="#007AFF"/>
+                  <stop offset="1" stop-color="#FFD60A"/>
+                </linearGradient>
+              </defs>
+              <path d="M 15 65 A 55 55 0 0 1 125 65" fill="none" stroke="url(#semi62)" stroke-width="10" stroke-linecap="round" stroke-dasharray="172.78" stroke-dashoffset="65.66"/>
+            </svg>
+            <div style="font-family:var(--font-rounded);font-size:28px;font-weight:600;color:#B59400;letter-spacing:-0.02em;line-height:1;margin-top:-4px;">62</div>
+            <div class="meta" style="margin-top:6px;">Moderate</div>
+          </div>
+          <!-- 78 High -->
+          <div style="text-align:center;">
+            <svg width="120" height="70" viewBox="0 0 140 75">
+              <path d="M 15 65 A 55 55 0 0 1 125 65" fill="none" stroke="rgba(60,60,67,0.10)" stroke-width="10" stroke-linecap="round"/>
+              <!-- Fill 78% · dashoffset = 172.78 × 0.22 = 38.01 -->
+              <defs>
+                <linearGradient id="semi78" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0" stop-color="#34C759"/>
+                  <stop offset="0.33" stop-color="#007AFF"/>
+                  <stop offset="0.66" stop-color="#FFD60A"/>
+                  <stop offset="1" stop-color="#FF9500"/>
+                </linearGradient>
+              </defs>
+              <path d="M 15 65 A 55 55 0 0 1 125 65" fill="none" stroke="url(#semi78)" stroke-width="10" stroke-linecap="round" stroke-dasharray="172.78" stroke-dashoffset="38.01"/>
+            </svg>
+            <div style="font-family:var(--font-rounded);font-size:28px;font-weight:600;color:var(--stress-high);letter-spacing:-0.02em;line-height:1;margin-top:-4px;">78</div>
+            <div class="meta" style="margin-top:6px;">High</div>
+          </div>
+          <!-- 95 Severe -->
+          <div style="text-align:center;">
+            <svg width="120" height="70" viewBox="0 0 140 75">
+              <path d="M 15 65 A 55 55 0 0 1 125 65" fill="none" stroke="rgba(60,60,67,0.10)" stroke-width="10" stroke-linecap="round"/>
+              <!-- Fill 95% · dashoffset = 172.78 × 0.05 = 8.64 -->
+              <defs>
+                <linearGradient id="semi95" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0" stop-color="#34C759"/>
+                  <stop offset="0.25" stop-color="#007AFF"/>
+                  <stop offset="0.5" stop-color="#FFD60A"/>
+                  <stop offset="0.75" stop-color="#FF9500"/>
+                  <stop offset="1" stop-color="#FF3B30"/>
+                </linearGradient>
+              </defs>
+              <path d="M 15 65 A 55 55 0 0 1 125 65" fill="none" stroke="url(#semi95)" stroke-width="10" stroke-linecap="round" stroke-dasharray="172.78" stroke-dashoffset="8.64"/>
+            </svg>
+            <div style="font-family:var(--font-rounded);font-size:28px;font-weight:600;color:var(--stress-severe);letter-spacing:-0.02em;line-height:1;margin-top:-4px;">95</div>
+            <div class="meta" style="margin-top:6px;">Severe</div>
+          </div>
+        </div>
+        <p class="footnote-doc">180° arc, r=55. Sweep-flag=1 yields the ⌒ (rainbow) shape — open at the bottom where the numeric label lives. Same multi-stop gradient logic: more of the spectrum shows as the score climbs.</p>
+      </div>
+    </section>
+
+    <!-- ═══ 11 Characters ═══════════════════════════════════════ -->
+    <section class="doc-section" id="characters" data-od-id="sec-characters">
+      <p class="doc-eyebrow">11 · Components</p>
+      <h2>Companion characters</h2>
+      <p class="doc-lede">Five elemental companions, each with a 30-shape SVG illustration library, three evolution stages, and five stress-state expressions. Two free (Ripple, Blossom), two Plus (Ember, Zephyr), one streak-unlock at 30 days (Lumi). All shapes are inline SVG — never external images, never emoji.</p>
+
+      <div class="demo demo-tinted">
+        <p class="demo-label">The five · mini roster</p>
+        <div class="demo-row" style="gap:28px;align-items:flex-end;">
+
+          <!-- Ripple · Water Otter -->
+          <div style="text-align:center;">
+            <div style="width:84px;height:84px;background:radial-gradient(circle at 50% 40%, rgba(79,195,247,0.18), transparent 70%);border-radius:20px;display:grid;place-items:center;">
+              <svg width="60" height="60" viewBox="0 0 100 100">
+                <!-- Ripple · Water Otter (free) · serene face -->
+                <ellipse cx="50" cy="92" rx="32" ry="3" fill="#0288D1" opacity="0.18"/>
+                <ellipse cx="38" cy="86" rx="6" ry="3" fill="#4FC3F7"/>
+                <ellipse cx="62" cy="86" rx="6" ry="3" fill="#4FC3F7"/>
+                <ellipse cx="50" cy="58" rx="22" ry="20" fill="#4FC3F7"/>
+                <ellipse cx="50" cy="58" rx="22" ry="20" fill="url(#rg1)" opacity="0.4"/>
+                <ellipse cx="50" cy="34" rx="18" ry="16" fill="#4FC3F7"/>
+                <ellipse cx="38" cy="26" rx="6" ry="8" fill="#4FC3F7"/>
+                <ellipse cx="62" cy="26" rx="6" ry="8" fill="#4FC3F7"/>
+                <ellipse cx="38" cy="28" rx="3" ry="4" fill="#0288D1" opacity="0.4"/>
+                <ellipse cx="62" cy="28" rx="3" ry="4" fill="#0288D1" opacity="0.4"/>
+                <ellipse cx="50" cy="38" rx="12" ry="9" fill="#E1F5FE"/>
+                <circle cx="44" cy="34" r="2.2" fill="#0A1929"/>
+                <circle cx="56" cy="34" r="2.2" fill="#0A1929"/>
+                <ellipse cx="50" cy="42" rx="1.5" ry="1" fill="#0A1929"/>
+                <path d="M46 45 Q50 48 54 45" stroke="#0A1929" stroke-width="1" fill="none" stroke-linecap="round"/>
+                <circle cx="50" cy="62" r="3.5" fill="#0288D1"/>
+                <defs><radialGradient id="rg1" cx="50%" cy="30%" r="60%"><stop offset="0" stop-color="#fff" stop-opacity="0.5"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient></defs>
+              </svg>
+            </div>
+            <div style="font-family:var(--font-rounded);font-size:13px;font-weight:600;color:var(--ripple);margin-top:8px;">Ripple</div>
+            <div class="footnote-doc" style="margin-top:2px;">Water Otter · Free</div>
+          </div>
+
+          <!-- Blossom · Forest Sprite -->
+          <div style="text-align:center;">
+            <div style="width:84px;height:84px;background:radial-gradient(circle at 50% 40%, rgba(165,214,167,0.32), transparent 70%);border-radius:20px;display:grid;place-items:center;">
+              <svg width="60" height="60" viewBox="0 0 100 100">
+                <!-- Blossom · Forest Sprite (free) -->
+                <ellipse cx="50" cy="92" rx="30" ry="3" fill="#388E3C" opacity="0.2"/>
+                <ellipse cx="50" cy="58" rx="22" ry="20" fill="#A5D6A7"/>
+                <ellipse cx="50" cy="34" rx="17" ry="15" fill="#C8E6C9"/>
+                <path d="M50 14 Q44 6 38 12 Q42 18 50 18 Q58 18 62 12 Q56 6 50 14z" fill="#66BB6A"/>
+                <ellipse cx="42" cy="30" rx="6" ry="7" fill="#C8E6C9"/>
+                <ellipse cx="58" cy="30" rx="6" ry="7" fill="#C8E6C9"/>
+                <ellipse cx="42" cy="32" rx="3" ry="4" fill="#81C784" opacity="0.6"/>
+                <ellipse cx="58" cy="32" rx="3" ry="4" fill="#81C784" opacity="0.6"/>
+                <circle cx="44" cy="34" r="2" fill="#1B5E20"/>
+                <circle cx="56" cy="34" r="2" fill="#1B5E20"/>
+                <path d="M48 41 Q50 43 52 41" stroke="#1B5E20" stroke-width="1" fill="none" stroke-linecap="round"/>
+                <circle cx="40" cy="40" r="1.5" fill="#E91E63" opacity="0.4"/>
+                <circle cx="60" cy="40" r="1.5" fill="#E91E63" opacity="0.4"/>
+              </svg>
+            </div>
+            <div style="font-family:var(--font-rounded);font-size:13px;font-weight:600;color:#4CAF50;margin-top:8px;">Blossom</div>
+            <div class="footnote-doc" style="margin-top:2px;">Forest Sprite · Free</div>
+          </div>
+
+          <!-- Ember · Flame Fox -->
+          <div style="text-align:center;">
+            <div style="width:84px;height:84px;background:radial-gradient(circle at 50% 40%, rgba(255,171,145,0.32), transparent 70%);border-radius:20px;display:grid;place-items:center;">
+              <svg width="60" height="60" viewBox="0 0 100 100">
+                <!-- Ember · Flame Fox (premium) -->
+                <path d="M50 8 Q42 22 44 36 Q36 32 34 22 Q32 38 38 48 Q28 44 28 32 Q24 48 32 60 Q24 60 22 52 Q22 72 38 80 Q50 88 62 80 Q78 72 78 52 Q76 60 68 60 Q76 48 72 32 Q72 44 62 48 Q68 38 66 22 Q64 32 56 36 Q58 22 50 8z" fill="#FFAB91"/>
+                <path d="M50 18 Q44 30 46 42 Q40 40 38 32 Q36 44 42 52 Q50 56 58 52 Q64 44 62 32 Q60 40 54 42 Q56 30 50 18z" fill="#FF7043" opacity="0.7"/>
+                <ellipse cx="50" cy="58" rx="18" ry="16" fill="#FFCCBC"/>
+                <path d="M36 38 L30 26 L40 36z" fill="#FF7043"/>
+                <path d="M64 38 L70 26 L60 36z" fill="#FF7043"/>
+                <circle cx="43" cy="55" r="2" fill="#BF360C"/>
+                <circle cx="57" cy="55" r="2" fill="#BF360C"/>
+                <ellipse cx="50" cy="62" rx="1.5" ry="1" fill="#BF360C"/>
+                <path d="M46 65 Q50 68 54 65" stroke="#BF360C" stroke-width="1" fill="none" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div style="font-family:var(--font-rounded);font-size:13px;font-weight:600;color:#FF7043;margin-top:8px;">Ember</div>
+            <div class="footnote-doc" style="margin-top:2px;">Flame Fox · Plus</div>
+          </div>
+
+          <!-- Zephyr · Wind Wisp -->
+          <div style="text-align:center;">
+            <div style="width:84px;height:84px;background:radial-gradient(circle at 50% 40%, rgba(209,196,233,0.5), transparent 70%);border-radius:20px;display:grid;place-items:center;">
+              <svg width="60" height="60" viewBox="0 0 100 100">
+                <!-- Zephyr · Wind Wisp (premium) · cloud rabbit -->
+                <ellipse cx="50" cy="92" rx="30" ry="3" fill="#5E35B1" opacity="0.15"/>
+                <ellipse cx="36" cy="22" rx="5" ry="14" fill="#D1C4E9"/>
+                <ellipse cx="64" cy="22" rx="5" ry="14" fill="#D1C4E9"/>
+                <ellipse cx="36" cy="24" rx="2.5" ry="9" fill="#B39DDB" opacity="0.6"/>
+                <ellipse cx="64" cy="24" rx="2.5" ry="9" fill="#B39DDB" opacity="0.6"/>
+                <ellipse cx="50" cy="58" rx="24" ry="22" fill="#EDE7F6"/>
+                <ellipse cx="50" cy="36" rx="16" ry="14" fill="#D1C4E9"/>
+                <path d="M28 60 Q22 58 22 64 Q22 68 28 66" stroke="#B39DDB" stroke-width="2" fill="none" stroke-linecap="round"/>
+                <path d="M72 60 Q78 58 78 64 Q78 68 72 66" stroke="#B39DDB" stroke-width="2" fill="none" stroke-linecap="round"/>
+                <circle cx="44" cy="34" r="2" fill="#311B92"/>
+                <circle cx="56" cy="34" r="2" fill="#311B92"/>
+                <ellipse cx="50" cy="40" rx="1.2" ry="0.8" fill="#311B92"/>
+                <path d="M47 43 Q50 45 53 43" stroke="#311B92" stroke-width="0.8" fill="none" stroke-linecap="round"/>
+                <circle cx="74" cy="78" r="6" fill="#D1C4E9"/>
+              </svg>
+            </div>
+            <div style="font-family:var(--font-rounded);font-size:13px;font-weight:600;color:#7E57C2;margin-top:8px;">Zephyr</div>
+            <div class="footnote-doc" style="margin-top:2px;">Wind Wisp · Plus</div>
+          </div>
+
+          <!-- Lumi · Star Pup (Owl) -->
+          <div style="text-align:center;">
+            <div style="width:84px;height:84px;background:radial-gradient(circle at 50% 40%, rgba(121,134,203,0.32), transparent 70%);border-radius:20px;display:grid;place-items:center;">
+              <svg width="60" height="60" viewBox="0 0 100 100">
+                <!-- Lumi · Star Pup (owl · 30-day streak) -->
+                <path d="M22 18 L24 22 L28 24 L24 26 L22 30 L20 26 L16 24 L20 22z" fill="#FE9901"/>
+                <path d="M78 18 L80 22 L84 24 L80 26 L78 30 L76 26 L72 24 L76 22z" fill="#FE9901"/>
+                <ellipse cx="50" cy="58" rx="22" ry="24" fill="#7986CB"/>
+                <ellipse cx="50" cy="40" rx="20" ry="18" fill="#9FA8DA"/>
+                <circle cx="42" cy="36" r="6" fill="#E8EAF6"/>
+                <circle cx="58" cy="36" r="6" fill="#E8EAF6"/>
+                <circle cx="42" cy="36" r="3.5" fill="#1A237E"/>
+                <circle cx="58" cy="36" r="3.5" fill="#1A237E"/>
+                <circle cx="43" cy="35" r="1" fill="#fff"/>
+                <circle cx="59" cy="35" r="1" fill="#fff"/>
+                <path d="M48 42 L50 46 L52 42z" fill="#FFD54F"/>
+                <circle cx="50" cy="62" r="3.5" fill="#FFD54F"/>
+                <path d="M50 58 L50 66 M46 62 L54 62" stroke="#FFD54F" stroke-width="1.2" stroke-linecap="round"/>
+              </svg>
+            </div>
+            <div style="font-family:var(--font-rounded);font-size:13px;font-weight:600;color:#5C6BC0;margin-top:8px;">Lumi</div>
+            <div class="footnote-doc" style="margin-top:2px;">Star Owl · 30-day</div>
+          </div>
+
+        </div>
+      </div>
+
+      <div class="callout-doc">
+        <strong>Unlock tiers.</strong> Ripple + Blossom are free from onboarding. Ember + Zephyr require StressMonitor Plus. Lumi unlocks at a 30-day streak — the only character earned through behavior, not purchase.
+      </div>
+    </section>
+
+    <!-- ═══ 12 Charts ═════════════════════════════════════════ -->
+    <section class="doc-section" id="charts" data-od-id="sec-charts">
+      <p class="doc-eyebrow">12 · Components</p>
+      <h2>Charts</h2>
+      <p class="doc-lede">Four chart archetypes carry every data story. <strong>Bars</strong> for daily stress over a week. <strong>Distribution stack</strong> for percentage of time spent in each tier. <strong>Calendar heatmap</strong> for monthly patterns — Apple Calendar lineage, circles not squares. <strong>HRV line</strong> with a dashed average reference and halo endpoint. All SVG, all hairline-grid, no chart library.</p>
+
+      <div class="demo">
+        <p class="demo-label">Daily stress bars · 7-day window</p>
+        <svg width="100%" height="140" viewBox="0 0 360 140" style="display:block;">
+          <!-- gridlines -->
+          <line x1="0" y1="20" x2="360" y2="20" stroke="rgba(60,60,67,0.08)"/>
+          <line x1="0" y1="55" x2="360" y2="55" stroke="rgba(60,60,67,0.08)"/>
+          <line x1="0" y1="90" x2="360" y2="90" stroke="rgba(60,60,67,0.08)"/>
+          <line x1="0" y1="125" x2="360" y2="125" stroke="rgba(60,60,67,0.18)"/>
+          <!-- bars: W T F S S M T -->
+          <rect x="14"  y="60"  width="32" height="65" rx="4" fill="var(--stress-mild)"/>
+          <rect x="62"  y="50"  width="32" height="75" rx="4" fill="var(--stress-mild)"/>
+          <rect x="110" y="70"  width="32" height="55" rx="4" fill="var(--stress-relaxed)" fill-opacity="0.85"/>
+          <rect x="158" y="32"  width="32" height="93" rx="4" fill="var(--stress-moderate)" fill-opacity="0.75"/>
+          <rect x="206" y="85"  width="32" height="40" rx="4" fill="var(--stress-relaxed)"/>
+          <rect x="254" y="95"  width="32" height="30" rx="4" fill="var(--stress-relaxed)"/>
+          <!-- today (Tue) outlined -->
+          <rect x="302" y="68" width="32" height="57" rx="4" fill="rgba(0,122,255,0.18)" stroke="var(--accent-strong)" stroke-width="1.5"/>
+          <text x="30"  y="138" text-anchor="middle" font-family="var(--font-mono)" font-size="9" fill="var(--muted)">W</text>
+          <text x="78"  y="138" text-anchor="middle" font-family="var(--font-mono)" font-size="9" fill="var(--muted)">T</text>
+          <text x="126" y="138" text-anchor="middle" font-family="var(--font-mono)" font-size="9" fill="var(--muted)">F</text>
+          <text x="174" y="138" text-anchor="middle" font-family="var(--font-mono)" font-size="9" fill="var(--muted)">S</text>
+          <text x="222" y="138" text-anchor="middle" font-family="var(--font-mono)" font-size="9" fill="var(--muted)">S</text>
+          <text x="270" y="138" text-anchor="middle" font-family="var(--font-mono)" font-size="9" fill="var(--muted)">M</text>
+          <text x="318" y="138" text-anchor="middle" font-family="var(--font-mono)" font-size="9" fill="var(--accent-strong)" font-weight="600">T</text>
+        </svg>
+      </div>
+
+      <div class="demo">
+        <p class="demo-label">Distribution stack · % time in tier</p>
+        <div style="height:36px;border-radius:8px;overflow:hidden;display:flex;">
+          <div style="width:29%;background:var(--stress-relaxed);"></div>
+          <div style="width:43%;background:var(--stress-mild);"></div>
+          <div style="width:28%;background:var(--stress-moderate);"></div>
+        </div>
+        <div class="demo-row" style="margin-top:10px;gap:18px;">
+          <span class="footnote-doc"><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:var(--stress-relaxed);margin-right:5px;vertical-align:middle;"></span>Relaxed · 29%</span>
+          <span class="footnote-doc"><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:var(--stress-mild);margin-right:5px;vertical-align:middle;"></span>Mild · 43%</span>
+          <span class="footnote-doc"><span style="display:inline-block;width:8px;height:8px;border-radius:2px;background:var(--stress-moderate);margin-right:5px;vertical-align:middle;"></span>Moderate · 28%</span>
+        </div>
+      </div>
+
+      <div class="demo">
+        <p class="demo-label">HRV trend · line with avg reference</p>
+        <svg width="100%" height="140" viewBox="0 0 360 140" style="display:block;">
+          <line x1="0" y1="60" x2="360" y2="60" stroke="var(--hrv-color)" stroke-dasharray="4 4" stroke-opacity="0.5"/>
+          <text x="356" y="56" text-anchor="end" font-family="var(--font-mono)" font-size="9" fill="var(--hrv-color)" fill-opacity="0.7">avg 52 ms</text>
+          <path d="M0 95 L60 80 L120 92 L180 70 L240 60 L300 50 L360 42 L360 140 L0 140z" fill="var(--hrv-color)" fill-opacity="0.12"/>
+          <path d="M0 95 L60 80 L120 92 L180 70 L240 60 L300 50 L360 42" stroke="var(--hrv-color)" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+          <circle cx="360" cy="42" r="6" fill="var(--hrv-color)" fill-opacity="0.25"/>
+          <circle cx="360" cy="42" r="3" fill="var(--hrv-color)"/>
+          <text x="350" y="32" text-anchor="end" font-family="var(--font-body)" font-size="11" font-weight="600" fill="var(--hrv-color)">today · 56 ms</text>
+        </svg>
+      </div>
+    </section>
+
+    <!-- ═══ 13 Surfaces ════════════════════════════════════════ -->
+    <section class="doc-section" id="surfaces" data-od-id="sec-surfaces">
+      <p class="doc-eyebrow">13 · Components</p>
+      <h2>Glass &amp; surfaces</h2>
+      <p class="doc-lede">Frosted glass surfaces follow iOS Control Center lineage — backdrop-filter blur (14–20px) paired with strong saturation (165–180%) so colors stay vivid through the frost. Used sparingly: the tab bar, the premium banner on Home, and modal sheets. Never decorative.</p>
+
+      <div class="demo demo-tinted" style="background:linear-gradient(135deg, var(--ember) 0%, var(--gold) 40%, var(--zephyr) 75%, var(--lumi) 100%);position:relative;overflow:hidden;padding:48px 28px;">
+        <p class="demo-label" style="color:#fff;opacity:0.8;">Premium banner · frost over character gradient</p>
+        <div style="background:rgba(255,255,255,0.17);backdrop-filter:blur(14px) saturate(165%);-webkit-backdrop-filter:blur(14px) saturate(165%);border-radius:18px;border:0.5px solid rgba(255,255,255,0.35);padding:18px;color:#fff;max-width:340px;">
+          <div style="font-family:var(--font-mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;opacity:0.85;margin-bottom:6px;">StressMonitor Plus</div>
+          <div style="font-family:var(--font-display);font-size:19px;font-weight:600;letter-spacing:-0.015em;line-height:1.2;margin-bottom:8px;">Meet your full companion team</div>
+          <div style="font-size:13px;line-height:1.4;opacity:0.92;">3 premium companions · 4-hour stress forecast · unlimited history.</div>
+          <div style="margin-top:10px;font-size:12px;font-weight:600;opacity:0.95;">Try 7 days free ›</div>
+        </div>
+      </div>
+
+      <div class="callout-doc">
+        <strong>Frost contract.</strong> Always pair blur with saturation ≥ 165%. Blur alone reads as muddy gray — saturation keeps the underlying color readable through the frost. iOS Control Center uses 30px blur + 180% saturation; we match that ratio at smaller sizes.
+      </div>
+    </section>
+
+    <!-- ═══ 14 Motion ══════════════════════════════════════════ -->
+    <section class="doc-section" id="motion" data-od-id="sec-motion">
+      <p class="doc-eyebrow">14 · Reference</p>
+      <h2>Motion</h2>
+      <p class="doc-lede">Motion is restrained and functional. Three timings are used throughout: <strong>150ms ease</strong> for color/state transitions on interactive elements, <strong>200ms ease</strong> for toggle knob travel and modal sheet entry, <strong>400–600ms ease</strong> for tide gauge fill and ring draw-on. All motion is suppressed under <code>prefers-reduced-motion: reduce</code>.</p>
+
+      <div class="demo">
+        <p class="demo-label">Reduced motion guarantee</p>
+        <p class="body" style="margin:0;">The CSS rule below is in <code>css/app.css</code>. It zeroes out every animation and transition duration when the OS reports reduced-motion preference. No component needs to opt-in.</p>
+        <pre style="background:var(--bg);border-radius:10px;padding:14px 16px;font-family:var(--font-mono);font-size:12px;color:var(--fg-secondary);margin:14px 0 0;overflow-x:auto;line-height:1.5;"><span style="color:var(--muted);">@media (prefers-reduced-motion: reduce) {</span>
+  *, *::before, *::after {
+    animation-duration: 0.01ms <span style="color:var(--danger);">!important</span>;
+    animation-iteration-count: 1 <span style="color:var(--danger);">!important</span>;
+    transition-duration: 0.01ms <span style="color:var(--danger);">!important</span>;
+  }
+<span style="color:var(--muted);">}</span></pre>
+      </div>
+    </section>
+
+    <!-- ═══ 15 Accessibility ═══════════════════════════════════ -->
+    <section class="doc-section" id="a11y" data-od-id="sec-a11y">
+      <p class="doc-eyebrow">15 · Reference</p>
+      <h2>Accessibility</h2>
+      <p class="doc-lede">Five invariants that cannot regress. Stress colors always pair with an icon or label — never color-only. Tap targets are 44px minimum, 50px for primary CTAs. Body copy stays above 14px. Every interactive surface exposes <code>data-od-id</code> for screen-reader and inspector tooling. The home indicator and status bar glyphs are real SVG, not text stand-ins.</p>
+
+      <div class="demo">
+        <p class="demo-label">Tap target audit · minimums</p>
+        <div class="demo-row" style="gap:24px;">
+          <div style="text-align:center;">
+            <div style="width:44px;height:44px;background:var(--accent-soft);border:0.5px solid var(--accent);border-radius:8px;display:grid;place-items:center;color:var(--accent-strong);font-family:var(--font-mono);font-size:11px;">44</div>
+            <div class="footnote-doc" style="margin-top:6px;">list row min</div>
+          </div>
+          <div style="text-align:center;">
+            <div style="width:49px;height:49px;background:var(--accent-soft);border:0.5px solid var(--accent);border-radius:8px;display:grid;place-items:center;color:var(--accent-strong);font-family:var(--font-mono);font-size:11px;">49</div>
+            <div class="footnote-doc" style="margin-top:6px;">tab bar</div>
+          </div>
+          <div style="text-align:center;">
+            <div style="width:50px;height:50px;background:var(--accent-soft);border:0.5px solid var(--accent);border-radius:10px;display:grid;place-items:center;color:var(--accent-strong);font-family:var(--font-mono);font-size:11px;">50</div>
+            <div class="footnote-doc" style="margin-top:6px;">primary CTA</div>
+          </div>
+          <div style="text-align:center;">
+            <div style="width:51px;height:31px;background:var(--accent-soft);border:0.5px solid var(--accent);border-radius:999px;display:grid;place-items:center;color:var(--accent-strong);font-family:var(--font-mono);font-size:10px;">51×31</div>
+            <div class="footnote-doc" style="margin-top:6px;">toggle</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout-doc">
+        <strong>Stress color contract.</strong> Every use of <code>--stress-*</code> must be accompanied by either a glyph (◌ ◎ ◐ ◑ ●), a label ("Mild", "High"), or a numeric value. Color is reinforcement, never the sole signal. This is the only hard accessibility rule in the system.
+      </div>
+
+      <p class="footnote-doc" style="margin-top:32px;">
+        StressMonitor Design System · v1.4.2 · Apple HIG · SF Pro · SF Symbols · iOS 17+
+        <br/>Extracted from 25 production screens · Cross-referenced with the Apple Design System reference at <a href="index.html" style="color:var(--accent-strong);">index.html</a>.
+      </p>
+    </section>
+
+  </main>
+</div>
+
+</body>
+</html>

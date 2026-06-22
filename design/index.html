@@ -1,0 +1,1061 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>StressMonitor · 25-screen prototype</title>
+  <style>
+    /* ===================================================================
+       StressMonitor — prototype launcher
+       Apple Design System · iPhone 14 Pro 393×852pt · light theme
+       =================================================================== */
+    :root {
+      --bg: #F2F2F7;
+      --surface: #FFFFFF;
+      --fg: #101223;
+      --muted: #777986;
+      --separator: rgba(60, 60, 67, 0.12);
+      --accent: #4FC3F7;
+      --accent-strong: #0288D1;
+      --ripple: #4FC3F7;
+      --blossom: #A5D6A7;
+      --ember: #FFAB91;
+      --zephyr: #D1C4E9;
+      --lumi: #7986CB;
+      --tier1: #007AFF;
+      --tier2: #8B5CF6;
+      --tier3: #FE9901;
+      --success: #34C759;
+      --warn: #FF9500;
+      --danger: #FF3B30;
+      --stress-mild: #007AFF;
+      --stress-moderate: #FFD60A;
+      --stress-relaxed: #34C759;
+      --stress-high: #FF9500;
+      --stress-severe: #FF3B30;
+      --font-display: -apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif;
+      --font-body: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
+      --font-rounded: -apple-system, BlinkMacSystemFont, 'SF Pro Rounded', 'SF Pro Display', system-ui, sans-serif;
+      --font-mono: ui-monospace, 'SF Mono', Menlo, monospace;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    body {
+      margin: 0; padding: 0;
+      font-family: var(--font-body);
+      color: var(--fg);
+      background:
+        radial-gradient(50% 30% at 50% 0%, rgba(79,195,247,0.10) 0%, transparent 60%),
+        radial-gradient(40% 30% at 90% 100%, rgba(165,214,167,0.10) 0%, transparent 60%),
+        #ECF0F3;
+      -webkit-font-smoothing: antialiased;
+      min-height: 100vh;
+    }
+    .shell {
+      max-width: 1280px;
+      margin: 0 auto;
+      padding: 48px 32px 80px;
+    }
+
+    /* Header */
+    .masthead {
+      display: flex; align-items: center; gap: 18px;
+      padding-bottom: 24px;
+      border-bottom: 1px solid var(--separator);
+      margin-bottom: 32px;
+    }
+    .masthead .logo-tile {
+      width: 64px; height: 64px;
+      border-radius: 18px;
+      background: linear-gradient(135deg, var(--ripple), var(--blossom));
+      display: grid; place-items: center;
+      color: #fff;
+      box-shadow: 0 12px 24px -8px rgba(79,195,247,0.4);
+    }
+    .masthead .logo-tile svg { width: 36px; height: 36px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .masthead .m-text { flex: 1; }
+    .masthead .m-eyebrow {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin: 0 0 6px;
+    }
+    .masthead h1 {
+      font-family: var(--font-rounded);
+      font-size: 34px;
+      letter-spacing: -0.022em;
+      font-weight: 700;
+      margin: 0;
+    }
+    .masthead .m-sub { font-size: 14px; color: var(--fg-secondary, #3C3C43); margin-top: 4px; max-width: 50ch; line-height: 1.45; }
+    .masthead .m-stats {
+      display: flex; gap: 16px;
+      align-items: center;
+    }
+    .masthead .m-stat {
+      text-align: right;
+    }
+    .masthead .m-stat .v { font-family: var(--font-rounded); font-size: 22px; font-weight: 700; line-height: 1; }
+    .masthead .m-stat .l { font-family: var(--font-mono); font-size: 10px; color: var(--muted); letter-spacing: 0.06em; text-transform: uppercase; margin-top: 2px; }
+    .masthead .ds-cta {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 11px 18px;
+      border-radius: 12px;
+      background: var(--ink, #101223);
+      color: #fff;
+      font-family: var(--font-rounded);
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: -0.01em;
+      text-decoration: none;
+      box-shadow: 0 6px 16px -6px rgba(16,18,35,0.35);
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      white-space: nowrap;
+    }
+    .masthead .ds-cta:hover { box-shadow: 0 10px 24px -8px rgba(16,18,35,0.4); }
+    .masthead .ds-cta:active { transform: scale(0.97); }
+    .masthead .ds-cta svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+    .masthead .ds-cta .arrow { transition: transform 0.15s ease; }
+    .masthead .ds-cta:hover .arrow { transform: translateX(2px); }
+
+    /* Filter chips */
+    .filter-row {
+      display: flex; gap: 8px;
+      flex-wrap: wrap;
+      margin-bottom: 28px;
+    }
+    .filter-chip {
+      padding: 8px 14px;
+      background: var(--surface);
+      border: 1px solid var(--separator);
+      border-radius: 999px;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--fg);
+      cursor: pointer;
+      transition: all 0.15s ease;
+    }
+    .filter-chip:hover { background: rgba(79,195,247,0.06); border-color: rgba(79,195,247,0.3); }
+    .filter-chip.active { background: var(--fg); color: #fff; border-color: var(--fg); }
+    .filter-chip .count { font-family: var(--font-mono); font-size: 11px; color: var(--muted); margin-left: 4px; }
+    .filter-chip.active .count { color: rgba(255,255,255,0.6); }
+
+    /* Tier section */
+    .tier-section { margin-bottom: 40px; }
+    .tier-head {
+      display: flex; align-items: baseline; gap: 14px;
+      padding: 0 0 14px;
+      margin-bottom: 14px;
+      border-bottom: 1px solid var(--separator);
+    }
+    .tier-head .tier-num {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 28px; height: 28px;
+      border-radius: 8px;
+      color: #fff;
+      font-family: var(--font-rounded);
+      font-size: 13px;
+      font-weight: 700;
+    }
+    .tier-section[data-tier="1"] .tier-num { background: var(--tier1); }
+    .tier-section[data-tier="2"] .tier-num { background: var(--tier2); }
+    .tier-section[data-tier="3"] .tier-num { background: var(--tier3); }
+    .tier-head h2 {
+      font-family: var(--font-display);
+      font-size: 22px;
+      font-weight: 700;
+      letter-spacing: -0.018em;
+      margin: 0;
+    }
+    .tier-head .tier-sub { font-size: 13px; color: var(--muted); }
+
+    /* Card grid */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+      gap: 16px;
+    }
+
+    .card {
+      position: relative;
+      background: var(--surface);
+      border-radius: 16px;
+      padding: 14px;
+      display: flex; flex-direction: column;
+      gap: 10px;
+      text-decoration: none;
+      color: var(--fg);
+      box-shadow: 0 1px 3px rgba(0,0,0,0.04);
+      border: 1px solid var(--separator);
+      transition: all 0.18s cubic-bezier(0.2, 0.8, 0.4, 1);
+    }
+    .card:hover {
+      transform: translateY(-3px);
+      box-shadow: 0 12px 28px -8px rgba(0,0,0,0.12);
+      border-color: rgba(79,195,247,0.3);
+    }
+
+    .card .thumb {
+      aspect-ratio: 9 / 16;
+      border-radius: 12px;
+      overflow: hidden;
+      position: relative;
+      background: var(--bg);
+      display: flex; flex-direction: column;
+    }
+    .card .thumb .device-frame {
+      flex: 1;
+      margin: 6px;
+      background: var(--surface);
+      border-radius: 8px;
+      position: relative;
+      overflow: hidden;
+      display: flex; flex-direction: column;
+      box-shadow: inset 0 0 0 1px var(--separator);
+    }
+    .card .thumb .island {
+      position: absolute;
+      top: 3px; left: 50%;
+      transform: translateX(-50%);
+      width: 32px; height: 9px;
+      background: #000;
+      border-radius: 999px;
+      z-index: 2;
+    }
+    .card .thumb .home-ind {
+      position: absolute;
+      bottom: 3px; left: 50%;
+      transform: translateX(-50%);
+      width: 36px; height: 2px;
+      background: var(--fg);
+      border-radius: 999px;
+      opacity: 0.4;
+    }
+
+    /* Mini preview contents — each gets a unique painted thumbnail */
+    .thumb-content {
+      flex: 1;
+      padding: 16px 6px 6px;
+      display: flex; flex-direction: column;
+      gap: 4px;
+      font-family: var(--font-body);
+    }
+
+    /* Generic mini elements */
+    .mini-h { font-family: var(--font-rounded); font-size: 7px; font-weight: 700; color: var(--fg); }
+    .mini-sub { font-family: var(--font-mono); font-size: 4.5px; color: var(--muted); letter-spacing: 0.04em; text-transform: uppercase; }
+    .mini-num { font-family: var(--font-rounded); font-weight: 700; }
+    .mini-card {
+      background: rgba(60,60,67,0.04);
+      border-radius: 3px;
+      padding: 3px 4px;
+      font-size: 4.5px;
+      color: var(--fg);
+    }
+    .mini-bar { height: 2px; background: rgba(60,60,67,0.10); border-radius: 999px; }
+    .mini-bar > span { display: block; height: 100%; border-radius: 999px; }
+    .mini-pill {
+      display: inline-block;
+      padding: 1.5px 4px;
+      border-radius: 999px;
+      font-family: var(--font-mono);
+      font-size: 4px;
+      letter-spacing: 0.04em;
+    }
+    .mini-circle {
+      width: 32px; height: 32px;
+      border-radius: 50%;
+      margin: 4px auto;
+      display: grid; place-items: center;
+    }
+
+    /* Card meta below thumbnail */
+    .card .meta-row {
+      display: flex; align-items: baseline; gap: 8px;
+      margin-top: 4px;
+    }
+    .card .num-tag {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--muted);
+      font-weight: 600;
+      letter-spacing: 0.04em;
+    }
+    .card .name {
+      font-family: var(--font-display);
+      font-size: 14px;
+      font-weight: 600;
+      letter-spacing: -0.005em;
+      flex: 1;
+    }
+    .card .group-pill {
+      display: inline-block;
+      padding: 2px 6px;
+      background: rgba(60,60,67,0.06);
+      color: var(--muted);
+      border-radius: 4px;
+      font-family: var(--font-mono);
+      font-size: 9px;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      font-weight: 600;
+    }
+    .card .desc { font-size: 11px; color: var(--muted); line-height: 1.35; }
+
+    /* Tier accent dot on each card */
+    .card::before {
+      content: '';
+      position: absolute;
+      top: 14px; right: 14px;
+      width: 8px; height: 8px;
+      border-radius: 50%;
+      z-index: 2;
+    }
+    .card[data-tier="1"]::before { background: var(--tier1); }
+    .card[data-tier="2"]::before { background: var(--tier2); }
+    .card[data-tier="3"]::before { background: var(--tier3); }
+
+    /* Footer */
+    .footer {
+      margin-top: 56px;
+      padding: 24px 0;
+      border-top: 1px solid var(--separator);
+      display: flex; justify-content: space-between; align-items: center;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: 0.04em;
+    }
+    .footer a { color: var(--accent-strong); text-decoration: none; }
+
+    /* Hidden when filtered */
+    .card.hidden { display: none; }
+
+    /* Responsive */
+    @media (max-width: 720px) {
+      .shell { padding: 24px 16px 48px; }
+      .masthead { flex-direction: column; align-items: flex-start; gap: 16px; }
+      .grid { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
+</head>
+<body>
+  <div class="shell">
+    <header class="masthead">
+      <div class="logo-tile">
+        <svg viewBox="0 0 24 24"><path d="M12 21s-7-4.5-7-11a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 6.5-7 11-7 11z"/></svg>
+      </div>
+      <div class="m-text">
+        <p class="m-eyebrow">PROTOTYPE · APPLE DESIGN SYSTEM</p>
+        <h1>StressMonitor — 27 screens</h1>
+        <p class="m-sub">iOS stress monitoring with 5 elemental companions. iPhone 14 Pro (393×852pt) · SF Pro + SF Rounded · Light theme · 5-level stress colors · 5-character illustration library.</p>
+      </div>
+      <div class="m-stats">
+        <div class="m-stat"><div class="v">25</div><div class="l">screens</div></div>
+        <div class="m-stat"><div class="v">5</div><div class="l">characters</div></div>
+        <div class="m-stat"><div class="v">4</div><div class="l">tabs</div></div>
+        <a class="ds-cta" href="design-system.html" data-od-id="ds-link">
+          <svg viewBox="0 0 24 24"><path d="M4 4h7v7H4z"/><path d="M13 4h7v7h-7z"/><path d="M4 13h7v7H4z"/><path d="M13 13h7v7h-7z"/></svg>
+          Design system
+          <svg class="arrow" viewBox="0 0 24 24"><path d="M9 6l6 6-6 6"/></svg>
+        </a>
+      </div>
+    </header>
+
+    <div class="filter-row" id="filters">
+      <span class="filter-chip active" data-filter="all">All <span class="count">25</span></span>
+      <span class="filter-chip" data-filter="onboarding">Onboarding <span class="count">3</span></span>
+      <span class="filter-chip" data-filter="tabs">Tabs <span class="count">3</span></span>
+      <span class="filter-chip" data-filter="measure">Measure <span class="count">2</span></span>
+      <span class="filter-chip" data-filter="breathing">Breathing <span class="count">3</span></span>
+      <span class="filter-chip" data-filter="chat">Chat <span class="count">1</span></span>
+      <span class="filter-chip" data-filter="settings">Settings <span class="count">4</span></span>
+      <span class="filter-chip" data-filter="characters">Characters <span class="count">2</span></span>
+      <span class="filter-chip" data-filter="history">History <span class="count">2</span></span>
+      <span class="filter-chip" data-filter="walk">Walk <span class="count">1</span></span>
+      <span class="filter-chip" data-filter="bioage">Bio Age <span class="count">1</span></span>
+      <span class="filter-chip" data-filter="iap">IAP <span class="count">2</span></span>
+      <span class="filter-chip" data-filter="data">Data <span class="count">2</span></span>
+    </div>
+
+    <!-- TIER 1 -->
+    <section class="tier-section" data-tier="1">
+      <div class="tier-head">
+        <span class="tier-num">1</span>
+        <h2>Primary surfaces</h2>
+        <span class="tier-sub">10 screens · must-have</span>
+      </div>
+      <div class="grid">
+
+        <a class="card" data-tier="1" data-group="onboarding" href="screens/01-welcome.html">
+          <div class="thumb"><div class="device-frame"><div class="island"></div><div class="thumb-content" style="align-items: center; justify-content: center; padding-top: 22px;">
+            <div style="width: 38px; height: 38px; background: var(--ripple); border-radius: 50%; display: grid; place-items: center; box-shadow: 0 4px 8px rgba(79,195,247,0.3);">
+              <svg width="22" height="22" viewBox="0 0 100 100"><ellipse cx="50" cy="55" rx="26" ry="28" fill="#B3E5FC"/><circle cx="50" cy="38" r="20" fill="#4FC3F7"/><circle cx="42" cy="36" r="3" fill="#101223"/><circle cx="58" cy="36" r="3" fill="#101223"/></svg>
+            </div>
+            <div class="mini-h" style="margin-top: 8px; text-align: center; font-size: 8px;">Meet Ripple</div>
+            <div class="mini-sub" style="text-align: center;">your companion</div>
+            <div style="margin-top: 6px; padding: 4px 8px; background: var(--ripple); color: #fff; font-size: 5px; border-radius: 3px; font-weight: 700;">GET STARTED</div>
+          </div><div class="home-ind"></div></div></div>
+          <div class="meta-row"><span class="num-tag">01</span><span class="name">Welcome</span></div>
+          <span class="group-pill">Onboarding</span>
+        </a>
+
+        <a class="card" data-tier="1" data-group="onboarding" href="screens/02-health-permission.html">
+          <div class="thumb"><div class="device-frame"><div class="island"></div><div class="thumb-content" style="align-items: center; padding-top: 16px;">
+            <div style="width: 28px; height: 28px; background: linear-gradient(135deg, #FF3B30, #FF9500); border-radius: 7px; display: grid; place-items: center; color: #fff; margin-bottom: 4px;">
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 21s-7-4.5-7-11a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 6.5-7 11-7 11z"/></svg>
+            </div>
+            <div class="mini-h" style="text-align: center; font-size: 6px; line-height: 1.3;">Allow heart signals</div>
+            <div class="mini-sub" style="text-align: center; margin-bottom: 4px;">HRV · HR · Sleep</div>
+            <div style="width: 100%;"><div class="mini-card" style="font-size: 4px;">Heart Rate</div></div>
+            <div style="width: 100%;"><div class="mini-card" style="font-size: 4px;">Sleep &amp; RHR</div></div>
+            <div style="margin-top: 4px; padding: 3px 8px; background: var(--ripple); color: #fff; font-size: 4.5px; border-radius: 3px; font-weight: 700;">GRANT ACCESS</div>
+          </div><div class="home-ind"></div></div></div>
+          <div class="meta-row"><span class="num-tag">02</span><span class="name">Health Permission</span></div>
+          <span class="group-pill">Onboarding</span>
+        </a>
+
+        <a class="card" data-tier="1" data-group="onboarding" href="screens/03-onboarding-complete.html">
+          <div class="thumb"><div class="device-frame"><div class="island"></div><div class="thumb-content" style="align-items: center; padding-top: 18px;">
+            <div style="width: 18px; height: 18px; background: var(--success); border-radius: 50%; display: grid; place-items: center; color: #fff;">
+              <svg width="10" height="10" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5 5L20 7"/></svg>
+            </div>
+            <div class="mini-h" style="margin-top: 4px; font-size: 6px;">You're all set, Alex</div>
+            <div style="margin-top: 4px; padding: 4px; background: rgba(79,195,247,0.08); border-radius: 5px; border: 1px solid rgba(79,195,247,0.2); width: 70%;">
+              <div style="width: 24px; height: 24px; background: var(--ripple); border-radius: 50%; margin: 0 auto;"></div>
+              <div class="mini-h" style="text-align: center; font-size: 5px; margin-top: 2px;">Ripple unlocked</div>
+            </div>
+            <div style="margin-top: 4px; padding: 3px 8px; background: var(--accent-strong); color: #fff; font-size: 4.5px; border-radius: 3px; font-weight: 700;">FIRST READING</div>
+          </div><div class="home-ind"></div></div></div>
+          <div class="meta-row"><span class="num-tag">03</span><span class="name">Setup Complete</span></div>
+          <span class="group-pill">Onboarding</span>
+        </a>
+
+        <a class="card" data-tier="1" data-group="tabs" href="screens/04-home.html">
+          <div class="thumb"><div class="device-frame"><div class="island"></div><div class="thumb-content" style="padding-top: 18px;">
+            <div class="mini-sub">Tuesday · Apr 22</div>
+            <div class="mini-h" style="font-size: 8px;">Good morning, Alex</div>
+            <div style="background: #fff; border-radius: 4px; padding: 4px; margin-top: 4px; display: flex; gap: 4px; align-items: center;">
+              <div style="flex: 1;"><div class="mini-num" style="font-size: 14px; color: var(--stress-mild);">42</div><div class="mini-sub">Mild</div></div>
+              <div style="width: 22px; height: 22px; border-radius: 50%; background: conic-gradient(var(--stress-mild) 0% 42%, rgba(60,60,67,0.10) 42% 100%); display: grid; place-items: center;"><div style="width: 14px; height: 14px; border-radius: 50%; background: #fff;"></div></div>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 2px; margin-top: 4px;">
+              <div style="background: rgba(60,60,67,0.04); padding: 2px; border-radius: 2px;"><div class="mini-num" style="font-size: 6px; color: var(--success);">52ms</div><div class="mini-sub">HRV</div></div>
+              <div style="background: rgba(60,60,67,0.04); padding: 2px; border-radius: 2px;"><div class="mini-num" style="font-size: 6px; color: var(--danger);">68</div><div class="mini-sub">HR</div></div>
+              <div style="background: rgba(60,60,67,0.04); padding: 2px; border-radius: 2px;"><div class="mini-num" style="font-size: 6px; color: var(--success);">7d</div><div class="mini-sub">Streak</div></div>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; margin-top: 4px;">
+              <div style="height: 4px; background: var(--stress-relaxed); border-radius: 1px;"></div>
+              <div style="height: 4px; background: var(--stress-mild); border-radius: 1px; outline: 1px solid var(--accent-strong);"></div>
+              <div style="height: 4px; background: rgba(60,60,67,0.08); border-radius: 1px;"></div>
+              <div style="height: 4px; background: rgba(60,60,67,0.08); border-radius: 1px;"></div>
+              <div style="height: 4px; background: rgba(60,60,67,0.08); border-radius: 1px;"></div>
+              <div style="height: 4px; background: rgba(60,60,67,0.08); border-radius: 1px;"></div>
+              <div style="height: 4px; background: rgba(60,60,67,0.08); border-radius: 1px;"></div>
+            </div>
+            <div style="margin-top: auto; background: var(--fg); color: #fff; font-size: 4.5px; padding: 2.5px 6px; border-radius: 999px; text-align: center; font-weight: 600;">Measure now</div>
+          </div><div class="home-ind"></div></div></div>
+          <div class="meta-row"><span class="num-tag">04</span><span class="name">Home / Dashboard</span></div>
+          <span class="group-pill">Tab 1</span>
+        </a>
+
+        <a class="card" data-tier="1" data-group="tabs" href="screens/04-home-no-health.html">
+          <div class="thumb"><div class="device-frame"><div class="island"></div><div class="thumb-content" style="padding-top: 18px;">
+            <div class="mini-sub">Tuesday · Apr 22</div>
+            <div style="display: inline-flex; align-items: center; gap: 3px; padding: 2px 6px; border-radius: 999px; background: rgba(255,149,0,0.10); border: 1px solid rgba(255,149,0,0.22); color: var(--warn); font-size: 5px; font-weight: 600; letter-spacing: 0.04em; margin-top: 2px;"><span style="width: 3px; height: 3px; border-radius: 50%; background: currentColor;"></span>WAITING</div>
+            <div style="background: linear-gradient(178deg, #fff, #F2F7FF); border: 1px solid rgba(0,122,255,0.12); border-radius: 4px; padding: 6px; margin-top: 4px; text-align: center;">
+              <div style="width: 26px; height: 26px; margin: 0 auto 3px; background: var(--ripple); border-radius: 50%; position: relative;"><div style="position: absolute; top: 8px; left: 7px; width: 3px; height: 3px; background: #1A2138; border-radius: 50%;"></div><div style="position: absolute; top: 8px; right: 7px; width: 3px; height: 3px; background: #1A2138; border-radius: 50%;"></div><div style="position: absolute; top: 14px; left: 50%; transform: translateX(-50%); width: 6px; height: 2px; border-bottom: 1px solid #1A2138; border-radius: 50%;"></div></div>
+              <div class="mini-h" style="font-size: 6px;">Connect Apple Health</div>
+              <div style="margin-top: 3px; background: var(--accent-strong); color: #fff; font-size: 5px; padding: 3px 6px; border-radius: 999px; font-weight: 600;">Connect</div>
+            </div>
+            <div style="margin-top: 4px; display: flex; flex-direction: column; gap: 2px;">
+              <div style="height: 3px; background: rgba(60,60,67,0.08); border-radius: 1px;"></div>
+              <div style="height: 3px; background: rgba(60,60,67,0.08); border-radius: 1px; width: 70%;"></div>
+              <div style="height: 3px; background: rgba(60,60,67,0.08); border-radius: 1px; width: 85%;"></div>
+            </div>
+          </div><div class="home-ind"></div></div></div>
+          <div class="meta-row"><span class="num-tag">04a</span><span class="name">Home · No Health</span></div>
+          <span class="group-pill">Empty state</span>
+        </a>
+
+        <a class="card" data-tier="1" data-group="tabs" href="screens/04-home-no-data.html">
+          <div class="thumb"><div class="device-frame"><div class="island"></div><div class="thumb-content" style="padding-top: 18px;">
+            <div class="mini-sub">Tuesday · Apr 22</div>
+            <div style="display: inline-flex; align-items: center; gap: 3px; padding: 2px 6px; border-radius: 999px; background: rgba(0,122,255,0.10); border: 1px solid rgba(0,122,255,0.22); color: var(--accent-strong); font-size: 5px; font-weight: 600; letter-spacing: 0.04em; margin-top: 2px;"><span style="display: inline-flex; gap: 1px;"><span style="width: 2px; height: 2px; border-radius: 50%; background: currentColor;"></span><span style="width: 2px; height: 2px; border-radius: 50%; background: currentColor;"></span><span style="width: 2px; height: 2px; border-radius: 50%; background: currentColor;"></span></span>READING</div>
+            <div style="background: linear-gradient(178deg, #fff, #F2F7FF); border: 1px solid rgba(0,122,255,0.12); border-radius: 4px; padding: 6px; margin-top: 4px; text-align: center;">
+              <div style="position: relative; width: 40px; height: 20px; margin: 0 auto;">
+                <svg viewBox="0 0 180 90" style="width: 100%; height: 100%;"><path d="M 20 80 A 70 70 0 0 1 160 80" fill="none" stroke="rgba(60,60,67,0.10)" stroke-width="12" stroke-linecap="round"/><path d="M 20 80 A 70 70 0 0 1 160 80" fill="none" stroke="#007AFF" stroke-width="12" stroke-linecap="round" stroke-dasharray="219.91" stroke-dashoffset="136.34"/><circle cx="66.9" cy="22.4" r="5" fill="#007AFF" stroke="#fff" stroke-width="2"/></svg>
+                <div style="position: absolute; bottom: 0; left: 50%; transform: translateX(-50%); width: 16px; height: 16px; background: var(--ripple); border-radius: 50%;"></div>
+              </div>
+              <div class="mini-h" style="font-size: 6px; margin-top: 2px;">Reading data</div>
+              <div class="mini-sub" style="font-size: 4.5px;">38% · ~30s</div>
+            </div>
+            <div style="margin-top: 4px; display: flex; flex-direction: column; gap: 2px;">
+              <div style="height: 4px; background: linear-gradient(90deg, rgba(60,60,67,0.06), rgba(60,60,67,0.12), rgba(60,60,67,0.06)); border-radius: 1px;"></div>
+              <div style="height: 4px; background: linear-gradient(90deg, rgba(60,60,67,0.06), rgba(60,60,67,0.12), rgba(60,60,67,0.06)); border-radius: 1px; width: 80%;"></div>
+              <div style="height: 4px; background: linear-gradient(90deg, rgba(60,60,67,0.06), rgba(60,60,67,0.12), rgba(60,60,67,0.06)); border-radius: 1px;"></div>
+            </div>
+          </div><div class="home-ind"></div></div></div>
+          <div class="meta-row"><span class="num-tag">04b</span><span class="name">Home · Reading</span></div>
+          <span class="group-pill">Empty state</span>
+        </a>
+
+        <a class="card" data-tier="1" data-group="tabs" href="screens/05-action.html">
+          <div class="thumb"><div class="device-frame"><div class="island"></div><div class="thumb-content" style="padding-top: 18px;">
+            <div class="mini-sub">Stress · Mild 42</div>
+            <div class="mini-h" style="font-size: 8px;">Take action.</div>
+            <div style="background: linear-gradient(135deg, var(--ripple), var(--accent-strong)); border-radius: 4px; padding: 5px; margin-top: 4px; color: #fff;">
+              <div class="mini-h" style="font-size: 5px; color: #fff;">Box Breathing</div>
+              <div class="mini-sub" style="color: rgba(255,255,255,0.7);">2 min · +14ms HRV</div>
+              <div style="width: 12px; height: 12px; border-radius: 50%; background: rgba(255,255,255,0.4); margin: 2px auto 0;"></div>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2px; margin-top: 2px;">
+              <div style="background: linear-gradient(135deg, var(--blossom), #66BB6A); padding: 2.5px; border-radius: 2px; color: #fff;"><div class="mini-h" style="font-size: 4px; color: #fff;">Mini Walk</div></div>
+              <div style="background: var(--surface); padding: 2.5px; border-radius: 2px;"><div class="mini-h" style="font-size: 4px;">Body Scan</div></div>
+            </div>
+            <div style="display: flex; gap: 2px; margin-top: 4px;"><span style="padding: 1px 3px; background: var(--fg); color: #fff; border-radius: 999px; font-size: 3.5px;">😐</span><span style="padding: 1px 3px; background: var(--surface); border-radius: 999px; font-size: 3.5px; border: 1px solid var(--separator);">😌</span></div>
+          </div><div class="home-ind"></div></div></div>
+          <div class="meta-row"><span class="num-tag">05</span><span class="name">Action (Bento)</span></div>
+          <span class="group-pill">Tab 2</span>
+        </a>
+
+        <a class="card" data-tier="1" data-group="tabs" href="screens/06-trends.html">
+          <div class="thumb"><div class="device-frame"><div class="island"></div><div class="thumb-content" style="padding-top: 18px;">
+            <div class="mini-sub">Apr 16 – 22</div>
+            <div class="mini-h" style="font-size: 8px;">Trends</div>
+            <div style="background: #fff; border-radius: 3px; padding: 4px; margin-top: 4px;">
+              <div style="display: flex; align-items: baseline; gap: 3px;"><span class="mini-num" style="font-size: 9px; color: var(--stress-mild);">41</span><span class="mini-sub" style="color: var(--success);">↓ 18%</span></div>
+              <div style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 1px; align-items: end; height: 22px; margin-top: 2px;">
+                <div style="height: 80%; background: var(--stress-high); border-radius: 1px;"></div>
+                <div style="height: 60%; background: var(--stress-moderate); border-radius: 1px;"></div>
+                <div style="height: 45%; background: var(--stress-mild); border-radius: 1px;"></div>
+                <div style="height: 70%; background: var(--stress-high); border-radius: 1px;"></div>
+                <div style="height: 28%; background: var(--stress-relaxed); border-radius: 1px;"></div>
+                <div style="height: 24%; background: var(--stress-relaxed); border-radius: 1px;"></div>
+                <div style="height: 42%; background: var(--stress-mild); border-radius: 1px;"></div>
+              </div>
+            </div>
+            <div style="background: linear-gradient(135deg, #1F2937, #111827); padding: 3px; border-radius: 2px; margin-top: 3px;">
+              <div style="display: flex; align-items: center; gap: 2px;"><div style="width: 6px; height: 6px; border-radius: 50%; background: linear-gradient(135deg, #FE9901, #FFAB91);"></div><div class="mini-h" style="font-size: 3.5px; color: #fff;">Predictive insights</div></div>
+            </div>
+          </div><div class="home-ind"></div></div></div>
+          <div class="meta-row"><span class="num-tag">06</span><span class="name">Trends</span></div>
+          <span class="group-pill">Tab 3</span>
+        </a>
+
+        <a class="card" data-tier="1" data-group="measure" href="screens/07-measurement.html">
+          <div class="thumb"><div class="device-frame"><div class="island"></div><div class="thumb-content" style="align-items: center; padding-top: 14px;">
+            <div style="width: 48px; height: 48px; border-radius: 50%; background: conic-gradient(var(--stress-mild) 0% 42%, rgba(60,60,67,0.10) 42% 100%); display: grid; place-items: center; margin-bottom: 4px;">
+              <div style="width: 38px; height: 38px; border-radius: 50%; background: var(--surface); display: grid; place-items: center;">
+                <div class="mini-num" style="font-size: 14px; color: var(--stress-mild);">42</div>
+              </div>
+            </div>
+            <div class="mini-h" style="font-size: 5px; color: var(--stress-mild);">Mild · Focused</div>
+            <div class="mini-sub" style="margin-top: 2px;">96% confidence</div>
+            <div style="width: 100%; margin-top: 6px;">
+              <div class="mini-card" style="display: flex; justify-content: space-between; align-items: center;">
+                <span>HRV</span><span style="color: var(--success); font-weight: 700;">+38</span>
+              </div>
+              <div class="mini-card" style="display: flex; justify-content: space-between; align-items: center; margin-top: 1.5px;">
+                <span>Sleep debt</span><span style="color: var(--stress-moderate); font-weight: 700;">-12</span>
+              </div>
+              <div class="mini-card" style="display: flex; justify-content: space-between; align-items: center; margin-top: 1.5px;">
+                <span>Activity</span><span style="color: var(--stress-high); font-weight: 700;">-18</span>
+              </div>
+            </div>
+          </div><div class="home-ind"></div></div></div>
+          <div class="meta-row"><span class="num-tag">07</span><span class="name">Measurement Result</span></div>
+          <span class="group-pill">Measure flow</span>
+        </a>
+
+        <a class="card" data-tier="1" data-group="breathing" href="screens/08-breathing-active.html">
+          <div class="thumb"><div class="device-frame" style="background: linear-gradient(180deg, #ECF8FE, #fff);"><div class="island"></div><div class="thumb-content" style="align-items: center; justify-content: center; padding-top: 16px;">
+            <div class="mini-sub">2:14 remaining</div>
+            <div style="position: relative; width: 48px; height: 48px; margin: 8px auto;">
+              <div style="position: absolute; inset: 0; background: radial-gradient(circle, rgba(79,195,247,0.3), transparent); border-radius: 50%;"></div>
+              <div style="position: absolute; inset: 25%; background: linear-gradient(135deg, var(--ripple), var(--accent-strong)); border-radius: 50%; display: grid; place-items: center; color: #fff;">
+                <div class="mini-h" style="font-size: 4px; color: #fff;">HOLD</div>
+              </div>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin-top: 6px; width: 80%;">
+              <div style="text-align: center;"><div style="width: 4px; height: 4px; background: var(--accent); border-radius: 50%; margin: 0 auto;"></div><div class="mini-sub" style="margin-top: 2px;">Inhale</div></div>
+              <div style="text-align: center;"><div style="width: 4px; height: 4px; background: var(--accent); border-radius: 50%; margin: 0 auto;"></div><div class="mini-sub" style="margin-top: 2px;">Hold</div></div>
+              <div style="text-align: center;"><div style="width: 6px; height: 6px; background: var(--accent-strong); border-radius: 50%; margin: 0 auto; transform: scale(1.4);"></div><div class="mini-sub" style="margin-top: 2px; color: var(--accent-strong); font-weight: 700;">Exhale</div></div>
+              <div style="text-align: center;"><div style="width: 4px; height: 4px; background: rgba(60,60,67,0.18); border-radius: 50%; margin: 0 auto;"></div><div class="mini-sub" style="margin-top: 2px;">Hold</div></div>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 3px; margin-top: auto; width: 80%;">
+              <div style="background: rgba(60,60,67,0.08); padding: 3px; border-radius: 2px; text-align: center; font-size: 4px; font-weight: 600;">End</div>
+              <div style="background: var(--fg); padding: 3px; border-radius: 2px; text-align: center; font-size: 4px; font-weight: 600; color: #fff;">Skip</div>
+            </div>
+          </div><div class="home-ind"></div></div></div>
+          <div class="meta-row"><span class="num-tag">08</span><span class="name">Breathing Active</span></div>
+          <span class="group-pill">Breathing</span>
+        </a>
+
+        <a class="card" data-tier="1" data-group="chat" href="screens/09-chat.html">
+          <div class="thumb"><div class="device-frame"><div class="island"></div><div class="thumb-content" style="padding-top: 16px; gap: 3px;">
+            <div style="display: flex; align-items: center; gap: 4px; padding-bottom: 3px; border-bottom: 1px solid var(--separator);">
+              <div style="width: 12px; height: 12px; border-radius: 50%; background: var(--ripple);"></div>
+              <div><div class="mini-h" style="font-size: 4.5px;">Ripple</div><div class="mini-sub" style="font-size: 3.5px;">Water Otter</div></div>
+            </div>
+            <div style="background: #fff; padding: 3px 5px; border-radius: 6px; border-bottom-left-radius: 1px; font-size: 4px; max-width: 80%; line-height: 1.4;">Morning Alex. Want to breathe?</div>
+            <div style="background: linear-gradient(135deg, var(--ripple), var(--accent-strong)); padding: 3px 5px; border-radius: 6px; border-bottom-right-radius: 1px; font-size: 4px; max-width: 70%; align-self: flex-end; color: #fff; line-height: 1.4;">Yeah, let's breathe.</div>
+            <div style="background: #fff; padding: 3px 5px; border-radius: 6px; border-bottom-left-radius: 1px; font-size: 4px; max-width: 85%; line-height: 1.4;">Queued Box Breathing 4-4-4-4.</div>
+            <div style="background: linear-gradient(135deg, rgba(79,195,247,0.08), rgba(2,136,209,0.04)); padding: 4px; border-radius: 5px; display: flex; gap: 3px; align-items: center; border: 1px solid rgba(79,195,247,0.2);">
+              <div style="width: 10px; height: 10px; border-radius: 2px; background: linear-gradient(135deg, var(--ripple), var(--accent-strong));"></div>
+              <div style="flex: 1;"><div class="mini-h" style="font-size: 3.5px;">Box Breathing 2min</div></div>
+              <div style="padding: 1px 3px; background: var(--accent); color: #fff; font-size: 3px; border-radius: 1px; font-weight: 700;">START</div>
+            </div>
+            <div style="display: flex; gap: 2px; margin-top: auto;"><span style="padding: 1.5px 3px; background: #fff; border-radius: 999px; font-size: 3.5px; border: 1px solid var(--separator);">Why HRV?</span><span style="padding: 1.5px 3px; background: #fff; border-radius: 999px; font-size: 3.5px; border: 1px solid var(--separator);">Walk</span></div>
+          </div><div class="home-ind"></div></div></div>
+          <div class="meta-row"><span class="num-tag">09</span><span class="name">AI Chat (Ripple)</span></div>
+          <span class="group-pill">Chat</span>
+        </a>
+
+        <a class="card" data-tier="1" data-group="settings" href="screens/10-settings.html">
+          <div class="thumb"><div class="device-frame" style="background: #FFFDF6;"><div class="island"></div><div class="thumb-content" style="padding-top: 16px;">
+            <div class="mini-h" style="font-size: 8px;">Settings</div>
+            <div style="background: #fff; border-radius: 3px; padding: 3px; margin-top: 4px; display: flex; gap: 3px; align-items: center;">
+              <div style="width: 12px; height: 12px; border-radius: 50%; background: linear-gradient(135deg, var(--ripple), var(--blossom)); display: grid; place-items: center; color: #fff; font-family: var(--font-rounded); font-size: 4px; font-weight: 700;">A</div>
+              <div style="flex: 1;"><div class="mini-h" style="font-size: 4px;">Alex Chen</div><div class="mini-sub" style="font-size: 3px;">28 yrs · Cupertino</div></div>
+            </div>
+            <div style="background: linear-gradient(135deg, rgba(255,153,0,0.10), rgba(255,59,48,0.10)); border-radius: 3px; padding: 3px; display: flex; gap: 3px; align-items: center; margin-top: 2px;">
+              <div style="width: 9px; height: 9px; border-radius: 50%; background: linear-gradient(135deg, #FF9500, #FF3B30);"></div>
+              <div class="mini-h" style="font-size: 4px; color: var(--warn);">7 days</div>
+              <div class="mini-sub" style="margin-left: auto; font-size: 3px;">to Lumi</div>
+            </div>
+            <div style="background: #fff; border-radius: 3px; margin-top: 3px;">
+              <div style="padding: 2.5px 3px; display: flex; align-items: center; gap: 2px; border-bottom: 1px solid var(--separator);"><div style="width: 6px; height: 6px; border-radius: 1.5px; background: var(--ripple);"></div><div style="font-size: 3.5px;">Characters</div><div style="margin-left: auto; font-size: 3px; color: var(--muted);">2 of 5 ›</div></div>
+              <div style="padding: 2.5px 3px; display: flex; align-items: center; gap: 2px;"><div style="width: 6px; height: 6px; border-radius: 1.5px; background: var(--danger);"></div><div style="font-size: 3.5px;">Apple Health</div><div style="margin-left: auto; font-size: 3px; color: var(--muted);">Connected ›</div></div>
+            </div>
+          </div><div class="home-ind"></div></div></div>
+          <div class="meta-row"><span class="num-tag">10</span><span class="name">Settings Root</span></div>
+          <span class="group-pill">Settings</span>
+        </a>
+      </div>
+    </section>
+
+    <!-- TIER 2 -->
+    <section class="tier-section" data-tier="2">
+      <div class="tier-head">
+        <span class="tier-num">2</span>
+        <h2>Important flows</h2>
+        <span class="tier-sub">8 screens · user journeys</span>
+      </div>
+      <div class="grid">
+
+        <a class="card" data-tier="2" data-group="history" href="screens/11-history.html">
+          <div class="thumb"><div class="device-frame"><div class="island"></div><div class="thumb-content" style="padding-top: 16px;">
+            <div class="mini-h" style="font-size: 6px;">Stress History</div>
+            <div style="display: flex; gap: 2px; margin-top: 2px;"><span style="padding: 1.5px 4px; background: var(--fg); color: #fff; border-radius: 999px; font-size: 3.5px;">All · 24</span><span style="padding: 1.5px 4px; background: #fff; border: 1px solid var(--separator); border-radius: 999px; font-size: 3.5px;">Relaxed</span></div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 2px; margin-top: 3px;">
+              <div style="background: #fff; padding: 2px; border-radius: 2px; text-align: center;"><div class="mini-num" style="font-size: 5px; color: var(--stress-mild);">42</div><div class="mini-sub" style="font-size: 3px;">avg</div></div>
+              <div style="background: #fff; padding: 2px; border-radius: 2px; text-align: center;"><div class="mini-num" style="font-size: 5px; color: var(--success);">24</div><div class="mini-sub" style="font-size: 3px;">best</div></div>
+              <div style="background: #fff; padding: 2px; border-radius: 2px; text-align: center;"><div class="mini-num" style="font-size: 5px; color: var(--stress-high);">68</div><div class="mini-sub" style="font-size: 3px;">peak</div></div>
+            </div>
+            <div class="mini-sub" style="margin-top: 4px;">Today · Tue</div>
+            <div style="background: #fff; padding: 3px; border-radius: 2px; display: flex; gap: 3px; align-items: center; margin-top: 2px;"><div style="width: 2px; height: 8px; background: var(--stress-mild); border-radius: 1px;"></div><div style="flex: 1;"><div class="mini-h" style="font-size: 4px;">42 · Mild</div><div class="mini-sub" style="font-size: 3px;">9:32 AM</div></div></div>
+            <div style="background: #fff; padding: 3px; border-radius: 2px; display: flex; gap: 3px; align-items: center; margin-top: 1px;"><div style="width: 2px; height: 8px; background: var(--stress-relaxed); border-radius: 1px;"></div><div style="flex: 1;"><div class="mini-h" style="font-size: 4px;">24 · Relaxed</div><div class="mini-sub" style="font-size: 3px;">11:18 PM</div></div></div>
+            <div style="background: #fff; padding: 3px; border-radius: 2px; display: flex; gap: 3px; align-items: center; margin-top: 1px;"><div style="width: 2px; height: 8px; background: var(--stress-moderate); border-radius: 1px;"></div><div style="flex: 1;"><div class="mini-h" style="font-size: 4px;">58 · Moderate</div><div class="mini-sub" style="font-size: 3px;">3:47 PM</div></div></div>
+          </div><div class="home-ind"></div></div></div>
+          <div class="meta-row"><span class="num-tag">11</span><span class="name">History Timeline</span></div>
+          <span class="group-pill">History</span>
+        </a>
+
+        <a class="card" data-tier="2" data-group="history" href="screens/12-measurement-detail.html">
+          <div class="thumb"><div class="device-frame"><div class="island"></div><div class="thumb-content" style="padding-top: 14px; align-items: center;">
+            <div class="mini-h" style="font-size: 5px;">Yesterday · 3:47 PM</div>
+            <div class="mini-num" style="font-size: 18px; color: var(--stress-moderate); margin-top: 2px;">58</div>
+            <div class="mini-h" style="font-size: 5px; color: var(--stress-moderate);">Moderate</div>
+            <div style="display: flex; gap: 2px; margin: 4px 0;">
+              <div style="width: 5px; height: 5px; border-radius: 1px; background: var(--stress-relaxed);"></div>
+              <div style="width: 5px; height: 5px; border-radius: 1px; background: var(--stress-mild);"></div>
+              <div style="width: 5px; height: 5px; border-radius: 1px; background: var(--stress-moderate); box-shadow: 0 0 0 1px var(--fg);"></div>
+              <div style="width: 5px; height: 5px; border-radius: 1px; background: var(--stress-high);"></div>
+              <div style="width: 5px; height: 5px; border-radius: 1px; background: var(--stress-severe);"></div>
+            </div>
+            <div style="width: 100%;">
+              <div class="mini-card" style="display: flex; justify-content: space-between;"><span>HRV</span><span style="color: var(--stress-moderate); font-weight: 700;">-8</span></div>
+              <div class="mini-card" style="display: flex; justify-content: space-between; margin-top: 1.5px;"><span>Sleep debt</span><span style="color: var(--stress-high); font-weight: 700;">-22</span></div>
+              <div class="mini-card" style="display: flex; justify-content: space-between; margin-top: 1.5px;"><span>Caffeine</span><span style="color: var(--stress-moderate); font-weight: 700;">-14</span></div>
+            </div>
+          </div><div class="home-ind"></div></div></div>
+          <div class="meta-row"><span class="num-tag">12</span><span class="name">Measurement Detail</span></div>
+          <span class="group-pill">History</span>
+        </a>
+
+        <a class="card" data-tier="2" data-group="breathing" href="screens/13-breathing-intro.html">
+          <div class="thumb"><div class="device-frame"><div class="island"></div><div class="thumb-content" style="align-items: center; padding-top: 14px;">
+            <div style="position: relative; width: 38px; height: 38px; margin: 6px auto;">
+              <div style="position: absolute; top: 0; left: 0; width: 12px; height: 12px; background: var(--accent); border-radius: 3px;"></div>
+              <div style="position: absolute; top: 0; right: 0; width: 12px; height: 12px; background: var(--accent); border-radius: 3px;"></div>
+              <div style="position: absolute; bottom: 0; left: 0; width: 12px; height: 12px; background: var(--accent); border-radius: 3px;"></div>
+              <div style="position: absolute; bottom: 0; right: 0; width: 12px; height: 12px; background: var(--accent); border-radius: 3px;"></div>
+              <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 12px; height: 12px; border-radius: 50%; background: var(--accent-strong);"></div>
+            </div>
+            <div class="mini-h" style="font-size: 6px;">Box Breathing</div>
+            <div class="mini-sub" style="text-align: center; margin-top: 2px;">Navy SEAL pattern</div>
+            <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 2px; margin-top: 4px; width: 100%;">
+              <div style="background: rgba(79,195,247,0.10); padding: 2px; border-radius: 2px; text-align: center;"><div class="mini-num" style="font-size: 4px; color: var(--accent-strong);">1</div><div class="mini-sub" style="font-size: 3px;">Inhale</div></div>
+              <div style="background: rgba(79,195,247,0.10); padding: 2px; border-radius: 2px; text-align: center;"><div class="mini-num" style="font-size: 4px; color: var(--accent-strong);">2</div><div class="mini-sub" style="font-size: 3px;">Hold</div></div>
+              <div style="background: rgba(79,195,247,0.10); padding: 2px; border-radius: 2px; text-align: center;"><div class="mini-num" style="font-size: 4px; color: var(--accent-strong);">3</div><div class="mini-sub" style="font-size: 3px;">Exhale</div></div>
+              <div style="background: rgba(79,195,247,0.10); padding: 2px; border-radius: 2px; text-align: center;"><div class="mini-num" style="font-size: 4px; color: var(--accent-strong);">4</div><div class="mini-sub" style="font-size: 3px;">Hold</div></div>
+            </div>
+            <div style="margin-top: auto; padding: 3px 8px; background: var(--accent); color: #fff; font-size: 4px; border-radius: 2px; font-weight: 700;">BEGIN SESSION</div>
+          </div><div class="home-ind"></div></div></div>
+          <div class="meta-row"><span class="num-tag">13</span><span class="name">Breathing Intro</span></div>
+          <span class="group-pill">Breathing</span>
+        </a>
+
+        <a class="card" data-tier="2" data-group="breathing" href="screens/14-breathing-summary.html">
+          <div class="thumb"><div class="device-frame"><div class="island"></div><div class="thumb-content" style="align-items: center; padding-top: 14px;">
+            <div style="width: 18px; height: 18px; border-radius: 50%; background: linear-gradient(135deg, var(--ripple), var(--success)); display: grid; place-items: center; color: #fff;">
+              <svg width="10" height="10" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="3.4" stroke-linecap="round"><path d="M5 12l5 5L20 7"/></svg>
+            </div>
+            <div class="mini-h" style="font-size: 6px; margin-top: 3px;">Beautifully done</div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2px; margin-top: 4px; width: 100%;">
+              <div style="background: #fff; padding: 3px; border-radius: 2px; text-align: center;"><div class="mini-num" style="font-size: 6px; color: var(--success);">52ms</div><div class="mini-sub" style="font-size: 3px;">before</div></div>
+              <div style="background: #fff; padding: 3px; border-radius: 2px; text-align: center;"><div class="mini-num" style="font-size: 6px; color: var(--success);">68ms</div><div class="mini-sub" style="font-size: 3px; color: var(--success); font-weight: 700;">+16</div></div>
+            </div>
+            <svg viewBox="0 0 80 30" style="width: 90%; margin-top: 4px;"><path d="M0 22 L10 18 L20 12 L30 10 L40 6 L50 4 L60 2 L80 1" stroke="#34D399" stroke-width="1.2" fill="none"/><path d="M0 22 L10 18 L20 12 L30 10 L40 6 L50 4 L60 2 L80 1 L80 30 L0 30 Z" fill="rgba(52,211,153,0.18)"/></svg>
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 2px; margin-top: 4px; width: 100%;">
+              <div style="background: #fff; padding: 2px; border-radius: 2px; text-align: center;"><div class="mini-num" style="font-size: 5px;">8/8</div><div class="mini-sub" style="font-size: 3px;">cycles</div></div>
+              <div style="background: #fff; padding: 2px; border-radius: 2px; text-align: center;"><div class="mini-num" style="font-size: 5px;">2:00</div><div class="mini-sub" style="font-size: 3px;">time</div></div>
+              <div style="background: #fff; padding: 2px; border-radius: 2px; text-align: center;"><div class="mini-num" style="font-size: 5px;">95%</div><div class="mini-sub" style="font-size: 3px;">rhythm</div></div>
+            </div>
+          </div><div class="home-ind"></div></div></div>
+          <div class="meta-row"><span class="num-tag">14</span><span class="name">Breathing Summary</span></div>
+          <span class="group-pill">Breathing</span>
+        </a>
+
+        <a class="card" data-tier="2" data-group="walk" href="screens/15-walk.html">
+          <div class="thumb"><div class="device-frame" style="background: linear-gradient(180deg, #F4FBF4, #fff);"><div class="island"></div><div class="thumb-content" style="align-items: center; padding-top: 16px;">
+            <div class="mini-sub" style="color: var(--success); font-weight: 700;">● LIVE</div>
+            <div style="position: relative; width: 60px; height: 60px; margin: 6px 0;">
+              <svg viewBox="0 0 60 60" style="width: 100%; height: 100%; transform: rotate(-90deg);"><circle cx="30" cy="30" r="26" stroke="rgba(60,60,67,0.08)" stroke-width="3" fill="none"/><circle cx="30" cy="30" r="26" stroke="#66BB6A" stroke-width="3" stroke-linecap="round" fill="none" stroke-dasharray="163.4" stroke-dashoffset="65.4"/></svg>
+              <div style="position: absolute; inset: 0; display: grid; place-items: center;"><div class="mini-num" style="font-size: 10px;">2:14</div></div>
+            </div>
+            <div class="mini-sub">of 5:00 target · 47%</div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 2px; margin-top: 4px; width: 100%;">
+              <div style="background: rgba(255,255,255,0.85); padding: 3px; border-radius: 2px; text-align: center;"><div class="mini-num" style="font-size: 6px; color: var(--blossom);">284</div><div class="mini-sub" style="font-size: 3px;">steps</div></div>
+              <div style="background: rgba(255,255,255,0.85); padding: 3px; border-radius: 2px; text-align: center;"><div class="mini-num" style="font-size: 6px; color: var(--danger);">82</div><div class="mini-sub" style="font-size: 3px;">bpm</div></div>
+              <div style="background: rgba(255,255,255,0.85); padding: 3px; border-radius: 2px; text-align: center;"><div class="mini-num" style="font-size: 6px; color: var(--success);">0.13</div><div class="mini-sub" style="font-size: 3px;">mi</div></div>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2px; margin-top: auto; width: 100%;">
+              <div style="background: rgba(60,60,67,0.08); padding: 3px; border-radius: 2px; text-align: center; font-size: 4px; font-weight: 600;">Pause</div>
+              <div style="background: var(--danger); color: #fff; padding: 3px; border-radius: 2px; text-align: center; font-size: 4px; font-weight: 600;">End</div>
+            </div>
+          </div><div class="home-ind"></div></div></div>
+          <div class="meta-row"><span class="num-tag">15</span><span class="name">Mini Walk Active</span></div>
+          <span class="group-pill">Walk</span>
+        </a>
+
+        <a class="card" data-tier="2" data-group="characters" href="screens/16-characters.html">
+          <div class="thumb"><div class="device-frame"><div class="island"></div><div class="thumb-content" style="padding-top: 16px;">
+            <div class="mini-sub">2 of 5 unlocked</div>
+            <div class="mini-h" style="font-size: 7px;">Companions</div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 3px; margin-top: 3px;">
+              <div style="background: var(--surface); border-radius: 3px; padding: 4px; text-align: center;">
+                <div style="width: 14px; height: 14px; border-radius: 50%; background: var(--ripple); margin: 0 auto 2px;"></div>
+                <div class="mini-h" style="font-size: 4px;">Ripple</div>
+                <div class="mini-sub" style="font-size: 3px; color: var(--success);">FREE</div>
+              </div>
+              <div style="background: var(--surface); border-radius: 3px; padding: 4px; text-align: center;">
+                <div style="width: 14px; height: 14px; border-radius: 50%; background: var(--blossom); margin: 0 auto 2px;"></div>
+                <div class="mini-h" style="font-size: 4px;">Blossom</div>
+                <div class="mini-sub" style="font-size: 3px; color: var(--success);">FREE</div>
+              </div>
+              <div style="background: var(--surface); border-radius: 3px; padding: 4px; text-align: center; opacity: 0.6;">
+                <div style="width: 14px; height: 14px; border-radius: 50%; background: var(--ember); margin: 0 auto 2px;"></div>
+                <div class="mini-h" style="font-size: 4px;">Ember</div>
+                <div class="mini-sub" style="font-size: 3px; color: var(--gold);">PLUS</div>
+              </div>
+              <div style="background: var(--surface); border-radius: 3px; padding: 4px; text-align: center; opacity: 0.6;">
+                <div style="width: 14px; height: 14px; border-radius: 50%; background: var(--zephyr); margin: 0 auto 2px;"></div>
+                <div class="mini-h" style="font-size: 4px;">Zephyr</div>
+                <div class="mini-sub" style="font-size: 3px; color: var(--gold);">PLUS</div>
+              </div>
+            </div>
+            <div style="background: linear-gradient(135deg, rgba(123,134,203,0.10), rgba(79,195,247,0.10)); border-radius: 3px; padding: 3px; margin-top: 3px; text-align: center;">
+              <div class="mini-sub" style="font-size: 3px;">Lumi · 23 days to go</div>
+              <div style="height: 2px; background: rgba(123,134,203,0.18); border-radius: 999px; margin-top: 2px;"><div style="width: 23%; height: 100%; background: var(--lumi); border-radius: 999px;"></div></div>
+            </div>
+          </div><div class="home-ind"></div></div></div>
+          <div class="meta-row"><span class="num-tag">16</span><span class="name">Characters Grid</span></div>
+          <span class="group-pill">Characters</span>
+        </a>
+
+        <a class="card" data-tier="2" data-group="characters" href="screens/17-character-detail.html">
+          <div class="thumb"><div class="device-frame"><div class="island"></div><div class="thumb-content" style="padding-top: 12px;">
+            <div style="background: radial-gradient(circle at 50% 30%, rgba(79,195,247,0.18), transparent), #fff; border-radius: 6px; padding: 8px 4px; text-align: center;">
+              <div style="width: 36px; height: 36px; background: var(--ripple); border-radius: 50%; margin: 0 auto 3px; display: grid; place-items: center;">
+                <svg width="22" height="22" viewBox="0 0 100 100"><ellipse cx="50" cy="55" rx="26" ry="28" fill="#B3E5FC"/><circle cx="50" cy="38" r="20" fill="#4FC3F7"/><circle cx="42" cy="36" r="3" fill="#101223"/><circle cx="58" cy="36" r="3" fill="#101223"/></svg>
+              </div>
+              <div class="mini-h" style="font-size: 7px;">Ripple</div>
+              <div class="mini-sub" style="color: var(--accent-strong); font-size: 3.5px;">WATER OTTER</div>
+              <div class="mini-sub" style="font-size: 3px; font-style: italic; margin-top: 2px;">"find the still water"</div>
+            </div>
+            <div style="display: flex; gap: 2px; margin-top: 4px;">
+              <div style="flex: 1; background: var(--accent); padding: 2px; border-radius: 2px; text-align: center; color: #fff; font-size: 3px;">S1</div>
+              <div style="flex: 1; background: rgba(60,60,67,0.08); padding: 2px; border-radius: 2px; text-align: center; font-size: 3px;">S2</div>
+              <div style="flex: 1; background: rgba(60,60,67,0.08); padding: 2px; border-radius: 2px; text-align: center; font-size: 3px;">S3</div>
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 1px; margin-top: 4px;">
+              <div style="height: 8px; background: rgba(52,199,89,0.20); border-radius: 1px;"></div>
+              <div style="height: 8px; background: rgba(0,122,255,0.20); border-radius: 1px;"></div>
+              <div style="height: 8px; background: rgba(255,214,10,0.20); border-radius: 1px;"></div>
+              <div style="height: 8px; background: rgba(255,149,0,0.20); border-radius: 1px;"></div>
+              <div style="height: 8px; background: rgba(255,59,48,0.20); border-radius: 1px;"></div>
+            </div>
+          </div><div class="home-ind"></div></div></div>
+          <div class="meta-row"><span class="num-tag">17</span><span class="name">Ripple Detail</span></div>
+          <span class="group-pill">Characters</span>
+        </a>
+
+        <a class="card" data-tier="2" data-group="bioage" href="screens/18-bio-age.html">
+          <div class="thumb"><div class="device-frame"><div class="island"></div><div class="thumb-content" style="padding-top: 12px;">
+            <div style="background: linear-gradient(135deg, var(--lumi), #5C6BC0); border-radius: 6px; padding: 8px 4px; text-align: center; color: #fff;">
+              <div class="mini-sub" style="color: rgba(255,255,255,0.7); font-size: 3.5px;">YOUR BIO AGE</div>
+              <div class="mini-num" style="font-size: 22px; line-height: 1;">26</div>
+              <div style="display: inline-block; padding: 1.5px 4px; background: rgba(255,255,255,0.18); border-radius: 999px; font-size: 3.5px; font-weight: 600; margin-top: 3px;">↑ 2 yrs younger</div>
+            </div>
+            <div style="background: #fff; border-radius: 3px; padding: 3px; margin-top: 3px;">
+              <div style="display: flex; justify-content: space-between; padding: 1.5px 0; font-size: 3.5px;"><span>HRV</span><span style="color: var(--success); font-weight: 700;">-1.4y</span></div>
+              <div style="display: flex; justify-content: space-between; padding: 1.5px 0; font-size: 3.5px; border-top: 1px solid var(--separator);"><span>Sleep</span><span style="color: var(--success); font-weight: 700;">-0.6y</span></div>
+              <div style="display: flex; justify-content: space-between; padding: 1.5px 0; font-size: 3.5px; border-top: 1px solid var(--separator);"><span>Stress load</span><span style="color: var(--danger); font-weight: 700;">+0.4y</span></div>
+            </div>
+          </div><div class="home-ind"></div></div></div>
+          <div class="meta-row"><span class="num-tag">18</span><span class="name">Biological Age</span></div>
+          <span class="group-pill">Bio Age</span>
+        </a>
+      </div>
+    </section>
+
+    <!-- TIER 3 -->
+    <section class="tier-section" data-tier="3">
+      <div class="tier-head">
+        <span class="tier-num">3</span>
+        <h2>Secondary &amp; paywall</h2>
+        <span class="tier-sub">7 screens · commerce + utility</span>
+      </div>
+      <div class="grid">
+
+        <a class="card" data-tier="3" data-group="iap" href="screens/19-paywall.html">
+          <div class="thumb"><div class="device-frame"><div class="island"></div><div class="thumb-content" style="padding-top: 14px; align-items: center;">
+            <div style="display: flex; align-items: end; gap: -3px;">
+              <div style="width: 14px; height: 14px; border-radius: 50%; background: var(--ember);"></div>
+              <div style="width: 18px; height: 18px; border-radius: 50%; background: var(--zephyr); margin: 0 -3px;"></div>
+              <div style="width: 14px; height: 14px; border-radius: 50%; background: var(--lumi);"></div>
+            </div>
+            <div class="mini-h" style="font-size: 5px; text-align: center; margin-top: 3px; line-height: 1.3;">Unlock premium companions</div>
+            <div style="background: #fff; border-radius: 3px; padding: 3px; width: 100%; margin-top: 3px;">
+              <div style="display: flex; gap: 2px; padding: 1.5px 0; font-size: 3.5px;"><div style="width: 5px; height: 5px; background: linear-gradient(135deg, #FE9901, #FFAB91); border-radius: 1.5px;"></div><span>Predictive insights</span><span style="margin-left: auto; color: var(--success);">✓</span></div>
+              <div style="display: flex; gap: 2px; padding: 1.5px 0; font-size: 3.5px;"><div style="width: 5px; height: 5px; background: linear-gradient(135deg, #FE9901, #FFAB91); border-radius: 1.5px;"></div><span>3 characters</span><span style="margin-left: auto; color: var(--success);">✓</span></div>
+            </div>
+            <div style="background: #fff; border: 1px solid var(--gold); border-radius: 3px; padding: 3px; margin-top: 3px; width: 100%; text-align: center;">
+              <div class="mini-h" style="font-size: 4px;">Annual · SAVE 45%</div>
+              <div class="mini-num" style="font-size: 7px; color: var(--gold);">$4.99<span style="font-size: 3.5px; color: var(--muted);">/mo</span></div>
+            </div>
+            <div style="margin-top: auto; padding: 3px 6px; background: linear-gradient(135deg, #FE9901, #FFAB91); color: #fff; font-size: 4px; border-radius: 2px; font-weight: 700;">FREE TRIAL</div>
+          </div><div class="home-ind"></div></div></div>
+          <div class="meta-row"><span class="num-tag">19</span><span class="name">Premium Paywall</span></div>
+          <span class="group-pill">IAP</span>
+        </a>
+
+        <a class="card" data-tier="3" data-group="iap" href="screens/20-purchase-success.html">
+          <div class="thumb"><div class="device-frame" style="background: radial-gradient(50% 30% at 50% 20%, rgba(254,153,1,0.18), transparent), var(--bg);"><div class="island"></div><div class="thumb-content" style="align-items: center; padding-top: 16px;">
+            <div style="width: 20px; height: 20px; border-radius: 50%; background: linear-gradient(135deg, #FE9901, #FFAB91); display: grid; place-items: center; color: #fff;">
+              <svg width="12" height="12" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="3.4" stroke-linecap="round"><path d="M5 12l5 5L20 7"/></svg>
+            </div>
+            <div class="mini-h" style="font-size: 6px; margin-top: 3px;">Welcome to Plus</div>
+            <div class="mini-sub" style="text-align: center; margin-top: 2px;">3 friends traveling</div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 2px; margin-top: 4px; width: 100%;">
+              <div style="background: #fff; border-radius: 2px; padding: 3px; text-align: center;">
+                <div style="width: 12px; height: 12px; border-radius: 50%; background: var(--ember); margin: 0 auto 1px;"></div>
+                <div class="mini-h" style="font-size: 3px;">Ember</div>
+              </div>
+              <div style="background: #fff; border-radius: 2px; padding: 3px; text-align: center;">
+                <div style="width: 12px; height: 12px; border-radius: 50%; background: var(--zephyr); margin: 0 auto 1px;"></div>
+                <div class="mini-h" style="font-size: 3px;">Zephyr</div>
+              </div>
+              <div style="background: #fff; border-radius: 2px; padding: 3px; text-align: center;">
+                <div style="width: 12px; height: 12px; border-radius: 50%; background: var(--lumi); margin: 0 auto 1px;"></div>
+                <div class="mini-h" style="font-size: 3px;">Lumi</div>
+              </div>
+            </div>
+            <div style="background: #fff; border-radius: 2px; padding: 3px; width: 100%; margin-top: 4px;">
+              <div style="display: flex; justify-content: space-between; font-size: 3px;"><span>Trial ends</span><span style="font-family: var(--font-mono);">Apr 29</span></div>
+              <div style="display: flex; justify-content: space-between; font-size: 3px; margin-top: 1px;"><span>Charged</span><span style="font-family: var(--font-mono);">$59.99/y</span></div>
+            </div>
+            <div style="margin-top: auto; padding: 3px 8px; background: linear-gradient(135deg, #FE9901, #FFAB91); color: #fff; font-size: 4px; border-radius: 2px; font-weight: 700;">HOME</div>
+          </div><div class="home-ind"></div></div></div>
+          <div class="meta-row"><span class="num-tag">20</span><span class="name">Purchase Success</span></div>
+          <span class="group-pill">IAP</span>
+        </a>
+
+        <a class="card" data-tier="3" data-group="data" href="screens/21-export.html">
+          <div class="thumb"><div class="device-frame"><div class="island"></div><div class="thumb-content" style="padding-top: 16px;">
+            <div class="mini-h" style="font-size: 6px;">Export data</div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 2px; margin-top: 3px;">
+              <div style="background: rgba(79,195,247,0.10); border: 1.5px solid var(--accent-strong); padding: 3px; border-radius: 2px; text-align: center;"><div class="mini-h" style="font-size: 4px;">CSV</div><div class="mini-sub" style="font-size: 3px;">Excel</div></div>
+              <div style="background: #fff; border: 1px solid var(--separator); padding: 3px; border-radius: 2px; text-align: center;"><div class="mini-h" style="font-size: 4px;">JSON</div><div class="mini-sub" style="font-size: 3px;">Dev</div></div>
+              <div style="background: #fff; border: 1px solid var(--separator); padding: 3px; border-radius: 2px; text-align: center;"><div class="mini-h" style="font-size: 4px;">PDF</div><div class="mini-sub" style="font-size: 3px;">Report</div></div>
+            </div>
+            <div style="background: #fff; padding: 3px; border-radius: 2px; margin-top: 3px;">
+              <div class="mini-h" style="font-size: 3.5px; margin-bottom: 2px;">Date range</div>
+              <div style="display: flex; justify-content: space-between; padding: 1.5px; font-size: 3px; background: var(--accent-strong); color: #fff; border-radius: 1.5px;"><span>All data</span><span>1 year</span></div>
+            </div>
+            <div style="background: rgba(60,60,67,0.04); padding: 3px; border-radius: 2px; margin-top: 3px; font-family: var(--font-mono); font-size: 3px; color: var(--muted); line-height: 1.4;">
+              date, score, hrv…<br/>2026-04-22, 42, 52…
+            </div>
+            <div style="background: rgba(52,199,89,0.10); padding: 3px; border-radius: 2px; margin-top: 3px; display: flex; align-items: center; gap: 2px;">
+              <svg width="6" height="6" viewBox="0 0 24 24" stroke="var(--success)" fill="none" stroke-width="2"><path d="M12 2L4 6v6c0 5 3.5 8.5 8 10"/></svg>
+              <div class="mini-sub" style="font-size: 3px; color: var(--fg-secondary); flex: 1;">Stays on device</div>
+            </div>
+            <div style="margin-top: auto; padding: 3px 6px; background: var(--accent); color: #fff; font-size: 4px; border-radius: 2px; font-weight: 700; text-align: center;">GENERATE</div>
+          </div><div class="home-ind"></div></div></div>
+          <div class="meta-row"><span class="num-tag">21</span><span class="name">Data Export</span></div>
+          <span class="group-pill">Data</span>
+        </a>
+
+        <a class="card" data-tier="3" data-group="data" href="screens/22-manage.html">
+          <div class="thumb"><div class="device-frame"><div class="island"></div><div class="thumb-content" style="padding-top: 16px; position: relative;">
+            <div class="mini-h" style="font-size: 6px;">Manage data</div>
+            <div style="background: rgba(255,59,48,0.08); border: 1px solid rgba(255,59,48,0.18); padding: 3px; border-radius: 2px; margin-top: 3px;">
+              <div class="mini-sub" style="font-size: 3px; color: var(--danger); font-weight: 700;">⚠ DELETIONS PERMANENT</div>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 2px; margin-top: 3px;">
+              <div style="background: #fff; padding: 3px; border-radius: 2px; text-align: center;"><div class="mini-num" style="font-size: 5px;">247</div><div class="mini-sub" style="font-size: 3px;">readings</div></div>
+              <div style="background: #fff; padding: 3px; border-radius: 2px; text-align: center;"><div class="mini-num" style="font-size: 5px;">14</div><div class="mini-sub" style="font-size: 3px;">months</div></div>
+            </div>
+            <div style="background: #fff; padding: 3px; border-radius: 2px; margin-top: 3px;">
+              <div style="display: flex; gap: 2px; padding: 1.5px 0; font-size: 3px; border-bottom: 1px solid var(--separator);"><div style="width: 4px; height: 4px; background: rgba(255,59,48,0.10); border-radius: 1px;"></div><span>Stress scores</span></div>
+              <div style="display: flex; gap: 2px; padding: 1.5px 0; font-size: 3px;"><div style="width: 4px; height: 4px; background: rgba(255,59,48,0.10); border-radius: 1px;"></div><span>Mood notes</span></div>
+            </div>
+            <div style="border: 1.5px solid rgba(255,59,48,0.18); padding: 3px; border-radius: 2px; margin-top: 3px;">
+              <div class="mini-h" style="font-size: 4px; color: var(--danger);">Delete everything</div>
+            </div>
+            <!-- Mocked confirm sheet -->
+            <div style="position: absolute; bottom: 18px; left: 4px; right: 4px; background: rgba(0,0,0,0.4); border-radius: 4px; padding: 4px; backdrop-filter: blur(4px);">
+              <div style="background: #fff; border-radius: 3px; padding: 3px; text-align: center;">
+                <div class="mini-h" style="font-size: 4px;">Erase everything?</div>
+                <div style="padding: 2px 4px; background: var(--danger); color: #fff; font-size: 3px; border-radius: 1.5px; margin-top: 2px; font-weight: 700;">ERASE</div>
+              </div>
+            </div>
+          </div><div class="home-ind"></div></div></div>
+          <div class="meta-row"><span class="num-tag">22</span><span class="name">Manage Data</span></div>
+          <span class="group-pill">Data</span>
+        </a>
+
+        <a class="card" data-tier="3" data-group="settings" href="screens/23-appearance.html">
+          <div class="thumb"><div class="device-frame" style="background: #FFFDF6;"><div class="island"></div><div class="thumb-content" style="padding-top: 16px;">
+            <div class="mini-h" style="font-size: 6px;">Appearance</div>
+            <div style="background: linear-gradient(135deg, #F2F2F7, #fff); border-radius: 3px; padding: 3px; margin-top: 3px;">
+              <div style="background: #fff; border-radius: 2px; padding: 3px; display: flex; gap: 2px; align-items: center;">
+                <div style="width: 10px; height: 10px; border-radius: 50%; background: conic-gradient(var(--stress-mild) 0% 42%, rgba(60,60,67,0.10) 42%); display: grid; place-items: center;"><div style="width: 6px; height: 6px; border-radius: 50%; background: #fff;"></div></div>
+                <div style="flex: 1;"><div class="mini-h" style="font-size: 3px;">Mild · Focused</div></div>
+              </div>
+            </div>
+            <div style="background: #fff; padding: 3px; border-radius: 2px; margin-top: 3px;">
+              <div class="mini-h" style="font-size: 3.5px;">Theme</div>
+              <div style="display: flex; gap: 1px; background: rgba(60,60,67,0.06); padding: 1.5px; border-radius: 2px; margin-top: 1.5px;">
+                <div style="flex: 1; text-align: center; padding: 1.5px; font-size: 3px; border-radius: 1px;">Light</div>
+                <div style="flex: 1; text-align: center; padding: 1.5px; font-size: 3px; background: #fff; border-radius: 1px; box-shadow: 0 0.5px 1px rgba(0,0,0,0.06); font-weight: 700;">System</div>
+                <div style="flex: 1; text-align: center; padding: 1.5px; font-size: 3px; border-radius: 1px;">Dark</div>
+              </div>
+            </div>
+            <div style="background: #fff; padding: 3px; border-radius: 2px; margin-top: 3px;">
+              <div class="mini-h" style="font-size: 3.5px;">Text size</div>
+              <div style="height: 1.5px; background: rgba(60,60,67,0.10); border-radius: 999px; margin-top: 3px; position: relative;"><div style="width: 50%; height: 100%; background: var(--accent-strong); border-radius: 999px;"></div><div style="position: absolute; top: -1.5px; left: 50%; width: 5px; height: 5px; background: #fff; border-radius: 50%; box-shadow: 0 1px 2px rgba(0,0,0,0.15);"></div></div>
+            </div>
+            <div style="background: #fff; padding: 3px; border-radius: 2px; margin-top: 3px;">
+              <div style="display: flex; gap: 2px; padding: 1.5px 0; font-size: 3px; border-bottom: 1px solid var(--separator);"><div style="width: 4px; height: 4px; background: var(--gold); border-radius: 1px;"></div><span>Haptics</span><div style="margin-left: auto; width: 7px; height: 4px; background: var(--success); border-radius: 999px;"></div></div>
+              <div style="display: flex; gap: 2px; padding: 1.5px 0; font-size: 3px;"><div style="width: 4px; height: 4px; background: var(--accent); border-radius: 1px;"></div><span>Rain on breathe</span></div>
+            </div>
+          </div><div class="home-ind"></div></div></div>
+          <div class="meta-row"><span class="num-tag">23</span><span class="name">Appearance</span></div>
+          <span class="group-pill">Settings</span>
+        </a>
+
+        <a class="card" data-tier="3" data-group="settings" href="screens/24-watch-face.html">
+          <div class="thumb"><div class="device-frame"><div class="island"></div><div class="thumb-content" style="padding-top: 16px;">
+            <div class="mini-h" style="font-size: 6px;">Watch Face</div>
+            <div style="background: #fff; border-radius: 3px; padding: 4px; margin-top: 3px; display: flex; gap: 3px; align-items: center;">
+              <div style="width: 16px; height: 20px; background: #000; border-radius: 5px; display: grid; place-items: center; flex: 0 0 16px;">
+                <svg width="10" height="13" viewBox="0 0 60 80"><circle cx="30" cy="42" r="20" stroke="rgba(255,255,255,0.15)" stroke-width="3" fill="none"/><circle cx="30" cy="42" r="20" stroke="#007AFF" stroke-width="3" stroke-linecap="round" fill="none" stroke-dasharray="125" stroke-dashoffset="73" transform="rotate(-90 30 42)"/><text x="30" y="46" text-anchor="middle" font-family="-apple-system" font-size="14" font-weight="700" fill="#fff">42</text></svg>
+              </div>
+              <div style="flex: 1;"><div class="mini-h" style="font-size: 3.5px;">Watch Series 9</div><div class="mini-sub" style="font-size: 3px; color: var(--success);">● Synced · 78%</div></div>
+            </div>
+            <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 2px; margin-top: 3px;">
+              <div style="background: #fff; border: 1.5px solid var(--accent-strong); border-radius: 2px; padding: 2.5px; text-align: center;"><div style="width: 10px; height: 13px; background: #000; border-radius: 3px; margin: 0 auto 2px; display: grid; place-items: center;"><svg width="6" height="8" viewBox="0 0 60 80"><circle cx="30" cy="42" r="18" stroke="#007AFF" stroke-width="3" fill="none"/></svg></div><div class="mini-h" style="font-size: 3px;">Ring</div></div>
+              <div style="background: #fff; border-radius: 2px; padding: 2.5px; text-align: center;"><div style="width: 10px; height: 13px; background: #000; border-radius: 3px; margin: 0 auto 2px;"></div><div class="mini-h" style="font-size: 3px;">Bars</div></div>
+              <div style="background: #fff; border-radius: 2px; padding: 2.5px; text-align: center;"><div style="width: 10px; height: 13px; background: #000; border-radius: 3px; margin: 0 auto 2px;"></div><div class="mini-h" style="font-size: 3px;">Mascot</div></div>
+            </div>
+            <div style="background: rgba(79,195,247,0.10); border: 1px solid rgba(79,195,247,0.18); padding: 3px; border-radius: 2px; margin-top: 3px;">
+              <div class="mini-sub" style="font-size: 3px; color: var(--accent-strong);">↻ Syncs every 5 min</div>
+            </div>
+          </div><div class="home-ind"></div></div></div>
+          <div class="meta-row"><span class="num-tag">24</span><span class="name">Watch Face</span></div>
+          <span class="group-pill">Settings</span>
+        </a>
+
+        <a class="card" data-tier="3" data-group="settings" href="screens/25-about.html">
+          <div class="thumb"><div class="device-frame" style="background: #FFFDF6;"><div class="island"></div><div class="thumb-content" style="padding-top: 14px; align-items: center;">
+            <div style="width: 22px; height: 22px; border-radius: 6px; background: linear-gradient(135deg, var(--ripple), var(--blossom)); display: grid; place-items: center; color: #fff;">
+              <svg width="11" height="11" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2"><path d="M12 21s-7-4.5-7-11a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 6.5-7 11-7 11z"/></svg>
+            </div>
+            <div class="mini-h" style="font-size: 6px; margin-top: 3px;">StressMonitor</div>
+            <div class="mini-sub">VERSION 1.4.2 · BUILD 248</div>
+            <div class="mini-sub" style="text-align: center; max-width: 28ch; margin-top: 2px;">Calmer nervous system, one breath at a time.</div>
+            <div style="background: #fff; border-radius: 2px; padding: 3px; width: 100%; margin-top: 4px;">
+              <div style="display: flex; gap: 2px; padding: 1.5px 0; font-size: 3px; border-bottom: 1px solid var(--separator);"><div style="width: 4px; height: 4px; background: var(--accent); border-radius: 1px;"></div><span>Help center</span><span style="margin-left: auto;">›</span></div>
+              <div style="display: flex; gap: 2px; padding: 1.5px 0; font-size: 3px; border-bottom: 1px solid var(--separator);"><div style="width: 4px; height: 4px; background: var(--blossom); border-radius: 1px;"></div><span>Contact</span><span style="margin-left: auto;">›</span></div>
+              <div style="display: flex; gap: 2px; padding: 1.5px 0; font-size: 3px;"><div style="width: 4px; height: 4px; background: var(--purple); border-radius: 1px;"></div><span>Privacy</span><span style="margin-left: auto;">›</span></div>
+            </div>
+            <div style="background: linear-gradient(135deg, rgba(79,195,247,0.10), rgba(165,214,167,0.10)); padding: 3px; border-radius: 2px; width: 100%; margin-top: 3px; text-align: center;">
+              <div class="mini-sub" style="font-size: 3px;">Built by 4 humans, 5 otters</div>
+            </div>
+          </div><div class="home-ind"></div></div></div>
+          <div class="meta-row"><span class="num-tag">25</span><span class="name">About / Help</span></div>
+          <span class="group-pill">Settings</span>
+        </a>
+      </div>
+    </section>
+
+    <footer class="footer">
+      <div>StressMonitor prototype · 27 screens · Apple Design System</div>
+      <div>
+        <a href="design-system.html">Design system ›</a>
+        <span style="margin: 0 12px; color: var(--separator);">·</span>
+        <a href="screens/01-welcome.html">Start the flow ›</a>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    // Filter chips
+    const chips = document.querySelectorAll('.filter-chip');
+    const cards = document.querySelectorAll('.card');
+    chips.forEach(chip => {
+      chip.addEventListener('click', () => {
+        chips.forEach(c => c.classList.remove('active'));
+        chip.classList.add('active');
+        const filter = chip.dataset.filter;
+        cards.forEach(card => {
+          if (filter === 'all' || card.dataset.group === filter) {
+            card.classList.remove('hidden');
+          } else {
+            card.classList.add('hidden');
+          }
+        });
+        // Hide tier sections with no visible cards
+        document.querySelectorAll('.tier-section').forEach(section => {
+          const visible = section.querySelectorAll('.card:not(.hidden)');
+          section.style.display = visible.length > 0 ? '' : 'none';
+        });
+      });
+    });
+  </script>
+</body>
+</html>

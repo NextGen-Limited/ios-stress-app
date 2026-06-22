@@ -1,0 +1,249 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>07 · Measurement Result — StressMonitor</title>
+  <link rel="stylesheet" href="../css/app.css" />
+  <style>
+    .result-stage { padding: 0 20px 16px; display: flex; flex-direction: column; gap: 16px; }
+    .result-hero {
+      display: flex; flex-direction: column; align-items: center;
+      padding: 14px 0 6px; gap: 6px;
+    }
+    .ring-big {
+      position: relative;
+      width: 200px; height: 200px;
+      display: grid; place-items: center;
+    }
+    .ring-big svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+    .ring-big .center {
+      position: absolute; inset: 0;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px;
+    }
+    .ring-big .num-big {
+      font-family: var(--font-rounded);
+      font-size: 64px;
+      line-height: 1;
+      font-weight: 700;
+      letter-spacing: -0.025em;
+      color: var(--stress-mild);
+    }
+    .ring-big .state {
+      font-family: var(--font-body);
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--stress-mild);
+    }
+    .ring-big .meta-line {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      margin-top: 4px;
+    }
+    .conf-row {
+      display: flex; gap: 6px; align-items: center;
+      font-size: 12px; color: var(--muted);
+    }
+    .conf-row .dot { width: 6px; height: 6px; border-radius: 50%; background: var(--success); }
+
+    .factor-list {
+      background: var(--surface);
+      border-radius: var(--radius-card);
+      padding: 4px 16px;
+    }
+    .factor-row {
+      display: grid; grid-template-columns: 28px 1fr 50px 60px; gap: 10px;
+      align-items: center;
+      padding: 10px 0;
+      border-top: 1px solid var(--separator);
+    }
+    .factor-row:first-child { border-top: 0; }
+    .factor-row .ficon {
+      width: 28px; height: 28px;
+      border-radius: 8px;
+      display: grid; place-items: center;
+      color: #fff;
+    }
+    .factor-row .ficon svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 1.8; }
+    .factor-row .fname { font-size: 14px; font-weight: 500; }
+    .factor-row .fname .sub { font-size: 11px; color: var(--muted); display: block; font-weight: 400; }
+    .factor-row .fbar {
+      height: 6px;
+      background: rgba(60,60,67,0.10);
+      border-radius: 999px;
+      overflow: hidden;
+    }
+    .factor-row .fbar > span {
+      display: block;
+      height: 100%;
+      border-radius: 999px;
+    }
+    .factor-row .fval { font-family: var(--font-mono); font-size: 13px; font-weight: 600; text-align: right; }
+
+    .takeaways {
+      background: linear-gradient(135deg, rgba(79,195,247,0.10), rgba(165,214,167,0.10));
+      border: 1px solid var(--separator);
+      border-radius: var(--radius-card);
+      padding: 14px 16px;
+      display: flex; gap: 12px;
+    }
+    .takeaways .tk-avatar {
+      width: 36px; height: 36px;
+      border-radius: 50%;
+      background: var(--accent-soft);
+      display: grid; place-items: center;
+      flex: 0 0 36px;
+    }
+    .takeaways .tk-avatar svg { width: 28px; height: 28px; }
+    .takeaways p { margin: 0; font-size: 13px; line-height: 1.4; }
+    .takeaways strong { color: var(--accent-strong); }
+
+    .action-row { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+
+    .ribbon {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 6px 12px;
+      border-radius: 999px;
+      background: rgba(0,122,255,0.10);
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--stress-mild);
+    }
+  </style>
+</head>
+<body>
+  <div class="stage">
+    <div class="caption"><a href="04-home.html" class="nav-back">‹ Home</a> <strong>STRESSMONITOR</strong> · 07 Measurement</div>
+
+    <div class="device" data-od-id="device">
+      <span class="btn-rail left-1" aria-hidden></span>
+      <span class="btn-rail left-2" aria-hidden></span>
+      <span class="btn-rail left-3" aria-hidden></span>
+      <span class="btn-rail right-1" aria-hidden></span>
+      <span class="island" aria-hidden></span>
+
+      <div class="screen">
+        <div class="statusbar">
+          <span class="num">9:41</span>
+          <span class="right">
+            <svg viewBox="0 0 17 11" aria-hidden><rect x="0" y="7" width="3" height="4" rx="0.6"/><rect x="4" y="5" width="3" height="6" rx="0.6"/><rect x="8" y="3" width="3" height="8" rx="0.6"/><rect x="12" y="0" width="3" height="11" rx="0.6"/></svg>
+            <svg viewBox="0 0 17 11" aria-hidden><path d="M8.5 1.5C5.5 1.5 2.7 2.6 0.5 4.6L2 6.1C3.8 4.5 6.1 3.6 8.5 3.6c2.4 0 4.7 0.9 6.5 2.5l1.5-1.5c-2.2-2-5-3.1-8-3.1zM3.5 7.6L5 9.1c1-0.9 2.2-1.4 3.5-1.4 1.3 0 2.5 0.5 3.5 1.4l1.5-1.5c-1.4-1.3-3.1-2-5-2-1.9 0-3.6 0.7-5 2zM6.5 10.6l2 2 2-2c-0.5-0.5-1.2-0.8-2-0.8s-1.5 0.3-2 0.8z"/></svg>
+            <svg class="battery" viewBox="0 0 25 11" aria-hidden><rect x="0.5" y="0.5" width="21" height="10" rx="2.5" fill="none" stroke="currentColor" stroke-opacity="0.45"/><rect x="22" y="3.5" width="1.5" height="4" rx="0.4" fill="currentColor" fill-opacity="0.45"/><rect x="2" y="2" width="18" height="7" rx="1.4"/></svg>
+          </span>
+        </div>
+
+        <main class="content" data-od-id="content">
+          <div class="nav">
+            <button class="nav-btn" type="button">
+              <svg viewBox="0 0 14 20"><path d="M11 2L3 10l8 8"/></svg>
+            </button>
+            <span class="nav-title">Result</span>
+            <button class="nav-action">Share</button>
+          </div>
+
+          <div class="result-stage">
+            <div class="result-hero">
+              <div class="ring-big">
+                <svg viewBox="0 0 200 200">
+                  <circle cx="100" cy="100" r="84" fill="none" stroke="rgba(60,60,67,0.10)" stroke-width="14"/>
+                  <circle cx="100" cy="100" r="84" fill="none" stroke="#007AFF" stroke-width="14" stroke-linecap="round" stroke-dasharray="527.78" stroke-dashoffset="305.71"/>
+                </svg>
+                <div class="center">
+                  <div class="num-big">42</div>
+                  <div class="state">Mild · Focused</div>
+                  <div class="meta-line">9:32 AM · 60s reading</div>
+                </div>
+              </div>
+              <div class="conf-row"><span class="dot"></span> 96% confidence · 5-factor analysis</div>
+            </div>
+
+            <div class="ribbon">
+              <svg width="11" height="11" viewBox="0 0 24 24" stroke="currentColor" fill="none" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M7 14l5-5 5 5"/></svg>
+              Down 16 pts from yesterday
+            </div>
+
+            <!-- 5 factor breakdown -->
+            <div>
+              <p class="meta" style="padding: 0 4px 6px;">5-factor breakdown</p>
+              <div class="factor-list">
+                <div class="factor-row">
+                  <div class="ficon" style="background: var(--hrv-color);">
+                    <svg viewBox="0 0 24 24"><path d="M3 12h4l2-6 4 12 2-6h6"/></svg>
+                  </div>
+                  <div class="fname">HRV balance <span class="sub">parasympathetic tone</span></div>
+                  <div class="fbar"><span style="width: 78%; background: var(--success);"></span></div>
+                  <div class="fval" style="color: var(--success);">+38</div>
+                </div>
+                <div class="factor-row">
+                  <div class="ficon" style="background: var(--hr-color);">
+                    <svg viewBox="0 0 24 24"><path d="M12 21s-7-4.5-7-11a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 6.5-7 11-7 11z"/></svg>
+                  </div>
+                  <div class="fname">Resting HR <span class="sub">recovery baseline</span></div>
+                  <div class="fbar"><span style="width: 65%; background: var(--success);"></span></div>
+                  <div class="fval" style="color: var(--success);">+22</div>
+                </div>
+                <div class="factor-row">
+                  <div class="ficon" style="background: var(--purple);">
+                    <svg viewBox="0 0 24 24"><path d="M21 12.8A9 9 0 1 1 11.2 3a7 7 0 0 0 9.8 9.8z"/></svg>
+                  </div>
+                  <div class="fname">Sleep debt <span class="sub">last night -42min</span></div>
+                  <div class="fbar"><span style="width: 48%; background: var(--stress-moderate);"></span></div>
+                  <div class="fval" style="color: var(--stress-moderate);">-12</div>
+                </div>
+                <div class="factor-row">
+                  <div class="ficon" style="background: var(--warn);">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+                  </div>
+                  <div class="fname">Activity load <span class="sub">14h since move</span></div>
+                  <div class="fbar"><span style="width: 55%; background: var(--stress-high);"></span></div>
+                  <div class="fval" style="color: var(--stress-high);">-18</div>
+                </div>
+                <div class="factor-row">
+                  <div class="ficon" style="background: var(--gold);">
+                    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="3" r="0.5"/><circle cx="12" cy="21" r="0.5"/><circle cx="3" cy="12" r="0.5"/><circle cx="21" cy="12" r="0.5"/></svg>
+                  </div>
+                  <div class="fname">Circadian phase <span class="sub">morning cortisol</span></div>
+                  <div class="fbar"><span style="width: 70%; background: var(--stress-mild);"></span></div>
+                  <div class="fval" style="color: var(--stress-mild);">+12</div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Ripple takeaways -->
+            <div class="takeaways">
+              <div class="tk-avatar">
+                <!-- Ripple mini face -->
+                <svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="50" cy="50" r="36" fill="#4FC3F7"/>
+                  <circle cx="50" cy="56" r="26" fill="#E1F5FE"/>
+                  <circle cx="40" cy="46" r="4.5" fill="#101223"/>
+                  <circle cx="60" cy="46" r="4.5" fill="#101223"/>
+                  <ellipse cx="50" cy="56" rx="2.5" ry="1.8" fill="#101223"/>
+                  <path d="M44 60 Q50 65 56 60" stroke="#101223" stroke-width="1.8" fill="none" stroke-linecap="round"/>
+                </svg>
+              </div>
+              <div>
+                <p><strong>Ripple noticed:</strong> Sleep debt and a long sit are dragging the score down. A 5-minute walk + a tall glass of water should pull you back into Relaxed territory within the hour.</p>
+              </div>
+            </div>
+
+            <div class="action-row">
+              <a href="13-breathing-intro.html" class="btn-secondary">Breathe 2min</a>
+              <a href="15-walk.html" class="btn-primary">Mini Walk</a>
+            </div>
+
+            <a href="11-history.html" class="btn-text" style="text-align: center;">Save &amp; view history</a>
+          </div>
+        </main>
+
+        <div class="home-indicator" aria-hidden></div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>

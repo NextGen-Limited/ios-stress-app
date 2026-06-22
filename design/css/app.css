@@ -1,0 +1,634 @@
+/* =====================================================================
+   StressMonitor · Apple Design System
+   Shared stylesheet — link from every screen file.
+   Apple HIG · SF Pro Display/Text/Rounded · iOS system palette
+   ===================================================================== */
+
+:root {
+  /* ─── iOS surfaces ─────────────────────────────────────────────── */
+  --bg:               #F2F2F7;   /* system grouped background */
+  --bg-elevated:      #FFFFFF;
+  --surface:          #FFFFFF;
+  --surface-2:        #FBFBFD;
+  --settings-bg:      #FFFDF6;   /* warm cream */
+
+  /* ─── Ink ──────────────────────────────────────────────────────── */
+  --fg:               #101223;
+  --fg-secondary:     #3C3C43;
+  --muted:            #777986;
+  --muted-2:          #8E8E93;
+  --separator:        rgba(60, 60, 67, 0.12);
+  --separator-strong: rgba(60, 60, 67, 0.29);
+
+  /* ─── Ripple accent (primary character) ───────────────────────── */
+  --accent:           #4FC3F7;
+  --accent-strong:    #0288D1;
+  --accent-soft:      rgba(79, 195, 247, 0.14);
+
+  /* ─── Stress 5-level scale (always paired with icon/label) ────── */
+  --stress-relaxed:   #34C759;
+  --stress-mild:      #007AFF;
+  --stress-moderate:  #FFD60A;
+  --stress-high:      #FF9500;
+  --stress-severe:    #FF3B30;
+
+  /* ─── Character palette ────────────────────────────────────────── */
+  --ripple:           #4FC3F7;   /* Water Otter — free */
+  --blossom:          #A5D6A7;   /* Forest Sprite — free */
+  --ember:            #FFAB91;   /* Flame Fox — premium */
+  --zephyr:           #D1C4E9;   /* Wind Wisp — premium */
+  --lumi:             #7986CB;   /* Star Pup — 30-day streak */
+
+  /* ─── Semantic + heart metrics ─────────────────────────────────── */
+  --success:          #34C759;
+  --warn:             #FF9500;
+  --danger:           #FF3B30;
+  --hrv-color:        #34D399;
+  --hr-color:         #F87171;
+  --purple:           #8B5CF6;
+  --gold:             #FE9901;
+
+  /* ─── Apple typography ─────────────────────────────────────────── */
+  --font-display: -apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif;
+  --font-body:    -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
+  --font-rounded: -apple-system, BlinkMacSystemFont, 'SF Pro Rounded', 'SF Pro Display', system-ui, sans-serif;
+  --font-mono:    ui-monospace, 'SF Mono', Menlo, monospace;
+
+  /* Type scale (Apple HIG) */
+  --fs-large-title: 34px;
+  --fs-title1: 28px;
+  --fs-title2: 22px;
+  --fs-title3: 20px;
+  --fs-headline: 17px;
+  --fs-body: 17px;
+  --fs-callout: 16px;
+  --fs-subhead: 15px;
+  --fs-footnote: 13px;
+  --fs-caption: 12px;
+  --fs-mini: 11px;
+
+  /* Radii */
+  --radius-card: 18px;
+  --radius-card-lg: 22px;
+  --radius-control: 12px;
+  --radius-pill: 999px;
+}
+
+/* ─── Reset ───────────────────────────────────────────────────── */
+*, *::before, *::after { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; height: 100%; }
+body {
+  background: radial-gradient(70% 50% at 50% 0%, rgba(79,195,247,0.06) 0%, transparent 60%), #ECF0F3;
+  color: var(--fg);
+  font-family: var(--font-body);
+  font-size: var(--fs-body);
+  line-height: 1.4;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+  display: grid;
+  place-items: center;
+  padding: 32px 16px;
+  min-height: 100vh;
+}
+
+/* ─── Caption above device ────────────────────────────────────── */
+.stage { display: flex; flex-direction: column; align-items: center; gap: 18px; }
+.caption {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-align: center;
+}
+.caption strong { color: var(--fg); font-weight: 600; }
+.caption .nav-back { display: inline-block; margin-right: 8px; color: var(--accent-strong); text-decoration: none; }
+
+/* ─── iPhone 14 Pro frame (393 × 852) ─────────────────────────── */
+.device {
+  position: relative;
+  width: 393px;
+  height: 852px;
+  border-radius: 56px;
+  padding: 12px;
+  background: linear-gradient(160deg, #2a2a2c 0%, #1a1a1c 50%, #0e0e10 100%);
+  box-shadow:
+    0 0 0 1px rgba(255,255,255,0.04) inset,
+    0 0 0 2px #000 inset,
+    0 28px 60px -12px rgba(0,0,0,0.45),
+    0 8px 20px -8px rgba(0,0,0,0.35);
+  isolation: isolate;
+}
+.device::before, .device::after {
+  content: ''; position: absolute; width: 3px;
+  background: linear-gradient(to bottom, transparent 0%, rgba(255,255,255,0.06) 8%, transparent 16%, transparent 84%, rgba(255,255,255,0.04) 92%, transparent 100%);
+  top: 100px; bottom: 100px; pointer-events: none;
+}
+.device::before { left: -1px; }
+.device::after  { right: -1px; }
+
+.island {
+  position: absolute;
+  top: 22px; left: 50%;
+  transform: translateX(-50%);
+  width: 125px; height: 36px;
+  background: #000; border-radius: 999px;
+  z-index: 5;
+}
+
+.btn-rail { position: absolute; width: 4px; background: #0a0a0c; border-radius: 2px; }
+.btn-rail.left-1  { left: -3px;  top: 174px; height: 32px; }
+.btn-rail.left-2  { left: -3px;  top: 220px; height: 60px; }
+.btn-rail.left-3  { left: -3px;  top: 290px; height: 60px; }
+.btn-rail.right-1 { right: -3px; top: 250px; height: 100px; }
+
+/* ─── Screen surface ──────────────────────────────────────────── */
+.screen {
+  position: relative;
+  width: 100%; height: 100%;
+  background: var(--bg);
+  border-radius: 44px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.screen.dark { background: #000; color: #fff; }
+.screen.cream { background: var(--settings-bg); }
+
+/* Status bar */
+.statusbar {
+  flex: 0 0 54px;
+  padding: 20px 30px 0;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  font-family: var(--font-body);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--fg);
+  letter-spacing: -0.01em;
+}
+.statusbar.on-dark { color: #fff; }
+.statusbar .right { display: inline-flex; align-items: center; gap: 6px; }
+.statusbar svg { width: 17px; height: 11px; fill: currentColor; }
+.statusbar .battery { width: 25px; }
+
+/* Content region */
+.content {
+  flex: 1 1 auto;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
+  padding: 4px 0 24px;
+}
+.content::-webkit-scrollbar { display: none; }
+
+/* Home indicator */
+.home-indicator { flex: 0 0 28px; position: relative; }
+.home-indicator::after {
+  content: ''; position: absolute;
+  left: 50%; bottom: 8px;
+  transform: translateX(-50%);
+  width: 134px; height: 5px;
+  background: var(--fg);
+  border-radius: 999px;
+  opacity: 0.85;
+}
+.home-indicator.on-dark::after { background: #fff; }
+
+/* ─── Layout primitives ───────────────────────────────────────── */
+.pad     { padding-inline: 20px; }
+.pad-lg  { padding-inline: 24px; }
+.stack   { display: flex; flex-direction: column; gap: 16px; }
+.stack-sm { display: flex; flex-direction: column; gap: 10px; }
+.row     { display: flex; align-items: center; gap: 12px; }
+.row-between { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.grid-2  { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.grid-3  { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; }
+.grid-4  { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; }
+
+/* Large title header (Apple HIG) */
+.large-header {
+  padding: 8px 20px 12px;
+}
+.large-header .eyebrow {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin: 0 0 6px;
+}
+.large-header h1 {
+  font-family: var(--font-display);
+  font-size: var(--fs-large-title);
+  letter-spacing: -0.022em;
+  line-height: 1.1;
+  font-weight: 700;
+  margin: 0;
+}
+
+/* Inline header (back chevron + title + action) */
+.nav {
+  flex: 0 0 auto;
+  padding: 8px 12px 4px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 44px;
+}
+.nav .nav-btn {
+  width: 36px; height: 36px;
+  display: grid; place-items: center;
+  background: transparent;
+  border: 0;
+  color: var(--accent-strong);
+  cursor: pointer;
+  font-family: var(--font-body);
+}
+.nav .nav-btn svg { width: 12px; height: 20px; stroke: currentColor; fill: none; stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; }
+.nav .nav-title {
+  font-family: var(--font-body);
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  color: var(--fg);
+}
+.nav .nav-action {
+  font-family: var(--font-body);
+  font-size: 17px;
+  font-weight: 400;
+  color: var(--accent-strong);
+  background: transparent;
+  border: 0;
+  padding: 6px 10px;
+  cursor: pointer;
+}
+
+/* Section header */
+.section-head {
+  padding: 24px 20px 8px;
+  display: flex; align-items: baseline; justify-content: space-between;
+}
+.section-head h2 {
+  font-family: var(--font-display);
+  font-size: var(--fs-title3);
+  letter-spacing: -0.015em;
+  font-weight: 600;
+  margin: 0;
+}
+.section-head .meta {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent-strong);
+}
+
+/* Typography helpers */
+.h-display { font-family: var(--font-display); font-size: var(--fs-large-title); font-weight: 700; letter-spacing: -0.022em; line-height: 1.1; margin: 0; }
+.h1 { font-family: var(--font-display); font-size: var(--fs-title1); font-weight: 700; letter-spacing: -0.02em; line-height: 1.12; margin: 0; }
+.h2 { font-family: var(--font-display); font-size: var(--fs-title2); font-weight: 700; letter-spacing: -0.018em; line-height: 1.15; margin: 0; }
+.h3 { font-family: var(--font-display); font-size: var(--fs-title3); font-weight: 600; letter-spacing: -0.012em; line-height: 1.2; margin: 0; }
+.headline { font-size: var(--fs-headline); font-weight: 600; line-height: 1.3; margin: 0; letter-spacing: -0.01em; }
+.body { font-size: var(--fs-body); line-height: 1.45; margin: 0; }
+.callout { font-size: var(--fs-callout); line-height: 1.4; color: var(--fg-secondary); margin: 0; }
+.subhead { font-size: var(--fs-subhead); color: var(--fg-secondary); line-height: 1.4; margin: 0; }
+.footnote { font-size: var(--fs-footnote); color: var(--muted); line-height: 1.35; margin: 0; }
+.caption-text { font-size: var(--fs-caption); color: var(--muted); letter-spacing: 0.02em; }
+.meta {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--muted);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+.num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+.rounded { font-family: var(--font-rounded); }  /* character moments */
+
+/* ─── Cards ───────────────────────────────────────────────────── */
+.card {
+  background: var(--surface);
+  border-radius: var(--radius-card);
+  padding: 16px;
+}
+.card.flat { background: transparent; padding: 12px 0; border-top: 1px solid var(--separator); border-radius: 0; }
+.card.flat:first-child { border-top: 0; padding-top: 0; }
+
+/* Apple grouped list (iOS Settings style) */
+.grouped {
+  background: var(--surface);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  margin: 0 16px;
+}
+.grouped-row {
+  display: grid;
+  grid-template-columns: 28px 1fr auto;
+  align-items: center;
+  gap: 12px;
+  padding: 11px 16px;
+  border-top: 1px solid var(--separator);
+  min-height: 44px;
+  background: var(--surface);
+}
+.grouped-row:first-child { border-top: 0; }
+.grouped-row .icon-sf {
+  width: 28px; height: 28px;
+  border-radius: 7px;
+  display: grid; place-items: center;
+  background: var(--accent);
+  color: #fff;
+}
+.grouped-row .icon-sf svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.grouped-row .icon-sf.filled svg { fill: currentColor; stroke: none; }
+.grouped-row .label { font-size: var(--fs-body); color: var(--fg); }
+.grouped-row .value { font-size: var(--fs-subhead); color: var(--muted); }
+.grouped-row .chev { color: var(--muted-2); }
+.grouped-row .chev svg { width: 8px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2.2; }
+.grouped-row .toggle { transform: scale(0.85); transform-origin: right center; }
+
+.grouped-label {
+  padding: 8px 32px 8px;
+  font-size: 13px;
+  color: var(--muted);
+  line-height: 1.35;
+}
+.grouped-label.top { padding-top: 24px; }
+
+/* iOS toggle */
+.ios-toggle {
+  position: relative;
+  width: 51px; height: 31px;
+  background: #E9E9EA;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+  flex: 0 0 51px;
+}
+.ios-toggle::after {
+  content: '';
+  position: absolute;
+  top: 2px; left: 2px;
+  width: 27px; height: 27px;
+  background: #fff;
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+  transition: transform 0.2s ease;
+}
+.ios-toggle.on { background: var(--success); }
+.ios-toggle.on::after { transform: translateX(20px); }
+
+/* ─── Tab bar ───────────────────────────────────────────────────
+   4-tab bar (Home · Action · Trends · Settings). Apple UITabBar
+   lineage: 24px SF Symbol icons, hairline top border, frosted surface.
+   Inactive = thin outline stroke; active = filled glyph + accent tint. */
+.tabbar {
+  flex: 0 0 auto;
+  display: grid;
+  grid-template-columns: repeat(var(--tabs, 4), 1fr);
+  padding: 6px 4px 0;
+  border-top: 0.5px solid var(--separator);
+  background: color-mix(in srgb, var(--surface) 88%, transparent);
+  backdrop-filter: blur(20px) saturate(180%);
+  -webkit-backdrop-filter: blur(20px) saturate(180%);
+}
+.tab {
+  display: flex; flex-direction: column; align-items: center; justify-content: center;
+  gap: 2px;
+  min-height: 49px;
+  padding: 6px 2px;
+  color: var(--muted-2);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  text-decoration: none;
+  -webkit-tap-highlight-color: transparent;
+  transition: color 0.15s ease;
+}
+.tab.active { color: var(--accent-strong); }
+.tab svg {
+  width: 24px; height: 24px;
+  stroke: currentColor; fill: none;
+  stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round;
+}
+.tab.active svg { stroke-width: 1.8; }
+/* .fill-active = icon swaps to filled variant when active (SF Symbol .fill convention) */
+.tab.active svg.fill-active { fill: currentColor; stroke: none; }
+
+/* ─── Buttons ─────────────────────────────────────────────────── */
+.btn-primary {
+  display: flex; align-items: center; justify-content: center;
+  width: 100%;
+  min-height: 50px;
+  padding: 14px 20px;
+  background: var(--accent);
+  color: #fff;
+  border: 0;
+  border-radius: 14px;
+  font-family: var(--font-body);
+  font-size: 17px;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  cursor: pointer;
+}
+.btn-primary.fill-strong { background: var(--accent-strong); }
+.btn-secondary {
+  display: flex; align-items: center; justify-content: center;
+  width: 100%;
+  min-height: 50px;
+  padding: 14px 20px;
+  background: var(--surface-2);
+  color: var(--accent-strong);
+  border: 0;
+  border-radius: 14px;
+  font-family: var(--font-body);
+  font-size: 17px;
+  font-weight: 600;
+  cursor: pointer;
+}
+.btn-text {
+  background: transparent;
+  border: 0;
+  color: var(--accent-strong);
+  font-family: var(--font-body);
+  font-size: 17px;
+  font-weight: 400;
+  padding: 8px 4px;
+  cursor: pointer;
+}
+.btn-pill {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 8px 16px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+  font-family: var(--font-body);
+  font-size: 14px;
+  font-weight: 500;
+  border: 0;
+  cursor: pointer;
+}
+
+/* Pills + tags */
+.pill {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-family: var(--font-body);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  background: var(--accent-soft);
+  color: var(--accent-strong);
+}
+.pill.stress-relaxed  { background: rgba(52,199,89,0.14);  color: var(--stress-relaxed); }
+.pill.stress-mild     { background: rgba(0,122,255,0.14);  color: var(--stress-mild); }
+.pill.stress-moderate { background: rgba(255,214,10,0.20); color: #B59400; }
+.pill.stress-high     { background: rgba(255,149,0,0.16);  color: var(--stress-high); }
+.pill.stress-severe   { background: rgba(255,59,48,0.14);  color: var(--stress-severe); }
+.tag {
+  display: inline-flex; align-items: center;
+  padding: 5px 12px;
+  background: transparent;
+  color: var(--fg-secondary);
+  border: 1px solid var(--separator-strong);
+  border-radius: 999px;
+  font-size: 13px;
+}
+.tag.active { background: var(--fg); color: #fff; border-color: var(--fg); }
+
+/* Chips */
+.chip-row { display: flex; gap: 8px; overflow-x: auto; padding: 0 16px 4px; }
+.chip-row::-webkit-scrollbar { display: none; }
+.chip {
+  flex: 0 0 auto;
+  padding: 8px 14px;
+  border-radius: 999px;
+  background: var(--surface);
+  border: 1px solid var(--separator);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--fg-secondary);
+  white-space: nowrap;
+}
+.chip.active { background: var(--fg); color: #fff; border-color: var(--fg); }
+
+/* Progress bar */
+.progress { height: 6px; background: rgba(60,60,67,0.12); border-radius: 999px; overflow: hidden; }
+.progress > span { display: block; height: 100%; background: var(--accent); border-radius: 999px; }
+
+/* Ring (stress score) */
+.ring-wrap { position: relative; display: inline-grid; place-items: center; }
+.ring-wrap svg { transform: rotate(-90deg); }
+.ring-track  { stroke: rgba(60,60,67,0.10); }
+.ring-fill   { stroke-linecap: round; transition: stroke-dashoffset 0.6s ease; }
+.ring-label  { position: absolute; inset: 0; display: grid; place-items: center; text-align: center; }
+
+/* Placeholder */
+.ph-img {
+  background: linear-gradient(135deg, rgba(79,195,247,0.18), rgba(60,60,67,0.08));
+  border-radius: 14px;
+  aspect-ratio: 4 / 3;
+  display: grid; place-items: center;
+  color: var(--muted);
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.04em;
+}
+.ph-img.square { aspect-ratio: 1; }
+.ph-img.wide   { aspect-ratio: 16 / 9; }
+
+/* SF Symbol-style monoline icons (used inside buttons / navs) */
+.sf { display: inline-block; }
+.sf svg { stroke: currentColor; fill: none; stroke-width: 1.7; stroke-linecap: round; stroke-linejoin: round; }
+
+/* SF Symbol-style filled icons (for tab active states, etc.) */
+.sf-fill svg { fill: currentColor; stroke: none; }
+
+/* Character stage — soft glow background */
+.char-glow {
+  position: relative;
+  border-radius: var(--radius-card-lg);
+  padding: 20px;
+  background: radial-gradient(circle at 50% 40%, var(--char-tint, rgba(79,195,247,0.18)) 0%, transparent 70%);
+  display: grid; place-items: center;
+}
+
+/* Stress meter — vertical 18px tide gauge */
+.tide-gauge {
+  width: 18px;
+  height: 88px;
+  border-radius: 9px;
+  background: rgba(60,60,67,0.08);
+  position: relative;
+  overflow: hidden;
+  flex: 0 0 18px;
+}
+.tide-gauge .fill {
+  position: absolute;
+  left: 0; right: 0; bottom: 0;
+  background: linear-gradient(to top, var(--stress-relaxed), var(--stress-mild), var(--stress-moderate));
+  border-radius: 9px;
+  transition: height 0.4s ease;
+}
+.tide-gauge .tick {
+  position: absolute;
+  left: -4px;
+  width: 26px; height: 2px;
+  background: var(--fg);
+  border-radius: 1px;
+}
+
+/* Stress meter — horizontal oval (pill) gauge · same vocabulary as tide gauge */
+.oval-gauge {
+  position: relative;
+  width: 200px;
+  height: 36px;
+  border-radius: 18px;
+  background: rgba(60,60,67,0.08);
+  overflow: hidden;
+}
+.oval-gauge .fill {
+  position: absolute;
+  top: 0; bottom: 0; left: 0;
+  background: linear-gradient(to right, var(--stress-relaxed), var(--stress-mild), var(--stress-moderate));
+  border-radius: 18px;
+  transition: width 0.4s ease;
+}
+.oval-gauge .scale {
+  position: absolute;
+  top: 50%;
+  width: 1px;
+  height: 8px;
+  background: rgba(60,60,67,0.30);
+  transform: translate(-50%, -50%);
+  z-index: 1;
+}
+.oval-gauge .tick {
+  position: absolute;
+  top: -4px; bottom: -4px;
+  width: 2px;
+  background: var(--fg);
+  border-radius: 1px;
+  transform: translateX(-1px);
+  box-shadow: 0 0 0 2px var(--surface);
+  z-index: 2;
+  transition: left 0.4s ease;
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Print: hide the device chrome, show only the screen */
+@media print {
+  body { background: #fff; padding: 0; }
+  .device { box-shadow: none; }
+}
