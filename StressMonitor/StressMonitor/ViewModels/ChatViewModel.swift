@@ -22,6 +22,13 @@ final class ChatViewModel {
         ChatQuickActions.actions(for: stressResult?.category)
     }
 
+    /// Ripple avatar mood derived from the current stress level, so the chat
+    /// companion reacts visibly to the user's state.
+    var companionMood: RippleMood {
+        let level = stressResult?.level ?? recentHistory.first?.stressLevel ?? 0
+        return RippleMood.from(stressLevel: level)
+    }
+
     // MARK: - Private State
 
     private let llmService: LLMServiceProtocol

@@ -105,14 +105,11 @@ struct DataExportView: View {
     }
 
     private var formatSection: some View {
-        Section("Format") {
-            Picker("File Format", selection: $viewModel.format) {
-                Text("CSV").tag(ExportFormat.csv)
-                Text("JSON").tag(ExportFormat.json)
-            }
-            .pickerStyle(.segmented)
-            .accessibilityLabel("File format")
-
+        Section {
+            FormatPickerRow(format: $viewModel.format)
+        } header: {
+            Text("Format")
+        } footer: {
             Text(viewModel.formatDescription)
                 .font(.caption)
                 .foregroundColor(.secondary)

@@ -127,7 +127,7 @@ struct ChatBottomSheetView: View {
 
     private var welcomeMessage: some View {
         VStack(spacing: 12) {
-            RippleCharacterView(mood: .serene, size: 80)
+            RippleCharacterView(mood: viewModel.companionMood, size: 80)
 
             Text("Hi! I'm Ripple 💧")
                 .font(.headline)
@@ -148,7 +148,7 @@ struct ChatBottomSheetView: View {
         HStack {
             VStack(alignment: .leading, spacing: 4) {
                 HStack(spacing: 4) {
-                    RippleCharacterView(mood: .serene, size: 20)
+                    RippleCharacterView(mood: viewModel.companionMood, size: 20)
                         .clipShape(Circle())
 
                     Text("Ripple")

@@ -1,9 +1,15 @@
 import SwiftUI
 
-// MARK: - Stress Buddy Character Illustration
+// MARK: - Character Illustration
 
-/// Character illustration using SVG assets from the character asset pipeline.
-/// Supports legacy generic buddy assets and new per-character assets.
+/// Character illustration that renders the SwiftUI procedural character views
+/// through the ``CharacterAssetResolver`` router.
+///
+/// Kept as a thin wrapper so existing call sites (dashboard gauge, character
+/// collection, picker sheet, illustration exporter) can adopt the new
+/// procedural views without each one switching on character id. When a
+/// `characterId` is supplied the matching elemental creature is rendered;
+/// otherwise the Ripple (water) character is used as the default.
 struct StressBuddyIllustration: View {
     let mood: RippleMood
     let size: CGFloat
@@ -25,24 +31,32 @@ struct StressBuddyIllustration: View {
     }
 
     var body: some View {
-        Image(resolvedAssetName)
-            .resizable()
-            .aspectRatio(contentMode: .fit)
-            .frame(width: size, height: size)
-            .scaleEffect(evolution?.scaleFactor ?? 1)
-            .characterAnimation(for: mood)
-    }
-
-    private var resolvedAssetName: String {
-        guard let characterId, let evolution else {
-            return CharacterAssetResolver.legacyAssetName(for: mood)
+        Group {
+            if let characterId {
+                if let evolution {
+                    CharacterAssetResolver.characterView(
+                        for: characterId,
+                        evolution: evolution,
+                        mood: mood,
+                        size: size
+                    )
+                } else {
+                    CharacterAssetResolver.characterView(
+                        for: characterId,
+                        mood: mood,
+                        size: size
+                    )
+                }
+            } else {
+                CharacterAssetResolver.characterView(
+                    for: "ripple",
+                    mood: mood,
+                    size: size
+                )
+            }
         }
-
-        return CharacterAssetResolver.resolvedAssetName(
-            characterId: characterId,
-            evolution: evolution,
-            mood: mood
-        )
+        .frame(width: size, height: size)
+        .characterAnimation(for: mood)
     }
 }
 

@@ -3,8 +3,8 @@ import SwiftUI
 /// Mood states for the Ripple water-droplet character used in Action subscreens.
 /// Each mood drives visibly different eyes/mouth and an associated body tint.
 ///
-/// Canonical mood type for the StressMonitor character system. Legacy
-/// `StressBuddyMood` values map to `RippleMood` via their `.rippleMood` bridge.
+/// Canonical mood type for the StressMonitor character system. All five
+/// elemental creatures (Ripple, Blossom, Ember, Zephyr, Lumi) share this type.
 public enum RippleMood: String, CaseIterable, Sendable {
     case serene
     case focused
