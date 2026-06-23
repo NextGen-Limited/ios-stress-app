@@ -42,7 +42,7 @@ enum HabitType: String, CaseIterable, Codable, Sendable, Identifiable {
 
     var unit: String {
         switch self {
-        case .hydration: return "cups"
+        case .hydration: return "L"
         case .caffeine:  return "cups"
         case .sunlight:  return "min"
         }
@@ -50,9 +50,9 @@ enum HabitType: String, CaseIterable, Codable, Sendable, Identifiable {
 
     var goal: Double {
         switch self {
-        case .hydration: return 8
-        case .caffeine:  return 4
-        case .sunlight:  return 30
+        case .hydration: return 2.0
+        case .caffeine:  return 3
+        case .sunlight:  return 60
         }
     }
 }

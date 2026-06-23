@@ -1,10 +1,13 @@
 import SwiftUI
 
-/// iOS grouped-list row for the Breathe / Move / Reflect sections of the Action tab.
+/// A single row inside an action group card on the Action tab.
 ///
-/// SF Symbol icon tile + title + subtitle + trailing chevron, wired as a
-/// NavigationLink so the parent NavigationStack pushes `Destination`. Reusable
-/// across all three groups.
+/// SF Symbol icon (no colored circle wrapper — removes the icon-wrap AI-slop tell)
+/// + title + subtitle + trailing chevron. Wrapped in a NavigationLink so the
+/// parent NavigationStack pushes `Destination`.
+///
+/// Designed to be placed inside an `ActionGroupCard` which provides the shared
+/// background, rounded corners, and hairline separators between rows.
 struct ActionGroupRow<Destination: View>: View {
     let icon: String
     let title: String
@@ -16,19 +19,15 @@ struct ActionGroupRow<Destination: View>: View {
         NavigationLink {
             destination()
         } label: {
-            HStack(spacing: 14) {
-                ZStack {
-                    RoundedRectangle(cornerRadius: 10, style: .continuous)
-                        .fill(tint.opacity(0.14))
-                    Image(systemName: icon)
-                        .font(.system(size: 16, weight: .semibold))
-                        .foregroundStyle(tint)
-                }
-                .frame(width: 38, height: 38)
+            HStack(spacing: 12) {
+                Image(systemName: icon)
+                    .font(.system(size: 18, weight: .medium))
+                    .foregroundStyle(tint)
+                    .frame(width: 28, height: 28)
 
-                VStack(alignment: .leading, spacing: 2) {
+                VStack(alignment: .leading, spacing: 1) {
                     Text(title)
-                        .font(.system(size: 15, weight: .semibold, design: .rounded))
+                        .font(.system(size: 15, weight: .medium, design: .rounded))
                         .foregroundStyle(Color.Wellness.adaptivePrimaryText)
                     Text(subtitle)
                         .font(.system(size: 12, weight: .regular))
@@ -39,46 +38,102 @@ struct ActionGroupRow<Destination: View>: View {
                 Spacer(minLength: 0)
 
                 Image(systemName: "chevron.right")
-                    .font(.system(size: 12, weight: .bold))
-                    .foregroundStyle(Color.Wellness.adaptiveSecondaryText.opacity(0.6))
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundStyle(Color.Wellness.adaptiveSecondaryText.opacity(0.55))
             }
             .contentShape(Rectangle())
+            .padding(.horizontal, 14)
+            .padding(.vertical, 13)
+            .frame(minHeight: 44)
         }
         .buttonStyle(.plain)
-        .padding(.horizontal, 14)
-        .padding(.vertical, 12)
-        .background(Color.Wellness.adaptiveCardBackground)
-        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .stroke(Color.Wellness.adaptiveSecondaryText.opacity(0.10), lineWidth: 1)
-        )
         .accessibilityElement(children: .combine)
         .accessibilityLabel("\(title). \(subtitle)")
         .accessibilityHint("Double tap to open")
     }
 }
 
+/// Container that gives a group of action rows a shared card background with
+/// hairline separators — matching the iOS Settings grouped-list style.
+///
+/// Usage:
+/// ```swift
+/// ActionGroupCard {
+///     ActionGroupRow(icon: "wind", ...)
+///     ActionGroupRow(icon: "figure.walk", ...)
+/// }
+/// ```
+struct ActionGroupCard<Content: View>: View {
+    @ViewBuilder let content: () -> Content
+
+    var body: some View {
+        content()
+            .background(Color.Wellness.adaptiveCardBackground)
+            .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
+            .overlay(
+                RoundedRectangle(cornerRadius: 14, style: .continuous)
+                    .stroke(Color.Wellness.adaptiveSecondaryText.opacity(0.10), lineWidth: 0.5)
+            )
+    }
+}
+
+/// Hairline separator placed between action rows inside a group card.
+/// Each row except the last gets a bottom divider at `0.5px` opacity,
+/// matching `border-bottom: 0.5px solid rgba(60,60,67,0.12)`.
+struct ActionRowDivider: View {
+    var body: some View {
+        Rectangle()
+            .fill(Color(white: 60 / 255, opacity: 0.12))
+            .frame(height: 0.5)
+            .padding(.horizontal, 14)
+    }
+}
+
 #Preview("ActionGroupRow") {
     NavigationStack {
-        VStack(spacing: 10) {
-            ActionGroupRow(
-                icon: "wind",
-                title: "Box Breathing",
-                subtitle: "4-4-4-4 · 2 min",
-                tint: HomeCharacterDesignTokens.Ripple.primary,
-                destination: { Text("Box Breathing") }
-            )
-            ActionGroupRow(
-                icon: "figure.walk",
-                title: "Mini Walk",
-                subtitle: "5 min reset",
-                tint: HomeCharacterDesignTokens.Blossom.accent,
-                destination: { Text("Mini Walk") }
-            )
-            Spacer()
+        ScrollView {
+            VStack(spacing: 18) {
+                ActionGroupCard {
+                    VStack(spacing: 0) {
+                        ActionGroupRow(
+                            icon: "wind",
+                            title: "Box Breathing",
+                            subtitle: "4-4-4-4 · 2 min",
+                            tint: HomeCharacterDesignTokens.Ripple.primary,
+                            destination: { Text("Box Breathing") }
+                        )
+                        ActionRowDivider()
+                        ActionGroupRow(
+                            icon: "brain.head.profile",
+                            title: "Body Scan",
+                            subtitle: "90s · somatic reset",
+                            tint: HomeCharacterDesignTokens.Zephyr.accent,
+                            destination: { Text("Body Scan") }
+                        )
+                    }
+                }
+                ActionGroupCard {
+                    VStack(spacing: 0) {
+                        ActionGroupRow(
+                            icon: "figure.walk",
+                            title: "Mini Walk",
+                            subtitle: "5 min reset",
+                            tint: Color(hex: "#34C759"),
+                            destination: { Text("Mini Walk") }
+                        )
+                        ActionRowDivider()
+                        ActionGroupRow(
+                            icon: "drop.fill",
+                            title: "Cold Splash",
+                            subtitle: "30s vagus nerve reset",
+                            tint: HomeCharacterDesignTokens.Ember.accent,
+                            destination: { Text("Cold Splash") }
+                        )
+                    }
+                }
+            }
+            .padding(16)
         }
-        .padding()
         .background(HomeCharacterDesignTokens.homeBackground)
     }
 }

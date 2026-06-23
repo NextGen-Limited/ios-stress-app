@@ -1,11 +1,13 @@
 import SwiftUI
 
-/// One habit row on the Action tab.
+/// One habit row inside the "Today's habits" group card on the Action tab.
 ///
-/// Layout: icon tile + label + value, a thin progress bar toward the daily goal,
-/// a SourcePill (AUTO tinted with the Ripple accent for hydration/sunlight, LOG
-/// neutral for caffeine), and a trailing chevron. The whole row is tappable for
-/// manual habits to add one unit; AUTO rows are read-only.
+/// Layout matches `05-action.html` §6:
+/// - Row 1: icon + label w/ source pill ........ value text (mono, tabular-nums)
+/// - Row 2: full-width progress bar (3px) toward daily goal
+///
+/// The whole row is a plain row (no card background/border) — it lives inside
+/// an `ActionGroupCard` that provides the shared card chrome and separators.
 struct HabitLogRow: View {
     let habit: Habit
     var onTap: (() -> Void)? = nil
@@ -22,95 +24,97 @@ struct HabitLogRow: View {
             HapticManager.shared.buttonPress()
             onTap?()
         } label: {
-            HStack(spacing: 12) {
-                ZStack {
-                    RoundedRectangle(cornerRadius: 10, style: .continuous)
-                        .fill(tint.opacity(0.14))
+            VStack(spacing: 6) {
+                // Row 1: icon + label + value
+                HStack(spacing: 12) {
                     Image(systemName: habit.type.icon)
-                        .font(.system(size: 15, weight: .semibold))
+                        .font(.system(size: 18, weight: .medium))
                         .foregroundStyle(tint)
-                }
-                .frame(width: 36, height: 36)
+                        .frame(width: 28, height: 28)
 
-                VStack(alignment: .leading, spacing: 5) {
                     HStack(spacing: 6) {
                         Text(habit.type.displayName)
-                            .font(.system(size: 14, weight: .semibold, design: .rounded))
+                            .font(.system(size: 15, weight: .medium, design: .rounded))
                             .foregroundStyle(Color.Wellness.adaptivePrimaryText)
                         SourcePill(source: habit.source, tint: tint)
                     }
 
-                    progressBar
-                }
+                    Spacer(minLength: 0)
 
-                VStack(alignment: .trailing, spacing: 2) {
-                    HStack(alignment: .firstTextBaseline, spacing: 2) {
-                        Text(valueText)
-                            .font(.system(size: 16, weight: .heavy, design: .rounded))
-                            .foregroundStyle(Color.Wellness.adaptivePrimaryText)
-                        Text("/ \(Int(habit.goalValue.rounded()))")
-                            .font(.system(size: 11, weight: .bold, design: .rounded))
-                            .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
+                    Text(valueText)
+                        .font(.system(size: 13, weight: .semibold, design: .monospaced))
+                        .foregroundStyle(Color.Wellness.adaptivePrimaryText)
+                        .monospacedDigit()
+                }
+                .frame(minHeight: 44)
+
+                // Row 2: progress bar (only for AUTO habits)
+                if showProgressBar {
+                    GeometryReader { proxy in
+                        ZStack(alignment: .leading) {
+                            Capsule()
+                                .fill(Color(white: 60 / 255, opacity: 0.10))
+                            Capsule()
+                                .fill(tint)
+                                .frame(width: proxy.size.width * progress)
+                        }
                     }
-                    Image(systemName: "chevron.right")
-                        .font(.system(size: 10, weight: .bold))
-                        .foregroundStyle(Color.Wellness.adaptiveSecondaryText.opacity(0.5))
+                    .frame(height: 3)
                 }
             }
             .contentShape(Rectangle())
+            .padding(.horizontal, 14)
+            .padding(.top, 12)
+            .padding(.bottom, 14)
         }
         .buttonStyle(.plain)
         .disabled(habit.source == .auto)
-        .padding(.horizontal, 14)
-        .padding(.vertical, 12)
-        .background(Color.Wellness.adaptiveCardBackground)
-        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .stroke(Color.Wellness.adaptiveSecondaryText.opacity(0.10), lineWidth: 1)
-        )
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("\(habit.type.displayName): \(valueText) of \(Int(habit.goalValue.rounded())) \(habit.type.unit)")
+        .accessibilityLabel("\(habit.type.displayName): \(valueText)")
         .accessibilityHint(habit.source == .manual ? "Double tap to log one unit" : "Auto-tracked from HealthKit")
     }
 
     private var tint: Color {
         switch habit.type {
-        case .hydration: return HomeCharacterDesignTokens.Ripple.primary
-        case .sunlight:  return HomeCharacterDesignTokens.Ember.accent
-        case .caffeine:  return HomeCharacterDesignTokens.Zephyr.accent
+        case .hydration: return Color(hex: "#007AFF") // accent-soft blue per HTML
+        case .sunlight:  return Color(hex: "#FE9901")  // gold per HTML
+        case .caffeine:  return Color.Wellness.adaptiveSecondaryText // LOG uses neutral tint
         }
     }
 
+    /// Show progress bar only for AUTO-tracked habits.
+    private var showProgressBar: Bool {
+        habit.source == .auto
+    }
+
+    /// Value text in "current / goal unit" format matching the HTML reference.
+    /// e.g. "1.4 / 2.0 L", "2 / 3 cups", "42 / 60 min"
     private var valueText: String {
-        // Whole-number habits read cleaner than "3.0"
-        let rounded = (habit.currentValue * 10).rounded() / 10
-        return rounded.truncatingRemainder(dividingBy: 1) == 0
-            ? "\(Int(rounded))"
-            : String(format: "%.1f", rounded)
+        let cur = formatValue(habit.currentValue)
+        let goal = formatValue(habit.goalValue)
+        return "\(cur) / \(goal) \(habit.type.unit)"
     }
 
-    private var progressBar: some View {
-        GeometryReader { proxy in
-            ZStack(alignment: .leading) {
-                Capsule()
-                    .fill(tint.opacity(0.14))
-                Capsule()
-                    .fill(tint.opacity(0.7))
-                    .frame(width: proxy.size.width * progress)
-            }
+    /// Hydration shows one decimal (1.4); cups/min are whole numbers (2, 42).
+    private func formatValue(_ v: Double) -> String {
+        if habit.type == .hydration {
+            return String(format: "%.1f", v)
         }
-        .frame(height: 5)
+        return "\(Int(v.rounded()))"
     }
 }
 
 #Preview("HabitLogRow") {
-    @Previewable @State var habit = Habit(type: .hydration, currentValue: 5, goalValue: 8)
-    return VStack(spacing: 10) {
-        HabitLogRow(habit: habit) { habit.currentValue += 1 }
-        HabitLogRow(habit: Habit(type: .sunlight, currentValue: 18, goalValue: 30))
-        HabitLogRow(habit: Habit(type: .caffeine, currentValue: 2, goalValue: 4)) { }
-        Spacer()
+    ScrollView {
+        VStack(spacing: 0) {
+            HabitLogRow(habit: Habit(type: .hydration, currentValue: 1.4, goalValue: 2.0))
+            ActionRowDivider()
+            HabitLogRow(habit: Habit(type: .caffeine, currentValue: 2, goalValue: 3)) { }
+            ActionRowDivider()
+            HabitLogRow(habit: Habit(type: .sunlight, currentValue: 42, goalValue: 60))
+        }
+        .background(Color.Wellness.adaptiveCardBackground)
+        .clipShape(RoundedRectangle(cornerRadius: 14, style: .continuous))
     }
     .padding()
     .background(HomeCharacterDesignTokens.homeBackground)
