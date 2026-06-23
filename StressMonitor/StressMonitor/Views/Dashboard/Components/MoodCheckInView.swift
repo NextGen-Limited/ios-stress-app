@@ -34,15 +34,17 @@ struct MoodCheckInView: View {
     }
 
     private var header: some View {
-        HStack(spacing: 8) {
-            Image(systemName: "face.smiling.inverse")
-                .font(.system(size: 14, weight: .bold))
-                .foregroundStyle(HomeCharacterDesignTokens.Ripple.primary)
-            Text("How do you feel right now?")
-                .font(.system(size: 15, weight: .bold, design: .rounded))
+        VStack(alignment: .leading, spacing: 3) {
+            Text("Ripple asks")
+                .font(.system(size: 10, weight: .semibold, design: .monospaced))
+                .tracking(0.8)
+                .textCase(.uppercase)
+                .foregroundStyle(HomeCharacterDesignTokens.Ripple.deep)
+            Text("How are you feeling right now?")
+                .font(.system(size: 14, weight: .medium))
                 .foregroundStyle(Color.Wellness.adaptivePrimaryText)
-            Spacer()
         }
+        .frame(maxWidth: .infinity, alignment: .leading)
     }
 
     private func chip(for level: MoodLevel) -> some View {
