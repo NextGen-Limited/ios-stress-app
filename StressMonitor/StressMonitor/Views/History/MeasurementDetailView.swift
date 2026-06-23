@@ -1,6 +1,11 @@
 import SwiftUI
 import SwiftData
 
+/// Measurement detail screen matching `12-measurement-detail.html`.
+///
+/// Layout: big stress score + category label + timestamp → segmented stress-scale
+/// position bar → 5-factor breakdown with weight bars → context card (HR/HRV/Sleep/
+/// Steps/Mood) → action row (Breathe / Ask Ripple / Share).
 struct MeasurementDetailView: View {
     let measurement: StressMeasurement
     @Environment(\.modelContext) private var modelContext
@@ -13,194 +18,282 @@ struct MeasurementDetailView: View {
 
     var body: some View {
         ScrollView {
-            VStack(spacing: 20) {
-                stressLevelCard
-                    .padding(.horizontal)
+            VStack(spacing: 14) {
+                scoreHero
+                    .padding(.horizontal, 20)
 
-                hrvMeasurementsCard
-                    .padding(.horizontal)
+                stressScaleBar
+                    .padding(.horizontal, 20)
 
-                contributingFactorsCard
-                    .padding(.horizontal)
+                factorBreakdownSection
+                    .padding(.horizontal, 20)
+
+                contextCard
+                    .padding(.horizontal, 20)
 
                 if let viewModel = viewModel, !viewModel.recommendations.isEmpty {
                     recommendationsCard
-                        .padding(.horizontal)
+                        .padding(.horizontal, 20)
+                }
+
+                actionBar
+                    .padding(.horizontal, 20)
+                    .padding(.top, 2)
+            }
+            .padding(.vertical, 16)
+        }
+        .background(Color.appBackground)
+        .navigationBarTitleDisplayMode(.inline)
+        .toolbar {
+            ToolbarItem(placement: .principal) {
+                Text(navTitle)
+                    .font(.system(size: 15, weight: .semibold, design: .rounded))
+                    .foregroundStyle(Color.Wellness.adaptivePrimaryText)
+            }
+            ToolbarItem(placement: .topBarTrailing) {
+                Button(action: { viewModel?.shareMeasurement() }) {
+                    Image(systemName: "square.and.arrow.up")
+                        .font(.system(size: 15, weight: .semibold))
+                        .foregroundStyle(Color.primaryBlue)
                 }
             }
-            .padding(.vertical, 20)
         }
-        .background(Color.Wellness.adaptiveBackground)
-        .navigationBarHidden(true)
-        .overlay(navigationBar)
         .task {
             viewModel = DetailViewModel(measurement: measurement, modelContext: modelContext)
             await viewModel?.loadData()
         }
     }
 
-    private var navigationBar: some View {
-        HStack {
-            Button(action: { dismiss() }) {
-                Image(systemName: "chevron.left")
-                    .font(.title3)
-                    .foregroundColor(.primary)
-            }
+    // MARK: - Score hero (big number + state + time)
 
-            Spacer()
+    private var scoreHero: some View {
+        VStack(spacing: 4) {
+            Text("\(Int(measurement.stressLevel))")
+                .font(.system(size: 80, weight: .heavy, design: .rounded))
+                .foregroundStyle(category.color)
+                .accessibilityLabel("Stress score \(Int(measurement.stressLevel))")
 
-            Text(formatDate(measurement.timestamp))
-                .font(Typography.headline)
+            Text(categoryDisplayName)
+                .font(.system(size: 20, weight: .semibold, design: .rounded))
+                .foregroundStyle(category.color)
 
-            Spacer()
-
-            Button(action: { viewModel?.shareMeasurement() }) {
-                Image(systemName: "square.and.arrow.up")
-                    .font(.title3)
-                    .foregroundColor(.primaryBlue)
-            }
+            Text(formatFullDate(measurement.timestamp))
+                .font(.system(size: 11, weight: .medium, design: .monospaced))
+                .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
+                .tracking(0.4)
         }
-        .padding(.horizontal)
-        .padding(.top, 16)
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 8)
     }
 
-    private var stressLevelCard: some View {
-        VStack(spacing: 16) {
-            HStack(spacing: 8) {
-                Image(systemName: iconForCategory(category))
-                    .font(.title3)
+    // MARK: - Stress scale position bar
 
-                Text(categoryTitle(category))
-                    .font(Typography.headline)
+    private var stressScaleBar: some View {
+        VStack(spacing: 6) {
+            HStack {
+                Text("Stress scale · position")
+                    .font(.system(size: 10, weight: .medium, design: .monospaced))
+                    .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
+                    .tracking(0.4)
+                    .textCase(.uppercase)
+                Spacer()
             }
-            .foregroundColor(colorForCategory(category))
-            .padding(.horizontal, 16)
-            .padding(.vertical, 8)
-            .background(colorForCategory(category).opacity(0.15))
-            .cornerRadius(20)
 
-            StressGaugeView(
-                level: measurement.stressLevel,
-                category: category
-            )
-
-            if let confidences = measurement.confidences, !confidences.isEmpty {
-                let avgConfidence = confidences.reduce(0, +) / Double(confidences.count)
-                HStack {
-                    Label("\(Int(avgConfidence * 100))% Confidence", systemImage: "checkmark.circle.fill")
-                        .font(Typography.caption1)
-                        .foregroundColor(.secondary)
-
-                    Spacer()
-
-                    Text(formatTime(measurement.timestamp))
-                        .font(Typography.caption1)
-                        .foregroundColor(.secondary)
-                }
-            }
-        }
-        .padding(20)
-        .background(
-            RoundedRectangle(cornerRadius: 16)
-                .fill(Color.secondary.opacity(0.1))
-        )
-    }
-
-    private var hrvMeasurementsCard: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text("HRV Measurements")
-                .font(Typography.headline)
-
-            VStack(spacing: 12) {
-                HRVRow(
-                    label: "Current HRV",
-                    value: "\(Int(measurement.hrv)) ms",
-                    icon: "heart.fill",
-                    color: .red
-                )
-
-                Divider()
-
-                HRVRow(
-                    label: "Today's Average",
-                    value: todayAvgText,
-                    icon: "calendar",
-                    color: .primaryBlue
-                )
-
-                Divider()
-
-                HRVRow(
-                    label: "Weekly Average",
-                    value: weeklyAvgText,
-                    icon: "chart.bar",
-                    color: .stressRelaxed
-                )
-
-                Divider()
-
-                HRVRow(
-                    label: "Baseline Range",
-                    value: baselineRangeText,
-                    icon: "scale.3d",
-                    color: .stressModerate
-                )
-
-                if let trend = viewModel?.trend {
-                    Divider()
-
-                    HStack {
-                        Image(systemName: trendIcon(trend))
-                            .foregroundColor(trendColor(trend))
-
-                        Text(trendText(trend))
-                            .font(Typography.body)
-
-                        Spacer()
-
-                        Text("\(Int(viewModel?.percentile ?? 0))th percentile")
-                            .font(Typography.caption1)
-                            .foregroundColor(.secondary)
+            GeometryReader { proxy in
+                let segmentWidth = proxy.size.width / 5
+                HStack(spacing: 2) {
+                    ForEach(0..<5, id: \.self) { i in
+                        RoundedRectangle(cornerRadius: 2)
+                            .fill(segmentColor(i))
+                            .frame(height: 8)
+                            .overlay(
+                                activeSegmentIndex == i
+                                    ? RoundedRectangle(cornerRadius: 2)
+                                        .stroke(Color.Wellness.adaptivePrimaryText, lineWidth: 2)
+                                    : nil
+                            )
                     }
                 }
+                .overlay(alignment: .leading) {
+                    Image(systemName: "arrowtriangle.down.fill")
+                        .font(.system(size: 10))
+                        .foregroundStyle(Color.Wellness.adaptivePrimaryText)
+                        .offset(x: markerOffset(segmentWidth: segmentWidth), y: -12)
+                }
+            }
+            .frame(height: 8)
+
+            HStack(spacing: 2) {
+                ForEach([0, 25, 50, 75, 100], id: \.self) { val in
+                    Text("\(val)")
+                        .font(.system(size: 9, weight: .medium, design: .monospaced))
+                        .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
+                        .frame(maxWidth: .infinity)
+                }
             }
         }
-        .padding(20)
-        .background(
-            RoundedRectangle(cornerRadius: 16)
-                .fill(Color.secondary.opacity(0.1))
-        )
+        .padding(12)
+        .background(Color.Wellness.adaptiveCardBackground, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
     }
 
-    private var contributingFactorsCard: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text("Contributing Factors")
-                .font(Typography.headline)
+    // MARK: - 5-factor breakdown
 
-            VStack(spacing: 14) {
-                FactorBreakdownRow(factor: .hrv, value: factorBreakdown.hrvComponent, detailText: "\(Int(measurement.hrv)) ms")
-                FactorBreakdownRow(factor: .heartRate, value: factorBreakdown.hrComponent, detailText: "\(Int(measurement.restingHeartRate)) bpm")
+    private var factorBreakdownSection: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text("5-factor breakdown")
+                .font(.system(size: 12, weight: .medium, design: .rounded))
+                .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
+                .padding(.horizontal, 4)
+
+            VStack(spacing: 0) {
+                FactorBreakdownRow(factor: .hrv, value: factorBreakdown.hrvComponent, detailText: hrvDetailText)
+                factorDivider
+                FactorBreakdownRow(factor: .heartRate, value: factorBreakdown.hrComponent, detailText: hrDetailText)
+                factorDivider
                 FactorBreakdownRow(factor: .sleep, value: factorBreakdown.sleepComponent)
+                factorDivider
                 FactorBreakdownRow(factor: .activity, value: factorBreakdown.activityComponent)
+                factorDivider
                 FactorBreakdownRow(factor: .recovery, value: factorBreakdown.recoveryComponent)
             }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 8)
+            .background(Color.Wellness.adaptiveCardBackground, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
 
             if factorBreakdown.dataCompleteness < 1.0 {
                 Text("Some factors were unavailable for this measurement.")
-                    .font(.system(size: 12, weight: .regular))
+                    .font(.system(size: 11, weight: .regular))
                     .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
+                    .padding(.horizontal, 4)
+                    .padding(.top, 2)
             }
         }
-        .padding(20)
-        .background(
-            RoundedRectangle(cornerRadius: 16)
-                .fill(Color.secondary.opacity(0.1))
-        )
+    }
+
+    private var factorDivider: some View {
+        Rectangle()
+            .fill(Color.Wellness.adaptiveSecondaryText.opacity(0.10))
+            .frame(height: 0.5)
+    }
+
+    // MARK: - Context card (HR / HRV / Sleep / Steps / Mood)
+
+    private var contextCard: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text("Context")
+                .font(.system(size: 12, weight: .medium, design: .rounded))
+                .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
+                .padding(.horizontal, 4)
+
+            VStack(spacing: 0) {
+                contextRow(label: "Heart rate", value: "\(Int(measurement.restingHeartRate)) bpm")
+                contextDivider
+                contextRow(label: "HRV (RMSSD)", value: "\(Int(measurement.hrv)) ms")
+                contextDivider
+                contextRow(label: "Sleep last night", value: sleepText)
+                contextDivider
+                contextRow(label: "Confidence", value: confidenceText)
+            }
+            .padding(.horizontal, 16)
+            .padding(.vertical, 10)
+            .background(Color.Wellness.adaptiveCardBackground, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+        }
+    }
+
+    private func contextRow(label: String, value: String) -> some View {
+        HStack {
+            Text(label)
+                .font(.system(size: 13, weight: .regular))
+                .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
+            Spacer()
+            Text(value)
+                .font(.system(size: 13, weight: .semibold, design: .monospaced))
+                .foregroundStyle(Color.Wellness.adaptivePrimaryText)
+        }
+        .padding(.vertical, 6)
+    }
+
+    private var contextDivider: some View {
+        Rectangle()
+            .fill(Color.Wellness.adaptiveSecondaryText.opacity(0.10))
+            .frame(height: 0.5)
+    }
+
+    // MARK: - Recommendations
+
+    private var recommendationsCard: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text("Recommendations")
+                .font(.system(size: 12, weight: .medium, design: .rounded))
+                .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
+                .padding(.horizontal, 4)
+
+            VStack(spacing: 10) {
+                ForEach(viewModel?.recommendations ?? [], id: \.title) { rec in
+                    RecommendationCard(recommendation: rec)
+                }
+            }
+        }
+    }
+
+    // MARK: - Action bar
+
+    private var actionBar: some View {
+        HStack(spacing: 6) {
+            actionButton(icon: "wind", label: "Breathe")
+            actionButton(icon: "bubble.left.fill", label: "Ask Ripple")
+            actionButton(icon: "square.and.arrow.up", label: "Share") {
+                viewModel?.shareMeasurement()
+            }
+        }
+    }
+
+    private func actionButton(icon: String, label: String, action: (() -> Void)? = nil) -> some View {
+        Button {
+            HapticManager.shared.buttonPress()
+            action?()
+        } label: {
+            VStack(spacing: 4) {
+                Image(systemName: icon)
+                    .font(.system(size: 18))
+                Text(label)
+                    .font(.system(size: 13, weight: .semibold))
+            }
+            .foregroundStyle(Color.primaryBlue)
+            .frame(maxWidth: .infinity)
+            .padding(.vertical, 12)
+            .background(Color.Wellness.adaptiveCardBackground, in: RoundedRectangle(cornerRadius: 12, style: .continuous))
+        }
+        .buttonStyle(.plain)
+    }
+
+    // MARK: - Helpers
+
+    private var category: StressCategory {
+        measurement.category
+    }
+
+    private var categoryDisplayName: String {
+        switch category {
+        case .relaxed:  return "Relaxed"
+        case .mild:     return "Mild"
+        case .moderate: return "Moderate"
+        case .high:     return "High"
+        case .severe:   return "Severe"
+        }
+    }
+
+    private var navTitle: String {
+        let time = formatTimeShort(measurement.timestamp)
+        let cal = Calendar.current
+        let prefix: String
+        if cal.isDateInToday(measurement.timestamp) { prefix = "Today" }
+        else if cal.isDateInYesterday(measurement.timestamp) { prefix = "Yesterday" }
+        else { prefix = formatDateShort(measurement.timestamp) }
+        return "\(prefix) · \(time)"
     }
 
     /// Builds a `FactorBreakdown` from the measurement's individual component fields.
-    /// Older measurements with no multi-factor data resolve to all-nil components,
-    /// which `FactorBreakdownRow` renders as greyed-out "—" rows.
     private var factorBreakdown: FactorBreakdown {
         FactorBreakdown(
             hrvComponent: measurement.hrvComponent,
@@ -212,92 +305,61 @@ struct MeasurementDetailView: View {
         )
     }
 
-    private var recommendationsCard: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            Text("Recommendations")
-                .font(Typography.headline)
+    private var hrvDetailText: String { "\(Int(measurement.hrv)) ms" }
+    private var hrDetailText: String { "\(Int(measurement.restingHeartRate)) bpm" }
 
-            VStack(spacing: 12) {
-                ForEach(viewModel?.recommendations ?? [], id: \.title) { rec in
-                    RecommendationCard(recommendation: rec)
-                }
-            }
-        }
-        .padding(20)
-        .background(
-            RoundedRectangle(cornerRadius: 16)
-                .fill(Color.secondary.opacity(0.1))
-        )
+    private var sleepText: String {
+        guard let sleep = measurement.sleepComponent else { return "—" }
+        let pct = Int((sleep * 100).rounded())
+        return "\(pct)% quality"
     }
 
-    private var category: StressCategory {
+    private var confidenceText: String {
+        guard let confidences = measurement.confidences, !confidences.isEmpty else { return "—" }
+        let avg = confidences.reduce(0, +) / Double(confidences.count)
+        return "\(Int(avg * 100))%"
+    }
+
+    private var activeSegmentIndex: Int {
         switch measurement.stressLevel {
-        case 0...25: return .relaxed
-        case 26...50: return .mild
-        case 51...75: return .moderate
-        default: return .high
+        case ..<20:   return 0
+        case 20..<40: return 1
+        case 40..<60: return 2
+        case 60..<80: return 3
+        default:      return 4
         }
     }
 
-    private var todayAvgText: String {
-        guard let viewModel = viewModel, let avg = viewModel.todayAverage else { return "--" }
-        return "\(Int(avg)) ms"
+    private func markerOffset(segmentWidth: CGFloat) -> CGFloat {
+        let clamped = min(1, max(0, measurement.stressLevel / 100))
+        return segmentWidth * 5 * clamped - 3
     }
 
-    private var weeklyAvgText: String {
-        guard let viewModel = viewModel, let avg = viewModel.weeklyAverage else { return "--" }
-        return "\(Int(avg)) ms"
+    private func segmentColor(_ index: Int) -> Color {
+        switch index {
+        case 0: return .stressRelaxed
+        case 1: return .stressMild
+        case 2: return .stressModerate
+        case 3: return .stressHigh
+        default: return .stressSevere
+        }
     }
 
-    private var baselineRangeText: String {
-        guard let viewModel = viewModel, let baseline = viewModel.baseline else { return "--" }
-        let lowerBound = baseline.baselineHRV - 10
-        let upperBound = baseline.baselineHRV + 10
-        return "\(Int(lowerBound))-\(Int(upperBound)) ms"
-    }
-
-    private func formatDate(_ date: Date) -> String {
+    private func formatFullDate(_ date: Date) -> String {
         let formatter = DateFormatter()
-        formatter.dateFormat = "MMM d, YYYY"
+        formatter.dateFormat = "MMM d · h:mm a"
         return formatter.string(from: date)
     }
 
-    private func formatTime(_ date: Date) -> String {
+    private func formatDateShort(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMM d"
+        return formatter.string(from: date)
+    }
+
+    private func formatTimeShort(_ date: Date) -> String {
         let formatter = DateFormatter()
         formatter.dateFormat = "h:mm a"
         return formatter.string(from: date)
-    }
-}
-
-struct HRVRow: View {
-    let label: String
-    let value: String
-    let icon: String
-    let color: Color
-
-    var body: some View {
-        HStack {
-            Image(systemName: icon)
-                .foregroundColor(color)
-                .frame(width: 32)
-
-            Text(label)
-                .font(Typography.subheadline)
-                .foregroundColor(.secondary)
-
-            Spacer()
-
-            Text(value)
-                .font(Typography.body)
-                .fontWeight(.medium)
-        }
-    }
-}
-
-func trendText(_ trend: TrendDirection) -> String {
-    switch trend {
-    case .up: return "Above average"
-    case .down: return "Below average"
-    case .stable: return "Stable"
     }
 }

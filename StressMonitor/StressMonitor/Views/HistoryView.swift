@@ -34,10 +34,10 @@ struct HistoryView: View {
             HapticManager.shared.success()
         }
     }
-
     private var listContent: some View {
         VStack(spacing: 0) {
             filterBar
+            summaryTiles
             List {
                 if filteredMeasurements.isEmpty {
                     Section {
@@ -50,16 +50,72 @@ struct HistoryView: View {
                         NavigationLink {
                             MeasurementDetailView(measurement: measurement)
                         } label: {
-                            HistoryRow(measurement: measurement)
+                            HistoryEntryCard(measurement: measurement)
                         }
+                        .listRowInsets(EdgeInsets())
+                        .listRowBackground(Color.clear)
                         .accessibilityElement(children: .combine)
                     }
                 }
             }
-            .listStyle(.insetGrouped)
+            .listStyle(.plain)
             .accessibilityLabel("Stress measurements list")
             .accessibilityHint("\(filteredMeasurements.count) measurements available")
         }
+    }
+
+    private var summaryTiles: some View {
+        HStack(spacing: 8) {
+            summaryTile(
+                value: avgScoreText,
+                label: "avg · 7d",
+                color: .stressMild
+            )
+            summaryTile(
+                value: bestScoreText,
+                label: "best",
+                color: .stressRelaxed
+            )
+            summaryTile(
+                value: peakScoreText,
+                label: "peak",
+                color: .stressHigh
+            )
+        }
+        .padding(.horizontal, 16)
+        .padding(.bottom, 8)
+    }
+
+    private func summaryTile(value: String, label: String, color: Color) -> some View {
+        VStack(spacing: 2) {
+            Text(value)
+                .font(.system(size: 22, weight: .heavy, design: .rounded))
+                .foregroundStyle(color)
+            Text(label)
+                .font(.system(size: 10, weight: .medium, design: .monospaced))
+                .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
+                .tracking(0.4)
+        }
+        .frame(maxWidth: .infinity)
+        .padding(.vertical, 12)
+        .padding(.horizontal, 10)
+        .background(Color.Wellness.adaptiveCardBackground, in: RoundedRectangle(cornerRadius: 14, style: .continuous))
+    }
+
+    private var avgScoreText: String {
+        guard !filteredMeasurements.isEmpty else { return "—" }
+        let avg = filteredMeasurements.reduce(0.0) { $0 + $1.stressLevel } / Double(filteredMeasurements.count)
+        return "\(Int(avg))"
+    }
+
+    private var bestScoreText: String {
+        guard let best = filteredMeasurements.min(by: { $0.stressLevel < $1.stressLevel }) else { return "—" }
+        return "\(Int(best.stressLevel))"
+    }
+
+    private var peakScoreText: String {
+        guard let peak = filteredMeasurements.max(by: { $0.stressLevel < $1.stressLevel }) else { return "—" }
+        return "\(Int(peak.stressLevel))"
     }
 
     private var filterBar: some View {
