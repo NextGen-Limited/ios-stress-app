@@ -91,12 +91,6 @@
 				"Fonts/Lato-Bold.ttf",
 				"Fonts/Lato-Medium.ttf",
 				"Fonts/Lato-Regular.ttf",
-				"Fonts/Roboto-Bold.ttf",
-				"Fonts/Roboto-ExtraBold.ttf",
-				"Fonts/Roboto-Italic.ttf",
-				"Fonts/Roboto-Light.ttf",
-				"Fonts/Roboto-Medium.ttf",
-				"Fonts/Roboto-Regular.ttf",
 			);
 			target = F2E2EC182F1CC602000C2B53 /* StressMonitorWatch Watch App */;
 		};
