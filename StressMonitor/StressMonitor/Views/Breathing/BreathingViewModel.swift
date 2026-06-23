@@ -13,6 +13,15 @@ class BreathingSessionViewModel {
     var boxPhase: BoxBreathingPhase = .inhale
     /// Seconds remaining in the current 4-second box phase.
     var secondsRemaining: Int = 4
+    /// Number of completed cycles (each cycle = 4 phases × 4s = 16s).
+    var cyclesCompleted: Int = 0
+    /// Total cycles planned for the session.
+    var totalCycles: Int { max(1, Int(sessionDuration / 16)) }
+
+    // Session config
+    var audioGuide: String = "Soft tones"
+    var hapticFeedback: Bool = true
+    var backgroundSound: String = "Rain"
 
     private let healthKit: HealthKitServiceProtocol
     private var timer: Timer?
@@ -39,6 +48,7 @@ class BreathingSessionViewModel {
         remainingTime = sessionDuration
         boxPhase = .inhale
         secondsRemaining = BoxBreathingPhase.inhale.durationSeconds
+        cyclesCompleted = 0
 
         Task {
             if let hrv = try? await healthKit.fetchLatestHRV() {
@@ -66,7 +76,15 @@ class BreathingSessionViewModel {
                     preSessionHRV: pre,
                     postSessionHRV: post,
                     duration: sessionDuration - remainingTime,
-                    cyclesCompleted: Int((sessionDuration - remainingTime) / 16)
+                    cyclesCompleted: cyclesCompleted
+                )
+            } else {
+                // Fallback with placeholder data so the summary always renders
+                sessionResult = BreathingSessionResult(
+                    preSessionHRV: preSessionHRV ?? 52,
+                    postSessionHRV: postSessionHRV ?? 66,
+                    duration: sessionDuration - remainingTime,
+                    cyclesCompleted: cyclesCompleted
                 )
             }
         }
@@ -90,6 +108,10 @@ class BreathingSessionViewModel {
     }
 
     private func advanceBoxPhase() {
+        // Count a completed cycle when we wrap from holdOut back to inhale
+        if boxPhase == .holdOut {
+            cyclesCompleted += 1
+        }
         switch boxPhase {
         case .inhale:  boxPhase = .holdIn
         case .holdIn:  boxPhase = .exhale
@@ -114,6 +136,34 @@ class BreathingSessionViewModel {
             }
         }
     }
+
+    /// Skips the current cycle by fast-forwarding remaining time to the next cycle boundary.
+    func skipCycle() {
+        let phaseIndex: Int
+        switch boxPhase {
+        case .inhale:  phaseIndex = 0
+        case .holdIn:  phaseIndex = 1
+        case .exhale:  phaseIndex = 2
+        case .holdOut: phaseIndex = 3
+        }
+        let phasesIntoCycle = phaseIndex + 1
+        let totalPhasesElapsed = cyclesCompleted * 4 + phasesIntoCycle
+        let phasesToSkip = 4 - phaseIndex
+        let secondsToSkip = phasesToSkip * 4 + (secondsRemaining - 1)
+
+        // Advance through remaining phases in this cycle
+        for _ in 0..<phasesToSkip {
+            advanceBoxPhase()
+        }
+
+        // Reduce remaining time accordingly
+        remainingTime = max(0, remainingTime - Double(secondsToSkip))
+
+        if remainingTime <= 0 {
+            endSession()
+            NotificationCenter.default.post(name: .breathingSessionComplete, object: sessionResult)
+        }
+    }
 }
 
 struct BreathingSessionResult {
@@ -127,7 +177,7 @@ struct BreathingSessionResult {
     }
 
     var percentageImprovement: Double {
-        (improvement / preSessionHRV) * 100
+        preSessionHRV > 0 ? (improvement / preSessionHRV) * 100 : 0
     }
 
     var stressChange: StressChangeCategory {

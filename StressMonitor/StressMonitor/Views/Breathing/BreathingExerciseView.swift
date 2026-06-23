@@ -1,368 +1,316 @@
 import SwiftUI
 
-// MARK: - Box Breathing Exercise View
+// MARK: - Box Breathing Intro View
 
-/// Box Breathing (4-4-4-4) exercise screen — Ripple redesign.
-/// Dark canvas, Ripple breathing orb, phase pills, and Ripple guidance card.
+/// Box Breathing (4-4-4-4) intro / launcher screen — redesigned per
+/// `13-breathing-intro.html`.
+///
+/// Light surface with a 4-step pattern explainer card, a "before HRV" readout,
+/// session configuration rows, and a "Begin Session" CTA that navigates to
+/// `BreathingSessionView`.
 struct BreathingExerciseView: View {
     @Environment(\.dismiss) private var dismiss
 
-    @State private var isRunning = false
-    @State private var currentStepIndex = 0
-    @State private var phaseElapsed: Double = 0
-    @State private var remainingTime: TimeInterval = 180
-    @State private var timer: Timer?
+    @State private var navigateToSession = false
+    @State private var currentHRV: Double = 0
+    @State private var hrvTimestamp: Date?
 
-    private let phaseDuration: Double = 4.0
-    private let sessionDuration: TimeInterval = 180
-
-    // MARK: - Ripple Design Tokens
-
-    private let darkCanvas = HomeCharacterDesignTokens.darkCanvas
-    private let ripplePrimary = HomeCharacterDesignTokens.Ripple.primary  // #4FC3F7
-    private let rippleDeep = HomeCharacterDesignTokens.Ripple.deep        // #0288D1
-    private let rippleMid = HomeCharacterDesignTokens.Ripple.mid          // #81D4FA
-    private let rippleLight = HomeCharacterDesignTokens.Ripple.light      // #B3E5FC
-
-    // MARK: - Derived Values
-
-    private var currentStep: BoxBreathingStep {
-        BoxBreathingStep.steps[currentStepIndex]
-    }
-
-    private var phaseProgress: Double {
-        min(phaseElapsed / phaseDuration, 1.0)
-    }
-
-    private var breathingPhase: BreathingSessionViewModel.BreathingPhase {
-        switch currentStepIndex {
-        case 0: return .inhale
-        case 2: return .exhale
-        default: return .hold
-        }
-    }
-
-    private var breathingScale: Double {
-        switch currentStepIndex {
-        case 0: return 1.0 + phaseProgress * 0.3    // Inhale: expand
-        case 1: return 1.3                           // Hold: stay expanded
-        case 2: return 1.3 - phaseProgress * 0.6   // Exhale: contract
-        case 3: return 0.7                           // Hold: stay contracted
-        default: return 1.0
-        }
-    }
-
-    // MARK: - Body
+    // Design tokens from app.css
+    private let accent = Color(hex: "#4FC3F7")           // --accent
+    private let accentStrong = Color(hex: "#0288D1")     // --accent-strong
+    private let accentSoft = Color(hex: "#4FC3F7").opacity(0.14) // --accent-soft
+    private let surface = Color.white                     // --surface
+    private let fg = Color(hex: "#101223")               // --fg
+    private let fgSecondary = Color(hex: "#3C3C43")      // --fg-secondary
+    private let muted = Color(hex: "#777986")            // --muted
+    private let separator = Color(red: 60/255, green: 60/255, blue: 67/255).opacity(0.12)
+    private let hrvColor = Color(hex: "#34D399")         // --hrv-color
+    private let success = Color(hex: "#34C759")          // --success
 
     var body: some View {
-        VStack(spacing: 0) {
-            headerSection
-
-            VStack(spacing: 0) {
-                Spacer()
-
-                // Ripple breathing orb
-                RippleBreathingView(
-                    phase: breathingPhase,
-                    scale: isRunning ? breathingScale : 1.0,
-                    size: 140
-                )
-                .frame(height: 220)
-                .animation(.easeInOut(duration: 0.3), value: isRunning)
-                .accessibilityLabel("Ripple breathing animation, currently \(currentStep.label)")
-
-                // Time display
-                Text(formattedTime)
-                    .font(.system(size: 40, weight: .bold, design: .rounded))
-                    .foregroundStyle(rippleLight)
-                    .monospacedDigit()
-                    .padding(.top, 4)
-
-                // Phase pills
-                phasePillsRow
-                    .padding(.top, 20)
-
-                // Instruction text
-                Text(currentStep.instruction)
-                    .font(.system(size: 16, weight: .semibold, design: .rounded))
-                    .foregroundStyle(rippleMid)
-                    .padding(.top, 14)
-                    .animation(.easeInOut, value: currentStepIndex)
-
-                // Progress bar
-                progressBarSection
-                    .padding(.top, 12)
-
-                // How Ripple guides you
-                howRippleGuidesCard
-                    .padding(.top, 24)
-
-                Spacer()
-
-                // Action buttons
-                actionButtons
-                    .padding(.bottom, 40)
+        NavigationStack {
+            ScrollView(showsIndicators: false) {
+                VStack(spacing: 18) {
+                    introHero
+                    patternExplain
+                    beforeCard
+                    sessionConfig
+                    ctaRow
+                    footnote
+                }
+                .padding(.horizontal, 24)
+                .padding(.bottom, 24)
             }
+            .background(Color(hex: "#F2F2F7"))
+            .navigationBarBackButtonHidden(true)
+            .toolbar {
+                ToolbarItem(placement: .topBarLeading) {
+                    Button(action: { dismiss() }) {
+                        Image(systemName: "chevron.left")
+                            .font(.system(size: 16, weight: .medium))
+                            .foregroundStyle(accentStrong)
+                    }
+                    .accessibilityLabel("Back")
+                }
+                ToolbarItem(placement: .principal) {
+                    Text("Box Breathing")
+                        .font(.system(size: 17, weight: .semibold))
+                        .foregroundStyle(fg)
+                }
+            }
+            .navigationDestination(isPresented: $navigateToSession) {
+                BreathingSessionView()
+            }
+            .task { await fetchCurrentHRV() }
         }
-        .background(darkCanvas)
-        .ignoresSafeArea(edges: .bottom)
-        .navigationBarHidden(true)
-        .onDisappear { stopTimer() }
     }
 
-    // MARK: - Header
+    // MARK: - Intro Hero
 
-    private var headerSection: some View {
-        HStack {
-            Button(action: { dismiss() }) {
-                Image(systemName: "chevron.left")
-                    .font(.system(size: 16, weight: .medium, design: .rounded))
-                    .foregroundStyle(rippleLight)
-                    .frame(width: 36, height: 36)
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 10)
-                            .stroke(Color.white.opacity(0.12), lineWidth: 0.75)
+    private var introHero: some View {
+        VStack(spacing: 16) {
+            // Animated box-breathing pattern icon (4 corner squares pulsing)
+            boxPatternAnimation
+                .frame(width: 200, height: 200)
+
+            VStack(spacing: 6) {
+                Text("Box Breathing")
+                    .font(.system(size: 32, weight: .bold, design: .rounded))
+                    .tracking(-0.02 * 32)
+                    .foregroundStyle(fg)
+                Text("Navy SEAL pattern. Lowers stress, sharpens focus. Used by Alex's HRV to recover +14ms on average.")
+                    .font(.system(size: 15))
+                    .foregroundStyle(fgSecondary)
+                    .multilineTextAlignment(.center)
+                    .frame(maxWidth: 240)
+                    .fixedSize(horizontal: false, vertical: true)
+            }
+        }
+        .padding(.top, 8)
+    }
+
+    // MARK: - Box Pattern Animation
+
+    private var boxPatternAnimation: some View {
+        ZStack {
+            // 4 corner squares pulsing in sequence
+            ForEach(0..<4, id: \.self) { i in
+                let (dx, dy): (CGFloat, CGFloat) = {
+                    switch i {
+                    case 0: return (-50, -50)
+                    case 1: return (50, -50)
+                    case 2: return (-50, 50)
+                    default: return (50, 50)
+                    }
+                }()
+                RoundedRectangle(cornerRadius: 8)
+                    .stroke(accentStrong, style: StrokeStyle(lineWidth: 3, lineCap: .round))
+                    .frame(width: 40, height: 40)
+                    .offset(x: dx, y: dy)
+                    .scaleEffect(boxScales[i])
+                    .opacity(boxOpacities[i])
+                    .animation(
+                        .easeInOut(duration: 1)
+                            .repeatForever(autoreverses: true)
+                            .delay(Double(i)),
+                        value: animateBox
                     )
             }
-            .accessibilityLabel("Back")
-
-            Spacer()
-
-            Text("Box Breathing")
-                .font(.system(size: 18, weight: .bold, design: .rounded))
-                .foregroundStyle(rippleLight)
-
-            Spacer()
-
-            Color.clear.frame(width: 36, height: 36)
+            // Center dot with "4·4·4·4" label
+            Circle()
+                .fill(accentStrong)
+                .frame(width: 40, height: 40)
+                .overlay(
+                    Text("4·4·4·4")
+                        .font(.system(size: 11, weight: .bold))
+                        .foregroundStyle(.white)
+                )
         }
-        .padding(.horizontal, 16)
-        .padding(.top, 16)
+        .onAppear { animateBox = true }
     }
 
-    // MARK: - Phase Pills
+    @State private var animateBox = false
+    @State private var boxScales: [CGFloat] = [0.85, 0.85, 0.85, 0.85]
+    @State private var boxOpacities: [Double] = [0.6, 0.6, 0.6, 0.6]
 
-    private var phasePillsRow: some View {
+    // MARK: - Pattern Explain (4-step grid)
+
+    private var patternExplain: some View {
         HStack(spacing: 8) {
-            ForEach(0..<4, id: \.self) { index in
-                let step = BoxBreathingStep.steps[index]
-                let isActive = index == currentStepIndex
-                VStack(spacing: 4) {
-                    Text(step.emoji)
-                        .font(.system(size: 22, design: .rounded))
-                    Text(step.label)
-                        .font(.system(size: 12, weight: .semibold, design: .rounded))
-                        .foregroundStyle(isActive ? ripplePrimary : .white.opacity(0.4))
-                    Text("\(Int(phaseDuration))s")
-                        .font(.system(size: 11, design: .rounded))
-                        .monospacedDigit()
-                        .foregroundStyle(.white.opacity(0.35))
+            ForEach(0..<4, id: \.self) { i in
+                let step = BoxBreathingStep.steps[i]
+                VStack(spacing: 6) {
+                    ZStack {
+                        Circle()
+                            .fill(accentSoft)
+                            .frame(width: 36, height: 36)
+                        Text("\(i + 1)")
+                            .font(.system(size: 16, weight: .bold, design: .rounded))
+                            .foregroundStyle(accentStrong)
+                    }
+                    Text(step.shortName)
+                        .font(.system(size: 12, weight: .semibold))
+                        .foregroundStyle(fg)
+                    Text("4 sec")
+                        .font(.system(size: 11, weight: .medium, design: .monospaced))
+                        .foregroundStyle(accentStrong)
                 }
                 .frame(maxWidth: .infinity)
-                .padding(.vertical, 10)
-                .background(
-                    RoundedRectangle(cornerRadius: 14)
-                        .fill(isActive ? ripplePrimary.opacity(0.12) : Color.white.opacity(0.04))
-                )
-                .overlay(
-                    RoundedRectangle(cornerRadius: 14)
-                        .stroke(isActive ? ripplePrimary.opacity(0.5) : Color.clear, lineWidth: 1.5)
-                )
-                .animation(.easeInOut(duration: 0.3), value: currentStepIndex)
-                .accessibilityElement(children: .combine)
-                .accessibilityLabel("\(step.label), \(Int(phaseDuration)) seconds")
-                .accessibilityValue(isActive ? "current phase" : "")
             }
         }
-        .padding(.horizontal, 16)
-    }
-
-    // MARK: - Progress Bar
-
-    private var progressBarSection: some View {
-        GeometryReader { geo in
-            ZStack(alignment: .leading) {
-                RoundedRectangle(cornerRadius: 6)
-                    .fill(Color(red: 120/255, green: 120/255, blue: 128/255).opacity(0.12))
-                    .frame(height: 10)
-                RoundedRectangle(cornerRadius: 6)
-                    .fill(
-                        LinearGradient(
-                            colors: [ripplePrimary, rippleDeep],
-                            startPoint: .leading,
-                            endPoint: .trailing
-                        )
-                    )
-                    .frame(width: geo.size.width * phaseProgress, height: 10)
-                    .animation(.easeInOut(duration: 0.15), value: phaseProgress)
-            }
-        }
-        .frame(height: 10)
-        .padding(.horizontal, 16)
-    }
-
-    // MARK: - How Ripple Guides You
-
-    private var howRippleGuidesCard: some View {
-        VStack(spacing: 18) {
-            Text("💧 How Ripple guides you")
-                .font(.system(size: 16, weight: .semibold, design: .rounded))
-                .foregroundStyle(rippleLight)
-
-            HStack(spacing: 0) {
-                ForEach(0..<4, id: \.self) { index in
-                    let step = BoxBreathingStep.steps[index]
-                    VStack(spacing: 6) {
-                        Text(step.emoji)
-                            .font(.system(size: 26, design: .rounded))
-                        Text(step.label)
-                            .font(.system(size: 13, weight: .medium, design: .rounded))
-                            .foregroundStyle(rippleMid)
-                        Text("\(Int(phaseDuration))s")
-                            .font(.system(size: 12, design: .rounded))
-                            .monospacedDigit()
-                            .foregroundStyle(.white.opacity(0.4))
-                    }
-                    .frame(maxWidth: .infinity)
-
-                    if index < 3 {
-                        Image(systemName: "arrow.right")
-                            .font(.system(size: 11, weight: .semibold, design: .rounded))
-                            .foregroundStyle(ripplePrimary.opacity(0.5))
-                    }
-                }
-            }
-        }
-        .padding(20)
+        .padding(18)
         .background(
-            RoundedRectangle(cornerRadius: 24)
-                .fill(Color.white.opacity(0.05))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 24)
-                        .stroke(Color.white.opacity(0.08), lineWidth: 1)
-                )
+            RoundedRectangle(cornerRadius: 18).fill(surface)
         )
+    }
+
+    // MARK: - Before Card (Current HRV)
+
+    private var beforeCard: some View {
+        HStack(spacing: 12) {
+            // HRV icon
+            ZStack {
+                RoundedRectangle(cornerRadius: 10)
+                    .fill(hrvColor)
+                    .frame(width: 40, height: 40)
+                Image(systemName: "waveform.path.ecg")
+                    .font(.system(size: 18, weight: .semibold))
+                    .foregroundStyle(.white)
+            }
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text("\(Int(currentHRV)) ms")
+                    .font(.system(size: 22, weight: .bold, design: .rounded))
+                    .foregroundStyle(fg)
+                Text("Current HRV · \(hrvTimeLabel)")
+                    .font(.system(size: 12))
+                    .foregroundStyle(muted)
+            }
+
+            Spacer()
+
+            Text("+14 ms\npredicted")
+                .font(.system(size: 11, weight: .semibold))
+                .foregroundStyle(success)
+                .multilineTextAlignment(.trailing)
+        }
         .padding(.horizontal, 16)
+        .padding(.vertical, 14)
+        .background(
+            RoundedRectangle(cornerRadius: 18).fill(surface)
+        )
     }
 
-    // MARK: - Action Buttons
+    private var hrvTimeLabel: String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "h:mm a"
+        return formatter.string(from: hrvTimestamp ?? Date())
+    }
 
-    private var actionButtons: some View {
-        VStack(spacing: 12) {
-            Button(action: toggleRunning) {
-                HStack(spacing: 8) {
-                    Image(systemName: isRunning ? "pause.fill" : "play.fill")
-                    Text(isRunning ? "Pause" : "Start")
-                        .font(.system(size: 20, weight: .bold, design: .rounded))
-                }
-                .foregroundStyle(.white)
-                .frame(width: 180, height: 56)
-                .background(
-                    RoundedRectangle(cornerRadius: 20)
-                        .fill(
-                            LinearGradient(
-                                colors: [ripplePrimary, rippleDeep],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
-                            )
-                        )
-                )
-                .shadow(color: ripplePrimary.opacity(0.4), radius: 12, y: 4)
-            }
-            .accessibilityLabel(isRunning ? "Pause session" : "Start session")
+    // MARK: - Session Config
 
-            Button(action: resetSession) {
-                HStack(spacing: 8) {
-                    Image(systemName: "arrow.counterclockwise")
-                    Text("Reset")
-                        .font(.system(size: 18, weight: .semibold, design: .rounded))
-                }
-                .foregroundStyle(rippleMid)
-                .frame(width: 180, height: 52)
-                .background(
-                    RoundedRectangle(cornerRadius: 16)
-                        .fill(Color.white.opacity(0.06))
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 16)
-                                .stroke(Color.white.opacity(0.12), lineWidth: 1)
-                        )
-                )
-            }
-            .accessibilityLabel("Reset session")
+    private var sessionConfig: some View {
+        VStack(spacing: 0) {
+            configRow(label: "Duration", value: "2 min · 8 cycles")
+            divider
+            configRow(label: "Audio guide", value: "Soft tones")
+            divider
+            configRow(label: "Haptic feedback", value: "On")
+            divider
+            configRow(label: "Background sound", value: "Rain")
         }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 14)
+        .background(
+            RoundedRectangle(cornerRadius: 18).fill(surface)
+        )
     }
 
-    // MARK: - Time
-
-    private var formattedTime: String {
-        let t = max(0, remainingTime)
-        return String(format: "%d:%02d", Int(t) / 60, Int(t) % 60)
+    private func configRow(label: String, value: String) -> some View {
+        HStack {
+            Text(label)
+                .font(.system(size: 14))
+                .foregroundStyle(fg)
+            Spacer()
+            Text(value)
+                .font(.system(size: 14, weight: .semibold))
+                .foregroundStyle(accentStrong)
+        }
+        .padding(.vertical, 5)
     }
 
-    // MARK: - Timer Logic
-
-    private func toggleRunning() {
-        isRunning ? pauseSession() : startSession()
+    private var divider: some View {
+        Rectangle()
+            .fill(separator)
+            .frame(height: 1)
+            .padding(.vertical, 5)
     }
 
-    private func startSession() {
-        isRunning = true
-        timer = Timer.scheduledTimer(withTimeInterval: 0.1, repeats: true) { _ in
-            phaseElapsed += 0.1
-            remainingTime -= 0.1
+    // MARK: - CTA Row
 
-            if remainingTime <= 0 {
-                remainingTime = 0
-                stopTimer()
-                isRunning = false
-                return
+    private var ctaRow: some View {
+        VStack(spacing: 6) {
+            Button(action: { navigateToSession = true }) {
+                Text("Begin Session")
+                    .font(.system(size: 17, weight: .semibold))
+                    .foregroundStyle(.white)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 50)
+                    .background(
+                        RoundedRectangle(cornerRadius: 14).fill(accent)
+                    )
             }
+            .accessibilityLabel("Begin breathing session")
 
-            if phaseElapsed >= phaseDuration {
-                phaseElapsed = 0
-                currentStepIndex = (currentStepIndex + 1) % 4
+            Button(action: { dismiss() }) {
+                Text("Cancel")
+                    .font(.system(size: 17, weight: .regular))
+                    .foregroundStyle(accentStrong)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 44)
             }
         }
     }
 
-    private func pauseSession() {
-        stopTimer()
-        isRunning = false
+    // MARK: - Footnote
+
+    private var footnote: some View {
+        Text("Find a comfortable seat. Sit upright, soften your shoulders.")
+            .font(.system(size: 13))
+            .foregroundStyle(muted)
+            .multilineTextAlignment(.center)
+            .padding(.horizontal, 16)
     }
 
-    private func resetSession() {
-        stopTimer()
-        isRunning = false
-        phaseElapsed = 0
-        currentStepIndex = 0
-        remainingTime = sessionDuration
-    }
+    // MARK: - HRV Fetch
 
-    private func stopTimer() {
-        timer?.invalidate()
-        timer = nil
+    private func fetchCurrentHRV() async {
+        let manager = HealthKitManager()
+        if let hrv = try? await manager.fetchLatestHRV() {
+            currentHRV = hrv.value
+            hrvTimestamp = hrv.timestamp
+        } else {
+            currentHRV = 52
+            hrvTimestamp = Date()
+        }
     }
 }
 
 // MARK: - Box Breathing Step Info
 
 private struct BoxBreathingStep {
-    let label: String
-    let instruction: String
-    let emoji: String
+    let shortName: String
 
     static let steps: [BoxBreathingStep] = [
-        BoxBreathingStep(label: "Inhale", instruction: "Breathe in slowly", emoji: "🌬️"),
-        BoxBreathingStep(label: "Hold", instruction: "Hold your breath", emoji: "✋"),
-        BoxBreathingStep(label: "Exhale", instruction: "Breathe out slowly", emoji: "💨"),
-        BoxBreathingStep(label: "Hold", instruction: "Hold your breath", emoji: "✋"),
+        BoxBreathingStep(shortName: "Inhale"),
+        BoxBreathingStep(shortName: "Hold"),
+        BoxBreathingStep(shortName: "Exhale"),
+        BoxBreathingStep(shortName: "Hold"),
     ]
 }
 
 // MARK: - Preview
 
 #Preview {
-    NavigationStack {
-        BreathingExerciseView()
-    }
+    BreathingExerciseView()
 }

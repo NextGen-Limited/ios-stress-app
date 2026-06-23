@@ -1,37 +1,49 @@
 import SwiftUI
 
-/// Large phase title ("INHALE") with a seconds countdown ("4s").
+/// Large SF Pro Rounded phase word (e.g. "INHALE") with a countdown number below.
 ///
-/// Designed for the active breathing session — uses SF Pro Rounded at title scale
-/// with the phase's accent color.
+/// Matches the `.breath-instruction` block from `08-breathing-active.html`:
+/// white text sitting inside the solid core circle of the breathing arena.
 struct PhaseLabel: View {
     let phase: BoxBreathingPhase
-    var secondsRemaining: Int
-    var tint: Color = HomeCharacterDesignTokens.Ripple.primary
+    let secondsRemaining: Int
+    var tint: Color = .white
 
     var body: some View {
         VStack(spacing: 4) {
-            Text(phase.label.uppercased())
-                .font(.system(size: 32, weight: .heavy, design: .rounded))
-                .tracking(1.2)
+            Text(phase.displayWord)
+                .font(.system(size: 24, weight: .bold, design: .rounded))
+                .tracking(0.04 * 24)
                 .foregroundStyle(tint)
-                .contentTransition(.opacity)
-
-            Text("\(secondsRemaining)s")
-                .font(.system(size: 15, weight: .bold, design: .rounded))
-                .monospacedDigit()
-                .foregroundStyle(tint.opacity(0.7))
+            Text("\(secondsRemaining)")
+                .font(.system(size: 48, weight: .bold, design: .rounded).monospacedDigit())
+                .foregroundStyle(tint)
+                .contentTransition(.numericText())
         }
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("\(phase.label), \(secondsRemaining) seconds remaining")
+        .accessibilityLabel("\(phase.displayWord), \(secondsRemaining) seconds remaining")
     }
 }
 
-#Preview {
-    VStack(spacing: 24) {
-        PhaseLabel(phase: .inhale, secondsRemaining: 4)
-        PhaseLabel(phase: .exhale, secondsRemaining: 2, tint: HomeCharacterDesignTokens.Blossom.accent)
+extension BoxBreathingPhase {
+    /// Uppercase display word for the breathing arena center.
+    var displayWord: String {
+        switch self {
+        case .inhale:  return "INHALE"
+        case .holdIn:  return "HOLD"
+        case .exhale:  return "EXHALE"
+        case .holdOut: return "HOLD"
+        }
     }
-    .padding()
-    .background(HomeCharacterDesignTokens.darkCanvas)
+}
+
+#Preview("PhaseLabel") {
+    HStack(spacing: 32) {
+        PhaseLabel(phase: .inhale, secondsRemaining: 3)
+        PhaseLabel(phase: .holdIn, secondsRemaining: 2)
+        PhaseLabel(phase: .exhale, secondsRemaining: 4)
+        PhaseLabel(phase: .holdOut, secondsRemaining: 1)
+    }
+    .padding(40)
+    .background(Color(hex: "#0288D1"))
 }

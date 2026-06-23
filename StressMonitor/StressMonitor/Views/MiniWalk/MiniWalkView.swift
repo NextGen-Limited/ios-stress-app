@@ -1,32 +1,83 @@
 import SwiftUI
 
+/// Mini Walk active session screen — redesigned per `15-walk.html`.
+///
+/// Light green-tinted background with:
+/// - Header row (mode label + LIVE indicator)
+/// - Circular timer ring (WalkTimer) with walk icon, time, target
+/// - Target line (goal + percent)
+/// - Live stats tiles (steps / heart rate / distance)
+/// - Route card with mini map, location, pace
+/// - Pause / End Session buttons
 struct MiniWalkView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var viewModel = MiniWalkViewModel()
 
+    // Design tokens from app.css / 15-walk.html
+    private let success = Color(hex: "#34C759")
+    private let blossom = Color(hex: "#A5D6A7")
+    private let hrColor = Color(hex: "#F87171")
+    private let surface = Color.white
+    private let fg = Color(hex: "#101223")
+    private let fgSecondary = Color(hex: "#3C3C43")
+    private let muted = Color(hex: "#777986")
+    private let separator = Color(red: 60/255, green: 60/255, blue: 67/255).opacity(0.12)
+    private let danger = Color(hex: "#FF3B30")
+
     var body: some View {
         ZStack {
-            // Dark canvas #0A0A0F
-            HomeCharacterDesignTokens.darkCanvas
-                .ignoresSafeArea()
+            // Gradient background matching .walk-stage
+            ZStack {
+                LinearGradient(
+                    colors: [
+                        Color(red: 0.957, green: 0.984, blue: 0.957),  // #F4FBF4
+                        Color.white
+                    ],
+                    startPoint: .top,
+                    endPoint: .center
+                )
+                RadialGradient(
+                    colors: [blossom.opacity(0.30), Color.clear],
+                    center: .bottom,
+                    startRadius: 50,
+                    endRadius: 300
+                )
+            }
+            .ignoresSafeArea()
 
             VStack(spacing: 0) {
-                headerSection
-                Spacer(minLength: 8)
+                // Header row
+                walkHead
+                    .padding(.top, 16)
+
+                Spacer()
+
+                // Timer ring
                 WalkTimer(
                     progress: viewModel.progress,
-                    stepCount: viewModel.stepCount,
-                    paceDisplay: viewModel.paceDisplay
+                    timeDisplay: viewModel.timeDisplay,
+                    targetDisplay: targetTimeLabel,
+                    stepCount: viewModel.stepCount
                 )
-                MiniWalkInstructionCard(progress: viewModel.progress)
+
+                // Target line
+                targetLine
+                    .padding(.top, 12)
+
+                // Live stats
+                liveStats
                     .padding(.top, 20)
-                Spacer(minLength: 8)
-                statsRow
-                    .padding(.top, 8)
+
+                // Route card
+                routeCard
+                    .padding(.top, 12)
+
+                // Buttons
                 actionButtons
-                    .padding(.top, 24)
-                    .padding(.bottom, 40)
+                    .padding(.top, 16)
+                    .padding(.bottom, 24)
             }
+            .padding(.horizontal, 24)
 
             // Completion overlay
             if viewModel.showComplete {
@@ -46,184 +97,215 @@ struct MiniWalkView: View {
         .onDisappear { viewModel.cleanup() }
     }
 
-    // MARK: - Header
+    // MARK: - Walk Head
 
-    private var headerSection: some View {
-        VStack(spacing: 4) {
-            HStack {
-                Button(action: { dismiss() }) {
-                    Image(systemName: "chevron.left")
-                        .font(.system(size: 16, weight: .medium))
-                        .foregroundStyle(Color(hex: "#9CA3AF"))
-                        .frame(width: 36, height: 36)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 8)
-                                .stroke(Color.white.opacity(0.08), lineWidth: 0.75)
-                        )
-                }
-                .accessibilityLabel("Back")
-
-                Spacer()
-
-                Text("Mini Walk")
-                    .font(.system(size: 18, weight: .bold, design: .rounded))
-                    .foregroundStyle(Color(hex: "#E0E0E8"))
-
-                Spacer()
-
-                Color.clear.frame(width: 36, height: 36)
+    private var walkHead: some View {
+        HStack {
+            Text("Mini walk · Outdoor")
+                .font(.system(size: 11, weight: .medium, design: .monospaced))
+                .tracking(0.8)
+                .textCase(.uppercase)
+                .foregroundStyle(muted)
+            Spacer()
+            HStack(spacing: 6) {
+                Circle()
+                    .fill(success)
+                    .frame(width: 6, height: 6)
+                    .opacity(viewModel.isRunning ? 1 : 0.4)
+                    .scaleEffect(viewModel.isRunning ? 1.0 : 0.8)
+                    .animation(.easeInOut(duration: 1.5).repeatForever(autoreverses: true), value: viewModel.isRunning)
+                Text(viewModel.isRunning ? "LIVE" : "PAUSED")
+                    .font(.system(size: 12, weight: .semibold))
+                    .foregroundStyle(success)
             }
-
-            // Subtitle: "10 min · Brisk pace"
-            Text("10 min · Brisk pace")
-                .font(.system(size: 13, weight: .medium, design: .rounded))
-                .foregroundStyle(Color(hex: "#9CA3AF"))
+            .padding(.horizontal, 12)
+            .padding(.vertical, 6)
+            .background(success.opacity(0.14))
+            .clipShape(Capsule())
         }
-        .padding(.horizontal, 16)
-        .padding(.top, 16)
     }
 
-    // MARK: - Stats Row (Steps / BPM / kcal)
+    // MARK: - Target Line
 
-    private var statsRow: some View {
-        HStack(spacing: 12) {
-            WalkStatView(
-                icon: "figure.walk",
-                value: viewModel.stepDisplay,
-                label: "Steps"
+    private var targetLine: some View {
+        HStack {
+            Text("Goal · \(targetSteps) steps · \(targetTimeLabel)")
+                .font(.system(size: 13))
+                .foregroundStyle(fgSecondary)
+            Spacer()
+            Text("\(Int((viewModel.progress * 100).rounded()))%")
+                .font(.system(size: 16, weight: .bold, design: .rounded))
+                .foregroundStyle(fg)
+        }
+        .frame(maxWidth: 260)
+    }
+
+    // MARK: - Live Stats
+
+    private var liveStats: some View {
+        HStack(spacing: 8) {
+            liveStatTile(
+                value: "\(viewModel.stepCount)",
+                label: "STEPS",
+                color: blossom
             )
-            WalkStatView(
-                icon: "heart.fill",
+            liveStatTile(
                 value: viewModel.bpmDisplay,
-                label: "BPM"
+                suffix: viewModel.hasBPM ? "bpm" : nil,
+                label: "HEART RATE",
+                color: hrColor
             )
-            WalkStatView(
-                icon: "flame.fill",
-                value: viewModel.calorieDisplay,
-                label: "kcal"
+            liveStatTile(
+                value: distanceLabel,
+                suffix: "mi",
+                label: "DISTANCE",
+                color: success
             )
         }
-        .padding(.horizontal, 16)
+        .frame(maxWidth: 260)
     }
 
-    // MARK: - Buttons
-
-    private var actionButtons: some View {
-        VStack(spacing: 12) {
-            if !viewModel.isRunning && !viewModel.isPaused {
-                // Start button — accent gradient
-                Button(action: { viewModel.start() }) {
-                    HStack(spacing: 8) {
-                        Image(systemName: "play.fill")
-                        Text("Start Walk")
-                            .font(.system(size: 18, weight: .bold, design: .rounded))
-                    }
-                    .foregroundStyle(.white)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 56)
-                    .background(
-                        RoundedRectangle(cornerRadius: 16)
-                            .fill(
-                                LinearGradient(
-                                    colors: [
-                                        HomeCharacterDesignTokens.Ripple.primary,
-                                        HomeCharacterDesignTokens.Ripple.deep
-                                    ],
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                )
-                            )
-                    )
-                    .shadow(color: HomeCharacterDesignTokens.Ripple.primary.opacity(0.3), radius: 8, y: 4)
+    private func liveStatTile(value: String, suffix: String?, label: String, color: Color) -> some View {
+        VStack(spacing: 2) {
+            HStack(alignment: .firstTextBaseline, spacing: 2) {
+                Text(value)
+                    .font(.system(size: 22, weight: .bold, design: .rounded))
+                    .foregroundStyle(color)
+                if let suffix {
+                    Text(suffix)
+                        .font(.system(size: 11))
+                        .foregroundStyle(muted)
                 }
-                .padding(.horizontal, 20)
-            } else {
-                // Pause / Resume button — accent gradient
-                Button(action: {
-                    if viewModel.isPaused { viewModel.start() } else { viewModel.pause() }
-                }) {
-                    HStack(spacing: 8) {
-                        Image(systemName: viewModel.isPaused ? "play.fill" : "pause.fill")
-                        Text(viewModel.isPaused ? "Resume" : "Pause")
-                            .font(.system(size: 18, weight: .bold, design: .rounded))
-                    }
-                    .foregroundStyle(.white)
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 56)
-                    .background(
-                        RoundedRectangle(cornerRadius: 16)
-                            .fill(
-                                LinearGradient(
-                                    colors: [
-                                        HomeCharacterDesignTokens.Ripple.primary,
-                                        HomeCharacterDesignTokens.Ripple.deep
-                                    ],
-                                    startPoint: .topLeading,
-                                    endPoint: .bottomTrailing
-                                )
-                            )
-                    )
-                    .shadow(color: HomeCharacterDesignTokens.Ripple.primary.opacity(0.3), radius: 8, y: 4)
-                }
-                .padding(.horizontal, 20)
             }
-
-            // End Walk — glass card button
-            Button(action: { viewModel.reset() }) {
-                HStack(spacing: 8) {
-                    Image(systemName: "stop.fill")
-                    Text("End Walk")
-                        .font(.system(size: 16, weight: .semibold, design: .rounded))
-                }
-                .foregroundStyle(Color(hex: "#9CA3AF"))
-                .frame(maxWidth: .infinity)
-                .frame(height: 50)
-                .background(
-                    RoundedRectangle(cornerRadius: 14)
-                        .fill(HomeCharacterDesignTokens.darkCard)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 14)
-                                .strokeBorder(Color.white.opacity(0.06), lineWidth: 1)
-                        )
-                )
-            }
-            .padding(.horizontal, 20)
-            .disabled(!viewModel.isRunning && !viewModel.isPaused && !viewModel.isFinished)
-            .opacity((!viewModel.isRunning && !viewModel.isPaused && !viewModel.isFinished) ? 0.4 : 1.0)
-        }
-    }
-}
-
-// MARK: - Walk Stat Cell
-
-private struct WalkStatView: View {
-    let icon: String
-    let value: String
-    let label: String
-
-    var body: some View {
-        VStack(spacing: 6) {
-            Image(systemName: icon)
-                .font(.system(size: 16))
-                .foregroundStyle(HomeCharacterDesignTokens.Ripple.primary)
-            Text(value)
-                .font(.system(size: 20, weight: .bold, design: .rounded))
-                .foregroundStyle(Color(hex: "#E0E0E8"))
-                .monospacedDigit()
             Text(label)
-                .font(.system(size: 11, weight: .medium, design: .rounded))
-                .foregroundStyle(Color(hex: "#9CA3AF"))
+                .font(.system(size: 10, weight: .medium, design: .monospaced))
+                .tracking(0.4)
+                .foregroundStyle(muted)
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 12)
         .background(
             RoundedRectangle(cornerRadius: 14)
-                .fill(HomeCharacterDesignTokens.darkCard)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 14)
-                        .strokeBorder(Color.white.opacity(0.06), lineWidth: 1)
-                )
+                .fill(surface.opacity(0.8))
+                .overlay(RoundedRectangle(cornerRadius: 14).stroke(separator, lineWidth: 1))
         )
+    }
+
+    // MARK: - Route Card
+
+    private var routeCard: some View {
+        HStack(spacing: 12) {
+            // Mini map placeholder
+            ZStack {
+                RoundedRectangle(cornerRadius: 12)
+                    .fill(
+                        LinearGradient(
+                            colors: [
+                                Color(red: 165/255, green: 214/255, blue: 167/255).opacity(0.4),
+                                Color(red: 79/255, green: 195/255, blue: 247/255).opacity(0.3),
+                                Color(red: 241/255, green: 248/255, blue: 233/255)
+                            ],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
+                    )
+                    .frame(width: 60, height: 60)
+
+                // Dashed route path
+                Image(systemName: "point.topleft.down.curvedto.point.bottomright.up")
+                    .font(.system(size: 24))
+                    .foregroundStyle(blossom)
+                    .opacity(0.4)
+            }
+            .frame(width: 60, height: 60)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Local Route")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(fg)
+                Text("Outdoor walk · live tracking")
+                    .font(.system(size: 11))
+                    .foregroundStyle(muted)
+            }
+
+            Spacer()
+
+            VStack(alignment: .trailing, spacing: 0) {
+                Text(viewModel.paceDisplay ?? "—")
+                    .font(.system(size: 16, weight: .bold, design: .rounded))
+                    .foregroundStyle(blossom)
+                Text("pace")
+                    .font(.system(size: 9, weight: .medium, design: .monospaced))
+                    .tracking(0.4)
+                    .foregroundStyle(muted)
+            }
+        }
+        .padding(14)
+        .background(RoundedRectangle(cornerRadius: 14).fill(surface))
+        .frame(maxWidth: 260)
+    }
+
+    // MARK: - Buttons
+
+    private var actionButtons: some View {
+        HStack(spacing: 10) {
+            // Pause / Resume
+            Button(action: {
+                if viewModel.isPaused {
+                    viewModel.start()
+                } else if !viewModel.isRunning {
+                    viewModel.start()
+                } else {
+                    viewModel.pause()
+                }
+            }) {
+                Text(viewModel.isRunning ? "Pause" : (viewModel.isPaused ? "Resume" : "Start"))
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundStyle(fg)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 48)
+                    .background(
+                        RoundedRectangle(cornerRadius: 14)
+                            .fill(Color(red: 60/255, green: 60/255, blue: 67/255).opacity(0.08))
+                    )
+            }
+
+            // End Session
+            Button(action: {
+                viewModel.reset()
+                dismiss()
+            }) {
+                Text("End Session")
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundStyle(.white)
+                    .frame(maxWidth: .infinity)
+                    .frame(height: 48)
+                    .background(
+                        RoundedRectangle(cornerRadius: 14)
+                            .fill(danger)
+                    )
+            }
+        }
+        .frame(maxWidth: 260)
+    }
+
+    // MARK: - Computed Helpers
+
+    private var targetTimeLabel: String {
+        let mins = viewModel.durationSeconds / 60
+        return "\(mins):00"
+    }
+
+    private var targetSteps: Int {
+        // Roughly 100 steps per minute of walking
+        viewModel.durationSeconds / 60 * 100
+    }
+
+    private var distanceLabel: String {
+        guard viewModel.stepCount > 0 else { return "0.00" }
+        let feet = Double(viewModel.stepCount) * 2.1
+        let miles = feet / 5280.0
+        return String(format: "%.2f", miles)
     }
 }
 
