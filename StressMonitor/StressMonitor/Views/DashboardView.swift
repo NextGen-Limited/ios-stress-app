@@ -185,9 +185,17 @@ struct DashboardView: View {
         StressOverTimeChart()
             .opacity(appearAnimation ? 1 : 0)
 
-        // 9. Premium banner
-        PremiumBanner()
-            .opacity(appearAnimation ? 1 : 0)
+        // 9. Premium banner — tap navigates to paywall
+        NavigationLink {
+            IAPPremiumView(
+                storeKit: StoreKitService(premiumState: PremiumState.shared),
+                premiumState: PremiumState.shared
+            )
+        } label: {
+            PremiumBanner()
+        }
+        .buttonStyle(.plain)
+        .opacity(appearAnimation ? 1 : 0)
     }
 
     // MARK: - Status Chips
