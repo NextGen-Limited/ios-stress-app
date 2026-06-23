@@ -22,12 +22,6 @@
 	<string>$(CURRENT_PROJECT_VERSION)</string>
 	<key>UIAppFonts</key>
 	<array>
-		<string>Roboto-Bold.ttf</string>
-		<string>Roboto-ExtraBold.ttf</string>
-		<string>Roboto-Italic.ttf</string>
-		<string>Roboto-Light.ttf</string>
-		<string>Roboto-Medium.ttf</string>
-		<string>Roboto-Regular.ttf</string>
 		<string>Lato-Regular.ttf</string>
 		<string>Lato-Medium.ttf</string>
 		<string>Lato-Bold.ttf</string>

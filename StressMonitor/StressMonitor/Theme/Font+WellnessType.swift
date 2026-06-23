@@ -2,11 +2,10 @@ import SwiftUI
 
 // MARK: - Wellness Typography System
 extension Font {
-    /// Wellness-themed type styles backed by SF Pro.
+    /// Wellness-themed type styles backed by SF Pro system fonts.
     ///
-    /// Public API is unchanged from the prior Roboto-backed implementation;
-    /// internals now resolve to system fonts (SF Pro / SF Pro Rounded) so the
-    /// app ships without bundled font assets.
+    /// UI text uses SF Pro (`.default` design); character moments use
+    /// SF Pro Rounded (`.rounded` design). No bundled font assets required.
     struct WellnessType {
         // MARK: - Heading Fonts (SF Pro Rounded / SF Pro)
 
@@ -90,12 +89,9 @@ extension Font {
 }
 
 // MARK: - Font Registration Helper
-/// Helper to check if custom fonts are loaded
+/// Helper to check if custom fonts are loaded (legacy compatibility).
+/// All wellness styles resolve to SF Pro system fonts — no bundled assets.
 struct WellnessFontLoader {
-    /// Roboto is no longer bundled; wellness styles resolve to SF Pro.
-    /// Kept for compatibility with existing call sites that gate on font availability.
-    static var isRobotoAvailable: Bool { false }
-
     /// Check if Lora font family is available (legacy compatibility)
     static var isLoraAvailable: Bool {
         UIFont.familyNames.contains { $0.contains("Lora") }
@@ -106,10 +102,8 @@ struct WellnessFontLoader {
         UIFont.familyNames.contains { $0.contains("Raleway") }
     }
 
-    /// Check if all wellness fonts are available
-    static var areAllFontsAvailable: Bool {
-        isRobotoAvailable
-    }
+    /// Check if all wellness fonts are available (always true — SF Pro is system-bundled)
+    static var areAllFontsAvailable: Bool { true }
 
     /// Get list of available font families (for debugging)
     static var availableFamilies: [String] {
@@ -119,13 +113,7 @@ struct WellnessFontLoader {
     /// Print font status to console (useful for debugging)
     static func printFontStatus() {
         print("=== Wellness Font Status ===")
-        print("Roboto available: \(isRobotoAvailable)")
         print("All fonts loaded: \(areAllFontsAvailable)")
-
-        if !areAllFontsAvailable {
-            print("⚠️ Using SF Pro system fonts as fallback")
-        } else {
-            print("✓ All wellness fonts loaded successfully")
-        }
+        print("✓ All wellness styles resolve to SF Pro system fonts")
     }
 }
