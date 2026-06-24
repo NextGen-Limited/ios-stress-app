@@ -32,27 +32,28 @@ struct SemicircularGaugeView: View {
             VStack(spacing: 8) {
                 if hasData {
                     StressBuddyIllustration(mood: mood, size: characterSize)
-                        .padding(.top, 20)
+                        .padding(.top, 16)
 
                     Text(mood.displayName)
-                        .font(.system(size: 18, weight: .bold))
+                        .font(.system(size: 16, weight: .bold))
                         .foregroundStyle(moodColor)
+                        .padding(.bottom, 4)
                 } else {
                     // No data state
                     Text("No Data")
-                        .font(.system(size: 24, weight: .bold))
-                        .foregroundStyle(Color(hex: "FF3B30")) // Red #FF3B30
+                        .font(.system(size: 22, weight: .bold))
+                        .foregroundStyle(Color(hex: "FF3B30"))
 
                     StressBuddyIllustration(mood: .relaxed, size: characterSize * 0.8)
-                        .padding(.top, 8)
+                        .padding(.top, 4)
                 }
             }
         }
-        .frame(width: size, height: size * 0.6)
+        .frame(width: size, height: size * 0.6, alignment: .top)
     }
 
     private var characterSize: CGFloat {
-        size * 0.35
+        size * 0.30
     }
 
     private var moodColor: Color {
