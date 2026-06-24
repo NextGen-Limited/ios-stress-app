@@ -90,6 +90,7 @@ struct SettingsView: View {
         CompanionBanner(
             companionName: activeCreature.displayName,
             companionSubtitle: activeCreature.element.rawValue.capitalized,
+            mood: RippleMood.from(stressLevel: viewModel.latestStressLevel),
             onSwitch: { navigateToCharacters = true }
         )
     }

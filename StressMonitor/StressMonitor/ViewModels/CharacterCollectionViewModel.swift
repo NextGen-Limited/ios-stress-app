@@ -8,14 +8,21 @@ import WidgetKit
 final class CharacterCollectionViewModel {
     var unlocks: [CharacterUnlock] = []
     var activeCharacterId: String?
+    var currentStressLevel: Double = 0
 
     private var modelContext: ModelContext?
     private let characterSync = CharacterSelectionSync.shared
+
+    /// Mood derived from the latest stress reading — drives character facial expression.
+    var currentMood: RippleMood {
+        RippleMood.from(stressLevel: currentStressLevel)
+    }
 
     func configure(modelContext: ModelContext) {
         self.modelContext = modelContext
         seedDefaultUnlocksIfNeeded(in: modelContext)
         fetchUnlocks()
+        fetchLatestStressLevel()
     }
 
     func fetchUnlocks() {
@@ -38,6 +45,18 @@ final class CharacterCollectionViewModel {
         activeCharacterId = characterId
         try? modelContext?.save()
         characterSync.saveActiveCharacter(characterId: characterId, evolution: selected.evolutionStage)
+    }
+
+    /// Fetch the latest stress reading so character mood reflects the user's actual state.
+    private func fetchLatestStressLevel() {
+        guard let ctx = modelContext else { return }
+        let descriptor = FetchDescriptor<StressMeasurement>(
+            sortBy: [SortDescriptor(\.timestamp, order: .reverse)]
+        )
+        descriptor.fetchLimit = 1
+        if let latest = try? ctx.fetch(descriptor).first {
+            currentStressLevel = latest.stressLevel
+        }
     }
 
     private func seedDefaultUnlocksIfNeeded(in context: ModelContext) {

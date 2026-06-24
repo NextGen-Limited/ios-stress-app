@@ -11,6 +11,7 @@ struct CharacterGridCard: View {
     let creature: CharacterCreature
     let unlock: CharacterUnlock?
     let isActive: Bool
+    var mood: RippleMood = .serene
 
     private var isUnlocked: Bool { unlock?.isUnlocked ?? false }
     private var isPremium: Bool { creature.unlockType == .premium }
@@ -31,14 +32,14 @@ struct CharacterGridCard: View {
                     StressBuddyIllustration(
                         characterId: creature.id,
                         evolution: currentStage,
-                        mood: .serene,
+                        mood: mood,
                         size: 72
                     )
                 } else {
                     StressBuddyIllustration(
                         characterId: creature.id,
                         evolution: .droplet,
-                        mood: .serene,
+                        mood: mood,
                         size: 72
                     )
                     .overlay {

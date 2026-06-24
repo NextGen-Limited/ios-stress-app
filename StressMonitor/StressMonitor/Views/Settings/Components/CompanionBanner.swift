@@ -5,6 +5,7 @@ import SwiftUI
 struct CompanionBanner: View {
     var companionName: String
     var companionSubtitle: String
+    var mood: RippleMood = .serene
     var onSwitch: (() -> Void)? = nil
 
     var body: some View {
@@ -13,7 +14,7 @@ struct CompanionBanner: View {
                 ZStack {
                     Circle()
                         .fill(HomeCharacterDesignTokens.Ripple.primary.opacity(0.14))
-                    RippleCharacterView(mood: .serene, size: 44)
+                    RippleCharacterView(mood: mood, size: 44)
                 }
                 .frame(width: 60, height: 60)
                 .accessibilityHidden(true)
