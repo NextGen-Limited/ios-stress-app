@@ -64,12 +64,13 @@ struct MeasurementHistoryView: View {
     // MARK: - Filter chips
 
     private func filterChips(vm: HistoryViewModel) -> some View {
-        VStack(spacing: 8) {
+        @Bindable var bindable = vm
+        return VStack(spacing: 8) {
             // Date range chips
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 6) {
                     ForEach(DateRangeFilter.allCases) { range in
-                        DateFilterChip(range: range, selected: $vm.dateRange)
+                        DateFilterChip(range: range, selected: $bindable.dateRange)
                     }
                 }
                 .padding(.horizontal, 16)
@@ -83,7 +84,7 @@ struct MeasurementHistoryView: View {
                 HStack(spacing: 6) {
                     allChip(vm: vm)
                     ForEach(StressCategory.allCases, id: \.self) { cat in
-                        CategoryFilterChip(category: cat, selected: $vm.selectedCategories)
+                        CategoryFilterChip(category: cat, selected: $bindable.selectedCategories)
                     }
                 }
                 .padding(.horizontal, 16)
