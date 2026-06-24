@@ -146,6 +146,7 @@ struct MiniWalkView: View {
         HStack(spacing: 8) {
             liveStatTile(
                 value: "\(viewModel.stepCount)",
+                suffix: nil,
                 label: "STEPS",
                 color: blossom
             )
