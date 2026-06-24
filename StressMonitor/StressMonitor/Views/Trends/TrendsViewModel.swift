@@ -148,16 +148,82 @@ class TrendsViewModel {
         return computed > 0 ? computed : 52
     }
 
+    /// Week-over-week HRV delta text for the chart summary. Returns nil when
+    /// there isn't enough data yet.
+    var hrvDeltaText: String? {
+        guard let pct = hrvChangePercent, pct != 0 else { return nil }
+        let sign = pct > 0 ? "+" : ""
+        return "\(sign)\(Int(pct)) vs last week"
+    }
+
+    /// Day counts per stress tier for the current week, used by DistributionBar.
+    /// Each day is classified by its average stress level into the 4-tier system.
+    var distributionDays: (relaxed: Int, mild: Int, moderate: Int, high: Int) {
+        var r = 0, m = 0, mo = 0, h = 0
+        for day in dailyStressData where day.averageStress > 0 {
+            switch day.averageStress {
+            case ..<25:   r += 1
+            case ..<50:   m += 1
+            case ..<75:   mo += 1
+            default:      h += 1
+            }
+        }
+        return (r, m, mo, h)
+    }
+
+    /// Distribution comment derived from the current week's dominant tier.
+    var distributionComment: String? {
+        guard dailyStressData.contains(where: { $0.averageStress > 0 }) else { return nil }
+        let d = distributionDays
+        let maxTier = max(d.relaxed, d.mild, d.moderate, d.high)
+        if d.mild == maxTier {
+            return "Most days landed in Mild — your baseline is shifting in the right direction."
+        } else if d.relaxed == maxTier {
+            return "Most days were Relaxed — great recovery this week."
+        } else if d.moderate == maxTier {
+            return "Moderate stress dominated — consider prioritizing rest tomorrow."
+        } else if d.high == maxTier {
+            return "Several high-stress days — take it easy and recover."
+        }
+        return nil
+    }
+
+    /// Average of all daily stress values for the bar chart header.
+    var dailyStressAverage: Int {
+        let valid = dailyStressData.filter { $0.averageStress > 0 }
+        guard !valid.isEmpty else { return 0 }
+        let avg = valid.map { $0.averageStress }.reduce(0, +) / Double(valid.count)
+        return Int(avg.rounded())
+    }
+
     /// Editorial one-liner derived from the current week's data. Falls back to a
     /// neutral prompt when there isn't enough data yet.
+    /// Format: "You're X% calmer. Hardest day was Day (NN), best was Day (NN)."
     var editorialSummary: String {
         guard let hardest = dailyStressData.max(by: { $0.averageStress < $1.averageStress }),
               let best = dailyStressData.min(by: { $0.averageStress < $1.averageStress }),
-              !dailyStressData.isEmpty else {
+              !dailyStressData.isEmpty,
+              hardest.averageStress > 0 else {
             return "Track for a full week to unlock your trends story."
         }
-        let calmerPct = max(0, Int(100 - hardest.averageStress))
-        return "You're \(calmerPct)% calmer on your best day. Hardest day: \(hardest.dayLabel) (\(Int(hardest.averageStress))). Best: \(best.dayLabel) (\(Int(best.averageStress)))."
+        // Calmer percentage = how much lower best is vs hardest
+        let calmerPct = Int(((hardest.averageStress - best.averageStress) / max(hardest.averageStress, 1)) * 100)
+        let calmerWord = calmerPct >= 0 ? "calmer" : "more stressed"
+        return "You're \(abs(calmerPct))% \(calmerWord). " +
+               "Hardest day was \(hardest.dayLabel) (\(Int(hardest.averageStress))), " +
+               "best was \(best.dayLabel) (\(Int(best.averageStress)))."
+    }
+
+    /// Short delta label for the editorial header (e.g. "18% calmer").
+    var editorialDelta: String? {
+        guard let hardest = dailyStressData.max(by: { $0.averageStress < $1.averageStress }),
+              let best = dailyStressData.min(by: { $0.averageStress < $1.averageStress }),
+              !dailyStressData.isEmpty,
+              hardest.averageStress > 0 else {
+            return nil
+        }
+        let calmerPct = Int(((hardest.averageStress - best.averageStress) / max(hardest.averageStress, 1)) * 100)
+        return "\(abs(calmerPct))% \(calmerPct >= 0 ? "calmer" : "more stressed")"
     }
 
     private let repository: StressRepositoryProtocol
@@ -399,9 +465,11 @@ class TrendsViewModel {
             let stressed = total > 0 ? Double(dayMeasurements.filter { $0.stressLevel > 75 }.count) / total * 100 : 0
 
             let weekday = calendar.component(.weekday, from: dayDate) // 1=Sun, 7=Sat
+            let dateNum = calendar.component(.day, from: dayDate)
             return DailyStressData(
                 dayLabel: shortDays[weekday - 1],
                 averageStress: avg,
+                dateNumber: dateNum,
                 distribution: StressDistributionPerDay(
                     relaxed: relaxed,
                     normal: normal,
@@ -469,6 +537,7 @@ struct DailyStressData: Identifiable {
     let id = UUID()
     let dayLabel: String     // e.g. "Mon", "Tue"
     let averageStress: Double
+    var dateNumber: Int? = nil  // e.g. 22 for the 22nd of the month
     var distribution: StressDistributionPerDay? = nil
 }
 

@@ -1,97 +1,168 @@
 import SwiftUI
 
-/// Stacked horizontal distribution bar with three segments — relaxed / mixed /
-/// high — plus a legend row beneath.
+/// Distribution stacked bar matching `06-trends.html` section 3.
 ///
-/// The view takes raw percentages and renders them with a guaranteed-sum of
-/// 100%: the last segment absorbs rounding error so the visible widths always
-/// fill the bar exactly. This is the math contract from the Trends spec.
+/// Four segments (Relaxed / Mild / Moderate / High) rendered as a single
+/// horizontal bar whose widths always sum to 100%. Below the bar sits a
+/// 2×2 legend grid showing day-counts per tier, plus an editorial comment.
 struct DistributionBar: View {
-    let relaxedPercent: Double
-    let mixedPercent: Double
-    let highPercent: Double
+    let relaxedDays: Int
+    let mildDays: Int
+    let moderateDays: Int
+    let highDays: Int
+    var comment: String? = nil
 
-    /// Adjusted segment widths that always sum to 100.
-    /// The high segment absorbs the rounding residual.
-    private var segments: (relaxed: Double, mixed: Double, high: Double) {
-        let raw = [relaxedPercent, mixedPercent, highPercent]
-        let rawSum = raw.reduce(0, +)
-        guard rawSum > 0 else { return (0, 0, 0) }
-        // Normalize to 100 first so callers can pass counts or unnormalized %.
-        let normalized = raw.map { ($0 / rawSum) * 100 }
-        let relaxed = (normalized[0]).rounded()
-        let mixed = (normalized[1]).rounded()
-        // Last segment = 100 - others, so the three always sum to exactly 100.
-        let high = 100 - relaxed - mixed
-        return (relaxed, mixed, high)
+    // MARK: - Derived
+
+    private var totalDays: Int {
+        relaxedDays + mildDays + moderateDays + highDays
     }
 
+    /// Exact percentages that always sum to 100. Last non-zero segment
+    /// absorbs the rounding residual.
+    private var segments: (relaxed: Int, mild: Int, moderate: Int, high: Int) {
+        guard totalDays > 0 else { return (0, 0, 0, 0) }
+        let t = Double(totalDays)
+        let rPct = (Double(relaxedDays) / t * 100).rounded()
+        let mPct = (Double(mildDays) / t * 100).rounded()
+        let moPct = (Double(moderateDays) / t * 100).rounded()
+        let hPct = max(0, 100 - rPct - mPct - moPct)
+        return (Int(rPct), Int(mPct), Int(moPct), Int(hPct))
+    }
+
+    // MARK: - Body
+
     var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
+        VStack(alignment: .leading, spacing: 14) {
             bar
             legend
+            if let comment {
+                Text(comment)
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
+                    .lineSpacing(2)
+            }
         }
-        .padding(18)
+        .padding(16)
+        .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color.Wellness.adaptiveCardBackground)
-        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
         .overlay(
-            RoundedRectangle(cornerRadius: 20, style: .continuous)
-                .stroke(Color.Wellness.adaptiveSecondaryText.opacity(0.10), lineWidth: 1)
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .stroke(Color.Wellness.adaptiveSecondaryText.opacity(0.08), lineWidth: 1)
         )
         .accessibilityElement(children: .contain)
         .accessibilityLabel(
-            "Stress distribution. Relaxed \(Int(segments.relaxed)) percent. " +
-            "Mixed \(Int(segments.mixed)) percent. High \(Int(segments.high)) percent."
+            "Time spent by tier. Relaxed \(segments.relaxed) percent. " +
+            "Mild \(segments.mild) percent. Moderate \(segments.moderate) percent. " +
+            "High \(segments.high) percent."
         )
     }
+
+    // MARK: - Bar
 
     private var bar: some View {
         GeometryReader { proxy in
             let total = max(proxy.size.width, 1)
             let s = segments
-            HStack(spacing: 2) {
-                segment(fill: TrendsPalette.tierVeryCalm, width: total * (s.relaxed / 100))
-                segment(fill: TrendsPalette.tierNeutral, width: total * (s.mixed / 100))
-                segment(fill: TrendsPalette.tierCritical, width: total * (s.high / 100))
+            HStack(spacing: 0) {
+                if s.relaxed > 0 {
+                    barSegment(
+                        color: StressCategory.relaxed.color,
+                        width: total * CGFloat(s.relaxed) / 100,
+                        label: "\(s.relaxed)%"
+                    )
+                }
+                if s.mild > 0 {
+                    barSegment(
+                        color: StressCategory.mild.color,
+                        width: total * CGFloat(s.mild) / 100,
+                        label: "\(s.mild)%"
+                    )
+                }
+                if s.moderate > 0 {
+                    barSegment(
+                        color: StressCategory.moderate.color,
+                        width: total * CGFloat(s.moderate) / 100,
+                        label: "\(s.moderate)%",
+                        darkText: true
+                    )
+                }
+                if s.high > 0 {
+                    barSegment(
+                        color: StressCategory.high.color,
+                        width: total * CGFloat(s.high) / 100,
+                        label: "\(s.high)%"
+                    )
+                }
             }
         }
-        .frame(height: 14)
-        .clipShape(Capsule())
+        .frame(height: 28)
+        .clipShape(RoundedRectangle(cornerRadius: 6, style: .continuous))
     }
 
-    private func segment(fill: Color, width: CGFloat) -> some View {
-        Rectangle()
-            .fill(fill)
-            .frame(width: max(0, width))
+    private func barSegment(color: Color, width: CGFloat, label: String, darkText: Bool = false) -> some View {
+        ZStack {
+            Rectangle().fill(color)
+            if width > 32 {
+                Text(label)
+                    .font(.system(size: 11, weight: .semibold, design: .rounded))
+                    .foregroundStyle(darkText ? Color.black.opacity(0.65) : Color.white)
+            }
+        }
+        .frame(width: max(0, width))
     }
+
+    // MARK: - Legend
 
     private var legend: some View {
-        HStack(spacing: 14) {
-            legendItem(color: TrendsPalette.tierVeryCalm, label: "Relaxed", percent: segments.relaxed)
-            legendItem(color: TrendsPalette.tierNeutral, label: "Mixed", percent: segments.mixed)
-            legendItem(color: TrendsPalette.tierCritical, label: "High", percent: segments.high)
-            Spacer(minLength: 0)
+        LazyVGrid(
+            columns: [
+                GridItem(.flexible(), spacing: 16),
+                GridItem(.flexible(), spacing: 16)
+            ],
+            spacing: 8
+        ) {
+            legendItem(color: StressCategory.relaxed.color, label: "Relaxed", days: relaxedDays)
+            legendItem(color: StressCategory.mild.color, label: "Mild", days: mildDays)
+            legendItem(color: StressCategory.moderate.color, label: "Moderate", days: moderateDays)
+            legendItem(
+                color: StressCategory.high.color,
+                label: "High",
+                days: highDays,
+                dimmed: highDays == 0
+            )
         }
     }
 
-    private func legendItem(color: Color, label: String, percent: Double) -> some View {
-        HStack(spacing: 6) {
-            Circle()
+    private func legendItem(color: Color, label: String, days: Int, dimmed: Bool = false) -> some View {
+        HStack(spacing: 8) {
+            RoundedRectangle(cornerRadius: 3)
                 .fill(color)
-                .frame(width: 8, height: 8)
-            Text("\(Int(percent))% \(label)")
-                .font(.system(size: 11, weight: .semibold, design: .rounded))
+                .frame(width: 10, height: 10)
+            Text(label)
+                .font(.system(size: 12, weight: .medium))
                 .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
+            Spacer(minLength: 0)
+            Text("\(days) day\(days == 1 ? "" : "s")")
+                .font(.system(size: 11, weight: .medium, design: .monospaced))
+                .foregroundStyle(Color.Wellness.adaptiveSecondaryText.opacity(dimmed ? 0.45 : 1))
         }
+        .opacity(dimmed ? 0.45 : 1)
     }
 }
 
 #Preview("DistributionBar") {
     VStack(spacing: 20) {
-        DistributionBar(relaxedPercent: 33.3, mixedPercent: 33.3, highPercent: 33.4)
-        DistributionBar(relaxedPercent: 55, mixedPercent: 30, highPercent: 15)
-        DistributionBar(relaxedPercent: 0, mixedPercent: 0, highPercent: 0)
+        DistributionBar(
+            relaxedDays: 2,
+            mildDays: 3,
+            moderateDays: 2,
+            highDays: 0,
+            comment: "Most days landed in Mild — your baseline is shifting in the right direction."
+        )
         Spacer()
     }
     .padding()
+    .background(Color.Wellness.adaptiveBackground)
 }

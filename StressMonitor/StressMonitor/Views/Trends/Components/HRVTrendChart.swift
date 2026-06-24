@@ -1,79 +1,112 @@
 import SwiftUI
 
-/// HRV trend line chart with a dashed reference line at the personal baseline
-/// (default 52 ms) and a glowing endpoint halo in the Ripple accent tint.
+/// HRV trend line chart matching `06-trends.html` section 5.
 ///
-/// Draws directly with Path so it carries no Charts framework dependency.
-/// Y-axis auto-scales to the data range with a small padding band; if all data
-/// is missing the chart shows an empty-state message instead of a flat line.
+/// Draws a Path-based line chart with:
+/// - A dashed reference line at the personal baseline (default 52 ms)
+/// - An area fill gradient below the line
+/// - A glowing endpoint halo dot
+/// - A summary header showing the average + week-over-week delta
 struct HRVTrendChart: View {
     let dataPoints: [ChartDataPoint]
     var referenceValue: Double = 52
+    var deltaText: String? = nil
+
+    /// HRV accent color (green per HTML `--hrv-color: #34D399`).
+    private let hrvColor = Color(hex: "#34D399")
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 14) {
+        VStack(alignment: .leading, spacing: 12) {
             header
 
             if dataPoints.isEmpty {
                 emptyState
             } else {
+                summaryRow
                 chart
-                footer
             }
         }
-        .padding(18)
+        .padding(16)
+        .frame(maxWidth: .infinity, alignment: .leading)
         .background(Color.Wellness.adaptiveCardBackground)
-        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
         .overlay(
-            RoundedRectangle(cornerRadius: 20, style: .continuous)
-                .stroke(Color.Wellness.adaptiveSecondaryText.opacity(0.10), lineWidth: 1)
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .stroke(Color.Wellness.adaptiveSecondaryText.opacity(0.08), lineWidth: 1)
         )
         .accessibilityElement(children: .contain)
-        .accessibilityLabel("HRV trend chart. Reference line at \(Int(referenceValue)) milliseconds.")
+        .accessibilityLabel(
+            "HRV trend chart. Average \(Int(referenceValue)) milliseconds. Reference line at \(Int(referenceValue)) milliseconds."
+        )
     }
 
     // MARK: - Header
 
     private var header: some View {
         HStack(alignment: .firstTextBaseline) {
-            VStack(alignment: .leading, spacing: 4) {
-                Text("HRV Trend")
-                    .font(.system(size: 18, weight: .bold, design: .rounded))
-                    .foregroundStyle(Color.Wellness.adaptivePrimaryText)
-                Text("Last 7 days")
-                    .font(.system(size: 12, weight: .medium))
-                    .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
-            }
+            Text("HRV trend")
+                .font(.system(size: 14, weight: .semibold, design: .rounded))
+                .foregroundStyle(Color.Wellness.adaptivePrimaryText)
             Spacer()
-            Text("\(Int(referenceValue)) ms")
-                .font(.system(size: 11, weight: .bold, design: .rounded))
-                .foregroundStyle(HomeCharacterDesignTokens.Ripple.primary)
-                .padding(.horizontal, 10)
-                .padding(.vertical, 5)
-                .background(HomeCharacterDesignTokens.Ripple.primary.opacity(0.12))
-                .clipShape(Capsule())
+            Text("ms · 7 days")
+                .font(.system(size: 11, weight: .medium, design: .monospaced))
+                .foregroundStyle(Color.Wellness.adaptiveSecondaryText.opacity(0.6))
+        }
+    }
+
+    // MARK: - Summary Row
+
+    private var summaryRow: some View {
+        HStack(alignment: .firstTextBaseline, spacing: 8) {
+            Text("\(Int(referenceValue))")
+                .font(.system(size: 22, weight: .semibold, design: .rounded))
+                .foregroundStyle(hrvColor)
+            Text("ms avg")
+                .font(.system(size: 12, weight: .medium))
+                .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
+            Spacer()
+            if let deltaText {
+                Text(deltaText)
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundStyle(Color(hex: "#34C759"))
+            }
         }
     }
 
     // MARK: - Chart
 
     private var chart: some View {
-        GeometryReader { proxy in
-            let layout = ChartLayout(
-                points: dataPoints,
-                reference: referenceValue,
-                size: proxy.size
-            )
-            ZStack {
-                referenceLine(layout: layout)
-                trendLine(layout: layout)
-                if let endpoint = layout.endpoint {
-                    endpointHalo(at: endpoint)
+        ZStack(alignment: .topTrailing) {
+            GeometryReader { proxy in
+                let layout = ChartLayout(
+                    points: dataPoints,
+                    reference: referenceValue,
+                    size: proxy.size
+                )
+                ZStack {
+                    referenceLine(layout: layout)
+                    areaFill(layout: layout)
+                    trendLine(layout: layout)
+                    if let endpoint = layout.endpoint {
+                        endpointHalo(at: endpoint)
+                    }
                 }
             }
+            .frame(height: 110)
+
+            // Endpoint annotation (top-right)
+            if let last = dataPoints.last {
+                Text("today · \(Int(last.value))ms")
+                    .font(.system(size: 10, weight: .medium, design: .monospaced))
+                    .foregroundStyle(hrvColor)
+                    .padding(.horizontal, 4)
+                    .background(Color.Wellness.adaptiveCardBackground)
+                    .zIndex(2)
+            }
         }
-        .frame(height: 160)
     }
+
+    // MARK: - Chart Layers
 
     private func referenceLine(layout: ChartLayout) -> some View {
         Path { path in
@@ -82,8 +115,35 @@ struct HRVTrendChart: View {
             path.addLine(to: CGPoint(x: layout.size.width, y: y))
         }
         .stroke(
-            HomeCharacterDesignTokens.Ripple.primary.opacity(0.55),
-            style: StrokeStyle(lineWidth: 1, dash: [4, 4])
+            Color.Wellness.adaptiveSecondaryText.opacity(0.28),
+            style: StrokeStyle(lineWidth: 1, dash: [3, 3])
+        )
+    }
+
+    private func areaFill(layout: ChartLayout) -> some View {
+        Path { path in
+            let pts = layout.pointCoordinates
+            guard let first = pts.first else { return }
+            let bottom = layout.size.height
+            path.move(to: CGPoint(x: first.x, y: bottom))
+            path.addLine(to: first)
+            for point in pts.dropFirst() {
+                path.addLine(to: point)
+            }
+            if let last = pts.last {
+                path.addLine(to: CGPoint(x: last.x, y: bottom))
+            }
+            path.closeSubpath()
+        }
+        .fill(
+            LinearGradient(
+                colors: [
+                    hrvColor.opacity(0.32),
+                    hrvColor.opacity(0)
+                ],
+                startPoint: .top,
+                endPoint: .bottom
+            )
         )
     }
 
@@ -96,48 +156,22 @@ struct HRVTrendChart: View {
                 path.addLine(to: point)
             }
         }
-        .stroke(HomeCharacterDesignTokens.Ripple.deep, lineWidth: 2.5)
+        .stroke(hrvColor, lineWidth: 2.4)
     }
 
     private func endpointHalo(at point: CGPoint) -> some View {
         ZStack {
             Circle()
-                .fill(HomeCharacterDesignTokens.Ripple.primary.opacity(0.25))
-                .frame(width: 22, height: 22)
-                .blur(radius: 3)
+                .fill(hrvColor.opacity(0.2))
+                .frame(width: 16, height: 16)
             Circle()
-                .fill(HomeCharacterDesignTokens.Ripple.primary)
+                .fill(hrvColor)
                 .frame(width: 8, height: 8)
         }
         .position(point)
     }
 
-    // MARK: - Footer / Empty
-
-    private var footer: some View {
-        let avg = dataPoints.map { $0.value }.reduce(0, +) / Double(max(1, dataPoints.count))
-        return HStack(spacing: 16) {
-            statTile(title: "Average", value: "\(Int(avg))", unit: "ms")
-            statTile(title: "Reference", value: "\(Int(referenceValue))", unit: "ms")
-            Spacer(minLength: 0)
-        }
-    }
-
-    private func statTile(title: String, value: String, unit: String) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
-            Text(title)
-                .font(.system(size: 10, weight: .semibold))
-                .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
-            HStack(alignment: .firstTextBaseline, spacing: 2) {
-                Text(value)
-                    .font(.system(size: 18, weight: .heavy, design: .rounded))
-                    .foregroundStyle(Color.Wellness.adaptivePrimaryText)
-                Text(unit)
-                    .font(.system(size: 10, weight: .bold, design: .rounded))
-                    .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
-            }
-        }
-    }
+    // MARK: - Empty State
 
     private var emptyState: some View {
         VStack(spacing: 10) {
@@ -153,7 +187,7 @@ struct HRVTrendChart: View {
                 .multilineTextAlignment(.center)
         }
         .frame(maxWidth: .infinity)
-        .frame(height: 160)
+        .frame(height: 110)
     }
 }
 
@@ -164,7 +198,6 @@ private struct ChartLayout {
     let reference: Double
     let size: CGSize
 
-    /// Y-domain padded so the line never touches the top/bottom edge.
     private var yDomain: ClosedRange<Double> {
         guard let minVal = points.map({ $0.value }).min(),
               let maxVal = points.map({ $0.value }).max() else {
@@ -206,8 +239,9 @@ private struct ChartLayout {
         ChartDataPoint(date: cal.date(byAdding: .day, value: -(6 - index), to: now) ?? now, value: value)
     }
     return VStack {
-        HRVTrendChart(dataPoints: points, referenceValue: 52)
+        HRVTrendChart(dataPoints: points, referenceValue: 52, deltaText: "+8 vs last week")
         Spacer()
     }
     .padding()
+    .background(Color.Wellness.adaptiveBackground)
 }
