@@ -69,7 +69,7 @@ struct CharacterCollectionView: View {
                 Button {
                     navigateToExport = true
                 } label: {
-                    Image(systemName: "square.and.arrow.up")
+                    Image(systemName: AppIconSystem.System.export_.sfSymbol)
                         .foregroundStyle(Color.primaryBlue)
                 }
                 .accessibilityLabel("Export all character illustrations")
@@ -265,7 +265,7 @@ struct CharacterCollectionView: View {
 
                         Spacer()
 
-                        Image(systemName: "chevron.right")
+                        Image(systemName: AppIconSystem.Nav.forward.sfSymbol)
                             .font(.caption.weight(.semibold))
                             .foregroundStyle(Color.secondary)
                     }

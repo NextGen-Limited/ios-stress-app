@@ -28,15 +28,22 @@ enum TabItem: Int, CaseIterable, Identifiable {
     /// SF Symbol for the unselected state.
     var sfSymbol: String {
         switch self {
-        case .home:       return "house"
-        case .action:     return "plus.circle"
-        case .trend:      return "chart.bar"
-        case .settings:   return "gearshape"
+        case .home:       return AppIconSystem.Tab.home.sfSymbol
+        case .action:     return AppIconSystem.Tab.action.sfSymbol
+        case .trend:      return AppIconSystem.Tab.trends.sfSymbol
+        case .settings:   return AppIconSystem.Tab.settings.sfSymbol
         }
     }
 
     /// SF Symbol for the selected state (filled variant).
-    var sfSymbolActive: String { sfSymbol + ".fill" }
+    var sfSymbolActive: String {
+        switch self {
+        case .home:       return AppIconSystem.Tab.home.sfSymbolActive
+        case .action:     return AppIconSystem.Tab.action.sfSymbolActive
+        case .trend:      return AppIconSystem.Tab.trends.sfSymbolActive
+        case .settings:   return AppIconSystem.Tab.settings.sfSymbolActive
+        }
+    }
 
     // MARK: - Color for selected state
     var selectedColor: Color {

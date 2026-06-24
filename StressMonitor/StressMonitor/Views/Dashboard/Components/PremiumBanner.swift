@@ -83,7 +83,7 @@ struct PremiumBanner: View {
                     Circle()
                         .fill(.white.opacity(0.25))
                         .frame(width: 64, height: 64)
-                    Image(systemName: "crown.fill")
+                    Image(systemName: AppIconSystem.System.premium.sfSymbol)
                         .font(.system(size: 28, weight: .bold))
                         .foregroundStyle(Color(hex: "FFD700"))
                 }

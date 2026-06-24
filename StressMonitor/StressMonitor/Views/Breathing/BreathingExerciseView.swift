@@ -115,7 +115,7 @@ struct BreathingExerciseView: View {
     private var headerSection: some View {
         HStack {
             Button(action: { dismiss() }) {
-                Image(systemName: "chevron.left")
+                Image(systemName: AppIconSystem.Nav.back.sfSymbol)
                     .font(.system(size: 16, weight: .medium, design: .rounded))
                     .foregroundStyle(rippleLight)
                     .frame(width: 36, height: 36)

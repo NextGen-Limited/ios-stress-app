@@ -109,7 +109,7 @@ struct AboutView: View {
                 .foregroundStyle(Color.Wellness.adaptivePrimaryText)
             Spacer()
             if showChevron {
-                Image(systemName: "chevron.right")
+                Image(systemName: AppIconSystem.Nav.forward.sfSymbol)
                     .font(.system(size: 11, weight: .semibold))
                     .foregroundStyle(Color.Wellness.adaptiveSecondaryText.opacity(0.5))
             }

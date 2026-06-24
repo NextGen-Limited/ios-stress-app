@@ -23,7 +23,7 @@ struct OnboardingSuccessView: View {
             HStack {
                 Button(action: { onBack?() }) {
                     HStack(spacing: 4) {
-                        Image(systemName: "chevron.left")
+                        Image(systemName: AppIconSystem.Nav.back.sfSymbol)
                             .font(.system(size: 14, weight: .medium))
                         Text("Back")
                             .font(.system(size: 14, weight: .medium))

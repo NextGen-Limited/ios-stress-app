@@ -21,7 +21,7 @@ struct PremiumLockOverlay: View {
             } label: {
                 VStack(spacing: 6) {
                     HStack(spacing: 8) {
-                        Image(systemName: "lock.fill")
+                        Image(systemName: AppIconSystem.System.locked.sfSymbol)
                             .font(.system(size: 14, weight: .semibold))
 
                         Text(lockedFeatureLabel ?? "Unlock with Premium")

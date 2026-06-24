@@ -94,7 +94,7 @@ struct BreathingSummaryView: View {
 
                     Button(action: { shareResult() }) {
                         HStack(spacing: 8) {
-                            Image(systemName: "square.and.arrow.up")
+                            Image(systemName: AppIconSystem.System.export_.sfSymbol)
                             Text("Share Result")
                                 .font(.system(size: 16, weight: .semibold, design: .rounded))
                         }

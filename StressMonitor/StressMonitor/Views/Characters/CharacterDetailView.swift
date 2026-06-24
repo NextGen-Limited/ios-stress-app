@@ -66,7 +66,7 @@ struct CharacterDetailView: View {
                     size: 150
                 )
             } else {
-                Image(systemName: "lock.fill")
+                Image(systemName: AppIconSystem.System.locked.sfSymbol)
                     .font(.system(size: 54, weight: .semibold))
                     .foregroundStyle(creature.element.primaryColor.opacity(0.55))
             }
@@ -172,7 +172,7 @@ struct CharacterDetailView: View {
         GlassCard {
             VStack(spacing: Spacing.md) {
                 if creature.unlockType == .premium {
-                    Image(systemName: "crown.fill")
+                    Image(systemName: AppIconSystem.System.premium.sfSymbol)
                         .font(.largeTitle)
                         .foregroundStyle(.orange)
                     Text("Premium Character")
@@ -183,7 +183,7 @@ struct CharacterDetailView: View {
                     Button("Get Premium") { }
                         .buttonStyle(.borderedProminent)
                 } else if creature.unlockType == .streakGated {
-                    Image(systemName: "flame.fill")
+                    Image(systemName: AppIconSystem.Metric.streak.sfSymbol)
                         .font(.largeTitle)
                         .foregroundStyle(.orange)
                     Text("\(creature.streakRequired)-Day Streak Required")

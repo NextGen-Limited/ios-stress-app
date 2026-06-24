@@ -25,14 +25,14 @@ struct CharacterGridCard: View {
                         size: 64
                     )
                 } else {
-                    Image(systemName: "lock.fill")
+                    Image(systemName: AppIconSystem.System.locked.sfSymbol)
                         .font(.title2)
                         .foregroundStyle(creature.element.primaryColor.opacity(0.65))
                 }
             }
             .overlay(alignment: .topTrailing) {
                 if isActive {
-                    Image(systemName: "checkmark.circle.fill")
+                    Image(systemName: AppIconSystem.System.success.sfSymbol)
                         .font(.title3)
                         .foregroundStyle(.green)
                         .background(Circle().fill(Color.Wellness.adaptiveCardBackground).padding(-2))
@@ -76,10 +76,10 @@ struct CharacterGridCard: View {
     private var unlockBadge: some View {
         HStack(spacing: 4) {
             if isPremium {
-                Image(systemName: "crown.fill")
+                Image(systemName: AppIconSystem.System.premium.sfSymbol)
                 Text("Premium")
             } else if isStreakGated {
-                Image(systemName: "flame.fill")
+                Image(systemName: AppIconSystem.Metric.streak.sfSymbol)
                 Text("\(creature.streakRequired)d streak")
             }
         }

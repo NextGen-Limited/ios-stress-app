@@ -52,7 +52,7 @@ struct MiniWalkView: View {
         VStack(spacing: 4) {
             HStack {
                 Button(action: { dismiss() }) {
-                    Image(systemName: "chevron.left")
+                    Image(systemName: AppIconSystem.Nav.back.sfSymbol)
                         .font(.system(size: 16, weight: .medium))
                         .foregroundStyle(Color(hex: "#9CA3AF"))
                         .frame(width: 36, height: 36)

@@ -52,7 +52,7 @@ struct HabitLogRow: View {
                             .font(.system(size: 11, weight: .bold, design: .rounded))
                             .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
                     }
-                    Image(systemName: "chevron.right")
+                    Image(systemName: AppIconSystem.Nav.forward.sfSymbol)
                         .font(.system(size: 10, weight: .bold))
                         .foregroundStyle(Color.Wellness.adaptiveSecondaryText.opacity(0.5))
                 }

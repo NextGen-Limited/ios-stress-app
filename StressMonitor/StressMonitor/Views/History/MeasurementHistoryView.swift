@@ -117,7 +117,7 @@ struct MeasurementHistoryView: View {
 
     private var emptyState: some View {
         VStack(spacing: 16) {
-            Image(systemName: "chart.bar")
+            Image(systemName: AppIconSystem.Tab.trends.sfSymbol)
                 .font(.system(size: 64))
                 .foregroundColor(.secondary)
 

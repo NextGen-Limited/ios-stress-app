@@ -171,7 +171,7 @@ struct PlaceholderDestination: View {
 
     var body: some View {
         VStack(spacing: DesignTokens.Spacing.lg) {
-            Image(systemName: "figure.mind.and.body")
+            Image(systemName: AppIconSystem.Action.bodyScan.sfSymbol)
                 .font(.system(size: 60))
                 .foregroundStyle(HomeCharacterDesignTokens.Ripple.primary)
 

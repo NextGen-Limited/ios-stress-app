@@ -25,7 +25,7 @@ struct RecommendationCard: View {
             Spacer()
 
             if recommendation.action != .none {
-                Image(systemName: "chevron.right")
+                Image(systemName: AppIconSystem.Nav.forward.sfSymbol)
                     .font(Typography.caption1)
                     .foregroundColor(.secondary)
             }

@@ -16,7 +16,7 @@ struct OnboardingHealthSyncView: View {
             HStack {
                 Button(action: { onBack?() }) {
                     HStack(spacing: 4) {
-                        Image(systemName: "chevron.left")
+                        Image(systemName: AppIconSystem.Nav.back.sfSymbol)
                             .font(.system(size: 14, weight: .medium))
                         Text("Back")
                             .font(.system(size: 14, weight: .medium))
@@ -202,7 +202,7 @@ private struct PermissionDataTypeRow: View {
             Spacer()
 
             // Read-only badge
-            Image(systemName: "checkmark.circle.fill")
+            Image(systemName: AppIconSystem.System.success.sfSymbol)
                 .font(.system(size: 16))
                 .foregroundStyle(HomeCharacterDesignTokens.Ripple.primary.opacity(0.7))
                 .accessibilityHidden(true)

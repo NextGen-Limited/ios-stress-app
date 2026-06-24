@@ -133,7 +133,7 @@ struct DataDeleteView: View {
                     }) {
                         HStack {
                             Spacer()
-                            Image(systemName: "trash.fill")
+                            Image(systemName: AppIconSystem.System.delete.sfSymbol)
                             Text("Delete Data")
                             Spacer()
                         }

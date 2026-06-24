@@ -42,7 +42,7 @@ struct MeasurementDetailView: View {
     private var navigationBar: some View {
         HStack {
             Button(action: { dismiss() }) {
-                Image(systemName: "chevron.left")
+                Image(systemName: AppIconSystem.Nav.back.sfSymbol)
                     .font(.title3)
                     .foregroundColor(.primary)
             }
@@ -55,7 +55,7 @@ struct MeasurementDetailView: View {
             Spacer()
 
             Button(action: { viewModel?.shareMeasurement() }) {
-                Image(systemName: "square.and.arrow.up")
+                Image(systemName: AppIconSystem.System.export_.sfSymbol)
                     .font(.title3)
                     .foregroundColor(.primaryBlue)
             }

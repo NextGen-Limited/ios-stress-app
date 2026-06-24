@@ -44,7 +44,7 @@ struct ChatBottomSheetView: View {
                         Button {
                             viewModel.clearConversation()
                         } label: {
-                            Image(systemName: "trash")
+                            Image(systemName: AppIconSystem.System.delete.sfSymbol)
                                 .foregroundStyle(.secondary)
                         }
                     }
