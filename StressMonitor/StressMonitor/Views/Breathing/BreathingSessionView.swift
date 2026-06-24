@@ -1,126 +1,110 @@
 import SwiftUI
-import SwiftData
 
-/// Live breathing session screen — Ripple redesign.
-/// Dark canvas with radial glow, phase-colored text, encouragement bubble, haptics.
+/// Active box-breathing session screen — redesigned per `08-breathing-active.html`.
+///
+/// Light gradient background with:
+/// - Meta row (remaining time / cycles completed)
+/// - Breathing arena (BreathingCircle + PhaseLabel inside core)
+/// - Phase track (4 dots showing inhale→hold→exhale→hold progress)
+/// - Progress bar + End early / Skip cycle buttons
 struct BreathingSessionView: View {
     @State private var viewModel: BreathingSessionViewModel?
     @Environment(\.dismiss) private var dismiss
     @State private var showSummary = false
-    @State private var showEncouragement = false
 
-    // Ripple design tokens
-    private let darkCanvas = HomeCharacterDesignTokens.darkCanvas
-    private let ripplePrimary = HomeCharacterDesignTokens.Ripple.primary  // #4FC3F7
-    private let rippleDeep = HomeCharacterDesignTokens.Ripple.deep        // #0288D1
-    private let rippleMid = HomeCharacterDesignTokens.Ripple.mid          // #81D4FA
-    private let rippleLight = HomeCharacterDesignTokens.Ripple.light      // #B3E5FC
-    private let exhaleColor = Color(hex: "#26C6DA")
+    // Design tokens
+    private let accent = Color(hex: "#4FC3F7")
+    private let accentStrong = Color(hex: "#0288D1")
+    private let fg = Color(hex: "#101223")
+    private let muted = Color(hex: "#777986")
+    private let separator = Color(red: 60/255, green: 60/255, blue: 67/255).opacity(0.12)
 
     var body: some View {
         ZStack {
-            // Dark canvas with subtle radial glow at center
-            darkCanvas.ignoresSafeArea()
-
-            // Radial glow
-            RadialGradient(
-                colors: [
-                    ripplePrimary.opacity(0.04),
-                    Color.clear
-                ],
-                center: .center,
-                startRadius: 0,
-                endRadius: 240
-            )
+            // Radial gradient background matching .breath-stage
+            ZStack {
+                LinearGradient(
+                    colors: [
+                        Color(red: 0.925, green: 0.969, blue: 0.996),  // #ECF8FE
+                        Color.white
+                    ],
+                    startPoint: .top,
+                    endPoint: .bottom
+                )
+                RadialGradient(
+                    colors: [accent.opacity(0.22), Color.clear],
+                    center: .center,
+                    startRadius: 50,
+                    endRadius: 200
+                )
+            }
             .ignoresSafeArea()
-            .allowsHitTesting(false)
 
             VStack(spacing: 0) {
-                // Top bar
-                HStack {
+                if let vm = viewModel {
+                    // Top meta row (remaining + cycles)
+                    metaRow(vm: vm)
+                        .padding(.top, 16)
+
                     Spacer()
-                    Button(action: {
-                        viewModel?.endSession()
-                        dismiss()
-                    }) {
-                        Image(systemName: "xmark.circle.fill")
-                            .font(.system(size: 28, design: .rounded))
-                            .foregroundStyle(.white.opacity(0.35))
-                    }
-                    .accessibilityLabel("Close session")
-                }
-                .padding(.trailing, 20)
-                .padding(.top, 8)
 
-                Spacer()
-
-                // Breathing orb driven by the single box-phase state machine.
-                // Ripple character overlaid at center to keep its breathing mood.
-                if let viewModel = viewModel {
+                    // Breathing arena (circle + phase label inside)
                     ZStack {
-                        BreathingCircle(phase: viewModel.boxPhase, size: 200)
-                        RippleCharacterView(mood: rippleMood(for: viewModel.boxPhase), size: 120)
-                            .accessibilityLabel("Ripple is guiding your breathing, phase: \(viewModel.boxPhase.label)")
+                        BreathingCircle(phase: vm.boxPhase, size: 280)
+                        PhaseLabel(
+                            phase: vm.boxPhase,
+                            secondsRemaining: vm.secondsRemaining,
+                            tint: .white
+                        )
                     }
                     .frame(height: 300)
-                    .animation(.easeInOut(duration: 0.4), value: viewModel.boxPhase)
-                } else {
-                    Color.clear.frame(height: 300)
+
+                    Spacer()
+
+                    // Phase track (4 dots)
+                    phaseTrack(vm: vm)
+                        .padding(.top, 8)
+
+                    // Progress bar + buttons
+                    VStack(spacing: 12) {
+                        progressBar(fraction: vm.sessionProgressFraction)
+
+                        HStack(spacing: 10) {
+                            Button(action: { dismiss() }) {
+                                Text("End early")
+                                    .font(.system(size: 16, weight: .semibold))
+                                    .foregroundStyle(fg)
+                                    .frame(maxWidth: .infinity)
+                                    .frame(height: 48)
+                                    .background(
+                                        RoundedRectangle(cornerRadius: 14)
+                                            .fill(Color(red: 60/255, green: 60/255, blue: 67/255).opacity(0.08))
+                                    )
+                            }
+
+                            Button(action: { vm.skipCycle() }) {
+                                Text("Skip cycle")
+                                    .font(.system(size: 16, weight: .semibold))
+                                    .foregroundStyle(.white)
+                                    .frame(maxWidth: .infinity)
+                                    .frame(height: 48)
+                                    .background(
+                                        RoundedRectangle(cornerRadius: 14)
+                                            .fill(fg)
+                                    )
+                            }
+                        }
+
+                        Text("Haptic + heartbeat on each transition")
+                            .font(.system(size: 12))
+                            .foregroundStyle(muted)
+                    }
+                    .padding(.horizontal, 24)
+                    .padding(.bottom, 32)
                 }
-
-                Spacer()
-
-                // Box-phase countdown (4-4-4-4) — the single phase driver
-                if let viewModel = viewModel {
-                    PhaseLabel(
-                        phase: viewModel.boxPhase,
-                        secondsRemaining: viewModel.secondsRemaining,
-                        tint: phaseColor
-                    )
-                    .padding(.top, 12)
-                    .animation(.easeInOut(duration: 0.3), value: viewModel.boxPhase)
-                }
-
-                // Time remaining
-                Text(timeRemainingText)
-                    .font(.system(size: 56, weight: .light, design: .rounded))
-                    .monospacedDigit()
-                    .foregroundStyle(rippleLight)
-                    .monospacedDigit()
-                    .padding(.top, 20)
-
-                // Encouragement bubble (appears mid-session)
-                if showEncouragement {
-                    encouragementBubble
-                        .transition(.opacity.combined(with: .move(edge: .bottom)))
-                        .padding(.top, 16)
-                }
-
-                // End Session button
-                Button(action: {
-                    viewModel?.endSession()
-                    showSummary = true
-                }) {
-                    Text("End Session")
-                        .font(.system(size: 17, weight: .semibold, design: .rounded))
-                        .foregroundStyle(Color(hex: "#E53935"))
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 50)
-                        .background(
-                            RoundedRectangle(cornerRadius: 25)
-                                .fill(Color(red: 229/255, green: 57/255, blue: 53/255).opacity(0.1))
-                        )
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 25)
-                                .stroke(Color(hex: "#E53935").opacity(0.3), lineWidth: 1)
-                        )
-                }
-                .padding(.horizontal, 32)
-                .padding(.top, 24)
-                .padding(.bottom, 32)
-                .accessibilityLabel("End Session")
             }
         }
+        .navigationBarHidden(true)
         .onAppear {
             viewModel = BreathingSessionViewModel()
             viewModel?.startSession()
@@ -128,11 +112,10 @@ struct BreathingSessionView: View {
         .onDisappear {
             viewModel?.endSession()
         }
-        .onChange(of: viewModel?.boxPhase) {
-            triggerHaptic()
-        }
-        .onChange(of: viewModel?.remainingTime) {
-            checkEncouragement()
+        .onChange(of: viewModel?.sessionComplete ?? false) { _, completed in
+            if completed {
+                showSummary = true
+            }
         }
         .navigationDestination(isPresented: $showSummary) {
             if let result = viewModel?.sessionResult {
@@ -141,87 +124,120 @@ struct BreathingSessionView: View {
         }
     }
 
-    // MARK: - Encouragement Bubble
+    // MARK: - Meta Row
 
-    private var encouragementBubble: some View {
-        HStack(spacing: 12) {
-            RippleCharacterView(mood: .happy, size: 44)
-                .accessibilityLabel("Ripple avatar")
-
-            Text("You are doing great! Keep going.")
-                .font(.system(size: 14, weight: .medium, design: .rounded))
-                .foregroundStyle(rippleLight)
-                .fixedSize(horizontal: false, vertical: true)
-
-            Spacer(minLength: 0)
-        }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 12)
-        .background(
-            RoundedRectangle(cornerRadius: 16)
-                .fill(Color.white.opacity(0.06))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 16)
-                        .stroke(Color.white.opacity(0.1), lineWidth: 1)
-                )
-        )
-        .padding(.horizontal, 32)
-        .accessibilityElement(children: .combine)
-    }
-
-    // MARK: - Phase Helpers
-
-    private var phaseColor: Color {
-        guard let viewModel = viewModel else { return ripplePrimary }
-        switch viewModel.boxPhase {
-        case .inhale:  return ripplePrimary   // #4FC3F7
-        case .holdIn:  return rippleMid       // #81D4FA
-        case .exhale:  return exhaleColor     // #26C6DA
-        case .holdOut: return rippleLight     // #B3E5FC
-        }
-    }
-
-    private func rippleMood(for phase: BoxBreathingPhase) -> RippleMood {
-        switch phase {
-        case .inhale:  return .serene
-        case .holdIn:  return .focused
-        case .exhale:  return .relaxed
-        case .holdOut: return .focused
-        }
-    }
-
-    // MARK: - Time
-
-    private var timeRemainingText: String {
-        guard let viewModel = viewModel else { return "02:00" }
-        let minutes = Int(viewModel.remainingTime) / 60
-        let seconds = Int(viewModel.remainingTime) % 60
-        return String(format: "%02d:%02d", minutes, seconds)
-    }
-
-    // MARK: - Encouragement Logic
-
-    private func checkEncouragement() {
-        guard let vm = viewModel, !showEncouragement else { return }
-        // Show encouragement at ~40% through the session
-        let threshold = vm.sessionDuration * 0.6
-        if vm.remainingTime <= threshold {
-            withAnimation(.easeInOut(duration: 0.5)) {
-                showEncouragement = true
+    private func metaRow(vm: BreathingSessionViewModel) -> some View {
+        HStack(spacing: 24) {
+            VStack(spacing: 2) {
+                Text(vm.remainingTimeString)
+                    .font(.system(size: 22, weight: .bold, design: .rounded))
+                    .foregroundStyle(fg)
+                    .monospacedDigit()
+                Text("REMAINING")
+                    .font(.system(size: 10, weight: .medium, design: .monospaced))
+                    .tracking(0.6)
+                    .foregroundStyle(muted)
             }
-            // Auto-hide after 10 seconds
-            DispatchQueue.main.asyncAfter(deadline: .now() + 10) {
-                withAnimation(.easeInOut(duration: 0.5)) {
-                    showEncouragement = false
+            // Vertical separator
+            Rectangle()
+                .fill(separator)
+                .frame(width: 1, height: 36)
+
+            VStack(spacing: 2) {
+                HStack(alignment: .firstTextBaseline, spacing: 2) {
+                    Text("\(vm.cyclesCompleted)")
+                        .font(.system(size: 22, weight: .bold, design: .rounded))
+                        .foregroundStyle(fg)
+                    Text("/\(vm.totalCycles)")
+                        .font(.system(size: 14, weight: .medium))
+                        .foregroundStyle(muted)
                 }
+                Text("CYCLES")
+                    .font(.system(size: 10, weight: .medium, design: .monospaced))
+                    .tracking(0.6)
+                    .foregroundStyle(muted)
             }
         }
+        .frame(maxWidth: 280)
     }
 
-    // MARK: - Haptics
+    // MARK: - Phase Track
 
-    private func triggerHaptic() {
-        let generator = UIImpactFeedbackGenerator(style: .light)
-        generator.impactOccurred()
+    private func phaseTrack(vm: BreathingSessionViewModel) -> some View {
+        let phases: [BoxBreathingPhase] = [.inhale, .holdIn, .exhale, .holdOut]
+        let currentIndex = phases.firstIndex(of: vm.boxPhase) ?? 0
+
+        return HStack(spacing: 14) {
+            ForEach(0..<4, id: \.self) { i in
+                let phase = phases[i]
+                let isActive = i == currentIndex
+                let isDone = i < currentIndex
+
+                VStack(spacing: 4) {
+                    Circle()
+                        .fill(dotColor(isActive: isActive, isDone: isDone))
+                        .frame(width: 10, height: 10)
+                        .scaleEffect(isActive ? 1.4 : 1.0)
+                        .animation(.easeInOut(duration: 0.3), value: vm.boxPhase)
+                    Text("\(phase.label) 4")
+                        .font(.system(size: 10, weight: .medium, design: .monospaced))
+                        .tracking(0.4)
+                        .textCase(.uppercase)
+                        .foregroundStyle(isActive ? accentStrong : muted)
+                        .animation(.easeInOut(duration: 0.3), value: vm.boxPhase)
+                }
+                .frame(maxWidth: .infinity)
+            }
+        }
+        .frame(maxWidth: 280)
+        .padding(.horizontal, 24)
+    }
+
+    private func dotColor(isActive: Bool, isDone: Bool) -> Color {
+        if isActive { return accentStrong }
+        if isDone { return accent }
+        return Color(red: 60/255, green: 60/255, blue: 67/255).opacity(0.18)
+    }
+
+    // MARK: - Progress Bar
+
+    private func progressBar(fraction: Double) -> some View {
+        GeometryReader { geo in
+            ZStack(alignment: .leading) {
+                RoundedRectangle(cornerRadius: 999)
+                    .fill(Color(red: 60/255, green: 60/255, blue: 67/255).opacity(0.10))
+                    .frame(height: 4)
+                RoundedRectangle(cornerRadius: 999)
+                    .fill(accent)
+                    .frame(width: geo.size.width * min(1, max(0, fraction)), height: 4)
+                    .animation(.easeInOut(duration: 0.3), value: fraction)
+            }
+        }
+        .frame(height: 4)
+    }
+}
+
+// MARK: - ViewModel Convenience
+
+extension BreathingSessionViewModel {
+    var remainingTimeString: String {
+        let t = max(0, remainingTime)
+        return String(format: "%d:%02d", Int(t) / 60, Int(t) % 60)
+    }
+
+    /// Fraction of session elapsed (0 → 1) for the progress bar.
+    var sessionProgressFraction: Double {
+        guard sessionDuration > 0 else { return 0 }
+        return 1.0 - (remainingTime / sessionDuration)
+    }
+
+    var sessionComplete: Bool {
+        remainingTime <= 0
+    }
+}
+
+#Preview {
+    NavigationStack {
+        BreathingSessionView()
     }
 }

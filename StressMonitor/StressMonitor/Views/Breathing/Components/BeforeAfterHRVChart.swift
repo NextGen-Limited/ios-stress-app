@@ -1,106 +1,115 @@
 import SwiftUI
 
-/// Two-bar vertical comparison of pre- and post-session HRV.
+/// Before/after HRV comparison chart matching the `.hrv-diff-chart` from
+/// `14-breathing-summary.html`.
 ///
-/// Renders the delta (e.g. "+14 ms") in `stressRelaxed` when positive (improvement),
-/// `stressHigh` when negative. Nil-safe: a nil value renders an empty bar with "—".
+/// Renders a smooth ascending path from `before` to `after` with a gradient
+/// fill underneath, a dashed baseline at the "before" level, and labelled
+/// endpoints. The delta (e.g. "+16 ms · +31%") is surfaced as a parameter
+/// so the parent view controls the exact wording.
 struct BeforeAfterHRVChart: View {
-    var before: Double?
-    var after: Double?
+    var before: Double
+    var after: Double
 
-    private let barWidth: CGFloat = 56
+    private let beforeColor = Color(hex: "#34D399")    // --hrv-color / success
+    private let mutedLabel = Color(hex: "#8E8E93")      // --muted-2
+    private let separatorColor = Color(red: 60/255, green: 60/255, blue: 67/255).opacity(0.12)
 
     var body: some View {
-        VStack(spacing: 16) {
-            barsRow
-            deltaLabel
-        }
-        .padding(20)
-        .background(
-            RoundedRectangle(cornerRadius: 18, style: .continuous)
-                .fill(Color.white.opacity(0.05))
-                .overlay(
-                    RoundedRectangle(cornerRadius: 18, style: .continuous)
-                        .stroke(Color.white.opacity(0.08), lineWidth: 1)
-                )
-        )
-        .accessibilityElement(children: .combine)
-        .accessibilityLabel(deltaAccessibility)
-    }
-
-    private var barsRow: some View {
-        let maxValue = max(before ?? 1, after ?? 1, 1)
-
-        return GeometryReader { proxy in
-            let availableHeight = proxy.size.height
-            HStack(alignment: .bottom, spacing: 32) {
-                bar(
-                    label: "Before",
-                    value: before,
-                    height: before.map { availableHeight * ($0 / maxValue) } ?? 0,
-                    tint: HomeCharacterDesignTokens.Ember.accent
-                )
-                bar(
-                    label: "After",
-                    value: after,
-                    height: after.map { availableHeight * ($0 / maxValue) } ?? 0,
-                    tint: .stressRelaxed
-                )
+        VStack(alignment: .leading, spacing: 10) {
+            // Header row
+            HStack {
+                Text("HRV across session")
+                    .font(.system(size: 13, weight: .semibold))
+                    .foregroundStyle(Color(hex: "#3C3C43"))
+                Spacer()
+                Text("live")
+                    .font(.system(size: 10, weight: .medium, design: .monospaced))
+                    .tracking(0.4)
+                    .textCase(.uppercase)
+                    .foregroundStyle(mutedLabel)
             }
-            .frame(maxWidth: .infinity, alignment: .center)
-        }
-        .frame(height: 140)
-    }
 
-    private func bar(label: String, value: Double?, height: CGFloat, tint: Color) -> some View {
-        VStack(spacing: 8) {
-            Text(value.map { "\(Int($0.rounded())) ms" } ?? "—")
-                .font(.system(size: 13, weight: .bold, design: .rounded))
-                .foregroundStyle(Color.white)
-                .monospacedDigit()
+            // SVG-like chart
+            GeometryReader { geo in
+                let w = geo.size.width
+                let h = geo.size.height
+                let maxVal = max(before, after, 1)
+                let minVal = min(before, after, 0)
+                let range = max(maxVal - minVal, 1)
+                // Normalise: before at 80% down, after at ~25% down (inverted)
+                let beforeY = h * 0.70
+                let afterY = h * (0.70 - 0.45 * (after - before) / range)
+                let clampedAfterY = max(h * 0.15, min(h * 0.85, afterY))
 
-            RoundedRectangle(cornerRadius: 10, style: .continuous)
-                .fill(tint.opacity(value == nil ? 0.2 : 0.85))
-                .frame(width: barWidth, height: max(4, height))
+                ZStack {
+                    // Dashed baseline
+                    Path { p in
+                        p.move(to: CGPoint(x: 0, y: beforeY))
+                        p.addLine(to: CGPoint(x: w, y: beforeY))
+                    }
+                    .stroke(separatorColor, style: StrokeStyle(lineWidth: 1, dash: [3, 3]))
 
-            Text(label)
-                .font(.system(size: 12, weight: .semibold, design: .rounded))
-                .foregroundStyle(Color.white.opacity(0.5))
-        }
-    }
+                    // Before label
+                    Text("before \(Int(before))ms")
+                        .font(.system(size: 9))
+                        .foregroundStyle(mutedLabel)
+                        .position(x: 36, y: beforeY - 8)
 
-    private var deltaLabel: some View {
-        Group {
-            if let delta = computedDelta {
-                HStack(spacing: 4) {
-                    Image(systemName: delta >= 0 ? "arrow.up.right" : "arrow.down.right")
-                        .font(.system(size: 12, weight: .bold))
-                    Text("\(delta >= 0 ? "+" : "")\(Int(delta.rounded())) ms")
-                        .font(.system(size: 15, weight: .heavy, design: .rounded))
+                    // Gradient fill under the curve
+                    Path { p in
+                        p.move(to: CGPoint(x: 0, y: beforeY))
+                        p.addCurve(
+                            to: CGPoint(x: w, y: clampedAfterY),
+                            control1: CGPoint(x: w * 0.35, y: beforeY - (beforeY - clampedAfterY) * 0.3),
+                            control2: CGPoint(x: w * 0.65, y: clampedAfterY + (beforeY - clampedAfterY) * 0.25)
+                        )
+                        p.addLine(to: CGPoint(x: w, y: h))
+                        p.addLine(to: CGPoint(x: 0, y: h))
+                        p.closeSubpath()
+                    }
+                    .fill(
+                        LinearGradient(
+                            colors: [beforeColor.opacity(0.35), beforeColor.opacity(0)],
+                            startPoint: .top,
+                            endPoint: .bottom
+                        )
+                    )
+
+                    // Curve stroke
+                    Path { p in
+                        p.move(to: CGPoint(x: 0, y: beforeY))
+                        p.addCurve(
+                            to: CGPoint(x: w, y: clampedAfterY),
+                            control1: CGPoint(x: w * 0.35, y: beforeY - (beforeY - clampedAfterY) * 0.3),
+                            control2: CGPoint(x: w * 0.65, y: clampedAfterY + (beforeY - clampedAfterY) * 0.25)
+                        )
+                    }
+                    .stroke(beforeColor, style: StrokeStyle(lineWidth: 2.4, lineCap: .round))
+
+                    // Endpoint dot
+                    Circle()
+                        .fill(beforeColor)
+                        .frame(width: 7, height: 7)
+                        .position(x: w - 2, y: clampedAfterY)
+
+                    // After label
+                    Text("\(Int(after))ms after")
+                        .font(.system(size: 9, weight: .bold))
+                        .foregroundStyle(beforeColor)
+                        .position(x: w - 40, y: clampedAfterY - 10)
                 }
-                .foregroundStyle(delta >= 0 ? Color.stressRelaxed : Color.stressHigh)
-            } else {
-                Text("HRV comparison unavailable")
-                    .font(.system(size: 13, weight: .medium, design: .rounded))
-                    .foregroundStyle(Color.white.opacity(0.45))
             }
+            .frame(height: 120)
         }
-    }
-
-    private var computedDelta: Double? {
-        guard let before, let after else { return nil }
-        return after - before
-    }
-
-    private var deltaAccessibility: String {
-        guard let delta = computedDelta else { return "HRV comparison unavailable" }
-        let direction = delta >= 0 ? "improved by" : "decreased by"
-        return "Heart rate variability \(direction) \(Int(abs(delta).rounded())) milliseconds"
     }
 }
 
-#Preview {
-    BeforeAfterHRVChart(before: 52, after: 66)
-        .padding()
-        .background(HomeCharacterDesignTokens.darkCanvas)
+#Preview("BeforeAfterHRVChart") {
+    BeforeAfterHRVChart(before: 52, after: 68)
+        .padding(16)
+        .background(Color.white)
+        .cornerRadius(18)
+        .padding(40)
+        .background(Color(hex: "#F2F2F7"))
 }
