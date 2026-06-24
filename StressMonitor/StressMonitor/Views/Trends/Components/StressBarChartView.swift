@@ -1,166 +1,160 @@
-import Charts
 import SwiftUI
 
-/// Character-Reactive Bar Chart.
+/// Daily stress bar chart matching `06-trends.html` section 2.
 ///
-/// Each bar gets a Ripple mood face on top based on that day's stress tier.
-/// Today's bar glows with an accent ring. **No numeric stress scores** —
-/// faces are the only indicator.
+/// Seven vertical bars in a 7-column grid, each colored by its stress tier
+/// (Relaxed/Mild/Moderate/High). Today's bar gets an accent outline ring.
+/// Below each bar: weekday abbreviation + date number.
 struct StressBarChartView: View {
     let dailyStress: [DailyStressData]
-    let distribution: StressDistribution
-    @Binding var selectedTimeRange: TrendsTimeRange
+    var averageValue: Int = 0
+
+    // MARK: - Body
 
     var body: some View {
-        VStack(alignment: .leading, spacing: 16) {
-            // Header with time range picker
-            HStack {
-                Text("Stress over time")
-                    .font(.system(size: 20, weight: .bold))
-                    .foregroundColor(.white)
-
-                Spacer()
-
-                Menu {
-                    ForEach(TrendsTimeRange.allCases, id: \.self) { range in
-                        Button {
-                            selectedTimeRange = range
-                        } label: {
-                            HStack {
-                                Text(range.displayName)
-                                if range == selectedTimeRange {
-                                    Image(systemName: "checkmark")
-                                }
-                            }
-                        }
-                    }
-                } label: {
-                    HStack(spacing: 4) {
-                        Text(selectedTimeRange.displayName)
-                            .font(.system(size: 12, weight: .medium))
-                        Image(systemName: "chevron.down")
-                            .font(.system(size: 10, weight: .semibold))
-                    }
-                    .foregroundColor(.white.opacity(0.6))
-                    .padding(.horizontal, 12)
-                    .padding(.vertical, 7)
-                    .background(Color.white.opacity(0.08))
-                    .clipShape(Capsule())
-                }
-            }
-
-            // Bar chart with mood faces
+        VStack(alignment: .leading, spacing: 14) {
+            header
             if dailyStress.isEmpty {
-                emptyChartPlaceholder
+                emptyState
             } else {
-                chartContent
+                bars
             }
-
-            // 5-tier legend strip (no numbers)
-            tierLegend
         }
-        .trendsGlassCard()
+        .padding(16)
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .background(Color.Wellness.adaptiveCardBackground)
+        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
+        .overlay(
+            RoundedRectangle(cornerRadius: 16, style: .continuous)
+                .stroke(Color.Wellness.adaptiveSecondaryText.opacity(0.08), lineWidth: 1)
+        )
+        .accessibilityElement(children: .contain)
+        .accessibilityLabel("Daily stress bar chart. Average \(averageValue) on a 0 to 100 scale.")
     }
 
-    // MARK: - Chart
+    // MARK: - Header
+
+    private var header: some View {
+        HStack(alignment: .firstTextBaseline) {
+            Text("Daily stress")
+                .font(.system(size: 14, weight: .semibold, design: .rounded))
+                .foregroundStyle(Color.Wellness.adaptivePrimaryText)
+            Spacer()
+            Text("avg \(averageValue) · 0-100")
+                .font(.system(size: 11, weight: .medium, design: .monospaced))
+                .foregroundStyle(Color.Wellness.adaptiveSecondaryText.opacity(0.6))
+        }
+    }
+
+    // MARK: - Bars
+
+    private var bars: some View {
+        HStack(alignment: .bottom, spacing: 6) {
+            ForEach(Array(dailyStress.enumerated()), id: \.element.id) { index, item in
+                barColumn(item: item, isToday: index == dailyStress.count - 1)
+            }
+        }
+    }
 
     @ViewBuilder
-    private var chartContent: some View {
-        Chart(dailyStress) { item in
-            let hasData = item.averageStress > 0
-            let tier = StressTier.from(level: item.averageStress)
-            let isToday = item.id == dailyStress.last?.id
+    private func barColumn(item: DailyStressData, isToday: Bool) -> some View {
+        let tier = stressCategory(for: item.averageStress)
+        let hasData = item.averageStress > 0
+        let fillHeight = CGFloat(hasData ? item.averageStress : 3) / 100.0
 
-            BarMark(
-                x: .value("Day", item.dayLabel),
-                y: .value("Stress", hasData ? item.averageStress : 4)
-            )
-            .foregroundStyle(hasData ? tier.color : Color.white.opacity(0.1))
-            .cornerRadius(6)
-            .annotation(position: .top) {
-                if hasData {
-                    RippleMoodFace(
-                        tier: tier,
-                        size: isToday ? 34 : 26,
-                        showsRing: isToday,
-                        glow: isToday
-                    )
-                } else {
-                    Text("·")
-                        .font(.system(size: 14, weight: .bold))
-                        .foregroundColor(.white.opacity(0.2))
+        VStack(spacing: 5) {
+            // Track + fill
+            GeometryReader { proxy in
+                let trackHeight = proxy.size.height
+                let fillPx = trackHeight * fillHeight
+                ZStack(alignment: .bottom) {
+                    // Track background
+                    RoundedRectangle(cornerRadius: 4)
+                        .fill(Color.Wellness.adaptiveSecondaryText.opacity(0.05))
+                    // Fill
+                    if hasData {
+                        RoundedRectangle(cornerRadius: 4)
+                            .fill(tier.color)
+                            .frame(height: max(2, fillPx))
+                    }
                 }
+                .overlay(
+                    RoundedRectangle(cornerRadius: 4)
+                        .stroke(
+                            isToday ? Color(hex: "#0288D1") : Color.clear,
+                            lineWidth: 2
+                        )
+                )
+            }
+            .frame(height: 104)
+
+            // Weekday label
+            Text(item.dayLabel.uppercased())
+                .font(.system(size: 9, weight: .medium, design: .monospaced))
+                .tracking(0.6)
+                .foregroundStyle(
+                    isToday
+                        ? Color(hex: "#0288D1")
+                        : Color.Wellness.adaptiveSecondaryText.opacity(0.55)
+                )
+
+            // Date number
+            if let dateNum = item.dateNumber {
+                Text("\(dateNum)")
+                    .font(.system(size: 9, weight: .medium, design: .monospaced))
+                    .foregroundStyle(Color.Wellness.adaptiveSecondaryText.opacity(0.3))
             }
         }
-        .chartYScale(domain: 0...115) // headroom for face annotations
-        .chartYAxis(.hidden) // no numeric stress scores
-        .chartXAxis {
-            AxisMarks { _ in
-                AxisValueLabel()
-                    .foregroundStyle(Color.white.opacity(0.45))
-                    .font(.system(size: 11, weight: .medium))
-            }
-        }
-        .frame(height: 200)
+        .accessibilityLabel(
+            "\(item.dayLabel) \(item.dateNumber.map { "\($0)" } ?? ""), " +
+            (hasData ? "stress level \(Int(item.averageStress)), \(tier.rawValue)" : "no data")
+        )
     }
 
-    // MARK: - Legend
+    // MARK: - Helpers
 
-    private var tierLegend: some View {
-        VStack(alignment: .leading, spacing: 6) {
-            HStack(spacing: 0) {
-                ForEach(StressTier.allCases, id: \.self) { tier in
-                    RoundedRectangle(cornerRadius: 3)
-                        .fill(tier.color)
-                        .frame(height: 8)
-                }
-            }
-
-            HStack {
-                Text("Calm")
-                Spacer()
-                Text("Overwhelmed")
-            }
-            .font(.system(size: 10, weight: .medium))
-            .foregroundColor(.white.opacity(0.4))
+    /// Maps 0–100 stress level to the 4-tier StressCategory system.
+    private func stressCategory(for level: Double) -> StressCategory {
+        switch level {
+        case ..<25:   return .relaxed
+        case ..<50:   return .mild
+        case ..<75:   return .moderate
+        default:      return .high
         }
     }
 
     // MARK: - Empty State
 
-    private var emptyChartPlaceholder: some View {
+    private var emptyState: some View {
         VStack(spacing: 10) {
             Image(systemName: "chart.bar.xaxis")
                 .font(.system(size: 32))
-                .foregroundColor(.white.opacity(0.25))
-
+                .foregroundStyle(Color.Wellness.adaptiveSecondaryText.opacity(0.25))
             Text("No data yet")
                 .font(.system(size: 13, weight: .medium))
-                .foregroundColor(.white.opacity(0.45))
+                .foregroundStyle(Color.Wellness.adaptiveSecondaryText.opacity(0.45))
         }
-        .frame(height: 200)
+        .frame(height: 120)
         .frame(maxWidth: .infinity)
     }
 }
 
-// MARK: - Preview
-
-struct StressBarChartView_Previews: PreviewProvider {
-    static var previews: some View {
+#Preview("StressBarChartView") {
+    VStack(spacing: 16) {
         StressBarChartView(
             dailyStress: [
-                DailyStressData(dayLabel: "Mon", averageStress: 30),
-                DailyStressData(dayLabel: "Tue", averageStress: 55),
-                DailyStressData(dayLabel: "Wed", averageStress: 70),
-                DailyStressData(dayLabel: "Thu", averageStress: 15),
-                DailyStressData(dayLabel: "Fri", averageStress: 85),
-                DailyStressData(dayLabel: "Sat", averageStress: 20),
-                DailyStressData(dayLabel: "Sun", averageStress: 45)
+                DailyStressData(dayLabel: "Wed", averageStress: 58, dateNumber: 16),
+                DailyStressData(dayLabel: "Thu", averageStress: 48, dateNumber: 17),
+                DailyStressData(dayLabel: "Fri", averageStress: 36, dateNumber: 18),
+                DailyStressData(dayLabel: "Sat", averageStress: 62, dateNumber: 19),
+                DailyStressData(dayLabel: "Sun", averageStress: 24, dateNumber: 20),
+                DailyStressData(dayLabel: "Mon", averageStress: 18, dateNumber: 21),
+                DailyStressData(dayLabel: "Tue", averageStress: 42, dateNumber: 22)
             ],
-            distribution: StressDistribution(),
-            selectedTimeRange: .constant(.week)
+            averageValue: 41
         )
-        .padding()
-        .background(TrendsPalette.darkCanvas)
+        Spacer()
     }
+    .padding()
+    .background(Color.Wellness.adaptiveBackground)
 }

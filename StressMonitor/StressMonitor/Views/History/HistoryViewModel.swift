@@ -4,7 +4,8 @@ import SwiftData
 @Observable
 class HistoryViewModel {
     var measurements: [StressMeasurement] = []
-    var selectedTimeRange: TimeRange = .sevenDays
+    var dateRange: DateRangeFilter = .sevenDays
+    var selectedCategories: Set<StressCategory> = []
     var isLoading = false
     var errorMessage: String?
 
@@ -14,6 +15,17 @@ class HistoryViewModel {
         self.repository = StressRepository(modelContext: modelContext, baselineCalculator: baselineCalculator)
     }
 
+    /// Combined filter state for external consumers.
+    var filter: HistoryFilter {
+        HistoryFilter(dateRange: dateRange, categories: selectedCategories)
+    }
+
+    func updateFilter(_ filter: HistoryFilter) {
+        dateRange = filter.dateRange
+        selectedCategories = filter.categories
+        Task { await fetchMeasurements() }
+    }
+
     func fetchMeasurements() async {
         isLoading = true
         defer { isLoading = false }
@@ -21,20 +33,16 @@ class HistoryViewModel {
         do {
             let calendar = Calendar.current
             let now = Date()
-            var startDate: Date
+            let startDate: Date
 
-            switch selectedTimeRange {
-            case .twentyFourHours:
-                startDate = calendar.date(byAdding: .hour, value: -24, to: now) ?? now
-            case .sevenDays:
-                startDate = calendar.date(byAdding: .day, value: -7, to: now) ?? now
-            case .fourWeeks:
-                startDate = calendar.date(byAdding: .weekOfYear, value: -4, to: now) ?? now
-            case .threeMonths:
-                startDate = calendar.date(byAdding: .month, value: -3, to: now) ?? now
+            if let cutoff = dateRange.cutoff(from: now) {
+                startDate = cutoff
+            } else {
+                startDate = calendar.date(byAdding: .year, value: -10, to: now) ?? now
             }
 
-            measurements = try await repository.fetchMeasurements(from: startDate, to: now)
+            let raw = try await repository.fetchMeasurements(from: startDate, to: now)
+            measurements = applyCategoryFilter(raw)
         } catch {
             errorMessage = error.localizedDescription
         }
@@ -49,31 +57,97 @@ class HistoryViewModel {
         }
     }
 
-    var groupedMeasurements: [String: [StressMeasurement]] {
-        Dictionary(grouping: measurements) { measurement in
-            formatDateGroup(measurement.timestamp)
-        }
+    private func applyCategoryFilter(_ items: [StressMeasurement]) -> [StressMeasurement] {
+        guard !selectedCategories.isEmpty else { return items }
+        return items.filter { selectedCategories.contains($0.category) }
     }
 
-    private func formatDateGroup(_ date: Date) -> String {
-        let calendar = Calendar.current
+    // MARK: - Grouping (by day)
 
-        if calendar.isDateInToday(date) {
-            return "TODAY"
-        } else if calendar.isDateInYesterday(date) {
-            return "YESTERDAY"
-        } else {
-            let daysSince = calendar.dateComponents([.day], from: date, to: Date()).day ?? 0
-            if daysSince <= 7 {
-                return "PREVIOUS 7 DAYS"
-            } else {
-                let formatter = DateFormatter()
-                formatter.dateFormat = "MMM d, YYYY"
-                return formatter.string(from: date).uppercased()
+    struct DayGroup: Identifiable {
+        let id: String
+        let title: String
+        let count: Int
+        let measurements: [StressMeasurement]
+    }
+
+    var dayGroups: [DayGroup] {
+        let grouped = Dictionary(grouping: measurements) { dayKey($0.timestamp) }
+        return grouped
+            .map { (key, items) in
+                DayGroup(
+                    id: key,
+                    title: dayTitle(key, items: items),
+                    count: items.count,
+                    measurements: items.sorted { $0.timestamp > $1.timestamp }
+                )
             }
+            .sorted { $0.id > $1.id }
+    }
+
+    // MARK: - Summary tiles
+
+    var averageScore7d: Double? {
+        let now = Date()
+        guard let cutoff = Calendar.current.date(byAdding: .day, value: -7, to: now) else { return nil }
+        let recent = measurements.filter { $0.timestamp >= cutoff }
+        guard !recent.isEmpty else { return nil }
+        return recent.reduce(0) { $0 + $1.stressLevel } / Double(recent.count)
+    }
+
+    var bestScore: (value: Double, label: String)? {
+        guard let best = measurements.min(by: { $0.stressLevel < $1.stressLevel }) else { return nil }
+        return (best.stressLevel, shortDayLabel(best.timestamp))
+    }
+
+    var peakScore: (value: Double, label: String)? {
+        guard let peak = measurements.max(by: { $0.stressLevel < $1.stressLevel }) else { return nil }
+        return (peak.stressLevel, shortDayLabel(peak.timestamp))
+    }
+
+    // MARK: - Date helpers
+
+    private func dayKey(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "yyyy-MM-dd"
+        return formatter.string(from: date)
+    }
+
+    private func dayTitle(_ key: String, items: [StressMeasurement]) -> String {
+        let cal = Calendar.current
+        guard let date = items.first?.timestamp else { return key }
+        if cal.isDateInToday(date) {
+            return "Today · \(formatDayDate(date))"
+        } else if cal.isDateInYesterday(date) {
+            return "Yesterday · \(formatDayDate(date))"
         }
+        return formatDayDate(date)
+    }
+
+    private func formatDayDate(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "EEE MMM d"
+        return formatter.string(from: date)
+    }
+
+    private func shortDayLabel(_ date: Date) -> String {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "EEE"
+        return formatter.string(from: date).lowercased()
     }
 }
+
+// MARK: - HistoryFilter
+
+/// Combined filter state for history views.
+struct HistoryFilter: Hashable {
+    var dateRange: DateRangeFilter
+    var categories: Set<StressCategory>
+
+    static let defaultAll = HistoryFilter(dateRange: .all, categories: [])
+}
+
+// MARK: - TimeRange (legacy, kept for compatibility)
 
 enum TimeRange: String, CaseIterable {
     case twentyFourHours = "24H"

@@ -24,7 +24,7 @@ struct ActionView: View {
     var body: some View {
         NavigationStack {
             ScrollView {
-                VStack(alignment: .leading, spacing: 22) {
+                VStack(alignment: .leading, spacing: 18) {
                     sectionHeader
                     RippleRecommendationCard(stressLevel: stressLevel) {
                         isChatPresented = true
@@ -61,20 +61,22 @@ struct ActionView: View {
 
     private var sectionHeader: some View {
         VStack(alignment: .leading, spacing: 6) {
-            Text(timeEyebrow.uppercased())
-                .font(.system(size: 11, weight: .heavy, design: .rounded))
-                .tracking(1.0)
-                .foregroundStyle(HomeCharacterDesignTokens.Ripple.primary)
+            if let level = stressLevel {
+                let category = StressResult.category(for: level).displayName
+                Text("Now · \(category) \(Int(level.rounded())) · \(timeEyebrow)")
+                    .font(.system(size: 11, weight: .heavy, design: .rounded))
+                    .tracking(1.0)
+                    .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
+            } else {
+                Text(timeEyebrow.uppercased())
+                    .font(.system(size: 11, weight: .heavy, design: .rounded))
+                    .tracking(1.0)
+                    .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
+            }
 
             Text("What helps right now")
                 .font(.system(size: 26, weight: .heavy, design: .rounded))
                 .foregroundStyle(Color.Wellness.adaptivePrimaryText)
-
-            if let level = stressLevel {
-                Text("Stress \(Int(level.rounded()))/100")
-                    .font(.system(size: 13, weight: .medium))
-                    .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
-            }
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.top, 4)
@@ -82,7 +84,7 @@ struct ActionView: View {
 
     private var timeEyebrow: String {
         let formatter = DateFormatter()
-        formatter.dateFormat = "EEEE • h:mm a"
+        formatter.dateFormat = "h:mm a"
         return formatter.string(from: Date())
     }
 
@@ -90,22 +92,25 @@ struct ActionView: View {
 
     private var breatheGroup: some View {
         VStack(alignment: .leading, spacing: 8) {
-            groupLabel("Breathe")
-            VStack(spacing: 8) {
-                ActionGroupRow(
-                    icon: "wind",
-                    title: "Box Breathing",
-                    subtitle: "4-4-4-4 · 2 min",
-                    tint: HomeCharacterDesignTokens.Ripple.primary,
-                    destination: { BreathingExerciseView() }
-                )
-                ActionGroupRow(
-                    icon: "leaf.fill",
-                    title: "Calm Breathing",
-                    subtitle: "4-7-8 · 3 min",
-                    tint: HomeCharacterDesignTokens.Zephyr.accent,
-                    destination: { BreathingExerciseView() }
-                )
+            groupLabel("Breathe", hint: "90s — 2 min")
+            ActionGroupCard {
+                VStack(spacing: 0) {
+                    ActionGroupRow(
+                        icon: "wind",
+                        title: "Box Breathing",
+                        subtitle: "4-4-4-4 · 2 min · ~14% HRV lift",
+                        tint: HomeCharacterDesignTokens.Ripple.primary,
+                        destination: { BreathingExerciseView() }
+                    )
+                    ActionRowDivider()
+                    ActionGroupRow(
+                        icon: "brain.head.profile",
+                        title: "Body Scan",
+                        subtitle: "90s · somatic reset · head to feet",
+                        tint: HomeCharacterDesignTokens.Zephyr.accent,
+                        destination: { BreathingExerciseView() }
+                    )
+                }
             }
         }
     }
@@ -114,14 +119,26 @@ struct ActionView: View {
 
     private var moveGroup: some View {
         VStack(alignment: .leading, spacing: 8) {
-            groupLabel("Move")
-            ActionGroupRow(
-                icon: "figure.walk",
-                title: "Mini Walk",
-                subtitle: "5 min nervous-system reset",
-                tint: HomeCharacterDesignTokens.Blossom.accent,
-                destination: { MiniWalkView() }
-            )
+            groupLabel("Move", hint: "30s — 5 min")
+            ActionGroupCard {
+                VStack(spacing: 0) {
+                    ActionGroupRow(
+                        icon: "figure.walk",
+                        title: "Mini Walk",
+                        subtitle: "5 min · target 600 steps",
+                        tint: Color(hex: "#34C759"),
+                        destination: { MiniWalkView() }
+                    )
+                    ActionRowDivider()
+                    ActionGroupRow(
+                        icon: "drop.fill",
+                        title: "Cold Splash",
+                        subtitle: "30s · vagus nerve reset",
+                        tint: HomeCharacterDesignTokens.Ember.accent,
+                        destination: { BreathingExerciseView() }
+                    )
+                }
+            }
         }
     }
 
@@ -129,119 +146,91 @@ struct ActionView: View {
 
     private var reflectGroup: some View {
         VStack(alignment: .leading, spacing: 8) {
-            groupLabel("Reflect")
-            VStack(spacing: 8) {
-                // NoteEntryView is sheet-presented by design (its own
-                // NavigationStack + dismiss binding), so we open it as a sheet
-                // rather than pushing onto this stack.
-                Button {
-                    HapticManager.shared.buttonPress()
-                    isJournalPresented = true
-                } label: {
-                    journalRow
+            groupLabel("Reflect", hint: "2 — 5 min")
+            ActionGroupCard {
+                VStack(spacing: 0) {
+                    // NoteEntryView is sheet-presented (its own NavigationStack +
+                    // dismiss binding), so we open it as a sheet rather than push.
+                    reflectRow(
+                        icon: "face.smiling",
+                        title: "Gratitude",
+                        subtitle: "3-line journal · what went well today",
+                        tint: Color(hex: "#FE9901"),
+                        action: {
+                            HapticManager.shared.buttonPress()
+                            isJournalPresented = true
+                        }
+                    )
+                    ActionRowDivider()
+                    reflectRow(
+                        icon: "bubble.left",
+                        title: "Talk to Ripple",
+                        subtitle: "Process today's stressor · 5 min",
+                        tint: HomeCharacterDesignTokens.Ripple.primary,
+                        action: {
+                            HapticManager.shared.buttonPress()
+                            isChatPresented = true
+                        }
+                    )
                 }
-                .buttonStyle(.plain)
-
-                Button {
-                    HapticManager.shared.buttonPress()
-                    isChatPresented = true
-                } label: {
-                    reflectChatRow
-                }
-                .buttonStyle(.plain)
             }
         }
     }
 
-    private var journalRow: some View {
-        HStack(spacing: 14) {
-            ZStack {
-                RoundedRectangle(cornerRadius: 10, style: .continuous)
-                    .fill(HomeCharacterDesignTokens.Lumi.accent.opacity(0.14))
-                Image(systemName: "note.text")
-                    .font(.system(size: 16, weight: .semibold))
-                    .foregroundStyle(HomeCharacterDesignTokens.Lumi.accent)
-            }
-            .frame(width: 38, height: 38)
+    /// A reflect row — same layout as ActionGroupRow but driven by a Button
+    /// (sheet presentation) rather than a NavigationLink push.
+    private func reflectRow(
+        icon: String,
+        title: String,
+        subtitle: String,
+        tint: Color,
+        action: @escaping () -> Void
+    ) -> some View {
+        Button(action: action) {
+            HStack(spacing: 12) {
+                Image(systemName: icon)
+                    .font(.system(size: 18, weight: .medium))
+                    .foregroundStyle(tint)
+                    .frame(width: 28, height: 28)
 
-            VStack(alignment: .leading, spacing: 2) {
-                Text("Journal")
-                    .font(.system(size: 15, weight: .semibold, design: .rounded))
-                    .foregroundStyle(Color.Wellness.adaptivePrimaryText)
-                Text("Capture one stressor")
-                    .font(.system(size: 12, weight: .regular))
-                    .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
-                    .lineLimit(1)
+                VStack(alignment: .leading, spacing: 1) {
+                    Text(title)
+                        .font(.system(size: 15, weight: .medium, design: .rounded))
+                        .foregroundStyle(Color.Wellness.adaptivePrimaryText)
+                    Text(subtitle)
+                        .font(.system(size: 12, weight: .regular))
+                        .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
+                        .lineLimit(1)
+                }
+
+                Spacer(minLength: 0)
+
+                Image(systemName: AppIconSystem.Nav.forward.sfSymbol)
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundStyle(Color.Wellness.adaptiveSecondaryText.opacity(0.55))
             }
-            Spacer(minLength: 0)
-            Image(systemName: AppIconSystem.Nav.forward.sfSymbol)
-                .font(.system(size: 12, weight: .bold))
-                .foregroundStyle(Color.Wellness.adaptiveSecondaryText.opacity(0.6))
+            .contentShape(Rectangle())
+            .padding(.horizontal, 14)
+            .padding(.vertical, 13)
+            .frame(minHeight: 44)
         }
-        .padding(.horizontal, 14)
-        .padding(.vertical, 12)
-        .background(Color.Wellness.adaptiveCardBackground)
-        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .stroke(Color.Wellness.adaptiveSecondaryText.opacity(0.10), lineWidth: 1)
-        )
+        .buttonStyle(.plain)
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("Journal. Capture one stressor.")
-        .accessibilityHint("Double tap to write a reflection")
-    }
-
-    private var reflectChatRow: some View {
-        HStack(spacing: 14) {
-            ZStack {
-                RoundedRectangle(cornerRadius: 10, style: .continuous)
-                    .fill(HomeCharacterDesignTokens.Ripple.primary.opacity(0.14))
-                Image(systemName: "bubble.left.fill")
-                    .font(.system(size: 16, weight: .semibold))
-                    .foregroundStyle(HomeCharacterDesignTokens.Ripple.primary)
-            }
-            .frame(width: 38, height: 38)
-
-            VStack(alignment: .leading, spacing: 2) {
-                Text("Talk to Ripple")
-                    .font(.system(size: 15, weight: .semibold, design: .rounded))
-                    .foregroundStyle(Color.Wellness.adaptivePrimaryText)
-                Text("AI coach for what's on your mind")
-                    .font(.system(size: 12, weight: .regular))
-                    .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
-                    .lineLimit(1)
-            }
-            Spacer(minLength: 0)
-            Image(systemName: AppIconSystem.Nav.forward.sfSymbol)
-                .font(.system(size: 12, weight: .bold))
-                .foregroundStyle(Color.Wellness.adaptiveSecondaryText.opacity(0.6))
-        }
-        .padding(.horizontal, 14)
-        .padding(.vertical, 12)
-        .background(Color.Wellness.adaptiveCardBackground)
-        .clipShape(RoundedRectangle(cornerRadius: 16, style: .continuous))
-        .overlay(
-            RoundedRectangle(cornerRadius: 16, style: .continuous)
-                .stroke(Color.Wellness.adaptiveSecondaryText.opacity(0.10), lineWidth: 1)
-        )
-        .accessibilityElement(children: .combine)
-        .accessibilityLabel("Talk to Ripple. AI coach for what's on your mind.")
-        .accessibilityHint("Double tap to open chat")
+        .accessibilityLabel("\(title). \(subtitle)")
+        .accessibilityHint("Double tap to open")
     }
 
     // MARK: - 6. Today's Habits
 
     private var habitsSection: some View {
         VStack(alignment: .leading, spacing: 8) {
-            groupLabel("Today's habits")
-            VStack(spacing: 8) {
-                ForEach(HabitType.allCases) { type in
-                    if let habit = habitViewModel?.habit(for: type) {
+            groupLabel("Today's habits", hint: "Tap to log")
+            ActionGroupCard {
+                VStack(spacing: 0) {
+                    ForEach(Array(HabitType.allCases.enumerated()), id: \.element) { idx, type in
+                        if idx > 0 { ActionRowDivider() }
+                        let habit = habitViewModel?.habit(for: type) ?? Habit(type: type)
                         HabitLogRow(habit: habit) {
-                            habitViewModel?.logManual(type)
-                        }
-                    } else {
-                        HabitLogRow(habit: Habit(type: type)) {
                             habitViewModel?.logManual(type)
                         }
                     }
@@ -252,13 +241,23 @@ struct ActionView: View {
 
     // MARK: - Helpers
 
+    /// Group label with optional right-aligned hint — matches HTML `.group-label`.
     @ViewBuilder
-    private func groupLabel(_ title: String) -> some View {
-        Text(title.uppercased())
-            .font(.system(size: 11, weight: .heavy, design: .rounded))
-            .tracking(0.8)
-            .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
-            .padding(.leading, 4)
+    private func groupLabel(_ title: String, hint: String? = nil) -> some View {
+        HStack(alignment: .firstTextBaseline) {
+            Text(title.uppercased())
+                .font(.system(size: 11, weight: .heavy, design: .rounded))
+                .tracking(0.8)
+                .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
+            Spacer(minLength: 0)
+            if let hint = hint {
+                Text(hint)
+                    .font(.system(size: 10, weight: .regular, design: .rounded))
+                    .foregroundStyle(Color.Wellness.adaptiveSecondaryText.opacity(0.7))
+            }
+        }
+        .padding(.horizontal, 4)
+        .padding(.bottom, 2)
     }
 }
 

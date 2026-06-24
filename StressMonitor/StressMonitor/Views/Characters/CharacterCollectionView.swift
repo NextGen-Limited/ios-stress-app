@@ -1,83 +1,56 @@
 import SwiftData
 import SwiftUI
 
+// MARK: - Character Collection View
+
+/// Character collection screen matching `16-characters.html`.
+///
+/// Displays a 2-column grid of all 5 characters with unlock status badges,
+/// an evolution explainer banner, and a "why elemental companions" legend card.
 struct CharacterCollectionView: View {
     @Environment(\.modelContext) private var modelContext
     @State private var viewModel = CharacterCollectionViewModel()
     @State private var selectedCharacter: CharacterCreature?
-    @State private var selectedElement: CharacterElement?
-    @State private var navigateToExport = false
 
     // MARK: - Computed
 
-    private var unlockedCreatures: [CharacterCreature] {
-        CharacterCreature.allCharacters.filter { creature in
-            viewModel.unlockStatus(for: creature.id)?.isUnlocked ?? false
-        }
+    private var unlockedCount: Int {
+        CharacterCreature.allCharacters.filter { isUnlocked($0.id) }.count
     }
-
-    private var lockedCreatures: [CharacterCreature] {
-        CharacterCreature.allCharacters.filter { creature in
-            !(viewModel.unlockStatus(for: creature.id)?.isUnlocked ?? false)
-        }
-    }
-
-    private var activeCreature: CharacterCreature? {
-        guard let activeId = viewModel.activeCharacterId,
-              let creature = CharacterCreature.find(by: activeId) else { return nil }
-        return creature
-    }
-
-    private var activeUnlock: CharacterUnlock? {
-        guard let activeId = viewModel.activeCharacterId else { return nil }
-        return viewModel.unlockStatus(for: activeId)
-    }
-
-    private var collectedCount: Int { unlockedCreatures.count }
     private var totalCount: Int { CharacterCreature.allCharacters.count }
-    private var collectionProgress: Double {
-        guard totalCount > 0 else { return 0 }
-        return Double(collectedCount) / Double(totalCount)
-    }
+
+    // MARK: - Body
 
     var body: some View {
         ScrollView {
-            VStack(alignment: .leading, spacing: Spacing.lg) {
-                collectionHero
-                elementFilterChips
+            VStack(alignment: .leading, spacing: 14) {
+                // Header
+                headerSection
+                    .padding(.horizontal, 16)
+                        .padding(.top, 4)
 
-                if let creature = activeCreature {
-                    activeBuddySection(creature)
-                }
+                // Character grid (2 columns)
+                characterGrid
+                    .padding(.horizontal, 16)
 
-                if !unlockedCreatures.isEmpty {
-                    unlockedSection
-                }
+                // Lumi streak card (full-width)
+                lumiStreakCard
+                    .padding(.horizontal, 16)
 
-                if !lockedCreatures.isEmpty {
-                    lockedSection
-                }
+                // Evolution banner
+                evolutionBanner
+                    .padding(.horizontal, 16)
+
+                // Legend card
+                legendCard
+                    .padding(.horizontal, 16)
+                    .padding(.bottom, 14)
             }
-            .padding(.horizontal, Spacing.md)
             .padding(.bottom, 40)
         }
         .background(Color.Wellness.adaptiveBackground.ignoresSafeArea())
         .navigationTitle("Characters")
-        .navigationBarTitleDisplayMode(.large)
-        .toolbar {
-            ToolbarItem(placement: .topBarTrailing) {
-                Button {
-                    navigateToExport = true
-                } label: {
-                    Image(systemName: AppIconSystem.System.export_.sfSymbol)
-                        .foregroundStyle(Color.primaryBlue)
-                }
-                .accessibilityLabel("Export all character illustrations")
-            }
-        }
-        .navigationDestination(isPresented: $navigateToExport) {
-            CharacterIllustrationExportView()
-        }
+        .navigationBarTitleDisplayMode(.inline)
         .sheet(item: $selectedCharacter) { creature in
             CharacterDetailView(
                 creature: creature,
@@ -93,268 +66,243 @@ struct CharacterCollectionView: View {
         }
     }
 
-    // MARK: - Collection Hero
+    // MARK: - Header
 
-    private var collectionHero: some View {
-        VStack(spacing: Spacing.md) {
-            HStack(spacing: Spacing.lg) {
-                // Circular progress with active character inside
+    private var headerSection: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text("\(unlockedCount) of \(totalCount) unlocked".uppercased())
+                .font(.system(size: 11, weight: .semibold, design: .monospaced))
+                .tracking(0.8)
+                .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
+
+            Text("Elemental companions")
+                .font(.system(size: 28, weight: .bold))
+                .foregroundStyle(Color.Wellness.adaptivePrimaryText)
+        }
+    }
+
+    // MARK: - Character Grid
+
+    private var characterGrid: some View {
+        LazyVGrid(
+            columns: [
+                GridItem(.flexible(), spacing: 12),
+                GridItem(.flexible(), spacing: 12),
+            ],
+            spacing: 12
+        ) {
+            // Show all characters except Lumi (Lumi gets full-width card below)
+            ForEach(CharacterCreature.allCharacters.filter { $0.id != "lumi" }) { creature in
+                CharacterGridCard(
+                    creature: creature,
+                    unlock: viewModel.unlockStatus(for: creature.id),
+                    isActive: viewModel.activeCharacterId == creature.id
+                )
+                .contentShape(RoundedRectangle(cornerRadius: 18))
+                .onTapGesture {
+                    selectedCharacter = creature
+                    HapticManager.shared.buttonPress()
+                }
+            }
+        }
+    }
+
+    // MARK: - Lumi Streak Card (full-width)
+
+    @ViewBuilder
+    private var lumiStreakCard: some View {
+        if let lumi = CharacterCreature.find(by: "lumi") {
+            let unlock = viewModel.unlockStatus(for: lumi.id)
+            let isUnlocked = unlock?.isUnlocked ?? false
+            let currentStreak = unlock?.streakDays ?? 0
+            let progress = min(Double(currentStreak) / Double(lumi.streakRequired), 1.0)
+            let daysToGo = max(lumi.streakRequired - currentStreak, 0)
+
+            HStack(spacing: 16) {
+                // Lumi art
                 ZStack {
                     Circle()
-                        .stroke(Color.secondary.opacity(0.12), lineWidth: 8)
-                        .frame(width: 96, height: 96)
+                        .fill(lumi.element.primaryColor.opacity(0.55))
+                        .frame(width: 70, height: 70)
+                        .blur(radius: 16)
 
-                    Circle()
-                        .trim(from: 0, to: max(collectionProgress, 0.001))
-                        .stroke(
-                            AngularGradient(
-                                colors: [Color.primaryBlue, Color(hex: "#A5D6A7"), Color.primaryBlue],
-                                center: .center
-                            ),
-                            style: StrokeStyle(lineWidth: 8, lineCap: .round)
-                        )
-                        .frame(width: 96, height: 96)
-                        .rotationEffect(.degrees(-90))
-                        .animation(.spring(response: 0.6, dampingFraction: 0.82), value: collectionProgress)
-
-                    if let creature = activeCreature {
-                        StressBuddyIllustration(
-                            characterId: creature.id,
-                            evolution: activeUnlock?.evolutionStage ?? .droplet,
-                            mood: .serene,
-                            size: 56
-                        )
-                    } else {
-                        Image(systemName: "sparkles")
-                            .font(.title)
-                            .foregroundStyle(Color.secondary)
-                    }
+                    StressBuddyIllustration(
+                        characterId: lumi.id,
+                        evolution: unlock?.evolutionStage ?? .droplet,
+                        mood: .serene,
+                        size: 72
+                    )
+                    .opacity(isUnlocked ? 1 : 0.65)
+                    .saturation(isUnlocked ? 1 : 0.5)
                 }
-                .accessibilityHidden(true)
+                .frame(width: 92, height: 92)
 
+                // Info
                 VStack(alignment: .leading, spacing: 4) {
-                    Text("\(collectedCount) of \(totalCount)")
-                        .font(Typography.dataMedium)
+                    Text(lumi.displayName)
+                        .font(.system(size: 17, weight: .bold, design: .rounded))
                         .foregroundStyle(Color.Wellness.adaptivePrimaryText)
 
-                    Text("Characters Collected")
-                        .font(Typography.callout)
+                    Text(lumi.subtitle.uppercased())
+                        .font(.system(size: 10, weight: .medium, design: .monospaced))
+                        .tracking(0.6)
                         .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
 
-                    if let creature = activeCreature {
-                        Text("\(creature.emoji) \(creature.displayName) active")
-                            .font(Typography.caption1)
-                            .foregroundStyle(creature.element.accentColor)
-                            .padding(.top, 2)
+                    // Streak badge
+                    HStack(spacing: 4) {
+                        Image(systemName: AppIconSystem.Metric.streak.sfSymbol)
+                            .font(.system(size: 9))
+                        Text("30-DAY STREAK")
+                            .font(.system(size: 10, weight: .semibold))
                     }
-                }
+                    .foregroundStyle(Color(hex: "#7B86CB"))
+                    .padding(.horizontal, 9)
+                    .padding(.vertical, 3)
+                    .background(Color(hex: "#7B86CB").opacity(0.14), in: Capsule())
+                    .padding(.top, 2)
 
-                Spacer()
-            }
-            .padding(Spacing.cardPadding)
-            .background(
-                LinearGradient(
-                    colors: [
-                        Color.primaryBlue.opacity(0.08),
-                        Color.Wellness.adaptiveCardBackground,
-                    ],
-                    startPoint: .topLeading,
-                    endPoint: .bottomTrailing
-                )
-            )
-            .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-            .overlay(
-                RoundedRectangle(cornerRadius: 20, style: .continuous)
-                    .stroke(Color.primaryBlue.opacity(0.12), lineWidth: 1)
-            )
-        }
-    }
+                    Text("\(daysToGo) days to go · current \(currentStreak)d")
+                        .font(.system(size: 11))
+                        .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
+                        .padding(.top, 2)
 
-    // MARK: - Element Filter Chips
+                    // Progress bar
+                    GeometryReader { geo in
+                        ZStack(alignment: .leading) {
+                            Capsule()
+                                .fill(Color(hex: "#7B86CB").opacity(0.18))
+                                .frame(height: 6)
 
-    private var elementFilterChips: some View {
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: Spacing.sm) {
-                filterChip(title: "All", element: nil, icon: nil)
-
-                ForEach(CharacterElement.allCases, id: \.self) { element in
-                    filterChip(title: element.displayName, element: element, icon: element.emoji)
-                }
-            }
-            .padding(.horizontal, 2)
-        }
-    }
-
-    private func filterChip(title: String, element: CharacterElement?, icon: String?) -> some View {
-        let isSelected = selectedElement == element
-        let color = element?.primaryColor ?? Color.primaryBlue
-
-        return Button {
-            withAnimation(.spring(response: 0.3, dampingFraction: 0.82)) {
-                selectedElement = element
-            }
-            HapticManager.shared.buttonPress()
-        } label: {
-            HStack(spacing: 4) {
-                if let icon { Text(icon) }
-                Text(title)
-            }
-            .font(Typography.subheadline.weight(.semibold))
-            .foregroundStyle(isSelected ? .white : Color.Wellness.adaptivePrimaryText)
-            .padding(.horizontal, 14)
-            .padding(.vertical, 8)
-            .background(
-                Capsule()
-                    .fill(isSelected ? color : Color.Wellness.adaptiveCardBackground)
-            )
-            .overlay(
-                Capsule()
-                    .stroke(color.opacity(isSelected ? 0 : 0.25), lineWidth: 1)
-            )
-        }
-        .buttonStyle(.plain)
-        .accessibilityLabel("Filter by \(title)")
-    }
-
-    // MARK: - Active Buddy
-
-    @ViewBuilder
-    private func activeBuddySection(_ creature: CharacterCreature) -> some View {
-        if shouldShow(creature) {
-            VStack(alignment: .leading, spacing: Spacing.sm) {
-                SectionHeader(title: "Active Buddy", icon: "star.fill")
-
-                if let unlock = activeUnlock {
-                    HStack(spacing: Spacing.md) {
-                        ZStack {
-                            Circle()
-                                .fill(creature.element.primaryColor.opacity(0.15))
-                                .frame(width: 72, height: 72)
-
-                            StressBuddyIllustration(
-                                characterId: creature.id,
-                                evolution: unlock.evolutionStage,
-                                mood: .serene,
-                                size: 56
-                            )
+                            Capsule()
+                                .fill(Color(hex: "#7B86CB"))
+                                .frame(width: geo.size.width * progress, height: 6)
                         }
-
-                        VStack(alignment: .leading, spacing: 6) {
-                            HStack(spacing: 6) {
-                                Text(creature.displayName)
-                                    .font(Typography.headline)
-                                    .foregroundStyle(Color.Wellness.adaptivePrimaryText)
-
-                                Text(creature.subtitle)
-                                    .font(Typography.caption1)
-                                    .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
-                            }
-
-                            HStack(spacing: 8) {
-                                Label("\(unlock.streakDays)d streak", systemImage: "flame.fill")
-                                    .font(Typography.caption2)
-                                    .foregroundStyle(.orange)
-
-                                Label("\(unlock.sessionsCompleted) sessions", systemImage: "figure.mind.and.body")
-                                    .font(Typography.caption2)
-                                    .foregroundStyle(.teal)
-                            }
-
-                            EvolutionDots(currentStage: unlock.evolutionStage, color: creature.element.accentColor)
-                        }
-
-                        Spacer()
-
-                        Image(systemName: AppIconSystem.Nav.forward.sfSymbol)
-                            .font(.caption.weight(.semibold))
-                            .foregroundStyle(Color.secondary)
                     }
-                    .padding(Spacing.cardPadding)
-                    .background(Color.Wellness.adaptiveCardBackground)
-                    .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-                    .overlay(
-                        RoundedRectangle(cornerRadius: 20, style: .continuous)
-                            .stroke(creature.element.primaryColor.opacity(0.3), lineWidth: 1.5)
+                    .frame(height: 6)
+                    .padding(.top, 4)
+                }
+                .frame(maxWidth: .infinity, alignment: .leading)
+            }
+            .padding(16)
+            .background(Color.Wellness.adaptiveCardBackground)
+            .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+            .contentShape(RoundedRectangle(cornerRadius: 18))
+            .onTapGesture {
+                selectedCharacter = lumi
+                HapticManager.shared.buttonPress()
+            }
+        }
+    }
+
+    // MARK: - Evolution Banner
+
+    private var evolutionBanner: some View {
+        HStack(spacing: 14) {
+            stageProgressionViz
+            evolutionBannerText
+            Spacer()
+        }
+        .padding(16)
+        .background(evolutionBannerGradient)
+        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+        .overlay(bannerBorder)
+    }
+
+    private var stageProgressionViz: some View {
+        HStack(alignment: .bottom, spacing: 2) {
+            ForEach(0..<3, id: \.self) { i in
+                Circle()
+                    .fill(Color(hex: "#7B86CB").opacity(0.18 + Double(i) * 0.12))
+                    .frame(width: 36, height: 36 + CGFloat(i) * 6)
+                    .overlay {
+                        Image(systemName: "circle.fill")
+                            .font(.system(size: 12))
+                            .foregroundStyle(Color(hex: "#7B86CB"))
+                    }
+            }
+        }
+    }
+
+    private var evolutionBannerText: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text("Each character evolves 3 stages")
+                .font(.system(size: 14, weight: .semibold))
+                .foregroundStyle(Color.Wellness.adaptivePrimaryText)
+
+            Text("Stay consistent — forms change, new animations unlock at 30, 90, 180 days.")
+                .font(.system(size: 12))
+                .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
+                .lineSpacing(3)
+        }
+    }
+
+    private var evolutionBannerGradient: LinearGradient {
+        LinearGradient(
+            colors: [
+                Color(hex: "#7B86CB").opacity(0.14),
+                Color(hex: "#4FC3F7").opacity(0.10),
+            ],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+    }
+
+    private var bannerBorder: some View {
+        RoundedRectangle(cornerRadius: 20, style: .continuous)
+            .stroke(Color.Wellness.adaptiveSecondaryText.opacity(0.15), lineWidth: 1)
+    }
+
+    // MARK: - Legend Card
+
+    private var legendCard: some View {
+        HStack(spacing: 12) {
+            // Gradient icon
+            ZStack {
+                Circle()
+                    .fill(
+                        LinearGradient(
+                            colors: [
+                                Color(hex: "#4FC3F7"), // Ripple
+                                Color(hex: "#A5D6A7"), // Blossom
+                                Color(hex: "#FFAB91"), // Ember
+                                Color(hex: "#D1C4E9"), // Zephyr
+                                Color(hex: "#7986CB"), // Lumi
+                            ],
+                            startPoint: .topLeading,
+                            endPoint: .bottomTrailing
+                        )
                     )
-                    .contentShape(RoundedRectangle(cornerRadius: 20))
-                    .onTapGesture { selectedCharacter = creature }
-                }
+                    .frame(width: 36, height: 36)
+
+                Image(systemName: "sparkles")
+                    .font(.system(size: 14))
+                    .foregroundStyle(.white)
+            }
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Why elemental companions?")
+                    .font(.system(size: 14, weight: .semibold))
+                    .foregroundStyle(Color.Wellness.adaptivePrimaryText)
+
+                Text("Each maps to a stress-recovery archetype — water for calm, forest for grounding, fire for energy, wind for lightness, stars for rest.")
+                    .font(.system(size: 12))
+                    .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
+                    .lineSpacing(3)
             }
         }
+        .padding(14)
+        .background(Color.Wellness.adaptiveCardBackground)
+        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
     }
 
-    // MARK: - Unlocked Section
+    // MARK: - Helpers
 
-    @ViewBuilder
-    private var unlockedSection: some View {
-        let creatures = filteredCreatures(unlockedCreatures)
-        if !creatures.isEmpty {
-            VStack(alignment: .leading, spacing: Spacing.sm) {
-                SectionHeader(title: "Your Buddies", icon: "heart.fill")
-
-                LazyVGrid(
-                    columns: [
-                        GridItem(.flexible(), spacing: Spacing.md),
-                        GridItem(.flexible(), spacing: Spacing.md),
-                    ],
-                    spacing: Spacing.md
-                ) {
-                    ForEach(creatures) { creature in
-                        CharacterGridCard(
-                            creature: creature,
-                            unlock: viewModel.unlockStatus(for: creature.id),
-                            isActive: viewModel.activeCharacterId == creature.id
-                        )
-                        .contentShape(RoundedRectangle(cornerRadius: 20))
-                        .onTapGesture { selectedCharacter = creature }
-                    }
-                }
-            }
-        }
-    }
-
-    // MARK: - Locked Section
-
-    @ViewBuilder
-    private var lockedSection: some View {
-        let creatures = filteredCreatures(lockedCreatures)
-        if !creatures.isEmpty {
-            VStack(alignment: .leading, spacing: Spacing.sm) {
-                SectionHeader(title: "To Discover", icon: "lock.fill")
-
-                LazyVGrid(
-                    columns: [
-                        GridItem(.flexible(), spacing: Spacing.md),
-                        GridItem(.flexible(), spacing: Spacing.md),
-                    ],
-                    spacing: Spacing.md
-                ) {
-                    ForEach(creatures) { creature in
-                        CharacterGridCard(
-                            creature: creature,
-                            unlock: viewModel.unlockStatus(for: creature.id),
-                            isActive: false
-                        )
-                        .contentShape(RoundedRectangle(cornerRadius: 20))
-                        .onTapGesture { selectedCharacter = creature }
-                    }
-                }
-            }
-        }
-    }
-
-    // MARK: - Filtering Helper
-
-    private func shouldShow(_ creature: CharacterCreature) -> Bool {
-        guard let selectedElement else { return true }
-        return creature.element == selectedElement
-    }
-
-    private func filteredCreatures(_ creatures: [CharacterCreature]) -> [CharacterCreature] {
-        guard let selectedElement else { return creatures }
-        return creatures.filter { $0.element == selectedElement }
+    private func isUnlocked(_ characterId: String) -> Bool {
+        viewModel.unlockStatus(for: characterId)?.isUnlocked ?? false
     }
 }
+
+// MARK: - Preview
 
 #Preview {
     NavigationStack {

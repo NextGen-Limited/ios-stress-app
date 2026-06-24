@@ -1,76 +1,106 @@
 import SwiftUI
 
-/// Animated breathing orb with concentric aura arcs.
+/// Animated breathing arena with three concentric rings matching the
+/// `.breath-arena` from `08-breathing-active.html`.
 ///
-/// The central circle scales 0.6 (exhale) ↔ 1.0 (inhale) with a 4-second ease in/out
-/// driven by the supplied `BreathingPhase`. Three outer aura arcs fade outwards and
-/// pulse with the same cycle.
+/// - r1: outer aura (100% width, radial gradient, scale 0.85 ↔ 1.05)
+/// - r2: mid aura (70% width, radial gradient, scale 0.85 ↔ 1.10)
+/// - r3: solid core (42% width, linear gradient #4FC3F7 → #0288D1, scale 0.85 ↔ 1.15)
 ///
-/// When `accessibilityReduceMotion` is enabled, the orb holds a static 0.8 scale and
-/// the aura is rendered without animation so motion-sensitive users still see a
-/// calm, stationary guide.
+/// All rings scale over a 4-second easeInOut per phase, synced to the
+/// 4-4-4-4 box-breathing cycle. When `accessibilityReduceMotion` is enabled,
+/// the rings hold static mid-scale positions and no animation runs.
 struct BreathingCircle: View {
     let phase: BoxBreathingPhase
-    var size: CGFloat = 200
+    var size: CGFloat = 280
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var animate = false
 
-    private var phaseColor: Color {
+    // Design tokens from HTML
+    private let auraColor = Color(hex: "#4FC3F7")
+    private let coreGradientTop = Color(hex: "#4FC3F7")
+    private let coreGradientBottom = Color(hex: "#0288D1")
+
+    /// Target scale for the core (r3) per phase — 0.85 (contracted) ↔ 1.15 (expanded)
+    private var coreScale: CGFloat {
+        guard !reduceMotion else { return 0.95 }
         switch phase {
-        case .inhale:  return HomeCharacterDesignTokens.Ripple.primary
-        case .holdIn:  return HomeCharacterDesignTokens.Ripple.mid
-        case .exhale:  return HomeCharacterDesignTokens.Blossom.accent
-        case .holdOut: return HomeCharacterDesignTokens.Ripple.light
+        case .inhale:  return animate ? 1.15 : 0.85
+        case .holdIn:  return 1.15
+        case .exhale:  return animate ? 0.85 : 1.15
+        case .holdOut: return 0.85
         }
     }
 
-    private var targetScale: CGFloat {
-        guard !reduceMotion else { return 0.8 }
+    /// Target scale for mid aura (r2)
+    private var midScale: CGFloat {
+        guard !reduceMotion else { return 0.95 }
         switch phase {
-        case .inhale:  return animate ? 1.0 : 0.7
-        case .holdIn:  return 1.0
-        case .exhale:  return animate ? 0.6 : 0.9
-        case .holdOut: return 0.6
+        case .inhale:  return animate ? 1.10 : 0.85
+        case .holdIn:  return 1.10
+        case .exhale:  return animate ? 0.85 : 1.10
+        case .holdOut: return 0.85
+        }
+    }
+
+    /// Target scale for outer aura (r1)
+    private var outerScale: CGFloat {
+        guard !reduceMotion else { return 0.95 }
+        switch phase {
+        case .inhale:  return animate ? 1.05 : 0.85
+        case .holdIn:  return 1.05
+        case .exhale:  return animate ? 0.85 : 1.05
+        case .holdOut: return 0.85
         }
     }
 
     var body: some View {
         ZStack {
-            auraArc(radius: size * 0.5, opacity: 0.10)
-            auraArc(radius: size * 0.42, opacity: 0.16)
-            auraArc(radius: size * 0.34, opacity: 0.22)
-
+            // r1 — outer aura (100% width, radial gradient)
             Circle()
                 .fill(
                     RadialGradient(
-                        colors: [phaseColor.opacity(0.85), phaseColor.opacity(0.45)],
+                        colors: [auraColor.opacity(0.18), Color.clear],
                         center: .center,
-                        startRadius: size * 0.05,
-                        endRadius: size * 0.25
+                        startRadius: size * 0.1,
+                        endRadius: size * 0.5
                     )
                 )
-                .frame(width: size * 0.5, height: size * 0.5)
-                .overlay(
-                    Circle()
-                        .stroke(phaseColor.opacity(0.55), lineWidth: 2)
-                        .frame(width: size * 0.5, height: size * 0.5)
+                .frame(width: size, height: size)
+                .scaleEffect(outerScale)
+
+            // r2 — mid aura (70% width)
+            Circle()
+                .fill(
+                    RadialGradient(
+                        colors: [auraColor.opacity(0.30), Color.clear],
+                        center: .center,
+                        startRadius: size * 0.05,
+                        endRadius: size * 0.35
+                    )
                 )
-                .scaleEffect(targetScale)
+                .frame(width: size * 0.7, height: size * 0.7)
+                .scaleEffect(midScale)
+
+            // r3 — solid core (42% width, linear gradient, shadow)
+            Circle()
+                .fill(
+                    LinearGradient(
+                        colors: [coreGradientTop, coreGradientBottom],
+                        startPoint: .topLeading,
+                        endPoint: .bottomTrailing
+                    )
+                )
+                .frame(width: size * 0.42, height: size * 0.42)
+                .shadow(color: auraColor.opacity(0.5), radius: 25, x: 0, y: 10)
+                .scaleEffect(coreScale)
         }
         .frame(width: size, height: size)
         .accessibilityElement(children: .ignore)
         .accessibilityLabel("Breathing guide, \(phase.label)")
         .onAppear { beginCycle() }
-        .onChange(of: phase) { beginCycle() }
-    }
-
-    private func auraArc(radius: CGFloat, opacity: Double) -> some View {
-        Circle()
-            .stroke(phaseColor.opacity(opacity), lineWidth: 2)
-            .frame(width: radius * 2, height: radius * 2)
-            .scaleEffect(reduceMotion ? 0.9 : (animate ? 1.0 : 0.85))
-            .opacity(reduceMotion ? opacity : (animate ? opacity * 0.4 : opacity))
+        .onChange(of: phase) { _, _ in beginCycle() }
     }
 
     private func beginCycle() {
@@ -109,9 +139,9 @@ enum BoxBreathingPhase: String, CaseIterable, Sendable {
 
 #Preview {
     VStack(spacing: 24) {
-        BreathingCircle(phase: .inhale, size: 180)
-        BreathingCircle(phase: .exhale, size: 140)
+        BreathingCircle(phase: .inhale, size: 280)
+        BreathingCircle(phase: .exhale, size: 200)
     }
     .padding()
-    .background(HomeCharacterDesignTokens.darkCanvas)
+    .background(Color(hex: "#ECF8FE"))
 }

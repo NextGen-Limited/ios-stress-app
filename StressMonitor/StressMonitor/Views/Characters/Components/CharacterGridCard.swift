@@ -1,5 +1,12 @@
 import SwiftUI
 
+// MARK: - Character Grid Card
+
+/// Grid tile for a character in the collection, matching `16-characters.html`.
+///
+/// Renders a glow background, procedural character art, name, element label,
+/// an unlock status badge (FREE / PLUS / 30-DAY STREAK), and evolution stage dots.
+/// Locked characters are visually desaturated with a lock overlay.
 struct CharacterGridCard: View {
     let creature: CharacterCreature
     let unlock: CharacterUnlock?
@@ -11,84 +18,127 @@ struct CharacterGridCard: View {
     private var currentStage: EvolutionStage { unlock?.evolutionStage ?? .droplet }
 
     var body: some View {
-        VStack(spacing: Spacing.sm) {
+        VStack(spacing: 6) {
+            // Character art with glow background
             ZStack {
                 Circle()
-                    .fill(creature.element.primaryColor.opacity(0.15))
-                    .frame(width: 86, height: 86)
+                    .fill(creature.element.primaryColor.opacity(0.55))
+                    .frame(width: 80, height: 80)
+                    .blur(radius: 20)
+                    .offset(y: -12)
 
                 if isUnlocked {
                     StressBuddyIllustration(
                         characterId: creature.id,
                         evolution: currentStage,
                         mood: .serene,
-                        size: 64
+                        size: 72
                     )
                 } else {
-                    Image(systemName: AppIconSystem.System.locked.sfSymbol)
-                        .font(.title2)
-                        .foregroundStyle(creature.element.primaryColor.opacity(0.65))
+                    StressBuddyIllustration(
+                        characterId: creature.id,
+                        evolution: .droplet,
+                        mood: .serene,
+                        size: 72
+                    )
+                    .overlay {
+                        Image(systemName: AppIconSystem.System.locked.sfSymbol)
+                            .font(.system(size: 13, weight: .bold))
+                            .foregroundStyle(Color.Wellness.adaptivePrimaryText)
+                            .frame(width: 32, height: 32)
+                            .background(.thinMaterial, in: Circle())
+                    }
                 }
             }
-            .overlay(alignment: .topTrailing) {
-                if isActive {
-                    Image(systemName: AppIconSystem.System.success.sfSymbol)
-                        .font(.title3)
-                        .foregroundStyle(.green)
-                        .background(Circle().fill(Color.Wellness.adaptiveCardBackground).padding(-2))
-                        .accessibilityLabel("Active character")
-                }
-            }
+            .frame(height: 92)
 
-            VStack(spacing: 2) {
-                Text(creature.displayName)
-                    .font(Typography.headline)
-                    .foregroundStyle(Color.Wellness.adaptivePrimaryText)
+            // Name
+            Text(creature.displayName)
+                .font(.system(size: 17, weight: .bold, design: .rounded))
+                .foregroundStyle(Color.Wellness.adaptivePrimaryText)
 
-                Text("\(creature.element.emoji) \(creature.subtitle)")
-                    .font(Typography.caption1)
-                    .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.8)
-            }
+            // Element subtitle
+            Text(creature.subtitle.uppercased())
+                .font(.system(size: 10, weight: .medium, design: .monospaced))
+                .tracking(0.6)
+                .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
 
-            if isUnlocked {
-                EvolutionDots(currentStage: currentStage, color: creature.element.accentColor)
-            } else {
-                unlockBadge
-            }
+            // Status badge
+            statusBadge
+                .padding(.top, 2)
+
+            // Stage / streak info
+            stageLabel
+                .font(.system(size: 11))
+                .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
         }
         .frame(maxWidth: .infinity)
-        .padding(Spacing.cardPadding)
+        .padding(.horizontal, 12)
+        .padding(.top, 16)
+        .padding(.bottom, 14)
         .background(Color.Wellness.adaptiveCardBackground)
-        .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
+        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
         .overlay {
-            RoundedRectangle(cornerRadius: 20, style: .continuous)
-                .stroke(isActive ? creature.element.primaryColor : Color.borderLight.opacity(0.45), lineWidth: isActive ? 2 : 1)
+            RoundedRectangle(cornerRadius: 18, style: .continuous)
+                .stroke(isActive ? creature.element.primaryColor : Color.clear, lineWidth: 2)
         }
-        .shadow(color: .black.opacity(0.04), radius: 8, x: 0, y: 4)
+        .opacity(isUnlocked ? 1.0 : 0.65)
+        .saturation(isUnlocked ? 1.0 : 0.5)
         .accessibilityElement(children: .combine)
         .accessibilityLabel(accessibilityLabel)
         .accessibilityHint("Double tap for character details")
     }
 
+    // MARK: - Status Badge
+
     @ViewBuilder
-    private var unlockBadge: some View {
-        HStack(spacing: 4) {
-            if isPremium {
-                Image(systemName: AppIconSystem.System.premium.sfSymbol)
-                Text("Premium")
-            } else if isStreakGated {
+    private var statusBadge: some View {
+        HStack(spacing: 5) {
+            if isStreakGated {
                 Image(systemName: AppIconSystem.Metric.streak.sfSymbol)
-                Text("\(creature.streakRequired)d streak")
+                    .font(.system(size: 9))
+                Text(isUnlocked ? "UNLOCKED" : "30-DAY STREAK")
+                    .font(.system(size: 10, weight: .semibold))
+            } else if isPremium {
+                Image(systemName: AppIconSystem.System.premium.sfSymbol)
+                    .font(.system(size: 9))
+                Text("PLUS")
+                    .font(.system(size: 10, weight: .semibold))
+            } else {
+                Image(systemName: AppIconSystem.System.success.sfSymbol)
+                    .font(.system(size: 9))
+                Text(isActive ? "FREE · ACTIVE" : "FREE")
+                    .font(.system(size: 10, weight: .semibold))
             }
         }
-        .font(Typography.caption2)
-        .foregroundStyle(isPremium ? .orange : .blue)
-        .padding(.horizontal, Spacing.sm)
-        .padding(.vertical, Spacing.xs)
-        .background((isPremium ? Color.orange : Color.blue).opacity(0.12))
-        .clipShape(Capsule())
+        .foregroundStyle(badgeColor)
+        .padding(.horizontal, 9)
+        .padding(.vertical, 3)
+        .background(badgeColor.opacity(0.14), in: Capsule())
+    }
+
+    private var badgeColor: Color {
+        if isStreakGated { return Color(hex: "#7B86CB") }
+        if isPremium { return Color(hex: "#FE9901") }
+        return Color(hex: "#34C759")
+    }
+
+    // MARK: - Stage Label
+
+    @ViewBuilder
+    private var stageLabel: some View {
+        if isUnlocked {
+            if let unlock {
+                Text("Stage \(currentStage.sortOrder + 1) · \(unlock.streakDays)d streak")
+            } else {
+                Text("Stage \(currentStage.sortOrder + 1)")
+            }
+        } else if isStreakGated {
+            let current = unlock?.streakDays ?? 0
+            Text("Locked · \(max(creature.streakRequired - current, 0))d to go")
+        } else {
+            Text("Locked · $4.99/mo")
+        }
     }
 
     private var accessibilityLabel: String {
