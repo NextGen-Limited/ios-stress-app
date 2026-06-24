@@ -2,11 +2,16 @@ import SwiftUI
 
 // MARK: - Chat Bottom Sheet View
 
-/// Bottom sheet wrapper presenting the AI chat interface.
-/// Presented via `.sheet` modifier from ActionView.
+/// AI Chat bottom sheet matching `09-chat.html`.
+///
+/// Shows a chat header with a mood-reactive Ripple avatar (serene when stress
+/// is Mild, worried when High), a message stream, quick reply chips, and a
+/// composer with mic + send buttons. The Ripple avatar's expression reflects
+/// the user's current stress level.
 struct ChatBottomSheetView: View {
     @Environment(\.dismiss) private var dismiss
     @State private var viewModel: ChatViewModel
+    @State private var inputText = ""
 
     // MARK: - Initialization
 
@@ -33,7 +38,7 @@ struct ChatBottomSheetView: View {
                     unavailableView
                 }
             }
-            .navigationTitle("Ripple")
+            .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
@@ -44,9 +49,10 @@ struct ChatBottomSheetView: View {
                         Button {
                             viewModel.clearConversation()
                         } label: {
-                            Image(systemName: "trash")
+                            Image(systemName: "arrow.counterclockwise")
                                 .foregroundStyle(.secondary)
                         }
+                        .accessibilityLabel("Clear conversation")
                     }
                 }
             }
@@ -59,17 +65,10 @@ struct ChatBottomSheetView: View {
 
     private var chatContent: some View {
         VStack(spacing: 0) {
-            // Quick action chips
-            if !viewModel.isLoading && viewModel.messages.isEmpty {
-                QuickActionChipsView(
-                    actions: viewModel.quickActions,
-                    onSelect: { viewModel.sendQuickAction($0) }
-                )
-                .padding(.horizontal, 16)
-                .padding(.vertical, 8)
-            }
+            // Chat header (Ripple avatar + name + subtitle)
+            chatHeader
 
-            // Message list
+            // Message stream
             messageList
 
             // Streaming indicator
@@ -82,8 +81,76 @@ struct ChatBottomSheetView: View {
                 errorBanner(error)
             }
 
-            // Input bar
-            chatInputBar
+            // Quick replies (label + chips)
+            if !viewModel.isLoading {
+                quickRepliesSection
+            }
+
+            // Composer
+            chatComposer
+        }
+    }
+
+    // MARK: - Chat Header
+
+    private var chatHeader: some View {
+        HStack(spacing: 12) {
+            // Ripple avatar with online dot
+            ZStack(alignment: .bottomTrailing) {
+                StressBuddyIllustration(
+                    mood: viewModel.companionMood,
+                    size: 36
+                )
+                .background(
+                    Circle()
+                        .fill(Color(hex: "#4FC3F7").opacity(0.12))
+                )
+
+                // Online indicator dot
+                Circle()
+                    .fill(Color(hex: "#34C759"))
+                    .frame(width: 10, height: 10)
+                    .overlay(
+                        Circle().stroke(.white, lineWidth: 2)
+                    )
+            }
+            .accessibilityHidden(true)
+
+            VStack(alignment: .leading, spacing: 2) {
+                Text("Ripple")
+                    .font(.system(size: 16, weight: .bold, design: .rounded))
+                    .foregroundStyle(Color.Wellness.adaptivePrimaryText)
+
+                Text(companionSubtitle)
+                    .font(.system(size: 12))
+                    .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
+            }
+
+            Spacer()
+
+            // Overflow menu
+            Image(systemName: "ellipsis")
+                .font(.system(size: 20))
+                .foregroundStyle(Color(hex: "#0288D1"))
+                .accessibilityLabel("More options")
+        }
+        .padding(.horizontal, 16)
+        .padding(.vertical, 12)
+        .overlay(alignment: .bottom) {
+            Divider()
+        }
+    }
+
+    /// Subtitle reflecting current stress state.
+    private var companionSubtitle: String {
+        let level = Int(viewModel.companionMood == .serene ? 30 : 50)
+        switch viewModel.companionMood {
+        case .relaxed, .serene: return "Water Otter · reading your morning"
+        case .focused:          return "Water Otter · noticing your focus"
+        case .worried:          return "Water Otter · sensing your stress"
+        case .tired:            return "Water Otter · you seem tired"
+        case .determined:       return "Water Otter · feeling your intensity"
+        default:                return "Water Otter · stress level ~\(level)"
         }
     }
 
@@ -92,27 +159,27 @@ struct ChatBottomSheetView: View {
     private var messageList: some View {
         ScrollViewReader { proxy in
             ScrollView {
-                LazyVStack(spacing: 12) {
-                    // Welcome message
+                LazyVStack(spacing: 10) {
                     if viewModel.messages.isEmpty {
-                        welcomeMessage
+                        welcomeBubble
                     }
 
                     ForEach(viewModel.messages) { message in
-                        MessageBubbleView(message: message)
+                        MessageBubbleView(message: message, mood: viewModel.companionMood)
                             .id(message.id)
                     }
 
-                    // Streaming placeholder
+                    // Typing indicator
                     if viewModel.isLoading && viewModel.currentStreamingText.isEmpty {
                         HStack {
                             typingIndicator
                             Spacer()
                         }
                         .padding(.horizontal, 16)
+                        .padding(.top, 4)
                     }
                 }
-                .padding(.vertical, 12)
+                .padding(.vertical, 16)
             }
             .onChange(of: viewModel.messages.count) { _, _ in
                 scrollToLast(proxy)
@@ -123,23 +190,26 @@ struct ChatBottomSheetView: View {
         }
     }
 
-    // MARK: - Welcome Message
+    // MARK: - Welcome Bubble
 
-    private var welcomeMessage: some View {
-        VStack(spacing: 12) {
-            RippleCharacterView(mood: viewModel.companionMood, size: 80)
-
-            Text("Hi! I'm Ripple 💧")
-                .font(.headline)
+    private var welcomeBubble: some View {
+        VStack(alignment: .leading, spacing: 6) {
+            Text("Hi, I'm Ripple — your water otter companion.")
+                .font(.system(size: 14, weight: .medium))
                 .foregroundStyle(Color.Wellness.adaptivePrimaryText)
 
-            Text("I'm here to help you understand your stress levels and suggest wellness activities. What would you like to know?")
-                .font(.subheadline)
+            Text("I track your stress patterns and suggest quick resets. Ask me anything about your readings, or pick a quick reply below.")
+                .font(.system(size: 14))
                 .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
-                .multilineTextAlignment(.center)
-                .padding(.horizontal, 32)
+                .lineSpacing(3)
         }
-        .padding(.vertical, 24)
+        .frame(maxWidth: 260, alignment: .leading)
+        .padding(.horizontal, 14)
+        .padding(.vertical, 10)
+        .background(Color.Wellness.adaptiveCardBackground)
+        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .frame(maxWidth: .infinity, alignment: .leading)
+        .padding(.horizontal, 16)
     }
 
     // MARK: - Streaming Bubble
@@ -147,23 +217,15 @@ struct ChatBottomSheetView: View {
     private var streamingBubble: some View {
         HStack {
             VStack(alignment: .leading, spacing: 4) {
-                HStack(spacing: 4) {
-                    RippleCharacterView(mood: viewModel.companionMood, size: 20)
-                        .clipShape(Circle())
-
-                    Text("Ripple")
-                        .font(.caption2)
-                        .foregroundStyle(.secondary)
-                }
-
                 Text(viewModel.currentStreamingText)
-                    .font(.body)
+                    .font(.system(size: 14))
                     .foregroundStyle(Color.Wellness.adaptivePrimaryText)
             }
-            .padding(12)
+            .padding(.horizontal, 14)
+            .padding(.vertical, 10)
             .background(Color.Wellness.adaptiveCardBackground)
-            .clipShape(RoundedRectangle(cornerRadius: 16))
-            .frame(maxWidth: 280, alignment: .leading)
+            .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+            .frame(maxWidth: 260, alignment: .leading)
 
             Spacer()
         }
@@ -176,57 +238,128 @@ struct ChatBottomSheetView: View {
         HStack(spacing: 4) {
             ForEach(0..<3, id: \.self) { index in
                 Circle()
-                    .fill(Color.Wellness.adaptiveSecondaryText)
+                    .fill(Color.Wellness.adaptiveSecondaryText.opacity(0.6))
                     .frame(width: 6, height: 6)
                     .modifier(TypingDotAnimation(delay: Double(index) * 0.2))
             }
         }
-        .padding(12)
+        .padding(.horizontal, 14)
+        .padding(.vertical, 12)
         .background(Color.Wellness.adaptiveCardBackground)
-        .clipShape(RoundedRectangle(cornerRadius: 16))
+        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+    }
+
+    // MARK: - Quick Replies Section
+
+    private var quickRepliesSection: some View {
+        VStack(alignment: .leading, spacing: 4) {
+            Text("QUICK REPLIES")
+                .font(.system(size: 10, weight: .semibold, design: .monospaced))
+                .tracking(0.8)
+                .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
+                .padding(.horizontal, 16)
+
+            ScrollView(.horizontal, showsIndicators: false) {
+                HStack(spacing: 6) {
+                    ForEach(defaultQuickReplies, id: \.self) { reply in
+                        Button {
+                            inputText = reply
+                            sendMessage()
+                        } label: {
+                            Text(reply)
+                                .font(.system(size: 13, weight: .medium))
+                                .foregroundStyle(Color(hex: "#0288D1"))
+                                .padding(.horizontal, 14)
+                                .padding(.vertical, 7)
+                                .background(Color.Wellness.adaptiveCardBackground)
+                                .clipShape(Capsule())
+                                .overlay(
+                                    Capsule()
+                                        .stroke(Color.Wellness.adaptiveSecondaryText.opacity(0.15), lineWidth: 1)
+                                )
+                        }
+                        .buttonStyle(.plain)
+                    }
+                }
+                .padding(.horizontal, 16)
+            }
+        }
+        .padding(.vertical, 6)
+    }
+
+    /// Default quick replies matching the HTML design.
+    private var defaultQuickReplies: [String] {
+        ["Why is my HRV low?", "Suggest a walk", "Set a 5pm check-in", "Read me a poem"]
     }
 
     // MARK: - Error Banner
 
     private func errorBanner(_ message: String) -> some View {
         Text(message)
-            .font(.caption)
+            .font(.system(size: 12))
             .foregroundStyle(.white)
             .padding(.horizontal, 12)
             .padding(.vertical, 6)
-            .background(Color.error.cornerRadius(8))
+            .background(Color.red.cornerRadius(8))
             .padding(.horizontal, 16)
     }
 
-    // MARK: - Input Bar
+    // MARK: - Composer
 
-    private var chatInputBar: some View {
-        HStack(spacing: 12) {
-            TextField("Ask Ripple...", text: $inputText, axis: .vertical)
-                .textFieldStyle(.plain)
-                .lineLimit(1...4)
-                .padding(.horizontal, 12)
-                .padding(.vertical, 10)
-                .background(Color.Wellness.adaptiveCardBackground)
-                .clipShape(RoundedRectangle(cornerRadius: 20))
-                .onSubmit { sendMessage() }
+    private var chatComposer: some View {
+        HStack(spacing: 8) {
+            // Input shell
+            HStack(spacing: 4) {
+                TextField("Message Ripple…", text: $inputText, axis: .vertical)
+                    .font(.system(size: 15))
+                    .lineLimit(1...4)
+                    .padding(.leading, 10)
+                    .padding(.trailing, 4)
+                    .padding(.vertical, 8)
+                    .onSubmit { sendMessage() }
 
+                // Mic button
+                Button {
+                    // Voice input not yet implemented
+                } label: {
+                    Image(systemName: "mic.fill")
+                        .font(.system(size: 14))
+                        .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
+                        .frame(width: 32, height: 32)
+                        .background(Color.Wellness.adaptiveSecondaryText.opacity(0.08))
+                        .clipShape(Circle())
+                }
+                .accessibilityLabel("Voice input")
+            }
+            .background(Color.Wellness.adaptiveCardBackground)
+            .clipShape(Capsule())
+            .overlay(
+                Capsule()
+                    .stroke(Color.Wellness.adaptiveSecondaryText.opacity(0.15), lineWidth: 1)
+            )
+
+            // Send button
             Button {
                 sendMessage()
             } label: {
-                Image(systemName: "arrow.up.circle.fill")
-                    .font(.system(size: 32))
-                    .foregroundStyle(
-                        inputText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
-                            ? Color.Wellness.adaptiveSecondaryText
-                            : Color.accentTeal
-                    )
+                Image(systemName: "arrow.up")
+                    .font(.system(size: 16, weight: .semibold))
+                    .foregroundStyle(.white)
+                    .frame(width: 36, height: 36)
+                    .background(canSend ? Color(hex: "#0288D1") : Color.Wellness.adaptiveSecondaryText.opacity(0.3))
+                    .clipShape(Circle())
             }
-            .disabled(inputText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty || viewModel.isLoading)
+            .disabled(!canSend)
+            .accessibilityLabel("Send message")
         }
-        .padding(.horizontal, 16)
-        .padding(.vertical, 8)
-        .background(Color.Wellness.adaptiveBackground)
+        .padding(.horizontal, 14)
+        .padding(.top, 10)
+        .padding(.bottom, 14)
+        .background(Color.Wellness.adaptiveBackground.opacity(0.92))
+    }
+
+    private var canSend: Bool {
+        !inputText.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty && !viewModel.isLoading
     }
 
     // MARK: - Unavailable View
@@ -238,11 +371,11 @@ struct ChatBottomSheetView: View {
                 .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
 
             Text("AI Chat needs backend auth")
-                .font(.title3.weight(.semibold))
+                .font(.system(size: 20, weight: .semibold))
                 .foregroundStyle(Color.Wellness.adaptivePrimaryText)
 
             Text("Connect Supabase Auth and provide SUPABASE_ANON_KEY to stream through the StressMonitor backend.")
-                .font(.body)
+                .font(.system(size: 15))
                 .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 32)
@@ -253,8 +386,6 @@ struct ChatBottomSheetView: View {
     }
 
     // MARK: - Helpers
-
-    @State private var inputText = ""
 
     private func sendMessage() {
         let text = inputText.trimmingCharacters(in: .whitespacesAndNewlines)
@@ -274,49 +405,59 @@ struct ChatBottomSheetView: View {
 
 // MARK: - Message Bubble View
 
-/// Single message bubble in the chat
+/// Single message bubble in the chat stream. Matching `09-chat.html`:
+/// - Assistant (from-them): surface bg, left-aligned, bottom-left small radius
+/// - User (from-me): gradient blue bg, right-aligned, bottom-right small radius
 private struct MessageBubbleView: View {
     let message: ChatMessage
+    let mood: RippleMood
 
     var body: some View {
         HStack {
             if message.role == .user { Spacer(minLength: 60) }
 
-            VStack(alignment: message.role == .user ? .trailing : .leading, spacing: 4) {
-                if message.role == .assistant {
-                    HStack(spacing: 4) {
-                        RippleCharacterView(mood: .serene, size: 20)
-                            .clipShape(Circle())
-
-                        Text("Ripple")
-                            .font(.caption2)
-                            .foregroundStyle(.secondary)
-
-                        Spacer()
-                    }
-                }
-
+            VStack(
+                alignment: message.role == .user ? .trailing : .leading,
+                spacing: 4
+            ) {
                 Text(message.content)
-                    .font(.body)
-                    .foregroundStyle(
-                        message.role == .user ? .white : Color.Wellness.adaptivePrimaryText
-                    )
+                    .font(.system(size: 14))
+                    .foregroundStyle(message.role == .user ? .white : Color.Wellness.adaptivePrimaryText)
+                    .lineSpacing(2)
                     .padding(.horizontal, 14)
                     .padding(.vertical, 10)
                     .background(
                         message.role == .user
-                            ? Color.accentTeal
-                            : Color.Wellness.adaptiveCardBackground
+                        ? AnyShapeStyle(
+                            LinearGradient(
+                                colors: [Color(hex: "#4FC3F7"), Color(hex: "#0288D1")],
+                                startPoint: .topLeading,
+                                endPoint: .bottomTrailing
+                            )
+                        )
+                        : AnyShapeStyle(Color.Wellness.adaptiveCardBackground)
                     )
                     .clipShape(
-                        RoundedRectangle(cornerRadius: 16)
+                        RoundedRectangle(cornerRadius: 18, style: .continuous)
                     )
-                    .frame(maxWidth: 280, alignment: message.role == .user ? .trailing : .leading)
+                    .frame(maxWidth: 260, alignment: message.role == .user ? .trailing : .leading)
+
+                // Timestamp
+                Text(timestampText)
+                    .font(.system(size: 9, weight: .medium, design: .monospaced))
+                    .foregroundStyle(Color.Wellness.adaptiveSecondaryText.opacity(0.7))
+                    .padding(.horizontal, 4)
             }
 
             if message.role == .assistant { Spacer(minLength: 60) }
         }
         .padding(.horizontal, 16)
+    }
+
+    private var timestampText: String {
+        let formatter = DateFormatter()
+        formatter.timeStyle = .short
+        return formatter.string(from: message.timestamp)
     }
 }
 
