@@ -34,7 +34,7 @@ struct AIInsightCard: View {
 
                         Spacer()
 
-                        Image(systemName: "chevron.right")
+                        Image(systemName: AppIconSystem.Nav.forward.sfSymbol)
                             .font(.caption)
                     }
                     .foregroundColor(.primaryBlue)

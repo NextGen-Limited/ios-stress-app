@@ -1,0 +1,869 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>StressMonitor · Character Export Sheet</title>
+<style>
+:root {
+  --bg: #F2F2F7;
+  --surface: #FFFFFF;
+  --fg: #101223;
+  --muted: #777986;
+  --separator: rgba(60,60,67,0.12);
+  --accent: #4FC3F7;
+  --accent-strong: #0288D1;
+  --ripple: #4FC3F7;
+  --blossom: #A5D6A7;
+  --ember: #FFAB91;
+  --zephyr: #D1C4E9;
+  --lumi: #7986CB;
+  --stress-relaxed: #34C759;
+  --stress-mild: #007AFF;
+  --stress-moderate: #FFD60A;
+  --stress-high: #FF9500;
+  --stress-severe: #FF3B30;
+  --font-display: -apple-system, BlinkMacSystemFont, 'SF Pro Display', system-ui, sans-serif;
+  --font-body: -apple-system, BlinkMacSystemFont, 'SF Pro Text', system-ui, sans-serif;
+  --font-rounded: -apple-system, 'SF Pro Rounded', sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', Menlo, monospace;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--fg);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Header */
+.doc-header {
+  background: linear-gradient(135deg, #0F1729 0%, #1a2040 60%, #0a1128 100%);
+  color: #fff;
+  padding: 64px 48px 48px;
+  position: relative;
+  overflow: hidden;
+}
+.doc-header::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background:
+    radial-gradient(circle at 15% 30%, rgba(79,195,247,0.15), transparent 40%),
+    radial-gradient(circle at 85% 60%, rgba(169,214,167,0.10), transparent 40%),
+    radial-gradient(circle at 50% 80%, rgba(255,171,145,0.08), transparent 40%);
+}
+.doc-header > * { position: relative; z-index: 1; }
+.doc-header .eyebrow {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--accent);
+  margin-bottom: 12px;
+}
+.doc-header h1 {
+  font-family: var(--font-display);
+  font-size: 42px;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+.doc-header p {
+  font-size: 17px;
+  color: rgba(255,255,255,0.65);
+  margin-top: 12px;
+  max-width: 600px;
+  line-height: 1.5;
+}
+
+.doc-main { max-width: 1200px; margin: 0 auto; padding: 48px 48px 96px; }
+
+/* Character showcase row */
+.char-showcase {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 16px;
+  margin-bottom: 64px;
+}
+@media (max-width: 768px) {
+  .char-showcase { grid-template-columns: repeat(2, 1fr); }
+}
+
+.char-hero {
+  background: var(--surface);
+  border-radius: 20px;
+  padding: 24px 16px 20px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  border: 1px solid var(--separator);
+  transition: transform 0.2s ease;
+}
+.char-hero:hover { transform: translateY(-4px); }
+.char-hero .glow {
+  position: absolute;
+  top: -20%; left: -20%; right: -20%;
+  height: 50%;
+  border-radius: 50%;
+  filter: blur(24px);
+  opacity: 0.3;
+  z-index: 0;
+}
+.char-hero > * { position: relative; z-index: 1; }
+.char-hero .art {
+  width: 100px; height: 100px;
+  margin: 0 auto 14px;
+  filter: drop-shadow(0 8px 16px rgba(0,0,0,0.10));
+  animation: bob 4s ease-in-out infinite;
+}
+.char-hero:nth-child(2) .art { animation-delay: 0.3s; }
+.char-hero:nth-child(3) .art { animation-delay: 0.6s; }
+.char-hero:nth-child(4) .art { animation-delay: 0.9s; }
+.char-hero:nth-child(5) .art { animation-delay: 1.2s; }
+@keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-5px); } }
+.char-hero .art svg { width: 100%; height: 100%; }
+.char-hero .ch-name {
+  font-family: var(--font-rounded);
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+.char-hero .ch-element {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  margin-top: 2px;
+}
+.char-hero .ch-unlock {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 10px;
+  border-radius: 999px;
+  font-size: 10px;
+  font-weight: 600;
+  margin-top: 8px;
+  background: rgba(79,195,247,0.14);
+  color: var(--accent-strong);
+}
+
+/* Detail section per character */
+.char-detail {
+  background: var(--surface);
+  border-radius: 24px;
+  padding: 0;
+  margin-bottom: 32px;
+  overflow: hidden;
+  border: 1px solid var(--separator);
+}
+.char-detail .cd-header {
+  padding: 32px;
+  display: flex;
+  gap: 32px;
+  align-items: center;
+  flex-wrap: wrap;
+  position: relative;
+  overflow: hidden;
+}
+.char-detail .cd-header::before {
+  content: '';
+  position: absolute;
+  top: -50%; left: -10%;
+  width: 60%; height: 200%;
+  border-radius: 50%;
+  filter: blur(40px);
+  opacity: 0.12;
+  z-index: 0;
+}
+.char-detail .cd-header > * { position: relative; z-index: 1; }
+.char-detail .cd-art {
+  width: 160px; height: 160px;
+  flex: 0 0 160px;
+  filter: drop-shadow(0 12px 24px rgba(0,0,0,0.12));
+  animation: bob 4s ease-in-out infinite;
+}
+.char-detail .cd-art svg { width: 100%; height: 100%; }
+.char-detail .cd-info { flex: 1; min-width: 240px; }
+.char-detail .cd-name {
+  font-family: var(--font-rounded);
+  font-size: 34px;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+}
+.char-detail .cd-role {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  margin-top: 4px;
+}
+.char-detail .cd-quote {
+  font-size: 15px;
+  font-style: italic;
+  color: var(--muted);
+  line-height: 1.5;
+  margin-top: 12px;
+  max-width: 400px;
+}
+
+.char-detail .cd-body {
+  padding: 0 32px 32px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+@media (max-width: 768px) {
+  .char-detail .cd-body { grid-template-columns: 1fr; }
+}
+
+/* Size variants */
+.size-variants {
+  display: flex;
+  align-items: flex-end;
+  gap: 20px;
+  padding: 20px;
+  background: rgba(0,0,0,0.02);
+  border-radius: 14px;
+}
+.size-variant {
+  text-align: center;
+}
+.size-variant .sv-art { display: grid; place-items: center; margin-bottom: 8px; }
+.size-variant .sv-label {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* Mood reactions */
+.mood-strip {
+  padding: 20px;
+  background: rgba(0,0,0,0.02);
+  border-radius: 14px;
+}
+.mood-strip-title {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 14px;
+}
+.mood-strip-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+}
+.mood-strip-cell {
+  text-align: center;
+}
+.mood-strip-cell .ms-face {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 12px;
+  display: grid;
+  place-items: center;
+  margin-bottom: 6px;
+}
+.mood-strip-cell .ms-face svg { width: 50%; height: 50%; color: #fff; }
+.mood-strip-cell .ms-label {
+  font-family: var(--font-mono);
+  font-size: 9px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* Evolution stages */
+.evo-strip {
+  padding: 20px;
+  background: rgba(0,0,0,0.02);
+  border-radius: 14px;
+  grid-column: 1 / -1;
+}
+.evo-strip-title {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 14px;
+}
+.evo-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+}
+.evo-card {
+  text-align: center;
+  padding: 16px 8px;
+  border-radius: 12px;
+  background: var(--surface);
+  border: 2px solid transparent;
+  position: relative;
+}
+.evo-card.unlocked { border-color: var(--accent); }
+.evo-card.locked { opacity: 0.5; }
+.evo-card .es-stage {
+  width: 44px; height: 44px;
+  margin: 0 auto 8px;
+  border-radius: 50%;
+  background: rgba(79,195,247,0.18);
+  display: grid; place-items: center;
+}
+.evo-card.unlocked .es-stage { background: var(--accent); }
+.evo-card .es-name { font-size: 13px; font-weight: 600; }
+.evo-card .es-req { font-family: var(--font-mono); font-size: 9px; color: var(--muted); letter-spacing: 0.04em; text-transform: uppercase; margin-top: 2px; }
+
+/* Color tokens */
+.color-row {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  padding: 20px;
+  background: rgba(0,0,0,0.02);
+  border-radius: 14px;
+  grid-column: 1 / -1;
+}
+.color-swatch {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+.color-swatch .sw {
+  width: 48px; height: 48px;
+  border-radius: 12px;
+  border: 1px solid var(--separator);
+}
+.color-swatch .sw-hex {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  color: var(--muted);
+}
+
+.doc-footer {
+  padding: 32px 48px;
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+</style>
+</head>
+<body>
+
+<div class="doc-header">
+  <div class="eyebrow">StressMonitor Character System</div>
+  <h1>Elemental Companion Export Sheet</h1>
+  <p>5 characters - Ripple, Blossom, Ember, Zephyr, Lumi. Each shown at 3 display sizes, 5 mood reactions, 3 evolution stages, and color tokens. The character IS the stress indicator.</p>
+</div>
+
+<div class="doc-main">
+<div class="char-showcase">  <div class="char-hero">
+    <div class="glow" style="background:#4FC3F7;"></div>
+    <div class="art"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><ellipse cx="50" cy="55" rx="26" ry="28" fill="#4FC3F7"/><ellipse cx="50" cy="62" rx="18" ry="20" fill="#B3E5FC"/><circle cx="50" cy="38" r="20" fill="#4FC3F7"/><circle cx="50" cy="42" r="14" fill="#E1F5FE"/><circle cx="40" cy="24" r="5" fill="#4FC3F7"/><circle cx="60" cy="24" r="5" fill="#4FC3F7"/><circle cx="43" cy="40" r="3" fill="#101223"/><circle cx="57" cy="40" r="3" fill="#101223"/><ellipse cx="50" cy="46" rx="1.6" ry="1.2" fill="#101223"/><path d="M44 50 Q50 54 56 50" stroke="#101223" stroke-width="1.2" fill="none" stroke-linecap="round"/></svg></div>
+    <div class="ch-name">Ripple</div>
+    <div class="ch-element" style="color:#4FC3F7;">Water Otter</div>
+    <div class="ch-unlock">Free · Default</div>
+  </div>
+  <div class="char-hero">
+    <div class="glow" style="background:#A5D6A7;"></div>
+    <div class="art"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><!-- body --><ellipse cx="50" cy="62" rx="24" ry="22" fill="#A5D6A7"/><ellipse cx="50" cy="68" rx="16" ry="14" fill="#E8F5E9"/><!-- head --><path d="M28 38 L36 18 L48 30 Z" fill="#A5D6A7"/><path d="M72 38 L64 18 L52 30 Z" fill="#A5D6A7"/><circle cx="50" cy="40" r="20" fill="#A5D6A7"/><path d="M30 42 Q50 56 70 42 Q60 50 50 50 Q40 50 30 42 Z" fill="#C8E6C9"/><!-- face --><circle cx="42" cy="42" r="3" fill="#1B5E20"/><circle cx="58" cy="42" r="3" fill="#1B5E20"/><ellipse cx="50" cy="48" rx="2" ry="1.5" fill="#1B5E20"/><path d="M44 52 Q50 56 56 52" stroke="#1B5E20" stroke-width="1.2" fill="none" stroke-linecap="round"/><!-- leaf on head --><path d="M50 20 Q44 14 46 8 Q52 12 50 20 Z" fill="#66BB6A"/><path d="M50 20 L48 12" stroke="#388E3C" stroke-width="0.8"/><!-- tail --><path d="M70 70 Q84 60 82 76 Q78 80 70 76 Z" fill="#A5D6A7"/><path d="M75 70 Q82 65 80 75" stroke="#66BB6A" stroke-width="0.8" fill="none"/></svg></div>
+    <div class="ch-name">Blossom</div>
+    <div class="ch-element" style="color:#A5D6A7;">Forest Sprite</div>
+    <div class="ch-unlock">Free</div>
+  </div>
+  <div class="char-hero">
+    <div class="glow" style="background:#FFAB91;"></div>
+    <div class="art"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><!-- flame aura --><path d="M30 60 Q20 40 30 20 Q40 30 38 50 Q44 30 50 18 Q56 30 62 50 Q60 30 70 20 Q80 40 70 60 Z" fill="#FF7043" opacity="0.4"/><!-- body --><ellipse cx="50" cy="62" rx="24" ry="22" fill="#FFAB91"/><ellipse cx="50" cy="68" rx="16" ry="14" fill="#FFE0B2"/><!-- head --><path d="M28 38 L34 18 L46 32 Z" fill="#FFAB91"/><path d="M72 38 L66 18 L54 32 Z" fill="#FFAB91"/><circle cx="50" cy="40" r="20" fill="#FFAB91"/><path d="M30 44 Q50 58 70 44 Q60 52 50 52 Q40 52 30 44 Z" fill="#FFCC80"/><!-- flame on head --><path d="M50 18 Q45 12 50 4 Q55 12 50 18 Z" fill="#FF5722"/><!-- face --><circle cx="42" cy="42" r="3" fill="#BF360C"/><circle cx="58" cy="42" r="3" fill="#BF360C"/><ellipse cx="50" cy="48" rx="2" ry="1.5" fill="#BF360C"/><path d="M44 52 Q50 56 56 52" stroke="#BF360C" stroke-width="1.2" fill="none" stroke-linecap="round"/><!-- flame tail --><path d="M70 70 Q84 58 86 76 Q80 84 70 78 Z" fill="#FFAB91"/><path d="M75 72 Q83 64 82 76 Q78 78 75 72" fill="#FF5722"/></svg></div>
+    <div class="ch-name">Ember</div>
+    <div class="ch-element" style="color:#FFAB91;">Flame Fox</div>
+    <div class="ch-unlock">StressMonitor Plus</div>
+  </div>
+  <div class="char-hero">
+    <div class="glow" style="background:#D1C4E9;"></div>
+    <div class="art"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><!-- wind swirls --><path d="M20 50 Q12 40 22 36 M22 36 Q32 38 30 50" stroke="#D1C4E9" stroke-width="1.5" fill="none" stroke-linecap="round"/><path d="M80 50 Q88 40 78 36 M78 36 Q68 38 70 50" stroke="#D1C4E9" stroke-width="1.5" fill="none" stroke-linecap="round"/><!-- body (cloud-like) --><ellipse cx="50" cy="60" rx="24" ry="22" fill="#D1C4E9"/><ellipse cx="50" cy="68" rx="16" ry="14" fill="#F3E5F5"/><!-- head --><ellipse cx="36" cy="22" rx="6" ry="14" fill="#D1C4E9" transform="rotate(-15 36 22)"/><ellipse cx="64" cy="22" rx="6" ry="14" fill="#D1C4E9" transform="rotate(15 64 22)"/><ellipse cx="36" cy="22" rx="3" ry="10" fill="#E1BEE7" transform="rotate(-15 36 22)"/><ellipse cx="64" cy="22" rx="3" ry="10" fill="#E1BEE7" transform="rotate(15 64 22)"/><circle cx="50" cy="40" r="20" fill="#D1C4E9"/><circle cx="50" cy="44" r="14" fill="#F3E5F5"/><!-- face --><circle cx="42" cy="42" r="3" fill="#4527A0"/><circle cx="58" cy="42" r="3" fill="#4527A0"/><ellipse cx="50" cy="48" rx="2" ry="1.5" fill="#4527A0"/><path d="M44 52 Q50 56 56 52" stroke="#4527A0" stroke-width="1.2" fill="none" stroke-linecap="round"/><!-- puff tail --><circle cx="76" cy="64" r="9" fill="#E1BEE7"/></svg></div>
+    <div class="ch-name">Zephyr</div>
+    <div class="ch-element" style="color:#D1C4E9;">Wind Wisp</div>
+    <div class="ch-unlock">StressMonitor Plus</div>
+  </div>
+  <div class="char-hero">
+    <div class="glow" style="background:#7986CB;"></div>
+    <div class="art"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><!-- star sparkles --><path d="M20 30 L22 24 L24 30 L30 32 L24 34 L22 40 L20 34 L14 32 Z" fill="#FFE082"/><path d="M80 24 L81 20 L82 24 L86 25 L82 26 L81 30 L80 26 L76 25 Z" fill="#FFE082"/><!-- body --><ellipse cx="50" cy="62" rx="24" ry="24" fill="#7986CB"/><ellipse cx="50" cy="68" rx="16" ry="16" fill="#C5CAE9"/><!-- head --><path d="M30 30 L40 18 L44 30 Z" fill="#7986CB"/><path d="M70 30 L60 18 L56 30 Z" fill="#7986CB"/><circle cx="50" cy="40" r="22" fill="#7986CB"/><!-- big owl eyes --><circle cx="42" cy="42" r="7" fill="#FFE082"/><circle cx="58" cy="42" r="7" fill="#FFE082"/><circle cx="42" cy="42" r="4" fill="#1A237E"/><circle cx="58" cy="42" r="4" fill="#1A237E"/><circle cx="44" cy="40" r="1.5" fill="#fff"/><circle cx="60" cy="40" r="1.5" fill="#fff"/><!-- beak --><path d="M48 50 L52 50 L50 56 Z" fill="#FFB74D"/><!-- stars on body --><path d="M50 72 L52 68 L54 72 L58 74 L54 76 L52 80 L50 76 L46 74 L50 72 Z" fill="#FFE082" opacity="0.8"/><!-- wing --><path d="M28 60 Q22 70 28 78 Q32 70 32 64 Z" fill="#5C6BC0"/><path d="M72 60 Q78 70 72 78 Q68 70 68 64 Z" fill="#5C6BC0"/></svg></div>
+    <div class="ch-name">Lumi</div>
+    <div class="ch-element" style="color:#7986CB;">Star Pup · Owl</div>
+    <div class="ch-unlock">30-Day Streak</div>
+  </div>
+</div>
+<div class="char-detail" id="char-ripple">
+  <div class="cd-header">
+    <div class="cd-art"><svg viewBox="0 0 220 220" xmlns="http://www.w3.org/2000/svg"><ellipse cx="110" cy="190" rx="68" ry="10" fill="rgba(2,136,209,0.18)"/><path d="M40 178 Q70 172 100 178 T160 178 T200 178" stroke="rgba(79,195,247,0.5)" stroke-width="2.5" fill="none" stroke-linecap="round"/><ellipse cx="110" cy="120" rx="55" ry="58" fill="#4FC3F7"/><ellipse cx="110" cy="135" rx="38" ry="42" fill="#B3E5FC"/><circle cx="110" cy="78" r="42" fill="#4FC3F7"/><circle cx="110" cy="86" r="30" fill="#E1F5FE"/><circle cx="84" cy="48" r="11" fill="#4FC3F7"/><circle cx="136" cy="48" r="11" fill="#4FC3F7"/><circle cx="84" cy="50" r="6" fill="#FFAB91"/><circle cx="136" cy="50" r="6" fill="#FFAB91"/><circle cx="95" cy="80" r="6.5" fill="#101223"/><circle cx="125" cy="80" r="6.5" fill="#101223"/><circle cx="97" cy="78" r="2" fill="#fff"/><circle cx="127" cy="78" r="2" fill="#fff"/><circle cx="82" cy="92" r="6" fill="#FFCDD2" opacity="0.7"/><circle cx="138" cy="92" r="6" fill="#FFCDD2" opacity="0.7"/><ellipse cx="110" cy="93" rx="3" ry="2.2" fill="#101223"/><path d="M100 100 Q110 108 120 100" stroke="#101223" stroke-width="2" fill="none" stroke-linecap="round"/><path d="M110 140 Q100 156 110 168 Q120 156 110 140 Z" fill="#0288D1"/><circle cx="106" cy="150" r="2" fill="#fff" opacity="0.8"/><ellipse cx="60" cy="130" rx="14" ry="22" fill="#4FC3F7" transform="rotate(-20 60 130)"/><ellipse cx="160" cy="130" rx="14" ry="22" fill="#4FC3F7" transform="rotate(20 160 130)"/></svg></div>
+    <div class="cd-info">
+      <div class="cd-name">Ripple</div>
+      <div class="cd-role" style="color:#4FC3F7;">Water Otter · Element of Calm</div>
+      <p class="cd-quote">"Stress is just ripples on the surface. I'll help you find the still water underneath."</p>
+    </div>
+  </div>
+  <div class="cd-body">
+    <div>
+      <div class="mood-strip-title" style="padding:0 0 10px;">Display Sizes</div>
+      <div class="size-variants">
+        <div class="size-variant">
+          <div class="sv-art" style="width:24px;height:24px;"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><ellipse cx="50" cy="55" rx="26" ry="28" fill="#4FC3F7"/><ellipse cx="50" cy="62" rx="18" ry="20" fill="#B3E5FC"/><circle cx="50" cy="38" r="20" fill="#4FC3F7"/><circle cx="50" cy="42" r="14" fill="#E1F5FE"/><circle cx="40" cy="24" r="5" fill="#4FC3F7"/><circle cx="60" cy="24" r="5" fill="#4FC3F7"/><circle cx="43" cy="40" r="3" fill="#101223"/><circle cx="57" cy="40" r="3" fill="#101223"/><ellipse cx="50" cy="46" rx="1.6" ry="1.2" fill="#101223"/><path d="M44 50 Q50 54 56 50" stroke="#101223" stroke-width="1.2" fill="none" stroke-linecap="round"/></svg></div>
+          <div class="sv-label">24px<br>Tab/Favicon</div>
+        </div>
+        <div class="size-variant">
+          <div class="sv-art" style="width:48px;height:48px;"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><ellipse cx="50" cy="55" rx="26" ry="28" fill="#4FC3F7"/><ellipse cx="50" cy="62" rx="18" ry="20" fill="#B3E5FC"/><circle cx="50" cy="38" r="20" fill="#4FC3F7"/><circle cx="50" cy="42" r="14" fill="#E1F5FE"/><circle cx="40" cy="24" r="5" fill="#4FC3F7"/><circle cx="60" cy="24" r="5" fill="#4FC3F7"/><circle cx="43" cy="40" r="3" fill="#101223"/><circle cx="57" cy="40" r="3" fill="#101223"/><ellipse cx="50" cy="46" rx="1.6" ry="1.2" fill="#101223"/><path d="M44 50 Q50 54 56 50" stroke="#101223" stroke-width="1.2" fill="none" stroke-linecap="round"/></svg></div>
+          <div class="sv-label">48px<br>List Item</div>
+        </div>
+        <div class="size-variant">
+          <div class="sv-art" style="width:92px;height:92px;"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><ellipse cx="50" cy="55" rx="26" ry="28" fill="#4FC3F7"/><ellipse cx="50" cy="62" rx="18" ry="20" fill="#B3E5FC"/><circle cx="50" cy="38" r="20" fill="#4FC3F7"/><circle cx="50" cy="42" r="14" fill="#E1F5FE"/><circle cx="40" cy="24" r="5" fill="#4FC3F7"/><circle cx="60" cy="24" r="5" fill="#4FC3F7"/><circle cx="43" cy="40" r="3" fill="#101223"/><circle cx="57" cy="40" r="3" fill="#101223"/><ellipse cx="50" cy="46" rx="1.6" ry="1.2" fill="#101223"/><path d="M44 50 Q50 54 56 50" stroke="#101223" stroke-width="1.2" fill="none" stroke-linecap="round"/></svg></div>
+          <div class="sv-label">92px<br>Grid Tile</div>
+        </div>
+        <div class="size-variant">
+          <div class="sv-art" style="width:120px;height:120px;"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><ellipse cx="50" cy="55" rx="26" ry="28" fill="#4FC3F7"/><ellipse cx="50" cy="62" rx="18" ry="20" fill="#B3E5FC"/><circle cx="50" cy="38" r="20" fill="#4FC3F7"/><circle cx="50" cy="42" r="14" fill="#E1F5FE"/><circle cx="40" cy="24" r="5" fill="#4FC3F7"/><circle cx="60" cy="24" r="5" fill="#4FC3F7"/><circle cx="43" cy="40" r="3" fill="#101223"/><circle cx="57" cy="40" r="3" fill="#101223"/><ellipse cx="50" cy="46" rx="1.6" ry="1.2" fill="#101223"/><path d="M44 50 Q50 54 56 50" stroke="#101223" stroke-width="1.2" fill="none" stroke-linecap="round"/></svg></div>
+          <div class="sv-label">120px<br>Card Hero</div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="mood-strip-title" style="padding:0 0 10px;">5 Stress Moods · Face Reacts</div>
+      <div class="mood-strip">
+        <div class="mood-strip-grid">
+          <div class="mood-strip-cell">
+            <div class="ms-face" style="background:#34C759;"><svg viewBox="0 0 24 24"><circle cx="9" cy="10" r="1.5" fill="currentColor"/><circle cx="15" cy="10" r="1.5" fill="currentColor"/><path d="M9 15s1.5 1.5 3 1.5 3-1.5 3-1.5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></div>
+            <div class="ms-label">Relaxed<br>0-25</div>
+          </div>
+          <div class="mood-strip-cell">
+            <div class="ms-face" style="background:#007AFF;"><svg viewBox="0 0 24 24"><circle cx="9" cy="10" r="1.5" fill="currentColor"/><circle cx="15" cy="10" r="1.5" fill="currentColor"/><path d="M9 15h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+            <div class="ms-label">Mild<br>26-50</div>
+          </div>
+          <div class="mood-strip-cell">
+            <div class="ms-face" style="background:#FFD60A;"><svg viewBox="0 0 24 24"><circle cx="9" cy="10" r="1.5" fill="currentColor"/><circle cx="15" cy="10" r="1.5" fill="currentColor"/><path d="M9 14h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+            <div class="ms-label">Moderate<br>51-75</div>
+          </div>
+          <div class="mood-strip-cell">
+            <div class="ms-face" style="background:#FF9500;"><svg viewBox="0 0 24 24"><circle cx="9" cy="10" r="1.5" fill="currentColor"/><circle cx="15" cy="10" r="1.5" fill="currentColor"/><path d="M9 16c1.5-1.5 4.5-1.5 6 0" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></div>
+            <div class="ms-label">High<br>76-90</div>
+          </div>
+          <div class="mood-strip-cell">
+            <div class="ms-face" style="background:#FF3B30;"><svg viewBox="0 0 24 24"><circle cx="9" cy="10" r="1.5" fill="currentColor"/><circle cx="15" cy="10" r="1.5" fill="currentColor"/><path d="M8 17c2-2 6-2 8 0" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></div>
+            <div class="ms-label">Severe<br>91+</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="evo-strip">
+      <div class="evo-strip-title">Evolution · 3 Stages</div>
+      <div class="evo-grid">
+        <div class="evo-card unlocked">
+          <div class="es-stage"><svg viewBox="0 0 24 24" width="20" height="20" fill="#fff" stroke="#fff" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg></div>
+          <div class="es-name">Tadpole</div>
+          <div class="es-req">Day 1</div>
+        </div>
+        <div class="evo-card locked">
+          <div class="es-stage"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="var(--accent-strong)" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg></div>
+          <div class="es-name">River</div>
+          <div class="es-req">30 days</div>
+        </div>
+        <div class="evo-card locked">
+          <div class="es-stage"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="var(--accent-strong)" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg></div>
+          <div class="es-name">Ocean</div>
+          <div class="es-req">90 days</div>
+        </div>
+      </div>
+    </div>
+    <div class="color-row">
+      <div class="color-strip-title" style="font-family:var(--font-mono);font-size:10px;letter-spacing:0.06em;text-transform:uppercase;color:var(--muted);margin-right:auto;align-self:center;">Color Tokens</div>
+      <div class="color-swatch"><div class="sw" style="background:#4FC3F7;"></div><div class="sw-hex">#4FC3F7</div></div>
+      <div class="color-swatch"><div class="sw" style="background:#B3E5FC;"></div><div class="sw-hex">#B3E5FC</div></div>
+      <div class="color-swatch"><div class="sw" style="background:#1387BB;"></div><div class="sw-hex">#1387BB</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="char-detail" id="char-blossom">
+  <div class="cd-header">
+    <div class="cd-art"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><!-- body --><ellipse cx="50" cy="62" rx="24" ry="22" fill="#A5D6A7"/><ellipse cx="50" cy="68" rx="16" ry="14" fill="#E8F5E9"/><!-- head --><path d="M28 38 L36 18 L48 30 Z" fill="#A5D6A7"/><path d="M72 38 L64 18 L52 30 Z" fill="#A5D6A7"/><circle cx="50" cy="40" r="20" fill="#A5D6A7"/><path d="M30 42 Q50 56 70 42 Q60 50 50 50 Q40 50 30 42 Z" fill="#C8E6C9"/><!-- face --><circle cx="42" cy="42" r="3" fill="#1B5E20"/><circle cx="58" cy="42" r="3" fill="#1B5E20"/><ellipse cx="50" cy="48" rx="2" ry="1.5" fill="#1B5E20"/><path d="M44 52 Q50 56 56 52" stroke="#1B5E20" stroke-width="1.2" fill="none" stroke-linecap="round"/><!-- leaf on head --><path d="M50 20 Q44 14 46 8 Q52 12 50 20 Z" fill="#66BB6A"/><path d="M50 20 L48 12" stroke="#388E3C" stroke-width="0.8"/><!-- tail --><path d="M70 70 Q84 60 82 76 Q78 80 70 76 Z" fill="#A5D6A7"/><path d="M75 70 Q82 65 80 75" stroke="#66BB6A" stroke-width="0.8" fill="none"/></svg></div>
+    <div class="cd-info">
+      <div class="cd-name">Blossom</div>
+      <div class="cd-role" style="color:#A5D6A7;">Forest Sprite · Element of Grounding</div>
+      <p class="cd-quote">"Root down. The forest doesn't hurry, yet everything arrives."</p>
+    </div>
+  </div>
+  <div class="cd-body">
+    <div>
+      <div class="mood-strip-title" style="padding:0 0 10px;">Display Sizes</div>
+      <div class="size-variants">
+        <div class="size-variant">
+          <div class="sv-art" style="width:24px;height:24px;"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><!-- body --><ellipse cx="50" cy="62" rx="24" ry="22" fill="#A5D6A7"/><ellipse cx="50" cy="68" rx="16" ry="14" fill="#E8F5E9"/><!-- head --><path d="M28 38 L36 18 L48 30 Z" fill="#A5D6A7"/><path d="M72 38 L64 18 L52 30 Z" fill="#A5D6A7"/><circle cx="50" cy="40" r="20" fill="#A5D6A7"/><path d="M30 42 Q50 56 70 42 Q60 50 50 50 Q40 50 30 42 Z" fill="#C8E6C9"/><!-- face --><circle cx="42" cy="42" r="3" fill="#1B5E20"/><circle cx="58" cy="42" r="3" fill="#1B5E20"/><ellipse cx="50" cy="48" rx="2" ry="1.5" fill="#1B5E20"/><path d="M44 52 Q50 56 56 52" stroke="#1B5E20" stroke-width="1.2" fill="none" stroke-linecap="round"/><!-- leaf on head --><path d="M50 20 Q44 14 46 8 Q52 12 50 20 Z" fill="#66BB6A"/><path d="M50 20 L48 12" stroke="#388E3C" stroke-width="0.8"/><!-- tail --><path d="M70 70 Q84 60 82 76 Q78 80 70 76 Z" fill="#A5D6A7"/><path d="M75 70 Q82 65 80 75" stroke="#66BB6A" stroke-width="0.8" fill="none"/></svg></div>
+          <div class="sv-label">24px<br>Tab/Favicon</div>
+        </div>
+        <div class="size-variant">
+          <div class="sv-art" style="width:48px;height:48px;"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><!-- body --><ellipse cx="50" cy="62" rx="24" ry="22" fill="#A5D6A7"/><ellipse cx="50" cy="68" rx="16" ry="14" fill="#E8F5E9"/><!-- head --><path d="M28 38 L36 18 L48 30 Z" fill="#A5D6A7"/><path d="M72 38 L64 18 L52 30 Z" fill="#A5D6A7"/><circle cx="50" cy="40" r="20" fill="#A5D6A7"/><path d="M30 42 Q50 56 70 42 Q60 50 50 50 Q40 50 30 42 Z" fill="#C8E6C9"/><!-- face --><circle cx="42" cy="42" r="3" fill="#1B5E20"/><circle cx="58" cy="42" r="3" fill="#1B5E20"/><ellipse cx="50" cy="48" rx="2" ry="1.5" fill="#1B5E20"/><path d="M44 52 Q50 56 56 52" stroke="#1B5E20" stroke-width="1.2" fill="none" stroke-linecap="round"/><!-- leaf on head --><path d="M50 20 Q44 14 46 8 Q52 12 50 20 Z" fill="#66BB6A"/><path d="M50 20 L48 12" stroke="#388E3C" stroke-width="0.8"/><!-- tail --><path d="M70 70 Q84 60 82 76 Q78 80 70 76 Z" fill="#A5D6A7"/><path d="M75 70 Q82 65 80 75" stroke="#66BB6A" stroke-width="0.8" fill="none"/></svg></div>
+          <div class="sv-label">48px<br>List Item</div>
+        </div>
+        <div class="size-variant">
+          <div class="sv-art" style="width:92px;height:92px;"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><!-- body --><ellipse cx="50" cy="62" rx="24" ry="22" fill="#A5D6A7"/><ellipse cx="50" cy="68" rx="16" ry="14" fill="#E8F5E9"/><!-- head --><path d="M28 38 L36 18 L48 30 Z" fill="#A5D6A7"/><path d="M72 38 L64 18 L52 30 Z" fill="#A5D6A7"/><circle cx="50" cy="40" r="20" fill="#A5D6A7"/><path d="M30 42 Q50 56 70 42 Q60 50 50 50 Q40 50 30 42 Z" fill="#C8E6C9"/><!-- face --><circle cx="42" cy="42" r="3" fill="#1B5E20"/><circle cx="58" cy="42" r="3" fill="#1B5E20"/><ellipse cx="50" cy="48" rx="2" ry="1.5" fill="#1B5E20"/><path d="M44 52 Q50 56 56 52" stroke="#1B5E20" stroke-width="1.2" fill="none" stroke-linecap="round"/><!-- leaf on head --><path d="M50 20 Q44 14 46 8 Q52 12 50 20 Z" fill="#66BB6A"/><path d="M50 20 L48 12" stroke="#388E3C" stroke-width="0.8"/><!-- tail --><path d="M70 70 Q84 60 82 76 Q78 80 70 76 Z" fill="#A5D6A7"/><path d="M75 70 Q82 65 80 75" stroke="#66BB6A" stroke-width="0.8" fill="none"/></svg></div>
+          <div class="sv-label">92px<br>Grid Tile</div>
+        </div>
+        <div class="size-variant">
+          <div class="sv-art" style="width:120px;height:120px;"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><!-- body --><ellipse cx="50" cy="62" rx="24" ry="22" fill="#A5D6A7"/><ellipse cx="50" cy="68" rx="16" ry="14" fill="#E8F5E9"/><!-- head --><path d="M28 38 L36 18 L48 30 Z" fill="#A5D6A7"/><path d="M72 38 L64 18 L52 30 Z" fill="#A5D6A7"/><circle cx="50" cy="40" r="20" fill="#A5D6A7"/><path d="M30 42 Q50 56 70 42 Q60 50 50 50 Q40 50 30 42 Z" fill="#C8E6C9"/><!-- face --><circle cx="42" cy="42" r="3" fill="#1B5E20"/><circle cx="58" cy="42" r="3" fill="#1B5E20"/><ellipse cx="50" cy="48" rx="2" ry="1.5" fill="#1B5E20"/><path d="M44 52 Q50 56 56 52" stroke="#1B5E20" stroke-width="1.2" fill="none" stroke-linecap="round"/><!-- leaf on head --><path d="M50 20 Q44 14 46 8 Q52 12 50 20 Z" fill="#66BB6A"/><path d="M50 20 L48 12" stroke="#388E3C" stroke-width="0.8"/><!-- tail --><path d="M70 70 Q84 60 82 76 Q78 80 70 76 Z" fill="#A5D6A7"/><path d="M75 70 Q82 65 80 75" stroke="#66BB6A" stroke-width="0.8" fill="none"/></svg></div>
+          <div class="sv-label">120px<br>Card Hero</div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="mood-strip-title" style="padding:0 0 10px;">5 Stress Moods · Face Reacts</div>
+      <div class="mood-strip">
+        <div class="mood-strip-grid">
+          <div class="mood-strip-cell">
+            <div class="ms-face" style="background:#34C759;"><svg viewBox="0 0 24 24"><circle cx="9" cy="10" r="1.5" fill="currentColor"/><circle cx="15" cy="10" r="1.5" fill="currentColor"/><path d="M9 15s1.5 1.5 3 1.5 3-1.5 3-1.5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></div>
+            <div class="ms-label">Relaxed<br>0-25</div>
+          </div>
+          <div class="mood-strip-cell">
+            <div class="ms-face" style="background:#007AFF;"><svg viewBox="0 0 24 24"><circle cx="9" cy="10" r="1.5" fill="currentColor"/><circle cx="15" cy="10" r="1.5" fill="currentColor"/><path d="M9 15h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+            <div class="ms-label">Mild<br>26-50</div>
+          </div>
+          <div class="mood-strip-cell">
+            <div class="ms-face" style="background:#FFD60A;"><svg viewBox="0 0 24 24"><circle cx="9" cy="10" r="1.5" fill="currentColor"/><circle cx="15" cy="10" r="1.5" fill="currentColor"/><path d="M9 14h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+            <div class="ms-label">Moderate<br>51-75</div>
+          </div>
+          <div class="mood-strip-cell">
+            <div class="ms-face" style="background:#FF9500;"><svg viewBox="0 0 24 24"><circle cx="9" cy="10" r="1.5" fill="currentColor"/><circle cx="15" cy="10" r="1.5" fill="currentColor"/><path d="M9 16c1.5-1.5 4.5-1.5 6 0" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></div>
+            <div class="ms-label">High<br>76-90</div>
+          </div>
+          <div class="mood-strip-cell">
+            <div class="ms-face" style="background:#FF3B30;"><svg viewBox="0 0 24 24"><circle cx="9" cy="10" r="1.5" fill="currentColor"/><circle cx="15" cy="10" r="1.5" fill="currentColor"/><path d="M8 17c2-2 6-2 8 0" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></div>
+            <div class="ms-label">Severe<br>91+</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="evo-strip">
+      <div class="evo-strip-title">Evolution · 3 Stages</div>
+      <div class="evo-grid">
+        <div class="evo-card unlocked">
+          <div class="es-stage"><svg viewBox="0 0 24 24" width="20" height="20" fill="#fff" stroke="#fff" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg></div>
+          <div class="es-name">Seed</div>
+          <div class="es-req">Day 1</div>
+        </div>
+        <div class="evo-card locked">
+          <div class="es-stage"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="var(--accent-strong)" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg></div>
+          <div class="es-name">Sapling</div>
+          <div class="es-req">30 days</div>
+        </div>
+        <div class="evo-card locked">
+          <div class="es-stage"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="var(--accent-strong)" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg></div>
+          <div class="es-name">Canopy</div>
+          <div class="es-req">90 days</div>
+        </div>
+      </div>
+    </div>
+    <div class="color-row">
+      <div class="color-strip-title" style="font-family:var(--font-mono);font-size:10px;letter-spacing:0.06em;text-transform:uppercase;color:var(--muted);margin-right:auto;align-self:center;">Color Tokens</div>
+      <div class="color-swatch"><div class="sw" style="background:#A5D6A7;"></div><div class="sw-hex">#A5D6A7</div></div>
+      <div class="color-swatch"><div class="sw" style="background:#E8F5E9;"></div><div class="sw-hex">#E8F5E9</div></div>
+      <div class="color-swatch"><div class="sw" style="background:#699A6B;"></div><div class="sw-hex">#699A6B</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="char-detail" id="char-ember">
+  <div class="cd-header">
+    <div class="cd-art"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><!-- flame aura --><path d="M30 60 Q20 40 30 20 Q40 30 38 50 Q44 30 50 18 Q56 30 62 50 Q60 30 70 20 Q80 40 70 60 Z" fill="#FF7043" opacity="0.4"/><!-- body --><ellipse cx="50" cy="62" rx="24" ry="22" fill="#FFAB91"/><ellipse cx="50" cy="68" rx="16" ry="14" fill="#FFE0B2"/><!-- head --><path d="M28 38 L34 18 L46 32 Z" fill="#FFAB91"/><path d="M72 38 L66 18 L54 32 Z" fill="#FFAB91"/><circle cx="50" cy="40" r="20" fill="#FFAB91"/><path d="M30 44 Q50 58 70 44 Q60 52 50 52 Q40 52 30 44 Z" fill="#FFCC80"/><!-- flame on head --><path d="M50 18 Q45 12 50 4 Q55 12 50 18 Z" fill="#FF5722"/><!-- face --><circle cx="42" cy="42" r="3" fill="#BF360C"/><circle cx="58" cy="42" r="3" fill="#BF360C"/><ellipse cx="50" cy="48" rx="2" ry="1.5" fill="#BF360C"/><path d="M44 52 Q50 56 56 52" stroke="#BF360C" stroke-width="1.2" fill="none" stroke-linecap="round"/><!-- flame tail --><path d="M70 70 Q84 58 86 76 Q80 84 70 78 Z" fill="#FFAB91"/><path d="M75 72 Q83 64 82 76 Q78 78 75 72" fill="#FF5722"/></svg></div>
+    <div class="cd-info">
+      <div class="cd-name">Ember</div>
+      <div class="cd-role" style="color:#FFAB91;">Flame Fox · Element of Energy</div>
+      <p class="cd-quote">"Burn bright, but don't burn out. I'll keep the fire steady."</p>
+    </div>
+  </div>
+  <div class="cd-body">
+    <div>
+      <div class="mood-strip-title" style="padding:0 0 10px;">Display Sizes</div>
+      <div class="size-variants">
+        <div class="size-variant">
+          <div class="sv-art" style="width:24px;height:24px;"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><!-- flame aura --><path d="M30 60 Q20 40 30 20 Q40 30 38 50 Q44 30 50 18 Q56 30 62 50 Q60 30 70 20 Q80 40 70 60 Z" fill="#FF7043" opacity="0.4"/><!-- body --><ellipse cx="50" cy="62" rx="24" ry="22" fill="#FFAB91"/><ellipse cx="50" cy="68" rx="16" ry="14" fill="#FFE0B2"/><!-- head --><path d="M28 38 L34 18 L46 32 Z" fill="#FFAB91"/><path d="M72 38 L66 18 L54 32 Z" fill="#FFAB91"/><circle cx="50" cy="40" r="20" fill="#FFAB91"/><path d="M30 44 Q50 58 70 44 Q60 52 50 52 Q40 52 30 44 Z" fill="#FFCC80"/><!-- flame on head --><path d="M50 18 Q45 12 50 4 Q55 12 50 18 Z" fill="#FF5722"/><!-- face --><circle cx="42" cy="42" r="3" fill="#BF360C"/><circle cx="58" cy="42" r="3" fill="#BF360C"/><ellipse cx="50" cy="48" rx="2" ry="1.5" fill="#BF360C"/><path d="M44 52 Q50 56 56 52" stroke="#BF360C" stroke-width="1.2" fill="none" stroke-linecap="round"/><!-- flame tail --><path d="M70 70 Q84 58 86 76 Q80 84 70 78 Z" fill="#FFAB91"/><path d="M75 72 Q83 64 82 76 Q78 78 75 72" fill="#FF5722"/></svg></div>
+          <div class="sv-label">24px<br>Tab/Favicon</div>
+        </div>
+        <div class="size-variant">
+          <div class="sv-art" style="width:48px;height:48px;"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><!-- flame aura --><path d="M30 60 Q20 40 30 20 Q40 30 38 50 Q44 30 50 18 Q56 30 62 50 Q60 30 70 20 Q80 40 70 60 Z" fill="#FF7043" opacity="0.4"/><!-- body --><ellipse cx="50" cy="62" rx="24" ry="22" fill="#FFAB91"/><ellipse cx="50" cy="68" rx="16" ry="14" fill="#FFE0B2"/><!-- head --><path d="M28 38 L34 18 L46 32 Z" fill="#FFAB91"/><path d="M72 38 L66 18 L54 32 Z" fill="#FFAB91"/><circle cx="50" cy="40" r="20" fill="#FFAB91"/><path d="M30 44 Q50 58 70 44 Q60 52 50 52 Q40 52 30 44 Z" fill="#FFCC80"/><!-- flame on head --><path d="M50 18 Q45 12 50 4 Q55 12 50 18 Z" fill="#FF5722"/><!-- face --><circle cx="42" cy="42" r="3" fill="#BF360C"/><circle cx="58" cy="42" r="3" fill="#BF360C"/><ellipse cx="50" cy="48" rx="2" ry="1.5" fill="#BF360C"/><path d="M44 52 Q50 56 56 52" stroke="#BF360C" stroke-width="1.2" fill="none" stroke-linecap="round"/><!-- flame tail --><path d="M70 70 Q84 58 86 76 Q80 84 70 78 Z" fill="#FFAB91"/><path d="M75 72 Q83 64 82 76 Q78 78 75 72" fill="#FF5722"/></svg></div>
+          <div class="sv-label">48px<br>List Item</div>
+        </div>
+        <div class="size-variant">
+          <div class="sv-art" style="width:92px;height:92px;"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><!-- flame aura --><path d="M30 60 Q20 40 30 20 Q40 30 38 50 Q44 30 50 18 Q56 30 62 50 Q60 30 70 20 Q80 40 70 60 Z" fill="#FF7043" opacity="0.4"/><!-- body --><ellipse cx="50" cy="62" rx="24" ry="22" fill="#FFAB91"/><ellipse cx="50" cy="68" rx="16" ry="14" fill="#FFE0B2"/><!-- head --><path d="M28 38 L34 18 L46 32 Z" fill="#FFAB91"/><path d="M72 38 L66 18 L54 32 Z" fill="#FFAB91"/><circle cx="50" cy="40" r="20" fill="#FFAB91"/><path d="M30 44 Q50 58 70 44 Q60 52 50 52 Q40 52 30 44 Z" fill="#FFCC80"/><!-- flame on head --><path d="M50 18 Q45 12 50 4 Q55 12 50 18 Z" fill="#FF5722"/><!-- face --><circle cx="42" cy="42" r="3" fill="#BF360C"/><circle cx="58" cy="42" r="3" fill="#BF360C"/><ellipse cx="50" cy="48" rx="2" ry="1.5" fill="#BF360C"/><path d="M44 52 Q50 56 56 52" stroke="#BF360C" stroke-width="1.2" fill="none" stroke-linecap="round"/><!-- flame tail --><path d="M70 70 Q84 58 86 76 Q80 84 70 78 Z" fill="#FFAB91"/><path d="M75 72 Q83 64 82 76 Q78 78 75 72" fill="#FF5722"/></svg></div>
+          <div class="sv-label">92px<br>Grid Tile</div>
+        </div>
+        <div class="size-variant">
+          <div class="sv-art" style="width:120px;height:120px;"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><!-- flame aura --><path d="M30 60 Q20 40 30 20 Q40 30 38 50 Q44 30 50 18 Q56 30 62 50 Q60 30 70 20 Q80 40 70 60 Z" fill="#FF7043" opacity="0.4"/><!-- body --><ellipse cx="50" cy="62" rx="24" ry="22" fill="#FFAB91"/><ellipse cx="50" cy="68" rx="16" ry="14" fill="#FFE0B2"/><!-- head --><path d="M28 38 L34 18 L46 32 Z" fill="#FFAB91"/><path d="M72 38 L66 18 L54 32 Z" fill="#FFAB91"/><circle cx="50" cy="40" r="20" fill="#FFAB91"/><path d="M30 44 Q50 58 70 44 Q60 52 50 52 Q40 52 30 44 Z" fill="#FFCC80"/><!-- flame on head --><path d="M50 18 Q45 12 50 4 Q55 12 50 18 Z" fill="#FF5722"/><!-- face --><circle cx="42" cy="42" r="3" fill="#BF360C"/><circle cx="58" cy="42" r="3" fill="#BF360C"/><ellipse cx="50" cy="48" rx="2" ry="1.5" fill="#BF360C"/><path d="M44 52 Q50 56 56 52" stroke="#BF360C" stroke-width="1.2" fill="none" stroke-linecap="round"/><!-- flame tail --><path d="M70 70 Q84 58 86 76 Q80 84 70 78 Z" fill="#FFAB91"/><path d="M75 72 Q83 64 82 76 Q78 78 75 72" fill="#FF5722"/></svg></div>
+          <div class="sv-label">120px<br>Card Hero</div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="mood-strip-title" style="padding:0 0 10px;">5 Stress Moods · Face Reacts</div>
+      <div class="mood-strip">
+        <div class="mood-strip-grid">
+          <div class="mood-strip-cell">
+            <div class="ms-face" style="background:#34C759;"><svg viewBox="0 0 24 24"><circle cx="9" cy="10" r="1.5" fill="currentColor"/><circle cx="15" cy="10" r="1.5" fill="currentColor"/><path d="M9 15s1.5 1.5 3 1.5 3-1.5 3-1.5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></div>
+            <div class="ms-label">Relaxed<br>0-25</div>
+          </div>
+          <div class="mood-strip-cell">
+            <div class="ms-face" style="background:#007AFF;"><svg viewBox="0 0 24 24"><circle cx="9" cy="10" r="1.5" fill="currentColor"/><circle cx="15" cy="10" r="1.5" fill="currentColor"/><path d="M9 15h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+            <div class="ms-label">Mild<br>26-50</div>
+          </div>
+          <div class="mood-strip-cell">
+            <div class="ms-face" style="background:#FFD60A;"><svg viewBox="0 0 24 24"><circle cx="9" cy="10" r="1.5" fill="currentColor"/><circle cx="15" cy="10" r="1.5" fill="currentColor"/><path d="M9 14h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+            <div class="ms-label">Moderate<br>51-75</div>
+          </div>
+          <div class="mood-strip-cell">
+            <div class="ms-face" style="background:#FF9500;"><svg viewBox="0 0 24 24"><circle cx="9" cy="10" r="1.5" fill="currentColor"/><circle cx="15" cy="10" r="1.5" fill="currentColor"/><path d="M9 16c1.5-1.5 4.5-1.5 6 0" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></div>
+            <div class="ms-label">High<br>76-90</div>
+          </div>
+          <div class="mood-strip-cell">
+            <div class="ms-face" style="background:#FF3B30;"><svg viewBox="0 0 24 24"><circle cx="9" cy="10" r="1.5" fill="currentColor"/><circle cx="15" cy="10" r="1.5" fill="currentColor"/><path d="M8 17c2-2 6-2 8 0" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></div>
+            <div class="ms-label">Severe<br>91+</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="evo-strip">
+      <div class="evo-strip-title">Evolution · 3 Stages</div>
+      <div class="evo-grid">
+        <div class="evo-card unlocked">
+          <div class="es-stage"><svg viewBox="0 0 24 24" width="20" height="20" fill="#fff" stroke="#fff" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg></div>
+          <div class="es-name">Spark</div>
+          <div class="es-req">Day 1</div>
+        </div>
+        <div class="evo-card locked">
+          <div class="es-stage"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="var(--accent-strong)" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg></div>
+          <div class="es-name">Flame</div>
+          <div class="es-req">30 days</div>
+        </div>
+        <div class="evo-card locked">
+          <div class="es-stage"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="var(--accent-strong)" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg></div>
+          <div class="es-name">Blaze</div>
+          <div class="es-req">90 days</div>
+        </div>
+      </div>
+    </div>
+    <div class="color-row">
+      <div class="color-strip-title" style="font-family:var(--font-mono);font-size:10px;letter-spacing:0.06em;text-transform:uppercase;color:var(--muted);margin-right:auto;align-self:center;">Color Tokens</div>
+      <div class="color-swatch"><div class="sw" style="background:#FFAB91;"></div><div class="sw-hex">#FFAB91</div></div>
+      <div class="color-swatch"><div class="sw" style="background:#FFE0B2;"></div><div class="sw-hex">#FFE0B2</div></div>
+      <div class="color-swatch"><div class="sw" style="background:#C36F55;"></div><div class="sw-hex">#C36F55</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="char-detail" id="char-zephyr">
+  <div class="cd-header">
+    <div class="cd-art"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><!-- wind swirls --><path d="M20 50 Q12 40 22 36 M22 36 Q32 38 30 50" stroke="#D1C4E9" stroke-width="1.5" fill="none" stroke-linecap="round"/><path d="M80 50 Q88 40 78 36 M78 36 Q68 38 70 50" stroke="#D1C4E9" stroke-width="1.5" fill="none" stroke-linecap="round"/><!-- body (cloud-like) --><ellipse cx="50" cy="60" rx="24" ry="22" fill="#D1C4E9"/><ellipse cx="50" cy="68" rx="16" ry="14" fill="#F3E5F5"/><!-- head --><ellipse cx="36" cy="22" rx="6" ry="14" fill="#D1C4E9" transform="rotate(-15 36 22)"/><ellipse cx="64" cy="22" rx="6" ry="14" fill="#D1C4E9" transform="rotate(15 64 22)"/><ellipse cx="36" cy="22" rx="3" ry="10" fill="#E1BEE7" transform="rotate(-15 36 22)"/><ellipse cx="64" cy="22" rx="3" ry="10" fill="#E1BEE7" transform="rotate(15 64 22)"/><circle cx="50" cy="40" r="20" fill="#D1C4E9"/><circle cx="50" cy="44" r="14" fill="#F3E5F5"/><!-- face --><circle cx="42" cy="42" r="3" fill="#4527A0"/><circle cx="58" cy="42" r="3" fill="#4527A0"/><ellipse cx="50" cy="48" rx="2" ry="1.5" fill="#4527A0"/><path d="M44 52 Q50 56 56 52" stroke="#4527A0" stroke-width="1.2" fill="none" stroke-linecap="round"/><!-- puff tail --><circle cx="76" cy="64" r="9" fill="#E1BEE7"/></svg></div>
+    <div class="cd-info">
+      <div class="cd-name">Zephyr</div>
+      <div class="cd-role" style="color:#D1C4E9;">Wind Wisp · Element of Lightness</div>
+      <p class="cd-quote">"Let it pass through you. Wind never stays."</p>
+    </div>
+  </div>
+  <div class="cd-body">
+    <div>
+      <div class="mood-strip-title" style="padding:0 0 10px;">Display Sizes</div>
+      <div class="size-variants">
+        <div class="size-variant">
+          <div class="sv-art" style="width:24px;height:24px;"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><!-- wind swirls --><path d="M20 50 Q12 40 22 36 M22 36 Q32 38 30 50" stroke="#D1C4E9" stroke-width="1.5" fill="none" stroke-linecap="round"/><path d="M80 50 Q88 40 78 36 M78 36 Q68 38 70 50" stroke="#D1C4E9" stroke-width="1.5" fill="none" stroke-linecap="round"/><!-- body (cloud-like) --><ellipse cx="50" cy="60" rx="24" ry="22" fill="#D1C4E9"/><ellipse cx="50" cy="68" rx="16" ry="14" fill="#F3E5F5"/><!-- head --><ellipse cx="36" cy="22" rx="6" ry="14" fill="#D1C4E9" transform="rotate(-15 36 22)"/><ellipse cx="64" cy="22" rx="6" ry="14" fill="#D1C4E9" transform="rotate(15 64 22)"/><ellipse cx="36" cy="22" rx="3" ry="10" fill="#E1BEE7" transform="rotate(-15 36 22)"/><ellipse cx="64" cy="22" rx="3" ry="10" fill="#E1BEE7" transform="rotate(15 64 22)"/><circle cx="50" cy="40" r="20" fill="#D1C4E9"/><circle cx="50" cy="44" r="14" fill="#F3E5F5"/><!-- face --><circle cx="42" cy="42" r="3" fill="#4527A0"/><circle cx="58" cy="42" r="3" fill="#4527A0"/><ellipse cx="50" cy="48" rx="2" ry="1.5" fill="#4527A0"/><path d="M44 52 Q50 56 56 52" stroke="#4527A0" stroke-width="1.2" fill="none" stroke-linecap="round"/><!-- puff tail --><circle cx="76" cy="64" r="9" fill="#E1BEE7"/></svg></div>
+          <div class="sv-label">24px<br>Tab/Favicon</div>
+        </div>
+        <div class="size-variant">
+          <div class="sv-art" style="width:48px;height:48px;"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><!-- wind swirls --><path d="M20 50 Q12 40 22 36 M22 36 Q32 38 30 50" stroke="#D1C4E9" stroke-width="1.5" fill="none" stroke-linecap="round"/><path d="M80 50 Q88 40 78 36 M78 36 Q68 38 70 50" stroke="#D1C4E9" stroke-width="1.5" fill="none" stroke-linecap="round"/><!-- body (cloud-like) --><ellipse cx="50" cy="60" rx="24" ry="22" fill="#D1C4E9"/><ellipse cx="50" cy="68" rx="16" ry="14" fill="#F3E5F5"/><!-- head --><ellipse cx="36" cy="22" rx="6" ry="14" fill="#D1C4E9" transform="rotate(-15 36 22)"/><ellipse cx="64" cy="22" rx="6" ry="14" fill="#D1C4E9" transform="rotate(15 64 22)"/><ellipse cx="36" cy="22" rx="3" ry="10" fill="#E1BEE7" transform="rotate(-15 36 22)"/><ellipse cx="64" cy="22" rx="3" ry="10" fill="#E1BEE7" transform="rotate(15 64 22)"/><circle cx="50" cy="40" r="20" fill="#D1C4E9"/><circle cx="50" cy="44" r="14" fill="#F3E5F5"/><!-- face --><circle cx="42" cy="42" r="3" fill="#4527A0"/><circle cx="58" cy="42" r="3" fill="#4527A0"/><ellipse cx="50" cy="48" rx="2" ry="1.5" fill="#4527A0"/><path d="M44 52 Q50 56 56 52" stroke="#4527A0" stroke-width="1.2" fill="none" stroke-linecap="round"/><!-- puff tail --><circle cx="76" cy="64" r="9" fill="#E1BEE7"/></svg></div>
+          <div class="sv-label">48px<br>List Item</div>
+        </div>
+        <div class="size-variant">
+          <div class="sv-art" style="width:92px;height:92px;"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><!-- wind swirls --><path d="M20 50 Q12 40 22 36 M22 36 Q32 38 30 50" stroke="#D1C4E9" stroke-width="1.5" fill="none" stroke-linecap="round"/><path d="M80 50 Q88 40 78 36 M78 36 Q68 38 70 50" stroke="#D1C4E9" stroke-width="1.5" fill="none" stroke-linecap="round"/><!-- body (cloud-like) --><ellipse cx="50" cy="60" rx="24" ry="22" fill="#D1C4E9"/><ellipse cx="50" cy="68" rx="16" ry="14" fill="#F3E5F5"/><!-- head --><ellipse cx="36" cy="22" rx="6" ry="14" fill="#D1C4E9" transform="rotate(-15 36 22)"/><ellipse cx="64" cy="22" rx="6" ry="14" fill="#D1C4E9" transform="rotate(15 64 22)"/><ellipse cx="36" cy="22" rx="3" ry="10" fill="#E1BEE7" transform="rotate(-15 36 22)"/><ellipse cx="64" cy="22" rx="3" ry="10" fill="#E1BEE7" transform="rotate(15 64 22)"/><circle cx="50" cy="40" r="20" fill="#D1C4E9"/><circle cx="50" cy="44" r="14" fill="#F3E5F5"/><!-- face --><circle cx="42" cy="42" r="3" fill="#4527A0"/><circle cx="58" cy="42" r="3" fill="#4527A0"/><ellipse cx="50" cy="48" rx="2" ry="1.5" fill="#4527A0"/><path d="M44 52 Q50 56 56 52" stroke="#4527A0" stroke-width="1.2" fill="none" stroke-linecap="round"/><!-- puff tail --><circle cx="76" cy="64" r="9" fill="#E1BEE7"/></svg></div>
+          <div class="sv-label">92px<br>Grid Tile</div>
+        </div>
+        <div class="size-variant">
+          <div class="sv-art" style="width:120px;height:120px;"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><!-- wind swirls --><path d="M20 50 Q12 40 22 36 M22 36 Q32 38 30 50" stroke="#D1C4E9" stroke-width="1.5" fill="none" stroke-linecap="round"/><path d="M80 50 Q88 40 78 36 M78 36 Q68 38 70 50" stroke="#D1C4E9" stroke-width="1.5" fill="none" stroke-linecap="round"/><!-- body (cloud-like) --><ellipse cx="50" cy="60" rx="24" ry="22" fill="#D1C4E9"/><ellipse cx="50" cy="68" rx="16" ry="14" fill="#F3E5F5"/><!-- head --><ellipse cx="36" cy="22" rx="6" ry="14" fill="#D1C4E9" transform="rotate(-15 36 22)"/><ellipse cx="64" cy="22" rx="6" ry="14" fill="#D1C4E9" transform="rotate(15 64 22)"/><ellipse cx="36" cy="22" rx="3" ry="10" fill="#E1BEE7" transform="rotate(-15 36 22)"/><ellipse cx="64" cy="22" rx="3" ry="10" fill="#E1BEE7" transform="rotate(15 64 22)"/><circle cx="50" cy="40" r="20" fill="#D1C4E9"/><circle cx="50" cy="44" r="14" fill="#F3E5F5"/><!-- face --><circle cx="42" cy="42" r="3" fill="#4527A0"/><circle cx="58" cy="42" r="3" fill="#4527A0"/><ellipse cx="50" cy="48" rx="2" ry="1.5" fill="#4527A0"/><path d="M44 52 Q50 56 56 52" stroke="#4527A0" stroke-width="1.2" fill="none" stroke-linecap="round"/><!-- puff tail --><circle cx="76" cy="64" r="9" fill="#E1BEE7"/></svg></div>
+          <div class="sv-label">120px<br>Card Hero</div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="mood-strip-title" style="padding:0 0 10px;">5 Stress Moods · Face Reacts</div>
+      <div class="mood-strip">
+        <div class="mood-strip-grid">
+          <div class="mood-strip-cell">
+            <div class="ms-face" style="background:#34C759;"><svg viewBox="0 0 24 24"><circle cx="9" cy="10" r="1.5" fill="currentColor"/><circle cx="15" cy="10" r="1.5" fill="currentColor"/><path d="M9 15s1.5 1.5 3 1.5 3-1.5 3-1.5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></div>
+            <div class="ms-label">Relaxed<br>0-25</div>
+          </div>
+          <div class="mood-strip-cell">
+            <div class="ms-face" style="background:#007AFF;"><svg viewBox="0 0 24 24"><circle cx="9" cy="10" r="1.5" fill="currentColor"/><circle cx="15" cy="10" r="1.5" fill="currentColor"/><path d="M9 15h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+            <div class="ms-label">Mild<br>26-50</div>
+          </div>
+          <div class="mood-strip-cell">
+            <div class="ms-face" style="background:#FFD60A;"><svg viewBox="0 0 24 24"><circle cx="9" cy="10" r="1.5" fill="currentColor"/><circle cx="15" cy="10" r="1.5" fill="currentColor"/><path d="M9 14h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+            <div class="ms-label">Moderate<br>51-75</div>
+          </div>
+          <div class="mood-strip-cell">
+            <div class="ms-face" style="background:#FF9500;"><svg viewBox="0 0 24 24"><circle cx="9" cy="10" r="1.5" fill="currentColor"/><circle cx="15" cy="10" r="1.5" fill="currentColor"/><path d="M9 16c1.5-1.5 4.5-1.5 6 0" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></div>
+            <div class="ms-label">High<br>76-90</div>
+          </div>
+          <div class="mood-strip-cell">
+            <div class="ms-face" style="background:#FF3B30;"><svg viewBox="0 0 24 24"><circle cx="9" cy="10" r="1.5" fill="currentColor"/><circle cx="15" cy="10" r="1.5" fill="currentColor"/><path d="M8 17c2-2 6-2 8 0" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></div>
+            <div class="ms-label">Severe<br>91+</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="evo-strip">
+      <div class="evo-strip-title">Evolution · 3 Stages</div>
+      <div class="evo-grid">
+        <div class="evo-card unlocked">
+          <div class="es-stage"><svg viewBox="0 0 24 24" width="20" height="20" fill="#fff" stroke="#fff" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg></div>
+          <div class="es-name">Breeze</div>
+          <div class="es-req">Day 1</div>
+        </div>
+        <div class="evo-card locked">
+          <div class="es-stage"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="var(--accent-strong)" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg></div>
+          <div class="es-name">Gust</div>
+          <div class="es-req">30 days</div>
+        </div>
+        <div class="evo-card locked">
+          <div class="es-stage"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="var(--accent-strong)" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg></div>
+          <div class="es-name">Tempest</div>
+          <div class="es-req">90 days</div>
+        </div>
+      </div>
+    </div>
+    <div class="color-row">
+      <div class="color-strip-title" style="font-family:var(--font-mono);font-size:10px;letter-spacing:0.06em;text-transform:uppercase;color:var(--muted);margin-right:auto;align-self:center;">Color Tokens</div>
+      <div class="color-swatch"><div class="sw" style="background:#D1C4E9;"></div><div class="sw-hex">#D1C4E9</div></div>
+      <div class="color-swatch"><div class="sw" style="background:#F3E5F5;"></div><div class="sw-hex">#F3E5F5</div></div>
+      <div class="color-swatch"><div class="sw" style="background:#9588AD;"></div><div class="sw-hex">#9588AD</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="char-detail" id="char-lumi">
+  <div class="cd-header">
+    <div class="cd-art"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><!-- star sparkles --><path d="M20 30 L22 24 L24 30 L30 32 L24 34 L22 40 L20 34 L14 32 Z" fill="#FFE082"/><path d="M80 24 L81 20 L82 24 L86 25 L82 26 L81 30 L80 26 L76 25 Z" fill="#FFE082"/><!-- body --><ellipse cx="50" cy="62" rx="24" ry="24" fill="#7986CB"/><ellipse cx="50" cy="68" rx="16" ry="16" fill="#C5CAE9"/><!-- head --><path d="M30 30 L40 18 L44 30 Z" fill="#7986CB"/><path d="M70 30 L60 18 L56 30 Z" fill="#7986CB"/><circle cx="50" cy="40" r="22" fill="#7986CB"/><!-- big owl eyes --><circle cx="42" cy="42" r="7" fill="#FFE082"/><circle cx="58" cy="42" r="7" fill="#FFE082"/><circle cx="42" cy="42" r="4" fill="#1A237E"/><circle cx="58" cy="42" r="4" fill="#1A237E"/><circle cx="44" cy="40" r="1.5" fill="#fff"/><circle cx="60" cy="40" r="1.5" fill="#fff"/><!-- beak --><path d="M48 50 L52 50 L50 56 Z" fill="#FFB74D"/><!-- stars on body --><path d="M50 72 L52 68 L54 72 L58 74 L54 76 L52 80 L50 76 L46 74 L50 72 Z" fill="#FFE082" opacity="0.8"/><!-- wing --><path d="M28 60 Q22 70 28 78 Q32 70 32 64 Z" fill="#5C6BC0"/><path d="M72 60 Q78 70 72 78 Q68 70 68 64 Z" fill="#5C6BC0"/></svg></div>
+    <div class="cd-info">
+      <div class="cd-name">Lumi</div>
+      <div class="cd-role" style="color:#7986CB;">Star Pup · Owl · Element of Rest</div>
+      <p class="cd-quote">"Even stars rest behind clouds. Your glow returns at dawn."</p>
+    </div>
+  </div>
+  <div class="cd-body">
+    <div>
+      <div class="mood-strip-title" style="padding:0 0 10px;">Display Sizes</div>
+      <div class="size-variants">
+        <div class="size-variant">
+          <div class="sv-art" style="width:24px;height:24px;"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><!-- star sparkles --><path d="M20 30 L22 24 L24 30 L30 32 L24 34 L22 40 L20 34 L14 32 Z" fill="#FFE082"/><path d="M80 24 L81 20 L82 24 L86 25 L82 26 L81 30 L80 26 L76 25 Z" fill="#FFE082"/><!-- body --><ellipse cx="50" cy="62" rx="24" ry="24" fill="#7986CB"/><ellipse cx="50" cy="68" rx="16" ry="16" fill="#C5CAE9"/><!-- head --><path d="M30 30 L40 18 L44 30 Z" fill="#7986CB"/><path d="M70 30 L60 18 L56 30 Z" fill="#7986CB"/><circle cx="50" cy="40" r="22" fill="#7986CB"/><!-- big owl eyes --><circle cx="42" cy="42" r="7" fill="#FFE082"/><circle cx="58" cy="42" r="7" fill="#FFE082"/><circle cx="42" cy="42" r="4" fill="#1A237E"/><circle cx="58" cy="42" r="4" fill="#1A237E"/><circle cx="44" cy="40" r="1.5" fill="#fff"/><circle cx="60" cy="40" r="1.5" fill="#fff"/><!-- beak --><path d="M48 50 L52 50 L50 56 Z" fill="#FFB74D"/><!-- stars on body --><path d="M50 72 L52 68 L54 72 L58 74 L54 76 L52 80 L50 76 L46 74 L50 72 Z" fill="#FFE082" opacity="0.8"/><!-- wing --><path d="M28 60 Q22 70 28 78 Q32 70 32 64 Z" fill="#5C6BC0"/><path d="M72 60 Q78 70 72 78 Q68 70 68 64 Z" fill="#5C6BC0"/></svg></div>
+          <div class="sv-label">24px<br>Tab/Favicon</div>
+        </div>
+        <div class="size-variant">
+          <div class="sv-art" style="width:48px;height:48px;"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><!-- star sparkles --><path d="M20 30 L22 24 L24 30 L30 32 L24 34 L22 40 L20 34 L14 32 Z" fill="#FFE082"/><path d="M80 24 L81 20 L82 24 L86 25 L82 26 L81 30 L80 26 L76 25 Z" fill="#FFE082"/><!-- body --><ellipse cx="50" cy="62" rx="24" ry="24" fill="#7986CB"/><ellipse cx="50" cy="68" rx="16" ry="16" fill="#C5CAE9"/><!-- head --><path d="M30 30 L40 18 L44 30 Z" fill="#7986CB"/><path d="M70 30 L60 18 L56 30 Z" fill="#7986CB"/><circle cx="50" cy="40" r="22" fill="#7986CB"/><!-- big owl eyes --><circle cx="42" cy="42" r="7" fill="#FFE082"/><circle cx="58" cy="42" r="7" fill="#FFE082"/><circle cx="42" cy="42" r="4" fill="#1A237E"/><circle cx="58" cy="42" r="4" fill="#1A237E"/><circle cx="44" cy="40" r="1.5" fill="#fff"/><circle cx="60" cy="40" r="1.5" fill="#fff"/><!-- beak --><path d="M48 50 L52 50 L50 56 Z" fill="#FFB74D"/><!-- stars on body --><path d="M50 72 L52 68 L54 72 L58 74 L54 76 L52 80 L50 76 L46 74 L50 72 Z" fill="#FFE082" opacity="0.8"/><!-- wing --><path d="M28 60 Q22 70 28 78 Q32 70 32 64 Z" fill="#5C6BC0"/><path d="M72 60 Q78 70 72 78 Q68 70 68 64 Z" fill="#5C6BC0"/></svg></div>
+          <div class="sv-label">48px<br>List Item</div>
+        </div>
+        <div class="size-variant">
+          <div class="sv-art" style="width:92px;height:92px;"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><!-- star sparkles --><path d="M20 30 L22 24 L24 30 L30 32 L24 34 L22 40 L20 34 L14 32 Z" fill="#FFE082"/><path d="M80 24 L81 20 L82 24 L86 25 L82 26 L81 30 L80 26 L76 25 Z" fill="#FFE082"/><!-- body --><ellipse cx="50" cy="62" rx="24" ry="24" fill="#7986CB"/><ellipse cx="50" cy="68" rx="16" ry="16" fill="#C5CAE9"/><!-- head --><path d="M30 30 L40 18 L44 30 Z" fill="#7986CB"/><path d="M70 30 L60 18 L56 30 Z" fill="#7986CB"/><circle cx="50" cy="40" r="22" fill="#7986CB"/><!-- big owl eyes --><circle cx="42" cy="42" r="7" fill="#FFE082"/><circle cx="58" cy="42" r="7" fill="#FFE082"/><circle cx="42" cy="42" r="4" fill="#1A237E"/><circle cx="58" cy="42" r="4" fill="#1A237E"/><circle cx="44" cy="40" r="1.5" fill="#fff"/><circle cx="60" cy="40" r="1.5" fill="#fff"/><!-- beak --><path d="M48 50 L52 50 L50 56 Z" fill="#FFB74D"/><!-- stars on body --><path d="M50 72 L52 68 L54 72 L58 74 L54 76 L52 80 L50 76 L46 74 L50 72 Z" fill="#FFE082" opacity="0.8"/><!-- wing --><path d="M28 60 Q22 70 28 78 Q32 70 32 64 Z" fill="#5C6BC0"/><path d="M72 60 Q78 70 72 78 Q68 70 68 64 Z" fill="#5C6BC0"/></svg></div>
+          <div class="sv-label">92px<br>Grid Tile</div>
+        </div>
+        <div class="size-variant">
+          <div class="sv-art" style="width:120px;height:120px;"><svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"><!-- star sparkles --><path d="M20 30 L22 24 L24 30 L30 32 L24 34 L22 40 L20 34 L14 32 Z" fill="#FFE082"/><path d="M80 24 L81 20 L82 24 L86 25 L82 26 L81 30 L80 26 L76 25 Z" fill="#FFE082"/><!-- body --><ellipse cx="50" cy="62" rx="24" ry="24" fill="#7986CB"/><ellipse cx="50" cy="68" rx="16" ry="16" fill="#C5CAE9"/><!-- head --><path d="M30 30 L40 18 L44 30 Z" fill="#7986CB"/><path d="M70 30 L60 18 L56 30 Z" fill="#7986CB"/><circle cx="50" cy="40" r="22" fill="#7986CB"/><!-- big owl eyes --><circle cx="42" cy="42" r="7" fill="#FFE082"/><circle cx="58" cy="42" r="7" fill="#FFE082"/><circle cx="42" cy="42" r="4" fill="#1A237E"/><circle cx="58" cy="42" r="4" fill="#1A237E"/><circle cx="44" cy="40" r="1.5" fill="#fff"/><circle cx="60" cy="40" r="1.5" fill="#fff"/><!-- beak --><path d="M48 50 L52 50 L50 56 Z" fill="#FFB74D"/><!-- stars on body --><path d="M50 72 L52 68 L54 72 L58 74 L54 76 L52 80 L50 76 L46 74 L50 72 Z" fill="#FFE082" opacity="0.8"/><!-- wing --><path d="M28 60 Q22 70 28 78 Q32 70 32 64 Z" fill="#5C6BC0"/><path d="M72 60 Q78 70 72 78 Q68 70 68 64 Z" fill="#5C6BC0"/></svg></div>
+          <div class="sv-label">120px<br>Card Hero</div>
+        </div>
+      </div>
+    </div>
+    <div>
+      <div class="mood-strip-title" style="padding:0 0 10px;">5 Stress Moods · Face Reacts</div>
+      <div class="mood-strip">
+        <div class="mood-strip-grid">
+          <div class="mood-strip-cell">
+            <div class="ms-face" style="background:#34C759;"><svg viewBox="0 0 24 24"><circle cx="9" cy="10" r="1.5" fill="currentColor"/><circle cx="15" cy="10" r="1.5" fill="currentColor"/><path d="M9 15s1.5 1.5 3 1.5 3-1.5 3-1.5" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></div>
+            <div class="ms-label">Relaxed<br>0-25</div>
+          </div>
+          <div class="mood-strip-cell">
+            <div class="ms-face" style="background:#007AFF;"><svg viewBox="0 0 24 24"><circle cx="9" cy="10" r="1.5" fill="currentColor"/><circle cx="15" cy="10" r="1.5" fill="currentColor"/><path d="M9 15h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+            <div class="ms-label">Mild<br>26-50</div>
+          </div>
+          <div class="mood-strip-cell">
+            <div class="ms-face" style="background:#FFD60A;"><svg viewBox="0 0 24 24"><circle cx="9" cy="10" r="1.5" fill="currentColor"/><circle cx="15" cy="10" r="1.5" fill="currentColor"/><path d="M9 14h6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg></div>
+            <div class="ms-label">Moderate<br>51-75</div>
+          </div>
+          <div class="mood-strip-cell">
+            <div class="ms-face" style="background:#FF9500;"><svg viewBox="0 0 24 24"><circle cx="9" cy="10" r="1.5" fill="currentColor"/><circle cx="15" cy="10" r="1.5" fill="currentColor"/><path d="M9 16c1.5-1.5 4.5-1.5 6 0" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></div>
+            <div class="ms-label">High<br>76-90</div>
+          </div>
+          <div class="mood-strip-cell">
+            <div class="ms-face" style="background:#FF3B30;"><svg viewBox="0 0 24 24"><circle cx="9" cy="10" r="1.5" fill="currentColor"/><circle cx="15" cy="10" r="1.5" fill="currentColor"/><path d="M8 17c2-2 6-2 8 0" stroke="currentColor" stroke-width="1.5" fill="none" stroke-linecap="round"/></svg></div>
+            <div class="ms-label">Severe<br>91+</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="evo-strip">
+      <div class="evo-strip-title">Evolution · 3 Stages</div>
+      <div class="evo-grid">
+        <div class="evo-card unlocked">
+          <div class="es-stage"><svg viewBox="0 0 24 24" width="20" height="20" fill="#fff" stroke="#fff" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg></div>
+          <div class="es-name">Glimmer</div>
+          <div class="es-req">Day 1</div>
+        </div>
+        <div class="evo-card locked">
+          <div class="es-stage"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="var(--accent-strong)" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg></div>
+          <div class="es-name">Twinkle</div>
+          <div class="es-req">30 days</div>
+        </div>
+        <div class="evo-card locked">
+          <div class="es-stage"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="var(--accent-strong)" stroke-width="2"><circle cx="12" cy="12" r="9"/></svg></div>
+          <div class="es-name">Supernova</div>
+          <div class="es-req">90 days</div>
+        </div>
+      </div>
+    </div>
+    <div class="color-row">
+      <div class="color-strip-title" style="font-family:var(--font-mono);font-size:10px;letter-spacing:0.06em;text-transform:uppercase;color:var(--muted);margin-right:auto;align-self:center;">Color Tokens</div>
+      <div class="color-swatch"><div class="sw" style="background:#7986CB;"></div><div class="sw-hex">#7986CB</div></div>
+      <div class="color-swatch"><div class="sw" style="background:#C5CAE9;"></div><div class="sw-hex">#C5CAE9</div></div>
+      <div class="color-swatch"><div class="sw" style="background:#3D4A8F;"></div><div class="sw-hex">#3D4A8F</div></div>
+    </div>
+  </div>
+</div>
+
+<div style="margin-top:48px;padding:32px;background:var(--surface);border-radius:24px;border:1px solid var(--separator);">
+  <h2 style="font-family:var(--font-display);font-size:22px;font-weight:700;margin-bottom:8px;">Raw SVG Source</h2>
+  <p style="font-size:14px;color:var(--muted);margin-bottom:20px;">Copy-paste ready SVG markup for each character at 100x100 viewBox. For SwiftUI, use <code style="font-family:var(--font-mono);font-size:12px;background:rgba(0,0,0,0.04);padding:2px 6px;border-radius:4px;">Image(svgName:)</code> with these as .svg assets in the Asset Catalog.</p>
+  <div style="margin-bottom:16px;">
+    <div style="font-family:var(--font-mono);font-size:11px;font-weight:600;color:#4FC3F7;margin-bottom:6px;">Ripple (ripple.svg)</div>
+    <pre style="background:#101223;color:#B3E5FC;padding:16px;border-radius:10px;font-family:var(--font-mono);font-size:10px;line-height:1.5;overflow-x:auto;white-space:pre-wrap;word-break:break-all;">&lt;svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"&gt;&lt;ellipse cx="50" cy="55" rx="26" ry="28" fill="#4FC3F7"/&gt;&lt;ellipse cx="50" cy="62" rx="18" ry="20" fill="#B3E5FC"/&gt;&lt;circle cx="50" cy="38" r="20" fill="#4FC3F7"/&gt;&lt;circle cx="50" cy="42" r="14" fill="#E1F5FE"/&gt;&lt;circle cx="40" cy="24" r="5" fill="#4FC3F7"/&gt;&lt;circle cx="60" cy="24" r="5" fill="#4FC3F7"/&gt;&lt;circle cx="43" cy="40" r="3" fill="#101223"/&gt;&lt;circle cx="57" cy="40" r="3" fill="#101223"/&gt;&lt;ellipse cx="50" cy="46" rx="1.6" ry="1.2" fill="#101223"/&gt;&lt;path d="M44 50 Q50 54 56 50" stroke="#101223" stroke-width="1.2" fill="none" stroke-linecap="round"/&gt;&lt;/svg&gt;</pre>
+  </div>
+  <div style="margin-bottom:16px;">
+    <div style="font-family:var(--font-mono);font-size:11px;font-weight:600;color:#A5D6A7;margin-bottom:6px;">Blossom (blossom.svg)</div>
+    <pre style="background:#101223;color:#B3E5FC;padding:16px;border-radius:10px;font-family:var(--font-mono);font-size:10px;line-height:1.5;overflow-x:auto;white-space:pre-wrap;word-break:break-all;">&lt;svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"&gt;&lt;!-- body --&gt;&lt;ellipse cx="50" cy="62" rx="24" ry="22" fill="#A5D6A7"/&gt;&lt;ellipse cx="50" cy="68" rx="16" ry="14" fill="#E8F5E9"/&gt;&lt;!-- head --&gt;&lt;path d="M28 38 L36 18 L48 30 Z" fill="#A5D6A7"/&gt;&lt;path d="M72 38 L64 18 L52 30 Z" fill="#A5D6A7"/&gt;&lt;circle cx="50" cy="40" r="20" fill="#A5D6A7"/&gt;&lt;path d="M30 42 Q50 56 70 42 Q60 50 50 50 Q40 50 30 42 Z" fill="#C8E6C9"/&gt;&lt;!-- face --&gt;&lt;circle cx="42" cy="42" r="3" fill="#1B5E20"/&gt;&lt;circle cx="58" cy="42" r="3" fill="#1B5E20"/&gt;&lt;ellipse cx="50" cy="48" rx="2" ry="1.5" fill="#1B5E20"/&gt;&lt;path d="M44 52 Q50 56 56 52" stroke="#1B5E20" stroke-width="1.2" fill="none" stroke-linecap="round"/&gt;&lt;!-- leaf on head --&gt;&lt;path d="M50 20 Q44 14 46 8 Q52 12 50 20 Z" fill="#66BB6A"/&gt;&lt;path d="M50 20 L48 12" stroke="#388E3C" stroke-width="0.8"/&gt;&lt;!-- tail --&gt;&lt;path d="M70 70 Q84 60 82 76 Q78 80 70 76 Z" fill="#A5D6A7"/&gt;&lt;path d="M75 70 Q82 65 80 75" stroke="#66BB6A" stroke-width="0.8" fill="none"/&gt;&lt;/svg&gt;</pre>
+  </div>
+  <div style="margin-bottom:16px;">
+    <div style="font-family:var(--font-mono);font-size:11px;font-weight:600;color:#FFAB91;margin-bottom:6px;">Ember (ember.svg)</div>
+    <pre style="background:#101223;color:#B3E5FC;padding:16px;border-radius:10px;font-family:var(--font-mono);font-size:10px;line-height:1.5;overflow-x:auto;white-space:pre-wrap;word-break:break-all;">&lt;svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"&gt;&lt;!-- flame aura --&gt;&lt;path d="M30 60 Q20 40 30 20 Q40 30 38 50 Q44 30 50 18 Q56 30 62 50 Q60 30 70 20 Q80 40 70 60 Z" fill="#FF7043" opacity="0.4"/&gt;&lt;!-- body --&gt;&lt;ellipse cx="50" cy="62" rx="24" ry="22" fill="#FFAB91"/&gt;&lt;ellipse cx="50" cy="68" rx="16" ry="14" fill="#FFE0B2"/&gt;&lt;!-- head --&gt;&lt;path d="M28 38 L34 18 L46 32 Z" fill="#FFAB91"/&gt;&lt;path d="M72 38 L66 18 L54 32 Z" fill="#FFAB91"/&gt;&lt;circle cx="50" cy="40" r="20" fill="#FFAB91"/&gt;&lt;path d="M30 44 Q50 58 70 44 Q60 52 50 52 Q40 52 30 44 Z" fill="#FFCC80"/&gt;&lt;!-- flame on head --&gt;&lt;path d="M50 18 Q45 12 50 4 Q55 12 50 18 Z" fill="#FF5722"/&gt;&lt;!-- face --&gt;&lt;circle cx="42" cy="42" r="3" fill="#BF360C"/&gt;&lt;circle cx="58" cy="42" r="3" fill="#BF360C"/&gt;&lt;ellipse cx="50" cy="48" rx="2" ry="1.5" fill="#BF360C"/&gt;&lt;path d="M44 52 Q50 56 56 52" stroke="#BF360C" stroke-width="1.2" fill="none" stroke-linecap="round"/&gt;&lt;!-- flame tail --&gt;&lt;path d="M70 70 Q84 58 86 76 Q80 84 70 78 Z" fill="#FFAB91"/&gt;&lt;path d="M75 72 Q83 64 82 76 Q78 78 75 72" fill="#FF5722"/&gt;&lt;/svg&gt;</pre>
+  </div>
+  <div style="margin-bottom:16px;">
+    <div style="font-family:var(--font-mono);font-size:11px;font-weight:600;color:#D1C4E9;margin-bottom:6px;">Zephyr (zephyr.svg)</div>
+    <pre style="background:#101223;color:#B3E5FC;padding:16px;border-radius:10px;font-family:var(--font-mono);font-size:10px;line-height:1.5;overflow-x:auto;white-space:pre-wrap;word-break:break-all;">&lt;svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"&gt;&lt;!-- wind swirls --&gt;&lt;path d="M20 50 Q12 40 22 36 M22 36 Q32 38 30 50" stroke="#D1C4E9" stroke-width="1.5" fill="none" stroke-linecap="round"/&gt;&lt;path d="M80 50 Q88 40 78 36 M78 36 Q68 38 70 50" stroke="#D1C4E9" stroke-width="1.5" fill="none" stroke-linecap="round"/&gt;&lt;!-- body (cloud-like) --&gt;&lt;ellipse cx="50" cy="60" rx="24" ry="22" fill="#D1C4E9"/&gt;&lt;ellipse cx="50" cy="68" rx="16" ry="14" fill="#F3E5F5"/&gt;&lt;!-- head --&gt;&lt;ellipse cx="36" cy="22" rx="6" ry="14" fill="#D1C4E9" transform="rotate(-15 36 22)"/&gt;&lt;ellipse cx="64" cy="22" rx="6" ry="14" fill="#D1C4E9" transform="rotate(15 64 22)"/&gt;&lt;ellipse cx="36" cy="22" rx="3" ry="10" fill="#E1BEE7" transform="rotate(-15 36 22)"/&gt;&lt;ellipse cx="64" cy="22" rx="3" ry="10" fill="#E1BEE7" transform="rotate(15 64 22)"/&gt;&lt;circle cx="50" cy="40" r="20" fill="#D1C4E9"/&gt;&lt;circle cx="50" cy="44" r="14" fill="#F3E5F5"/&gt;&lt;!-- face --&gt;&lt;circle cx="42" cy="42" r="3" fill="#4527A0"/&gt;&lt;circle cx="58" cy="42" r="3" fill="#4527A0"/&gt;&lt;ellipse cx="50" cy="48" rx="2" ry="1.5" fill="#4527A0"/&gt;&lt;path d="M44 52 Q50 56 56 52" stroke="#4527A0" stroke-width="1.2" fill="none" stroke-linecap="round"/&gt;&lt;!-- puff tail --&gt;&lt;circle cx="76" cy="64" r="9" fill="#E1BEE7"/&gt;&lt;/svg&gt;</pre>
+  </div>
+  <div style="margin-bottom:16px;">
+    <div style="font-family:var(--font-mono);font-size:11px;font-weight:600;color:#7986CB;margin-bottom:6px;">Lumi (lumi.svg)</div>
+    <pre style="background:#101223;color:#B3E5FC;padding:16px;border-radius:10px;font-family:var(--font-mono);font-size:10px;line-height:1.5;overflow-x:auto;white-space:pre-wrap;word-break:break-all;">&lt;svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg"&gt;&lt;!-- star sparkles --&gt;&lt;path d="M20 30 L22 24 L24 30 L30 32 L24 34 L22 40 L20 34 L14 32 Z" fill="#FFE082"/&gt;&lt;path d="M80 24 L81 20 L82 24 L86 25 L82 26 L81 30 L80 26 L76 25 Z" fill="#FFE082"/&gt;&lt;!-- body --&gt;&lt;ellipse cx="50" cy="62" rx="24" ry="24" fill="#7986CB"/&gt;&lt;ellipse cx="50" cy="68" rx="16" ry="16" fill="#C5CAE9"/&gt;&lt;!-- head --&gt;&lt;path d="M30 30 L40 18 L44 30 Z" fill="#7986CB"/&gt;&lt;path d="M70 30 L60 18 L56 30 Z" fill="#7986CB"/&gt;&lt;circle cx="50" cy="40" r="22" fill="#7986CB"/&gt;&lt;!-- big owl eyes --&gt;&lt;circle cx="42" cy="42" r="7" fill="#FFE082"/&gt;&lt;circle cx="58" cy="42" r="7" fill="#FFE082"/&gt;&lt;circle cx="42" cy="42" r="4" fill="#1A237E"/&gt;&lt;circle cx="58" cy="42" r="4" fill="#1A237E"/&gt;&lt;circle cx="44" cy="40" r="1.5" fill="#fff"/&gt;&lt;circle cx="60" cy="40" r="1.5" fill="#fff"/&gt;&lt;!-- beak --&gt;&lt;path d="M48 50 L52 50 L50 56 Z" fill="#FFB74D"/&gt;&lt;!-- stars on body --&gt;&lt;path d="M50 72 L52 68 L54 72 L58 74 L54 76 L52 80 L50 76 L46 74 L50 72 Z" fill="#FFE082" opacity="0.8"/&gt;&lt;!-- wing --&gt;&lt;path d="M28 60 Q22 70 28 78 Q32 70 32 64 Z" fill="#5C6BC0"/&gt;&lt;path d="M72 60 Q78 70 72 78 Q68 70 68 64 Z" fill="#5C6BC0"/&gt;&lt;/svg&gt;</pre>
+  </div>
+</div>
+
+<div class="doc-footer">
+  StressMonitor Character Export Sheet · 5 Characters · 5 Moods Each · 3 Evolution Stages
+</div>
+</div>
+</body>
+</html>

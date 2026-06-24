@@ -8,7 +8,7 @@ struct IAPNavBar: View {
         HStack {
             // Back button — circle style
             Button(action: onBack) {
-                Image(systemName: "chevron.left")
+                Image(systemName: AppIconSystem.Nav.back.sfSymbol)
                     .font(.system(size: 16, weight: .bold))
                     .foregroundStyle(Color.iapTextSecondary)
                     .frame(width: 38, height: 38)
@@ -33,7 +33,7 @@ struct IAPNavBar: View {
 
             // Close button — circle style
             Button(action: onClose) {
-                Image(systemName: "xmark")
+                Image(systemName: AppIconSystem.Nav.close.sfSymbol)
                     .font(.system(size: 14, weight: .bold))
                     .foregroundStyle(Color.iapTextSecondary)
                     .frame(width: 38, height: 38)

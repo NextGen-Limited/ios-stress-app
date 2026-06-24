@@ -135,7 +135,7 @@ struct LearningPhaseCard: View {
                 HStack(spacing: 4) {
                     Text("How It Works")
                         .font(.subheadline)
-                    Image(systemName: "chevron.right")
+                    Image(systemName: AppIconSystem.Nav.forward.sfSymbol)
                         .font(.caption)
                 }
                 .foregroundColor(.primaryBlue)

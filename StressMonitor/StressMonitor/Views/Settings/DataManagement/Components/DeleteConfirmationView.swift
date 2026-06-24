@@ -23,7 +23,7 @@ struct DeleteConfirmationView: View {
             ScrollView {
                 VStack(spacing: 24) {
                     // Warning icon
-                    Image(systemName: "exclamationmark.triangle.fill")
+                    Image(systemName: AppIconSystem.System.warning.sfSymbol)
                         .font(.system(size: 64))
                         .foregroundColor(.warning)
                         .padding(.top, 20)
@@ -129,7 +129,7 @@ struct DeleteConfirmationView: View {
                     VStack(spacing: 12) {
                         Button(action: onConfirm) {
                             HStack {
-                                Image(systemName: "trash.fill")
+                                Image(systemName: AppIconSystem.System.delete.sfSymbol)
                                 Text("Delete Everything")
                             }
                             .font(.headline)

@@ -42,7 +42,7 @@ struct CharacterGridCard: View {
                         size: 72
                     )
                     .overlay {
-                        Image(systemName: "lock.fill")
+                        Image(systemName: AppIconSystem.System.locked.sfSymbol)
                             .font(.system(size: 13, weight: .bold))
                             .foregroundStyle(Color.Wellness.adaptivePrimaryText)
                             .frame(width: 32, height: 32)
@@ -95,17 +95,17 @@ struct CharacterGridCard: View {
     private var statusBadge: some View {
         HStack(spacing: 5) {
             if isStreakGated {
-                Image(systemName: "flame.fill")
+                Image(systemName: AppIconSystem.Metric.streak.sfSymbol)
                     .font(.system(size: 9))
                 Text(isUnlocked ? "UNLOCKED" : "30-DAY STREAK")
                     .font(.system(size: 10, weight: .semibold))
             } else if isPremium {
-                Image(systemName: "crown.fill")
+                Image(systemName: AppIconSystem.System.premium.sfSymbol)
                     .font(.system(size: 9))
                 Text("PLUS")
                     .font(.system(size: 10, weight: .semibold))
             } else {
-                Image(systemName: "checkmark.circle.fill")
+                Image(systemName: AppIconSystem.System.success.sfSymbol)
                     .font(.system(size: 9))
                 Text(isActive ? "FREE · ACTIVE" : "FREE")
                     .font(.system(size: 10, weight: .semibold))

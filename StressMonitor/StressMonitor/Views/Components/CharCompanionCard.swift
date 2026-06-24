@@ -50,7 +50,7 @@ struct CharCompanionCard: View {
 
             Spacer()
 
-            Image(systemName: "chevron.right")
+            Image(systemName: AppIconSystem.Nav.forward.sfSymbol)
                 .font(.system(size: 14, weight: .semibold))
                 .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
         }

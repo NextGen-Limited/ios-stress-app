@@ -64,7 +64,7 @@ struct BreathingSummaryView: View {
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {
                 Button(action: { dismiss() }) {
-                    Image(systemName: "chevron.left")
+                    Image(systemName: AppIconSystem.Nav.back.sfSymbol)
                         .font(.system(size: 16, weight: .medium))
                         .foregroundStyle(accentStrong)
                 }
@@ -235,7 +235,7 @@ struct BreathingSummaryView: View {
                 Circle()
                     .fill(LinearGradient(colors: [warn, danger], startPoint: .topLeading, endPoint: .bottomTrailing))
                     .frame(width: 36, height: 36)
-                Image(systemName: "flame.fill")
+                Image(systemName: AppIconSystem.Metric.streak.sfSymbol)
                     .font(.system(size: 16))
                     .foregroundStyle(.white)
             }

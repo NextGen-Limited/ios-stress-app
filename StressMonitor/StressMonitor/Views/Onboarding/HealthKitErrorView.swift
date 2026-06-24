@@ -13,7 +13,7 @@ struct HealthKitErrorView: View {
                     .fill(Color.stressHigh.opacity(0.1))
                     .frame(width: 120, height: 120)
 
-                Image(systemName: "lock.fill")
+                Image(systemName: AppIconSystem.System.locked.sfSymbol)
                     .font(.system(size: 48))
                     .foregroundColor(.stressHigh)
             }

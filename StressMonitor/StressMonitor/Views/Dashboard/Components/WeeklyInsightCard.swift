@@ -52,7 +52,7 @@ struct WeeklyInsightCard: View {
     var body: some View {
         HStack(spacing: 12) {
             // Calendar icon
-            Image(systemName: "calendar")
+            Image(systemName: AppIconSystem.Metric.date.sfSymbol)
                 .font(.system(size: 16))
                 .foregroundColor(Color.oledTextSecondary)
                 .frame(width: 36, height: 36)

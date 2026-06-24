@@ -242,7 +242,7 @@ struct CharacterDetailView: View {
     private var unlockCTA: some View {
         VStack(spacing: 12) {
             if creature.unlockType == .premium {
-                Image(systemName: "crown.fill")
+                Image(systemName: AppIconSystem.System.premium.sfSymbol)
                     .font(.system(size: 36))
                     .foregroundStyle(.orange)
 
@@ -263,7 +263,7 @@ struct CharacterDetailView: View {
                 .background(creature.element.primaryColor)
                 .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
             } else if creature.unlockType == .streakGated {
-                Image(systemName: "flame.fill")
+                Image(systemName: AppIconSystem.Metric.streak.sfSymbol)
                     .font(.system(size: 36))
                     .foregroundStyle(Color(hex: "#7B86CB"))
 

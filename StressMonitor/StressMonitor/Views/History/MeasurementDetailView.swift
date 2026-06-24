@@ -52,7 +52,7 @@ struct MeasurementDetailView: View {
             }
             ToolbarItem(placement: .topBarTrailing) {
                 Button(action: { viewModel?.shareMeasurement() }) {
-                    Image(systemName: "square.and.arrow.up")
+                    Image(systemName: AppIconSystem.System.export_.sfSymbol)
                         .font(.system(size: 15, weight: .semibold))
                         .foregroundStyle(Color.primaryBlue)
                 }

@@ -118,7 +118,7 @@ struct SettingsView: View {
                     }
 
                     Spacer()
-                    Image(systemName: "chevron.right")
+                    Image(systemName: AppIconSystem.Nav.forward.sfSymbol)
                         .font(.system(size: 12, weight: .semibold))
                         .foregroundStyle(Color.Wellness.adaptiveSecondaryText.opacity(0.6))
                 }
@@ -335,7 +335,7 @@ struct SettingsView: View {
             navigateToPremium = true
         } label: {
             HStack {
-                Image(systemName: "crown.fill")
+                Image(systemName: AppIconSystem.System.premium.sfSymbol)
                     .font(.system(size: 15, weight: .semibold))
                     .foregroundStyle(Color.premiumGold)
                 Text("Premium")
@@ -363,7 +363,7 @@ struct SettingsView: View {
                     .font(.system(size: 15, weight: .semibold))
                     .foregroundStyle(role == .destructive ? Color.error : Color.Wellness.adaptivePrimaryText)
                 Spacer()
-                Image(systemName: "chevron.right")
+                Image(systemName: AppIconSystem.Nav.forward.sfSymbol)
                     .font(.system(size: 11, weight: .semibold))
                     .foregroundStyle(Color.Wellness.adaptiveSecondaryText.opacity(0.5))
             }
@@ -428,7 +428,7 @@ struct SettingsView: View {
                     .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
             }
             Spacer()
-            Image(systemName: "chevron.right")
+            Image(systemName: AppIconSystem.Nav.forward.sfSymbol)
                 .font(.system(size: 11, weight: .semibold))
                 .foregroundStyle(Color.Wellness.adaptiveSecondaryText.opacity(0.5))
         }
@@ -452,7 +452,7 @@ struct SettingsView: View {
                     .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
             }
             Spacer()
-            Image(systemName: "chevron.right")
+            Image(systemName: AppIconSystem.Nav.forward.sfSymbol)
                 .font(.system(size: 11, weight: .semibold))
                 .foregroundStyle(Color.Wellness.adaptiveSecondaryText.opacity(0.5))
         }

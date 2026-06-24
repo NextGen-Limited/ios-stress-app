@@ -158,3 +158,4 @@ tmp-home/
 .gitnexus
 vendor/bundle
 build/
+.worktrees/

@@ -215,7 +215,7 @@ struct DashboardView: View {
 
     private var streakChip: some View {
         HStack(spacing: 6) {
-            Image(systemName: "flame.fill")
+            Image(systemName: AppIconSystem.Metric.streak.sfSymbol)
                 .font(.system(size: 11, weight: .bold))
                 .foregroundStyle(HomeCharacterDesignTokens.Ember.accent)
             Text("\(max(1, viewModel.todayMeasurements.count)) day")

@@ -141,7 +141,7 @@ struct DataManageView: View {
                     .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
             }
             Spacer()
-            Image(systemName: "chevron.right")
+            Image(systemName: AppIconSystem.Nav.forward.sfSymbol)
                 .font(.system(size: 11, weight: .semibold))
                 .foregroundStyle(Color.Wellness.adaptiveSecondaryText.opacity(0.5))
         }

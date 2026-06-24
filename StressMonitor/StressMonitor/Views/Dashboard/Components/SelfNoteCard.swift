@@ -38,7 +38,7 @@ struct SelfNoteCard: View {
                 Spacer()
 
                 // Chevron
-                Image(systemName: "chevron.right")
+                Image(systemName: AppIconSystem.Nav.forward.sfSymbol)
                     .font(.system(size: 11.606, weight: .semibold))
                     .foregroundStyle(.white)
                     .rotationEffect(.degrees(90))

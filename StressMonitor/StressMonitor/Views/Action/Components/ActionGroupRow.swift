@@ -37,7 +37,7 @@ struct ActionGroupRow<Destination: View>: View {
 
                 Spacer(minLength: 0)
 
-                Image(systemName: "chevron.right")
+                Image(systemName: AppIconSystem.Nav.forward.sfSymbol)
                     .font(.system(size: 11, weight: .semibold))
                     .foregroundStyle(Color.Wellness.adaptiveSecondaryText.opacity(0.55))
             }

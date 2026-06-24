@@ -46,7 +46,7 @@ struct BreathingExerciseView: View {
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button(action: { dismiss() }) {
-                        Image(systemName: "chevron.left")
+                        Image(systemName: AppIconSystem.Nav.back.sfSymbol)
                             .font(.system(size: 16, weight: .medium))
                             .foregroundStyle(accentStrong)
                     }
@@ -173,7 +173,7 @@ struct BreathingExerciseView: View {
                 RoundedRectangle(cornerRadius: 10)
                     .fill(hrvColor)
                     .frame(width: 40, height: 40)
-                Image(systemName: "waveform.path.ecg")
+                Image(systemName: AppIconSystem.Metric.hrv.sfSymbol)
                     .font(.system(size: 18, weight: .semibold))
                     .foregroundStyle(.white)
             }

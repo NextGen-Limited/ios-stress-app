@@ -57,7 +57,7 @@ struct BioAgeCardView: View {
                 Circle()
                     .fill(accentColor.opacity(0.16))
                     .frame(width: 28, height: 28)
-                Image(systemName: "figure.mind.and.body")
+                Image(systemName: AppIconSystem.Action.bodyScan.sfSymbol)
                     .font(.system(size: 13, weight: .bold))
                     .foregroundStyle(accentColor)
             }

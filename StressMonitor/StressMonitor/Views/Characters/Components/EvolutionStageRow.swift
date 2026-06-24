@@ -40,7 +40,7 @@ struct EvolutionStageRow: View {
                         .font(.system(size: 16, weight: .bold))
                         .foregroundStyle(.white)
                 } else {
-                    Image(systemName: "lock.fill")
+                    Image(systemName: AppIconSystem.System.locked.sfSymbol)
                         .font(.system(size: 13))
                         .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
                 }

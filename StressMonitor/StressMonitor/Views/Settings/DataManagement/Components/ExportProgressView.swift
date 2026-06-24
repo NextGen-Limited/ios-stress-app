@@ -73,7 +73,7 @@ struct ExportProgressView: View {
                 // Estimated time remaining
                 if let timeRemaining = estimatedTimeRemaining {
                     HStack {
-                        Image(systemName: "clock")
+                        Image(systemName: AppIconSystem.Metric.time.sfSymbol)
                             .foregroundColor(.secondary)
                         Text(estimatedTimeText(timeRemaining))
                             .font(.callout)

@@ -166,7 +166,7 @@ struct DataExportView: View {
                         Text("Exporting...")
                             .foregroundColor(.secondary)
                     } else {
-                        Image(systemName: "square.and.arrow.up")
+                        Image(systemName: AppIconSystem.System.export_.sfSymbol)
                         Text("Export Data")
                     }
                     Spacer()

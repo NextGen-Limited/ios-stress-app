@@ -22,7 +22,7 @@ struct IAPHeroSection: View {
                     .shadow(color: Color(hex: "24B9CC").opacity(0.28), radius: 24, y: 12)
                     .overlay {
                         // Person icon
-                        Image(systemName: "figure.mind.and.body")
+                        Image(systemName: AppIconSystem.Action.bodyScan.sfSymbol)
                             .font(.system(size: 36, weight: .medium))
                             .foregroundStyle(.white)
                     }

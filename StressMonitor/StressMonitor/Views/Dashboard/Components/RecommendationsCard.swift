@@ -51,7 +51,7 @@ struct RecommendationsCard: View {
                         .font(.system(size: 14.599, weight: .bold, design: .rounded))
                         .foregroundStyle(.black.opacity(0.39))
 
-                    Image(systemName: "chevron.right")
+                    Image(systemName: AppIconSystem.Nav.forward.sfSymbol)
                         .font(.system(size: 10.949, weight: .semibold))
                         .foregroundStyle(.black.opacity(0.39))
                 }

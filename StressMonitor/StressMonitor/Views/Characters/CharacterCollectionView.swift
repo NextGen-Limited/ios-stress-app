@@ -150,7 +150,7 @@ struct CharacterCollectionView: View {
 
                     // Streak badge
                     HStack(spacing: 4) {
-                        Image(systemName: "flame.fill")
+                        Image(systemName: AppIconSystem.Metric.streak.sfSymbol)
                             .font(.system(size: 9))
                         Text("30-DAY STREAK")
                             .font(.system(size: 10, weight: .semibold))

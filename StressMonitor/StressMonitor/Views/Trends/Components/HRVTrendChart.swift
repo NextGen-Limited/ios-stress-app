@@ -175,7 +175,7 @@ struct HRVTrendChart: View {
 
     private var emptyState: some View {
         VStack(spacing: 10) {
-            Image(systemName: "waveform.path.ecg")
+            Image(systemName: AppIconSystem.Metric.hrv.sfSymbol)
                 .font(.system(size: 28))
                 .foregroundStyle(Color.Wellness.adaptiveSecondaryText.opacity(0.4))
             Text("Need more data")
