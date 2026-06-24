@@ -198,48 +198,58 @@ struct CharacterCollectionView: View {
 
     private var evolutionBanner: some View {
         HStack(spacing: 14) {
-            // Stage progression visualization
-            HStack(spacing: 2, alignment: .bottom) {
-                ForEach(0..<3, id: \.self) { i in
-                    Circle()
-                        .fill(Color(hex: "#7B86CB").opacity(0.18 + Double(i) * 0.12))
-                        .frame(width: 36, height: 36 + CGFloat(i) * 6)
-                        .overlay {
-                            Image(systemName: "circle.fill")
-                                .font(.system(size: 12))
-                                .foregroundStyle(Color(hex: "#7B86CB"))
-                        }
-                }
-            }
-
-            VStack(alignment: .leading, spacing: 2) {
-                Text("Each character evolves 3 stages")
-                    .font(.system(size: 14, weight: .semibold))
-                    .foregroundStyle(Color.Wellness.adaptivePrimaryText)
-
-                Text("Stay consistent — forms change, new animations unlock at 30, 90, 180 days.")
-                    .font(.system(size: 12))
-                    .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
-                    .lineSpacing(3)
-            }
+            stageProgressionViz
+            evolutionBannerText
             Spacer()
         }
         .padding(16)
-        .background(
-            LinearGradient(
-                colors: [
-                    Color(hex: "#7B86CB").opacity(0.14),
-                    Color(hex: "#4FC3F7").opacity(0.10),
-                ],
-                startPoint: .topLeading,
-                endPoint: .bottomTrailing
-            )
-        )
+        .background(evolutionBannerGradient)
         .clipShape(RoundedRectangle(cornerRadius: 20, style: .continuous))
-        .overlay {
-            RoundedRectangle(cornerRadius: 20, style: .continuous)
-                .stroke(Color.Wellness.adaptiveSecondaryText.opacity(0.15), lineWidth: 1)
+        .overlay(bannerBorder)
+    }
+
+    private var stageProgressionViz: some View {
+        HStack(spacing: 2, alignment: .bottom) {
+            ForEach(0..<3, id: \.self) { i in
+                Circle()
+                    .fill(Color(hex: "#7B86CB").opacity(0.18 + Double(i) * 0.12))
+                    .frame(width: 36, height: 36 + CGFloat(i) * 6)
+                    .overlay {
+                        Image(systemName: "circle.fill")
+                            .font(.system(size: 12))
+                            .foregroundStyle(Color(hex: "#7B86CB"))
+                    }
+            }
         }
+    }
+
+    private var evolutionBannerText: some View {
+        VStack(alignment: .leading, spacing: 2) {
+            Text("Each character evolves 3 stages")
+                .font(.system(size: 14, weight: .semibold))
+                .foregroundStyle(Color.Wellness.adaptivePrimaryText)
+
+            Text("Stay consistent — forms change, new animations unlock at 30, 90, 180 days.")
+                .font(.system(size: 12))
+                .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
+                .lineSpacing(3)
+        }
+    }
+
+    private var evolutionBannerGradient: LinearGradient {
+        LinearGradient(
+            colors: [
+                Color(hex: "#7B86CB").opacity(0.14),
+                Color(hex: "#4FC3F7").opacity(0.10),
+            ],
+            startPoint: .topLeading,
+            endPoint: .bottomTrailing
+        )
+    }
+
+    private var bannerBorder: some View {
+        RoundedRectangle(cornerRadius: 20, style: .continuous)
+            .stroke(Color.Wellness.adaptiveSecondaryText.opacity(0.15), lineWidth: 1)
     }
 
     // MARK: - Legend Card
