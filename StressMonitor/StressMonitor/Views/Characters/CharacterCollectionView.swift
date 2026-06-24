@@ -209,7 +209,7 @@ struct CharacterCollectionView: View {
     }
 
     private var stageProgressionViz: some View {
-        HStack(spacing: 2, alignment: .bottom) {
+        HStack(alignment: .bottom, spacing: 2) {
             ForEach(0..<3, id: \.self) { i in
                 Circle()
                     .fill(Color(hex: "#7B86CB").opacity(0.18 + Double(i) * 0.12))
