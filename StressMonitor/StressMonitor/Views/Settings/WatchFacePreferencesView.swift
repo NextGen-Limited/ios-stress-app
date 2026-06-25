@@ -1,4 +1,5 @@
 import SwiftUI
+import SwiftData
 
 /// Watch face & complication preferences. Surfaces the paired-watch state
 /// from ``PhoneConnectivityManager`` and lets the user pick the complication
@@ -7,6 +8,14 @@ struct WatchFacePreferencesView: View {
     @StateObject private var connectivity = PhoneConnectivityManager.shared
     @State private var backgroundStyle: WatchFaceBackground = .minimal
     @State private var activeCompanionId: String = UserDefaults.standard.string(forKey: "watchface.activeCompanionId") ?? "ripple"
+
+    /// Latest stress reading so character previews reflect the user's actual mood.
+    @Query(sort: \StressMeasurement.timestamp, order: .reverse)
+    private var latestMeasurements: [StressMeasurement]
+
+    private var currentMood: RippleMood {
+        RippleMood.from(stressLevel: latestMeasurements.first?.stressLevel ?? 0)
+    }
 
     var body: some View {
         Form {
@@ -68,7 +77,7 @@ struct WatchFacePreferencesView: View {
                     HapticManager.shared.buttonPress()
                 } label: {
                     HStack(spacing: 12) {
-                        CharacterAssetResolver.characterView(for: creature.id, mood: .serene, size: 36)
+                        CharacterAssetResolver.characterView(for: creature.id, mood: currentMood, size: 36)
                             .frame(width: 36, height: 36)
                         VStack(alignment: .leading, spacing: 2) {
                             Text(creature.displayName)
@@ -178,4 +187,5 @@ enum WatchFaceBackground: String, CaseIterable {
     NavigationStack {
         WatchFacePreferencesView()
     }
+    .modelContainer(for: StressMeasurement.self, inMemory: true)
 }

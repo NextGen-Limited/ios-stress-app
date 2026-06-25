@@ -55,6 +55,7 @@ struct StressBuddyIllustration: View {
                 )
             }
         }
+        .aspectRatio(1, contentMode: .fit)
         .frame(width: size, height: size)
         .characterAnimation(for: mood)
     }

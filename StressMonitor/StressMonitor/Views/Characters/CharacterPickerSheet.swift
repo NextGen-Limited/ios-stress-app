@@ -7,6 +7,14 @@ struct CharacterPickerSheet: View {
     @Query(filter: #Predicate<CharacterUnlock> { $0.isUnlocked }, sort: [SortDescriptor(\CharacterUnlock.characterId)])
     private var unlockedCharacters: [CharacterUnlock]
 
+    /// Fetch the latest stress reading so characters show the right mood.
+    @Query(sort: \StressMeasurement.timestamp, order: .reverse)
+    private var allMeasurements: [StressMeasurement]
+
+    private var currentMood: RippleMood {
+        RippleMood.from(stressLevel: allMeasurements.first?.stressLevel ?? 0)
+    }
+
     var body: some View {
         NavigationStack {
             ScrollView {
@@ -46,7 +54,7 @@ struct CharacterPickerSheet: View {
                 StressBuddyIllustration(
                     characterId: creature.id,
                     evolution: unlock.evolutionStage,
-                    mood: .serene,
+                    mood: currentMood,
                     size: 52
                 )
 

@@ -96,7 +96,8 @@ struct CharacterCollectionView: View {
                 CharacterGridCard(
                     creature: creature,
                     unlock: viewModel.unlockStatus(for: creature.id),
-                    isActive: viewModel.activeCharacterId == creature.id
+                    isActive: viewModel.activeCharacterId == creature.id,
+                    mood: viewModel.currentMood
                 )
                 .contentShape(RoundedRectangle(cornerRadius: 18))
                 .onTapGesture {
@@ -129,7 +130,7 @@ struct CharacterCollectionView: View {
                     StressBuddyIllustration(
                         characterId: lumi.id,
                         evolution: unlock?.evolutionStage ?? .droplet,
-                        mood: .serene,
+                        mood: viewModel.currentMood,
                         size: 72
                     )
                     .opacity(isUnlocked ? 1 : 0.65)
