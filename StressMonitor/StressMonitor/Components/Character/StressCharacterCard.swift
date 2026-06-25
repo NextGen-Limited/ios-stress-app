@@ -177,16 +177,12 @@ struct StressCharacterCard: View {
 
     @ViewBuilder
     private var characterGlyph: some View {
-        if activeCreature.id == "ripple", activeUnlock == nil || activeUnlock?.evolutionStage == .droplet {
-            RippleHomeCharacterGlyph(mood: mood, size: heroSize)
-        } else {
-            StressBuddyIllustration(
-                characterId: activeCreature.id,
-                evolution: activeUnlock?.evolutionStage ?? .droplet,
-                mood: mood,
-                size: heroSize
-            )
-        }
+        StressBuddyIllustration(
+            characterId: activeCreature.id,
+            evolution: activeUnlock?.evolutionStage ?? .droplet,
+            mood: mood,
+            size: heroSize
+        )
     }
 
     private func characterBadge(result: StressResult) -> some View {

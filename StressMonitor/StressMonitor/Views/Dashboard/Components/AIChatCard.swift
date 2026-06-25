@@ -8,7 +8,7 @@ struct AIChatCard: View {
     var body: some View {
         ZStack(alignment: .topTrailing) {
             // Ripple water-droplet mascot — positioned top-right, overlapping text area
-            RippleCharacterView(mood: .serene, size: 128)
+            StressBuddyIllustration(mood: .serene, size: 128)
                 .offset(x: 8, y: 40)
 
             // Content column

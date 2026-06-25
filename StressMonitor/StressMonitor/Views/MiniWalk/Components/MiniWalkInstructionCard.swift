@@ -3,7 +3,7 @@ import SwiftUI
 /// Ripple companion speech-bubble for the Mini Walk screen.
 ///
 /// Replaces the old static italic text card with a 40 pt bouncing
-/// RippleCharacterView avatar and a glass-card speech bubble that updates
+/// StressBuddyIllustration avatar and a glass-card speech bubble that updates
 /// its message based on walk progress.
 struct MiniWalkInstructionCard: View {
     let progress: Double
@@ -13,7 +13,7 @@ struct MiniWalkInstructionCard: View {
     var body: some View {
         HStack(alignment: .center, spacing: 12) {
             // 40 pt Ripple avatar with walk-bob animation
-            RippleCharacterView(mood: rippleMood, size: 40)
+            StressBuddyIllustration(mood: rippleMood, size: 40)
                 .offset(y: bobOffset)
                 .accessibilityHidden(true)
 

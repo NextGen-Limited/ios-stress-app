@@ -14,7 +14,7 @@ struct CompanionBanner: View {
                 ZStack {
                     Circle()
                         .fill(HomeCharacterDesignTokens.Ripple.primary.opacity(0.14))
-                    RippleCharacterView(mood: mood, size: 44)
+                    StressBuddyIllustration(mood: mood, size: 44)
                 }
                 .frame(width: 60, height: 60)
                 .accessibilityHidden(true)

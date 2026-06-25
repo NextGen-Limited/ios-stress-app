@@ -25,7 +25,7 @@ struct MiniWalkCompleteView: View {
             ScrollView(showsIndicators: false) {
                 VStack(spacing: 24) {
                     // Tired-happy Ripple
-                    RippleCharacterView(mood: .tired, size: 100)
+                    StressBuddyIllustration(mood: .tired, size: 100)
                         .padding(.top, 20)
 
                     // Headline
@@ -104,7 +104,7 @@ struct MiniWalkCompleteView: View {
     private var stressImpactCard: some View {
         HStack(spacing: 16) {
             // Calm Ripple
-            RippleCharacterView(mood: .relaxed, size: 50)
+            StressBuddyIllustration(mood: .relaxed, size: 50)
                 .accessibilityHidden(true)
 
             VStack(alignment: .leading, spacing: 4) {

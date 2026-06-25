@@ -49,7 +49,7 @@ struct RippleTransformationHero: View {
 
     private func transformationStage(mood: RippleMood, label: String) -> some View {
         VStack(spacing: 6) {
-            RippleCharacterView(mood: mood, size: 96)
+            StressBuddyIllustration(mood: mood, size: 96)
             Text(label)
                 .font(Typography.iapPillLabel)
                 .foregroundStyle(Color.iapTextSecondary)

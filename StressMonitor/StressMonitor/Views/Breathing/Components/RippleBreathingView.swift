@@ -4,7 +4,7 @@ import SwiftUI
 ///
 /// Replaces the former `BreathingCircleView` with a richer design:
 /// - Dashed outer ring (260pt) + solid ring (160pt) + rotating active ring
-/// - `RippleCharacterView` at center whose mood shifts per breathing phase
+/// - `StressBuddyIllustration` at center whose mood shifts per breathing phase
 /// - Scale animation synced to the breathing cycle (inhale→1.15, hold→1.0, exhale→0.85)
 /// - Water sparkles on inhale, water trail particles on exhale
 struct RippleBreathingView: View {
@@ -55,7 +55,7 @@ struct RippleBreathingView: View {
                 .blur(radius: 12)
 
             // Ripple character at center, scaled to breathing cycle
-            RippleCharacterView(mood: moodForPhase, size: size * 0.68)
+            StressBuddyIllustration(mood: moodForPhase, size: size * 0.68)
                 .scaleEffect(scale)
                 .shadow(color: ringColor.opacity(0.3), radius: 16)
 

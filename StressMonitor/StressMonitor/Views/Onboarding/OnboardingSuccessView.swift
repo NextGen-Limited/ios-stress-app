@@ -189,7 +189,7 @@ struct OnboardingSuccessView: View {
                 .rotationEffect(.degrees(-90))
 
             // Creature — celebrating mood for the success moment
-            RippleCharacterView(mood: .celebrating, size: 96)
+            StressBuddyIllustration(mood: .celebrating, size: 96)
                 .shadow(color: HomeCharacterDesignTokens.Ripple.primary.opacity(0.3), radius: 16)
 
             // Stress label badge
@@ -246,7 +246,7 @@ struct OnboardingSuccessView: View {
                         Circle()
                             .stroke(HomeCharacterDesignTokens.Ripple.primary.opacity(0.15), lineWidth: 2)
                     )
-                RippleCharacterView(mood: .celebrating, size: 40)
+                StressBuddyIllustration(mood: .celebrating, size: 40)
             }
 
             // Info

@@ -6,7 +6,7 @@ struct IntroMessageCard: View {
     var body: some View {
         HStack(alignment: .top, spacing: 12) {
             // Ripple water-droplet mascot
-            RippleCharacterView(mood: .relaxed, size: 44)
+            StressBuddyIllustration(mood: .relaxed, size: 44)
 
             // Speech bubble
             VStack(alignment: .leading, spacing: 0) {

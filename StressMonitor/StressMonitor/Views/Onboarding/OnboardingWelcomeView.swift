@@ -126,7 +126,7 @@ struct OnboardingWelcomeView: View {
                 .scaleEffect(viewModel.breathPhase2 ? 1.06 : 1.0)
 
             // Ripple character — happy mood to introduce the buddy
-            RippleCharacterView(mood: .happy, size: 120)
+            StressBuddyIllustration(mood: .happy, size: 120)
                 .shadow(color: HomeCharacterDesignTokens.Ripple.primary.opacity(0.35), radius: 24)
                 .offset(y: viewModel.floatOffset ? -10 : 0)
         }
