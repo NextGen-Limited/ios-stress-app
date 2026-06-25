@@ -186,4 +186,5 @@ enum WatchFaceBackground: String, CaseIterable {
     NavigationStack {
         WatchFacePreferencesView()
     }
+    .modelContainer(for: StressMeasurement.self, inMemory: true)
 }
