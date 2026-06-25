@@ -1,4 +1,5 @@
 import SwiftUI
+import SwiftData
 
 /// Watch face & complication preferences. Surfaces the paired-watch state
 /// from ``PhoneConnectivityManager`` and lets the user pick the complication
