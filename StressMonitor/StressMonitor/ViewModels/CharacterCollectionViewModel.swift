@@ -50,7 +50,7 @@ final class CharacterCollectionViewModel {
     /// Fetch the latest stress reading so character mood reflects the user's actual state.
     private func fetchLatestStressLevel() {
         guard let ctx = modelContext else { return }
-        let descriptor = FetchDescriptor<StressMeasurement>(
+        var descriptor = FetchDescriptor<StressMeasurement>(
             sortBy: [SortDescriptor(\.timestamp, order: .reverse)]
         )
         descriptor.fetchLimit = 1
