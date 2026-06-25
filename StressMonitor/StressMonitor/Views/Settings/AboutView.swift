@@ -29,7 +29,7 @@ struct AboutView: View {
                     Circle()
                         .fill(HomeCharacterDesignTokens.Ripple.primary.opacity(0.18))
                         .frame(width: 80, height: 80)
-                    RippleCharacterView(mood: .happy, size: 56)
+                    StressBuddyIllustration(mood: .happy, size: 56)
                 }
                 .accessibilityHidden(true)
 

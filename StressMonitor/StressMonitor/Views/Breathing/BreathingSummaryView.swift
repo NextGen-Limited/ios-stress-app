@@ -273,7 +273,7 @@ struct BreathingSummaryView: View {
                 Circle()
                     .fill(accent.opacity(0.14))
                     .frame(width: 36, height: 36)
-                RippleCharacterView(mood: .serene, size: 28)
+                StressBuddyIllustration(mood: .serene, size: 28)
             }
             .frame(width: 36, height: 36)
 

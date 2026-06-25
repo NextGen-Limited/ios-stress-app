@@ -30,7 +30,7 @@ struct SmartInsightsCard: View {
             }
 
             // Ripple water-droplet mascot
-            RippleCharacterView(mood: .happy, size: 56)
+            StressBuddyIllustration(mood: .happy, size: 56)
         }
         .padding(16)
         .background(Color.Wellness.adaptiveCardBackground)

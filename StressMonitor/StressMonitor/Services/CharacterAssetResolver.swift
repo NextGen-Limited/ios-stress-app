@@ -3,28 +3,30 @@ import SwiftUI
 import UIKit
 #endif
 
-/// Resolves a character id to a SwiftUI character view (and, for legacy
-/// callers, to a fallback asset name).
+/// Resolves a character id to an SVG-backed ``Image`` (from Assets.xcassets).
 ///
 /// The canonical entry point is ``characterView(for:mood:size:)``, which
-/// routes each character id to its procedural SwiftUI view. The legacy
-/// `assetName`/`resolvedAssetName` helpers are retained in a deprecated
-/// extension for callers that still resolve image assets.
+/// routes each character id to its exported SVG illustration. The legacy
+/// `assetName`/`resolvedAssetName` helpers are retained for callers that
+/// still resolve image assets (e.g. the illustration export pipeline).
 public enum CharacterAssetResolver {
 
-    /// Route a character id to its SwiftUI procedural view.
+    /// Route a character id to its SVG illustration.
     ///
     /// Unknown ids fall back to the Ripple (water) character so the UI never
     /// renders empty when an id is stale or missing.
     static func characterView(for id: String, mood: RippleMood, size: CGFloat = 120) -> AnyView {
-        switch id {
-        case "ripple":  return AnyView(RippleCharacterView(mood: mood, size: size))
-        case "blossom": return AnyView(BlossomCharacterView(mood: mood, size: size))
-        case "ember":   return AnyView(EmberCharacterView(mood: mood, size: size))
-        case "zephyr":  return AnyView(ZephyrCharacterView(mood: mood, size: size))
-        case "lumi":    return AnyView(LumiCharacterView(mood: mood, size: size))
-        default:        return AnyView(RippleCharacterView(mood: mood, size: size))
-        }
+        // `mood` drives the ambient animation applied by StressBuddyIllustration;
+        // the SVG itself is multi-colored (preserves-vector-representation = true)
+        // so we render in .original mode to keep all design-system colors intact.
+        let assetName = Self.assetName(for: id)
+        return AnyView(
+            Image(assetName)
+                .resizable()
+                .renderingMode(.original)
+                .aspectRatio(1, contentMode: .fit)
+                .frame(width: size, height: size)
+        )
     }
 
     /// Apply the per-evolution scale factor so callers can keep using the
@@ -36,6 +38,20 @@ public enum CharacterAssetResolver {
         size: CGFloat = 120
     ) -> AnyView {
         characterView(for: id, mood: mood, size: size * evolution.scaleFactor)
+    }
+
+    // MARK: - Asset Name Resolution
+
+    /// Map a character id to its SVG imageset name in Assets.xcassets.
+    private static func assetName(for id: String) -> String {
+        switch id {
+        case "ripple":  return "ripple"
+        case "blossom": return "blossom"
+        case "ember":   return "ember"
+        case "zephyr":  return "zephyr"
+        case "lumi":    return "lumi"
+        default:        return "ripple"
+        }
     }
 }
 
@@ -67,9 +83,8 @@ extension CharacterAssetResolver {
 
     /// Generate the canonical asset name for a specific character state.
     ///
-    /// - Deprecated: Prefer ``characterView(for:mood:size:)`` — characters
-    ///   now render as SwiftUI procedural views. This helper is retained only
-    ///   for the illustration export pipeline, which still rasterizes assets.
+    /// - Deprecated: Prefer ``characterView(for:mood:size:)``. This helper
+    ///   is retained only for the illustration export pipeline.
     @available(*, deprecated, message: "Use CharacterAssetResolver.characterView(for:mood:size:) for on-screen rendering.")
     static func assetName(
         characterId: String,

@@ -34,7 +34,7 @@ struct RippleRecommendationCard: View {
 
             // Grid: Ripple 84px + voice + CTA
             HStack(alignment: .center, spacing: 14) {
-                RippleCharacterView(mood: RippleMood.from(stressLevel: stressLevel ?? 0), size: 84)
+                StressBuddyIllustration(mood: RippleMood.from(stressLevel: stressLevel ?? 0), size: 84)
                     .accessibilityHidden(true)
 
                 VStack(alignment: .leading, spacing: 10) {

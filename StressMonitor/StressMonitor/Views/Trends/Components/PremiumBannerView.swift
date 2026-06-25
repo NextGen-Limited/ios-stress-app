@@ -14,7 +14,7 @@ struct PremiumBannerView: View {
 
             // Cat mascot anchored bottom-left
             HStack(alignment: .bottom) {
-                RippleCharacterView(mood: .celebrating, size: 110)
+                StressBuddyIllustration(mood: .celebrating, size: 110)
 
                 Spacer()
             }
