@@ -1,105 +1,145 @@
 import SwiftUI
 
-// MARK: - Health Data Section
-
-/// Health stats display showing exercise, sleep, and daylight data
+/// Behavioral metrics row — Exercise / Sleep / Daylight.
+///
+/// Separate from the vitals triplet: these are behaviors, not bio-signals.
+/// Each item shows an outline icon, a rounded numeric value with unit, a label,
+/// and a small delta context line. Daylight is the novel signal that gives the
+/// app character.
+///
+/// Spec reference: design/screens/04-home.html — `.health-data`.
 struct HealthDataSection: View {
-    var body: some View {
-        VStack(alignment: .leading, spacing: DesignTokens.Spacing.md) {
-            // Health data items
-            HStack(spacing: DesignTokens.Spacing.md) {
-                HealthDataItem(
-                    icon: "figure.run",
-                    label: "Exercise",
-                    value: "32",
-                    unit: "min",
-                    color: Color.Wellness.exerciseCyan
-                )
+    let exerciseMinutes: Int?
+    let exerciseDelta: String?
 
-                HealthDataItem(
-                    icon: "bed.double.fill",
-                    label: "Sleep",
-                    value: "7.5",
-                    unit: "hrs",
-                    color: Color.Wellness.sleepPurple
-                )
+    let sleepHours: Double?
+    let sleepDelta: String?
 
-                HealthDataItem(
-                    icon: "sun.max.fill",
-                    label: "Daylight",
-                    value: "45",
-                    unit: "min",
-                    color: Color.Wellness.daylightYellow
-                )
-            }
-        }
-        .accessibilityElement(children: .contain)
+    let daylightMinutes: Int?
+    let daylightDelta: String?
+
+    init(
+        exerciseMinutes: Int? = nil,
+        exerciseDelta: String? = "yesterday",
+        sleepHours: Double? = nil,
+        sleepDelta: String? = nil,
+        daylightMinutes: Int? = nil,
+        daylightDelta: String? = nil
+    ) {
+        self.exerciseMinutes = exerciseMinutes
+        self.exerciseDelta = exerciseDelta
+        self.sleepHours = sleepHours
+        self.sleepDelta = sleepDelta
+        self.daylightMinutes = daylightMinutes
+        self.daylightDelta = daylightDelta
     }
-}
-
-// MARK: - Health Data Item
-
-/// Individual health metric display with circular progress indicator placeholder
-struct HealthDataItem: View {
-    let icon: String
-    let label: String
-    let value: String
-    let unit: String
-    let color: Color
 
     var body: some View {
-        VStack(spacing: DesignTokens.Spacing.sm) {
-            // Circular progress indicator placeholder with icon
-            ZStack {
-                Circle()
-                    .stroke(color.opacity(0.2), lineWidth: 3)
-                    .frame(width: 48, height: 48)
-
-                // Progress arc placeholder (static for now)
-                Circle()
-                    .trim(from: 0, to: 0.6)
-                    .stroke(color, style: StrokeStyle(lineWidth: 3, lineCap: .round))
-                    .frame(width: 48, height: 48)
-                    .rotationEffect(.degrees(-90))
-
-                Image(systemName: icon)
-                    .font(.body)
-                    .foregroundStyle(color)
-            }
-
-            // Value and unit
-            HStack(alignment: .firstTextBaseline, spacing: 2) {
-                Text(value)
-                    .font(Typography.headline)
-                    .fontWeight(.bold)
-                    .foregroundStyle(.primary)
-
-                Text(unit)
-                    .font(Typography.caption1)
-                    .foregroundStyle(.secondary)
-            }
-
-            // Label
-            Text(label)
-                .font(Typography.caption1)
-                .foregroundStyle(.secondary)
-                .lineLimit(1)
+        HStack(alignment: .top, spacing: 12) {
+            item(
+                symbol: "figure.run",
+                value: exerciseMinutes.map { "\($0)" } ?? "--",
+                unit: "min",
+                label: "Exercise",
+                delta: exerciseDelta,
+                deltaGood: false
+            )
+            item(
+                symbol: "moon.stars",
+                value: sleepHours.map { sleepText($0) } ?? "--",
+                unit: sleepHours == nil ? "" : "h",
+                label: "Sleep",
+                delta: sleepDelta,
+                deltaGood: sleepDelta != nil
+            )
+            item(
+                symbol: "sun.max",
+                value: daylightMinutes.map { "\($0)" } ?? "--",
+                unit: "min",
+                label: "Daylight",
+                delta: daylightDelta,
+                deltaGood: daylightDelta != nil
+            )
         }
-        .frame(maxWidth: .infinity)
-        .padding(.vertical, DesignTokens.Spacing.md)
-        .background(Color.Wellness.adaptiveCardBackground)
-        .clipShape(RoundedRectangle(cornerRadius: 20))
-        .shadow(color: Color(red: 0.094, green: 0.153, blue: 0.294).opacity(0.04), radius: 5.7, y: 5.7)
-        .shadow(color: Color(red: 0.094, green: 0.153, blue: 0.294).opacity(0.08), radius: 2.85, y: 2.85)
-        .accessibilityElement(children: .combine)
-        .accessibilityLabel("\(label): \(value) \(unit)")
+        .padding(16)
+        .background(Color.Wellness.adaptiveCardBackground.opacity(0.92))
+        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .accessibilityElement(children: .contain)
+        .accessibilityLabel("Health behaviors. Exercise \(exerciseMinutes.map { "\($0) minutes" } ?? "unknown"). Sleep \(sleepHours.map { sleepText($0) + " hours" } ?? "unknown"). Daylight \(daylightMinutes.map { "\($0) minutes" } ?? "unknown").")
+    }
+
+    private func item(
+        symbol: String,
+        value: String,
+        unit: String,
+        label: String,
+        delta: String?,
+        deltaGood: Bool
+    ) -> some View {
+        VStack(alignment: .leading, spacing: 3) {
+            Image(systemName: symbol)
+                .font(.system(size: 16, weight: .regular))
+                .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
+                .padding(.bottom, 2)
+
+            HStack(alignment: .firstTextBaseline, spacing: 1) {
+                Text(value)
+                    .font(.system(size: 17, weight: .semibold, design: .rounded))
+                    .tracking(-0.3)
+                    .foregroundStyle(Color.Wellness.adaptivePrimaryText)
+                if !unit.isEmpty {
+                    Text(unit)
+                        .font(.system(size: 11, weight: .medium))
+                        .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
+                }
+            }
+
+            Text(label)
+                .font(.system(size: 11, weight: .regular))
+                .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
+
+            if let delta {
+                Text(delta)
+                    .font(.system(size: 10, weight: .regular, design: .monospaced))
+                    .tracking(0.2)
+                    .foregroundStyle(deltaGood ? Color.stressRelaxed : Color.Wellness.adaptiveSecondaryText)
+            }
+        }
+        .frame(maxWidth: .infinity, alignment: .leading)
+    }
+
+    /// Sleep renders as "6h 50" (hours + remaining minutes) per the spec.
+    private func sleepText(_ hours: Double) -> String {
+        let total = Int(hours.rounded(.toNearestOrEven) * 60)
+        let h = total / 60
+        let m = abs(total) % 60
+        return m == 0 ? "\(h)h" : "\(h)h \(m)"
     }
 }
 
 // MARK: - Preview
 
-#Preview {
-    HealthDataSection()
-        .padding()
-        .background(Color.Wellness.background)
+#Preview("HealthDataSection") {
+    VStack {
+        HealthDataSection(
+            exerciseMinutes: 23,
+            exerciseDelta: "yesterday",
+            sleepHours: 6.83,
+            sleepDelta: "+12m vs avg",
+            daylightMinutes: 42,
+            daylightDelta: "on target"
+        )
+        Spacer()
+    }
+    .padding()
+    .background(HomeCharacterDesignTokens.homeBackground)
+}
+
+#Preview("HealthDataSection — No Data") {
+    VStack {
+        HealthDataSection()
+        Spacer()
+    }
+    .padding()
+    .background(HomeCharacterDesignTokens.homeBackground)
 }

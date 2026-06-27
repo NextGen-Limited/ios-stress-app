@@ -41,6 +41,15 @@ final class StressViewModel {
     /// Latest self-reported mood from the Home check-in.
     var mood: MoodEntry?
 
+    // MARK: - Behavioral Metrics (Home health-data row)
+
+    /// Last workout duration in minutes — drives the Exercise tile.
+    var todayExerciseMinutes: Int?
+    /// Total sleep in hours from last night — drives the Sleep tile.
+    var todaySleepHours: Double?
+    /// Time outdoors in minutes — drives the Daylight tile (best-effort).
+    var todayDaylightMinutes: Int?
+
     // MARK: - Bio Age Properties
 
     /// Estimated biological age result — nil until enough data accumulates
@@ -154,6 +163,9 @@ final class StressViewModel {
             let result = try await algorithm.calculateMultiFactorStress(context: context)
             currentStress = result
             respiratoryRate = rrValue
+            todayExerciseMinutes = activityData?.lastWorkoutDurationMinutes.map { Int($0) }
+            todaySleepHours = sleepData?.totalSleepHours
+            todayDaylightMinutes = nil
             isPermissionRequired = false
             baseline = currentBaseline
             lastRefresh = Date()
@@ -381,6 +393,27 @@ final class StressViewModel {
 
         weeklyCurrentAvg = currentWeek.isEmpty ? 0 : currentWeek.map(\.stressLevel).reduce(0, +) / Double(currentWeek.count)
         weeklyPreviousAvg = prevWeek.isEmpty ? 0 : prevWeek.map(\.stressLevel).reduce(0, +) / Double(prevWeek.count)
+    }
+
+    /// Last 7 days of stress as chart points. Each day's bar encodes the peak
+    /// stress recorded that day; the bar's tier color comes from that peak.
+    /// Days without data collapse to a 0 / relaxed point so the chart still
+    /// renders a full week.
+    var weeklyStressPoints: [StressDataPoint] {
+        let calendar = Calendar.current
+        let today = calendar.startOfDay(for: Date())
+        guard let sixDaysAgo = calendar.date(byAdding: .day, value: -6, to: today) else { return [] }
+
+        return (0...6).map { offset in
+            guard let day = calendar.date(byAdding: .day, value: offset, to: sixDaysAgo) else {
+                return StressDataPoint(day: "", value: 0, category: .relaxed)
+            }
+            let dayMeasurements = historicalData.filter { calendar.isDate($0.timestamp, inSameDayAs: day) }
+            let peak = dayMeasurements.map { $0.stressLevel }.max() ?? 0
+            let category = StressResult.category(for: peak)
+            let label = offset == 6 ? "TODAY" : "D"
+            return StressDataPoint(day: label, value: Int(peak.rounded()), category: category)
+        }
     }
 
     /// Generate AI insight from current stress and history

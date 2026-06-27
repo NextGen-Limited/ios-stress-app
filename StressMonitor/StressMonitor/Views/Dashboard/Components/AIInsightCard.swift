@@ -1,5 +1,70 @@
 import SwiftUI
 
+/// Ripple's voice — the AI insight card that sits right under the hero.
+///
+/// Per the 04-home spec the status → AI summary flow: a Ripple avatar on the
+/// left, a "Ripple · just now" eyebrow, the insight message (which may
+/// emphasize a fragment), and an optional "Ask Ripple" link.
+///
+/// Spec reference: design/screens/04-home.html — `.ai-insight`.
+struct RippleInsightCard: View {
+    let insight: AIInsight
+    var onAskRipple: (() -> Void)?
+
+    var body: some View {
+        HStack(alignment: .top, spacing: 12) {
+            avatar
+
+            VStack(alignment: .leading, spacing: 4) {
+                Text("RIPPLE · JUST NOW")
+                    .font(.system(size: 10, weight: .semibold, design: .monospaced))
+                    .tracking(0.8)
+                    .foregroundStyle(HomeCharacterDesignTokens.Ripple.deep)
+
+                Text(insight.message)
+                    .font(.system(size: 14, weight: .regular))
+                    .foregroundStyle(Color.Wellness.adaptivePrimaryText)
+                    .lineSpacing(3)
+                    .fixedSize(horizontal: false, vertical: true)
+
+                if onAskRipple != nil {
+                    Button {
+                        onAskRipple?()
+                    } label: {
+                        HStack(spacing: 4) {
+                            Text("Ask Ripple")
+                                .font(.system(size: 13, weight: .semibold))
+                            Image(systemName: AppIconSystem.Nav.forward.sfSymbol)
+                                .font(.system(size: 10, weight: .bold))
+                        }
+                        .foregroundStyle(HomeCharacterDesignTokens.Ripple.deep)
+                        .padding(.top, 4)
+                    }
+                    .buttonStyle(.plain)
+                }
+            }
+            Spacer(minLength: 0)
+        }
+        .padding(16)
+        .background(Color.Wellness.adaptiveCardBackground.opacity(0.92))
+        .clipShape(RoundedRectangle(cornerRadius: 18, style: .continuous))
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("Ripple insight. \(insight.message)")
+    }
+
+    private var avatar: some View {
+        ZStack {
+            Circle()
+                .fill(HomeCharacterDesignTokens.Ripple.primary.opacity(0.14))
+            StressBuddyIllustration(mood: .happy, size: 28)
+        }
+        .frame(width: 36, height: 36)
+        .accessibilityHidden(true)
+    }
+}
+
+// MARK: - AIInsight model
+
 struct AIInsight: Sendable {
     let title: String
     let message: String
@@ -7,118 +72,28 @@ struct AIInsight: Sendable {
     let trendData: [Double]?
 }
 
-struct AIInsightCard: View {
-    let insight: AIInsight
-    var onTapAction: (() -> Void)?
+// MARK: - Preview
 
-    var body: some View {
-        VStack(alignment: .leading, spacing: 12) {
-            header
-
-            VStack(alignment: .leading, spacing: 8) {
-                Text(insight.title)
-                    .font(.subheadline)
-                    .fontWeight(.semibold)
-
-                Text(insight.message)
-                    .font(.body)
-                    .foregroundColor(.secondary)
-            }
-
-            if let actionTitle = insight.actionTitle {
-                Button(action: { onTapAction?() }) {
-                    HStack {
-                        Text(actionTitle)
-                            .font(.subheadline)
-                            .fontWeight(.semibold)
-
-                        Spacer()
-
-                        Image(systemName: AppIconSystem.Nav.forward.sfSymbol)
-                            .font(.caption)
-                    }
-                    .foregroundColor(.primaryBlue)
-                    .padding(.vertical, 8)
-                }
-            }
-        }
-        .padding(16)
-        .background(
-            RoundedRectangle(cornerRadius: 16)
-                .fill(Color.secondary.opacity(0.1))
+#Preview("RippleInsightCard") {
+    VStack(spacing: 12) {
+        RippleInsightCard(
+            insight: AIInsight(
+                title: "Recovery",
+                message: "Calm morning. HRV is 52 ms — your highest all week. An early wind-down tonight locks in the streak.",
+                actionTitle: "Ask Ripple",
+                trendData: nil
+            ),
+            onAskRipple: {}
         )
-        .overlay(
-            RoundedRectangle(cornerRadius: 16)
-                .stroke(Color.primaryBlue.opacity(0.2), lineWidth: 1)
+        RippleInsightCard(
+            insight: AIInsight(
+                title: "High Stress",
+                message: "Stress is elevated. A 3-minute box breathing reset will bring it down.",
+                actionTitle: nil,
+                trendData: nil
+            )
         )
-    }
-
-    private var header: some View {
-        HStack {
-            Image(systemName: "sparkles")
-                .foregroundColor(.primaryBlue)
-                .font(.title3)
-
-            Text("AI Insight")
-                .font(.headline)
-
-            Spacer()
-
-            if let trendData = insight.trendData, !trendData.isEmpty {
-                MiniSparkline(data: trendData)
-                    .frame(width: 60, height: 30)
-            }
-        }
-    }
-}
-
-struct MiniSparkline: View {
-    let data: [Double]
-
-    var body: some View {
-        GeometryReader { geometry in
-            let normalized = normalize(data: data)
-            let points = zip(normalized.indices, normalized).map { index, value in
-                CGPoint(
-                    x: CGFloat(index) / CGFloat(max(1, normalized.count - 1)) * geometry.size.width,
-                    y: geometry.size.height - (value * geometry.size.height)
-                )
-            }
-
-            Path { path in
-                if let first = points.first {
-                    path.move(to: first)
-                }
-                for point in points.dropFirst() {
-                    path.addLine(to: point)
-                }
-            }
-            .stroke(Color.primaryBlue, lineWidth: 2)
-        }
-    }
-
-    private func normalize(data: [Double]) -> [Double] {
-        guard let min = data.min(), let max = data.max(), max > min else { return data }
-        let range = max - min
-        return data.map { ($0 - min) / range }
-    }
-}
-
-#Preview {
-    VStack(spacing: 16) {
-        AIInsightCard(insight: AIInsight(
-            title: "High Stress Detected",
-            message: "Your stress is elevated. Consider a breathing exercise.",
-            actionTitle: "Start Breathing",
-            trendData: [0.3, 0.5, 0.7, 0.6, 0.8, 0.9]
-        ))
-
-        AIInsightCard(insight: AIInsight(
-            title: "Great Recovery",
-            message: "Your HRV is excellent today. Keep up the good work!",
-            actionTitle: nil,
-            trendData: nil
-        ))
     }
     .padding()
+    .background(HomeCharacterDesignTokens.homeBackground)
 }

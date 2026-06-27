@@ -22,13 +22,15 @@ enum MoodLevel: Int, CaseIterable, Codable, Sendable, Identifiable {
         }
     }
 
+    /// Self-report labels from the Home check-in.
+    /// Maps 1–5 to the 04-home spec chips: Calm / Focused / Tense / Wired / Fried.
     var displayName: String {
         switch self {
-        case .veryCalm:  return "Very calm"
-        case .calm:      return "Calm"
-        case .neutral:   return "Neutral"
-        case .tense:     return "Tense"
-        case .veryTense: return "Very tense"
+        case .veryCalm:  return "Calm"
+        case .calm:      return "Focused"
+        case .neutral:   return "Tense"
+        case .tense:     return "Wired"
+        case .veryTense: return "Fried"
         }
     }
 }

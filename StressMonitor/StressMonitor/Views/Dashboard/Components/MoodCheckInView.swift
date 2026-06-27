@@ -84,12 +84,13 @@ struct MoodCheckInView: View {
     }
 
     private func accentColor(for level: MoodLevel) -> Color {
+        // Color-coded by stress tier per the 04-home spec (◌ ◎ ◐ ◑ ●).
         switch level {
-        case .veryCalm:  return HomeCharacterDesignTokens.Blossom.accent
-        case .calm:      return HomeCharacterDesignTokens.Ripple.primary
-        case .neutral:   return HomeCharacterDesignTokens.Zephyr.accent
-        case .tense:     return HomeCharacterDesignTokens.Ember.accent
-        case .veryTense: return Color.stressHigh
+        case .veryCalm:  return Color.stressRelaxed
+        case .calm:      return Color.stressMild
+        case .neutral:   return Color.stressModerate
+        case .tense:     return Color.stressHigh
+        case .veryTense: return Color.stressSevere
         }
     }
 }

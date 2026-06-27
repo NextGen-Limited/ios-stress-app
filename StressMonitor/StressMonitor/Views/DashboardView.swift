@@ -126,66 +126,68 @@ struct DashboardView: View {
 
     @ViewBuilder
     private func dashboardContent(_ stress: StressResult?) -> some View {
-        // 1. Date header + stress / streak status chips
-        VStack(alignment: .leading, spacing: 12) {
-            DateHeaderView()
-            statusChipRow(stress)
-        }
-        .opacity(appearAnimation ? 1 : 0)
-
-        // 2. Hero semicircular gauge with Ripple inside
-        SemicircularGaugeView(
-            stressLevel: stress?.level ?? 0,
-            result: stress,
-            size: 280
+        // 1. Date stamp + bio-age / streak chips (compact header, no greeting)
+        HomeHeaderBar(
+            date: Date(),
+            bioAge: viewModel.bioAgeResult?.estimatedAge,
+            streakDays: viewModel.todayMeasurements.count
         )
         .opacity(appearAnimation ? 1 : 0)
 
-        // 3. AI insight — prefer generated insight, fall back to SmartInsightsCard
+        // 2. Hero — semicircle gauge + score + Ripple inside + state label
+        StressHeroCard(
+            level: stress?.level ?? 0,
+            category: stress?.category ?? .relaxed,
+            confidence: stress?.confidence,
+            measuredAt: viewModel.lastRefresh,
+            substate: substate(for: stress)
+        )
+        .opacity(appearAnimation ? 1 : 0)
+
+        // 3. AI insight — Ripple's voice right under the hero
         if let insight = viewModel.aiInsight {
-            AIInsightCard(
-                insight: insight,
-                onTapAction: nil
-            )
-            .opacity(appearAnimation ? 1 : 0)
-        } else {
-            SmartInsightsCard()
+            RippleInsightCard(insight: insight, onAskRipple: nil)
                 .opacity(appearAnimation ? 1 : 0)
         }
 
-        // 4. Vitals triplet — RHR / HRV / RR (RR slot hidden when nil)
-        TripleMetricRow(
-            rhrValue: stress.map { "\($0.heartRate)" } ?? "--",
-            hrvValue: stress.map { "\($0.hrv)" } ?? "--",
-            rrValue: respiratoryDisplayValue(stress)
+        // 4. Vitals triplet — HRV / Heart / Breath (color-coded, trend lines)
+        VitalsTriplet(
+            hrvValue: stress.map { "\(Int($0.hrv.rounded()))" } ?? "--",
+            hrvTrend: hrvTrendLabel(stress),
+            hrvTrendGood: viewModel.heartRateTrend != .down,
+            hrValue: stress.map { "\(Int($0.heartRate.rounded()))" } ?? "--",
+            hrTrend: "resting",
+            rrValue: respiratoryDisplayValue(stress),
+            rrTrend: stress == nil ? nil : "steady"
         )
         .opacity(appearAnimation ? 1 : 0)
 
-        // 5. Mood check-in chips
+        // 5. Mood check-in chips (Calm / Focused / Tense / Wired / Fried)
         MoodCheckInView(selected: viewModel.mood?.level) { level in
             viewModel.setMood(level)
         }
         .opacity(appearAnimation ? 1 : 0)
 
-        // 6. Health data — Exercise / Sleep / Daylight
-        HealthDataSection()
-            .opacity(appearAnimation ? 1 : 0)
-
-        // 7. Quick actions — Box Breathing + Mini Walk cards
-        ScrollView(.horizontal, showsIndicators: false) {
-            HStack(spacing: 12) {
-                QuickActionCard.boxBreathing()
-                QuickActionCard.miniWalk()
-            }
-            .padding(.horizontal, 4)
-        }
+        // 6. Health data — Exercise / Sleep / Daylight (behavioral signals)
+        HealthDataSection(
+            exerciseMinutes: viewModel.todayExerciseMinutes,
+            exerciseDelta: "yesterday",
+            sleepHours: viewModel.todaySleepHours,
+            sleepDelta: sleepDeltaLabel,
+            daylightMinutes: viewModel.todayDaylightMinutes,
+            daylightDelta: viewModel.todayDaylightMinutes == nil ? nil : "on target"
+        )
         .opacity(appearAnimation ? 1 : 0)
 
-        // 8. Stress over 7-day chart
-        StressOverTimeChart()
+        // 7. Quick actions — Box Breathing + Mini Walk (mid-screen)
+        QuickActionGrid(first: .boxBreathing, second: .miniWalk)
             .opacity(appearAnimation ? 1 : 0)
 
-        // 9. Premium banner — tap navigates to paywall
+        // 8. Stress over time — 7-day bar chart + tier legend
+        StressOverTimeChart(data: viewModel.weeklyStressPoints)
+            .opacity(appearAnimation ? 1 : 0)
+
+        // 9. Premium upsell — frosted glass banner
         NavigationLink {
             IAPPremiumView(
                 storeKit: StoreKitService(premiumState: PremiumState.shared),
@@ -198,35 +200,31 @@ struct DashboardView: View {
         .opacity(appearAnimation ? 1 : 0)
     }
 
-    // MARK: - Status Chips
+    // MARK: - Derivation helpers
 
-    @ViewBuilder
-    private func statusChipRow(_ stress: StressResult?) -> some View {
-        HStack(spacing: 8) {
-            if let category = stress?.category {
-                StatusBadgeView(category: category, style: .standard)
-            } else {
-                StatusBadgeView(category: .relaxed, style: .standard)
-            }
-            streakChip
-            Spacer()
+    private func substate(for stress: StressResult?) -> String {
+        guard let stress else { return "Waiting for a reading" }
+        switch stress.category {
+        case .relaxed:   return "Calm · recovered"
+        case .mild:      return "Focused · steady"
+        case .moderate:  return "Tense · busy"
+        case .high:      return "Wired · push back"
+        case .severe:    return "Fried · reset now"
         }
     }
 
-    private var streakChip: some View {
-        HStack(spacing: 6) {
-            Image(systemName: AppIconSystem.Metric.streak.sfSymbol)
-                .font(.system(size: 11, weight: .bold))
-                .foregroundStyle(HomeCharacterDesignTokens.Ember.accent)
-            Text("\(max(1, viewModel.todayMeasurements.count)) day")
-                .font(.system(size: 12, weight: .semibold, design: .rounded))
-                .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
+    private func hrvTrendLabel(_ stress: StressResult?) -> String? {
+        guard stress != nil else { return nil }
+        switch viewModel.heartRateTrend {
+        case .up:     return "+ vs avg"
+        case .down:   return "- vs avg"
+        case .stable: return "steady"
         }
-        .padding(.horizontal, 12)
-        .padding(.vertical, 6)
-        .background(HomeCharacterDesignTokens.Ember.accent.opacity(0.14))
-        .clipShape(Capsule())
-        .accessibilityLabel("Tracking streak")
+    }
+
+    private var sleepDeltaLabel: String? {
+        guard viewModel.todaySleepHours != nil else { return nil }
+        return "vs avg"
     }
 
     /// RR display string. Returns "--" when there is no stress result OR when
