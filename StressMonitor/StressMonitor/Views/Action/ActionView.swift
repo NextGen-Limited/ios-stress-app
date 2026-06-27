@@ -22,31 +22,29 @@ struct ActionView: View {
     var stressLevel: Double? = nil
 
     var body: some View {
-        NavigationStack {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 18) {
-                    sectionHeader
-                    RippleRecommendationCard(stressLevel: stressLevel) {
-                        isChatPresented = true
-                    }
-                    breatheGroup
-                    moveGroup
-                    reflectGroup
-                    habitsSection
+        ScrollView {
+            VStack(alignment: .leading, spacing: 18) {
+                sectionHeader
+                RippleRecommendationCard(stressLevel: stressLevel) {
+                    isChatPresented = true
                 }
-                .padding(.horizontal, 16)
-                .padding(.top, 12)
-                .padding(.bottom, 24)
+                breatheGroup
+                moveGroup
+                reflectGroup
+                habitsSection
             }
-            .background(HomeCharacterDesignTokens.homeBackground.ignoresSafeArea())
-            .navigationTitle("Action")
-            .navigationBarTitleDisplayMode(.inline)
-            .sheet(isPresented: $isChatPresented) {
-                ChatBottomSheetView(stressResult: nil, baseline: nil)
-            }
-            .sheet(isPresented: $isJournalPresented) {
-                NoteEntryView(isPresented: $isJournalPresented)
-            }
+            .padding(.horizontal, 16)
+            .padding(.top, 12)
+            .padding(.bottom, 24)
+        }
+        .background(HomeCharacterDesignTokens.homeBackground.ignoresSafeArea())
+        .navigationTitle("Action")
+        .navigationBarTitleDisplayMode(.inline)
+        .sheet(isPresented: $isChatPresented) {
+            ChatBottomSheetView(stressResult: nil, baseline: nil)
+        }
+        .sheet(isPresented: $isJournalPresented) {
+            NoteEntryView(isPresented: $isJournalPresented)
         }
         .onAppear {
             if habitViewModel == nil {
@@ -100,7 +98,7 @@ struct ActionView: View {
                         title: "Box Breathing",
                         subtitle: "4-4-4-4 · 2 min · ~14% HRV lift",
                         tint: HomeCharacterDesignTokens.Ripple.primary,
-                        destination: { BreathingExerciseView() }
+                        route: .boxBreathing
                     )
                     ActionRowDivider()
                     ActionGroupRow(
@@ -108,7 +106,7 @@ struct ActionView: View {
                         title: "Body Scan",
                         subtitle: "90s · somatic reset · head to feet",
                         tint: HomeCharacterDesignTokens.Zephyr.accent,
-                        destination: { BreathingExerciseView() }
+                        route: .boxBreathing
                     )
                 }
             }
@@ -127,7 +125,7 @@ struct ActionView: View {
                         title: "Mini Walk",
                         subtitle: "5 min · target 600 steps",
                         tint: Color(hex: "#34C759"),
-                        destination: { MiniWalkView() }
+                        route: .miniWalk
                     )
                     ActionRowDivider()
                     ActionGroupRow(
@@ -135,7 +133,7 @@ struct ActionView: View {
                         title: "Cold Splash",
                         subtitle: "30s · vagus nerve reset",
                         tint: HomeCharacterDesignTokens.Ember.accent,
-                        destination: { BreathingExerciseView() }
+                        route: .boxBreathing
                     )
                 }
             }
@@ -264,9 +262,15 @@ struct ActionView: View {
 // MARK: - Previews
 
 #Preview {
-    ActionView(stressLevel: 62)
+    NavigationStack {
+        ActionView(stressLevel: 62)
+            .stressNavigationDestinations()
+    }
 }
 
 #Preview("No Stress Data") {
-    ActionView()
+    NavigationStack {
+        ActionView()
+            .stressNavigationDestinations()
+    }
 }

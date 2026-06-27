@@ -14,7 +14,6 @@ import SwiftData
 struct TrendsView: View {
     @Environment(\.modelContext) private var modelContext
     @State private var viewModel: TrendsViewModel
-    @State private var navigateToPremium = false
 
     /// Allocated once, not per view re-evaluation. `.task` swaps in the real
     /// environment `modelContext` on first appearance.
@@ -31,44 +30,29 @@ struct TrendsView: View {
     }
 
     var body: some View {
-        NavigationStack {
-            ScrollView {
-                VStack(alignment: .leading, spacing: 14) {
-                    // Chip row — Week / Month / 3 Months / Year
-                    chipRow
-                    editorialSummary
-                    dailyBars
-                    distributionCard
-                    calendarCard
-                    hrvCard
-                    editorialInsight
-                }
-                .padding(.horizontal, 16)
-                .padding(.top, 8)
-                .padding(.bottom, 24)
+        ScrollView {
+            VStack(alignment: .leading, spacing: 14) {
+                // Chip row — Week / Month / 3 Months / Year
+                chipRow
+                editorialSummary
+                dailyBars
+                distributionCard
+                calendarCard
+                hrvCard
+                editorialInsight
             }
-            .background(HomeCharacterDesignTokens.homeBackground.ignoresSafeArea())
-            .navigationTitle("Trends")
-            .navigationBarTitleDisplayMode(.inline)
-            .task {
-                viewModel = TrendsViewModel(modelContext: modelContext)
-                await viewModel.loadTrendData()
-            }
-            .navigationDestination(isPresented: $navigateToPremium) {
-                IAPPremiumView(storeKit: Self.makeStoreKitService(), premiumState: PremiumState.shared)
-            }
+            .padding(.horizontal, 16)
+            .padding(.top, 8)
+            .padding(.bottom, 24)
+        }
+        .background(HomeCharacterDesignTokens.homeBackground.ignoresSafeArea())
+        .navigationTitle("Trends")
+        .navigationBarTitleDisplayMode(.inline)
+        .task {
+            viewModel = TrendsViewModel(modelContext: modelContext)
+            await viewModel.loadTrendData()
         }
     }
-
-    #if DEBUG
-    private static func makeStoreKitService() -> StoreKitServiceProtocol {
-        MockStoreKitService(premiumState: PremiumState.shared)
-    }
-    #else
-    private static func makeStoreKitService() -> StoreKitServiceProtocol {
-        StoreKitService(premiumState: PremiumState.shared)
-    }
-    #endif
 
     // MARK: - Chip Row
 
@@ -251,5 +235,10 @@ enum TrendsChip: String, CaseIterable {
 }
 
 #Preview("Trends") {
-    TrendsView()
+    NavigationStack {
+        TrendsView()
+            .stressNavigationDestinations()
+    }
+    .environment(AppRouter())
+    .modelContainer(for: [StressMeasurement.self], inMemory: true)
 }

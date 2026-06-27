@@ -6,10 +6,13 @@ import SwiftUI
 /// bottom. Breathing (Ripple blue / calm focus) and Walk (green / reset) carry
 /// two distinct accents justified by meaning, not decoration.
 ///
+/// Uses **value-based navigation** (`NavigationLink(value:)`); the parent
+/// `NavigationStack` resolves each `Route` via `.stressNavigationDestinations()`.
+///
 /// Spec reference: design/screens/04-home.html — `.quick-actions`.
-struct QuickActionGrid<DestinationA: View, DestinationB: View>: View {
-    let first: QuickActionTile<DestinationA>
-    let second: QuickActionTile<DestinationB>
+struct QuickActionGrid: View {
+    let first: QuickActionTile
+    let second: QuickActionTile
 
     var body: some View {
         HStack(spacing: 10) {
@@ -21,7 +24,7 @@ struct QuickActionGrid<DestinationA: View, DestinationB: View>: View {
 
 /// Single gradient-backed quick action tile with an icon bubble, title, and a
 /// mono meta line (duration + intent).
-struct QuickActionTile<Destination: View>: View {
+struct QuickActionTile: View {
     enum Accent {
         case breathing
         case walk
@@ -47,10 +50,10 @@ struct QuickActionTile<Destination: View>: View {
     let symbol: String
     let title: String
     let meta: String
-    @ViewBuilder let destination: () -> Destination
+    let route: Route
 
     var body: some View {
-        NavigationLink(destination: destination) {
+        NavigationLink(value: route) {
             VStack(alignment: .leading, spacing: 10) {
                 ZStack {
                     Circle()
@@ -94,26 +97,24 @@ struct QuickActionTile<Destination: View>: View {
 
 // MARK: - Convenience factory
 
-extension QuickActionTile where Destination == BreathingExerciseView {
-    static var boxBreathing: QuickActionTile<BreathingExerciseView> {
+extension QuickActionTile {
+    static var boxBreathing: QuickActionTile {
         QuickActionTile(
             accent: .breathing,
             symbol: "wind",
             title: "Box Breathing",
             meta: "3 MIN · CALM FOCUS",
-            destination: { BreathingExerciseView() }
+            route: .boxBreathing
         )
     }
-}
 
-extension QuickActionTile where Destination == MiniWalkView {
-    static var miniWalk: QuickActionTile<MiniWalkView> {
+    static var miniWalk: QuickActionTile {
         QuickActionTile(
             accent: .walk,
             symbol: "figure.walk",
             title: "Mini Walk",
             meta: "3 MIN · RESET",
-            destination: { MiniWalkView() }
+            route: .miniWalk
         )
     }
 }
@@ -125,5 +126,6 @@ extension QuickActionTile where Destination == MiniWalkView {
         QuickActionGrid(first: .boxBreathing, second: .miniWalk)
             .padding()
             .background(HomeCharacterDesignTokens.homeBackground)
+            .stressNavigationDestinations()
     }
 }

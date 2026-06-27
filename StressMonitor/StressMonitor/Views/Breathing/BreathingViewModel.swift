@@ -166,7 +166,7 @@ class BreathingSessionViewModel {
     }
 }
 
-struct BreathingSessionResult {
+struct BreathingSessionResult: Hashable, Codable {
     let preSessionHRV: Double
     let postSessionHRV: Double
     let duration: TimeInterval

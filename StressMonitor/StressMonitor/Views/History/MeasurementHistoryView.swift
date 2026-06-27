@@ -181,9 +181,7 @@ struct MeasurementHistoryView: View {
                 ForEach(vm.dayGroups) { group in
                     Section {
                         ForEach(group.measurements) { measurement in
-                            NavigationLink {
-                                MeasurementDetailView(measurement: measurement)
-                            } label: {
+                            NavigationLink(value: Route.measurement(id: measurement.persistentModelID)) {
                                 HistoryEntryCard(measurement: measurement)
                             }
                             .buttonStyle(.plain)

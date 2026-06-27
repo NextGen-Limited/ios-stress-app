@@ -7,9 +7,8 @@ import SwiftUI
 struct DataManageView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
+    @Environment(AppRouter.self) private var router
 
-    @State private var navigateToExport = false
-    @State private var navigateToDelete = false
     @State private var showingDeleteAll = false
     @State private var showingFactoryReset = false
     @State private var resultMessage: String?
@@ -24,12 +23,6 @@ struct DataManageView: View {
         }
         .navigationTitle("Manage Data")
         .navigationBarTitleDisplayMode(.inline)
-        .navigationDestination(isPresented: $navigateToExport) {
-            DataExportView()
-        }
-        .navigationDestination(isPresented: $navigateToDelete) {
-            DataDeleteView()
-        }
         .alert("Done", isPresented: $showingResult) {
             Button("OK", role: .cancel) {}
         } message: {
@@ -78,7 +71,7 @@ struct DataManageView: View {
     private var exportSection: some View {
         Section {
             Button {
-                navigateToExport = true
+                router.settingsPath.append(Route.dataExport)
             } label: {
                 rowLabel(icon: "square.and.arrow.up", tint: Color.primaryBlue, title: "Export data", subtitle: "CSV or JSON, with date range")
             }
@@ -94,7 +87,7 @@ struct DataManageView: View {
     private var deleteSection: some View {
         Section {
             Button {
-                navigateToDelete = true
+                router.settingsPath.append(Route.dataDelete)
             } label: {
                 rowLabel(icon: "calendar.badge.minus", tint: .orange, title: "Delete by range", subtitle: "Remove snapshots from a window of time")
             }
@@ -191,6 +184,8 @@ struct DataManageView: View {
 #Preview {
     NavigationStack {
         DataManageView()
+            .stressNavigationDestinations()
     }
+    .environment(AppRouter())
     .modelContainer(for: [StressMeasurement.self, CharacterUnlock.self], inMemory: true)
 }

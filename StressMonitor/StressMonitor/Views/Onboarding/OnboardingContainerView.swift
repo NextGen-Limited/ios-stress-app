@@ -201,5 +201,7 @@ struct OnboardingContainerView: View {
 
 #Preview {
     OnboardingContainerView()
+        .environment(AppRouter())
+        .environment(PaywallController())
         .modelContainer(for: [StressMeasurement.self, CharacterUnlock.self], inMemory: true)
 }

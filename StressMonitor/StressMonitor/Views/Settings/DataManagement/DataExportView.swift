@@ -457,7 +457,7 @@ struct ShareSheet: UIViewControllerRepresentable {
 }
 
 #Preview {
-    NavigationView {
+    NavigationStack {
         DataExportView()
     }
 }

@@ -47,9 +47,7 @@ struct HistoryView: View {
                     }
                 } else {
                     ForEach(filteredMeasurements) { measurement in
-                        NavigationLink {
-                            MeasurementDetailView(measurement: measurement)
-                        } label: {
+                        NavigationLink(value: Route.measurement(id: measurement.persistentModelID)) {
                             HistoryEntryCard(measurement: measurement)
                         }
                         .listRowInsets(EdgeInsets())
@@ -200,6 +198,7 @@ struct HistoryRow: View {
 #Preview {
     NavigationStack {
         HistoryView()
+            .stressNavigationDestinations()
     }
     .modelContainer(for: StressMeasurement.self, inMemory: true)
 }

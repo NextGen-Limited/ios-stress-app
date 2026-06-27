@@ -3,22 +3,21 @@ import SwiftUI
 /// A single row inside an action group card on the Action tab.
 ///
 /// SF Symbol icon (no colored circle wrapper — removes the icon-wrap AI-slop tell)
-/// + title + subtitle + trailing chevron. Wrapped in a NavigationLink so the
-/// parent NavigationStack pushes `Destination`.
+/// + title + subtitle + trailing chevron. Uses **value-based navigation**
+/// (`NavigationLink(value:)`) so the parent `NavigationStack` resolves the
+/// destination via `Route` + `.stressNavigationDestinations()`.
 ///
 /// Designed to be placed inside an `ActionGroupCard` which provides the shared
 /// background, rounded corners, and hairline separators between rows.
-struct ActionGroupRow<Destination: View>: View {
+struct ActionGroupRow: View {
     let icon: String
     let title: String
     let subtitle: String
     let tint: Color
-    @ViewBuilder let destination: () -> Destination
+    let route: Route
 
     var body: some View {
-        NavigationLink {
-            destination()
-        } label: {
+        NavigationLink(value: route) {
             HStack(spacing: 12) {
                 Image(systemName: icon)
                     .font(.system(size: 18, weight: .medium))
@@ -59,8 +58,8 @@ struct ActionGroupRow<Destination: View>: View {
 /// Usage:
 /// ```swift
 /// ActionGroupCard {
-///     ActionGroupRow(icon: "wind", ...)
-///     ActionGroupRow(icon: "figure.walk", ...)
+///     ActionGroupRow(icon: "wind", ..., route: .breathingSession)
+///     ActionGroupRow(icon: "figure.walk", ..., route: .miniWalk)
 /// }
 /// ```
 struct ActionGroupCard<Content: View>: View {
@@ -100,7 +99,7 @@ struct ActionRowDivider: View {
                             title: "Box Breathing",
                             subtitle: "4-4-4-4 · 2 min",
                             tint: HomeCharacterDesignTokens.Ripple.primary,
-                            destination: { Text("Box Breathing") }
+                            route: .boxBreathing
                         )
                         ActionRowDivider()
                         ActionGroupRow(
@@ -108,7 +107,7 @@ struct ActionRowDivider: View {
                             title: "Body Scan",
                             subtitle: "90s · somatic reset",
                             tint: HomeCharacterDesignTokens.Zephyr.accent,
-                            destination: { Text("Body Scan") }
+                            route: .boxBreathing
                         )
                     }
                 }
@@ -119,7 +118,7 @@ struct ActionRowDivider: View {
                             title: "Mini Walk",
                             subtitle: "5 min reset",
                             tint: Color(hex: "#34C759"),
-                            destination: { Text("Mini Walk") }
+                            route: .miniWalk
                         )
                         ActionRowDivider()
                         ActionGroupRow(
@@ -127,7 +126,7 @@ struct ActionRowDivider: View {
                             title: "Cold Splash",
                             subtitle: "30s vagus nerve reset",
                             tint: HomeCharacterDesignTokens.Ember.accent,
-                            destination: { Text("Cold Splash") }
+                            route: .boxBreathing
                         )
                     }
                 }
@@ -135,5 +134,6 @@ struct ActionRowDivider: View {
             .padding(16)
         }
         .background(HomeCharacterDesignTokens.homeBackground)
+        .stressNavigationDestinations()
     }
 }

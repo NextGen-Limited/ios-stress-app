@@ -493,7 +493,7 @@ enum DeleteError: LocalizedError {
 }
 
 #Preview {
-    NavigationView {
+    NavigationStack {
         DataDeleteView()
     }
 }

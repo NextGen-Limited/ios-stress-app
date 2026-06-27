@@ -3,6 +3,7 @@ import SwiftData
 
 struct DashboardView: View {
     @Environment(\.modelContext) private var modelContext
+    @Environment(PaywallController.self) private var paywall
     @State private var viewModel: StressViewModel
     @Environment(\.scenePhase) private var scenePhase
     @State private var appeared = false
@@ -184,15 +185,12 @@ struct DashboardView: View {
             .opacity(appearAnimation ? 1 : 0)
 
         // 8. Stress over time — 7-day bar chart + tier legend
-        StressOverTimeChart(data: viewModel.weeklyStressPoints)
+        StressOverTimeChart(data: viewModel.weeklyStressPoints) { paywall.present(reason: .trendsLongRange) }
             .opacity(appearAnimation ? 1 : 0)
 
-        // 9. Premium upsell — frosted glass banner
-        NavigationLink {
-            IAPPremiumView(
-                storeKit: StoreKitService(premiumState: PremiumState.shared),
-                premiumState: PremiumState.shared
-            )
+        // 9. Premium upsell — frosted glass banner (full-screen paywall)
+        Button {
+            paywall.present(reason: .general)
         } label: {
             PremiumBanner()
         }
@@ -252,15 +250,27 @@ struct DashboardView: View {
 
 #Preview("Dashboard - With Mock Data") {
     let viewModel = PreviewDataFactory.mockDashboardViewModel()
-    DashboardView(viewModel: viewModel)
+    NavigationStack {
+        DashboardView(viewModel: viewModel)
+            .stressNavigationDestinations()
+    }
+    .environment(PaywallController())
 }
 
 #Preview("Dashboard - No Data") {
-    DashboardView(repository: StressRepository(modelContext: ModelContext((try? ModelContainer(for: StressMeasurement.self, configurations: ModelConfiguration(isStoredInMemoryOnly: true)))!)))
+    NavigationStack {
+        DashboardView(repository: StressRepository(modelContext: ModelContext((try? ModelContainer(for: StressMeasurement.self, configurations: ModelConfiguration(isStoredInMemoryOnly: true)))!)))
+            .stressNavigationDestinations()
+    }
+    .environment(PaywallController())
 }
 
 #Preview("Dashboard - Dark Mode") {
     let viewModel = PreviewDataFactory.mockDashboardViewModel()
-    DashboardView(viewModel: viewModel)
-        .preferredColorScheme(.dark)
+    NavigationStack {
+        DashboardView(viewModel: viewModel)
+            .stressNavigationDestinations()
+    }
+    .environment(PaywallController())
+    .preferredColorScheme(.dark)
 }

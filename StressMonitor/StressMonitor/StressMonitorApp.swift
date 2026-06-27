@@ -12,6 +12,10 @@ enum DemoMode {
 
 @main
 struct StressMonitorApp: App {
+    // Central navigation + paywall state. Owned here so they are available to
+    // every scene, tab, sheet, and the root full-screen paywall cover.
+    @State private var appRouter = AppRouter()
+    @State private var paywall = PaywallController()
     // MARK: - Versioned Schema (V1 → V2 adds Habit)
     //
     // SwiftData can silently wipe an existing store on iOS 17.0–17.3 when the
@@ -83,7 +87,13 @@ struct StressMonitorApp: App {
 
     var body: some Scene {
         WindowGroup {
+            // The `PaywallController` is owned here (true singleton) and
+            // injected into the tree. The `.fullScreenCover` that consumes it
+            // lives on `MainTabView`, so the paywall renders above the entire
+            // TabView (all tabs + navigation stacks).
             OnboardingContainerView()
+                .environment(appRouter)
+                .environment(paywall)
                 .preferredColorScheme(AppearanceManager.shared.colorScheme)
                 #if DEBUG
                 .onAppear {

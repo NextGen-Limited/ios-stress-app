@@ -10,8 +10,8 @@ import SwiftUI
 /// `BreathingSessionView`.
 struct BreathingExerciseView: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(AppRouter.self) private var router
 
-    @State private var navigateToSession = false
     @State private var currentHRV: Double = 0
     @State private var hrvTimestamp: Date?
 
@@ -28,41 +28,36 @@ struct BreathingExerciseView: View {
     private let success = Color(hex: "#34C759")          // --success
 
     var body: some View {
-        NavigationStack {
-            ScrollView(showsIndicators: false) {
-                VStack(spacing: 18) {
-                    introHero
-                    patternExplain
-                    beforeCard
-                    sessionConfig
-                    ctaRow
-                    footnote
-                }
-                .padding(.horizontal, 24)
-                .padding(.bottom, 24)
+        ScrollView(showsIndicators: false) {
+            VStack(spacing: 18) {
+                introHero
+                patternExplain
+                beforeCard
+                sessionConfig
+                ctaRow
+                footnote
             }
-            .background(Color(hex: "#F2F2F7"))
-            .navigationBarBackButtonHidden(true)
-            .toolbar {
-                ToolbarItem(placement: .topBarLeading) {
-                    Button(action: { dismiss() }) {
-                        Image(systemName: AppIconSystem.Nav.back.sfSymbol)
-                            .font(.system(size: 16, weight: .medium))
-                            .foregroundStyle(accentStrong)
-                    }
-                    .accessibilityLabel("Back")
-                }
-                ToolbarItem(placement: .principal) {
-                    Text("Box Breathing")
-                        .font(.system(size: 17, weight: .semibold))
-                        .foregroundStyle(fg)
-                }
-            }
-            .navigationDestination(isPresented: $navigateToSession) {
-                BreathingSessionView()
-            }
-            .task { await fetchCurrentHRV() }
+            .padding(.horizontal, 24)
+            .padding(.bottom, 24)
         }
+        .background(Color(hex: "#F2F2F7"))
+        .navigationBarBackButtonHidden(true)
+        .toolbar {
+            ToolbarItem(placement: .topBarLeading) {
+                Button(action: { dismiss() }) {
+                    Image(systemName: AppIconSystem.Nav.back.sfSymbol)
+                        .font(.system(size: 16, weight: .medium))
+                        .foregroundStyle(accentStrong)
+                }
+                .accessibilityLabel("Back")
+            }
+            ToolbarItem(placement: .principal) {
+                Text("Box Breathing")
+                    .font(.system(size: 17, weight: .semibold))
+                    .foregroundStyle(fg)
+            }
+        }
+        .task { await fetchCurrentHRV() }
     }
 
     // MARK: - Intro Hero
@@ -250,7 +245,7 @@ struct BreathingExerciseView: View {
 
     private var ctaRow: some View {
         VStack(spacing: 6) {
-            Button(action: { navigateToSession = true }) {
+            Button(action: { router.actionPath.append(Route.breathingSession) }) {
                 Text("Begin Session")
                     .font(.system(size: 17, weight: .semibold))
                     .foregroundStyle(.white)
@@ -312,5 +307,9 @@ private struct BoxBreathingStep {
 // MARK: - Preview
 
 #Preview {
-    BreathingExerciseView()
+    NavigationStack {
+        BreathingExerciseView()
+            .stressNavigationDestinations()
+    }
+    .environment(AppRouter())
 }

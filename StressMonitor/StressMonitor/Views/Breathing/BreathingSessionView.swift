@@ -10,7 +10,7 @@ import SwiftUI
 struct BreathingSessionView: View {
     @State private var viewModel: BreathingSessionViewModel?
     @Environment(\.dismiss) private var dismiss
-    @State private var showSummary = false
+    @Environment(AppRouter.self) private var router
 
     // Design tokens
     private let accent = Color(hex: "#4FC3F7")
@@ -113,13 +113,8 @@ struct BreathingSessionView: View {
             viewModel?.endSession()
         }
         .onChange(of: viewModel?.sessionComplete ?? false) { _, completed in
-            if completed {
-                showSummary = true
-            }
-        }
-        .navigationDestination(isPresented: $showSummary) {
-            if let result = viewModel?.sessionResult {
-                BreathingSummaryView(result: result)
+            if completed, let result = viewModel?.sessionResult {
+                router.actionPath.append(Route.breathingSummary(result))
             }
         }
     }
@@ -239,5 +234,7 @@ extension BreathingSessionViewModel {
 #Preview {
     NavigationStack {
         BreathingSessionView()
+            .stressNavigationDestinations()
     }
+    .environment(AppRouter())
 }

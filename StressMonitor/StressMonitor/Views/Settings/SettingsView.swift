@@ -4,12 +4,10 @@ import HealthKit
 
 struct SettingsView: View {
     @Environment(\.modelContext) private var modelContext
+    @Environment(AppRouter.self) private var router
+    @Environment(PaywallController.self) private var paywall
     @State private var viewModel: SettingsViewModel
     @State private var habitViewModel: HabitViewModel?
-    @State private var navigateToExport = false
-    @State private var navigateToDelete = false
-    @State private var navigateToPremium = false
-    @State private var navigateToCharacters = false
     @State private var docsURL: URL? = nil
     @State private var appearance = AppearanceManager.shared
 
@@ -53,18 +51,6 @@ struct SettingsView: View {
             }
             Task { await viewModel.loadUserProfile() }
         }
-        .navigationDestination(isPresented: $navigateToExport) {
-            DataExportView()
-        }
-        .navigationDestination(isPresented: $navigateToDelete) {
-            DataDeleteView()
-        }
-        .navigationDestination(isPresented: $navigateToPremium) {
-            IAPPremiumView(storeKit: Self.makeStoreKitService(), premiumState: PremiumState.shared)
-        }
-        .navigationDestination(isPresented: $navigateToCharacters) {
-            CharacterCollectionView()
-        }
         .sheet(item: $docsURL) { url in
             SafariView(url: url)
                 .ignoresSafeArea()
@@ -80,7 +66,7 @@ struct SettingsView: View {
             streakDays: streakDayCount,
             displayName: "You",
             email: nil,
-            onPlusTap: { navigateToPremium = true }
+            onPlusTap: { paywall.present(reason: .general) }
         )
     }
 
@@ -91,7 +77,7 @@ struct SettingsView: View {
             companionName: activeCreature.displayName,
             companionSubtitle: activeCreature.element.rawValue.capitalized,
             mood: RippleMood.from(stressLevel: viewModel.latestStressLevel),
-            onSwitch: { navigateToCharacters = true }
+            onSwitch: { router.settingsPath.append(Route.characters) }
         )
     }
 
@@ -100,7 +86,7 @@ struct SettingsView: View {
     private var companionGroupSection: some View {
         SettingsCard {
             Button {
-                navigateToCharacters = true
+                router.settingsPath.append(Route.characters)
             } label: {
                 HStack(spacing: 12) {
                     Image(systemName: "circle.grid.2x2.fill")
@@ -249,9 +235,9 @@ struct SettingsView: View {
                 SettingsSectionHeader(icon: "lock.shield.fill", title: "Data & support", color: .settingsIconPurple)
                     .padding(.bottom, 12)
 
-                supportRow("Export CSV", icon: "arrow.down.doc") { navigateToExport = true }
+                supportRow("Export CSV", icon: "arrow.down.doc") { router.settingsPath.append(Route.dataExport) }
                 hairlineDivider
-                supportRow("Delete all data", icon: "trash", role: .destructive) { navigateToDelete = true }
+                supportRow("Delete all data", icon: "trash", role: .destructive) { router.settingsPath.append(Route.dataDelete) }
                 hairlineDivider
                 supportRow("Help & FAQ", icon: "questionmark.circle") { docsURL = DocsURL.help }
                 hairlineDivider
@@ -333,7 +319,7 @@ struct SettingsView: View {
 
     private var premiumRow: some View {
         Button {
-            navigateToPremium = true
+            paywall.present(reason: .general)
         } label: {
             HStack {
                 Image(systemName: AppIconSystem.System.premium.sfSymbol)
@@ -343,7 +329,7 @@ struct SettingsView: View {
                     .font(.system(size: 15, weight: .semibold))
                     .foregroundStyle(Color.Wellness.adaptivePrimaryText)
                 Spacer()
-                PlusPill(onTap: { navigateToPremium = true })
+                PlusPill(onTap: { paywall.present(reason: .general) })
             }
             .contentShape(Rectangle())
             .padding(.vertical, 10)
@@ -551,24 +537,16 @@ struct SettingsView: View {
         }
     }
 
-    // MARK: - StoreKit factory (ported from previous SettingsView)
-
-    #if DEBUG
-    private static func makeStoreKitService() -> StoreKitServiceProtocol {
-        MockStoreKitService(premiumState: PremiumState.shared)
-    }
-    #else
-    private static func makeStoreKitService() -> StoreKitServiceProtocol {
-        StoreKitService(premiumState: PremiumState.shared)
-    }
-    #endif
 }
 
 struct SettingsView_Previews: PreviewProvider {
     static var previews: some View {
         NavigationStack {
             SettingsView()
+                .stressNavigationDestinations()
         }
+        .environment(AppRouter())
+        .environment(PaywallController())
         .modelContainer(for: [StressMeasurement.self, CharacterUnlock.self], inMemory: true)
     }
 }
