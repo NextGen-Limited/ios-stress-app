@@ -62,10 +62,11 @@ extension Color {
 
 ### Font Families
 
-**Roboto (Primary):**
-- 6 weights bundled: Regular, Medium, Bold, ExtraBold, Light, Italic
-- Loaded via `FontBlaster` utility
+**SF Pro (Primary):**
+- System font via `.system(...design: .rounded)` (Foundation design system, Jun 2026 migration)
+- Weights: Regular, Medium, Semibold, Bold, Light via SwiftUI `Font.Weight`
 - Typography defined in `Theme/Font+WellnessType.swift`
+- *Note: Roboto custom fonts and `FontBlaster` loading were removed in the SF Pro migration.*
 
 **Monospace (for data):**
 - Menlo or Courier (`.monospaced`)

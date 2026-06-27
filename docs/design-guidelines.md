@@ -209,11 +209,14 @@ The app uses a 3-tab navigation structure:
 **Evolution System:**
 - 3 evolution stages (Seed → Growth → Flourish)
 - Triggered by user streaks, completed sessions, resilience scores
-- Unique SVG assets per stage and mood state
+- Single exported SVG per character; mood-reactivity via procedural SwiftUI animation layer
 - Free/premium/streak-gated unlock types
 
-**Asset Naming:** `{character}_{evolution}_{mood}.svg`
-- Example: `ripple_seed_calm.svg`, `blossom_flourish_overwhelmed.svg`
+**Asset Structure:** 6 character SVGs (5 characters + ripple-hero) + 5 mood-face SVGs
+- Characters: `ripple`, `blossom`, `ember`, `zephyr`, `lumi` (100×100 viewBox) + `ripple-hero` (220×220)
+- Mood faces: `mood-relaxed`, `mild`, `moderate`, `high`, `severe` (24×24 viewBox)
+- Design exports live in `design/exports/characters/` and `design/exports/mood-faces/`
+- Legacy `{character}_{evolution}_{mood}.svg` naming deprecated (export pipeline only)
 
 ### Character Mood States
 
@@ -248,16 +251,22 @@ Each character has 5 mood expressions tied to stress level:
 - **High** (75-100) - Stressed, worried
 - **Recovery** - Proud, glowing (post-exercise/breathing)
 
-### SVG Asset Naming
+### SVG Asset Structure
 
-All character assets follow strict naming convention: `{character}_{evolution}_{mood}.svg`
+**Current System (Commit #45):**
+- 6 character SVGs in `Assets.xcassets/Characters/`: `ripple`, `blossom`, `ember`, `zephyr`, `lumi` (100×100 viewBox) + `ripple-hero` (220×220)
+- 5 mood-face SVGs in `Assets.xcassets/MoodFaces/`: `mood-relaxed`, `mild`, `moderate`, `high`, `severe` (24×24 viewBox)
+- All SVGs have `preserves-vector-representation: true`
+- Mood-reactivity achieved via `StressBuddyIllustration` procedural animation layer (not per-mood SVGs)
 
-**Examples:**
-- `ripple_ripple_relaxed.svg` - Ripple character, Stage 2, relaxed mood
-- `ember_inferno_high.svg` - Ember character, Stage 3, high stress mood
-- `lumi_crescent_mild.svg` - Lumi character, Stage 1, mild stress mood
+**Design Source:**
+- `design/characters-export.html` - Character SVG export sheet
+- `design/icon-system.html` - Icon system spec and mood-face export sheet
+- `design/exports/characters/` - Generated character SVGs
+- `design/exports/mood-faces/` - Generated mood-face SVGs
 
-See `/docs/design/ASSET_NAMING.md` for comprehensive naming specification.
+**Legacy Naming (Deprecated):**
+The old `{character}_{evolution}_{mood}.svg` naming convention is retained only for the illustration export pipeline. See `/docs/design/ASSET_NAMING.md` for details.
 
 ### Color Palettes
 

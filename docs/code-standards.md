@@ -2,8 +2,8 @@
 
 **Framework:** Swift 5.9+ with SwiftUI & SwiftData
 **Architecture:** MVVM + Protocol-Oriented Design
-**External Dependencies:** 13 SPM packages (Moya, Alamofire, Kingfisher, SwiftUICharts, AnimatedTabBar, etc.)
-**Last Updated:** June 7, 2026
+**External Dependencies:** 8 SPM packages (2 direct: Chat, SwiftUICharts; 6 transitive: Kingfisher, Giphy, MediaPicker, ActivityIndicatorView, AnchoredPopup, LibWebP)
+**Last Updated:** June 27, 2026
 
 ---
 
@@ -60,7 +60,7 @@ Before committing code, verify:
 ```
 StressMonitor/
 ├── Components/              # Shared UI components (Character, Charts, Dashboard)
-├── Fonts/                   # Roboto font family (6 TTF files)
+├── Fonts/                   # SF Pro font family (Foundation design system)
 ├── Models/                  # Data structures (~18 files)
 ├── Services/                # Business logic
 │   ├── Algorithm/           # Multi-factor stress algorithm

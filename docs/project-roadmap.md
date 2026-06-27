@@ -3,7 +3,7 @@
 **Current Version:** 1.0 (Pre-Ship - RC1)
 **Release Date:** Target late June 2026 (pending B3 test suite)
 **Status:** Feature Complete — 1 blocker pending (B3)
-**Last Updated:** June 17, 2026
+**Last Updated:** June 27, 2026
 
 ---
 
@@ -17,7 +17,7 @@
 - ✅ Real-time stress measurement (HRV + HR algorithm)
 - ✅ Personal baseline adaptation (30-day learning)
 - ✅ Confidence scoring (data quality indicator)
-- ✅ Stress categorization (Relaxed, Mild, Moderate, High)
+- ✅ Stress categorization (Relaxed, Mild, Moderate, High, Severe — 5 levels with WCAG dual-coding)
 
 #### Data Management
 - ✅ Local SwiftData persistence
@@ -64,6 +64,8 @@
 - ✅ HealthKit permission request
 
 #### Recent Completions (June 2026)
+- ✅ **Centralized AppIconSystem** (PR #44, Jun 25) - `Theme/AppIconSystem.swift` (321 LOC); single source of truth for every SF Symbol across 7 categories (Tab, Nav, Action, Metric, Setting, System, MoodFace). **37 files / 59 references migrated** from scattered string literals.
+- ✅ **Character Views → SVG Assets** (PR #45, Jun 25) - 16 view files migrated from procedural SwiftUI drawing to design-exported SVG assets via `CharacterAssetResolver` + `CharacterAssetCatalog`. Mood-reactivity preserved via `StressBuddyIllustration` animation layer.
 - ✅ **AppearanceManager** - Dark mode preference manager with Light/Dark/System modes (Jun 13)
 - ✅ **Settings Redesign** - Ripple UI card-based architecture with 13 components (Jun 13)
 - ✅ **ProfileCard** - User profile with appearance toggle and Delete All Data CTA (Jun 13)
@@ -84,7 +86,7 @@
 - ✅ **Weekly Billing Option** - Added SubscriptionPeriod.weekly to premium tier (Jun 17)
 - ✅ **Streaming AI Chat** - Real-time token streaming with SSEParser (Apr 2026)
 - ✅ **Box Breathing Figma Alignment** - Enhanced breathing exercise visuals (Apr 2026)
-- ✅ **Character Collection UI** - 5 elemental characters with evolution system, 38 SVG assets (Jun 2026)
+- ✅ **Character Collection UI** - 5 elemental characters with evolution system, 6 character SVGs + 5 mood-face SVGs (mood-reactivity via procedural animation layer) (Jun 2026)
 - ✅ **B1 Resolution (Jun 7)** - CloudLLM removed; SupabaseLLMService deployed as production service
 - ✅ **B2 Real StoreKit 2 (Jun 12)** - Real App Store product fetching, transaction monitoring, PremiumState singleton (PR #19 merged)
 

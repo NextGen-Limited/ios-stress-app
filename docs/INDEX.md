@@ -1,7 +1,7 @@
 # StressMonitor Documentation Index
 
 **Version:** 1.0 (Pre-Ship RC1)
-**Last Updated:** June 17, 2026
+**Last Updated:** June 27, 2026
 **Blocker Status:** 1 critical remaining (B3 - comprehensive test suite rewrite)
 **Resolved Blockers:** B1 ✅ (Jun 7), B2 ✅ (Jun 12)
 
@@ -22,7 +22,7 @@ Product vision, requirements, features, algorithm specifications, and success me
 ### 2. **[Codebase Summary](./codebase-summary.md)**
 File structure, organization, component breakdown, and code metrics.
 - High-level project structure
-- iOS app architecture (250+ files, ~28K LOC)
+- iOS app architecture (298 files, ~41K LOC)
 - watchOS app architecture (46+ files, ~3.2K LOC)
 - Widget architecture (7+ files, ~1.4K LOC)
 - Component responsibilities and file metrics
@@ -81,20 +81,20 @@ App Store editorial preparation, ASO keyword strategy, and submission-ready copy
 
 ## Quick Reference
 
-### Codebase Metrics (as of Jun 17, 2026)
+### Codebase Metrics (as of Jun 27, 2026)
 
 | Metric | Value |
 |--------|-------|
-| **Total Swift Files** | 331+ |
-| **Total LOC** | ~36,000+ |
-| **iOS App** | 250+ files, ~28.5K LOC |
-| **watchOS App** | 46+ files, ~3.5K LOC |
-| **Widgets** | 7+ files, ~1.4K LOC |
-| **Tests** | 5+ files (placeholder - pending B3 rewrite) |
-| **External Dependencies** | 13+ SPM packages |
+| **Total Swift Files** | 389 |
+| **Total LOC** | ~41,000+ |
+| **iOS App** | 298 files, ~41K LOC |
+| **watchOS App** | 52 files |
+| **Widgets** | 13 files |
+| **Tests** | 5 files (placeholder - pending B3 rewrite) |
+| **External Dependencies** | 8 SPM packages (2 direct: Chat, SwiftUICharts) |
 | **CI/CD** | GitHub Actions (macos-15, Xcode 26) |
-| **Character Assets** | 38 SVG files |
-| **New (Jun 17)** | BioAgeCalculator, BioAgeCardView, WatchFacePreferences, CharacterIllustrationExporter |
+| **Character Assets** | 11 SVG files (6 characters + 5 mood-faces) |
+| **New (Jun 25)** | `AppIconSystem` (centralized icon system, PR #44), character views → SVG assets (PR #45) |
 
 ### Documentation Metrics
 
@@ -147,14 +147,16 @@ App Store editorial preparation, ASO keyword strategy, and submission-ready copy
 | **@Observable macro** | Modern iOS 17+ reactive |
 | **SwiftData (not Core Data)** | iOS 17+ native, SwiftUI-friendly |
 | **CloudKit E2E encryption** | User privacy guarantee |
-| **SPM Dependencies** | 13+ packages (Kingfisher, SwiftUICharts, ExyteChat, AnimatedTabBar, etc.) |
+| **SPM Dependencies** | 8 packages (Chat, SwiftUICharts + 6 transitive) |
 | **WidgetKit (not ClockKit)** | watchOS 10+ requirement |
 | **async/await throughout** | Modern concurrency |
 | **Foundation Models** | On-device LLM via Apple Intelligence (iOS 26+) |
 | **SupabaseLLMService** | Supabase Edge Functions as cloud LLM **production** service (B1 resolved Jun 7) |
 | **Real StoreKit 2** | App Store product fetching + transaction monitoring (PR #19, Jun 12) |
 | **3-Tab Navigation** | Home/Action/Trend structure with Settings non-tab (Jun 17, 2026) |
-| **Character System** | 5 elemental creatures with 3-stage evolution, 38 SVG assets |
+| **Character System** | 5 elemental creatures with 3-stage evolution, 11 SVG assets (6 characters + 5 mood-faces) |
+| **Centralized Icon System** | `AppIconSystem` single source of truth for all SF Symbols (PR #44, 37 files migrated) |
+| **5-Level Stress Scale** | Relaxed/Mild/Moderate/High/Severe with WCAG dual-coding (color + icon + pattern) |
 | **GitHub Actions CI** | Automated build + test on macos-15 with SPM caching |
 
 ---
@@ -231,7 +233,7 @@ SwiftUI Views → @Observable ViewModels → Protocol-based Services
 
 | Version | Release | Status | Notable |
 |---------|---------|--------|---------|
-| **1.0** | Jul/Aug 2026 | 🔄 Pre-Ship RC1 | AI Chat with SSE streaming, 5-tab navigation (Home/Trends/Breathing/Characters/Settings), Character Collection UI (5 characters, 3-stage evolution, 38 SVG assets), SupabaseLLM via Edge Functions + Apple Intelligence, Box Breathing Figma alignment, Mini Walk exercise, Real StoreKit 2 (PR #19 Jun 12), Stress History, Guided Breathing, Watch Complications, Morning Readiness Check. **Remaining Blocker:** Test suite rewrite |
+| **1.0** | Jul/Aug 2026 | 🔄 Pre-Ship RC1 | AI Chat with SSE streaming, 3-tab navigation (Home/Action/Trend) + Settings screen, Character Collection UI (5 characters, 3-stage evolution, 11 SVG assets), SupabaseLLM via Edge Functions + Apple Intelligence, Box Breathing Figma alignment, Mini Walk exercise, Real StoreKit 2 (PR #19 Jun 12), Stress History, Guided Breathing, Watch Complications, Morning Readiness Check, **Centralized `AppIconSystem` (PR #44)**, **Character views → SVG assets (PR #45)**. **Remaining Blocker:** Test suite rewrite |
 | **1.1** | Q3 2026 | 🔄 Planned | Advanced breathing, stress triggers, weekly reports, localization MVP |
 | **2.0** | Q4 2026 | 🎯 Concept | ML insights, Siri Shortcuts, iPad support |
 
@@ -239,6 +241,6 @@ SwiftUI Views → @Observable ViewModels → Protocol-based Services
 
 **Read the README.md** at project root for quick start and feature overview.
 
-**Last Updated:** June 19, 2026
+**Last Updated:** June 27, 2026
 **Maintained By:** Phuong Doan
 **Generated with:** repomix codebase analysis + manual documentation review

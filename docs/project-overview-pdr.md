@@ -39,7 +39,7 @@ StressMonitor is a **privacy-first stress monitoring application** that uses Hea
 | **Guided Breathing with Biofeedback** | Enhanced breathing with real-time feedback | ✅ Complete |
 | **Morning Readiness Check** | HRV trend analysis for daily readiness assessment | ✅ Complete |
 | **Home Screen Widgets** | At-a-glance stress display | ✅ Complete |
-| **Character Collection UI** | 5 elemental characters with 3-stage evolution, free/premium/streak unlocks, 38 SVG assets | ✅ Complete |
+| **Character Collection UI** | 5 elemental characters with 3-stage evolution, free/premium/streak unlocks, 6 character SVGs + 5 mood-face SVGs (mood-reactivity via procedural animation layer) | ✅ Complete |
 | **3-Tab Navigation** | Home/Action/Trend structure with Settings non-tab (Jun 17) | ✅ Complete |
 | **Biological Age Calculator** | Estimates biological age from HRV, resting HR, sleep; 7-day min requirement | ✅ Complete |
 | **Watch Face Personalization** | Background style selection synced via WatchConnectivity | ✅ Complete |
@@ -96,10 +96,13 @@ HealthKit → HRV + HR + Sleep + Activity + Recovery
 
 | Category | Range | Indicator | User Action |
 |----------|-------|-----------|------------|
-| **Relaxed** | 0-25 | 🟢 Green | Optimal state |
-| **Mild Stress** | 25-50 | 🔵 Blue | Monitor |
-| **Moderate Stress** | 50-75 | 🟡 Yellow | Consider intervention |
-| **High Stress** | 75-100 | 🟠 Orange | Take action |
+| **Relaxed** | 0-25 | 🟢 Green (#34C759) | Optimal state |
+| **Mild Stress** | 26-50 | 🔵 Blue (#007AFF) | Monitor |
+| **Moderate Stress** | 51-75 | 🟡 Yellow (#FFD60A) | Consider intervention |
+| **High Stress** | 76-90 | 🟠 Orange (#FF9500) | Take action |
+| **Severe Stress** | 91-100 | 🔴 Red (#FF3B30) | Immediate intervention |
+
+> **WCAG dual-coding:** Each level pairs color with a distinct SF Symbol face + pattern (`StressCategory` enum + `MoodFaceIcon`). Color is never the sole signal.
 
 ### Confidence Scoring
 
@@ -201,7 +204,7 @@ Each measurement includes a confidence value (0-1) based on:
 ### Privacy & Security
 - Zero data breaches
 - 100% CloudKit E2E encryption
-- Health data never sent externally (only anonymized chat context to CloudLLM)
+- Health data never sent externally (only anonymized chat context to SupabaseLLMService / Apple Intelligence)
 
 ---
 

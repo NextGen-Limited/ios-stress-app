@@ -1,9 +1,9 @@
 # Codebase Summary
 
-**Total Files:** ~650+ files (including 331+ Swift files)
-**Total LOC:** ~36,000+
+**Total Files:** ~720+ files (including 389 Swift files)
+**Total LOC:** ~41,000+
 **Architecture:** MVVM + Protocol-Oriented Design
-**Last Updated:** June 17, 2026
+**Last Updated:** June 27, 2026
 
 ---
 
@@ -12,7 +12,7 @@
 ```
 ios-stress-app/
 ├── StressMonitor/                      # Xcode project root
-│   ├── StressMonitor/                  # iOS App (210 files)
+│   ├── StressMonitor/                  # iOS App (298 files)
 │   │   ├── Models/                     # Data models (18 files)
 │   │   ├── Services/                   # Business logic (46 files)
 │   │   ├── ViewModels/                 # State management (4+ files)
@@ -31,7 +31,7 @@ ios-stress-app/
 
 ---
 
-## iOS App Structure (250+ Swift files)
+## iOS App Structure (298 Swift files)
 
 ### Models (23 files, ~1,300 LOC)
 Core data structures for health metrics, stress calculations, and character system.
@@ -40,7 +40,7 @@ Core data structures for health metrics, stress calculations, and character syst
 |------|---------|
 | `StressMeasurement.swift` | @Model SwiftData entity for measurements |
 | `StressResult.swift` | Stress calculation output |
-| `StressCategory.swift` | Enum: Relaxed, Mild, Moderate, High |
+| `StressCategory.swift` | Enum: Relaxed, Mild, Moderate, High, Severe (5 levels, WCAG dual-coding) |
 | `HRVMeasurement.swift` | Heart Rate Variability data |
 | `HeartRateSample.swift` | Individual HR reading |
 | `PersonalBaseline.swift` | User's physiological baseline |
@@ -61,7 +61,7 @@ Core data structures for health metrics, stress calculations, and character syst
 | `CharacterUnlock.swift` | Character unlock state + evolution progress |
 | `BioAgeResult.swift` | Biological age calculation output with trend (NEW: Jun 17) |
 
-### Services (58 files, ~8,500 LOC)
+### Services (60+ files, ~9,000 LOC)
 Business logic and system integrations.
 
 #### Algorithm Services (11 files)
@@ -126,7 +126,11 @@ Business logic and system integrations.
 - `MockStoreKitService.swift` - Mock implementation for testing only
 
 #### Theme Services (1 file)
-- `AppearanceManager.swift` - Dark mode preference management (@Observable singleton, Light/Dark/System modes, UserDefaults persistence)
+- `AppearanceManager.swift` - Dark mode preference management (@Observable singleton, Light/Dark/System modes, UserDefaults persistence) (lives in `Services/`; design tokens live in `Theme/`)
+
+#### Character Services (2 files)
+- `CharacterAssetResolver.swift` - Routes character IDs to design-exported SVG assets; mood drives ambient animation via the `StressBuddyIllustration` layer
+- `CharacterIllustrationExporter.swift` - @MainActor service rendering character × evolution × mood combinations to PNG + ZIP (illustration export pipeline)
 
 #### Additional Services
 - `InsightGeneratorService.swift` - AI-powered insights
@@ -150,12 +154,16 @@ State management layer:
 ### Views (150+ files)
 SwiftUI user interface components:
 
-#### Main Navigation Structure (5 tabs)
+#### Main Navigation Structure (3 tabs + Settings screen)
+The app uses a **3-tab navigation** architecture (updated Jun 17, 2026):
 1. **Home** (`DashboardView.swift`) - Main stress monitoring dashboard
-2. **Trends** (`TrendsView.swift`) - Historical stress visualization
-3. **Breathing** (`BreathingView.swift`) - Breathing exercises
-4. **Characters** (`CharacterCollectionView.swift`) - Character collection & evolution
-5. **Settings** (`SettingsView.swift`) - App settings
+2. **Action** (`ActionView.swift`) - Quick stress relief exercises + Ripple AI Coach
+3. **Trends** (`TrendsView.swift`) - Historical stress visualization
+
+Secondary (non-tab):
+- **Settings** (`SettingsView.swift`) - App settings, accessed via chevron from Dashboard
+- **Characters** - Collection accessible via CharactersCard inside Settings (not a tab)
+- **Breathing** / **Mini Walk** / **Chat** - Launched from Action tab quick-actions
 
 #### Feature Views
 - `Dashboard/` (27 files) - Dashboard components, cards, metrics, insights, BioAgeCardView (NEW: Jun 17)
@@ -171,14 +179,18 @@ SwiftUI user interface components:
 - `MiniWalk/` - Mini Walk exercise with circular timer
 - `Action/` - Quick stress relief interface with Ripple AI Coach, Bento grid, dark-canvas theme
 
-### Theme (5 files)
-Design system and styling:
+### Theme (8 files)
+Design system and styling — the visual source of truth for the entire app:
 
+- `AppIconSystem.swift` - **Centralized icon system** enum mapping the design spec to SF Symbols; single source of truth for every icon (37+ files migrated to this in PR #44). Categories: Tab (4), Nav (3), Action (6), Metric (8), Setting (17), System (11). Also defines `MoodFaceIcon` (5-level stress scale) + `SettingsIconView` + `MoodFaceView`
+- `CharacterAssetCatalog.swift` - Bridges design-exported character SVGs to SwiftUI `Image` for **static** contexts (list avatars, grid tiles, picker sheets, tab icons, locked placeholders). Bundled characters: ripple, blossom, ember, zephyr, lumi (+ ripple-hero)
+- `MoodFaceAssetCatalog.swift` - Bridges mood-face SVGs (mood-relaxed…mood-severe) to SwiftUI `Image`
 - `Color+Wellness.swift` - App-specific color definitions
-- `Color+Extensions.swift` - Color system extensions
+- `Color+Extensions.swift` - Color system extensions (incl. `Color(hex:)`, light/dark dual-mode)
 - `DesignTokens.swift` - Core design tokens
-- `Font+WellnessType.swift` - Typography system
+- `Font+WellnessType.swift` - Typography system (SF Pro family)
 - `Gradients.swift` - Gradient definitions
+- `HomeCharacterDesignTokens.swift` - Dashboard character sizing/positioning tokens
 
 ### Components (15+ files)
 Reusable UI components:
@@ -260,7 +272,10 @@ The app uses a 3-tab navigation structure:
 - **Configuration**: SupabaseConfig (URL + anonKey) for cloud endpoints
 
 ### Dependencies
-- **13+ SPM packages** - Moya, Alamofire, Kingfisher, SwiftUICharts, ReactiveSwift, RxSwift, Chat, Giphy iOS SDK, MediaPicker, ActivityIndicatorView, AnchoredPopup, AnimatedTabBar, LibWebP
+- **8 resolved SPM packages** (2 direct, 6 transitive):
+  - Direct: `Chat` (ExyteChat — AI chat UI), `SwiftUICharts` (trend charts)
+  - Transitive (via Chat): `Kingfisher`, `Giphy-ios-sdk`, `MediaPicker`, `ActivityIndicatorView`, `AnchoredPopup`, `LibWebP-Xcode`
+  - *Note: Moya, Alamofire, ReactiveSwift, RxSwift, and AnimatedTabBar were removed in earlier refactors and are no longer dependencies. The tab bar is now a custom SwiftUI implementation (`Components/TabBar/`).*
 - **Privacy-first design** - All data processed locally when possible
 - **Modular architecture** - Protocol-based dependency injection
 
@@ -269,14 +284,14 @@ The app uses a 3-tab navigation structure:
 ## Key Features
 
 ### Stress Monitoring
-- Multi-factor stress calculation (HRV 70%, Heart Rate 30%)
+- Multi-factor stress calculation (5 factors: HRV, Heart Rate, Sleep, Activity, Recovery with dynamic weight normalization)
 - Real-time stress level assessment with confidence scoring
 - Personalized baseline calibration
-- Stress categorization: Relaxed, Mild, Moderate, High
+- Stress categorization: **5 levels** — Relaxed, Mild, Moderate, High, Severe (`StressCategory` enum, WCAG dual-coding colors)
 
 ### AI-Powered Insights
 - Apple Intelligence integration for iOS 26+
-- CloudLLM fallback with SSE streaming
+- SupabaseLLMService fallback with SSE streaming (Apple Intelligence on-device primary for iOS 26+)
 - Contextual stress analysis and recommendations
 - Breathing exercise guidance
 - Conversational stress management
@@ -297,27 +312,28 @@ The app uses a 3-tab navigation structure:
 
 ## Recent Updates (June 2026)
 
-1. **AppearanceManager** - Dark mode preference manager (NEW: Jun 13) - @Observable singleton, Light/Dark/System modes, UserDefaults persistence
-2. **Settings Redesign** - Ripple UI card-based architecture (NEW: Jun 13) - 13 card components, ProfileCard with appearance picker
-3. **ProfileCard** - Appearance toggle (Light/Dark/System), Delete All Data button (NEW: Jun 13)
-4. **Trends Redesign** - Ripple character system (NEW: Jun 13) - MascotSpeechBubbleView, HorizontalWeekCalendarView, WeeklyHeatmapView, PatternInsightsSection
-5. **ActionView Redesign** - Ripple dark-canvas theme (NEW: Jun 13) - Mood Calendar, Daily Focus Hero, Ripple AI Coach, Bento Health Grid, Quick Actions
-6. **OnboardingFlow** - HealthKit permission integration (NEW: Jun 13) - 3-screen TabView (Welcome → HealthKit Sync → Success)
-7. **WatchOS Character-Reactive** - Stress tier emoji display (NEW: Jun 13) - 5 stress tiers mapped to emoji + color, NO numeric scores
-8. **WidgetKit Extensions** - Live Activity + ControlCenter launcher (NEW: Jun 13) - SmallWidget, MediumWidget, LargeWidget, no numeric scores, character emoji only
-9. **Stress History Timeline** - Activity correlation with stress data
-10. **Guided Breathing with Biofeedback** - Enhanced breathing exercises with real-time feedback
-11. **Apple Watch Complications** - Live stress metrics on watch face
-12. **Mini Walk Exercise** - Walking exercise screen with circular timer
-13. **Real StoreKit 2 Premium** - Real App Store product fetching + transaction monitoring (PR #19, Jun 12)
-14. **SupabaseLLMService** - Production cloud service with SSE streaming (replaces CloudLLMService)
-15. **3-Tab Navigation** - Home/Action/Trend structure with Settings moved to non-tab screen (Jun 17)
-16. **Character Collection UI** - 5 elemental characters with evolution system, unlock types (free/premium/streak-gated), persistent storage, 38 SVG assets
-17. **Biological Age Calculator** - `BioAgeCalculator` with estimatedAge, chronologicalAge, difference, BioAgeTrend; 7-day min data req (NEW: Jun 17)
-18. **BioAgeCardView** - Dark glass card on Dashboard showing bio age diff + character expression, color-coded (NEW: Jun 17)
-19. **Watch Face Personalization** - Background style selection, synced via WatchConnectivityManager (NEW: Jun 17)
-20. **Weekly Billing Option** - `SubscriptionPeriod.weekly` added to premium tier alongside monthly/annual (NEW: Jun 17)
-21. **CharacterIllustrationExporter** - @MainActor service rendering character PNG combinations to ZIP (NEW: In-progress Jun 17)
+22. **AppIconSystem — Centralized Icon System** (PR #44, NEW: Jun 25) - Single source of truth for every SF Symbol in the app (`Theme/AppIconSystem.swift`, 321 LOC). 7 categories (Tab, Nav, Action, Metric, Setting, System, MoodFace). **37 files / 59 references migrated** from scattered SF Symbol strings to `AppIconSystem.Icon.x.sfSymbol`. Pairs with bundled character/mood SVG assets in the Asset Catalog.
+21. **Character Views → SVG Assets** (PR #45, NEW: Jun 25) - Character views migrated from procedural SwiftUI drawing to design-exported SVG assets via `CharacterAssetResolver` + `CharacterAssetCatalog`. 16 view files updated to render `Image(assetName)` instead of procedural shapes. Mood-reactivity preserved via the `StressBuddyIllustration` animation layer.
+20. **AppearanceManager** - Dark mode preference manager (NEW: Jun 13) - @Observable singleton, Light/Dark/System modes, UserDefaults persistence
+19. **Settings Redesign** - Ripple UI card-based architecture (NEW: Jun 13) - 13 card components, ProfileCard with appearance picker
+18. **ProfileCard** - Appearance toggle (Light/Dark/System), Delete All Data button (NEW: Jun 13)
+17. **Trends Redesign** - Ripple character system (NEW: Jun 13) - MascotSpeechBubbleView, HorizontalWeekCalendarView, WeeklyHeatmapView, PatternInsightsSection
+16. **ActionView Redesign** - Ripple dark-canvas theme (NEW: Jun 13) - Mood Calendar, Daily Focus Hero, Ripple AI Coach, Bento Health Grid, Quick Actions
+15. **OnboardingFlow** - HealthKit permission integration (NEW: Jun 13) - 3-screen TabView (Welcome → HealthKit Sync → Success)
+14. **WatchOS Character-Reactive** - Stress tier emoji display (NEW: Jun 13) - 5 stress tiers mapped to emoji + color, NO numeric scores
+13. **WidgetKit Extensions** - Live Activity + ControlCenter launcher (NEW: Jun 13) - SmallWidget, MediumWidget, LargeWidget, no numeric scores, character emoji only
+12. **Stress History Timeline** - Activity correlation with stress data
+11. **Guided Breathing with Biofeedback** - Enhanced breathing exercises with real-time feedback
+10. **Apple Watch Complications** - Live stress metrics on watch face
+9. **Mini Walk Exercise** - Walking exercise screen with circular timer
+8. **Real StoreKit 2 Premium** - Real App Store product fetching + transaction monitoring (PR #19, Jun 12)
+7. **SupabaseLLMService** - Production cloud service with SSE streaming (replaces CloudLLMService)
+6. **3-Tab Navigation** - Home/Action/Trend structure with Settings moved to non-tab screen (Jun 17)
+5. **Character Collection UI** - 5 elemental characters with evolution system, unlock types (free/premium/streak-gated), persistent storage, 6 character SVGs + 5 mood-face SVGs (single exported SVG per character; mood-reactivity via StressBuddyIllustration animation layer)
+4. **Biological Age Calculator** - `BioAgeCalculator` with estimatedAge, chronologicalAge, difference, BioAgeTrend; 7-day min data req (NEW: Jun 17)
+3. **BioAgeCardView** - Dark glass card on Dashboard showing bio age diff + character expression, color-coded (NEW: Jun 17)
+2. **Watch Face Personalization** - Background style selection, synced via WatchConnectivityManager (NEW: Jun 17)
+1. **Weekly Billing Option** - `SubscriptionPeriod.weekly` added to premium tier alongside monthly/annual (NEW: Jun 17)
 
 ## New Files Added (IAP Premium)
 - **PremiumState** - Centralized premium state management singleton
@@ -355,14 +371,25 @@ The app uses a 3-tab navigation structure:
 - **5 elemental characters**: Ripple (Water/free), Blossom (Earth/free), Ember (Fire/premium), Zephyr (Air/premium), Lumi (Moon/streak-gated)
 - **Evolution system**: 3 stages (Droplet → Ripple → Tidal) triggered by streaks, sessions, resilience scores
 - **Unlock types**: Free, Premium (StoreKit-gated), Streak-gated (30-day)
-- **38 SVG assets**: Named as `{character}_{evolution}_{mood}.svg`
-- **Services**: `CharacterAssetResolver` (maps character+evolution+mood → SVG), `CharacterCollectionViewModel` (state management)
+- **6 character SVGs**: 5 characters (ripple, blossom, ember, zephyr, lumi) + ripple-hero (larger detail view)
+- **5 mood-face SVGs**: mood-relaxed, mood-mild, mood-moderate, mood-high, mood-severe (WCAG dual-coding colors)
+- **Services**: `CharacterAssetResolver` (routes character IDs to exported SVGs; mood drives ambient animation via StressBuddyIllustration), `CharacterCollectionViewModel` (state management)
+- **Asset bridges**: `CharacterAssetCatalog` (static image contexts), `MoodFaceAssetCatalog` (mood-face SVGs)
 - **Models**: `CharacterCreature` (definition), `CharacterUnlock` (persistent state in SwiftData)
 - **Views**: CharacterCollectionView (grid), CharacterDetailView, CharacterPickerSheet, EvolutionCelebrationView
 - **Element colors**: Water blue, Earth green, Fire orange, Air purple, Moon indigo
+- **Icon system**: `AppIconSystem` enum (single source of truth for all SF Symbol mappings; 37 files adopt this)
+- **Mood taxonomy**: `MoodFaceIcon` enum (5-level stress scale with SF Symbols + WCAG colors: relaxed #34C759, mild #007AFF, moderate #FFD60A, high #FF9500, severe #FF3B30)
 
-### Asset Naming Convention
-See `/docs/design/ASSET_NAMING.md` for full SVG asset naming specification.
+### Asset Structure
+Design source exports live in `design/exports/characters/` and `design/exports/mood-faces/` (generated from `design/characters-export.html` and `design/icon-system.html`). The legacy `{character}_{evolution}_{mood}.svg` naming is deprecated and retained only for the illustration export pipeline. See `/docs/design/ASSET_NAMING.md` for details.
+
+### Icon System (`AppIconSystem`)
+- **Single source of truth** for every SF Symbol in the app (`Theme/AppIconSystem.swift`)
+- **7 categories**: Tab (4 tabs, active/inactive variants), Nav (3), Action (6 exercises), Metric (8 factor icons), Setting (17 rows), System (11 semantic icons), MoodFace (5-level stress scale)
+- **Migration** (PR #44): 37 files / 59 references migrated from scattered SF Symbol string literals to `AppIconSystem.Icon.x.sfSymbol`
+- **WCAG dual-coding**: `MoodFaceIcon` enum always pairs face shape with its stress color (relaxed #34C759, mild #007AFF, moderate #FFD60A, high #FF9500, severe #FF3B30)
+- **Helper views**: `SettingsIconView` (28×28 tinted rounded square), `MoodFaceView` (colored circle + white face)
 
 ---
 
@@ -370,17 +397,19 @@ See `/docs/design/ASSET_NAMING.md` for full SVG asset naming specification.
 
 | Metric | Value |
 |--------|-------|
-| **Total Swift Files** | 331+ |
-| **Total LOC** | ~35,000+ |
-| **iOS App Files** | 250+ |
-| **watchOS App Files** | 46+ |
-| **Widget Files** | 7+ |
-| **External Dependencies** | 13+ SPM packages |
+| **Total Swift Files** | 389 |
+| **Total LOC** | ~41,000+ |
+| **iOS App Files** | 298 |
+| **watchOS App Files** | 52 |
+| **Widget Files** | 13 |
+| **Test Files** | 5 |
+| **External Dependencies** | 8 SPM packages (2 direct) |
 | **Average File Size** | <200 LOC |
-| **Font** | Roboto (6 weights) |
-| **Character Assets** | 38 SVG files |
+| **Font** | SF Pro (Foundation design system) |
+| **Character Assets** | 11 SVG files (6 characters + 5 mood-faces) |
+| **Icon System** | `AppIconSystem` — 7 categories, 37+ files migrated |
 
 ---
 
-**Last Updated:** June 19, 2026
+**Last Updated:** June 27, 2026
 **Maintainers:** Phuong Doan

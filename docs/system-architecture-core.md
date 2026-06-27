@@ -4,7 +4,7 @@
 **Concurrency:** async/await
 **Data Flow:** Unidirectional (Models -> Services -> ViewModels -> Views)
 **Section:** MVVM, data flow, core services, protocols
-**Last Updated:** June 12, 2026
+**Last Updated:** June 27, 2026
 
 ---
 
@@ -341,20 +341,42 @@ PremiumViewModel → StoreKitService
 ```
 
 #### Character System Service
-**Files:** `Services/Character/` (2 files, ~200 LOC)
+**Files:** `Services/CharacterAssetResolver.swift`, `Services/CharacterIllustrationExporter.swift`, `Theme/CharacterAssetCatalog.swift`, `Theme/MoodFaceAssetCatalog.swift`, `Theme/AppIconSystem.swift` (MoodFaceIcon) (~400 LOC)
 
 5 elemental characters with evolution tracking (June 2026).
 
 **Components:**
-- `CharacterAssetResolver.swift` - Maps character + evolution stage + mood → SVG asset path
+- `CharacterAssetResolver.swift` - Routes character IDs to design-exported SVG assets; mood drives ambient animation via `StressBuddyIllustration` layer. **Character views were migrated from procedural SwiftUI to SVG-backed assets in PR #45** (16 view files render `Image(assetName)` instead of procedural shapes).
+- `CharacterIllustrationExporter.swift` - @MainActor service rendering character × evolution × mood combinations to PNG + ZIP (illustration export pipeline)
+- `CharacterAssetCatalog.swift` - Bridges design-exported character SVGs to SwiftUI `Image` for **static** contexts (list avatars, grid tiles, picker sheets)
+- `MoodFaceAssetCatalog.swift` - Bridges mood-face SVGs to SwiftUI `Image`
+- `MoodFaceIcon` enum (in `Theme/AppIconSystem.swift`) - 5-level stress scale with SF Symbols + WCAG colors
 - `CharacterUnlock.swift` (@Model) - SwiftData persistence for unlock progress
 
 **Features:**
 - 5 elemental characters: Ripple (water), Blossom (earth), Ember (fire), Zephyr (air), Lumi (moon)
 - Dual unlock types: free, premium, streak-gated
 - Evolution system: 3 stages triggered by user activity
-- 38 SVG assets named `{character}_{evolution}_{mood}.svg`
+- 6 character SVGs (ripple, blossom, ember, zephyr, lumi + ripple-hero) exported from design/characters-export.html
+- 5 mood-face SVGs (relaxed, mild, moderate, high, severe) exported from design/icon-system.html
 - Free/premium asset separation for paywall integration
+- Mood-reactivity achieved via procedural SwiftUI animation (StressBuddyIllustration) over static SVG base
+
+#### Icon System Service
+**File:** `Theme/AppIconSystem.swift` (321 LOC) — centralized icon system, NEW PR #44 (Jun 25).
+
+Single source of truth for every SF Symbol in the app, mapping the design spec (`design/icon-system.html`) to SF Symbols. **37 files / 59 references migrated** from scattered string literals.
+
+**7 categories:**
+- `Tab` (4 tabs, `.sfSymbol` + `.sfSymbolActive` active/inactive variants)
+- `Nav` (back/forward/close)
+- `Action` (6 quick-start exercises: breathing, bodyScan, miniWalk, coldSplash, gratitude, chat)
+- `Metric` (8 health factor icons)
+- `Setting` (17 settings rows)
+- `System` (11 semantic icons: success, warning, locked, premium, etc.)
+- `MoodFaceIcon` (5-level stress scale → SF Symbol + WCAG color)
+
+**Helper views:** `SettingsIconView` (28×28 accent-tinted rounded square), `MoodFaceView` (colored circle + white face). Usage: `AppIconSystem.Tab.home.sfSymbol` or `SettingsIconView(.appleHealth, color: .pink)`.
 
 ---
 
@@ -383,7 +405,7 @@ final class StressMeasurement {
 - `HeartRateSample` - Raw HR reading
 - `PersonalBaseline` - 30-day baseline
 - `StressResult` - Calculation output
-- `StressCategory` - Enum (Relaxed, Mild, Moderate, High)
+- `StressCategory` - Enum (Relaxed, Mild, Moderate, High, Severe — 5 levels, WCAG dual-coding)
 - `ChatMessage` - Chat message with role enum
 - `ActivityData` - Activity metrics for multi-factor algorithm
 - `SleepData` - Sleep quality data
@@ -555,16 +577,18 @@ final class StubRepository: StressRepositoryProtocol {
 
 | Decision | Rationale | Trade-off |
 |----------|-----------|-----------|
-| **13 SPM packages** | Network, UI, and media capabilities | Dependency management overhead |
-| **CloudLLMService gateway** | Provides LLM fallback for pre-iOS 26 devices | Connects to self-hosted FastAPI endpoint; chat context (not raw health data) sent externally |
+| **8 SPM packages** (2 direct: Chat, SwiftUICharts) | Chat UI + charting capabilities without reinventing | Dependency management overhead |
+| **SupabaseLLMService** (Edge Functions + SSE) | Production cloud LLM fallback for pre-iOS 26 devices; configurable via `SupabaseConfig` (B1 resolved Jun 7) | Chat context (not raw health data) sent to Supabase Edge Functions |
 | **Local-first architecture** | Works offline, fast responsiveness | Eventual consistency |
 | **MVVM + Protocols** | Testability, loose coupling | More boilerplate |
 | **@Observable macro** | Modern, iOS 17+ reactive | Excludes iOS 16 |
-| **Hardcoded LLM endpoint** | Simplified configuration, removed UI complexity | Requires deployment updates for endpoint changes |
+| **Centralized AppIconSystem** (PR #44) | Single source of truth for every icon; design-spec alignment | Central enum must stay in sync with `design/icon-system.html` |
+| **SVG-backed character assets** (PR #45) | Crisp at any size; design fidelity; `preserves-vector-representation: true` | Mood-reactivity delegated to a separate animation layer (StressBuddyIllustration) |
+| **5-level stress scale** (incl. Severe) | Finer-grained feedback; WCAG dual-coding (color + icon + pattern) | More categories to localize/illustrate |
 
 ---
 
 **Next:** See `system-architecture-platform.md` for CloudKit, Watch, widgets, and security details.
 **Maintained By:** Phuong Doan
 **Version:** 1.0 Production
-**Last Updated:** June 19, 2026
+**Last Updated:** June 27, 2026

@@ -107,7 +107,7 @@ StressMonitor/
 │   │   ├── Trends/                         # Analytics charts
 │   │   ├── Settings/                       # App settings & data management
 │   │   └── Onboarding/                     # First-launch flow
-│   └── Theme/                              # Design system
+│   └── Theme/                              # Design system (AppIconSystem, CharacterAssetCatalog, MoodFaceAssetCatalog, colors, typography)
 ├── StressMonitorWatch Watch App/           # watchOS App (44 files, ~3.2K LOC)
 │   ├── Services/                           # Watch HealthKit + CloudKit
 │   ├── Models/                             # Shared data models

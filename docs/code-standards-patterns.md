@@ -365,7 +365,43 @@ func parseStream(_ stream: AsyncStream<String>) -> AsyncThrowingStream<String, E
 }
 ```
 
-### SupabaseConfig for Endpoint Configuration (Jun 2026)
+### Centralized Icon System (Commit #44 - Jun 2026)
+
+**AppIconSystem enum** - Single source of truth for all SF Symbol mappings (36 files adopt this):
+
+```swift
+// Usage: AppIconSystem.<Category>.<case>.sfSymbol
+enum AppIconSystem {
+    enum Tab { case home, action, trends, settings }
+    enum Action { case breathing, bodyScan, miniWalk, coldSplash, gratitude, chat }
+    enum Metric { case heartRate, hrv, sleep, activity, streak, time, date, achievement }
+    enum Setting { case profile, notifications, privacy, dataManagement, icloud, ... }
+    enum System { case success, warning, info, locked, privacy, delete, export, ... }
+    
+    var sfSymbol: String { /* mapped SF Symbol name */ }
+}
+
+// MoodFaceIcon enum - 5-level stress scale with WCAG colors
+enum MoodFaceIcon: String, CaseIterable {
+    case relaxed, mild, moderate, high, severe
+    
+    var sfSymbol: String { /* mapped SF Symbol */ }
+    var color: Color { /* WCAG-compliant color */ }
+    var rangeText: String { /* "0-25", "26-50", etc. */ }
+    
+    static func from(stressLevel: Double) -> MoodFaceIcon { /* mapping logic */ }
+}
+```
+
+**Benefits:**
+- Eliminates scattered raw `systemName:` string literals across views
+- Type-safe icon access with compile-time verification
+- Centralized mapping from design spec (design/icon-system.html, design/icon-asset-mapping.md)
+- WCAG dual-coding built into MoodFaceIcon (color + icon + text)
+
+**Companion views:**
+- `SettingsIconView` - SF Symbol in 28×28 rounded square with accent tint
+- `MoodFaceView` - Self-contained mood face with colored circle + white SF Symbol
 
 **Production**: SupabaseConfig manages cloud LLM endpoint for easy provider switching:
 

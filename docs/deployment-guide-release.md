@@ -399,7 +399,7 @@ Measure app size:
 ls -lh ./build/StressMonitor.xcarchive
 
 # Estimated App Store size (after thinning)
-# Typically: 20-35 MB (13 SPM packages)
+# Typically: 20-35 MB (8 SPM packages)
 ```
 
 ### App Launch Time

@@ -205,10 +205,14 @@ UI Updates on screen
 - Session-only chat persistence (no SwiftData)
 
 ### Character System Service (Jun 2026)
-- `CharacterAssetResolver` -- Maps character + evolution stage + mood → SVG asset path
+- `CharacterAssetResolver` -- Routes character IDs to exported SVG illustrations; mood drives ambient animation via StressBuddyIllustration
+- `CharacterAssetCatalog` -- Bridges design-exported character SVGs to SwiftUI Image (static contexts)
+- `MoodFaceAssetCatalog` -- Bridges mood-face SVGs to Image
 - 5 elemental characters with dual unlock types (free/premium/streak-gated)
 - Evolution system: 3 stages triggered by streaks, sessions, resilience scores
-- 38 SVG assets following `{character}_{evolution}_{mood}.svg` naming
+- 6 character SVGs (5 characters + ripple-hero) + 5 mood-face SVGs
+- `MoodFaceIcon` enum (5-level stress scale with SF Symbols + WCAG dual-coding colors)
+- `AppIconSystem` enum (centralized SF Symbol mappings; 36 files adopt this single source of truth)
 - `CharacterUnlock` SwiftData model for persistent unlock progress tracking
 
 ### StoreKit Service (Jun 2026 - PR #19) ✅ RESOLVED
@@ -261,13 +265,15 @@ UI Updates on screen
 
 | Decision | Rationale | Trade-off |
 |----------|-----------|-----------|
-| **13+ SPM packages** | Kingfisher, SwiftUICharts, ExyteChat, AnimatedTabBar, etc. | Network, UI, and media capabilities |
+| **8 SPM packages** (2 direct: Chat, SwiftUICharts) | Chat UI + charting without reinventing | Dependency management overhead |
 | **Local-first architecture** | Works offline, fast responsiveness | Eventual consistency |
 | **MVVM + Protocols** | Testability, loose coupling | More boilerplate |
 | **@Observable macro** | Modern, iOS 17+ reactive | Excludes iOS 16 |
 | **CloudKit E2E encryption** | User privacy, Apple ecosystem | Requires iCloud account |
 | **WidgetKit (not ClockKit)** | watchOS 10+ requirement | No ClockKit support |
 | **Multi-factor algorithm** | More comprehensive stress assessment | Increased complexity, more data required |
+| **Centralized AppIconSystem** (PR #44) | Single source of truth for every icon | Central enum must stay in sync with `design/icon-system.html` |
+| **SVG-backed character assets** (PR #45) | Crisp at any size; design fidelity | Mood-reactivity delegated to separate animation layer |
 | **Offline-first sync** | UX resilience, privacy | Conflict resolution complexity |
 | **Protocol-based services** | Testability, extensibility | More abstraction overhead |
 
