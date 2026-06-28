@@ -15,11 +15,23 @@ extension View {
             case .dataExport:
                 DataExportView()
 
+            case .dataManage:
+                DataManageView()
+
             case .dataDelete:
                 DataDeleteView()
 
             case .characters:
                 CharacterCollectionView()
+
+            case .appearance:
+                AppearanceSettingsView()
+
+            case .about:
+                AboutView()
+
+            case .watchFace:
+                WatchFacePreferencesView()
 
             case .measurement(let id):
                 MeasurementDetailDestination(id: id)

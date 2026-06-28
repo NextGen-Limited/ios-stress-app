@@ -2,10 +2,10 @@ import SwiftUI
 
 /// Hero stress card for the Home tab.
 ///
-/// Semicircle half-arc gauge carries the numeric burden (track + gradient fill +
-/// endpoint tick + score readout). Ripple sits INSIDE the arc opening — the
-/// character's expression IS the status. Below the gauge: the state label,
-/// substate, and confidence line.
+/// Semicircle half-arc gauge carries the progress burden (track + gradient fill +
+/// endpoint tick). Ripple sits INSIDE the arc opening — the character's
+/// expression IS the status. Below the gauge: the state label, substate, and
+/// confidence line.
 ///
 /// Spec reference: design/screens/04-home.html — `.hero` + `.arc-stage`.
 struct StressHeroCard: View {
@@ -81,7 +81,7 @@ struct StressHeroCard: View {
     private var arcStage: some View {
         let stageWidth: CGFloat = 220
         let stageHeight: CGFloat = 116
-        let characterSize: CGFloat = 74
+        let characterSize: CGFloat = 111
         return ZStack {
             // Track
             SemicircleArc(progress: 1.0)
@@ -104,11 +104,6 @@ struct StressHeroCard: View {
             TickMarker(progress: hasData ? min(1, level / 100.0) : 0, color: fillColor)
                 .frame(width: stageWidth, height: stageHeight)
 
-            // Score readout — top of the arc bowl
-            scoreReadout
-                .frame(maxHeight: .infinity, alignment: .top)
-                .padding(.top, 16)
-
             // Ripple — anchored to the arc baseline, inside the bowl
             StressBuddyIllustration(mood: mood, size: characterSize)
                 .frame(maxHeight: .infinity, alignment: .bottom)
@@ -116,19 +111,6 @@ struct StressHeroCard: View {
                 .accessibilityHidden(true)
         }
         .frame(width: stageWidth, height: stageHeight + characterSize * 0.45)
-    }
-
-    private var scoreReadout: some View {
-        VStack(spacing: 3) {
-            Text(hasData ? "\(Int(level.rounded()))" : "—")
-                .font(.system(size: 38, weight: .bold, design: .rounded))
-                .tracking(-1.0)
-                .foregroundStyle(fillColor)
-            Text("/100")
-                .font(.system(size: 9, weight: .medium, design: .monospaced))
-                .tracking(0.8)
-                .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
-        }
     }
 
     // MARK: - State row
@@ -167,8 +149,7 @@ struct StressHeroCard: View {
 
     private var accessibilityLabel: String {
         guard hasData else { return "Current stress: no data yet." }
-        let pct = Int(level.rounded())
-        return "Current stress \(pct) of 100, \(category.displayName). \(substate)."
+        return "Current stress, \(category.displayName). \(substate)."
     }
 }
 

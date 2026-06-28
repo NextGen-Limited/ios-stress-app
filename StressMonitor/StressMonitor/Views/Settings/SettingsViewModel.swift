@@ -7,42 +7,52 @@ class SettingsViewModel {
     var notificationSettings: NotificationSettings
     var exportSettings: ExportSettings
     var isDeletingAllData = false
-    var cloudKitStatus: CloudKitSyncStatus = .unknown
-    var iCloudSyncEnabled: Bool = true
     var latestStressLevel: Double = 35
+    var bioAge: Int? = nil
+    var streakDays: Int = 0
 
     private let repository: StressRepositoryProtocol
+    private let bioAgeCalculator = BioAgeCalculator()
 
     init(modelContext: ModelContext, baselineCalculator: BaselineCalculator? = nil) {
         self.repository = StressRepository(modelContext: modelContext, baselineCalculator: baselineCalculator)
-        self.userProfile = UserProfile(name: "", age: nil, restingHeartRate: 60, baselineHRV: 50)
-        self.notificationSettings = NotificationSettings()
+        self.userProfile = UserProfile(name: UserDefaults.standard.string(forKey: "profile.name") ?? "",
+                                        age: nil,
+                                        restingHeartRate: 60,
+                                        baselineHRV: 50)
+        self.notificationSettings = NotificationSettings.load()
         self.exportSettings = ExportSettings()
     }
 
     func loadUserProfile() async {
         if let baseline = try? await repository.getBaseline() {
             userProfile = UserProfile(
-                name: "",
-                age: nil,
+                name: userProfile.name,
+                age: userProfile.age,
                 restingHeartRate: baseline.restingHeartRate,
                 baselineHRV: baseline.baselineHRV
             )
         }
 
-        if let recentMeasurements = try? await repository.fetchRecent(limit: 1),
-           let latestMeasurement = recentMeasurements.first {
+        let recent = (try? await repository.fetchRecent(limit: 30)) ?? []
+        if let latestMeasurement = recent.first {
             latestStressLevel = latestMeasurement.stressLevel
         }
 
-        // Check CloudKit status
-        await checkCloudKitStatus()
+        streakDays = Self.computeStreak(from: recent)
+        bioAge = computeBioAge(recent: recent)
+
+        notificationSettings.persist()
     }
 
-    private func checkCloudKitStatus() async {
-        // TODO: Implement actual CloudKit status check
-        // For now, default to upToDate
-        cloudKitStatus = .upToDate
+    var displayName: String {
+        let raw = userProfile.name.trimmingCharacters(in: .whitespaces)
+        return raw.isEmpty ? "You" : raw
+    }
+
+    var displayEmail: String? {
+        let raw = userProfile.name.trimmingCharacters(in: .whitespaces)
+        return raw.isEmpty ? nil : UserDefaults.standard.string(forKey: "profile.email")
     }
 
     func updateProfile(_ profile: UserProfile) async throws {
@@ -53,12 +63,39 @@ class SettingsViewModel {
         )
         try await repository.updateBaseline(baseline)
         userProfile = profile
+        UserDefaults.standard.set(profile.name, forKey: "profile.name")
     }
 
     func deleteAllMeasurements() async throws {
         isDeletingAllData = true
         defer { isDeletingAllData = false }
         try await repository.deleteAllMeasurements()
+    }
+
+    private func computeBioAge(recent: [StressMeasurement]) -> Int? {
+        let chronological = userProfile.age ?? 35
+        let avgHRV = recent.isEmpty ? nil : recent.map(\.hrv).reduce(0, +) / Double(recent.count)
+        let rhr = userProfile.restingHeartRate > 0 ? userProfile.restingHeartRate : nil
+        guard let result = bioAgeCalculator.calculate(
+            chronologicalAge: chronological,
+            hrv: avgHRV,
+            restingHeartRate: rhr,
+            sleepEfficiency: nil
+        ) else { return nil }
+        return result.estimatedAge
+    }
+
+    private static func computeStreak(from measurements: [StressMeasurement]) -> Int {
+        guard !measurements.isEmpty else { return 0 }
+        let calendar = Calendar.current
+        let grouped = Dictionary(grouping: measurements) { calendar.startOfDay(for: $0.timestamp) }
+        var streak = 0
+        var cursor = calendar.startOfDay(for: Date())
+        while grouped[cursor] != nil {
+            streak += 1
+            cursor = calendar.date(byAdding: .day, value: -1, to: cursor) ?? cursor
+        }
+        return streak
     }
 }
 
@@ -70,16 +107,24 @@ struct UserProfile: Codable {
 }
 
 struct NotificationSettings: Codable {
-    var highStressAlerts: Bool = true
-    var dailyReminders: Bool = true
-    var reminderTime: Date = Calendar.current.date(from: DateComponents(hour: 9, minute: 0)) ?? Date()
-    var weeklyReport: Bool = true
-    // Settings screen UI controls
-    var snapshotTipsEnabled: Bool = true
-    var morningPreviewEnabled: Bool = true
-    var intensity: Double = 0.5
-    var quietHoursStart: Date = Calendar.current.date(from: DateComponents(hour: 0, minute: 0)) ?? Date()
-    var quietHoursEnd: Date = Calendar.current.date(from: DateComponents(hour: 8, minute: 0)) ?? Date()
+    var stressAlertsEnabled: Bool = true
+    var waterReminderEnabled: Bool = true
+    var dailySummaryEnabled: Bool = false
+
+    private static let storageKey = "settings.notifications"
+
+    static func load() -> NotificationSettings {
+        guard let data = UserDefaults.standard.data(forKey: storageKey),
+              let decoded = try? JSONDecoder().decode(NotificationSettings.self, from: data) else {
+            return NotificationSettings()
+        }
+        return decoded
+    }
+
+    func persist() {
+        guard let data = try? JSONEncoder().encode(self) else { return }
+        UserDefaults.standard.set(data, forKey: Self.storageKey)
+    }
 }
 
 struct ExportSettings: Codable {
@@ -102,33 +147,4 @@ enum ExportDateRange: String, CaseIterable, Codable {
 enum ExportFormat: String, CaseIterable, Codable {
     case csv = "CSV"
     case json = "JSON"
-}
-
-/// CloudKit sync status for display in settings
-enum CloudKitSyncStatus {
-    case unknown
-    case notSignedIn
-    case syncing
-    case syncFailed
-    case upToDate
-
-    var statusText: String {
-        switch self {
-        case .unknown: return "Unknown"
-        case .notSignedIn: return "Not Signed In"
-        case .syncing: return "Syncing..."
-        case .syncFailed: return "Sync Failed"
-        case .upToDate: return "Up to Date"
-        }
-    }
-
-    var color: Color {
-        switch self {
-        case .unknown: return .secondary
-        case .notSignedIn: return .secondary
-        case .syncing: return .primaryBlue
-        case .syncFailed: return .error
-        case .upToDate: return .success
-        }
-    }
 }

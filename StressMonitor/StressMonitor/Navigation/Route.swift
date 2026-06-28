@@ -16,10 +16,15 @@ import SwiftData
 enum Route: Hashable, Codable {
     // Data management
     case dataExport
+    case dataManage
     case dataDelete
 
     // Characters
     case characters
+
+    case appearance
+    case about
+    case watchFace
 
     // History
     case measurement(id: PersistentIdentifier)

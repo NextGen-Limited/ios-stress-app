@@ -74,7 +74,6 @@ struct MainTabView: View {
                 }
             }
         }
-        .tabBarMinimizeOnScroll()
         .onChange(of: router.selectedTab) {
             HapticManager.shared.buttonPress()
             selectedTabData = router.selectedTab.rawValue
@@ -156,15 +155,4 @@ struct MainTabView: View {
         .environment(AppRouter())
         .environment(PaywallController())
         .modelContainer(for: [StressMeasurement.self, CharacterUnlock.self], inMemory: true)
-}
-
-private extension View {
-    @ViewBuilder
-    func tabBarMinimizeOnScroll() -> some View {
-        if #available(iOS 26.0, *) {
-            self.tabBarMinimizeBehavior(.onScrollDown)
-        } else {
-            self
-        }
-    }
 }
