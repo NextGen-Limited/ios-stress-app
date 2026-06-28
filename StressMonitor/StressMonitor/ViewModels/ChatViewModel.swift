@@ -182,19 +182,3 @@ final class ChatViewModel {
         (llmService as? SupabaseLLMService)?.resetSession()
     }
 }
-
-// MARK: - Unavailable LLM Service (Fallback)
-
-/// Fallback service for devices without Apple Intelligence
-private final class UnavailableLLMService: LLMServiceProtocol, Sendable {
-    func isAvailable() -> Bool { false }
-
-    func send(
-        messages: [ChatMessage],
-        systemPrompt: String
-    ) async throws -> AsyncThrowingStream<String, Error> {
-        AsyncThrowingStream { $0.finish(throwing: LLMServiceError.unavailable(
-            reason: "AI Chat requires iOS 26 or later with Apple Intelligence enabled."
-        ))}
-    }
-}

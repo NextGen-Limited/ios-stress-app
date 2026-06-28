@@ -65,7 +65,7 @@ Advanced platform capabilities:
 | **WidgetKit** | Widgets & complications | Modern widget framework, watchOS 10+, Live Activities |
 | **async/await** | Concurrency | Swift 5.9+ native, structured concurrency |
 | **SSE Streaming** | Real-time AI chat | Server-sent events for SupabaseLLM responses |
-| **Foundation Models** | On-device LLM | Apple Intelligence (iOS 26+), conversational AI |
+| **Supabase Edge Functions** | Cloud LLM | SSE streaming for conversational AI |
 | **Combine** | Async streams | Background health data observation |
 | **AppearanceManager** | Theme management | @Observable singleton for Light/Dark/System mode |
 
@@ -97,7 +97,7 @@ ChatViewModel (sends messages + receives streaming tokens)
     ↓
 LLMServiceProtocol.send(messages:systemPrompt:) → AsyncThrowingStream<String, Error>
     ↓
-SupabaseLLMService (Supabase Edge Functions with SSE streaming) OR AppleIntelligenceService (iOS 26+ Foundation Models)
+SupabaseLLMService (Supabase Edge Functions with SSE streaming)
     ↑
 ChatContextBuilder (assembles health/stress context into system prompt)
 ```
@@ -193,10 +193,6 @@ UI Updates on screen
   - Health context injection via `StressContextPayload` (anonymized)
   - Graceful fallback when server unreachable
   - Real deployment ready as of Jun 12, 2026
-- **`AppleIntelligenceService` (iOS 26+ Fallback)** -- On-device Apple Foundation Models, streaming token response
-  - Automatic fallback for iOS 26+ capable devices
-  - On-device processing, no external API calls
-  - Streaming token response for real-time UX
 - `SSEParser` -- Server-Sent Events parser for streaming responses
 - `ChatContextBuilder` -- assembles health/stress data into system prompt
 - `ChatQuickActions` -- pre-built prompt suggestions for wellness topics

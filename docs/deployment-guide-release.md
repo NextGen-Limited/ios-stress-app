@@ -42,8 +42,7 @@ We DO NOT:
 
 AI Chat Feature (Apr 2026):
 - Chat messages are processed via streaming AI responses
-- Apple Intelligence (iOS 26+) provides on-device processing
-- SupabaseLLMService provides cloud fallback via Supabase Edge Functions (SSE streaming)
+- SupabaseLLMService provides cloud AI chat via Supabase Edge Functions (SSE streaming)
 - Only anonymized conversation context is transmitted (no raw health data)
 - Health data remains on your device at all times
 - Configurable endpoint via SupabaseConfig
@@ -79,7 +78,7 @@ Prepare screenshots for each device:
 2. 5-Tab navigation structure (Home/Trends/Breathing/Characters/Settings)
 3. Character collection with evolution unlocks
 4. Breathing exercise with animated circle
-5. AI chat with streaming responses (dual service: Apple Intelligence + SupabaseLLM)
+5. AI chat with streaming responses (SupabaseLLM SSE streaming)
 6. Trends view with charts and heatmaps
 7. Real StoreKit 2 premium paywall (optional)
 
@@ -97,7 +96,7 @@ adapts to your unique physiology with personal baseline learning.
 
 Features:
 • 5-factor stress measurement (HRV, Heart Rate, Sleep, Activity, Recovery)
-• Dual AI chat: Apple Intelligence (iOS 26+) + Supabase cloud fallback
+• AI Chat: SupabaseLLM SSE streaming via Edge Functions
 • Real-time token streaming for instant AI responses
 • Personal baseline adaptation (learns over 30 days)
 • 5-tab navigation (Home/Trends/Breathing/Characters/Settings)
@@ -221,7 +220,7 @@ StressMonitor 1.0
 
 Initial Release:
 • 5-factor stress algorithm (HRV, Heart Rate, Sleep, Activity, Recovery)
-• AI Chat with streaming responses (SupabaseLLMService primary + Apple Intelligence iOS 26+ fallback with SSE)
+• AI Chat with streaming responses (SupabaseLLMService SSE streaming via Edge Functions)
 • Personal baseline adaptation over 30 days
 • 5-tab navigation (Home/Trends/Breathing/Characters/Settings) for improved user flow
 • Real-time stress measurement with confidence scoring
@@ -367,7 +366,6 @@ Solution:
 → Test with SupabaseLLMService endpoint configuration
 → Verify SSEParser token processing
 → Check network connectivity
-→ Test fallback to Apple Intelligence (iOS 26+)
 → Verify Supabase Edge Functions are deployed and accessible
 ```
 

@@ -9,7 +9,7 @@ enum SupabaseConfig {
         infoPlistKey: "SUPABASE_URL",
         environmentKey: "SUPABASE_URL",
         userDefaultsKey: "supabaseURL",
-        fallback: "https://fqurrfnfczeozvaxjrcu.supabase.co"
+        fallback: "https://sxlaxpnyadellgyvxofm.supabase.co"
     ))!
 
     // Supabase anon/public key (safe to embed only when restricted by RLS).
@@ -19,8 +19,21 @@ enum SupabaseConfig {
         infoPlistKey: "SUPABASE_ANON_KEY",
         environmentKey: "SUPABASE_ANON_KEY",
         userDefaultsKey: "supabaseAnonKey",
-        fallback: ""
+        fallback: "**********************************************"
     )
+
+    /// Shared guest JWT for testing (1-week expiration, created 2026-06-28).
+    /// TODO: Replace with real SupabaseAuthService (Apple Sign-In) before production.
+    /// JWT value lives in gitignored SupabaseSecrets.swift to avoid committing secrets.
+    static var guestJWT: String {
+        let infoPlist = (Bundle.main.object(forInfoDictionaryKey: "SUPABASE_GUEST_JWT") as? String)
+            .flatMap { $0.isEmpty ? nil : $0 }
+        let env = ProcessInfo.processInfo.environment["SUPABASE_GUEST_JWT"]
+            .flatMap { $0.isEmpty ? nil : $0 }
+        let defaults = UserDefaults.standard.string(forKey: "supabaseGuestJWT")
+            .flatMap { $0.isEmpty ? nil : $0 }
+        return infoPlist ?? env ?? defaults ?? SupabaseSecrets.guestJWT
+    }
 
     static var isConfigured: Bool {
         !anonKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty

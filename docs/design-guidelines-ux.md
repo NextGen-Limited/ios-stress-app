@@ -249,7 +249,7 @@ Accessed via button/chevron from Home tab:
 
 **Streaming Features:**
 - Real-time token streaming via SSEParser
-- Dual-service LLM: Apple Intelligence (iOS 26+) → SupabaseLLMService fallback
+- SupabaseLLMService (SSE streaming via Edge Functions)
 - SupabaseConfig for environment-based endpoint configuration
 - Context-aware health/stress data injection via ChatContextBuilder
 - Session-only message history (no SwiftData persistence)
@@ -346,8 +346,7 @@ Figma-aligned 4-4-4-4 pattern with animated breathing circle (`BreathingCircleVi
 ```
 ChatViewModel.send()
   → LLMServiceProtocol.send() → AsyncThrowingStream<String, Error>
-  → SupabaseLLMService (HTTP/SSE to Supabase Edge Functions - PRODUCTION) OR
-  → AppleIntelligenceService (on-device Foundation Models - iOS 26+)
+  → SupabaseLLMService (HTTP/SSE to Supabase Edge Functions - PRODUCTION)
   → Token-by-token streaming display in ChatBottomSheetView
 ```
 
@@ -362,10 +361,6 @@ ChatViewModel.send()
    - HTTP/SSE with SSEParser for reliable streaming
    - Configurable endpoint via SupabaseConfig (easy provider switching)
    - Full production readiness as of Jun 12, 2026
-2. **`AppleIntelligenceService`** (iOS 26+ on-device fallback)
-   - On-device Foundation Models for privacy when available
-   - Automatic fallback on capable devices
-3. Graceful degradation on pre-iOS 26 devices (uses SupabaseLLM)
 
 ### UX Improvements (Apr 2026, refined Jun 2026)
 - **Real-time streaming** - Users see AI response as it's generated

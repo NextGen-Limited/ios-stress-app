@@ -277,8 +277,7 @@ protocol LLMServiceProtocol: Sendable {
 
 | Implementation | Platform | Transport | Status |
 |---------------|----------|-----------|--------|
-| `AppleIntelligenceService` | iOS 26+ (on-device) | Foundation Models framework | Primary for iOS 26+ |
-| `SupabaseLLMService` | All iOS (network) | HTTP/SSE to Supabase Edge Functions | Cloud fallback (Jun 2026) |
+| `SupabaseLLMService` | All iOS (network) | HTTP/SSE to Supabase Edge Functions | Production (Jun 2026) |
 
 **Updated - Jun 2026:**
 - Removed `CloudLLMService.swift` (dead code with hardcoded ngrok endpoint)
@@ -299,7 +298,7 @@ ChatViewModel → ChatContextBuilder.buildSystemPrompt(stress:baseline:history:)
              → LLMServiceProtocol.send(messages:systemPrompt:)
              → AsyncThrowingStream<String, Error> (token-by-token streaming)
                    ↓
-             (Try Apple Intelligence first, fall back to SupabaseLLMService)
+             (SupabaseLLMService via Supabase Edge Functions)
 ```
 
 **Persistence:** Chat data is session-only (in-memory `[ChatMessage]` array). No SwiftData persistence. Messages are lost on app restart.

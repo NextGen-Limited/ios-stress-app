@@ -298,7 +298,6 @@ SupabaseLLMService.send()
 - `continuation.onTermination` cancels upstream URLSession task
 - Configurable endpoint via `SupabaseConfig` (URL + anonKey)
 - Error mapping: 422 (bad request), 502 (provider failure), network errors
-- AppleIntelligenceService uses same `AsyncThrowingStream` interface but via Foundation Models `streamResponse`
 
 ---
 
@@ -365,7 +364,7 @@ BreathingExerciseView (setup)
 │  ├─ HealthKit (sensor data)
 │  ├─ Algorithm (calculations)
 │  ├─ Repository (local persistence)
-│  ├─ LLM (AI chat: Apple Intelligence + Cloud with SSE)
+│  ├─ LLM (AI chat: Supabase Cloud with SSE)
 │  ├─ CloudKit (cloud sync)
 │  ├─ DataManagement (export/delete)
 │  └─ Connectivity (watch sync)

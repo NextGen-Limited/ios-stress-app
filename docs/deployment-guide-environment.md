@@ -18,7 +18,7 @@
 | **watchOS** | 10.0 | 11.0+ |
 | **Swift** | 5.9 | 6.0+ |
 
-**Note:** Apple Intelligence features (on-device AI Chat) require iOS 26+ and compatible hardware. SupabaseLLMService provides cloud fallback for older iOS versions.
+**Note:** SupabaseLLMService provides cloud AI chat for all supported iOS versions.
 
 **Demo Mode:** Launch with `-demo-mode` argument for simulated HealthKit data (no watch required).
 
@@ -204,7 +204,6 @@ xcodebuild test \
 #### Streaming AI Features
 - [ ] SupabaseLLMService streaming chat works with SSEParser
 - [ ] SupabaseConfig endpoint properly configured (check URL + anonKey)
-- [ ] Fallback to Apple Intelligence (iOS 26+)
 
 #### Accessibility
 - [ ] VoiceOver reads all elements

@@ -40,7 +40,7 @@ enum LLMServiceError: Error, LocalizedError {
 
 // MARK: - LLM Service Protocol
 
-/// Protocol for LLM service implementations (Apple Intelligence, cloud LLM, etc.)
+/// Protocol for LLM service implementations (cloud LLM, etc.)
 protocol LLMServiceProtocol: Sendable {
     /// Whether the LLM service is available on this device
     func isAvailable() -> Bool

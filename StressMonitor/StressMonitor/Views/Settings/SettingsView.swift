@@ -117,7 +117,8 @@ struct SettingsView: View {
         SettingsCard {
             VStack(spacing: 0) {
                 navRow(
-                    icon: "circle.grid.2x2.fill",
+                    icon: AppIconSystem.Setting.characters.sfSymbol,
+                    setting: .characters,
                     tint: HomeCharacterDesignTokens.Ripple.deep,
                     title: "Characters",
                     value: "\(unlockedCharacters.count) of \(CharacterCreature.allCharacters.count)",
@@ -125,7 +126,8 @@ struct SettingsView: View {
                 )
                 hairlineDivider
                 navRow(
-                    icon: "bubble.left.fill",
+                    icon: AppIconSystem.Setting.rippleCoach.sfSymbol,
+                    setting: .rippleCoach,
                     tint: .settingsIconPurple,
                     title: "Ripple Coach",
                     value: "Active",
@@ -141,7 +143,8 @@ struct SettingsView: View {
         SettingsCard {
             VStack(spacing: 0) {
                 navRow(
-                    icon: "heart.fill",
+                    icon: AppIconSystem.Setting.appleHealth.sfSymbol,
+                    setting: .appleHealth,
                     tint: .primaryGreen,
                     title: "Apple Health",
                     value: healthStatusText,
@@ -149,7 +152,8 @@ struct SettingsView: View {
                 )
                 hairlineDivider
                 navRow(
-                    icon: "applewatch",
+                    icon: AppIconSystem.Setting.appleWatch.sfSymbol,
+                    setting: .appleWatch,
                     tint: .settingsRippleBlue,
                     title: "Apple Watch",
                     value: watchStatusText,
@@ -157,7 +161,8 @@ struct SettingsView: View {
                 )
                 hairlineDivider
                 navRow(
-                    icon: "timer.secondary",
+                    icon: AppIconSystem.Setting.biologicalAge.sfSymbol,
+                    setting: .biologicalAge,
                     tint: .primaryGreen,
                     title: "Biological Age",
                     value: bioAgeText,
@@ -201,21 +206,24 @@ struct SettingsView: View {
         SettingsCard {
             VStack(spacing: 0) {
                 toggleRow(
-                    icon: "bell.badge.fill",
+                    icon: AppIconSystem.Setting.stressAlerts.sfSymbol,
+                    setting: .stressAlerts,
                     tint: .settingsIconPurple,
                     title: "Stress alerts",
                     isOn: $viewModel.notificationSettings.stressAlertsEnabled
                 )
                 hairlineDivider
                 toggleRow(
-                    icon: "drop.fill",
+                    icon: AppIconSystem.Setting.waterReminder.sfSymbol,
+                    setting: .waterReminder,
                     tint: .settingsRippleBlue,
                     title: "Water reminder",
                     isOn: $viewModel.notificationSettings.waterReminderEnabled
                 )
                 hairlineDivider
                 toggleRow(
-                    icon: "clock.fill",
+                    icon: AppIconSystem.Setting.dailySummary.sfSymbol,
+                    setting: .dailySummary,
                     tint: Color(hex: "#FE9901"),
                     title: "Daily summary",
                     isOn: $viewModel.notificationSettings.dailySummaryEnabled
@@ -233,7 +241,8 @@ struct SettingsView: View {
         SettingsCard {
             VStack(spacing: 0) {
                 navRow(
-                    icon: "star.fill",
+                    icon: AppIconSystem.Setting.stressMonitorPlus.sfSymbol,
+                    setting: .stressMonitorPlus,
                     tint: .premiumGold,
                     title: "StressMonitor Plus",
                     value: "Try free",
@@ -242,7 +251,8 @@ struct SettingsView: View {
                 )
                 hairlineDivider
                 navRow(
-                    icon: "circle.lefthalf.filled",
+                    icon: AppIconSystem.Setting.appearance.sfSymbol,
+                    setting: .appearance,
                     tint: Color.Wellness.adaptiveSecondaryText,
                     title: "Appearance",
                     value: appearanceLabel,
@@ -250,7 +260,8 @@ struct SettingsView: View {
                 )
                 hairlineDivider
                 toggleRow(
-                    icon: "hand.tap.fill",
+                    icon: AppIconSystem.Setting.haptics.sfSymbol,
+                    setting: .haptics,
                     tint: .orange,
                     title: "Haptics",
                     isOn: $hapticsEnabled
@@ -273,21 +284,24 @@ struct SettingsView: View {
         SettingsCard {
             VStack(spacing: 0) {
                 navRow(
-                    icon: "square.and.arrow.up",
+                    icon: AppIconSystem.Setting.exportData.sfSymbol,
+                    setting: .exportData,
                     tint: .primaryGreen,
                     title: "Export data",
                     destination: .dataExport
                 )
                 hairlineDivider
                 navRow(
-                    icon: "externaldrive.badge.timemachine",
+                    icon: AppIconSystem.Setting.manageData.sfSymbol,
+                    setting: .manageData,
                     tint: Color.error,
                     title: "Manage data",
                     destination: .dataManage
                 )
                 hairlineDivider
                 navRow(
-                    icon: "questionmark.circle",
+                    icon: AppIconSystem.Setting.helpPrivacy.sfSymbol,
+                    setting: .helpPrivacy,
                     tint: Color.Wellness.adaptiveSecondaryText,
                     title: "Help & privacy",
                     destination: .about
@@ -308,6 +322,7 @@ struct SettingsView: View {
 
     private func navRow(
         icon: String,
+        setting: AppIconSystem.Setting? = nil,
         tint: Color,
         title: String,
         value: String? = nil,
@@ -316,7 +331,7 @@ struct SettingsView: View {
         action: (() -> Void)? = nil
     ) -> some View {
         let row = HStack(spacing: 12) {
-            iconBadge(systemName: icon, tint: tint)
+            iconBadge(systemName: icon, setting: setting, tint: tint)
             Text(title)
                 .font(.system(size: 15, weight: .semibold, design: .rounded))
                 .foregroundStyle(Color.Wellness.adaptivePrimaryText)
@@ -361,12 +376,13 @@ struct SettingsView: View {
 
     private func toggleRow(
         icon: String,
+        setting: AppIconSystem.Setting? = nil,
         tint: Color,
         title: String,
         isOn: Binding<Bool>
     ) -> some View {
         HStack(spacing: 12) {
-            iconBadge(systemName: icon, tint: tint)
+            iconBadge(systemName: icon, setting: setting, tint: tint)
             Text(title)
                 .font(.system(size: 15, weight: .semibold, design: .rounded))
                 .foregroundStyle(Color.Wellness.adaptivePrimaryText)
@@ -380,13 +396,15 @@ struct SettingsView: View {
         .accessibilityLabel(title)
     }
 
-    private func iconBadge(systemName: String, tint: Color) -> some View {
-        Image(systemName: systemName)
-            .font(.system(size: 14, weight: .semibold))
-            .foregroundStyle(.white)
-            .frame(width: 28, height: 28)
-            .background(tint, in: RoundedRectangle(cornerRadius: 7, style: .continuous))
-            .accessibilityHidden(true)
+    private func iconBadge(systemName: String, setting: AppIconSystem.Setting? = nil, tint: Color) -> some View {
+        Group {
+            if let setting {
+                SettingsIconView(setting, color: tint)
+            } else {
+                SettingsIconView(systemName: systemName, color: tint)
+            }
+        }
+        .accessibilityHidden(true)
     }
 
     private var hairlineDivider: some View {

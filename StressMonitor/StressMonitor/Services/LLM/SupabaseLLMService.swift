@@ -30,10 +30,13 @@ final class SupabaseLLMService: LLMServiceProtocol, @unchecked Sendable {
     // MARK: - Init
 
     init(accessToken: String? = nil) {
-        self.accessToken = accessToken ?? KeychainService.retrieve(
+        let storedToken = accessToken ?? KeychainService.retrieve(
             service: Self.keychainService,
             account: Self.keychainTokenAccount
         )
+        // Fall back to guest JWT if no user token is stored (test mode).
+        // TODO: Replace with real SupabaseAuthService (Apple Sign-In) before production.
+        self.accessToken = storedToken ?? SupabaseConfig.guestJWT
         if let storedSessionId = UserDefaults.standard.string(forKey: Self.sessionIdDefaultsKey) {
             self.sessionId = UUID(uuidString: storedSessionId)
         }

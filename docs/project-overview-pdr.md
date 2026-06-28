@@ -26,7 +26,7 @@ StressMonitor is a **privacy-first stress monitoring application** that uses Hea
 | **Historical Tracking** | Timeline view with date/category filtering | ✅ Complete |
 | **Trend Analytics** | Line charts, bar charts, heatmap, distribution stats -- Figma-aligned | ✅ Complete |
 | **AI-Powered Insights** | Personalized insights via InsightGeneratorService | ✅ Complete |
-| **AI Chat** | Conversational AI via SupabaseLLMService (primary) + Apple Intelligence (iOS 26+ fallback) with SSE streaming | ✅ Complete |
+| **AI Chat** | Conversational AI via SupabaseLLMService (SSE streaming via Edge Functions) | ✅ Complete |
 | **Weekly Dot-Matrix Timeline** | 7-day x 7-slot dot grid replacing 24h scatter chart | ✅ Complete |
 | **Apple Watch Standalone App** | Independent stress monitoring with WidgetKit complications | ✅ Complete |
 | **CloudKit Sync** | E2E encrypted offline-first cloud sync | ✅ Complete |
@@ -204,7 +204,7 @@ Each measurement includes a confidence value (0-1) based on:
 ### Privacy & Security
 - Zero data breaches
 - 100% CloudKit E2E encryption
-- Health data never sent externally (only anonymized chat context to SupabaseLLMService / Apple Intelligence)
+- Health data never sent externally (only anonymized chat context to SupabaseLLMService)
 
 ---
 
@@ -213,7 +213,6 @@ Each measurement includes a confidence value (0-1) based on:
 | Constraint | Impact | Mitigation |
 |-----------|--------|-----------|
 | **iOS 17+ only** | Excludes iOS 16 users | Feature target for modern users |
-| **iOS 26+ for Apple Intelligence** | AI Chat limited to newest iOS | SupabaseLLM fallback for older devices |
 | **HealthKit dependency** | Requires health data access | Graceful degradation on denial |
 | **iCloud requirement** | CloudKit sync needs account | Optional feature, not required |
 
@@ -238,8 +237,7 @@ HealthKit (Sensors) -> HealthKitManager (read-only)
 
 AI Chat (separate path):
 ActionView -> ChatBottomSheetView -> ChatViewModel
--> SupabaseLLMService (SSE streaming to Supabase Edge Functions) OR
-   AppleIntelligenceService (on-device, iOS 26+)
+-> SupabaseLLMService (SSE streaming to Supabase Edge Functions)
 -> ChatContextBuilder (assembles anonymized context only)
 -> SSEParser for Server-Sent Events streaming
 ```

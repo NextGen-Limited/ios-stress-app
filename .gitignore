@@ -159,3 +159,7 @@ tmp-home/
 vendor/bundle
 build/
 .worktrees/
+
+# Supabase local secrets (auto-generated, do not commit)
+StressMonitor/StressMonitor/Services/LLM/SupabaseSecrets.swift
+supabase/.temp/

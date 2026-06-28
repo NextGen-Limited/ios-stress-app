@@ -90,7 +90,7 @@ StressMonitor/
 │   │   ├── Algorithm/                      # Multi-factor stress calculation
 │   │   ├── Repository/                     # SwiftData persistence
 │   │   ├── CloudKit/                       # iCloud sync
-│   │   ├── LLM/                            # Cloud LLM + Apple Intelligence
+│   │   ├── LLM/                            # Cloud LLM (Supabase Edge Functions)
 │   │   ├── StoreKit/                       # IAP Premium subscriptions
 │   │   ├── Background/                     # Notifications & tasks
 │   │   ├── Connectivity/                   # Watch connectivity
@@ -143,7 +143,7 @@ Data Layer (SwiftData + CloudKit)
 | Health Data | HealthKit (read-only) |
 | Widgets | WidgetKit |
 | Networking | Moya + Alamofire |
-| AI Chat | SupabaseLLMService (production) + AppleIntelligenceService (iOS 26+ fallback) |
+| AI Chat | SupabaseLLMService (production, SSE streaming via Edge Functions) |
 | Charts | SwiftUICharts |
 
 ## Dependencies

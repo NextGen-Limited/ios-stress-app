@@ -89,9 +89,8 @@ Business logic and system integrations.
 - `CloudKitSyncEngine.swift` - Sync conflict resolution
 - `CloudKitSchema.swift` - CloudKit data model definitions
 
-#### LLM Services (8 files)
+#### LLM Services (7 files)
 - `LLMServiceProtocol.swift` - AI service abstraction
-- `AppleIntelligenceService.swift` - On-device AI integration (iOS 26+)
 - `SupabaseLLMService.swift` - Cloud LLM via Supabase Edge Functions with SSE streaming
 - `ChatContextBuilder.swift` - Conversation context management
 - `ChatQuickActions.swift` - Quick response suggestions
@@ -266,7 +265,6 @@ The app uses a 3-tab navigation structure:
 
 ### AI Integration
 - **Primary**: SupabaseLLMService with SSE streaming via Supabase Edge Functions (production cloud service, fully configured)
-- **Fallback**: AppleIntelligenceService with Foundation Models (iOS 26+ on-device)
 - **Architecture**: Server-Sent Events for real-time streaming
 - **Features**: Stress insights, breathing guidance, conversation
 - **Configuration**: SupabaseConfig (URL + anonKey) for cloud endpoints
@@ -290,8 +288,7 @@ The app uses a 3-tab navigation structure:
 - Stress categorization: **5 levels** — Relaxed, Mild, Moderate, High, Severe (`StressCategory` enum, WCAG dual-coding colors)
 
 ### AI-Powered Insights
-- Apple Intelligence integration for iOS 26+
-- SupabaseLLMService fallback with SSE streaming (Apple Intelligence on-device primary for iOS 26+)
+- SupabaseLLMService with SSE streaming via Edge Functions
 - Contextual stress analysis and recommendations
 - Breathing exercise guidance
 - Conversational stress management

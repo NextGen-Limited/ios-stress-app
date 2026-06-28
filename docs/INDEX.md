@@ -150,7 +150,7 @@ App Store editorial preparation, ASO keyword strategy, and submission-ready copy
 | **SPM Dependencies** | 8 packages (Chat, SwiftUICharts + 6 transitive) |
 | **WidgetKit (not ClockKit)** | watchOS 10+ requirement |
 | **async/await throughout** | Modern concurrency |
-| **Foundation Models** | On-device LLM via Apple Intelligence (iOS 26+) |
+| **Supabase Edge Functions** | Cloud LLM via SSE streaming |
 | **SupabaseLLMService** | Supabase Edge Functions as cloud LLM **production** service (B1 resolved Jun 7) |
 | **Real StoreKit 2** | App Store product fetching + transaction monitoring (PR #19, Jun 12) |
 | **3-Tab Navigation** | Home/Action/Trend structure with Settings non-tab (Jun 17, 2026) |
@@ -166,7 +166,6 @@ App Store editorial preparation, ASO keyword strategy, and submission-ready copy
 | Constraint | Impact | Mitigation |
 |-----------|--------|-----------|
 | iOS 17+ only | Excludes iOS 16 users | Target modern users |
-| iOS 26+ for Apple Intelligence | AI Chat limited to newest iOS | SupabaseLLM fallback for older devices |
 | HealthKit dependency | Requires permissions | Graceful degradation |
 | iCloud required for sync | CloudKit needs account | Optional feature |
 
@@ -233,7 +232,7 @@ SwiftUI Views → @Observable ViewModels → Protocol-based Services
 
 | Version | Release | Status | Notable |
 |---------|---------|--------|---------|
-| **1.0** | Jul/Aug 2026 | 🔄 Pre-Ship RC1 | AI Chat with SSE streaming, 3-tab navigation (Home/Action/Trend) + Settings screen, Character Collection UI (5 characters, 3-stage evolution, 11 SVG assets), SupabaseLLM via Edge Functions + Apple Intelligence, Box Breathing Figma alignment, Mini Walk exercise, Real StoreKit 2 (PR #19 Jun 12), Stress History, Guided Breathing, Watch Complications, Morning Readiness Check, **Centralized `AppIconSystem` (PR #44)**, **Character views → SVG assets (PR #45)**. **Remaining Blocker:** Test suite rewrite |
+| **1.0** | Jul/Aug 2026 | 🔄 Pre-Ship RC1 | AI Chat with SSE streaming, 3-tab navigation (Home/Action/Trend) + Settings screen, Character Collection UI (5 characters, 3-stage evolution, 11 SVG assets), SupabaseLLM via Edge Functions, Box Breathing Figma alignment, Mini Walk exercise, Real StoreKit 2 (PR #19 Jun 12), Stress History, Guided Breathing, Watch Complications, Morning Readiness Check, **Centralized `AppIconSystem` (PR #44)**, **Character views → SVG assets (PR #45)**. **Remaining Blocker:** Test suite rewrite |
 | **1.1** | Q3 2026 | 🔄 Planned | Advanced breathing, stress triggers, weekly reports, localization MVP |
 | **2.0** | Q4 2026 | 🎯 Concept | ML insights, Siri Shortcuts, iPad support |
 

@@ -4,7 +4,7 @@
 **Distribution:** TestFlight -> App Store
 **Last Updated:** June 17, 2026
 
-**Note:** Apple Intelligence features (on-device AI Chat) require iOS 26+ and compatible hardware. SupabaseLLMService with SSE streaming provides cloud fallback for older devices.
+**Note:** SupabaseLLMService with SSE streaming provides cloud AI chat across all supported iOS versions.
 
 ---
 
@@ -41,7 +41,7 @@ Once your app is built and tested:
 - [ ] Test character evolution unlocks
 - [ ] Test dark mode toggle in Settings → ProfileCard
 - [ ] Test appearance picker (Light/Dark/System) persistence
-- [ ] Test AI chat streaming with Apple Intelligence (iOS 26+) and SupabaseLLMService fallback
+- [ ] Test AI chat streaming with SupabaseLLMService (SSE)
 - [ ] Verify SupabaseConfig environment setup (URL + anonKey)
 - [ ] Test real StoreKit 2 purchasing flow (monthly/annual/weekly) with real/sandbox products
 - [ ] Test WidgetKit Live Activity (breathing session on lock screen)
@@ -108,7 +108,7 @@ Once your app is built and tested:
 - [ ] **Weekly Billing Option** - SubscriptionPeriod.weekly added to StoreKit products (Jun 17)
 - [ ] **Character Collection** - 5 elemental characters with 3-stage evolution, 38 SVG assets
 - [ ] **Streaming AI Chat** - Real-time token rendering via SSEParser
-- [ ] **Dual LLM Services** - Apple Intelligence (iOS 26+) + SupabaseLLMService fallback
+- [ ] **SupabaseLLMService** - SSE streaming via Edge Functions
 - [ ] **Real StoreKit 2** - App Store product fetching, transaction monitoring, PremiumState singleton
 - [ ] **Box Breathing Exercises** - Figma-aligned animations with HRV biofeedback
 - [ ] **Weekly Timeline View** - 7-day × 7-slot dot-matrix grid visualization

@@ -37,6 +37,11 @@ struct PlusPill: View {
 
         case .tryFree:
             HStack(spacing: 6) {
+                Image(AppIconSystem.Setting.plusPillSparkleAsset)
+                    .renderingMode(.template)
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: 12, height: 12)
                 Text("Plus")
                     .font(.system(size: 13, weight: .heavy, design: .rounded))
                 Text("Try free ›")

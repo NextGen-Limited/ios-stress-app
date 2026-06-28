@@ -212,7 +212,7 @@ To test with simulated HealthKit data on simulator:
 - **Persistence**: SwiftData (`StressMeasurement`, `CharacterUnlock`)
 - **Health Data**: HealthKit (HRV, HR, Sleep, Activity, Recovery)
 - **Cloud Sync**: CloudKit + custom `SyncManager`/`ConflictResolver`
-- **AI Chat**: `SupabaseLLMService` (primary) + `AppleIntelligenceService` (fallback), via `LLMServiceProtocol`
+- **AI Chat**: `SupabaseLLMService` (via Supabase Edge Functions, SSE streaming), via `LLMServiceProtocol`
 - **IAP**: StoreKit 2 — monthly/annual subscriptions via `StoreKitService` / `MockStoreKitService`
 - **Watch**: Separate watchOS target with `WatchConnectivity` sync
 
@@ -318,7 +318,7 @@ StressMonitor/
 │   ├── Services/
 │   │   ├── Algorithm/      (MultiFactorStressCalculator, StressCalculator, 5 StressFactor impls)
 │   │   ├── HealthKit/      (HealthKitManager + extensions for Activity/Recovery/Sleep fetch)
-│   │   ├── LLM/            (SupabaseLLMService, AppleIntelligenceService, ChatContextBuilder)
+│   │   ├── LLM/            (SupabaseLLMService, ChatContextBuilder)
 │   │   ├── StoreKit/       (StoreKitService, MockStoreKitService, StoreKitProductCatalog)
 │   │   ├── CloudKit/       (CloudKitManager, CloudKitSyncEngine, CloudKitSchema)
 │   │   ├── Sync/           (SyncManager, ConflictResolver)
@@ -478,7 +478,7 @@ Follow `documentation/references/README.md` for phased implementation:
 | watchOS Complications | WidgetKit (NOT ClockKit) | Required for watchOS 10+ |
 | Background Tasks | BGAppRefreshTask | System-managed, battery-efficient |
 | Dependencies | None (system only) | Privacy-first, no bloat |
-| AI Chat | SupabaseLLMService (primary) + AppleIntelligenceService (fallback) | On-device privacy when available |
+| AI Chat | SupabaseLLMService (via Supabase Edge Functions, SSE streaming) | On-device privacy when available |
 | IAP | StoreKit 2 — monthly + annual plans | StoreKitProductCatalog resolves IDs from Info.plist/env |
 | Gamification | 5 character creatures with evolution (SwiftData CharacterUnlock) | Engagement via stress-driven character evolution |
 | Algorithm | MultiFactorStressCalculator (5 factors) with StressCalculator fallback (HRV+HR) | Graceful degradation when sensors missing |
