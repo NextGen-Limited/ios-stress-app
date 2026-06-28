@@ -1,89 +1,59 @@
 import SwiftUI
 
-/// Watch **Home** screen.
+/// Watch **Home** screen — stress readout hero.
 ///
-/// A character-reactive face: the Ripple 💧 emoji changes expression based on
-/// the current stress level. **No numeric score is ever shown** — the face and
-/// its accent colour *are* the indicator. A "Measure" button triggers a fresh
-/// HealthKit reading via the existing `WatchStressViewModel`.
+/// Light canvas with the watch-face tint, framing a single large Ripple
+/// character in a radial halo with its ambient breathing scale animation,
+/// centered on the watch face.
 struct WatchHomeView: View {
     @Bindable var viewModel: WatchStressViewModel
 
+    @AppStorage(
+        WatchFacePreferences.Keys.theme,
+        store: WatchFacePreferences.defaults
+    ) private var themeRaw: String = WatchFacePreferences.defaultTheme.rawValue
+
+    private var theme: WatchFaceTheme { WatchFaceTheme(rawValue: themeRaw) ?? .ripple }
+    private var creature: CharacterCreature { theme.creature }
+    private var category: StressCategory { StressCategory.category(for: viewModel.currentLevel) }
+
     var body: some View {
-        VStack(spacing: 10) {
-            characterFace
-
-            // A single non-numeric mood word anchors the expression.
-            Text(currentTier.label)
-                .font(.system(size: 16, weight: .semibold, design: .rounded))
-                .foregroundStyle(currentTier.accent)
-                .contentTransition(.opacity)
-
-            if viewModel.isLoading {
-                ProgressView()
-                    .tint(currentTier.accent)
-            } else {
-                Button {
-                    Task { await viewModel.measureStress() }
-                } label: {
-                    Label("Measure", systemImage: "heart.text.square")
-                        .font(.system(size: 13, weight: .semibold))
-                        .frame(maxWidth: .infinity)
-                        .frame(height: 40)
-                }
-                .buttonStyle(.bordered)
-                .tint(currentTier.accent)
-                .disabled(viewModel.isLoading)
+        characterHalo
+            .frame(maxWidth: .infinity, maxHeight: .infinity)
+            .background(homeBackground.ignoresSafeArea())
+            .task {
+                await viewModel.requestAuthorization()
+                await viewModel.loadLatestStress()
             }
-
-            if let error = viewModel.errorMessage {
-                Text(error)
-                    .font(.system(size: 9))
-                    .foregroundStyle(.red)
-                    .multilineTextAlignment(.center)
-                    .lineLimit(2)
-            }
-        }
-        .padding(.horizontal, 6)
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(
-            ZStack {
-                StressCharacterPalette.darkCanvas
-                WatchFaceBackgroundView(
-                    style: WatchFacePreferences.backgroundStyle,
-                    theme: WatchFacePreferences.theme
-                )
-                .opacity(0.6)
-            }
-            .ignoresSafeArea()
-        )
-        .task {
-            await viewModel.requestAuthorization()
-            await viewModel.loadLatestStress()
-        }
     }
 
     // MARK: - Subviews
 
-    @ViewBuilder
-    private var characterFace: some View {
-        if viewModel.isLoading {
-            CharacterFaceView(tier: currentTier, size: 120, glow: true)
-                .opacity(0.6)
-        } else {
-            CharacterFaceView(tier: currentTier, size: 120, glow: true)
-                .startIdleAnimation()
-        }
+    private var characterHalo: some View {
+        CharacterFaceView(
+            creature: creature,
+            category: category,
+            size: 110,
+            showsHalo: true
+        )
     }
 
-    private var currentTier: StressTier {
-        StressTier.from(level: viewModel.currentLevel)
+    // MARK: - Helpers
+
+    private var homeBackground: some View {
+        ZStack {
+            WatchDesignTokens.canvas
+            WatchFaceBackgroundView(
+                style: WatchFacePreferences.backgroundStyle,
+                theme: theme
+            )
+            .opacity(0.5)
+        }
     }
 }
 
 #if DEBUG
 #Preview {
-    let vm = WatchStressViewModel()
-    return WatchHomeView(viewModel: vm)
+    WatchHomeView(viewModel: WatchStressViewModel())
 }
 #endif

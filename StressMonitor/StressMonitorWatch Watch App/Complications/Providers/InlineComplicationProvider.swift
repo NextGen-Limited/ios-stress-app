@@ -49,27 +49,25 @@ struct InlineComplicationEntry: TimelineEntry {
 }
 
 // MARK: - Inline Complication View
-/// SwiftUI view for inline complication display
+/// SwiftUI view for inline complication display.
+///
+/// Single-line: Ripple mini glyph + numeric score + tier glyph.  Score is
+/// rendered in the tier colour; the label sits in muted white.
 struct InlineComplicationView: View {
     let entry: InlineComplicationEntry
 
     var body: some View {
         HStack(spacing: 4) {
-            // Category indicator
-            Image(systemName: entry.entry.category.icon)
-                .font(.system(size: 12))
+            // Ripple mini glyph (no expression at this size)
+            CharacterFaceView(creature: .ripple, category: entry.entry.category, size: 14, showsHalo: false)
+
+            Text(entry.entry.isPlaceholder ? "—" : "\(Int(entry.entry.stressLevel.rounded()))")
+                .font(.system(size: 13, weight: .semibold, design: .rounded).monospacedDigit())
                 .foregroundColor(stressColor)
 
-            // Stress level
-            if entry.entry.isPlaceholder {
-                Text("—")
-                    .font(.system(size: 14, weight: .semibold, design: .rounded))
-                    .foregroundColor(.secondary)
-            } else {
-                Text("\(entry.entry.stressLevelText)")
-                    .font(.system(size: 14, weight: .semibold, design: .rounded))
-                    .foregroundColor(stressColor)
-            }
+            Text("· \(entry.entry.category.displayName)")
+                .font(.system(size: 11, weight: .medium, design: .monospaced))
+                .foregroundColor(.white.opacity(0.55))
         }
         .widgetURL(deepLinkURL)
     }

@@ -62,7 +62,7 @@ struct InlineStressView: View {
 
     // MARK: - Computed Properties
     private var stressLevelText: String {
-        StressTier.from(level: stressLevel).label
+        "\(Int(stressLevel.rounded()))"
     }
 
     private var hasData: Bool {

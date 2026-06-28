@@ -1,117 +1,187 @@
 import SwiftUI
 
-/// Watch **Breathe** screen.
+/// Watch **Breathe** screen — 4-7-8 guided breathing.
 ///
-/// A guided 4-7-8 breathing exercise:
-/// 1. **Inhale** for 4 seconds (ring expands)
-/// 2. **Hold** for 7 seconds (ring holds)
-/// 3. **Exhale** for 8 seconds (ring contracts)
-///
-/// The expanding ring is the visual guide; the phase label and a soft countdown
-/// keep the user in sync. No stress numbers appear here.
+/// Light canvas. A breathing ring expands/contracts with each phase; the
+/// phase label rides above in SF Pro Display, the countdown in SF Pro
+/// Rounded tabular numerals, and four phase dots track progress.  Phase
+/// colours follow the iOS Breathing lineage:
+///   - Inhale  → accent  `#4FC3F7`
+///   - Hold    → strong  `#0288D1`
+///   - Exhale  → mild    `#007AFF`  (transitions back toward accent)
 struct WatchBreatheView: View {
-    private enum Phase: String {
-        case inhale, hold, exhale, idle
+    private enum Phase: String, Hashable {
+        case idle, inhale, hold, exhale
     }
 
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var phase: Phase = .idle
-    @State private var scale: CGFloat = 0.45
+    @State private var ringScale: CGFloat = 0.55
     @State private var secondsLeft: Int = 0
     @State private var cycleCount: Int = 0
     @State private var timer: Timer?
+    @State private var ringFill: Double = 0    // 0…1 progress within phase
 
     private let inhaleSec = 4
-    private let holdSec = 7
+    private let holdSec   = 7
     private let exhaleSec = 8
 
     private var isRunning: Bool { phase != .idle }
 
     var body: some View {
-        VStack(spacing: 8) {
+        VStack(spacing: WatchDesignTokens.Spacing.xs) {
             Spacer(minLength: 0)
 
-            ZStack {
-                // Outer guide ring (static).
-                Circle()
-                    .stroke(StressCharacterPalette.ripple.opacity(0.2), lineWidth: 3)
-                    .frame(width: 140, height: 140)
+            phaseLabel
 
-                // Animated breathing ring.
-                Circle()
-                    .fill(
-                        RadialGradient(
-                            colors: [StressCharacterPalette.ripple.opacity(0.6),
-                                     StressCharacterPalette.ripple.opacity(0.1)],
-                            center: .center,
-                            startRadius: 2,
-                            endRadius: 70
-                        )
-                    )
-                    .frame(width: 150, height: 150)
-                    .scaleEffect(scale)
+            breathingRing
 
-                VStack(spacing: 2) {
-                    Text(phaseLabel)
-                        .font(.system(size: 17, weight: .semibold, design: .rounded))
-                        .foregroundStyle(.white)
-                        .contentTransition(.opacity)
+            countdownBlock
+                .padding(.top, 2)
 
-                    if isRunning {
-                        Text("\(secondsLeft)")
-                            .font(.system(size: 30, weight: .bold, design: .rounded)
-                                .monospacedDigit())
-                            .foregroundStyle(StressCharacterPalette.ripple)
-                            .contentTransition(.numericText(value: Double(secondsLeft)))
-                    } else {
-                        Text("💧")
-                            .font(.system(size: 30))
-                    }
-                }
-            }
-            .frame(width: 150, height: 150)
-            .animation(.easeInOut(duration: currentDuration), value: scale)
+            phaseDots
+                .padding(.top, 2)
 
             Spacer(minLength: 0)
 
-            Text(isRunning ? "Cycle \(cycleCount)" : "4·7·8 Breathing")
-                .font(.system(size: 11, weight: .medium))
-                .foregroundStyle(StressCharacterPalette.mutedInk)
+            Text(isRunning ? "Cycle \(cycleCount)" : "4 · 7 · 8 Breathing")
+                .font(.system(size: 10, weight: .medium, design: .monospaced))
+                .foregroundStyle(WatchDesignTokens.muted)
+                .padding(.bottom, 2)
 
-            Button {
-                isRunning ? stop() : start()
-            } label: {
-                Label(isRunning ? "Stop" : "Begin",
-                      systemImage: isRunning ? "stop.fill" : "play.fill")
-                    .font(.system(size: 13, weight: .semibold))
-                    .frame(maxWidth: .infinity)
-                    .frame(height: 40)
-            }
-            .buttonStyle(.bordered)
-            .tint(isRunning ? .red : StressCharacterPalette.ripple)
+            pillButton
         }
-        .padding(.horizontal, 6)
-        .padding(.bottom, 6)
+        .padding(.horizontal, WatchDesignTokens.contentSidePadding)
+        .padding(.top, 6)
+        .padding(.bottom, 10)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
-        .background(StressCharacterPalette.darkCanvas.ignoresSafeArea())
+        .background(WatchDesignTokens.canvas.ignoresSafeArea())
         .onDisappear { stop() }
+    }
+
+    // MARK: - Subviews
+
+    private var phaseLabel: some View {
+        Text(phaseTitle)
+            .font(.system(size: 13, weight: .semibold, design: .default))
+            .tracking(-0.01 * 13)
+            .foregroundStyle(phaseColor)
+            .contentTransition(.opacity)
+            .animation(WatchDesignTokens.motion(WatchDesignTokens.Motion.fast, reduceMotion: reduceMotion), value: phase)
+    }
+
+    private var breathingRing: some View {
+        ZStack {
+            // Track ring (static)
+            Circle()
+                .stroke(WatchDesignTokens.separator, lineWidth: 10)
+            // Phase progress ring
+            Circle()
+                .trim(from: 0, to: ringFill)
+                .stroke(
+                    phaseColor,
+                    style: StrokeStyle(lineWidth: 10, lineCap: .round)
+                )
+                .rotationEffect(.degrees(-90))
+                .animation(WatchDesignTokens.motion(WatchDesignTokens.Motion.default, reduceMotion: reduceMotion), value: ringFill)
+        }
+        .frame(width: 110, height: 110)
+        .scaleEffect(ringScale)
+        .animation(WatchDesignTokens.motion(WatchDesignTokens.Motion.slow, reduceMotion: reduceMotion), value: ringScale)
+    }
+
+    private var countdownBlock: some View {
+        VStack(spacing: 1) {
+            if isRunning {
+                Text("\(secondsLeft)")
+                    .font(.system(size: 36, weight: .semibold, design: .rounded).monospacedDigit())
+                    .tracking(-0.028 * 36)
+                    .foregroundStyle(phaseColor)
+                    .contentTransition(.numericText(value: Double(secondsLeft)))
+            } else {
+                Text("—")
+                    .font(.system(size: 36, weight: .semibold, design: .rounded).monospacedDigit())
+                    .foregroundStyle(WatchDesignTokens.muted)
+            }
+            Text(isRunning ? "sec" : "Ready")
+                .font(.system(size: 9, weight: .semibold, design: .monospaced))
+                .tracking(0.06 * 9)
+                .foregroundStyle(WatchDesignTokens.muted)
+        }
+    }
+
+    private var phaseDots: some View {
+        let phases: [Phase] = [.inhale, .hold, .exhale]
+        return HStack(spacing: 6) {
+            ForEach(phases, id: \.self) { p in
+                dot(for: p)
+            }
+        }
+    }
+
+    @ViewBuilder
+    private func dot(for p: Phase) -> some View {
+        let status = dotStatus(for: p)
+        Group {
+            if status == .active {
+                Capsule().fill(WatchDesignTokens.accent).frame(width: 16, height: 6)
+            } else {
+                Circle().fill(status == .done ? WatchDesignTokens.accent.opacity(0.45) : WatchDesignTokens.separatorStrong)
+                    .frame(width: 6, height: 6)
+            }
+        }
+    }
+
+    private enum DotStatus { case upcoming, active, done }
+
+    private func dotStatus(for p: Phase) -> DotStatus {
+        let order: [Phase] = [.inhale, .hold, .exhale]
+        guard let current = order.firstIndex(of: phase),
+              let target = order.firstIndex(of: p) else { return .upcoming }
+        if target < current { return .done }
+        if target == current { return .active }
+        return .upcoming
+    }
+
+    private var pillButton: some View {
+        Button {
+            isRunning ? stop() : start()
+        } label: {
+            Text(isRunning ? "End" : "Begin")
+                .font(.system(size: 12, weight: .semibold, design: .rounded))
+                .tracking(-0.01 * 12)
+                .foregroundStyle(isRunning ? WatchDesignTokens.accentStrong : .white)
+                .frame(maxWidth: .infinity)
+                .frame(height: 34)
+                .background(
+                    Capsule(style: .continuous)
+                        .fill(isRunning ? AnyShapeStyle(WatchDesignTokens.surface) : AnyShapeStyle(WatchDesignTokens.accentStrong))
+                )
+                .overlay(
+                    Capsule(style: .continuous)
+                        .stroke(WatchDesignTokens.separatorStrong, lineWidth: isRunning ? 0.5 : 0)
+                )
+        }
+        .buttonStyle(.plain)
     }
 
     // MARK: - State machine
 
-    private var phaseLabel: String {
+    private var phaseTitle: String {
         switch phase {
         case .inhale: return "Breathe In"
         case .hold:   return "Hold"
         case .exhale: return "Breathe Out"
-        case .idle:   return "Ready"
+        case .idle:   return "Breathe"
         }
     }
 
-    private var currentDuration: Double {
+    private var phaseColor: Color {
         switch phase {
-        case .inhale: return Double(inhaleSec)
-        case .exhale: return Double(exhaleSec)
-        default: return 0.4
+        case .inhale: return WatchDesignTokens.accent
+        case .hold:   return WatchDesignTokens.accentStrong
+        case .exhale: return Color.stressMild
+        case .idle:   return WatchDesignTokens.muted
         }
     }
 
@@ -124,44 +194,51 @@ struct WatchBreatheView: View {
         timer?.invalidate()
         timer = nil
         phase = .idle
-        scale = 0.45
+        ringScale = 0.55
         secondsLeft = 0
+        ringFill = 0
     }
 
     private func beginInhale() {
         phase = .inhale
         secondsLeft = inhaleSec
-        withAnimation(.easeInOut(duration: Double(inhaleSec))) {
-            scale = 1.0
+        ringFill = 0
+        if !reduceMotion {
+            withAnimation(.easeInOut(duration: Double(inhaleSec))) { ringScale = 1.0 }
         }
-        runCountdown { beginHold() }
+        runPhase(duration: inhaleSec) { beginHold() }
     }
 
     private func beginHold() {
         phase = .hold
         secondsLeft = holdSec
-        // Hold scale steady.
-        runCountdown { beginExhale() }
+        ringFill = 1.0
+        runPhase(duration: holdSec) { beginExhale() }
     }
 
     private func beginExhale() {
         phase = .exhale
         secondsLeft = exhaleSec
-        withAnimation(.easeInOut(duration: Double(exhaleSec))) {
-            scale = 0.45
+        ringFill = 1.0
+        if !reduceMotion {
+            withAnimation(.easeInOut(duration: Double(exhaleSec))) { ringScale = 0.55 }
         }
-        runCountdown {
+        runPhase(duration: exhaleSec) {
             cycleCount += 1
             beginInhale() // loop until the user stops
         }
     }
 
-    /// Counts down once per second; calls `onZero` when the phase elapses.
-    private func runCountdown(onZero: @escaping () -> Void) {
+    /// Drives both the per-second countdown and the smooth ring fill.
+    private func runPhase(duration: Int, onZero: @escaping () -> Void) {
+        let total = Double(duration)
         timer?.invalidate()
+        var ticks = 0
         timer = Timer.scheduledTimer(withTimeInterval: 1.0, repeats: true) { t in
+            ticks += 1
             if secondsLeft > 1 {
                 secondsLeft -= 1
+                ringFill = Double(ticks) / total
             } else {
                 t.invalidate()
                 onZero()

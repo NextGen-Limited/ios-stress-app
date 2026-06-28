@@ -110,8 +110,8 @@ final class WatchSharedDataStore {
 // MARK: - SharedReading
 
 /// Transport model for a single stress reading shared across surfaces.
-/// Only the level (0–100) and timestamp are required — the character face is
-/// derived from the level, so no score ever needs to be rendered as text.
+/// Only the level (0–100) and timestamp are required; the tier is derived
+/// from the level via `StressCategory` on demand.
 struct SharedReading: Codable, Sendable, Identifiable {
     let id: UUID
     let level: Double
@@ -119,9 +119,10 @@ struct SharedReading: Codable, Sendable, Identifiable {
 
     init(level: Double, timestamp: Date = Date()) {
         self.id = UUID()
-        self.level = min(100, max(0, level))
+        self.level = min(150, max(0, level))
         self.timestamp = timestamp
     }
 
-    var tier: StressTier { StressTier.from(level: level) }
+    /// Resolved 5-tier category (iOS-aligned).
+    var category: StressCategory { StressCategory.category(for: level) }
 }

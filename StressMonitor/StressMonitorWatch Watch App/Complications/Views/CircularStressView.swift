@@ -84,22 +84,14 @@ struct CircularStressView: View {
     }
 
     private var stressLevelText: String {
-        StressTier.from(level: stressLevel).label
+        "\(Int(stressLevel.rounded()))"
     }
 }
 
 // MARK: - Stress Category Extension
 extension StressCategory {
-    /// Human-readable label for the category
-    var label: String {
-        switch self {
-        case .relaxed: return "Relaxed"
-        case .mild: return "Mild"
-        case .moderate: return "Moderate"
-        case .high: return "High"
-        case .severe: return "Severe"
-        }
-    }
+    /// Human-readable label for the category.
+    var label: String { displayName }
 }
 
 // MARK: - Preview

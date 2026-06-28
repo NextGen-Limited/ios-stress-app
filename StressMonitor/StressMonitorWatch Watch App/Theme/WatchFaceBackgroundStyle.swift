@@ -2,20 +2,20 @@ import SwiftUI
 
 // MARK: - WatchFaceBackgroundStyle
 
-/// Background rendering style for watch face complications.
+/// Background rendering style for the watch face / Home canvas.
 ///
-/// Each style maps to a different visual treatment applied behind the
-/// Ripple character.  The actual colour ramp is driven by
-/// `WatchFaceTheme`, so a single style + theme combination fully
-/// determines the rendered background.
+/// Four styles are retained from the previous design, but each is reworked
+/// for the LIGHT theme: every treatment is a soft, low-opacity tint wash
+/// over the iOS grouped background (`--bg #F2F2F7`).  No mesh gradients,
+/// no dark canvas — the watch app reads as a sibling of the iOS app.
 enum WatchFaceBackgroundStyle: String, CaseIterable, Codable, Sendable {
-    /// Flat solid tint — subtle, battery-friendly.
+    /// Flat soft tint — subtle, battery-friendly.
     case solid
-    /// Two-stop vertical gradient.
+    /// Two-stop vertical tint ramp.
     case gradient
-    /// Multi-stop diagonal wash evoking northern lights.
+    /// Multi-stop diagonal wash evoking northern lights (soft).
     case aurora
-    /// Layered wave-like gradient evoking deep water.
+    /// Layered wave-like wash evoking calm water.
     case ocean
 
     var displayName: String {
@@ -27,7 +27,7 @@ enum WatchFaceBackgroundStyle: String, CaseIterable, Codable, Sendable {
         }
     }
 
-    /// SF Symbol used in the picker row.
+    /// SF Symbol used in the picker swatch.
     var iconName: String {
         switch self {
         case .solid:    return "circle.fill"
@@ -40,66 +40,44 @@ enum WatchFaceBackgroundStyle: String, CaseIterable, Codable, Sendable {
 
 // MARK: - WatchFaceTheme
 
-/// Five preset colour themes, one per StressMonitor character.
-///
-/// Hex values are kept in sync with `StressCharacterPalette` (the
-/// watch-local copy of `HomeCharacterDesignTokens`).  Each theme exposes
-/// a primary and secondary colour so gradient styles have a natural
-/// ramp.
+/// Five preset colour themes, one per elemental companion.  Bridges 1:1
+/// to `CharacterCreature` so the Settings preview can render the actual
+/// companion SVG instead of an emoji.
 enum WatchFaceTheme: String, CaseIterable, Codable, Sendable {
-    case ripple   // 💧 blue
-    case blossom  // 🌿 green
-    case ember    // 🔥 orange
-    case zephyr   // 🌬️ purple
-    case lumi     // 🌙 indigo
+    case ripple
+    case blossom
+    case ember
+    case zephyr
+    case lumi
 
-    var displayName: String {
+    /// Underlying companion used to render the character glyph.
+    var creature: CharacterCreature {
         switch self {
-        case .ripple:  return "Ripple"
-        case .blossom: return "Blossom"
-        case .ember:   return "Ember"
-        case .zephyr:  return "Zephyr"
-        case .lumi:    return "Lumi"
+        case .ripple:  return .ripple
+        case .blossom: return .blossom
+        case .ember:   return .ember
+        case .zephyr:  return .zephyr
+        case .lumi:    return .lumi
         }
     }
 
-    var emoji: String {
-        switch self {
-        case .ripple:  return "💧"
-        case .blossom: return "🌿"
-        case .ember:   return "🔥"
-        case .zephyr:  return "🌬️"
-        case .lumi:    return "🌙"
-        }
-    }
+    var displayName: String { creature.displayName }
 
-    var primaryColor: Color {
-        switch self {
-        case .ripple:  return Color(hex: "#4FC3F7")
-        case .blossom: return Color(hex: "#A5D6A7")
-        case .ember:   return Color(hex: "#FFAB91")
-        case .zephyr:  return Color(hex: "#B39DDB")
-        case .lumi:    return Color(hex: "#7986CB")
-        }
-    }
+    /// Theme primary colour (delegates to the companion palette).
+    var primaryColor: Color { creature.primaryColor }
 
-    var secondaryColor: Color {
-        switch self {
-        case .ripple:  return Color(hex: "#0288D1")
-        case .blossom: return Color(hex: "#81C784")
-        case .ember:   return Color(hex: "#FF8A65")
-        case .zephyr:  return Color(hex: "#9575CD")
-        case .lumi:    return Color(hex: "#5C6BC0")
-        }
-    }
+    /// Theme secondary colour (delegates to the companion palette).
+    var secondaryColor: Color { creature.secondaryColor }
 }
 
 // MARK: - WatchFaceBackgroundView
 
 /// Renders the chosen background treatment as a SwiftUI `View`.
 ///
-/// Used both in-app (behind the settings preview and the home face)
-/// and as the `containerBackground` content for complications.
+/// All styles are deliberately restrained — low-opacity tints over the
+/// light canvas.  Used in-app (Home, Settings preview) and as
+/// `containerBackground` content for complications (where watchOS
+/// overlays its own dark complication canvas by platform contract).
 struct WatchFaceBackgroundView: View {
     let style: WatchFaceBackgroundStyle
     let theme: WatchFaceTheme
@@ -107,13 +85,13 @@ struct WatchFaceBackgroundView: View {
     var body: some View {
         switch style {
         case .solid:
-            theme.primaryColor.opacity(0.28)
+            theme.primaryColor.opacity(0.10)
 
         case .gradient:
             LinearGradient(
                 colors: [
-                    theme.primaryColor.opacity(0.34),
-                    theme.secondaryColor.opacity(0.12)
+                    theme.primaryColor.opacity(0.14),
+                    theme.secondaryColor.opacity(0.06)
                 ],
                 startPoint: .top,
                 endPoint: .bottom
@@ -122,9 +100,9 @@ struct WatchFaceBackgroundView: View {
         case .aurora:
             LinearGradient(
                 stops: [
-                    .init(color: theme.primaryColor.opacity(0.38), location: 0.0),
-                    .init(color: theme.secondaryColor.opacity(0.20), location: 0.5),
-                    .init(color: theme.primaryColor.opacity(0.06), location: 1.0)
+                    .init(color: theme.primaryColor.opacity(0.16), location: 0.0),
+                    .init(color: theme.secondaryColor.opacity(0.10), location: 0.5),
+                    .init(color: theme.primaryColor.opacity(0.04), location: 1.0)
                 ],
                 startPoint: .topLeading,
                 endPoint: .bottomTrailing
@@ -133,9 +111,9 @@ struct WatchFaceBackgroundView: View {
         case .ocean:
             LinearGradient(
                 stops: [
-                    .init(color: theme.secondaryColor.opacity(0.22), location: 0.0),
-                    .init(color: theme.primaryColor.opacity(0.40), location: 0.45),
-                    .init(color: theme.secondaryColor.opacity(0.14), location: 1.0)
+                    .init(color: theme.secondaryColor.opacity(0.12), location: 0.0),
+                    .init(color: theme.primaryColor.opacity(0.18), location: 0.45),
+                    .init(color: theme.secondaryColor.opacity(0.08), location: 1.0)
                 ],
                 startPoint: .top,
                 endPoint: .bottom

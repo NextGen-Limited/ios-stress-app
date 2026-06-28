@@ -29,12 +29,10 @@ struct StressResult: Identifiable, Codable, Sendable {
         self.factorBreakdown = factorBreakdown
     }
 
+    /// Resolve the tier from a raw 0–100+ stress level.
+    /// Delegates to `StressCategory.category(for:)` so the model is the
+    /// single source of truth (and includes the Severe band 100+).
     static func category(for level: Double) -> StressCategory {
-        switch level {
-        case 0..<25: return .relaxed
-        case 25..<50: return .mild
-        case 50..<75: return .moderate
-        default: return .high
-        }
+        StressCategory.category(for: level)
     }
 }

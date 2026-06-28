@@ -49,83 +49,42 @@ struct RectangularComplicationEntry: TimelineEntry {
 }
 
 // MARK: - Rectangular Complication View
-/// SwiftUI view for rectangular complication display
+/// SwiftUI view for rectangular complication display.
+///
+/// Dark complication canvas (watchOS convention): 3pt tier-colour bar on
+/// the leading edge, the Ripple companion SVG glyph, then the numeric
+/// score in SF Pro Rounded + tier glyph label.  Mirrors the watch design
+/// output "Accessory Rectangular" family.
 struct RectangularComplicationView: View {
     let entry: RectangularComplicationEntry
 
     var body: some View {
-        HStack(spacing: 8) {
-            // Leading: Stress level indicator
-            leadingSection
+        HStack(spacing: 9) {
+            // Leading: 3pt tier bar
+            RoundedRectangle(cornerRadius: 2, style: .continuous)
+                .fill(stressColor)
+                .frame(width: 3, height: 36)
 
-            Spacer(minLength: 4)
+            // Ripple companion glyph
+            CharacterFaceView(creature: .ripple, category: entry.entry.category, size: 24, showsHalo: false)
 
-            // Middle: Current stress level
-            middleSection
+            // Score + tier label
+            VStack(alignment: .leading, spacing: 2) {
+                Text(entry.entry.isPlaceholder ? "—" : "\(Int(entry.entry.stressLevel.rounded()))")
+                    .font(.system(size: 22, weight: .semibold, design: .rounded).monospacedDigit())
+                    .tracking(-0.02 * 22)
+                    .foregroundColor(stressColor)
+                Text(entry.entry.isPlaceholder ? "No Data" : "\(entry.entry.category.glyph) \(entry.entry.category.displayName) · Ripple")
+                    .font(.system(size: 9, weight: .medium, design: .monospaced))
+                    .tracking(0.04 * 9)
+                    .foregroundColor(.white.opacity(0.55))
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.7)
+            }
 
-            Spacer(minLength: 4)
-
-            // Trailing: HRV value
-            trailingSection
+            Spacer(minLength: 0)
         }
         .widgetURL(deepLinkURL)
-    }
-
-    // MARK: - View Sections
-    /// Leading section with icon indicator
-    private var leadingSection: some View {
-        ZStack {
-            Circle()
-                .fill(stressColor.opacity(0.15))
-
-            Image(systemName: entry.entry.category.icon)
-                .font(.system(size: 10))
-                .foregroundColor(stressColor)
-        }
-        .frame(width: 24, height: 24)
-    }
-
-    /// Middle section with stress level and label
-    private var middleSection: some View {
-        VStack(alignment: .leading, spacing: 2) {
-            Text("Stress")
-                .font(.system(size: 9, weight: .medium))
-                .foregroundColor(.secondary)
-
-            if entry.entry.isPlaceholder {
-                Text("--")
-                    .font(.system(size: 16, weight: .bold, design: .rounded))
-                    .foregroundColor(.secondary)
-            } else {
-                Text(entry.entry.stressLevelText)
-                    .font(.system(size: 16, weight: .bold, design: .rounded))
-                    .foregroundColor(stressColor)
-                    .contentTransition(.numericText(value: entry.entry.stressLevel))
-            }
-        }
-    }
-
-    /// Trailing section with HRV value
-    private var trailingSection: some View {
-        VStack(alignment: .trailing, spacing: 2) {
-            Text("HRV")
-                .font(.system(size: 9, weight: .medium))
-                .foregroundColor(.secondary)
-
-            if entry.entry.isPlaceholder {
-                Text("--")
-                    .font(.system(size: 12, weight: .semibold, design: .rounded))
-                    .foregroundColor(.secondary)
-            } else {
-                Text(entry.entry.hrvText)
-                    .font(.system(size: 12, weight: .semibold, design: .rounded))
-                    .foregroundColor(.primary)
-                +
-                Text(" ms")
-                    .font(.system(size: 9, weight: .regular))
-                    .foregroundColor(.secondary)
-            }
-        }
     }
 
     // MARK: - Computed Properties

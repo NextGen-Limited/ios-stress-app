@@ -1,73 +1,140 @@
 import SwiftUI
 
-enum StressCategory: String, CaseIterable, Codable, Sendable {
+/// 5-tier stress category — single source of truth for the watch app.
+///
+/// Aligned exactly with the iOS app's `StressCategory` and the iOS Design
+/// System v1.4.2 stress scale. Every usage is paired with a numeric score
+/// and a glyph so colour is never the only encoding (WCAG).
+///
+/// | Tier      | Score range | Hex       | Glyph |
+/// |-----------|-------------|-----------|-------|
+/// | Relaxed   | 0–25        | `#34C759` | ◌     |
+/// | Mild      | 26–50       | `#007AFF` | ◎     |
+/// | Moderate  | 51–75       | `#FFD60A` | ◐     |
+/// | High      | 76–100      | `#FF9500` | ◑     |
+/// | Severe    | 100+        | `#FF3B30` | ●     |
+public enum StressCategory: String, CaseIterable, Codable, Sendable, Identifiable {
     case relaxed
     case mild
     case moderate
     case high
     case severe
 
-    // MARK: - Dual Coding: Color
+    public var id: String { rawValue }
 
-    /// Primary color for this stress category (WCAG AA compliant)
-    var color: Color {
+    // MARK: - Dual Coding: Colour
+
+    /// Primary colour for this stress category.
+    public var color: Color {
         switch self {
-        case .relaxed:
-            return Color(light: Color(hex: "#34C759"), dark: Color(hex: "#30D158"))
-        case .mild:
-            return Color(light: Color(hex: "#007AFF"), dark: Color(hex: "#0A84FF"))
-        case .moderate:
-            return Color(hex: "#FFD60A")
-        case .high:
-            return Color(light: Color(hex: "#FF9500"), dark: Color(hex: "#FF9F0A"))
-        case .severe:
-            return Color(light: Color(hex: "#FF3B30"), dark: Color(hex: "#FF453A"))
+        case .relaxed:  return Color(hex: "#34C759")
+        case .mild:     return Color(hex: "#007AFF")
+        case .moderate: return Color(hex: "#FFD60A")
+        case .high:     return Color(hex: "#FF9500")
+        case .severe:   return Color(hex: "#FF3B30")
         }
     }
 
-    // MARK: - Dual Coding: Icon
-
-    /// SF Symbol icon for this stress category
-    var icon: String {
+    /// Text colour that passes WCAG AA against light surfaces.  Moderate
+    /// yellow needs a darker ink; the other tiers reuse their own colour.
+    public var inkColor: Color {
         switch self {
-        case .relaxed: return "leaf.fill"
-        case .mild: return "circle.fill"
+        case .moderate: return Color(hex: "#B59400")
+        default:        return color
+        }
+    }
+
+    // MARK: - Dual Coding: Glyph + Icon
+
+    /// Geometric glyph used in tier labels (always paired with the colour).
+    public var glyph: String {
+        switch self {
+        case .relaxed:  return "◌"
+        case .mild:     return "◎"
+        case .moderate: return "◐"
+        case .high:     return "◑"
+        case .severe:   return "●"
+        }
+    }
+
+    /// SF Symbol icon for this stress category.
+    public var icon: String {
+        switch self {
+        case .relaxed:  return "leaf.fill"
+        case .mild:     return "circle.fill"
         case .moderate: return "triangle.fill"
-        case .high: return "square.fill"
-        case .severe: return "exclamationmark.octagon.fill"
+        case .high:     return "square.fill"
+        case .severe:   return "exclamationmark.octagon.fill"
         }
     }
 
-    // MARK: - Dual Coding: Pattern Description
+    // MARK: - Display
 
-    /// Accessibility pattern description for color-blind users
-    var pattern: String {
+    /// Capitalised display name ("Relaxed", "Mild", …) for tier labels.
+    public var displayName: String {
         switch self {
-        case .relaxed: return "solid fill"
-        case .mild: return "diagonal lines"
-        case .moderate: return "dots pattern"
-        case .high: return "crosshatch"
-        case .severe: return "solid warning"
+        case .relaxed:  return "Relaxed"
+        case .mild:     return "Mild"
+        case .moderate: return "Moderate"
+        case .high:     return "High"
+        case .severe:   return "Severe"
         }
     }
 
-    // MARK: - Accessibility
+    /// Short label combining the glyph and name ("◌ Relaxed").
+    public var glyphLabel: String { "\(glyph) \(displayName)" }
 
-    /// VoiceOver description combining all dual coding elements
-    var accessibilityDescription: String {
-        let name = rawValue.capitalized
-        return "\(name) stress level, represented by \(icon) icon with \(pattern)"
+    /// Score range (inclusive lower, exclusive upper except severe).
+    public var scoreRange: ClosedRange<Double> {
+        switch self {
+        case .relaxed:  return 0...25
+        case .mild:     return 26...50
+        case .moderate: return 51...75
+        case .high:     return 76...100
+        case .severe:   return 100...150
+        }
     }
 
-    /// Accessibility hint for interactive stress indicators
-    var accessibilityHint: String {
-        "Stress category indicator"
+    // MARK: - Pattern / Accessibility
+
+    public var pattern: String {
+        switch self {
+        case .relaxed:  return "solid fill"
+        case .mild:     return "diagonal lines"
+        case .moderate: return "dots pattern"
+        case .high:     return "crosshatch"
+        case .severe:   return "solid warning"
+        }
     }
 
-    /// Accessibility value for stress level indicators
-    /// - Parameter level: Stress level from 0-100
-    func accessibilityValue(level: Double) -> String {
-        let name = rawValue.capitalized
-        return "\(Int(level)) out of 100, \(name) stress"
+    public var accessibilityDescription: String {
+        "\(displayName) stress level, represented by \(icon) icon with \(pattern)"
     }
+
+    public func accessibilityValue(level: Double) -> String {
+        "\(Int(level)) out of 100, \(displayName) stress"
+    }
+
+    // MARK: - Resolution
+
+    /// Resolve the tier from a raw 0–100+ stress level.
+    public static func category(for level: Double) -> StressCategory {
+        switch level {
+        case ..<26:    return .relaxed
+        case ..<51:    return .mild
+        case ..<76:    return .moderate
+        case 76...100: return .high
+        default:       return .severe   // 100+ overflow → Severe
+        }
+    }
+}
+
+// MARK: - Stress Source
+
+/// Represents a stress source with name, percentage, and colour.
+struct StressSource: Identifiable, Equatable {
+    let id = UUID()
+    let name: String
+    let percentage: Double
+    let color: Color
 }

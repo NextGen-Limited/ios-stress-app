@@ -49,7 +49,12 @@ struct CircularComplicationEntry: TimelineEntry {
 }
 
 // MARK: - Circular Complication View
-/// SwiftUI view for circular complication display
+/// SwiftUI view for circular complication display.
+///
+/// Dark complication canvas (watchOS convention): a ring whose fill = the
+/// stress level, the numeric score in the centre in SF Pro Rounded, and the
+/// tier label in SF Mono below.  Ripple glyph is omitted at this size to
+/// keep the score legible; the ring colour carries the tier.
 struct CircularComplicationView: View {
     @Environment(\.widgetFamily) var family
     let entry: CircularComplicationEntry
@@ -58,37 +63,27 @@ struct CircularComplicationView: View {
         ZStack {
             // Background ring
             Circle()
-                .stroke(Color.gray.opacity(0.2), lineWidth: 4)
+                .stroke(Color.white.opacity(0.10), lineWidth: 4)
 
-            // Stress level ring with color coding
+            // Stress level ring with tier colour coding
             Circle()
                 .trim(from: 0, to: stressLevelFraction)
                 .stroke(
                     stressColor,
-                    style: StrokeStyle(
-                        lineWidth: 4,
-                        lineCap: .round
-                    )
+                    style: StrokeStyle(lineWidth: 4, lineCap: .round)
                 )
                 .rotationEffect(.degrees(-90))
-                .animation(.easeInOut, value: stressLevelFraction)
+                .animation(.easeInOut(duration: 0.2), value: stressLevelFraction)
 
-            // Center content
+            // Centre content — score + tier label
             VStack(spacing: 0) {
-                Text(entry.entry.character.emoji)
-                    .font(.system(size: 12))
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.6)
-
-                if entry.entry.isPlaceholder {
-                    Text("--")
-                        .font(.system(size: 16, weight: .bold, design: .rounded))
-                        .foregroundColor(.gray)
-                } else {
-                    Text(entry.entry.stressLevelText)
-                        .font(.system(size: 16, weight: .bold, design: .rounded))
-                        .foregroundColor(stressColor)
-                }
+                Text(entry.entry.isPlaceholder ? "—" : "\(Int(entry.entry.stressLevel.rounded()))")
+                    .font(.system(size: 14, weight: .bold, design: .rounded).monospacedDigit())
+                    .foregroundColor(stressColor)
+                Text(entry.entry.category.displayName.uppercased())
+                    .font(.system(size: 6.5, weight: .semibold, design: .monospaced))
+                    .tracking(0.06 * 6.5)
+                    .foregroundColor(.white.opacity(0.55))
             }
         }
         .widgetURL(deepLinkURL)
@@ -96,7 +91,7 @@ struct CircularComplicationView: View {
 
     // MARK: - Computed Properties
     private var stressLevelFraction: CGFloat {
-        CGFloat(entry.entry.stressLevel / 100.0)
+        CGFloat(min(max(entry.entry.stressLevel, 0), 100) / 100.0)
     }
 
     private var stressColor: Color {

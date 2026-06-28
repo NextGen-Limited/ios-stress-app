@@ -137,7 +137,6 @@ final class StressViewModel {
             let (hrvData, hrData) = try await (hrv, hr)
 
             guard let hrvValue = hrvData?.value else {
-                errorMessage = "No HRV data available"
                 return
             }
 
