@@ -38,15 +38,18 @@ struct WatchLoggingView: View {
     // MARK: - Header
 
     private var header: some View {
-        VStack(alignment: .leading, spacing: 1) {
+        HStack(alignment: .firstTextBaseline) {
             Text("Today")
                 .font(.system(size: 17, weight: .bold, design: .rounded))
+                .tracking(-0.02 * 17)
                 .foregroundStyle(WatchDesignTokens.ink)
+            Spacer(minLength: 0)
             Text(headerDate)
-                .font(.system(size: 9.5, weight: .regular, design: .monospaced))
+                .font(.system(size: 8.5, weight: .semibold, design: .monospaced))
+                .tracking(0.06 * 8.5)
                 .foregroundStyle(WatchDesignTokens.muted)
         }
-        .frame(maxWidth: .infinity, alignment: .leading)
+        .frame(maxWidth: .infinity)
     }
 
     private var headerDate: String {
@@ -83,20 +86,21 @@ struct WatchLoggingView: View {
             VStack(spacing: 4) {
                 HabitRingView(habit: habit, size: 60)
                 Text(habit.type.displayName.uppercased())
-                    .font(.system(size: 8, weight: .semibold, design: .monospaced))
-                    .tracking(0.03 * 8)
-                    .foregroundStyle(WatchDesignTokens.inkSecondary)
+                    .font(.system(size: 7, weight: .semibold, design: .monospaced))
+                    .tracking(0.06 * 7)
+                    .foregroundStyle(WatchDesignTokens.muted)
                     .lineLimit(1)
                     .minimumScaleFactor(0.7)
                 if isManual {
                     Text("+1")
-                        .font(.system(size: 9, weight: .bold, design: .rounded))
-                        .foregroundStyle(WatchDesignTokens.accentStrong)
+                        .font(.system(size: 7.5, weight: .semibold, design: .monospaced))
+                        .tracking(0.04 * 7.5)
+                        .foregroundStyle(Color(hex: "#FE9901"))
                 } else {
                     Text("AUTO")
                         .font(.system(size: 7, weight: .semibold, design: .monospaced))
                         .tracking(0.04 * 7)
-                        .foregroundStyle(WatchDesignTokens.muted)
+                        .foregroundStyle(WatchDesignTokens.mutedSystem)
                 }
             }
             .frame(maxWidth: .infinity)

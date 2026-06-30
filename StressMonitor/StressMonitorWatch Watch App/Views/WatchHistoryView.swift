@@ -107,20 +107,20 @@ struct WatchHistoryView: View {
     }
 
     private func statCard(value: Int, label: String, category: StressCategory) -> some View {
-        VStack(spacing: 2) {
+        VStack(spacing: 3) {
             Text("\(value)")
-                .font(.system(size: 14, weight: .semibold, design: .rounded).monospacedDigit())
-                .tracking(-0.02 * 14)
+                .font(.system(size: 18, weight: .bold, design: .rounded).monospacedDigit())
+                .tracking(-0.02 * 18)
                 .foregroundStyle(category.inkColor)
             Text(label.uppercased())
                 .font(.system(size: 7, weight: .semibold, design: .monospaced))
-                .tracking(0.04 * 7)
+                .tracking(0.08 * 7)
                 .foregroundStyle(WatchDesignTokens.muted)
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, 6)
+        .padding(.vertical, 7)
         .background(
-            RoundedRectangle(cornerRadius: 10, style: .continuous)
+            RoundedRectangle(cornerRadius: 11, style: .continuous)
                 .fill(WatchDesignTokens.surface)
         )
     }
@@ -128,9 +128,21 @@ struct WatchHistoryView: View {
     // MARK: - Bar chart card
 
     private var chartCard: some View {
-        StressBarChart(entries: chartEntries)
-            .frame(height: 56)
-            .padding(.horizontal, 2)
+        VStack(alignment: .leading, spacing: 3) {
+            Text("WEEKLY TREND")
+                .font(.system(size: 7.5, weight: .semibold, design: .monospaced))
+                .tracking(0.08 * 7.5)
+                .foregroundStyle(WatchDesignTokens.muted)
+            StressBarChart(entries: chartEntries)
+                .frame(height: 48)
+                .padding(.horizontal, 2)
+        }
+        .padding(WatchDesignTokens.Spacing.xs)
+        .frame(maxWidth: .infinity)
+        .background(
+            RoundedRectangle(cornerRadius: WatchDesignTokens.radiusCard, style: .continuous)
+                .fill(WatchDesignTokens.surface)
+        )
     }
 
     // MARK: - Reading list (grouped-list lineage)
@@ -155,30 +167,30 @@ struct WatchHistoryView: View {
 
     private func readingRow(_ reading: SharedReading) -> some View {
         let category = StressCategory.category(for: reading.level)
-        return HStack(spacing: 7) {
+        return HStack(spacing: 8) {
             // 3pt tier bar
             RoundedRectangle(cornerRadius: 2, style: .continuous)
                 .fill(category.color)
-                .frame(width: 3, height: 26)
+                .frame(width: 3, height: 22)
 
             Text("\(Int(reading.level))")
-                .font(.system(size: 15, weight: .semibold, design: .rounded).monospacedDigit())
-                .tracking(-0.02 * 15)
+                .font(.system(size: 14, weight: .bold, design: .rounded).monospacedDigit())
+                .tracking(-0.02 * 14)
                 .foregroundStyle(category.inkColor)
-                .frame(minWidth: 26, alignment: .leading)
+                .frame(minWidth: 22, alignment: .leading)
 
-            VStack(alignment: .leading, spacing: 1) {
-                Text(category.glyphLabel)
-                    .font(.system(size: 10, weight: .medium, design: .default))
-                    .foregroundStyle(WatchDesignTokens.ink)
-                Text(timeLabel(for: reading.timestamp))
-                    .font(.system(size: 8.5, weight: .regular, design: .monospaced))
-                    .foregroundStyle(WatchDesignTokens.muted)
-            }
+            Text(category.displayName)
+                .font(.system(size: 10, weight: .semibold, design: .default))
+                .foregroundStyle(WatchDesignTokens.inkSecondary)
 
             Spacer(minLength: 0)
+
+            Text(timeLabel(for: reading.timestamp))
+                .font(.system(size: 7.5, weight: .semibold, design: .monospaced))
+                .tracking(0.04 * 7.5)
+                .foregroundStyle(WatchDesignTokens.muted)
         }
-        .padding(.vertical, 5)
+        .padding(.vertical, 3)
         .accessibilityElement()
         .accessibilityLabel("\(category.displayName), score \(Int(reading.level)), \(timeLabel(for: reading.timestamp))")
     }
@@ -254,14 +266,14 @@ struct WatchHistoryView: View {
     private func timeLabel(for date: Date) -> String {
         let calendar = Calendar.current
         if calendar.isDateInToday(date) {
-            return "Today · " + date.formatted(date: .omitted, time: .shortened)
+            return "TODAY · " + date.formatted(date: .omitted, time: .shortened).uppercased()
         }
         if calendar.isDateInYesterday(date) {
-            return "Yesterday · " + date.formatted(date: .omitted, time: .shortened)
+            return "YDAY · " + date.formatted(date: .omitted, time: .shortened).uppercased()
         }
         let fmt = DateFormatter()
         fmt.dateFormat = "EEE · h:mm a"
-        return fmt.string(from: date)
+        return fmt.string(from: date).uppercased()
     }
 }
 
