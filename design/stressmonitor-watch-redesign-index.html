@@ -1,0 +1,822 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>StressMonitor · watchOS Design · iOS DS v1.4.2</title>
+<style>
+  :root{
+    /* iOS light surfaces */
+    --bg:#F2F2F7; --surface:#FFFFFF; --surface-2:#FBFBFD; --settings-bg:#FFFDF6;
+    --fg:#101223; --fg-secondary:#3C3C43; --muted:#777986; --muted-2:#8E8E93;
+    --separator:rgba(60,60,67,0.12); --separator-strong:rgba(60,60,67,0.29);
+    --accent:#4FC3F7; --accent-strong:#0288D1; --accent-soft:rgba(79,195,247,0.14);
+    --stress-relaxed:#34C759; --stress-mild:#007AFF; --stress-moderate:#FFD60A;
+    --stress-high:#FF9500; --stress-severe:#FF3B30;
+    --mod-ink:#B59400; /* ink for text on moderate yellow */
+    --ripple:#4FC3F7; --blossom:#A5D6A7; --ember:#FFAB91; --zephyr:#D1C4E9; --lumi:#7986CB;
+    --success:#34C759; --warn:#FF9500; --danger:#FF3B30; --hrv-color:#34D399; --hr-color:#F87171; --purple:#8B5CF6; --gold:#FE9901;
+    --font-display:-apple-system,BlinkMacSystemFont,'SF Pro Display',system-ui,sans-serif;
+    --font-body:-apple-system,BlinkMacSystemFont,'SF Pro Text',system-ui,sans-serif;
+    --font-rounded:-apple-system,BlinkMacSystemFont,'SF Pro Rounded','SF Pro Display',system-ui,sans-serif;
+    --font-mono:ui-monospace,'SF Mono',Menlo,monospace;
+    --radius-card:14px; --radius-control:10px; --radius-pill:999px;
+  }
+  *{box-sizing:border-box; -webkit-font-smoothing:antialiased;}
+  html,body{margin:0;}
+  body{
+    font-family:var(--font-body);
+    color:var(--fg);
+    background:
+      radial-gradient(circle at 50% -10%, rgba(79,195,247,0.10), transparent 55%),
+      #ECF0F3;
+    min-height:100vh;
+    padding:48px 28px 80px;
+  }
+
+  /* ---------- Page header ---------- */
+  .page-head{max-width:1200px;margin:0 auto 40px;text-align:center;}
+  .wordmark{
+    font-family:var(--font-rounded);
+    font-weight:700;
+    font-size:30px;
+    letter-spacing:-0.02em;
+    color:var(--fg);
+  }
+  .wordmark .dot{color:var(--accent-strong);}
+  .page-cap{
+    font-family:var(--font-mono);
+    font-size:11px;
+    font-weight:600;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    color:var(--muted);
+    margin-top:8px;
+  }
+
+  /* ---------- Gallery grid ---------- */
+  .gallery{
+    max-width:1240px;
+    margin:0 auto;
+    display:grid;
+    grid-template-columns:repeat(auto-fill,minmax(260px,1fr));
+    gap:48px 36px;
+    justify-items:center;
+  }
+  .tile{display:flex;flex-direction:column;align-items:center;}
+  .caption{
+    margin-top:18px;
+    text-align:center;
+  }
+  .caption .num{
+    font-family:var(--font-mono);
+    font-size:11px;
+    font-weight:600;
+    letter-spacing:0.06em;
+    color:var(--accent-strong);
+    text-transform:uppercase;
+  }
+  .caption .name{
+    font-family:var(--font-display);
+    font-size:14px;
+    font-weight:700;
+    color:var(--fg);
+    margin-top:2px;
+  }
+  .caption .note{
+    font-family:var(--font-body);
+    font-size:11.5px;
+    color:var(--muted);
+    margin-top:4px;
+    max-width:230px;
+    line-height:1.35;
+  }
+
+  /* ---------- Apple Watch case (identical for every device) ---------- */
+  .watch{
+    position:relative;
+    width:266px;
+    height:309px;
+    /* black case body */
+    background:#0A0A0C;
+    border-radius:60px;
+    padding:12px;
+    box-shadow:
+      0 1px 0 0 rgba(255,255,255,0.05) inset,
+      0 0 0 1.5px #15151A,
+      0 18px 36px -12px rgba(20,30,50,0.35),
+      0 4px 10px -2px rgba(20,30,50,0.18);
+  }
+  /* Digital Crown nib (right side, upper) */
+  .watch::before{
+    content:"";
+    position:absolute;
+    right:-6px;
+    top:108px;
+    width:7px;
+    height:34px;
+    border-radius:4px;
+    background:linear-gradient(90deg,#1d1d22,#3a3a42 60%,#23232a);
+    box-shadow:0 0 0 1px #0c0c10;
+  }
+  /* Side button (right side, lower) */
+  .watch::after{
+    content:"";
+    position:absolute;
+    right:-5px;
+    top:162px;
+    width:6px;
+    height:52px;
+    border-radius:4px;
+    background:linear-gradient(90deg,#161619,#34343b 60%,#1c1c20);
+  }
+  .display{
+    position:relative;
+    width:242px;
+    height:285px;
+    border-radius:48px;
+    overflow:hidden;
+    background:var(--bg);
+    box-shadow:0 0 0 2px #000 inset; /* black bezel ring */
+  }
+
+  /* ---------- Shared screen primitives ---------- */
+  .screen{
+    position:absolute; inset:0;
+    padding:11px 12px;
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+  }
+  .screen.cream{ background:var(--settings-bg); }
+  .navtitle{
+    font-family:var(--font-display);
+    font-size:14px;
+    font-weight:700;
+    letter-spacing:-0.01em;
+    color:var(--fg);
+    margin:2px 2px 8px;
+  }
+  .mono{
+    font-family:var(--font-mono);
+    font-weight:600;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    color:var(--muted);
+  }
+  .card{
+    background:var(--surface);
+    border-radius:var(--radius-card);
+    padding:9px 10px;
+    box-shadow:0 0.5px 0 0 var(--separator);
+  }
+  .card + .card{ margin-top:6px; }
+  .sep{ height:0; border-top:0.5px solid var(--separator); }
+
+  .num-big{
+    font-family:var(--font-rounded);
+    font-weight:700;
+    letter-spacing:-0.025em;
+    color:var(--fg);
+  }
+
+  .pill-btn{
+    width:100%;
+    height:34px;
+    border:none;
+    border-radius:var(--radius-pill);
+    background:var(--accent-strong);
+    color:#fff;
+    font-family:var(--font-rounded);
+    font-weight:600;
+    font-size:14px;
+    letter-spacing:-0.01em;
+    cursor:default;
+  }
+
+  /* ================= SCREEN 1 — HOME ================= */
+  .home{
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    background:
+      radial-gradient(circle at 50% 44%, rgba(79,195,247,0.10), transparent 62%),
+      var(--bg);
+    padding:0;
+  }
+  .home .gauge{ position:absolute; top:34px; left:50%; transform:translateX(-50%); }
+  .home .otter{ width:112px; height:112px; margin-top:18px; position:relative; z-index:2; }
+  .home .readout{ margin-top:6px; display:flex; flex-direction:column; align-items:center; }
+  .home .score{
+    font-family:var(--font-rounded);
+    font-weight:700;
+    font-size:42px;
+    letter-spacing:-0.028em;
+    color:var(--stress-mild);
+    line-height:1;
+  }
+  .home .score-lbl{
+    font-family:var(--font-mono);
+    font-size:9px;
+    font-weight:600;
+    letter-spacing:0.08em;
+    color:var(--stress-mild);
+    margin-top:5px;
+  }
+  .home .score-sub{
+    font-family:var(--font-body);
+    font-size:9.5px;
+    color:var(--muted);
+    margin-top:3px;
+  }
+
+  /* ================= SCREEN 2 — BREATHE ================= */
+  .breathe{ align-items:center; justify-content:space-between; padding:14px 14px 16px;}
+  .breathe .phase{
+    font-family:var(--font-display);
+    font-size:13px;
+    font-weight:700;
+    color:var(--accent);
+    margin-top:4px;
+  }
+  .ring-wrap{
+    position:relative;
+    width:130px; height:130px;
+    display:flex; align-items:center; justify-content:center;
+    margin-top:2px;
+  }
+  .ring-scale{ transform:scale(1.06); transform-origin:center; }
+  .ring-center{
+    position:absolute; inset:0;
+    display:flex; flex-direction:column; align-items:center; justify-content:center;
+  }
+  .ring-center .cd{
+    font-family:var(--font-rounded); font-weight:700; font-size:36px;
+    letter-spacing:-0.028em; color:var(--accent); line-height:1;
+  }
+  .ring-center .cd-lbl{
+    font-family:var(--font-mono); font-size:8px; font-weight:600;
+    letter-spacing:0.08em; color:var(--muted); margin-top:3px;
+  }
+  .phase-dots{ display:flex; gap:6px; align-items:center; }
+  .pdot{ width:6px; height:6px; border-radius:50%; background:var(--separator-strong); }
+  .pdot.active{ width:16px; height:6px; border-radius:3px; background:var(--accent); }
+  .breathe .foot{ width:100%; display:flex; flex-direction:column; gap:8px; }
+  .breathe .patt{
+    font-family:var(--font-mono); font-size:8.5px; font-weight:600;
+    letter-spacing:0.08em; color:var(--muted); text-align:center;
+  }
+
+  /* ================= SCREEN 3 — HISTORY ================= */
+  .h-scroll{ overflow:hidden; }
+  .bioage{ display:flex; align-items:center; justify-content:space-between; }
+  .bioage .l{ display:flex; flex-direction:column; gap:2px;}
+  .bioage .num{
+    font-family:var(--font-rounded); font-weight:700; font-size:26px;
+    letter-spacing:-0.025em; color:var(--fg); line-height:1;
+  }
+  .bioage .yrs{ font-family:var(--font-body); font-size:10px; color:var(--muted); margin-left:3px;}
+  .bioage .delta{
+    font-family:var(--font-rounded); font-weight:600; font-size:11px;
+    color:var(--success); text-align:right;
+  }
+  .bioage .lbl{ font-family:var(--font-mono); font-size:7.5px; font-weight:600; letter-spacing:0.08em; color:var(--muted); }
+  .stat-row{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:5px; margin-top:6px;}
+  .mini{ background:var(--surface); border-radius:11px; padding:7px 6px; text-align:center; box-shadow:0 0.5px 0 var(--separator);}
+  .mini .n{ font-family:var(--font-rounded); font-weight:700; font-size:18px; letter-spacing:-0.02em; line-height:1;}
+  .mini .l{ font-family:var(--font-mono); font-size:7px; font-weight:600; letter-spacing:0.08em; color:var(--muted); margin-top:3px;}
+  .seg{ display:flex; background:rgba(120,120,128,0.10); border-radius:9px; padding:2px; margin-top:6px;}
+  .seg div{ flex:1; text-align:center; font-family:var(--font-mono); font-size:8.5px; font-weight:600; letter-spacing:0.05em; color:var(--muted); padding:4px 0; border-radius:7px;}
+  .seg .on{ background:var(--accent-strong); color:#fff; }
+  .bars{ display:flex; align-items:flex-end; justify-content:space-between; height:48px; padding:0 2px; margin-top:4px;}
+  .bar{ width:10px; border-radius:3px 3px 0 0; opacity:0.92;}
+  .bar.today{ background:rgba(2,136,209,0.20); border:1.5px solid var(--accent-strong); box-sizing:border-box;}
+  .days{ display:flex; justify-content:space-between; padding:0 0px; margin-top:3px;}
+  .days span{ width:14px; text-align:center; font-family:var(--font-mono); font-size:7px; font-weight:600; letter-spacing:0.04em; color:var(--muted);}
+  .days .on{ color:var(--accent-strong); }
+  .heat{ display:grid; grid-template-columns:repeat(7,1fr); gap:3px; margin-top:4px;}
+  .heat i{ display:block; width:100%; aspect-ratio:1; border-radius:50%; background:rgba(120,120,128,0.14);}
+  .row-list{ display:flex; flex-direction:column;}
+  .rr{ display:flex; align-items:center; gap:8px; padding:6px 4px;}
+  .rr .bar-l{ width:3px; height:22px; border-radius:2px; flex:none;}
+  .rr .sc{ font-family:var(--font-rounded); font-weight:700; font-size:14px; letter-spacing:-0.02em; min-width:22px;}
+  .rr .gl{ font-family:var(--font-display); font-size:10px; font-weight:600; color:var(--fg-secondary);}
+  .rr .ts{ margin-left:auto; font-family:var(--font-mono); font-size:7.5px; font-weight:600; letter-spacing:0.04em; color:var(--muted);}
+
+  /* ================= SCREEN 4 — LOGGING ================= */
+  .habits{ display:grid; grid-template-columns:1fr 1fr 1fr; gap:6px;}
+  .habit{ background:var(--surface); border-radius:11px; padding:8px 5px 7px; text-align:center; box-shadow:0 0.5px 0 var(--separator);}
+  .ring-mini{ width:46px; height:46px; margin:0 auto; position:relative;}
+  .ring-mini .v{ position:absolute; inset:0; display:flex; align-items:center; justify-content:center; font-family:var(--font-rounded); font-weight:700; font-size:11px; color:var(--fg); letter-spacing:-0.01em;}
+  .habit .lab{ font-family:var(--font-mono); font-size:7px; font-weight:600; letter-spacing:0.06em; color:var(--muted); margin-top:4px;}
+  .habit .tag{ font-family:var(--font-mono); font-size:7.5px; font-weight:600; letter-spacing:0.04em; color:var(--muted-2); margin-top:1px;}
+  .habit .tag.add{ color:var(--gold);}
+  .moods{ display:flex; gap:5px; justify-content:space-between;}
+  .mood{ flex:1; display:flex; flex-direction:column; align-items:center; gap:2px; padding:6px 2px 5px; border-radius:9px; border:1px solid transparent;}
+  .mood .g{ font-family:var(--font-rounded); font-size:15px; line-height:1;}
+  .mood .t{ font-family:var(--font-mono); font-size:6.5px; font-weight:600; letter-spacing:0.04em; color:var(--muted);}
+  .mood.on{ background:var(--accent-soft); border-color:rgba(79,195,247,0.45);}
+  .mood.on .t{ color:var(--accent-strong); }
+
+  /* ================= SCREEN 5 — WORKOUT ================= */
+  .hr-hero{ text-align:center; padding:10px 10px 8px;}
+  .hr-hero .l{ font-family:var(--font-mono); font-size:8px; font-weight:600; letter-spacing:0.08em; color:var(--muted);}
+  .hr-hero .n{ font-family:var(--font-rounded); font-weight:700; font-size:54px; letter-spacing:-0.03em; color:var(--fg); line-height:1; margin-top:2px;}
+  .hr-hero .u{ font-family:var(--font-mono); font-size:8px; font-weight:600; letter-spacing:0.08em; color:var(--muted); margin-top:1px;}
+  .zone-row{ display:flex; align-items:center; justify-content:center; gap:6px; margin-top:4px;}
+  .zone-row .d{ width:7px; height:7px; border-radius:50%; background:var(--stress-moderate);}
+  .zone-row .tx{ font-family:var(--font-display); font-size:11px; font-weight:600; color:var(--mod-ink);}
+  .zone-row .tg{ font-family:var(--font-mono); font-size:7px; font-weight:600; letter-spacing:0.06em; color:var(--muted);}
+  .elap{ display:flex; align-items:center; justify-content:center; gap:7px; }
+  .elap .t{ font-family:var(--font-mono); font-size:13px; font-weight:600; color:var(--fg); letter-spacing:0.02em;}
+  .elap .tg{ font-family:var(--font-mono); font-size:7px; font-weight:600; letter-spacing:0.06em; color:var(--muted);}
+  .zbars{ display:flex; align-items:flex-end; justify-content:space-around; height:54px; padding:0 6px;}
+  .zbars .b{ width:22px; border-radius:4px 4px 0 0;}
+  .zlbls{ display:flex; justify-content:space-around; padding:0 6px; margin-top:3px;}
+  .zlbls span{ width:22px; text-align:center; font-family:var(--font-mono); font-size:7.5px; font-weight:600; letter-spacing:0.04em; color:var(--muted);}
+
+  /* ================= SCREEN 6 — CYCLE ================= */
+  .phase-card{ display:flex; align-items:center; gap:9px; padding:8px 8px;}
+  .phase-ico{ width:40px; height:40px; border-radius:50%; background:var(--accent-soft); display:flex; align-items:center; justify-content:center; flex:none;}
+  .phase-card .pl{ font-family:var(--font-mono); font-size:7.5px; font-weight:600; letter-spacing:0.08em; color:var(--muted);}
+  .phase-card .pn{ font-family:var(--font-rounded); font-weight:600; font-size:14px; letter-spacing:-0.01em; color:var(--fg); margin-top:1px;}
+  .day-row{ display:flex; align-items:baseline; justify-content:space-between;}
+  .day-row .dn{ font-family:var(--font-rounded); font-weight:700; font-size:18px; letter-spacing:-0.02em; color:var(--fg);}
+  .day-row .of{ font-family:var(--font-mono); font-size:8px; font-weight:600; letter-spacing:0.08em; color:var(--muted);}
+  .day-row .nx{ font-family:var(--font-rounded); font-size:10px; font-weight:500; color:var(--muted);}
+  .pred{ display:flex; align-items:center; gap:8px; }
+  .pred .d{ font-family:var(--font-rounded); font-weight:600; font-size:13px; color:var(--fg); letter-spacing:-0.01em;}
+  .pred .tg{ margin-left:auto; font-family:var(--font-mono); font-size:7px; font-weight:600; letter-spacing:0.06em; color:var(--muted);}
+  .note-card{ background:var(--accent-soft); border-radius:var(--radius-card); padding:8px 9px;}
+  .note-card .lab{ font-family:var(--font-mono); font-size:7.5px; font-weight:600; letter-spacing:0.08em; color:var(--accent-strong); display:flex; align-items:center; gap:5px;}
+  .note-card .body{ font-family:var(--font-body); font-size:9.5px; line-height:1.35; color:var(--fg-secondary); margin-top:3px;}
+
+  /* ================= SCREEN 7 — WATCH FACE SETTINGS ================= */
+  .prev{ display:flex; align-items:center; gap:9px; padding:8px;}
+  .prev .lab{ font-family:var(--font-mono); font-size:7.5px; font-weight:600; letter-spacing:0.08em; color:var(--muted);}
+  .prev-tile{ width:50px; height:50px; border-radius:14px; background:linear-gradient(135deg,#4FC3F7,#0288D1); display:flex; align-items:center; justify-content:center; margin-left:auto;}
+  .prev-tile span{ font-family:var(--font-rounded); font-weight:700; font-size:20px; color:#fff; letter-spacing:-0.02em;}
+  .sec-lbl{ font-family:var(--font-mono); font-size:7.5px; font-weight:600; letter-spacing:0.08em; color:var(--muted); margin:2px 4px 4px;}
+  .styles{ display:grid; grid-template-columns:1fr 1fr; gap:6px;}
+  .style{ background:var(--surface); border:1px solid transparent; border-radius:10px; padding:6px; display:flex; align-items:center; gap:7px;}
+  .style.on{ border-color:var(--accent-strong);}
+  .swatch{ width:24px; height:24px; border-radius:7px; flex:none;}
+  .style .t{ font-family:var(--font-mono); font-size:8px; font-weight:600; letter-spacing:0.05em; color:var(--fg-secondary);}
+  .themes{ display:flex; justify-content:space-between; padding:2px 2px 0;}
+  .thm{ display:flex; flex-direction:column; align-items:center; gap:3px; width:40px;}
+  .thm-sw{ width:30px; height:30px; border-radius:50%; border:2px solid transparent; position:relative; box-shadow:0 0 0 0 transparent;}
+  .thm.on .thm-sw{ background:var(--accent-soft); }
+  .thm.on .thm-sw::after{ content:""; position:absolute; inset:3px; border-radius:50%;}
+  .thm .dot-in{ position:absolute; inset:5px; border-radius:50%;}
+  .thm .chk{ position:absolute; right:-2px; bottom:-2px; width:13px; height:13px; border-radius:50%; background:var(--accent-strong); display:flex; align-items:center; justify-content:center;}
+  .thm .lab{ font-family:var(--font-mono); font-size:7px; font-weight:600; letter-spacing:0.05em; color:var(--muted);}
+  .thm.on .lab{ color:var(--accent-strong);}
+  .cust{ padding:0;}
+  .cust .cr{ display:flex; align-items:center; gap:9px; padding:9px 8px;}
+  .well{ width:24px; height:24px; border-radius:7px; background:var(--accent-soft); display:flex; align-items:center; justify-content:center; flex:none;}
+  .cust .mid{ display:flex; flex-direction:column; min-width:0;}
+  .cust .ti{ font-family:var(--font-rounded); font-weight:600; font-size:11.5px; letter-spacing:-0.01em; color:var(--fg);}
+  .cust .su{ font-family:var(--font-body); font-size:9px; color:var(--muted); margin-top:1px;}
+  .chev{ margin-left:auto; color:var(--muted-2);}
+
+  /* reduced motion */
+  @media (prefers-reduced-motion: reduce){
+    *{animation:none !important; transition:none !important;}
+    .ring-scale{ transform:none !important;}
+  }
+</style>
+</head>
+<body>
+
+<header class="page-head">
+  <div class="wordmark">StressMonitor<span class="dot">.</span></div>
+  <div class="page-cap">watchOS Design · iOS DS v1.4.2 · Apple Watch Series 10 45mm</div>
+</header>
+
+<div class="gallery">
+
+  <!-- ===================== 01 HOME ===================== -->
+  <div class="tile">
+    <div class="watch"><div class="display">
+      <div class="screen home">
+        <!-- semicircle gauge arc, 42% of full -->
+        <svg class="gauge" width="150" height="84" viewBox="0 0 150 84" fill="none">
+          <path d="M9 80 A66 66 0 0 1 141 80" stroke="rgba(60,60,67,0.12)" stroke-width="6" stroke-linecap="round"/>
+          <!-- 42% of ~207 circumference of semicircle arc length ≈ 0.42*207 ≈ 87 -->
+          <path d="M9 80 A66 66 0 0 1 141 80" stroke="#007AFF" stroke-width="6" stroke-linecap="round" stroke-dasharray="87 300"/>
+        </svg>
+
+        <!-- Ripple Water Otter (inline SVG) -->
+        <svg class="otter" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg" aria-label="Ripple water otter">
+          <!-- flippers -->
+          <ellipse cx="26" cy="86" rx="12" ry="9" fill="#4FC3F7"/>
+          <ellipse cx="94" cy="86" rx="12" ry="9" fill="#4FC3F7"/>
+          <!-- head -->
+          <circle cx="60" cy="58" r="40" fill="#4FC3F7"/>
+          <!-- water droplet on head -->
+          <path d="M60 18c6 8 12 14 12 20a12 12 0 0 1-24 0c0-6 6-12 12-20z" fill="#0288D1" opacity="0.55"/>
+          <!-- muzzle -->
+          <ellipse cx="60" cy="66" rx="24" ry="19" fill="#E1F5FE"/>
+          <!-- cheeks subtle -->
+          <circle cx="44" cy="70" r="5" fill="#4FC3F7" opacity="0.22"/>
+          <circle cx="76" cy="70" r="5" fill="#4FC3F7" opacity="0.22"/>
+          <!-- eyes -->
+          <circle cx="49" cy="55" r="4.4" fill="#101223"/>
+          <circle cx="71" cy="55" r="4.4" fill="#101223"/>
+          <circle cx="50.4" cy="53.6" r="1.4" fill="#fff"/>
+          <circle cx="72.4" cy="53.6" r="1.4" fill="#fff"/>
+          <!-- nose -->
+          <ellipse cx="60" cy="63" rx="3.4" ry="2.6" fill="#101223"/>
+          <!-- smile -->
+          <path d="M52 71c3 4 13 4 16 0" stroke="#101223" stroke-width="2.2" stroke-linecap="round" fill="none"/>
+          <!-- whisker hints -->
+          <path d="M44 64l-8-1M44 67l-8 2" stroke="#0288D1" stroke-width="1.2" stroke-linecap="round" opacity="0.5"/>
+          <path d="M76 64l8-1M76 67l8 2" stroke="#0288D1" stroke-width="1.2" stroke-linecap="round" opacity="0.5"/>
+        </svg>
+
+        <div class="readout">
+          <div class="score">42</div>
+          <div class="score-lbl">MILD</div>
+          <div class="score-sub">out of 100</div>
+        </div>
+      </div>
+    </div></div>
+    <div class="caption">
+      <div class="num">01 · Home</div>
+      <div class="name">WatchHomeView</div>
+      <div class="note">Scoreless-first face: Ripple otter hero, mild-blue 42 readout, semicircle gauge halo.</div>
+    </div>
+  </div>
+
+  <!-- ===================== 02 BREATHE ===================== -->
+  <div class="tile">
+    <div class="watch"><div class="display">
+      <div class="screen breathe">
+        <div class="phase">Breathe In</div>
+
+        <div class="ring-wrap">
+          <div class="ring-scale">
+            <svg width="130" height="130" viewBox="0 0 130 130" fill="none">
+              <circle cx="65" cy="65" r="55" stroke="rgba(60,60,67,0.12)" stroke-width="10" fill="none"/>
+              <!-- 35% progress: dasharray on circumference 2*pi*55 = 345.6 ; 0.35 = 121 -->
+              <circle cx="65" cy="65" r="55" stroke="#4FC3F7" stroke-width="10" stroke-linecap="round" fill="none"
+                stroke-dasharray="121 345.6" transform="rotate(-90 65 65)"/>
+            </svg>
+          </div>
+          <div class="ring-center">
+            <div class="cd">3</div>
+            <div class="cd-lbl">SEC</div>
+          </div>
+        </div>
+
+        <div class="phase-dots">
+          <span class="pdot active"></span>
+          <span class="pdot"></span>
+          <span class="pdot"></span>
+        </div>
+
+        <div class="foot">
+          <div class="patt">4 · 7 · 8 BREATHING</div>
+          <button class="pill-btn">Begin</button>
+        </div>
+      </div>
+    </div></div>
+    <div class="caption">
+      <div class="num">02 · Breathe</div>
+      <div class="name">WatchBreatheView</div>
+      <div class="note">4-7-8 inhale state: expanding ring mid-fill, phase dots, Begin pill.</div>
+    </div>
+  </div>
+
+  <!-- ===================== 03 HISTORY ===================== -->
+  <div class="tile">
+    <div class="watch"><div class="display">
+      <div class="screen h-scroll">
+        <div class="navtitle">History</div>
+
+        <div class="card bioage">
+          <div class="l">
+            <span class="lbl">BIO AGE</span>
+            <div style="display:flex;align-items:baseline;"><span class="num">34</span><span class="yrs">yrs</span></div>
+          </div>
+          <div class="delta">−2 vs actual</div>
+        </div>
+
+        <div class="stat-row">
+          <div class="mini"><div class="n" style="color:#007AFF;">42</div><div class="l">AVG</div></div>
+          <div class="mini"><div class="n" style="color:#34C759;">18</div><div class="l">BEST</div></div>
+          <div class="mini"><div class="n" style="color:#FF9500;">78</div><div class="l">PEAK</div></div>
+        </div>
+
+        <div class="seg" style="margin-top:6px;">
+          <div class="on">7D</div><div>30D</div><div>90D</div>
+        </div>
+
+        <div class="card" style="margin-top:6px;padding:8px 8px 5px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;">
+            <span class="lbl" style="font-family:var(--font-mono);font-size:7.5px;font-weight:600;letter-spacing:0.08em;color:var(--muted);">WEEKLY TREND</span>
+          </div>
+          <div class="bars">
+            <div class="bar" style="height:26px;background:#007AFF;"></div>
+            <div class="bar" style="height:22px;background:#007AFF;"></div>
+            <div class="bar" style="height:14px;background:#34C759;"></div>
+            <div class="bar" style="height:36px;background:#FFD60A;"></div>
+            <div class="bar" style="height:16px;background:#34C759;"></div>
+            <div class="bar" style="height:18px;background:#34C759;"></div>
+            <div class="bar today" style="height:30px;"></div>
+          </div>
+          <div class="days">
+            <span>W</span><span>T</span><span>F</span><span>S</span><span>S</span><span>M</span><span class="on">T</span>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:6px;padding:7px 8px;">
+          <span class="lbl" style="font-family:var(--font-mono);font-size:7.5px;font-weight:600;letter-spacing:0.08em;color:var(--muted);">HEATMAP</span>
+          <div class="heat">
+            <!-- 4 weeks -->
+            <i style="background:#007AFF;"></i><i style="background:#34C759;"></i><i style="background:#FFD60A;"></i><i style="background:#007AFF;"></i><i style="background:#34C759;"></i><i></i><i style="background:#007AFF;"></i>
+            <i style="background:#34C759;"></i><i style="background:#FFD60A;"></i><i style="background:#FF9500;"></i><i style="background:#007AFF;"></i><i style="background:#34C759;"></i><i style="background:#007AFF;"></i><i style="background:#34C759;"></i>
+            <i style="background:#007AFF;"></i><i style="background:#FFD60A;"></i><i style="background:#FF9500;"></i><i style="background:#007AFF;"></i><i style="background:#34C759;"></i><i style="background:#007AFF;"></i><i style="background:#34C759;"></i>
+            <i style="background:#34C759;"></i><i style="background:#007AFF;"></i><i style="background:#FFD60A;"></i><i style="background:#FF9500;"></i><i style="background:#007AFF;"></i><i style="background:#34C759;"></i><i style="background:#007AFF;"></i>
+          </div>
+        </div>
+
+        <div class="card row-list" style="margin-top:6px;padding:2px 6px;">
+          <div class="rr" style="border-bottom:0.5px solid var(--separator);">
+            <span class="bar-l" style="background:#007AFF;"></span>
+            <span class="sc" style="color:#007AFF;">42</span>
+            <span class="gl">Mild</span>
+            <span class="ts">TODAY · 2:14PM</span>
+          </div>
+          <div class="rr" style="border-bottom:0.5px solid var(--separator);">
+            <span class="bar-l" style="background:#FF9500;"></span>
+            <span class="sc" style="color:#FF9500;">78</span>
+            <span class="gl">High</span>
+            <span class="ts">TODAY · 8:02AM</span>
+          </div>
+          <div class="rr">
+            <span class="bar-l" style="background:#34C759;"></span>
+            <span class="sc" style="color:#34C759;">22</span>
+            <span class="gl">Relaxed</span>
+            <span class="ts">YDAY · 9:40PM</span>
+          </div>
+        </div>
+      </div>
+    </div></div>
+    <div class="caption">
+      <div class="num">03 · History</div>
+      <div class="name">WatchHistoryView</div>
+      <div class="note">Bio age, stat triad, range segment, tier-colored bars + heatmap, reading list.</div>
+    </div>
+  </div>
+
+  <!-- ===================== 04 LOGGING ===================== -->
+  <div class="tile">
+    <div class="watch"><div class="display">
+      <div class="screen">
+        <div class="navtitle">Today</div>
+        <div style="display:flex;align-items:baseline;justify-content:space-between;margin:0 2px 8px;">
+          <span style="font-family:var(--font-rounded);font-weight:700;font-size:20px;letter-spacing:-0.02em;color:var(--fg);">Today</span>
+          <span class="mono" style="font-size:8.5px;">TUE · JUN 24</span>
+        </div>
+
+        <div class="mono" style="font-size:7.5px;margin:0 2px 4px;">HABITS</div>
+        <div class="habits">
+          <div class="habit">
+            <div class="ring-mini">
+              <svg width="46" height="46" viewBox="0 0 46 46">
+                <circle cx="23" cy="23" r="18" stroke="rgba(60,60,67,0.14)" stroke-width="4" fill="none"/>
+                <!-- 6/8 = 75% : circ=113 ; 0.75=85 -->
+                <circle cx="23" cy="23" r="18" stroke="#4FC3F7" stroke-width="4" fill="none" stroke-linecap="round" stroke-dasharray="85 113" transform="rotate(-90 23 23)"/>
+              </svg>
+              <div class="v">6/8</div>
+            </div>
+            <div class="lab">HYDRATION</div>
+            <div class="tag">AUTO</div>
+          </div>
+          <div class="habit">
+            <div class="ring-mini">
+              <svg width="46" height="46" viewBox="0 0 46 46">
+                <circle cx="23" cy="23" r="18" stroke="rgba(60,60,67,0.14)" stroke-width="4" fill="none"/>
+                <!-- 2/3 = 66% : circ=113 ; 0.66=75 -->
+                <circle cx="23" cy="23" r="18" stroke="#FE9901" stroke-width="4" fill="none" stroke-linecap="round" stroke-dasharray="75 113" transform="rotate(-90 23 23)"/>
+              </svg>
+              <div class="v">2/3</div>
+            </div>
+            <div class="lab">CAFFEINE</div>
+            <div class="tag add">+1</div>
+          </div>
+          <div class="habit">
+            <div class="ring-mini">
+              <svg width="46" height="46" viewBox="0 0 46 46">
+                <circle cx="23" cy="23" r="18" stroke="rgba(60,60,67,0.14)" stroke-width="4" fill="none"/>
+                <!-- 42/60 = 70% : circ=113 ; 0.70=79 -->
+                <circle cx="23" cy="23" r="18" stroke="#34C759" stroke-width="4" fill="none" stroke-linecap="round" stroke-dasharray="79 113" transform="rotate(-90 23 23)"/>
+              </svg>
+              <div class="v" style="font-size:9px;">42m/60m</div>
+            </div>
+            <div class="lab">SUNLIGHT</div>
+            <div class="tag">AUTO</div>
+          </div>
+        </div>
+
+        <div class="mono" style="font-size:7.5px;margin:10px 2px 4px;">MOOD</div>
+        <div class="moods">
+          <div class="mood"><span class="g" style="color:#34C759;">◌</span><span class="t">RELAX</span></div>
+          <div class="mood on"><span class="g" style="color:#007AFF;">◎</span><span class="t">MILD</span></div>
+          <div class="mood"><span class="g" style="color:#B59400;">◐</span><span class="t">MOD</span></div>
+          <div class="mood"><span class="g" style="color:#FF9500;">◑</span><span class="t">HIGH</span></div>
+          <div class="mood"><span class="g" style="color:#FF3B30;">●</span><span class="t">SEV</span></div>
+        </div>
+      </div>
+    </div></div>
+    <div class="caption">
+      <div class="num">04 · Logging</div>
+      <div class="name">WatchLoggingView</div>
+      <div class="note">Habit rings (hydration / caffeine / sunlight) + 5-tier mood chips, Mild selected.</div>
+    </div>
+  </div>
+
+  <!-- ===================== 05 WORKOUT ===================== -->
+  <div class="tile">
+    <div class="watch"><div class="display">
+      <div class="screen">
+        <div class="navtitle">Workout</div>
+
+        <div class="card hr-hero">
+          <div class="l">HEART RATE</div>
+          <div class="n">142</div>
+          <div class="u">BPM</div>
+          <div class="zone-row">
+            <span class="d"></span>
+            <span class="tx">Zone 3 · Tempo</span>
+            <span class="tg">AEROBIC</span>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:6px;padding:7px 8px;">
+          <div class="elap">
+            <svg width="11" height="11" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="5" stroke="#777986" stroke-width="1.1"/><path d="M6 3v3l2 1.5" stroke="#777986" stroke-width="1.1" stroke-linecap="round"/></svg>
+            <span class="t">12:34</span>
+            <span class="tg">ELAPSED</span>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:6px;padding:7px 6px 5px;">
+          <div class="mono" style="font-size:7.5px;margin:0 4px 3px;">ZONE TIME</div>
+          <div class="zbars">
+            <div class="b" style="height:18px;background:#34C759;"></div>
+            <div class="b" style="height:30px;background:#007AFF;"></div>
+            <div class="b" style="height:46px;background:#FFD60A;"></div>
+            <div class="b" style="height:22px;background:#FF9500;"></div>
+            <div class="b" style="height:10px;background:#FF3B30;"></div>
+          </div>
+          <div class="zlbls"><span>1</span><span>2</span><span>3</span><span>4</span><span>5</span></div>
+        </div>
+
+        <div style="margin-top:8px;">
+          <button class="pill-btn" style="height:36px;">Stop</button>
+        </div>
+      </div>
+    </div></div>
+    <div class="caption">
+      <div class="num">05 · Workout</div>
+      <div class="name">WatchWorkoutView</div>
+      <div class="note">Live HR 142 BPM, Zone 3 Tempo badge, elapsed timer, 5-zone time bars, Stop.</div>
+    </div>
+  </div>
+
+  <!-- ===================== 06 CYCLE ===================== -->
+  <div class="tile">
+    <div class="watch"><div class="display">
+      <div class="screen">
+        <div class="navtitle">Cycle</div>
+
+        <div class="card phase-card">
+          <div class="phase-ico">
+            <!-- drop SF Symbol-ish -->
+            <svg width="18" height="20" viewBox="0 0 18 20" fill="none"><path d="M9 1c4 5 7 8 7 12a7 7 0 0 1-14 0c0-4 3-7 7-12z" fill="#0288D1"/></svg>
+          </div>
+          <div>
+            <div class="pl">CURRENT PHASE</div>
+            <div class="pn">Follicular</div>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:6px;padding:8px;">
+          <div class="day-row">
+            <div style="display:flex;align-items:baseline;gap:5px;">
+              <span class="dn">DAY 14</span><span class="of">OF 28</span>
+            </div>
+            <span class="nx">Next: Ovulation</span>
+          </div>
+        </div>
+
+        <div class="card" style="margin-top:6px;padding:8px;">
+          <div class="pred">
+            <!-- calendar icon -->
+            <svg width="15" height="15" viewBox="0 0 16 16" fill="none"><rect x="1.5" y="3" width="13" height="11.5" rx="2" stroke="#777986" stroke-width="1.1"/><path d="M1.5 6.5h13M5 1.5v3M11 1.5v3" stroke="#777986" stroke-width="1.1" stroke-linecap="round"/></svg>
+            <span class="d">Jul 8</span>
+            <span class="tg">NEXT</span>
+          </div>
+        </div>
+
+        <div class="note-card" style="margin-top:6px;">
+          <div class="lab">
+            <svg width="13" height="11" viewBox="0 0 20 12" fill="none"><path d="M1 6h3l2-4 3 8 2-5 2 3h4" stroke="#0288D1" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            STRESS NOTE
+          </div>
+          <div class="body">HRV dips ~8% in the luteal phase. Recovery habits matter most now.</div>
+        </div>
+      </div>
+    </div></div>
+    <div class="caption">
+      <div class="num">06 · Cycle</div>
+      <div class="name">WatchCycleView</div>
+      <div class="note">Follicular phase, Day 14/28, next prediction, luteal stress-HRV note.</div>
+    </div>
+  </div>
+
+  <!-- ===================== 07 WATCH FACE SETTINGS ===================== -->
+  <div class="tile">
+    <div class="watch"><div class="display">
+      <div class="screen cream">
+        <div class="navtitle">Watch Face</div>
+
+        <div class="card prev" style="background:var(--surface);box-shadow:0 0.5px 0 var(--separator);">
+          <span class="lab">PREVIEW</span>
+          <div class="prev-tile"><span>42</span></div>
+        </div>
+
+        <div class="sec-lbl" style="margin-top:8px;">BACKGROUND STYLE</div>
+        <div class="styles">
+          <div class="style"><div class="swatch" style="background:#0288D1;"></div><span class="t">SOLID</span></div>
+          <div class="style on"><div class="swatch" style="background:linear-gradient(135deg,#4FC3F7,#0288D1);"></div><span class="t">GRADIENT</span></div>
+          <div class="style"><div class="swatch" style="background:linear-gradient(135deg,#A5D6A7,#4FC3F7,#7986CB);"></div><span class="t">AURORA</span></div>
+          <div class="style"><div class="swatch" style="background:linear-gradient(135deg,#4FC3F7,#0277BD);"></div><span class="t">OCEAN</span></div>
+        </div>
+
+        <div class="sec-lbl" style="margin-top:8px;">COMPANION THEME</div>
+        <div class="card" style="padding:8px 6px;background:var(--surface);box-shadow:0 0.5px 0 var(--separator);">
+          <div class="themes">
+            <div class="thm on">
+              <div class="thm-sw"><span class="dot-in" style="background:#4FC3F7;"></span><span class="chk"><svg width="7" height="7" viewBox="0 0 8 8"><path d="M1.5 4l1.7 1.7L6.5 2.3" stroke="#fff" stroke-width="1.3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+              <span class="lab">RIP</span>
+            </div>
+            <div class="thm">
+              <div class="thm-sw"><span class="dot-in" style="background:#A5D6A7;"></span></div>
+              <span class="lab">BLO</span>
+            </div>
+            <div class="thm">
+              <div class="thm-sw"><span class="dot-in" style="background:#FFAB91;"></span></div>
+              <span class="lab">EMB</span>
+            </div>
+            <div class="thm">
+              <div class="thm-sw"><span class="dot-in" style="background:#D1C4E9;"></span></div>
+              <span class="lab">ZEP</span>
+            </div>
+            <div class="thm">
+              <div class="thm-sw"><span class="dot-in" style="background:#7986CB;"></span></div>
+              <span class="lab">LUM</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="sec-lbl" style="margin-top:8px;">CUSTOMIZATION</div>
+        <div class="card cust" style="background:var(--surface);box-shadow:0 0.5px 0 var(--separator);">
+          <div class="cr" style="border-bottom:0.5px solid var(--separator);">
+            <div class="well">
+              <!-- sparkles -->
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M8 1l1.6 4.4L14 7l-4.4 1.6L8 13l-1.6-4.4L2 7l4.4-1.6L8 1z" fill="#0288D1"/></svg>
+            </div>
+            <div class="mid">
+              <span class="ti">Seasonal Themes</span>
+              <span class="su">Spring, Lunar, Halloween, Holiday</span>
+            </div>
+            <span class="chev"><svg width="7" height="11" viewBox="0 0 7 11"><path d="M1 1l4.5 4.5L1 10" stroke="#8E8E93" stroke-width="1.3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          </div>
+          <div class="cr">
+            <div class="well">
+              <!-- textformat -->
+              <svg width="14" height="14" viewBox="0 0 16 16" fill="none"><path d="M2 3h12M8 3v10M5 13h6" stroke="#0288D1" stroke-width="1.4" stroke-linecap="round"/></svg>
+            </div>
+            <div class="mid">
+              <span class="ti">Rename Tiers</span>
+              <span class="su">Customize stress level names</span>
+            </div>
+            <span class="chev"><svg width="7" height="11" viewBox="0 0 7 11"><path d="M1 1l4.5 4.5L1 10" stroke="#8E8E93" stroke-width="1.3" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+          </div>
+        </div>
+      </div>
+    </div></div>
+    <div class="caption">
+      <div class="num">07 · Watch Face</div>
+      <div class="name">WatchFaceSettingsView</div>
+      <div class="note">Cream Settings lineage: preview, style grid (Gradient selected), 5 themes (Ripple selected), customization rows.</div>
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>
