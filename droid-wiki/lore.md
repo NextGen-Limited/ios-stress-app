@@ -32,7 +32,22 @@ June 2026 was the busiest month by far (143 commits) and reshaped the entire UI.
 - **2026-06-23 to 2026-06-24**: full dashboard, action, trends, history, and bio-age screens rebuilt per new HTML design specs. Icon system introduced and rolled out across 37 files.
 - **2026-06-25**: character views migrated from procedural SwiftUI to exported SVG assets.
 - **2026-06-27**: `AppRouter` and `PaywallController` introduced; Home tab rebuilt to match `04-home` design spec.
-- **2026-06-28**: Apple Intelligence fallback removed; SupabaseLLM wired as the sole LLM backend. Settings redesigned.
+- **2026-06-28**: Apple Intelligence fallback removed; SupabaseLLM wired as the sole LLM backend. Settings redesigned. Watch app expanded to feature parity with iOS (Bio Age, habit/mood logging, workout HR zones, cycle tracking, seasonal themes, tier rename). 22 new watch files, 7 swipeable screens.
+
+### Watch feature parity (Jun 28, 2026)
+
+Commit `92a40a2` expanded the watchOS app from 4 screens to 7, achieving feature parity with the iOS app's StressWatch plan (Option C full parity). The watch target grew from ~4,400 to ~7,500 lines of Swift in a single commit.
+
+Key additions:
+
+- **Bio Age**: `BioAgeCalculator` and `BioAgeResult` mirrored from iOS, surfaced via `WatchBioAgeCardView` in the History screen.
+- **Habit and mood logging**: `WatchHabitViewModel` (hydration, caffeine, sunlight) and `WatchMoodViewModel` (5-mood picker) with UserDefaults persistence.
+- **Workout HR zones**: `WatchWorkoutViewModel` maps live heart rate to 5 zones (Recovery / Endurance / Tempo / Threshold / Max) based on max HR.
+- **Cycle tracking**: `WatchCycleViewModel` predicts menstrual phase and surfaces stress correlations.
+- **Seasonal themes**: `SeasonalTheme` enum (Spring / Lunar New Year / Halloween / Holiday) as costume overlays.
+- **Tier rename**: `TierNamePreferences` for custom stress-level display names.
+
+The watch UI was also redesigned to align with the iOS Design System v1.4.2 (light surfaces, 5-tier stress scale, elemental companion characters rendered as inline SVG).
 
 ### Backend wiring (ongoing)
 
@@ -60,4 +75,4 @@ The Supabase Edge Function backend for AI chat was wired in late June. `Keychain
 
 - **Jan 2026**: iOS app + watchOS app + widget extension.
 - **Mar-Apr 2026**: algorithm maturation, no new targets.
-- **Jun 2026**: 143 commits in one month, the largest expansion. Fastlane release automation, ASO and community strategy docs, full UI redesign, backend wiring.
+- **Jun 2026**: 145 commits in one month, the largest expansion. Fastlane release automation, ASO and community strategy docs, full UI redesign, backend wiring, watchOS feature-parity expansion (7,529 lines, 22 new files).

@@ -36,24 +36,16 @@ struct WatchBreatheView: View {
 
             breathingRing
 
-            countdownBlock
-                .padding(.top, 2)
-
             phaseDots
                 .padding(.top, 2)
 
             Spacer(minLength: 0)
 
-            Text(isRunning ? "Cycle \(cycleCount)" : "4 · 7 · 8 Breathing")
-                .font(.system(size: 10, weight: .medium, design: .monospaced))
-                .foregroundStyle(WatchDesignTokens.muted)
-                .padding(.bottom, 2)
-
-            pillButton
+            footBlock
         }
         .padding(.horizontal, WatchDesignTokens.contentSidePadding)
-        .padding(.top, 6)
-        .padding(.bottom, 10)
+        .padding(.top, 14)
+        .padding(.bottom, 16)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
         .background(WatchDesignTokens.canvas.ignoresSafeArea())
         .onDisappear { stop() }
@@ -84,6 +76,9 @@ struct WatchBreatheView: View {
                 )
                 .rotationEffect(.degrees(-90))
                 .animation(WatchDesignTokens.motion(WatchDesignTokens.Motion.default, reduceMotion: reduceMotion), value: ringFill)
+
+            // Centered countdown overlay (matches HTML ring-center)
+            countdownBlock
         }
         .frame(width: 110, height: 110)
         .scaleEffect(ringScale)
@@ -141,6 +136,17 @@ struct WatchBreatheView: View {
         if target < current { return .done }
         if target == current { return .active }
         return .upcoming
+    }
+
+    private var footBlock: some View {
+        VStack(spacing: 8) {
+            Text(isRunning ? "CYCLE \(cycleCount)" : "4 · 7 · 8 BREATHING")
+                .font(.system(size: 8.5, weight: .semibold, design: .monospaced))
+                .tracking(0.08 * 8.5)
+                .foregroundStyle(WatchDesignTokens.muted)
+            pillButton
+        }
+        .frame(maxWidth: .infinity)
     }
 
     private var pillButton: some View {

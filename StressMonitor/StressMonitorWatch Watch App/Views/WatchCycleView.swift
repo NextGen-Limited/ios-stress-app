@@ -36,23 +36,24 @@ struct WatchCycleView: View {
     // MARK: - Phase card
 
     private func phaseCard(_ data: CycleData) -> some View {
-        HStack(spacing: 8) {
+        HStack(spacing: 9) {
             ZStack {
                 Circle()
                     .fill(WatchDesignTokens.accentSoft)
-                    .frame(width: 32, height: 32)
+                    .frame(width: 40, height: 40)
                 Image(systemName: data.currentPhase.icon)
-                    .font(.system(size: 14, weight: .semibold))
+                    .font(.system(size: 16, weight: .semibold))
                     .foregroundStyle(WatchDesignTokens.accentStrong)
             }
             VStack(alignment: .leading, spacing: 1) {
-                Text(data.currentPhase.displayName)
-                    .font(.system(size: 13, weight: .semibold, design: .rounded))
-                    .foregroundStyle(WatchDesignTokens.ink)
                 Text("CURRENT PHASE")
                     .font(.system(size: 7.5, weight: .semibold, design: .monospaced))
-                    .tracking(0.05 * 7.5)
+                    .tracking(0.08 * 7.5)
                     .foregroundStyle(WatchDesignTokens.muted)
+                Text(data.currentPhase.displayName)
+                    .font(.system(size: 14, weight: .semibold, design: .rounded))
+                    .tracking(-0.01 * 14)
+                    .foregroundStyle(WatchDesignTokens.ink)
             }
             Spacer(minLength: 0)
         }
@@ -68,26 +69,26 @@ struct WatchCycleView: View {
 
     private func dayIndicator(_ data: CycleData) -> some View {
         HStack(spacing: 6) {
-            VStack(alignment: .leading, spacing: 1) {
+            HStack(alignment: .firstTextBaseline, spacing: 5) {
                 Text("DAY \(data.dayOfCycle)")
-                    .font(.system(size: 16, weight: .bold, design: .rounded).monospacedDigit())
-                    .tracking(-0.01 * 16)
+                    .font(.system(size: 18, weight: .bold, design: .rounded).monospacedDigit())
+                    .tracking(-0.02 * 18)
                     .foregroundStyle(WatchDesignTokens.ink)
                 Text("OF \(data.cycleLength)")
                     .font(.system(size: 8, weight: .semibold, design: .monospaced))
-                    .tracking(0.04 * 8)
+                    .tracking(0.08 * 8)
                     .foregroundStyle(WatchDesignTokens.muted)
             }
             Spacer(minLength: 0)
             Text("Next: \(viewModel.predictNextPhase().displayName)")
-                .font(.system(size: 9, weight: .medium, design: .rounded))
+                .font(.system(size: 10, weight: .medium, design: .rounded))
                 .foregroundStyle(WatchDesignTokens.muted)
                 .multilineTextAlignment(.trailing)
         }
         .padding(.horizontal, WatchDesignTokens.Spacing.xs)
-        .padding(.vertical, 7)
+        .padding(.vertical, 8)
         .background(
-            RoundedRectangle(cornerRadius: WatchDesignTokens.radiusControl, style: .continuous)
+            RoundedRectangle(cornerRadius: WatchDesignTokens.radiusCard, style: .continuous)
                 .fill(WatchDesignTokens.surface)
         )
     }
@@ -95,23 +96,24 @@ struct WatchCycleView: View {
     // MARK: - Prediction
 
     private func predictionRow(_ date: Date) -> some View {
-        HStack(spacing: 6) {
+        HStack(spacing: 8) {
             Image(systemName: "calendar")
-                .font(.system(size: 10, weight: .semibold))
+                .font(.system(size: 11, weight: .semibold))
                 .foregroundStyle(WatchDesignTokens.muted)
             Text(date.formatted(date: .abbreviated, time: .omitted))
-                .font(.system(size: 10, weight: .medium, design: .rounded))
+                .font(.system(size: 13, weight: .semibold, design: .rounded))
+                .tracking(-0.01 * 13)
                 .foregroundStyle(WatchDesignTokens.ink)
             Spacer(minLength: 0)
             Text("NEXT")
-                .font(.system(size: 7.5, weight: .semibold, design: .monospaced))
-                .tracking(0.05 * 7.5)
+                .font(.system(size: 7, weight: .semibold, design: .monospaced))
+                .tracking(0.06 * 7)
                 .foregroundStyle(WatchDesignTokens.muted)
         }
         .padding(.horizontal, WatchDesignTokens.Spacing.xs)
-        .padding(.vertical, 6)
+        .padding(.vertical, 8)
         .background(
-            RoundedRectangle(cornerRadius: WatchDesignTokens.radiusControl, style: .continuous)
+            RoundedRectangle(cornerRadius: WatchDesignTokens.radiusCard, style: .continuous)
                 .fill(WatchDesignTokens.surface)
         )
     }
@@ -119,24 +121,24 @@ struct WatchCycleView: View {
     // MARK: - Correlation note
 
     private func correlationNote(_ note: String) -> some View {
-        VStack(alignment: .leading, spacing: 4) {
-            HStack(spacing: 4) {
+        VStack(alignment: .leading, spacing: 3) {
+            HStack(spacing: 5) {
                 Image(systemName: "waveform.path.ecg")
                     .font(.system(size: 9, weight: .semibold))
                     .foregroundStyle(WatchDesignTokens.accentStrong)
                 Text("STRESS NOTE")
-                    .font(.system(size: 8, weight: .semibold, design: .monospaced))
-                    .tracking(0.05 * 8)
-                    .foregroundStyle(WatchDesignTokens.muted)
+                    .font(.system(size: 7.5, weight: .semibold, design: .monospaced))
+                    .tracking(0.08 * 7.5)
+                    .foregroundStyle(WatchDesignTokens.accentStrong)
             }
             Text(note)
-                .font(.system(size: 10, weight: .regular, design: .default))
+                .font(.system(size: 9.5, weight: .regular, design: .default))
                 .foregroundStyle(WatchDesignTokens.inkSecondary)
                 .fixedSize(horizontal: false, vertical: true)
         }
         .frame(maxWidth: .infinity, alignment: .leading)
         .padding(.horizontal, WatchDesignTokens.Spacing.xs)
-        .padding(.vertical, 7)
+        .padding(.vertical, 8)
         .background(
             RoundedRectangle(cornerRadius: WatchDesignTokens.radiusCard, style: .continuous)
                 .fill(WatchDesignTokens.accentSoft)

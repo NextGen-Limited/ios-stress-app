@@ -12,7 +12,6 @@ struct WatchWorkoutView: View {
         ScrollView {
             VStack(spacing: WatchDesignTokens.Spacing.sm) {
                 hrHero
-                zoneBadge
                 elapsedRow
                 zoneDistribution
                 stopButton
@@ -34,61 +33,59 @@ struct WatchWorkoutView: View {
         }
     }
 
-    // MARK: - HR hero
+    // MARK: - HR hero (with zone badge)
 
     private var hrHero: some View {
         VStack(spacing: 2) {
             Text("HEART RATE")
-                .font(.system(size: 7.5, weight: .semibold, design: .monospaced))
-                .tracking(0.05 * 7.5)
+                .font(.system(size: 8, weight: .semibold, design: .monospaced))
+                .tracking(0.08 * 8)
                 .foregroundStyle(WatchDesignTokens.muted)
 
             Text("\(Int(viewModel.currentHR))")
-                .font(.system(size: 48, weight: .bold, design: .rounded).monospacedDigit())
-                .tracking(-0.02 * 48)
+                .font(.system(size: 54, weight: .bold, design: .rounded).monospacedDigit())
+                .tracking(-0.03 * 54)
                 .foregroundStyle(WatchDesignTokens.ink)
 
             Text("BPM")
-                .font(.system(size: 9, weight: .medium, design: .monospaced))
-                .tracking(0.04 * 9)
+                .font(.system(size: 8, weight: .semibold, design: .monospaced))
+                .tracking(0.08 * 8)
                 .foregroundStyle(WatchDesignTokens.muted)
+
+            zoneRow
+                .padding(.top, 4)
         }
         .frame(maxWidth: .infinity)
-        .padding(.vertical, 8)
+        .padding(.vertical, 10)
+        .padding(.horizontal, WatchDesignTokens.Spacing.xs)
         .background(
             RoundedRectangle(cornerRadius: WatchDesignTokens.radiusCard, style: .continuous)
                 .fill(WatchDesignTokens.surface)
         )
     }
 
-    // MARK: - Zone badge
+    // MARK: - Zone row (inside HR hero)
 
-    private var zoneBadge: some View {
+    private var zoneRow: some View {
         HStack(spacing: 6) {
             Circle()
                 .fill(zoneColor)
-                .frame(width: 8, height: 8)
-            Text(viewModel.currentZone.displayName)
-                .font(.system(size: 11, weight: .semibold, design: .rounded))
-                .foregroundStyle(WatchDesignTokens.ink)
-            Text(viewModel.currentZone.description.uppercased())
-                .font(.system(size: 8, weight: .semibold, design: .monospaced))
-                .tracking(0.04 * 8)
-                .foregroundStyle(WatchDesignTokens.muted)
+                .frame(width: 7, height: 7)
+            Text("\(viewModel.currentZone.displayName) · \(viewModel.currentZone.description)")
+                .font(.system(size: 11, weight: .semibold, design: .default))
+                .foregroundStyle(viewModel.currentZone == .zone3 ? Color(hex: "#B59400") : WatchDesignTokens.ink)
             Spacer(minLength: 0)
+            Text(viewModel.currentZone.description.uppercased())
+                .font(.system(size: 7, weight: .semibold, design: .monospaced))
+                .tracking(0.06 * 7)
+                .foregroundStyle(WatchDesignTokens.muted)
         }
-        .padding(.horizontal, WatchDesignTokens.Spacing.xs)
-        .padding(.vertical, 6)
-        .background(
-            RoundedRectangle(cornerRadius: WatchDesignTokens.radiusControl, style: .continuous)
-                .fill(WatchDesignTokens.surface)
-        )
     }
 
     // MARK: - Elapsed time
 
     private var elapsedRow: some View {
-        HStack(spacing: 6) {
+        HStack(spacing: 7) {
             Image(systemName: "timer")
                 .font(.system(size: 11, weight: .semibold))
                 .foregroundStyle(WatchDesignTokens.muted)
@@ -98,14 +95,14 @@ struct WatchWorkoutView: View {
                 .foregroundStyle(WatchDesignTokens.ink)
             Spacer(minLength: 0)
             Text("ELAPSED")
-                .font(.system(size: 7.5, weight: .semibold, design: .monospaced))
-                .tracking(0.05 * 7.5)
+                .font(.system(size: 7, weight: .semibold, design: .monospaced))
+                .tracking(0.06 * 7)
                 .foregroundStyle(WatchDesignTokens.muted)
         }
         .padding(.horizontal, WatchDesignTokens.Spacing.xs)
-        .padding(.vertical, 6)
+        .padding(.vertical, 7)
         .background(
-            RoundedRectangle(cornerRadius: WatchDesignTokens.radiusControl, style: .continuous)
+            RoundedRectangle(cornerRadius: WatchDesignTokens.radiusCard, style: .continuous)
                 .fill(WatchDesignTokens.surface)
         )
     }
@@ -119,13 +116,14 @@ struct WatchWorkoutView: View {
                 .tracking(0.06 * 8.5)
                 .foregroundStyle(WatchDesignTokens.muted)
 
-            HStack(spacing: 3) {
+            HStack(alignment: .bottom, spacing: 0) {
                 ForEach(WorkoutZone.allCases, id: \.self) { zone in
                     bar(for: zone)
                 }
             }
+            .frame(height: 54)
         }
-        .padding(.horizontal, WatchDesignTokens.Spacing.xs)
+        .padding(.horizontal, 6)
         .padding(.vertical, 7)
         .background(
             RoundedRectangle(cornerRadius: WatchDesignTokens.radiusCard, style: .continuous)
@@ -137,15 +135,15 @@ struct WatchWorkoutView: View {
         let total = viewModel.zoneTimeSummary.values.reduce(0, +)
         let value = viewModel.zoneTimeSummary[zone] ?? 0
         let ratio = total > 0 ? Double(value) / Double(total) : 0
-        let height = max(4, ratio * 36)
-        return VStack(spacing: 2) {
+        let height = max(6, ratio * 46)
+        return VStack(spacing: 3) {
             Spacer(minLength: 0)
-            RoundedRectangle(cornerRadius: 2, style: .continuous)
+            RoundedRectangle(cornerRadius: 4, style: .continuous)
                 .fill(Color(hex: zone.colorHex))
-                .frame(maxWidth: .infinity)
-                .frame(height: height)
+                .frame(width: 22, height: height)
             Text("\(zone.rawValue)")
-                .font(.system(size: 8, weight: .semibold, design: .monospaced))
+                .font(.system(size: 7.5, weight: .semibold, design: .monospaced))
+                .tracking(0.04 * 7.5)
                 .foregroundStyle(WatchDesignTokens.muted)
         }
         .frame(maxWidth: .infinity, alignment: .center)
@@ -159,7 +157,8 @@ struct WatchWorkoutView: View {
             viewModel.stop()
         } label: {
             Text("Stop")
-                .font(.system(size: 13, weight: .semibold, design: .rounded))
+                .font(.system(size: 14, weight: .semibold, design: .rounded))
+                .tracking(-0.01 * 14)
                 .foregroundStyle(.white)
                 .frame(maxWidth: .infinity)
                 .frame(height: 36)
@@ -169,6 +168,7 @@ struct WatchWorkoutView: View {
                 )
         }
         .buttonStyle(.plain)
+        .padding(.top, 8)
     }
 
     // MARK: - Helpers
