@@ -147,14 +147,22 @@ final class HealthKitManager: HealthKitServiceProtocol {
 
     func observeHeartRateUpdates() -> AsyncStream<HeartRateSample?> {
         return AsyncStream { continuation in
-            let query = HKObserverQuery(sampleType: self.heartRateType, predicate: nil) { _, _, error in
-                if error != nil {
+            let query = HKObserverQuery(sampleType: self.heartRateType, predicate: nil) { _, completionHandler, error in
+                // Foreground-only stream (no enableBackgroundDelivery). Always invoke
+                // the completion handler so HealthKit keeps delivering updates.
+                defer { completionHandler() }
+
+                guard error == nil else {
                     continuation.yield(nil)
                     return
                 }
 
-                Task {
+                // fetchHeartRate is @MainActor-isolated, so hop explicitly to the
+                // main actor instead of capturing @MainActor self in an unstructured,
+                // unisolated Task (avoids Swift 6 concurrency warnings).
+                Task { @MainActor [weak self] in
                     do {
+                        guard let self else { return }
                         let samples = try await self.fetchHeartRate(samples: 1)
                         continuation.yield(samples.first)
                     } catch {
@@ -165,7 +173,8 @@ final class HealthKitManager: HealthKitServiceProtocol {
 
             self.healthStore.execute(query)
 
-            continuation.onTermination = { @Sendable _ in
+            continuation.onTermination = { @Sendable [weak self] _ in
+                guard let self else { return }
                 self.healthStore.stop(query)
             }
         }

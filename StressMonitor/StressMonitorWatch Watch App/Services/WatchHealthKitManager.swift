@@ -124,10 +124,39 @@ final class WatchHealthKitManager: HealthKitServiceProtocol {
 
   func observeHeartRateUpdates() -> AsyncStream<HeartRateSample?> {
     AsyncStream { continuation in
-      let query = HKObserverQuery(sampleType: heartRateType, predicate: nil) { _, _, _ in
-        continuation.yield(nil)
+      let query = HKObserverQuery(sampleType: heartRateType, predicate: nil) { _, completionHandler, error in
+        // Always invoke the completion handler — failing it three times in a row
+        // makes HealthKit disable observer delivery for the app.
+        defer { completionHandler() }
+
+        guard error == nil else {
+          continuation.yield(nil)
+          return
+        }
+
+        // Fetch the latest heart-rate sample on each change notification so the
+        // stream carries real data instead of always yielding nil.
+        let sortDescriptor = NSSortDescriptor(key: HKSampleSortIdentifierEndDate, ascending: false)
+        let sampleQuery = HKSampleQuery(
+          sampleType: self.heartRateType,
+          predicate: nil,
+          limit: 1,
+          sortDescriptors: [sortDescriptor]
+        ) { _, samples, _ in
+          guard let sample = samples?.first as? HKQuantitySample else {
+            continuation.yield(nil)
+            return
+          }
+          let value = sample.quantity.doubleValue(for: HKUnit.count().unitDivided(by: .minute()))
+          continuation.yield(HeartRateSample(value: value, timestamp: sample.endDate))
+        }
+        self.healthStore.execute(sampleQuery)
       }
       self.healthStore.execute(query)
+
+      continuation.onTermination = { @Sendable [weak self] _ in
+        self?.healthStore.stop(query)
+      }
     }
   }
 
