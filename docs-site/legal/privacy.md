@@ -1,6 +1,6 @@
 # Privacy Policy
 
-*Last updated: 2026-03-21*
+*Last updated: 2026-08-09*
 
 ## Overview
 
@@ -14,7 +14,7 @@ StressMonitor is committed to protecting your privacy. All health data is proces
 
 ## Data We Do Not Collect
 
-- No data is transmitted to our servers
+- Raw HealthKit readings are never transmitted to our servers — the only exception is the derived data described in "AI Coaching Chat" below
 - No third-party analytics or advertising trackers
 - No advertising identifiers
 - HealthKit data is never used for advertising or marketing
@@ -22,6 +22,12 @@ StressMonitor is committed to protecting your privacy. All health data is proces
 ## iCloud Sync
 
 If you enable iCloud sync, your stress history syncs across your own Apple devices via CloudKit. This data is end-to-end encrypted by Apple. We cannot access it.
+
+## AI Coaching Chat
+
+When you open AI Coaching Chat, the app sends derived values to StressMonitor's backend to generate a coaching response: your stress score, stress category, confidence, trend, and a per-factor breakdown of normalized HRV, heart rate, sleep, activity, and recovery scores. Raw HealthKit sample values (e.g. exact HRV readings in milliseconds, exact heart rate in bpm) are never included.
+
+This request carries an authenticated session (a Bearer JWT, established via Supabase Auth — anonymous or signed-in), not an anonymous one. Chat messages and this derived context are retained according to the backend's own chat-history retention policy, separate from the on-device health store described above.
 
 ## HealthKit
 

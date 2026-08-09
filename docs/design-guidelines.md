@@ -3,7 +3,7 @@
 **System:** iOS Human Interface Guidelines compliant
 **Accessibility:** WCAG AA
 **Version:** 1.1
-**Last Updated:** June 7, 2026
+**Last Updated:** July 19, 2026
 
 ---
 
@@ -508,10 +508,12 @@ Views/
 
 ---
 
-## March 2026 Design Patterns
+## Historical Reference: March 2026 Design Patterns
 
-### Adaptive Card Background
-All cards now use unified adaptive backgrounds that auto-switch in light/dark mode:
+These patterns were foundational in March 2026. Most have evolved into the current design system. Refer to Design Guidelines: Visual and UX for current implementations.
+
+### Adaptive Card Background (Legacy)
+All cards use unified adaptive backgrounds that auto-switch in light/dark mode:
 
 ```swift
 .background(Color.adaptiveCardBackground)     // White / #2C2C2E

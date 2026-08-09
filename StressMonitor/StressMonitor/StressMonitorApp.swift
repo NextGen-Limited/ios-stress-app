@@ -16,6 +16,11 @@ struct StressMonitorApp: App {
     // every scene, tab, sheet, and the root full-screen paywall cover.
     @State private var appRouter = AppRouter()
     @State private var paywall = PaywallController()
+    // Owned once for the app's process lifetime so the Transaction.updates
+    // listener started in its init runs the whole time, not just while the
+    // paywall happens to be on screen. See StoreKitServiceEnvironment.swift.
+    @State private var storeKitService: StoreKitServiceProtocol = Self.makeStoreKitService()
+    @Environment(\.scenePhase) private var scenePhase
     // MARK: - Versioned Schema (V1 → V2 adds Habit)
     //
     // SwiftData can silently wipe an existing store on iOS 17.0–17.3 when the
@@ -94,6 +99,7 @@ struct StressMonitorApp: App {
             OnboardingContainerView()
                 .environment(appRouter)
                 .environment(paywall)
+                .environment(\.storeKitService, storeKitService)
                 .preferredColorScheme(AppearanceManager.shared.colorScheme)
                 #if DEBUG
                 .onAppear {
@@ -103,7 +109,32 @@ struct StressMonitorApp: App {
                 #endif
         }
         .modelContainer(sharedModelContainer)
+        .onChange(of: scenePhase) { _, newPhase in
+            // Self-correct entitlement state on every foreground, not only
+            // when Transaction.updates happens to deliver something while
+            // the app is already running.
+            guard newPhase == .active else { return }
+            Task { @MainActor in
+                await storeKitService.refreshEntitlements()
+                CharacterCollectionViewModel.syncPremiumCharacterEntitlement(
+                    isPremium: PremiumState.shared.isPremiumUser,
+                    in: sharedModelContainer.mainContext
+                )
+            }
+        }
     }
+
+    // MARK: - StoreKit factory (DEBUG vs Release)
+
+    #if DEBUG
+    private static func makeStoreKitService() -> StoreKitServiceProtocol {
+        MockStoreKitService(premiumState: .shared)
+    }
+    #else
+    private static func makeStoreKitService() -> StoreKitServiceProtocol {
+        StoreKitService(premiumState: .shared)
+    }
+    #endif
 
     #if DEBUG
     private static let initTimestamp = CFAbsoluteTimeGetCurrent()

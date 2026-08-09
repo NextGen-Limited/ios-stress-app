@@ -11,7 +11,7 @@ struct PurchaseSuccessView: View {
     @Environment(\.dismiss) private var dismiss
 
     /// Character ids unlocked by Premium.
-    private static let unlockedByPremium = ["ember", "zephyr", "lumi"]
+    private static let unlockedByPremium = CharacterCreature.allCharacters.filter { $0.unlockType == .premium }.map(\.id)
 
     var body: some View {
         ScrollView {
@@ -50,7 +50,7 @@ struct PurchaseSuccessView: View {
                 .font(.system(size: 26, weight: .bold, design: .rounded))
                 .foregroundStyle(Color.Wellness.adaptivePrimaryText)
 
-            Text("All five elemental companions are now yours, along with trends, AI coaching, and deeper recovery insights.")
+            Text("Your premium companions are unlocked, along with trends, AI coaching, and deeper recovery insights.")
                 .font(.subheadline)
                 .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
                 .multilineTextAlignment(.center)
@@ -74,7 +74,12 @@ struct PurchaseSuccessView: View {
                 }
             }
         }
-        .task { unlockPremiumCharacters() }
+        .task {
+            CharacterCollectionViewModel.syncPremiumCharacterEntitlement(
+                isPremium: PremiumState.shared.isPremiumUser,
+                in: modelContext
+            )
+        }
     }
 
     private func characterChip(creature: CharacterCreature) -> some View {
@@ -161,25 +166,6 @@ struct PurchaseSuccessView: View {
     /// Additively mark the premium-gated characters as unlocked. Existing rows
     /// are updated in place; missing rows (unexpected on a seeded store) are
     /// inserted so the unlock always lands.
-    private func unlockPremiumCharacters() {
-        let descriptor = FetchDescriptor<CharacterUnlock>()
-        let existing = (try? modelContext.fetch(descriptor)) ?? []
-        let byId = Dictionary(uniqueKeysWithValues: existing.map { ($0.characterId, $0) })
-
-        for id in Self.unlockedByPremium {
-            if let row = byId[id] {
-                guard !row.isUnlocked else { continue }
-                row.isUnlocked = true
-                row.unlockedAt = Date()
-            } else {
-                let row = CharacterUnlock(characterId: id, isUnlocked: true, currentEvolution: .droplet)
-                modelContext.insert(row)
-            }
-        }
-
-        try? modelContext.save()
-    }
-
     private func restoreOrDismiss() async {
         // Restore is handled by StoreKitService elsewhere; here we simply return
         // the user home since the purchase is already confirmed on this screen.

@@ -1,3 +1,4 @@
+import CloudKit
 import SwiftUI
 import SwiftData
 
@@ -409,39 +410,60 @@ class DataDeleteViewModel {
         }
 
         let (start, end) = getDateRangeBounds()
+        var didDeleteSomething = false
 
-        await MainActor.run {
-            currentOperation = "Fetching data..."
-        }
-
-        let descriptor = FetchDescriptor<StressMeasurement>(
-            predicate: #Predicate { measurement in
-                measurement.timestamp >= start && measurement.timestamp <= end
-            }
-        )
-
-        let measurements = try modelContext.fetch(descriptor)
-
-        guard !measurements.isEmpty else {
-            throw DeleteError.noData
-        }
-
-        for (index, measurement) in measurements.enumerated() {
-            try Task.checkCancellation()
-
+        // Local deletion — only for scopes that actually touch this device.
+        if deleteScope == .localOnly || deleteScope == .everything {
             await MainActor.run {
-                deleteProgress = Double(index + 1) / Double(measurements.count)
-                currentOperation = "Deleting \(index + 1) of \(measurements.count)..."
+                currentOperation = "Fetching local data..."
             }
 
-            modelContext.delete(measurement)
+            let descriptor = FetchDescriptor<StressMeasurement>(
+                predicate: #Predicate { measurement in
+                    measurement.timestamp >= start && measurement.timestamp <= end
+                }
+            )
+            let measurements = try modelContext.fetch(descriptor)
+
+            if !measurements.isEmpty {
+                didDeleteSomething = true
+                for (index, measurement) in measurements.enumerated() {
+                    try Task.checkCancellation()
+
+                    await MainActor.run {
+                        deleteProgress = Double(index + 1) / Double(measurements.count) * 0.5
+                        currentOperation = "Deleting \(index + 1) of \(measurements.count) locally..."
+                    }
+
+                    modelContext.delete(measurement)
+                }
+                try modelContext.save()
+            }
         }
 
-        try modelContext.save()
+        // Cloud deletion — `.cloudOnly` and `.everything` promise this in
+        // DeleteConfirmationView's own copy; it must actually happen.
+        if deleteScope.includesCloud {
+            try Task.checkCancellation()
+            await MainActor.run {
+                currentOperation = "Deleting from iCloud..."
+            }
+            didDeleteSomething = true
+            let cloudService = CloudKitResetService(container: .default(), logger: .default)
+            try await cloudService.deleteRecords(ofType: .stressMeasurement, in: start...end)
+            await MainActor.run {
+                deleteProgress = max(deleteProgress, 0.9)
+            }
+        }
 
         // Delete baseline if scope includes it
         if deleteScope.includesBaseline {
+            didDeleteSomething = true
             try await deleteBaseline(modelContext: modelContext)
+        }
+
+        guard didDeleteSomething else {
+            throw DeleteError.noData
         }
 
         await MainActor.run {
@@ -456,11 +478,11 @@ class DataDeleteViewModel {
     }
 
     private func deleteBaseline(modelContext: ModelContext) async throws {
-        // Baseline deletion logic would go here
-        // For now, we'll just mark it as completed
         await MainActor.run {
             currentOperation = "Removing baseline..."
         }
+        let repository = StressRepository(modelContext: modelContext)
+        try await repository.updateBaseline(PersonalBaseline())
     }
 
     private func getDateRangeBounds() -> (start: Date, end: Date) {

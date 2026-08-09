@@ -77,13 +77,39 @@ final class CharacterCollectionViewModel {
 
         try? context.save()
     }
+
+    /// Reconciles premium-character unlocks with live subscription status:
+    /// unlocked while subscribed, re-locked on lapse; active selection falls back to Ripple.
+    @MainActor
+    static func syncPremiumCharacterEntitlement(isPremium: Bool, in context: ModelContext) {
+        let descriptor = FetchDescriptor<CharacterUnlock>()
+        let unlocks = (try? context.fetch(descriptor)) ?? []
+
+        let premiumIds = Set(CharacterCreature.allCharacters.filter { $0.unlockType == .premium }.map(\.id))
+
+        var activeReLocked = false
+        for unlock in unlocks where premiumIds.contains(unlock.characterId) {
+            unlock.isUnlocked = isPremium
+            if !isPremium && unlock.isActive {
+                unlock.isActive = false
+                activeReLocked = true
+            }
+        }
+
+        if activeReLocked, let ripple = unlocks.first(where: { $0.characterId == "ripple" }) {
+            ripple.isActive = true
+            CharacterSelectionSync.shared.saveActiveCharacter(characterId: ripple.characterId, evolution: ripple.evolutionStage)
+        }
+
+        try? context.save()
+    }
 }
 
 /// Syncs active character selection to the App Group used by Watch complications.
 struct CharacterSelectionSync {
     static let shared = CharacterSelectionSync()
 
-    private let suiteName = "group.com.stressmonitor.watch"
+    private let suiteName = "group.stress.ai.com"
 
     private enum Keys {
         static let activeCharacterId = "activeCharacterId"

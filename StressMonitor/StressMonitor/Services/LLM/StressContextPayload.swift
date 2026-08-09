@@ -117,10 +117,13 @@ struct StressContextPayload: Codable, Sendable {
             stressLevel: stressResult.map { Int($0.level) },
             stressCategory: stressResult?.category.rawValue,
             confidence: stressResult?.confidence,
-            hrv: stressResult?.hrv,
-            heartRate: stressResult?.heartRate,
-            baselineHRV: baseline?.baselineHRV,
-            baselineHR: baseline?.restingHeartRate,
+            // Raw HealthKit-derived readings never leave the device — only the
+            // app's own derived stress score/category above do. See
+            // StressContextPayloadTests for the invariant this enforces.
+            hrv: nil,
+            heartRate: nil,
+            baselineHRV: nil,
+            baselineHR: nil,
             sleepQuality: nil,  // Not directly available from StressResult
             sleepHours: nil,
             activeMinutes: nil,

@@ -4,7 +4,7 @@
 **Accessibility:** WCAG AA
 **Section:** Colors, typography, spacing, components
 **Version:** 1.2
-**Last Updated:** June 13, 2026
+**Last Updated:** July 19, 2026
 
 ---
 
@@ -540,5 +540,5 @@ Xcode → Debug → View Debugging → Core Animation
 
 **Next:** See `design-guidelines-ux.md` for accessibility, haptics, animations, and StressBuddy character.
 **Design System Version:** 1.2
-**Last Updated:** June 13, 2026
+**Last Updated:** July 19, 2026
 **Maintained By:** Phuong Doan

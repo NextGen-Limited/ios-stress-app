@@ -4,7 +4,7 @@
 **Accessibility:** WCAG AA
 **Section:** Accessibility, haptics, StressBuddy, onboarding, data visualization, chat UX
 **Version:** 1.1
-**Last Updated:** June 13, 2026
+**Last Updated:** July 19, 2026
 
 ---
 

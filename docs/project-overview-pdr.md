@@ -3,7 +3,7 @@
 **Version:** 1.0 (Pre-Ship - RC1)
 **Status:** Feature Complete — 1 Blocker Pending (B3 test suite)
 **Platform:** iOS 17+ / watchOS 10+
-**Last Updated:** June 17, 2026
+**Last Updated:** July 19, 2026
 
 ---
 
@@ -204,7 +204,7 @@ Each measurement includes a confidence value (0-1) based on:
 ### Privacy & Security
 - Zero data breaches
 - 100% CloudKit E2E encryption
-- Health data never sent externally (only anonymized chat context to SupabaseLLMService)
+- Raw HealthKit readings never sent externally; AI Coaching Chat sends derived stress-context (score, category, confidence, trend, per-factor HRV/heart-rate/sleep/activity/recovery scores) to SupabaseLLMService under an authenticated (Bearer JWT) session
 
 ---
 
@@ -222,7 +222,7 @@ Each measurement includes a confidence value (0-1) based on:
 
 ### Privacy-First Design
 - **Local Storage:** SwiftData (encrypted at rest by iOS)
-- **Cloud Chat:** Sends anonymized chat context to Supabase Edge Functions via SupabaseLLMService; health data stays on-device
+- **Cloud Chat:** Sends derived stress-context (score, category, confidence, trend, per-factor HRV/heart-rate/sleep/activity/recovery scores) to Supabase Edge Functions via SupabaseLLMService under an authenticated (Bearer JWT) session; raw HealthKit readings stay on-device
 - **Read-Only HealthKit:** No writes to Apple Health
 - **CloudKit E2E Encryption:** End-to-end encrypted sync
 - **No Tracking:** No analytics, no advertising IDs
@@ -238,7 +238,7 @@ HealthKit (Sensors) -> HealthKitManager (read-only)
 AI Chat (separate path):
 ActionView -> ChatBottomSheetView -> ChatViewModel
 -> SupabaseLLMService (SSE streaming to Supabase Edge Functions)
--> ChatContextBuilder (assembles anonymized context only)
+-> StressContextPayload (derived stress-context sent as `stress_context`, session-linked via Bearer JWT)
 -> SSEParser for Server-Sent Events streaming
 ```
 

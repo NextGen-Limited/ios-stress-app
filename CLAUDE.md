@@ -491,7 +491,7 @@ Follow `documentation/references/README.md` for phased implementation:
 - CloudKit sync is end-to-end encrypted
 - HealthKit is read-only access (no writes)
 - No third-party analytics or tracking
-- No external API calls or servers
+- AI Coaching Chat sends derived stress-context (stress score/category, confidence, trend, and per-factor HRV/heart-rate/sleep/activity/recovery scores — never raw HealthKit readings) to the `/chat` Supabase Edge Function under a Bearer-JWT-authenticated session, not anonymously
 
 ---
 

@@ -2,7 +2,7 @@
 
 **Platform:** iOS 17+ / watchOS 10+
 **Section:** Distribution, Review, Post-Release Monitoring
-**Last Updated:** June 17, 2026
+**Last Updated:** July 19, 2026
 
 ---
 
@@ -75,7 +75,7 @@ Prepare screenshots for each device:
 
 **iPhone 15 (6.1-inch)** - At least 5 screenshots
 1. Dashboard with stress ring and insights
-2. 5-Tab navigation structure (Home/Trends/Breathing/Characters/Settings)
+2. 3-Tab navigation structure (Home/Action/Trend) with Settings non-tab
 3. Character collection with evolution unlocks
 4. Breathing exercise with animated circle
 5. AI chat with streaming responses (SupabaseLLM SSE streaming)
@@ -99,7 +99,7 @@ Features:
 • AI Chat: SupabaseLLM SSE streaming via Edge Functions
 • Real-time token streaming for instant AI responses
 • Personal baseline adaptation (learns over 30 days)
-• 5-tab navigation (Home/Trends/Breathing/Characters/Settings)
+• 3-tab navigation (Home/Action/Trend) with Settings
 • 5 Elemental Characters with 3-stage evolution system (38 SVG assets)
 • Guided breathing exercises with Figma-aligned animations
 • Historical tracking with filtering and analytics
@@ -222,7 +222,7 @@ Initial Release:
 • 5-factor stress algorithm (HRV, Heart Rate, Sleep, Activity, Recovery)
 • AI Chat with streaming responses (SupabaseLLMService SSE streaming via Edge Functions)
 • Personal baseline adaptation over 30 days
-• 5-tab navigation (Home/Trends/Breathing/Characters/Settings) for improved user flow
+• 3-tab navigation (Home/Action/Trend) with Settings for improved user flow
 • Real-time stress measurement with confidence scoring
 • Apple Watch standalone app with complications
 • CloudKit sync across devices with end-to-end encryption
@@ -233,13 +233,14 @@ Initial Release:
 • Real StoreKit 2 premium subscriptions
 • Comprehensive accessibility features (WCAG AA)
 
-Recent Updates (May-Jun 2026):
+Recent Updates (June-July 2026):
 • Real-time streaming AI chat responses via SupabaseLLMService
-• 5-tab navigation structure (Home/Trends/Breathing/Characters/Settings)
+• 3-tab navigation structure (Home/Action/Trend) with Settings
 • Character evolution system with 38 SVG assets
 • Real StoreKit 2 product fetching and purchase flow (PR #19)
 • Enhanced breathing exercise visual design
 • Improved streaming chat performance and reliability
+• Watch app redesign with list-based navigation (July 2026)
 
 Thank you for using StressMonitor!
 ```

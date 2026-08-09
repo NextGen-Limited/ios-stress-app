@@ -113,7 +113,7 @@ struct PlanCard: View {
                             .font(Typography.iapPrice)
                             .tracking(-0.045 * 22)
                             .foregroundStyle(Color.iapTextPrimary)
-                        Text(plan.periodUnitDisplay)
+                        Text(priceUnit(for: plan))
                             .font(Typography.iapPerMonth)
                             .foregroundStyle(Color.iapTextSecondary)
                     }
@@ -155,6 +155,10 @@ struct PlanCard: View {
         }
     }
 
+    private func priceUnit(for plan: SubscriptionPlan) -> String {
+        plan.period == .annual ? "/mo" : plan.periodUnitDisplay
+    }
+
     private func leftFooter(for plan: SubscriptionPlan) -> String {
         switch plan.period {
         case .annual:  return plan.savingsDisplay ?? "Save 37%"
@@ -173,7 +177,7 @@ struct PlanCard: View {
         }
         guard let plan else { return "Plan" }
         let selected = isSelected ? ", selected" : ""
-        return "\(plan.displayName), \(priceText(for: plan)) \(plan.periodUnitDisplay)\(selected)"
+        return "\(plan.displayName), \(priceText(for: plan)) \(priceUnit(for: plan))\(selected)"
     }
 
     private static let currencyFormatter: NumberFormatter = {

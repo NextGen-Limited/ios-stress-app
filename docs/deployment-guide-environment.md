@@ -2,7 +2,7 @@
 
 **Platform:** iOS 17+ / watchOS 10+
 **Section:** Setup, Requirements, Build Instructions
-**Last Updated:** June 17, 2026
+**Last Updated:** July 19, 2026
 
 ---
 
@@ -93,6 +93,40 @@ Widget:              com.stressmonitor.app.widgets
 App Groups:          group.com.stressmonitor.app
 iCloud Container:    iCloud.com.stressmonitor.app
 ```
+
+### 6. Configure SupabaseConfig (Required for AI Chat)
+
+The app uses **SupabaseLLMService** for production AI chat via Supabase Edge Functions with SSE streaming.
+
+**Setup Steps:**
+
+1. Create a Supabase project (https://supabase.io)
+2. Get your project credentials:
+   - **Project URL** (example: `https://your-project.supabase.co`)
+   - **Anon Key** (public API key from Settings → API)
+3. Update `Services/LLM/SupabaseConfig.swift`:
+
+```swift
+// Services/LLM/SupabaseConfig.swift
+struct SupabaseConfig {
+    static let url = "https://your-project.supabase.co"
+    static let anonKey = "your-anon-public-key"
+}
+```
+
+4. Verify the configuration in **Xcode Scheme** → **Run** → **Environment Variables**:
+   - Set `SUPABASE_URL` and `SUPABASE_ANON_KEY` if using env-based config (optional)
+
+5. Test the connection (before building):
+   ```bash
+   curl -X POST "https://your-project.supabase.co/functions/v1/chat" \
+     -H "Authorization: Bearer your-anon-key" \
+     -H "Content-Type: application/json" \
+     -d '{"messages":[{"role":"user","content":"test"}]}'
+   ```
+   Should return streaming response or empty 200 OK.
+
+**Note:** SupabaseConfig endpoint is checked during app startup. If misconfigured, AI Chat will show an error prompt but won't crash the app.
 
 ---
 

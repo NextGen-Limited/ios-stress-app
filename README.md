@@ -148,7 +148,7 @@ Data Layer (SwiftData + CloudKit)
 
 ## Dependencies
 
-Swift Package Manager (13 packages):
+Swift Package Manager (8 packages):
 
 | Package | Purpose |
 |---------|---------|
@@ -222,5 +222,5 @@ xcodebuild test -scheme StressMonitor \
 **Created by:** Phuong Doan
 **Version:** 1.0 Pre-Ship RC1
 **Platform:** iOS 17+ / watchOS 10+
-**Last Updated:** June 13, 2026
-**Ship Status:** B1 ✅ (Jun 7), B2 ✅ (Jun 12), B3 🚫 (test suite pending)
+**Last Updated:** July 19, 2026
+**Ship Status:** B1 ✅ (Jun 7), B2 ✅ (Jun 12), B3 🚫 (test suite pending - estimated July 2026 resolution)

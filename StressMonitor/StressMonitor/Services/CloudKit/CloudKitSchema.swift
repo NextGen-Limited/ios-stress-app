@@ -9,6 +9,10 @@ enum CloudKitRecordType: String, Sendable {
 }
 
 // MARK: - StressMeasurement Record
+// NOT the live schema — CloudKitManager.saveMeasurement/convertRecordToMeasurement and
+// CloudKitSyncEngine.uploadBatch are the actual read/write paths (encryptedValues for
+// hrv/stressLevel/restingHeartRate). This struct has zero call sites; its plain-key
+// mapping below is stale and would silently fail to decrypt/decode a live record.
 struct CloudKitStressMeasurement: Sendable {
     let recordID: CKRecord.ID
     let timestamp: Date
