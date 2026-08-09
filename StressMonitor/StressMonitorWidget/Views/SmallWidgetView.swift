@@ -18,7 +18,7 @@ public struct SmallWidgetView: View {
             if entry.isPlaceholder {
                 placeholderView
             } else if let stress = entry.latestStress {
-                stressContent(stress: stress)
+                stressContent(stress: stress, isStale: entry.dataState == .stale)
             } else {
                 emptyStateView
             }
@@ -29,17 +29,25 @@ public struct SmallWidgetView: View {
     // MARK: - Character-Reactive Content
 
     @ViewBuilder
-    private func stressContent(stress: StressData) -> some View {
+    private func stressContent(stress: StressData, isStale: Bool) -> some View {
         let tier = WidgetStressTier.from(level: stress.level)
 
         VStack(spacing: 6) {
             WidgetCharacterFace(tier: tier, size: 68, showsRing: true, glow: true)
 
-            Text(tier.label)
-                .font(.system(size: 12, weight: .semibold, design: .rounded))
-                .foregroundColor(tier.accent)
-                .contentTransition(.opacity)
+            if isStale {
+                Text(stress.timestamp, format: .relative(presentation: .named))
+                    .font(.system(size: 12, weight: .medium))
+                    .foregroundColor(.secondary)
+                    .contentTransition(.opacity)
+            } else {
+                Text(tier.label)
+                    .font(.system(size: 12, weight: .semibold, design: .rounded))
+                    .foregroundColor(tier.accent)
+                    .contentTransition(.opacity)
+            }
         }
+        .opacity(isStale ? 0.6 : 1.0)
         .padding(12)
         .frame(maxWidth: .infinity, maxHeight: .infinity)
     }

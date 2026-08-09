@@ -12,7 +12,7 @@ struct SubscriptionPlan: Identifiable {
     let pricePerMonth: Decimal
     let pricePerPeriod: Decimal
     let period: SubscriptionPeriod
-    let savingsPercent: Int?
+    var savingsPercent: Int?
     let isBestValue: Bool
     let subtitle: String?
 
@@ -20,6 +20,7 @@ struct SubscriptionPlan: Identifiable {
     let productID: String?
     let displayPrice: String?
     let billingSummary: String?
+    let hasIntroductoryOffer: Bool
 
     /// Human-readable period unit for display (e.g. "/week", "/month", "/year").
     var periodUnitDisplay: String {
@@ -63,7 +64,8 @@ struct SubscriptionPlan: Identifiable {
             subtitle: "Best value option",
             productID: nil,
             displayPrice: nil,
-            billingSummary: "Billed annually"
+            billingSummary: "Billed annually",
+            hasIntroductoryOffer: false
         ),
         SubscriptionPlan(
             id: .monthly,
@@ -76,7 +78,8 @@ struct SubscriptionPlan: Identifiable {
             subtitle: "Most popular",
             productID: nil,
             displayPrice: nil,
-            billingSummary: "Billed monthly"
+            billingSummary: "Billed monthly",
+            hasIntroductoryOffer: false
         ),
         SubscriptionPlan(
             id: .weekly,
@@ -89,7 +92,8 @@ struct SubscriptionPlan: Identifiable {
             subtitle: "Try it out, cancel anytime",
             productID: nil,
             displayPrice: nil,
-            billingSummary: "Billed weekly"
+            billingSummary: "Billed weekly",
+            hasIntroductoryOffer: false
         )
     ]
 }

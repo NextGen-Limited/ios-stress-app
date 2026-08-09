@@ -17,7 +17,7 @@ public struct LargeWidgetView: View {
             if entry.isPlaceholder {
                 placeholderView
             } else if let stress = entry.latestStress {
-                stressContent(stress: stress)
+                stressContent(stress: stress, isStale: entry.dataState == .stale)
             } else {
                 emptyStateView
             }
@@ -28,28 +28,31 @@ public struct LargeWidgetView: View {
     // MARK: - Character-Reactive Content
 
     @ViewBuilder
-    private func stressContent(stress: StressData) -> some View {
+    private func stressContent(stress: StressData, isStale: Bool) -> some View {
         let tier = WidgetStressTier.from(level: stress.level)
 
         VStack(spacing: 0) {
-            headerSection(tier: tier, stress: stress)
+            headerSection(tier: tier, stress: stress, isStale: isStale)
 
             Divider().opacity(0.3)
 
             if entry.history.count >= 2 {
                 historyChartSection(tier: tier)
+            } else {
+                gatheringDataSection
             }
 
             Divider().opacity(0.3)
 
             moodDescriptorsSection(tier: tier)
         }
+        .opacity(isStale ? 0.6 : 1.0)
     }
 
     // MARK: - Header
 
     @ViewBuilder
-    private func headerSection(tier: WidgetStressTier, stress: StressData) -> some View {
+    private func headerSection(tier: WidgetStressTier, stress: StressData, isStale: Bool) -> some View {
         HStack(spacing: 14) {
             WidgetCharacterFace(tier: tier, size: 72, showsRing: true, glow: true)
 
@@ -59,7 +62,7 @@ public struct LargeWidgetView: View {
                     .foregroundColor(tier.accent)
                     .contentTransition(.opacity)
 
-                Text(stress.timestamp.formatted(.relative(presentation: .named)))
+                Text((isStale ? "Stale · " : "") + stress.timestamp.formatted(.relative(presentation: .named)))
                     .font(.system(size: 10))
                     .foregroundColor(.secondary)
             }
@@ -69,6 +72,22 @@ public struct LargeWidgetView: View {
         .padding(.horizontal, 14)
         .padding(.top, 14)
         .padding(.bottom, 10)
+    }
+
+    // MARK: - Gathering Data Placeholder (history not yet published)
+
+    private var gatheringDataSection: some View {
+        VStack(spacing: 8) {
+            Image(systemName: "waveform.path.ecg")
+                .font(.system(size: 20))
+                .foregroundColor(.secondary.opacity(0.6))
+            Text("Gathering data…")
+                .font(.system(size: 9))
+                .foregroundColor(.secondary)
+        }
+        .frame(maxWidth: .infinity)
+        .frame(height: 80)
+        .padding(.vertical, 8)
     }
 
     // MARK: - History Chart (no axis labels)

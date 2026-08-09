@@ -7,7 +7,7 @@ public final class WidgetDataProvider {
 
     // MARK: - Constants
 
-    static let appGroupID = "group.com.stressmonitor.app"
+    static let appGroupID = "group.stress.ai.com"
 
     // MARK: - UserDefaults Keys
 

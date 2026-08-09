@@ -46,13 +46,16 @@ public struct StressWidgetProvider: TimelineProvider {
         let history = dataProvider.getHistory(limit: 20)
         let baseline = dataProvider.getBaseline()
 
+        let dataState = WidgetDataState.resolve(latestTimestamp: latestStress?.timestamp, now: currentDate)
+
         // Create the entry
         let entry = StressEntry(
             date: currentDate,
             latestStress: latestStress,
             history: history,
             baseline: baseline,
-            isPlaceholder: latestStress == nil
+            isPlaceholder: false,
+            dataState: dataState
         )
 
         // Calculate next update time (every 15 minutes)
@@ -123,6 +126,23 @@ public struct StressEntry: TimelineEntry {
     public let history: [StressData]
     public let baseline: (hrv: Double, restingHeartRate: Double)?
     public let isPlaceholder: Bool
+    public let dataState: WidgetDataState
+
+    public init(
+        date: Date,
+        latestStress: StressData?,
+        history: [StressData],
+        baseline: (hrv: Double, restingHeartRate: Double)?,
+        isPlaceholder: Bool,
+        dataState: WidgetDataState = .fresh
+    ) {
+        self.date = date
+        self.latestStress = latestStress
+        self.history = history
+        self.baseline = baseline
+        self.isPlaceholder = isPlaceholder
+        self.dataState = dataState
+    }
 
     /// Returns true if we have valid stress data to display
     public var hasValidData: Bool {
@@ -146,6 +166,23 @@ public struct StressEntry: TimelineEntry {
         if diff > 10 { return .increasing }
         if diff < -10 { return .decreasing }
         return .stable
+    }
+}
+
+// MARK: - Widget Data State
+
+/// Resolves whether the widget's latest measurement is fresh, stale, or absent.
+///
+/// Must stay byte-identical to its copy in WidgetSharedData.swift (app target) —
+/// the two live in separate compile targets and can't share a type (no shared
+/// module in this project), so they're duplicated by convention, same as
+/// WidgetPublisher/WidgetDataProvider.Keys.
+public enum WidgetDataState: Equatable, Sendable {
+    case fresh, stale, empty
+
+    public static func resolve(latestTimestamp: Date?, now: Date, stalenessThreshold: TimeInterval = 24 * 3600) -> WidgetDataState {
+        guard let latestTimestamp else { return .empty }
+        return now.timeIntervalSince(latestTimestamp) > stalenessThreshold ? .stale : .fresh
     }
 }
 

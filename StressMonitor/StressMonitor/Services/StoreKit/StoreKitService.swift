@@ -47,12 +47,25 @@ final class StoreKitService: StoreKitServiceProtocol {
                 }
 
                 // Map to SubscriptionPlan, sorted annual first, then monthly, then weekly
-                let plans = products.compactMap { [catalog] product -> SubscriptionPlan? in
+                var plans = products.compactMap { [catalog] product -> SubscriptionPlan? in
                     guard let period = catalog.period(for: product.id) else { return nil }
                     return Self.planFromProduct(product, period: period, catalog: catalog)
                 }
                 .sorted { lhs, rhs in
                     Self.periodSortOrder(lhs.period) < Self.periodSortOrder(rhs.period)
+                }
+
+                // Real savings, not a hardcoded guess — needs both prices loaded
+                // together, which is only true here, after all products fetched.
+                if let monthly = plans.first(where: { $0.period == .monthly }),
+                   let annualIndex = plans.firstIndex(where: { $0.period == .annual }),
+                   monthly.pricePerMonth > 0 {
+                    let annualPricePerMonth = plans[annualIndex].pricePerMonth
+                    let savings = (monthly.pricePerMonth - annualPricePerMonth) / monthly.pricePerMonth
+                    let percent = Int((savings as NSDecimalNumber).doubleValue * 100)
+                    if percent > 0 {
+                        plans[annualIndex].savingsPercent = percent
+                    }
                 }
 
                 return plans.isEmpty ? SubscriptionPlan.defaultPlans : plans
@@ -256,9 +269,10 @@ final class StoreKitService: StoreKitServiceProtocol {
             }
         }()
 
-        var savingsPercent: Int?
-        // We'd need both prices for savings calc; skip if only one product loaded
-        // The savings will be computed at display time or left nil
+        // Computed after all products load — see availablePlans. A lone
+        // product (e.g. only the annual tier configured) leaves this nil,
+        // which is honest; a hardcoded guess here was not.
+        let savingsPercent: Int? = nil
 
         return SubscriptionPlan(
             id: period,
@@ -271,7 +285,8 @@ final class StoreKitService: StoreKitServiceProtocol {
             subtitle: isAnnual ? "Best value option" : nil,
             productID: product.id,
             displayPrice: product.displayPrice,
-            billingSummary: billingSummary
+            billingSummary: billingSummary,
+            hasIntroductoryOffer: product.subscription?.introductoryOffer != nil
         )
     }
 

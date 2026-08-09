@@ -55,10 +55,11 @@ struct IAPPremiumView: View {
                     .padding(.horizontal, 16)
                     .padding(.top, 24)
 
-                    // Section 4 — 7-day trial prominence + CTA handled by sticky bar
-                    trialBanner
-                        .padding(.horizontal, 16)
-                        .padding(.top, 18)
+                    if viewModel.selectedPlanDetails?.hasIntroductoryOffer == true {
+                        trialBanner
+                            .padding(.horizontal, 16)
+                            .padding(.top, 18)
+                    }
 
                     // Section 5 — Trust indicators
                     TrustRow()

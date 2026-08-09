@@ -138,14 +138,26 @@ final class ChatViewModel {
             }
         } catch let error as LLMServiceError {
             if case .exceededContext = error {
+                // Intentionally discards any partial text — the whole
+                // conversation is being cleared to recover from overflow.
                 messages.removeAll()
                 errorMessage = error.localizedDescription
             } else {
+                preservePartialResponseIfNeeded()
                 errorMessage = error.localizedDescription
             }
         } catch {
+            preservePartialResponseIfNeeded()
             errorMessage = error.localizedDescription
         }
+    }
+
+    /// Mirrors the partial-text preservation `cancelResponse()` already does —
+    /// a network drop mid-stream shouldn't lose the tokens received so far.
+    private func preservePartialResponseIfNeeded() {
+        guard !currentStreamingText.isEmpty else { return }
+        let partial = ChatMessage(role: .assistant, content: currentStreamingText)
+        messages.append(partial)
     }
 
     // MARK: - Context Management

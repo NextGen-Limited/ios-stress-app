@@ -97,8 +97,66 @@ enum StressTrend: String, Codable {
 
 // MARK: - App Groups Constants
 enum WidgetConstants {
-    static let appGroupID = "group.com.stressmonitor.app"
+    static let appGroupID = "group.stress.ai.com"
     static let latestMeasurementKey = "latestMeasurement"
     static let widgetHistoryKey = "widgetHistory"
     static let lastUpdateKey = "lastUpdate"
+}
+
+// MARK: - Widget Publishing (main-app write side)
+
+/// Writes the latest measurement into the App Group suite that
+/// `WidgetDataProvider` (widget extension target) reads from, then reloads
+/// the widget timeline. Without this, `StressWidgetProvider` always falls
+/// back to its hardcoded placeholder — there was previously no call site
+/// anywhere in the main app target that wrote this data.
+///
+/// Key names below MUST match `WidgetDataProvider.Keys` exactly — the two
+/// live in separate compile targets and can't share a type (no shared
+/// module in this project), so they're duplicated by convention, not code.
+///
+/// Scope note: publishes latest-measurement only. History (sparkline) and
+/// baseline publishing are not yet wired — `StressWidgetProvider` degrades
+/// gracefully to an empty trend line when history is absent, so this still
+/// converts the widget from "always fake" to "shows real current data."
+enum WidgetPublisher {
+    private enum Keys {
+        static let latestStressLevel = "latest_stress_level"
+        static let latestStressCategory = "latest_stress_category"
+        static let latestHRV = "latest_hrv"
+        static let latestHeartRate = "latest_heart_rate"
+        static let latestTimestamp = "latest_timestamp"
+        static let latestConfidence = "latest_confidence"
+    }
+
+    static func publish(_ measurement: StressMeasurement) {
+        guard let defaults = UserDefaults(suiteName: WidgetConstants.appGroupID) else { return }
+
+        let confidences = measurement.confidences ?? []
+        let confidence = confidences.isEmpty ? 1.0 : confidences.reduce(0, +) / Double(confidences.count)
+
+        defaults.set(measurement.stressLevel, forKey: Keys.latestStressLevel)
+        defaults.set(measurement.categoryRawValue, forKey: Keys.latestStressCategory)
+        defaults.set(measurement.hrv, forKey: Keys.latestHRV)
+        defaults.set(measurement.restingHeartRate, forKey: Keys.latestHeartRate)
+        defaults.set(confidence, forKey: Keys.latestConfidence)
+        defaults.set(measurement.timestamp.timeIntervalSince1970, forKey: Keys.latestTimestamp)
+
+        WidgetCenter.shared.reloadAllTimelines()
+    }
+}
+
+/// Resolves whether the widget's latest measurement is fresh, stale, or absent.
+///
+/// Must stay byte-identical to its copy in StressWidgetProvider.swift — the two
+/// live in separate compile targets and can't share a type (no shared module in
+/// this project), so they're duplicated by convention, same as WidgetPublisher/
+/// WidgetDataProvider.Keys.
+enum WidgetDataState: Equatable, Sendable {
+    case fresh, stale, empty
+
+    static func resolve(latestTimestamp: Date?, now: Date, stalenessThreshold: TimeInterval = 24 * 3600) -> WidgetDataState {
+        guard let latestTimestamp else { return .empty }
+        return now.timeIntervalSince(latestTimestamp) > stalenessThreshold ? .stale : .fresh
+    }
 }

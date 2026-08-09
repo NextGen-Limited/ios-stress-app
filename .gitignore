@@ -154,6 +154,7 @@ DerivedData/
 # Runtime logs and session state
 .omx/logs/
 .claude/session-state/
+.claude/worktrees/
 tmp-home/
 .gitnexus
 vendor/bundle
@@ -163,3 +164,12 @@ build/
 # Supabase local secrets (auto-generated, do not commit)
 StressMonitor/StressMonitor/Services/LLM/SupabaseSecrets.swift
 supabase/.temp/
+
+# spm-cache (sandbox, lockfile, build artifacts - regenerated locally)
+StressMonitor/spm-cache/
+StressMonitor/spm-cache.lock
+StressMonitor/spm-cache.yml
+StressMonitor/build_output.log
+StressMonitor/test_output.log
+.claude/
+StressMonitor/StressMonitor.xcodeproj/StressMonitor.xcodeproj/

@@ -54,6 +54,8 @@ final class StressRepository: StressRepositoryProtocol {
             throw RepositoryError.saveFailed(error)
         }
 
+        WidgetPublisher.publish(measurement)
+
         // Trigger CloudKit sync if available
         if cloudKitManager != nil {
             await syncMeasurementToCloudKit(measurement)

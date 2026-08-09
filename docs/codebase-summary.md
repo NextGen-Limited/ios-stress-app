@@ -1,9 +1,9 @@
 # Codebase Summary
 
-**Total Files:** ~720+ files (including 389 Swift files)
-**Total LOC:** ~41,000+
+**Total Files:** ~740+ files (including 408 Swift files)
+**Total LOC:** ~57,000+
 **Architecture:** MVVM + Protocol-Oriented Design
-**Last Updated:** June 27, 2026
+**Last Updated:** July 19, 2026
 
 ---
 
@@ -12,9 +12,9 @@
 ```
 ios-stress-app/
 ├── StressMonitor/                      # Xcode project root
-│   ├── StressMonitor/                  # iOS App (298 files)
+│   ├── StressMonitor/                  # iOS App (292 files)
 │   │   ├── Models/                     # Data models (18 files)
-│   │   ├── Services/                   # Business logic (46 files)
+│   │   ├── Services/                   # Business logic (60+ files)
 │   │   ├── ViewModels/                 # State management (4+ files)
 │   │   ├── Views/                      # SwiftUI screens (~100 files)
 │   │   ├── Theme/                      # Design tokens (5 files)
@@ -31,7 +31,7 @@ ios-stress-app/
 
 ---
 
-## iOS App Structure (298 Swift files)
+## iOS App Structure (292 Swift files)
 
 ### Models (23 files, ~1,300 LOC)
 Core data structures for health metrics, stress calculations, and character system.
@@ -61,7 +61,7 @@ Core data structures for health metrics, stress calculations, and character syst
 | `CharacterUnlock.swift` | Character unlock state + evolution progress |
 | `BioAgeResult.swift` | Biological age calculation output with trend (NEW: Jun 17) |
 
-### Services (60+ files, ~9,000 LOC)
+### Services (60+ files, ~10,000 LOC)
 Business logic and system integrations.
 
 #### Algorithm Services (11 files)
@@ -91,12 +91,12 @@ Business logic and system integrations.
 
 #### LLM Services (7 files)
 - `LLMServiceProtocol.swift` - AI service abstraction
-- `SupabaseLLMService.swift` - Cloud LLM via Supabase Edge Functions with SSE streaming
+- `SupabaseLLMService.swift` - **Sole production LLM** via Supabase Edge Functions with SSE streaming (Apple Intelligence fallback removed)
 - `ChatContextBuilder.swift` - Conversation context management
 - `ChatQuickActions.swift` - Quick response suggestions
 - `SSEParser.swift` - Server-Sent Events streaming parser
 - `StressContextPayload.swift` - Health context for LLM system prompt
-- `LLMServiceError.swift` - Typed error handling
+- `SupabaseConfig.swift` / `SupabaseSecrets.swift` - Endpoint + Keychain-backed credentials
 
 #### Data Management Services (9 files)
 - `DataManagementService.swift` - Central data management
@@ -340,6 +340,53 @@ The app uses a 3-tab navigation structure:
 
 ---
 
+## watchOS App Structure (74 Swift files)
+
+List-based navigation redesign (Jul 2026) — replaces the 6-page swipe `TabView` (which violated Apple HIG's 2–4 page limit) with a root `NavigationStack` + scrollable list menu.
+
+### Watch Views
+| File | Purpose |
+|------|---------|
+| `WatchMenuView.swift` | Root menu list — header (character face + stress tier) + navigation rows |
+| `WatchHomeView.swift` | Stress overview with character face, sparkline, watch-face background |
+| `WatchBioAgeCardView.swift` | Biological age card (est. age, diff, confidence bar) |
+| `WatchBreatheView.swift` | Guided breathing session |
+| `WatchWorkoutView.swift` | Live heart-rate zones during workout (BPM hero, zone badge, distribution chart) |
+| `WatchCycleView.swift` | Menstrual-cycle phase tracking with stress-correlation notes |
+| `WatchLoggingView.swift` | Daily habit check-in (hydration/caffeine/sunlight) + mood picker |
+| `WatchHistoryView.swift` | Historical measurements |
+
+### Watch ViewModels
+- `WatchStressViewModel`, `WatchWorkoutViewModel`, `WatchCycleViewModel`, `WatchHabitViewModel`, `WatchMoodViewModel`
+
+### Watch Theme System (`Theme/`)
+- `WatchDesignTokens.swift` — canvas, surfaces, ink ramp, spacing, radii
+- `StressCharacter.swift` — 5 elemental creatures (Ripple/Blossom/Ember/Zephyr/Lumi) with element colors
+- `WatchFaceBackgroundStyle.swift` — selectable background styles
+- `Color+Extensions.swift` — hex initializer
+
+### Watch Models (20 files)
+Includes shared stress models plus watch-specific: `SeasonalTheme` (spring/lunarNewYear/halloween/holiday costume overlays), `CyclePhase`, `Habit`, `Mood`, `WorkoutZone`, `TierNamePreferences`, `WatchFacePreferences`.
+
+---
+
+## Navigation Architecture (NEW - Jun 2026)
+
+### AppRouter (`Navigation/AppRouter.swift`)
+- Central `@Observable` navigation state injected at app root via `.environment()`
+- Owns `selectedTab` plus one `NavigationPath` per primary tab (home, action, trends, settings)
+- Enables programmatic navigation, deep links, and cross-tab routing without scattered `@State` booleans
+- `Route` enum (Hashable + Codable) enumerates every pushable screen; `View.stressNavigationDestinations()` resolves routes to screens
+- State restoration via `NavigationPath.CodableRepresentation` serialized to `@SceneStorage` (defensive decode on schema drift)
+
+### PaywallController (`Services/Premium/PaywallController.swift`)
+- Single source of truth for presenting the paywall **full-screen, from anywhere**
+- `@Observable`, mounted once at app root via `.fullScreenCover(item:)`
+- Any view presents via `paywall.present(reason:)`; no-op when user is already premium
+- `PaywallReason` cases: general, trendsLongRange, bioAgeDetail, characters, breathingAdvanced, feature(named:)
+
+---
+
 ## Implementation Standards
 
 ### Architecture Patterns
@@ -394,10 +441,10 @@ Design source exports live in `design/exports/characters/` and `design/exports/m
 
 | Metric | Value |
 |--------|-------|
-| **Total Swift Files** | 389 |
-| **Total LOC** | ~41,000+ |
-| **iOS App Files** | 298 |
-| **watchOS App Files** | 52 |
+| **Total Swift Files** | 408 |
+| **Total LOC** | ~57,000+ |
+| **iOS App Files** | 292 |
+| **watchOS App Files** | 74 |
 | **Widget Files** | 13 |
 | **Test Files** | 5 |
 | **External Dependencies** | 8 SPM packages (2 direct) |
@@ -408,5 +455,5 @@ Design source exports live in `design/exports/characters/` and `design/exports/m
 
 ---
 
-**Last Updated:** June 27, 2026
+**Last Updated:** July 1, 2026
 **Maintainers:** Phuong Doan

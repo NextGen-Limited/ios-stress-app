@@ -12,7 +12,7 @@ import WidgetKit
 enum WatchFacePreferences {
 
     /// Must match `ComplicationDataProvider.suiteName`.
-    static let suiteName = "group.com.stressmonitor.watch"
+    static let suiteName = "group.stress.ai.com"
 
     static var defaults: UserDefaults {
         UserDefaults(suiteName: suiteName) ?? .standard

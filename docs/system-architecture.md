@@ -3,7 +3,7 @@
 **Pattern:** MVVM + Protocol-Oriented Design
 **Concurrency:** async/await
 **Data Flow:** Unidirectional (Models -> Services -> ViewModels -> Views)
-**Last Updated:** June 17, 2026
+**Last Updated:** July 19, 2026
 
 ---
 
@@ -190,7 +190,7 @@ UI Updates on screen
   - Configurable endpoint via `SupabaseConfig` (URL + anonKey) for easy deployment switching
   - Fully tested in production; reliable streaming with SSE (Server-Sent Events)
   - SSE streaming: `data: {"token": "..."}` with `[DONE]` sentinel
-  - Health context injection via `StressContextPayload` (anonymized)
+  - Health context injection via `StressContextPayload` (derived stress score/category/confidence/trend + per-factor scores; session-linked via Bearer JWT, not anonymized)
   - Graceful fallback when server unreachable
   - Real deployment ready as of Jun 12, 2026
 - `SSEParser` -- Server-Sent Events parser for streaming responses
@@ -338,10 +338,10 @@ let viewModel = StressViewModel(healthKit: MockHealthKitManager())
 - User can export/delete anytime
 
 ### Privacy
-- SupabaseLLMService sends anonymized chat context to Supabase Edge Functions; health data stays on-device
+- SupabaseLLMService sends derived stress-context (score, category, confidence, trend, per-factor HRV/heart-rate/sleep/activity/recovery scores — never raw HealthKit readings) to Supabase Edge Functions, under a Bearer-JWT-authenticated session
 - No telemetry or analytics
 - No third-party analytics services
-- Health data never leaves device+iCloud
+- Raw HealthKit readings never leave device+iCloud; the AI Coaching Chat context above is the one exception that is transmitted
 - SSE streaming ensures real-time AI responses without persistent data storage
 
 ---

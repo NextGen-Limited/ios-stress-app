@@ -3,7 +3,7 @@
 **Pattern:** MVVM + Protocol-Oriented Design
 **Concurrency:** async/await
 **Section:** CloudKit, Watch, widgets, security, extensibility
-**Last Updated:** June 17, 2026
+**Last Updated:** July 19, 2026
 
 ---
 
@@ -85,13 +85,28 @@ Watch app operates **independently** without iPhone:
 Apple Watch
 ├── HealthKit (direct sensor access)
 ├── WatchHealthKitManager
-├── WatchStressCalculator
+├── MultiFactorStressCalculator
 ├── SwiftData (local storage)
 ├── CloudKit (E2E sync)
 ├── WidgetKit Complications
 ├── WatchFacePreferences (background personalization)
+├── SeasonalTheme (character costume overlays)
 └── WatchConnectivityManager (sync with iPhone)
 ```
+
+### List-Based Navigation Redesign (Jul 2026)
+
+The watch app replaced its 6-page swipe `TabView` (which violated Apple HIG's 2–4 page limit for page-based navigation) with a root `NavigationStack` + scrollable list menu (`WatchMenuView`). Every screen is one tap away; the Digital Crown scrolls naturally.
+
+**Menu destinations:** Home, Bio Age, Breathe, Workout, Cycle, Logging, History.
+
+**New watch screens (Jul 2026):**
+- **Workout** — live heart-rate zones during a workout (BPM hero, current-zone badge, per-zone distribution chart)
+- **Cycle** — menstrual-cycle phase tracking with stress-correlation notes
+- **Logging** — daily habit check-in (hydration/caffeine/sunlight rings) + 5-button mood picker
+- **Bio Age** — biological age card with confidence bar
+
+**Seasonal themes:** Optional costume/overlay themes for the watch character (`SeasonalTheme`: none, spring, lunarNewYear, halloween, holiday).
 
 ### Watch Face Background Personalization (NEW - Jun 17)
 
@@ -109,14 +124,14 @@ Apple Watch
 
 ### Watch Character-Reactive Design (NEW - Jun 2026)
 
-**5 Stress Tiers mapped to emoji (NO numeric scores):**
-- **0-20:** 😴 Resting → Blue
-- **21-40:** 😊 Calm → Green
-- **41-60:** 😐 Balanced → Indigo
-- **61-80:** 😰 Tense → Orange
-- **81-100:** 🐚 Overwhelmed → Purple
+**5 Stress Tiers (stress category enum, dual-coded color + icon):**
+- **Relaxed** → Green
+- **Mild** → Blue
+- **Moderate** → Indigo
+- **High** → Orange
+- **Severe** → Purple
 
-**WatchHomeView** displays Ripple character face with 5 stress tier moods, full-day sparkline, and no numeric stress display.
+**WatchHomeView** displays the character face with tier mood, full-day sparkline, and watch-face background personalization. Numeric scores appear in the menu header and complications but the home canvas leads with the character.
 
 ### Watch Complications (WidgetKit)
 
@@ -241,9 +256,9 @@ let watchDefaults = UserDefaults(suiteName: "group.com.stressmonitor.watch")
 - Graceful error handling on access denied or keychain unavailable
 
 ### Privacy
-- SupabaseLLMService sends anonymized chat context to Supabase Edge Functions; health data stays on-device
+- SupabaseLLMService sends derived stress-context (score, category, confidence, trend, per-factor HRV/heart-rate/sleep/activity/recovery scores — never raw HealthKit readings) to Supabase Edge Functions, under a Bearer-JWT-authenticated session
 - No telemetry or analytics
-- Health data never leaves device+iCloud
+- Raw HealthKit readings never leave device+iCloud; the AI Coaching Chat context above is the one exception that is transmitted
 - SSE streaming ensures real-time AI responses without persistent data storage
 
 ---
@@ -379,4 +394,4 @@ BreathingExerciseView (setup)
 **Previous:** See `system-architecture-core.md` for core MVVM and service architecture.
 **Maintained By:** Phuong Doan
 **Version:** 1.0 Production
-**Last Updated:** June 19, 2026
+**Last Updated:** July 19, 2026

@@ -76,9 +76,12 @@ public final class CloudKitSyncEngine {
         let records = batch.map { measurement -> CKRecord in
             let record = CKRecord(recordType: CloudKitRecordType.stressMeasurement.rawValue)
             record["timestamp"] = measurement.timestamp
-            record["stressLevel"] = measurement.stressLevel
-            record["hrv"] = measurement.hrv
-            record["restingHeartRate"] = measurement.restingHeartRate
+            // Must mirror CloudKitManager.saveMeasurement's encryptedValues usage —
+            // both paths write CD_StressMeasurement records read back by the same
+            // CloudKitManager.convertRecordToMeasurement.
+            record.encryptedValues["stressLevel"] = measurement.stressLevel
+            record.encryptedValues["hrv"] = measurement.hrv
+            record.encryptedValues["restingHeartRate"] = measurement.restingHeartRate
             record["category"] = measurement.categoryRawValue
             record["confidences"] = measurement.confidences ?? []
             record["deviceID"] = cloudKitManager.deviceID

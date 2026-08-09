@@ -1,7 +1,7 @@
 # StressMonitor Documentation Index
 
 **Version:** 1.0 (Pre-Ship RC1)
-**Last Updated:** June 27, 2026
+**Last Updated:** July 1, 2026
 **Blocker Status:** 1 critical remaining (B3 - comprehensive test suite rewrite)
 **Resolved Blockers:** B1 ✅ (Jun 7), B2 ✅ (Jun 12)
 
@@ -81,14 +81,14 @@ App Store editorial preparation, ASO keyword strategy, and submission-ready copy
 
 ## Quick Reference
 
-### Codebase Metrics (as of Jun 27, 2026)
+### Codebase Metrics (as of Jul 1, 2026)
 
 | Metric | Value |
 |--------|-------|
-| **Total Swift Files** | 389 |
-| **Total LOC** | ~41,000+ |
-| **iOS App** | 298 files, ~41K LOC |
-| **watchOS App** | 52 files |
+| **Total Swift Files** | 408 |
+| **Total LOC** | ~57,000+ |
+| **iOS App** | 292 files, ~57K LOC |
+| **watchOS App** | 74 files |
 | **Widgets** | 13 files |
 | **Tests** | 5 files (placeholder - pending B3 rewrite) |
 | **External Dependencies** | 8 SPM packages (2 direct: Chat, SwiftUICharts) |
@@ -158,6 +158,9 @@ App Store editorial preparation, ASO keyword strategy, and submission-ready copy
 | **Centralized Icon System** | `AppIconSystem` single source of truth for all SF Symbols (PR #44, 37 files migrated) |
 | **5-Level Stress Scale** | Relaxed/Mild/Moderate/High/Severe with WCAG dual-coding (color + icon + pattern) |
 | **GitHub Actions CI** | Automated build + test on macos-15 with SPM caching |
+| **AppRouter + PaywallController** | Centralized navigation state (deep links, per-tab paths) and single full-screen paywall entry (Jun–Jul 2026) |
+| **Watch List Navigation** | HIG-compliant scrollable list replacing 6-page TabView (Jul 2026) |
+| **SupabaseLLM Sole Backend** | Apple Intelligence fallback removed; Supabase Edge Functions the only LLM (Jul 2026) |
 
 ---
 
@@ -181,11 +184,11 @@ App Store editorial preparation, ASO keyword strategy, and submission-ready copy
 - User data ownership (full export/delete)
 
 **Security Measures:**
-- SupabaseLLMService sends chat messages (not raw health data) to Supabase Edge Functions
+- SupabaseLLMService sends chat messages and derived stress-context (score, category, confidence, trend, per-factor HRV/heart-rate/sleep/activity/recovery scores — never raw health data) to Supabase Edge Functions, under a Bearer-JWT-authenticated session
 - No telemetry or analytics
 - HealthKit authorization flow
 - Error handling for denied permissions
-- Health data never leaves device + iCloud (only anonymized chat context sent to LLM)
+- Raw HealthKit readings never leave device + iCloud; the AI Coaching Chat context above is the one exception that is transmitted, and it is session-linked, not anonymized
 
 ---
 
@@ -232,7 +235,7 @@ SwiftUI Views → @Observable ViewModels → Protocol-based Services
 
 | Version | Release | Status | Notable |
 |---------|---------|--------|---------|
-| **1.0** | Jul/Aug 2026 | 🔄 Pre-Ship RC1 | AI Chat with SSE streaming, 3-tab navigation (Home/Action/Trend) + Settings screen, Character Collection UI (5 characters, 3-stage evolution, 11 SVG assets), SupabaseLLM via Edge Functions, Box Breathing Figma alignment, Mini Walk exercise, Real StoreKit 2 (PR #19 Jun 12), Stress History, Guided Breathing, Watch Complications, Morning Readiness Check, **Centralized `AppIconSystem` (PR #44)**, **Character views → SVG assets (PR #45)**. **Remaining Blocker:** Test suite rewrite |
+| **1.0** | Jul/Aug 2026 | 🔄 Pre-Ship RC1 | AI Chat with SSE streaming, 3-tab navigation (Home/Action/Trend) + Settings screen, Character Collection UI (5 characters, 3-stage evolution, 11 SVG assets), SupabaseLLM via Edge Functions (sole backend — Apple Intelligence fallback removed), Box Breathing Figma alignment, Mini Walk exercise, Real StoreKit 2 (PR #19 Jun 12), Stress History, Guided Breathing, Watch Complications, Morning Readiness Check, **Centralized `AppIconSystem` (PR #44)**, **Character views → SVG assets (PR #45)**, **AppRouter + PaywallController (Jun 2026)**, **Watch list-based navigation redesign + Workout/Cycle/Logging/BioAge screens + Seasonal themes (Jul 2026)**. **Remaining Blocker:** Test suite rewrite |
 | **1.1** | Q3 2026 | 🔄 Planned | Advanced breathing, stress triggers, weekly reports, localization MVP |
 | **2.0** | Q4 2026 | 🎯 Concept | ML insights, Siri Shortcuts, iPad support |
 
@@ -240,6 +243,6 @@ SwiftUI Views → @Observable ViewModels → Protocol-based Services
 
 **Read the README.md** at project root for quick start and feature overview.
 
-**Last Updated:** June 27, 2026
+**Last Updated:** July 1, 2026
 **Maintained By:** Phuong Doan
 **Generated with:** repomix codebase analysis + manual documentation review

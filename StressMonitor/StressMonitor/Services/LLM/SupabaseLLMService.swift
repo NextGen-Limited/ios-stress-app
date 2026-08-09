@@ -25,21 +25,82 @@ final class SupabaseLLMService: LLMServiceProtocol, @unchecked Sendable {
 
     private static let keychainService = "com.stressmonitor.app"
     private static let keychainTokenAccount = "supabaseAccessToken"
+    private static let keychainRefreshTokenAccount = "supabaseRefreshToken"
+    private static let expiresAtDefaultsKey = "supabaseSessionExpiresAt"
     private static let sessionIdDefaultsKey = "supabaseChatSessionId"
+
+    private var refreshToken: String?
+    private var expiresAt: Date?
+    private let authService: SupabaseAuthServiceProtocol
+
+    /// Clears the persisted Supabase session. Called by data-deletion flows
+    /// (factory reset, full account wipe) so a wipe actually signs the user
+    /// out rather than leaving stale tokens behind.
+    static func clearStoredCredentials() {
+        try? KeychainService.delete(service: Self.keychainService, account: Self.keychainTokenAccount)
+        try? KeychainService.delete(service: Self.keychainService, account: Self.keychainRefreshTokenAccount)
+        UserDefaults.standard.removeObject(forKey: Self.expiresAtDefaultsKey)
+    }
 
     // MARK: - Init
 
-    init(accessToken: String? = nil) {
-        let storedToken = accessToken ?? KeychainService.retrieve(
+    init(accessToken: String? = nil, authService: SupabaseAuthServiceProtocol = SupabaseAuthService()) {
+        self.authService = authService
+        self.accessToken = accessToken ?? KeychainService.retrieve(
             service: Self.keychainService,
             account: Self.keychainTokenAccount
         )
-        // Fall back to guest JWT if no user token is stored (test mode).
-        // TODO: Replace with real SupabaseAuthService (Apple Sign-In) before production.
-        self.accessToken = storedToken ?? SupabaseConfig.guestJWT
+        self.refreshToken = KeychainService.retrieve(
+            service: Self.keychainService,
+            account: Self.keychainRefreshTokenAccount
+        )
+        if let epoch = UserDefaults.standard.object(forKey: Self.expiresAtDefaultsKey) as? Double {
+            self.expiresAt = Date(timeIntervalSince1970: epoch)
+        }
         if let storedSessionId = UserDefaults.standard.string(forKey: Self.sessionIdDefaultsKey) {
             self.sessionId = UUID(uuidString: storedSessionId)
         }
+    }
+
+    // MARK: - Session Establishment
+
+    /// Ensures a live, non-expired session before every `/chat` call. A
+    /// fresh install has no token at all — this is what replaces the old
+    /// hardcoded guest JWT, which was both a leaked credential and (being
+    /// long expired) a guaranteed 401 for every unauthenticated user.
+    ///
+    /// Requires `enable_anonymous_sign_ins = true` on the Supabase project.
+    /// This repo's tracked config.toml shows it disabled — unverified from
+    /// this session whether the live dashboard actually differs.
+    private func ensureValidSession() async throws {
+        if let token = accessToken, !token.isEmpty,
+           let expiresAt, expiresAt > Date().addingTimeInterval(60) {
+            return
+        }
+
+        if let refreshToken, !refreshToken.isEmpty {
+            do {
+                apply(session: try await authService.refreshSession(refreshToken: refreshToken))
+                return
+            } catch {
+                // Refresh token expired or revoked — fall through to a fresh
+                // anonymous session rather than failing the send outright.
+            }
+        }
+
+        apply(session: try await authService.signInAnonymously())
+    }
+
+    private func apply(session: SupabaseSession) {
+        setAccessToken(session.accessToken)
+        refreshToken = session.refreshToken
+        try? KeychainService.save(
+            session.refreshToken,
+            service: Self.keychainService,
+            account: Self.keychainRefreshTokenAccount
+        )
+        expiresAt = session.expiresAt
+        UserDefaults.standard.set(session.expiresAt.timeIntervalSince1970, forKey: Self.expiresAtDefaultsKey)
     }
 
     /// Update the access token (e.g. after sign-in or token refresh)
@@ -61,8 +122,12 @@ final class SupabaseLLMService: LLMServiceProtocol, @unchecked Sendable {
 
     // MARK: - LLMServiceProtocol
 
+    /// A session is established on demand inside `send()` (anonymous
+    /// sign-in / refresh), so availability no longer requires a token to
+    /// already be cached — only that the app itself is configured to talk
+    /// to Supabase at all.
     func isAvailable() -> Bool {
-        SupabaseConfig.isConfigured && accessToken?.isEmpty == false
+        SupabaseConfig.isConfigured
     }
 
     func send(
@@ -79,6 +144,15 @@ final class SupabaseLLMService: LLMServiceProtocol, @unchecked Sendable {
                     guard SupabaseConfig.isConfigured else {
                         continuation.finish(throwing: LLMServiceError.unavailable(
                             reason: "Supabase anon key is not configured. Set SUPABASE_ANON_KEY in the app build settings."
+                        ))
+                        return
+                    }
+
+                    do {
+                        try await self.ensureValidSession()
+                    } catch {
+                        continuation.finish(throwing: LLMServiceError.unavailable(
+                            reason: "Couldn't sign in. Check your connection and try again."
                         ))
                         return
                     }

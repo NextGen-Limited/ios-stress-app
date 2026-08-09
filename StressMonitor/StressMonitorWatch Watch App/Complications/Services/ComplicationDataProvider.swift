@@ -11,7 +11,7 @@ final class ComplicationDataProvider {
 
     /// App Groups suite identifier for data sharing
     /// Must match entitlements configuration
-    private let suiteName = "group.com.stressmonitor.watch"
+    private let suiteName = "group.stress.ai.com"
 
     /// UserDefaults instance with App Groups access
     private let defaults: UserDefaults?

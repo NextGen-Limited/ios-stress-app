@@ -40,6 +40,9 @@ struct ChatBottomSheetView: View {
             }
             .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
+            // Covers swipe-to-dismiss too, not just the Close button — without
+            // this the SSE stream and its owning objects outlive the sheet.
+            .onDisappear { viewModel.cancelResponse() }
             .toolbar {
                 ToolbarItem(placement: .topBarLeading) {
                     Button("Close") { dismiss() }

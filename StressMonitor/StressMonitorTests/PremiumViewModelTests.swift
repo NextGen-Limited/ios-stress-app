@@ -88,7 +88,8 @@ struct PremiumViewModelTests {
                 subtitle: nil,
                 productID: nil,
                 displayPrice: nil,
-                billingSummary: nil
+                billingSummary: nil,
+                hasIntroductoryOffer: false
             )
         ]
         let state = makeIsolatedState()

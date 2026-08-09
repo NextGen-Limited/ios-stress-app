@@ -47,9 +47,12 @@ public final class CloudKitManager: CloudKitServiceProtocol {
 
         let record = CKRecord(recordType: CloudKitRecordType.stressMeasurement.rawValue)
         record["timestamp"] = measurement.timestamp
-        record["stressLevel"] = measurement.stressLevel
-        record["hrv"] = measurement.hrv
-        record["restingHeartRate"] = measurement.restingHeartRate
+        // Health-derived fields stored via encryptedValues, not plain keys — CloudKit
+        // can still sync/back these up but cannot read them server-side. Never used
+        // in a query predicate (only `timestamp`/`deviceID` are), so this is safe.
+        record.encryptedValues["stressLevel"] = measurement.stressLevel
+        record.encryptedValues["hrv"] = measurement.hrv
+        record.encryptedValues["restingHeartRate"] = measurement.restingHeartRate
         record["category"] = measurement.categoryRawValue
         record["confidences"] = measurement.confidences ?? []
         record["deviceID"] = deviceID
@@ -212,9 +215,9 @@ public final class CloudKitManager: CloudKitServiceProtocol {
 
     private func convertRecordToMeasurement(_ record: CKRecord) -> StressMeasurement? {
         guard let timestamp = record["timestamp"] as? Date,
-              let stressLevel = record["stressLevel"] as? Double,
-              let hrv = record["hrv"] as? Double,
-              let restingHeartRate = record["restingHeartRate"] as? Double,
+              let stressLevel = record.encryptedValues["stressLevel"] as? Double,
+              let hrv = record.encryptedValues["hrv"] as? Double,
+              let restingHeartRate = record.encryptedValues["restingHeartRate"] as? Double,
               let categoryRawValue = record["category"] as? String else {
             return nil
         }

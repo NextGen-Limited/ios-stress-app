@@ -324,6 +324,11 @@ class DataExportViewModel {
             throw ExportError.fileAccessFailed
         }
 
+        // Health-derived exports are short-lived (generated, shared, done) —
+        // sweep anything left over from a previous export the user never
+        // cleaned up, rather than letting them accumulate indefinitely.
+        Self.removeStaleExports(in: tempDir)
+
         let fileURL = tempDir.appendingPathComponent("\(fileName).\(fileExtension)")
 
         await MainActor.run {
@@ -338,6 +343,10 @@ class DataExportViewModel {
         }
 
         try content.write(to: fileURL, atomically: true, encoding: .utf8)
+        try? FileManager.default.setAttributes(
+            [.protectionKey: FileProtectionType.complete],
+            ofItemAtPath: fileURL.path
+        )
 
         await MainActor.run {
             exportProgress = 1.0
@@ -345,6 +354,24 @@ class DataExportViewModel {
         }
 
         return fileURL
+    }
+
+    /// Deletes `stress_export_*` files older than one hour. Exports are
+    /// meant to be generated, shared via the share sheet, and discarded —
+    /// nothing else in this flow ever cleans them up.
+    private static func removeStaleExports(in directory: URL) {
+        let fileManager = FileManager.default
+        guard let contents = try? fileManager.contentsOfDirectory(
+            at: directory, includingPropertiesForKeys: [.contentModificationDateKey]
+        ) else { return }
+
+        let cutoff = Date().addingTimeInterval(-3600)
+        for url in contents where url.lastPathComponent.hasPrefix("stress_export_") {
+            let modified = (try? url.resourceValues(forKeys: [.contentModificationDateKey]))?.contentModificationDate
+            if let modified, modified < cutoff {
+                try? fileManager.removeItem(at: url)
+            }
+        }
     }
 
     private func fetchRecords(modelContext: ModelContext, limit: Int?) -> [StressMeasurement] {

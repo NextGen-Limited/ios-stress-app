@@ -1,5 +1,5 @@
 {
-  "originHash" : "aaf203ab9c6fbff873543c81f782f597227a6c474fcff9f8a9e64e8ffc0d0253",
+  "originHash" : "1ef16aaa748b52d7d796c38825f5600afbfa7ae2bb300c6d028b4928fc4ab999",
   "pins" : [
     {
       "identity" : "activityindicatorview",
@@ -15,8 +15,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/exyte/AnchoredPopup.git",
       "state" : {
-        "revision" : "2fb9d1ac101b86cbcc12a3f8e571648ce4469d18",
-        "version" : "1.1.3"
+        "revision" : "dfa61fd6e4e4a3bf8a918d44c69bf66f2ccd9bb7",
+        "version" : "1.2.1"
       }
     },
     {
@@ -24,8 +24,7 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/exyte/Chat.git",
       "state" : {
-        "revision" : "2ea8fc57f719d59940cab6551bcd518e2ec6191c",
-        "version" : "3.0.2"
+        "revision" : "2ea8fc57f719d59940cab6551bcd518e2ec6191c"
       }
     },
     {
@@ -42,8 +41,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/onevcat/Kingfisher",
       "state" : {
-        "revision" : "c152c1915f60c51e4afa0752656993ee5b3c63db",
-        "version" : "8.8.1"
+        "revision" : "410984bf301f4fa224fe56277b3f8672cc465c79",
+        "version" : "8.11.0"
       }
     },
     {
@@ -51,8 +50,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/SDWebImage/libwebp-Xcode",
       "state" : {
-        "revision" : "0d60654eeefd5d7d2bef3835804892c40225e8b2",
-        "version" : "1.5.0"
+        "revision" : "2b5256c29ff4e20f2a0d5ee863b62b1a22144434",
+        "version" : "1.6.0"
       }
     },
     {
@@ -60,8 +59,8 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/exyte/MediaPicker.git",
       "state" : {
-        "revision" : "ce2eda6300337d1478a78fc033bce8dd9bf4bb2c",
-        "version" : "3.3.2"
+        "revision" : "07fa01cdf08458d8e73379e51f13bc1d374ddb98",
+        "version" : "3.4.2"
       }
     },
     {
@@ -69,8 +68,7 @@
       "kind" : "remoteSourceControl",
       "location" : "https://github.com/willdale/SwiftUICharts.git",
       "state" : {
-        "revision" : "c16f47217d1e32900f6b37c322d419945fadae9c",
-        "version" : "2.10.4"
+        "revision" : "c16f47217d1e32900f6b37c322d419945fadae9c"
       }
     }
   ],

@@ -4,7 +4,7 @@
 **Concurrency:** async/await
 **Data Flow:** Unidirectional (Models -> Services -> ViewModels -> Views)
 **Section:** MVVM, data flow, core services, protocols
-**Last Updated:** June 27, 2026
+**Last Updated:** July 19, 2026
 
 ---
 
@@ -12,8 +12,9 @@
 
 ```
 ┌─────────────────────────────────────────────────────────┐
-│                    SwiftUI Views                         │
+│              SwiftUI Views + AppRouter                   │
 │  (Dashboard, Action, Trends, Breathing, Settings, Chat) │
+│   AppRouter: tab + per-tab NavigationPath (deep links)  │
 └──────────────────────┬──────────────────────────────────┘
                        │
                        ↓
@@ -90,6 +91,8 @@ struct DashboardView: View {
 - HealthKit APIs
 - File system
 - Sensors
+
+**Navigation:** Views push `Route` values via `NavigationLink(value:)` or `AppRouter.deepLink(to:in:)`. A single `.navigationDestination(for: Route.self)` block resolves routes to screens across all tabs. Paywall presentation goes through `@Environment(PaywallController.self)` — never a local `@State` boolean.
 
 ### ViewModel Layer (@Observable)
 
@@ -577,17 +580,20 @@ final class StubRepository: StressRepositoryProtocol {
 | Decision | Rationale | Trade-off |
 |----------|-----------|-----------|
 | **8 SPM packages** (2 direct: Chat, SwiftUICharts) | Chat UI + charting capabilities without reinventing | Dependency management overhead |
-| **SupabaseLLMService** (Edge Functions + SSE) | Production cloud LLM fallback for pre-iOS 26 devices; configurable via `SupabaseConfig` (B1 resolved Jun 7) | Chat context (not raw health data) sent to Supabase Edge Functions |
+| **SupabaseLLMService** (Edge Functions + SSE) | **Sole production LLM** — Apple Intelligence on-device fallback removed; configurable via `SupabaseConfig` (B1 resolved Jun 7) | Chat context (not raw health data) sent to Supabase Edge Functions |
 | **Local-first architecture** | Works offline, fast responsiveness | Eventual consistency |
 | **MVVM + Protocols** | Testability, loose coupling | More boilerplate |
 | **@Observable macro** | Modern, iOS 17+ reactive | Excludes iOS 16 |
 | **Centralized AppIconSystem** (PR #44) | Single source of truth for every icon; design-spec alignment | Central enum must stay in sync with `design/icon-system.html` |
 | **SVG-backed character assets** (PR #45) | Crisp at any size; design fidelity; `preserves-vector-representation: true` | Mood-reactivity delegated to a separate animation layer (StressBuddyIllustration) |
 | **5-level stress scale** (incl. Severe) | Finer-grained feedback; WCAG dual-coding (color + icon + pattern) | More categories to localize/illustrate |
+| **AppRouter + Route enum** (Jun 2026) | Centralized navigation state, deep links, cross-tab routing; Codable paths for state restoration | One more indirection for simple pushes |
+| **PaywallController** (Jun 2026) | Single source of truth for full-screen paywall from anywhere; no-op for premium users | Must be injected at app root |
+| **Watch list-based navigation** (Jul 2026) | HIG-compliant (2–4 page limit); every screen one tap away | Replaces discoverable swipe paging |
 
 ---
 
 **Next:** See `system-architecture-platform.md` for CloudKit, Watch, widgets, and security details.
 **Maintained By:** Phuong Doan
 **Version:** 1.0 Production
-**Last Updated:** June 27, 2026
+**Last Updated:** July 19, 2026

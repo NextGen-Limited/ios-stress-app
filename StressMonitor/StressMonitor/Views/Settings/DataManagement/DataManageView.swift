@@ -1,3 +1,4 @@
+import CloudKit
 import SwiftData
 import SwiftUI
 
@@ -151,31 +152,54 @@ struct DataManageView: View {
 
     // MARK: - Actions
 
-    /// Delete-all operates directly on the local `ModelContext` so it does not
-    /// need the heavier `DataDeleterService` DI chain. CloudKit sync will
-    /// reconcile the deletions through the existing sync engine.
+    /// Deletes local measurements, then mirrors the deletion to CloudKit so
+    /// removed snapshots don't reappear on the next sync. CloudKit deletion
+    /// failure (e.g. offline) does not roll back the local delete — it's
+    /// reported separately so the user knows sync may resurrect the data.
     private func performDeleteAll() async {
         do {
             try modelContext.delete(model: StressMeasurement.self)
             try modelContext.save()
-            resultMessage = "All stress snapshots were deleted."
         } catch {
             resultMessage = "Delete failed: \(error.localizedDescription)"
+            showingResult = true
+            return
+        }
+
+        do {
+            try await CloudKitResetService(container: .default(), logger: .default)
+                .deleteRecords(ofType: .stressMeasurement)
+            resultMessage = "All stress snapshots were deleted."
+        } catch {
+            resultMessage = "Local snapshots were deleted. iCloud data couldn't be removed (\(error.localizedDescription)) — it may reappear after your next sync."
         }
         showingResult = true
     }
 
-    /// Factory reset clears local measurements and character progress, then
-    /// asks the user to relaunch. A full wipe (CloudKit, keychain) is handled
-    /// by the dedicated `DataDeleteView` for users who need it.
+    /// Full wipe matching the "wipes all data... and preferences" promise
+    /// shown in the confirmation sheet: local measurements + character
+    /// progress, CloudKit records, the stored sign-in token, and the shared
+    /// App Group cache used by the widget and watch complications.
     private func performFactoryReset() async {
         do {
             try modelContext.delete(model: StressMeasurement.self)
             try modelContext.delete(model: CharacterUnlock.self)
             try modelContext.save()
-            resultMessage = "Local data cleared. Relaunch the app to begin setup."
         } catch {
             resultMessage = "Reset failed: \(error.localizedDescription)"
+            showingResult = true
+            return
+        }
+
+        SupabaseLLMService.clearStoredCredentials()
+        UserDefaults(suiteName: "group.stress.ai.com")?.removePersistentDomain(forName: "group.stress.ai.com")
+
+        do {
+            try await CloudKitResetService(container: .default(), logger: .default)
+                .performDatabaseReset()
+            resultMessage = "Local data cleared. Relaunch the app to begin setup."
+        } catch {
+            resultMessage = "Local data, sign-in, and shared caches were cleared. iCloud reset failed (\(error.localizedDescription)) — relaunch the app to begin setup; remaining iCloud data will be cleared on the next sync attempt."
         }
         showingResult = true
     }

@@ -1,9 +1,9 @@
 # Project Roadmap
 
 **Current Version:** 1.0 (Pre-Ship - RC1)
-**Release Date:** Target late June 2026 (pending B3 test suite)
+**Release Date:** Target July 2026 (pending B3 test suite resolution)
 **Status:** Feature Complete — 1 blocker pending (B3)
-**Last Updated:** June 27, 2026
+**Last Updated:** July 19, 2026
 
 ---
 
@@ -187,7 +187,7 @@ Accessibility:
 • Haptic feedback
 
 Privacy:
-• 11 SPM packages (Kingfisher, SwiftUICharts, ExyteChat, AnimatedTabBar, etc.)
+• 8 SPM packages (2 direct: Chat, SwiftUICharts; 6 transitive: Kingfisher, Giphy, MediaPicker, ActivityIndicatorView, AnchoredPopup, LibWebP)
 • Local-first architecture
 • End-to-end encrypted CloudKit sync
 • No tracking or analytics
@@ -418,6 +418,14 @@ remains on your device or encrypted in iCloud.
 - ✅ **Streaming AI Chat** - Real-time token streaming with SSEParser
 - ✅ **Character Collection UI** - 5 elemental characters with 3-stage evolution system
 
+#### Recent Completions (July 2026)
+- ✅ **Watch List-Based Navigation Redesign** (Jul 1) - Replaced 6-page swipe `TabView` (HIG violation: 2–4 page limit) with root `NavigationStack` + `WatchMenuView` scrollable list. Every screen one tap away; Digital Crown scrolls naturally.
+- ✅ **Watch New Screens** (Jul 1) - Workout (live HR zones), Cycle (menstrual phase tracking), Logging (habit check-in + mood picker), Bio Age card.
+- ✅ **Watch Seasonal Themes** (Jul 1) - `SeasonalTheme` costume overlays (spring, lunar new year, halloween, holiday) for watch character.
+- ✅ **SupabaseLLM as Sole Production LLM** (Jul 1) - Apple Intelligence on-device fallback removed; SupabaseLLMService is the only LLM backend.
+- ✅ **AppRouter + PaywallController** (Jun 2026) - Centralized navigation state (tab + per-tab NavigationPath, deep links, Codable restoration) and single source of truth for full-screen paywall presentation.
+- ✅ **Settings + Dashboard Hero Redesign** (Jun 2026) - Refined settings cards, nav routing, and dashboard hero per design spec.
+
 **Critical Ship Blockers (June 2026 - Status Update):**
 1. ✅ **B1 (P0) - RESOLVED (Jun 7)** - CloudLLMService deleted; SupabaseLLMService is production service
 2. ✅ **B2 (P0) - RESOLVED (Jun 12)** - Real StoreKit 2 implementation shipped (PR #19): real product fetching, transaction monitoring, PremiumState singleton
@@ -489,7 +497,7 @@ Every release must meet:
 
 ### External Dependency Risks
 
-**Currently:** 11 SPM packages (Kingfisher, SwiftUICharts, ExyteChat, AnimatedTabBar, etc.)
+**Currently:** 8 resolved SPM packages (2 direct: ExyteChat, SwiftUICharts; 6 transitive incl. Kingfisher, GiphySDK, libwebp)
 
 **v2.0 Risk Assessment:**
 - **CoreML** (Apple framework, no risk)
@@ -594,6 +602,6 @@ Potential features for future consideration:
 ---
 
 **Owner:** Phuong Doan
-**Last Updated:** June 19, 2026
+**Last Updated:** July 1, 2026
 **Status:** 1 critical blocker remaining (B3 test suite)
 **Next Review:** Post-blocker resolution (target July 2026)
