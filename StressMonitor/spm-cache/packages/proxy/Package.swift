@@ -3,6 +3,7 @@ import PackageDescription
 
 let package = Package(
     name: "spm_cache_proxy",
+    platforms: [.iOS(.v17), .watchOS(.v10), .macOS(.v14)],
     products: [
         .library(name: "spm_cache_proxy", targets: ["spm_cache_root"])
     ],

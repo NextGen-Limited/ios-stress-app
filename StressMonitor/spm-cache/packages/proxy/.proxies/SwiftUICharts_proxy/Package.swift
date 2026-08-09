@@ -3,6 +3,7 @@ import PackageDescription
 
 let package = Package(
     name: "SwiftUICharts_proxy",
+    platforms: [.iOS(.v17), .macOS(.v14)],
     products: [
         .library(name: "SwiftUIChartsProxy", targets: ["SwiftUICharts_SwiftUICharts_shim"])
     ],

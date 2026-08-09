@@ -3,6 +3,7 @@ import PackageDescription
 
 let package = Package(
     name: "Chat_proxy",
+    platforms: [.iOS(.v17), .macOS(.v14)],
     products: [
         .library(name: "ExyteChatProxy", targets: ["Chat_ExyteChat_shim"])
     ],
