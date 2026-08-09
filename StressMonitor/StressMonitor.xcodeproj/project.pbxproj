@@ -325,8 +325,6 @@
 			);
 			name = StressMonitor;
 			packageProductDependencies = (
-				E33EE1D92CD476EB8C08E0DF /* SwiftUIChartsProxy */,
-				6F2FF5A4ADE814172284885B /* ExyteChatProxy */,
 			);
 			productName = StressMonitor;
 			productReference = F2E2EBE92F1CC553000C2B53 /* StressMonitor.app */;
@@ -383,7 +381,6 @@
 			mainGroup = F2E2EBE02F1CC553000C2B53;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				B9AD16C842CE4A056151F2A2 /* XCLocalSwiftPackageReference "proxy" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = F2E2EBEA2F1CC553000C2B53 /* Products */;
@@ -987,23 +984,9 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		B9AD16C842CE4A056151F2A2 /* XCLocalSwiftPackageReference "proxy" */ = {
-			isa = XCLocalSwiftPackageReference;
-			relativePath = "spm-cache/packages/proxy";
-		};
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		6F2FF5A4ADE814172284885B /* ExyteChatProxy */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = B9AD16C842CE4A056151F2A2 /* XCLocalSwiftPackageReference "proxy" */;
-			productName = ExyteChatProxy;
-		};
-		E33EE1D92CD476EB8C08E0DF /* SwiftUIChartsProxy */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = B9AD16C842CE4A056151F2A2 /* XCLocalSwiftPackageReference "proxy" */;
-			productName = SwiftUIChartsProxy;
-		};
 /* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = F2E2EBE12F1CC553000C2B53 /* Project object */;
