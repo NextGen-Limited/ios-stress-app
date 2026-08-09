@@ -165,8 +165,11 @@ build/
 StressMonitor/StressMonitor/Services/LLM/SupabaseSecrets.swift
 supabase/.temp/
 
-# spm-cache (sandbox, lockfile, build artifacts - regenerated locally)
-StressMonitor/spm-cache/
+# spm-cache: commit the proxy package source (referenced by the Xcode project),
+# but ignore generated build artifacts, lockfiles, and umbrella checkouts.
+StressMonitor/spm-cache/packages/*/.build/
+StressMonitor/spm-cache/packages/*/.swiftpm/
+StressMonitor/spm-cache/packages/umbrella/
 StressMonitor/spm-cache.lock
 StressMonitor/spm-cache.yml
 StressMonitor/build_output.log
