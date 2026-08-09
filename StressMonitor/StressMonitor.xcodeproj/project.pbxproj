@@ -12,21 +12,21 @@
 		19FF7CDE8F20585FB3F027EC /* StressContextPayloadTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = FF19921F5E82175704921949 /* StressContextPayloadTests.swift */; };
 		2A951B0BD4333E43C6CD797D /* CharacterAssetResolverTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 00D7CBDFC67338FE88016310 /* CharacterAssetResolverTests.swift */; };
 		32CD859348BB101E3C19E3AA /* StressMonitorProducts.storekit in Resources */ = {isa = PBXBuildFile; fileRef = 4C67EAC979024C30F581AD22 /* StressMonitorProducts.storekit */; };
+		39419B30DE0EE4EDBA6A2CB4 /* WidgetPublisherKeyMatchingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6AC42E6137A72A55808876F /* WidgetPublisherKeyMatchingTests.swift */; };
 		4B42B91606B4D42E3CE7A998 /* CharacterEntitlementSyncTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 713235225361EAF1FE04D14B /* CharacterEntitlementSyncTests.swift */; };
 		9E36EB4221565C3D18AE9BF1 /* StoreKitServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0ED711106429F77E210D3F60 /* StoreKitServiceTests.swift */; };
 		B31DF5E223857E730C1F1B04 /* SupabaseAuthServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 596464A7DA54461FFA3A015F /* SupabaseAuthServiceTests.swift */; };
 		D1858B03657E705B3A69F771 /* StoreKitProductCatalogTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A41EC256A3DD566A20DAB84B /* StoreKitProductCatalogTests.swift */; };
 		E21535775B493D041FBC5E94 /* CharacterCollectionViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21C3984665BFD5D2C50B51BC /* CharacterCollectionViewModelTests.swift */; };
+		E8D9B7231036C614602516E5 /* WidgetDataStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 174DE64763F4E03018E24D7D /* WidgetDataStateTests.swift */; };
 		F14C2C7A012F5F2D048E8230 /* PremiumViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5F1E29FB29A0C0373818403F /* PremiumViewModelTests.swift */; };
 		F211BBDA2FD9112000A6E25D /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F211BBD92FD9111F00A6E25D /* WidgetKit.framework */; };
 		F211BBDC2FD9112000A6E25D /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F211BBDB2FD9112000A6E25D /* SwiftUI.framework */; };
 		F211BBED2FD9112200A6E25D /* StressMonitorWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = F211BBD72FD9111F00A6E25D /* StressMonitorWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		F227C3DF3027787A0083F74C /* BuildFile in Frameworks */ = {isa = PBXBuildFile; };
 		F227C3E03027787A0083F74C /* BuildFile in Frameworks */ = {isa = PBXBuildFile; };
-		39419B30DE0EE4EDBA6A2CB4 /* WidgetPublisherKeyMatchingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6AC42E6137A72A55808876F /* WidgetPublisherKeyMatchingTests.swift */; };
-		E8D9B7231036C614602516E5 /* WidgetDataStateTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 174DE64763F4E03018E24D7D /* WidgetDataStateTests.swift */; };
-		F227C739302781F80083F74C /* SwiftUICharts in Frameworks */ = {isa = PBXBuildFile; productRef = C21BF36A627478DFA922CFB7 /* SwiftUICharts */; };
-		F227C73A302781F80083F74C /* ExyteChat in Frameworks */ = {isa = PBXBuildFile; productRef = 87F90A56BBFEAD5DFBF8F750 /* ExyteChat */; };
+		F227C739302781F80083F74C /* BuildFile in Frameworks */ = {isa = PBXBuildFile; };
+		F227C73A302781F80083F74C /* BuildFile in Frameworks */ = {isa = PBXBuildFile; };
 		F26968812F5DAE2400B40F0F /* BuildFile in Frameworks */ = {isa = PBXBuildFile; };
 		F2E2EC392F1CC605000C2B53 /* StressMonitorWatch Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = F2E2EC192F1CC602000C2B53 /* StressMonitorWatch Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		F2FCD7AF2F8FFBFF000DE6E8 /* BuildFile in Frameworks */ = {isa = PBXBuildFile; };
@@ -189,8 +189,8 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F227C73A302781F80083F74C /* ExyteChat in Frameworks */,
-				F227C739302781F80083F74C /* SwiftUICharts in Frameworks */,
+				F227C73A302781F80083F74C /* BuildFile in Frameworks */,
+				F227C739302781F80083F74C /* BuildFile in Frameworks */,
 				F227C3E03027787A0083F74C /* BuildFile in Frameworks */,
 				F227C3DF3027787A0083F74C /* BuildFile in Frameworks */,
 				F26968812F5DAE2400B40F0F /* BuildFile in Frameworks */,
@@ -325,8 +325,8 @@
 			);
 			name = StressMonitor;
 			packageProductDependencies = (
-				C21BF36A627478DFA922CFB7 /* SwiftUICharts */,
-				87F90A56BBFEAD5DFBF8F750 /* ExyteChat */,
+				E33EE1D92CD476EB8C08E0DF /* SwiftUIChartsProxy */,
+				6F2FF5A4ADE814172284885B /* ExyteChatProxy */,
 			);
 			productName = StressMonitor;
 			productReference = F2E2EBE92F1CC553000C2B53 /* StressMonitor.app */;
@@ -383,7 +383,7 @@
 			mainGroup = F2E2EBE02F1CC553000C2B53;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				FE96652F6BFFB27345C81DC1 /* XCLocalSwiftPackageReference "proxy" */,
+				B9AD16C842CE4A056151F2A2 /* XCLocalSwiftPackageReference "proxy" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = F2E2EBEA2F1CC553000C2B53 /* Products */;
@@ -987,22 +987,22 @@
 /* End XCConfigurationList section */
 
 /* Begin XCLocalSwiftPackageReference section */
-		FE96652F6BFFB27345C81DC1 /* XCLocalSwiftPackageReference "proxy" */ = {
+		B9AD16C842CE4A056151F2A2 /* XCLocalSwiftPackageReference "proxy" */ = {
 			isa = XCLocalSwiftPackageReference;
 			relativePath = "spm-cache/packages/proxy";
 		};
 /* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		87F90A56BBFEAD5DFBF8F750 /* ExyteChat */ = {
+		6F2FF5A4ADE814172284885B /* ExyteChatProxy */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = FE96652F6BFFB27345C81DC1 /* XCLocalSwiftPackageReference "proxy" */;
-			productName = ExyteChat;
+			package = B9AD16C842CE4A056151F2A2 /* XCLocalSwiftPackageReference "proxy" */;
+			productName = ExyteChatProxy;
 		};
-		C21BF36A627478DFA922CFB7 /* SwiftUICharts */ = {
+		E33EE1D92CD476EB8C08E0DF /* SwiftUIChartsProxy */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = FE96652F6BFFB27345C81DC1 /* XCLocalSwiftPackageReference "proxy" */;
-			productName = SwiftUICharts;
+			package = B9AD16C842CE4A056151F2A2 /* XCLocalSwiftPackageReference "proxy" */;
+			productName = SwiftUIChartsProxy;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

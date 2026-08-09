@@ -12,8 +12,8 @@ let package = Package(
     ],
     targets: [
         .target(name: "spm_cache_root", dependencies: [
-            .product(name: "ExyteChat", package: "Chat_proxy"),
-                    .product(name: "SwiftUICharts", package: "SwiftUICharts_proxy")
+            .product(name: "ExyteChatProxy", package: "Chat_proxy"),
+            .product(name: "SwiftUIChartsProxy", package: "SwiftUICharts_proxy")
         ], path: "src/root")
     ]
 )
