@@ -54,6 +54,25 @@ Plans:
 
 **UI hint**: yes
 
+### Phase 01.1: SwiftData Schema Migration Safety (INSERTED)
+
+**Goal**: The app launches without crashing for any device regardless of prior store schema state — the ModelContainer either migrates correctly from any historical schema or recovers without `fatalError`, and the SwiftData layer has no orphaned source, no entitlement/config mismatch, and no silent data-loss paths.
+**Depends on**: Phase 1 (build configuration baseline — app must build/archive first)
+**Requirements**: BUILD-04 (test execution — a launch-path integration test must be runnable)
+**Blocking Decisions**: D5 (does the pre-V2 installed base have real user data that must be preserved? Determines "reconstruct frozen V1 snapshots + custom MigrationStage" vs "accept data loss via `eraseDatabaseOnSchemaChange`" — the largest effort swing in this phase, 0.5 day vs 2-3 days)
+**Success Criteria** (what must be TRUE):
+
+  1. An app installed over an existing store created by any prior build shape launches without `loadIssueModelContainer` — verified by round-trip integration test (create V1 store, insert data, reopen with migration plan, assert data survives and `Habit` is queryable).
+  2. `fatalError` at `StressMonitorApp.swift:82` is replaced with a non-fatal recovery path in RELEASE (fresh container + telemetry log), so a migration defect never permanently bricks the app.
+  3. The `VersionedSchema` pair declares frozen `@Model` snapshots per version (not live class reuse), so the migration diff reflects reality — OR `eraseDatabaseOnSchemaChange` is DEBUG-gated with a documented data-loss acceptance (per D5).
+  4. CloudKit configuration is consistent: either the SwiftData `ModelConfiguration` binds `cloudKitContainer: .identifier("iCloud.stress.ai.com")` matching entitlements and all `@Model` types are CloudKit-conformant, OR the CloudKit entitlement is removed and the app is local-only.
+  5. The orphaned root source set (`./StressMonitor/StressMonitorApp.swift`, `./StressMonitor/StressMonitorSchema.swift`, `./StressMonitor/Models/StressMeasurement.swift`) is deleted — only the active target's models remain.
+
+**Plans**: 1/1 plans drafted
+Plans:
+
+- [ ] 01.1-01-PLAN.md — Non-fatal ModelContainer recovery (tracer integration test + fix), property-level migration defaults, CloudKit config consistency, orphaned root source deletion (D5 = Option A)
+
 ### Phase 2: Data Integrity, Deletion & Consolidation
 
 **Goal**: "Delete" actually deletes everywhere the app claims it does, health exports are protected, and only one data-management implementation remains.
