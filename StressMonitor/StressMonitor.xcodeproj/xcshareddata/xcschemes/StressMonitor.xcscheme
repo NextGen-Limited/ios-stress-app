@@ -35,7 +35,7 @@
             parallelizable = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "F2E2EBF72F1CC556000C2B53"
+               BlueprintIdentifier = "0685AF23B64355DB99B05140"
                BuildableName = "StressMonitorTests.xctest"
                BlueprintName = "StressMonitorTests"
                ReferencedContainer = "container:StressMonitor.xcodeproj">

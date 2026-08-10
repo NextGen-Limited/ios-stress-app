@@ -44,15 +44,13 @@ product decisions (D1-D4) that still gate specific scope.
   4. `xcodebuild test` executes a real unit-test bundle and reports pass/fail.
   5. The home-screen widget reflects a stress measurement taken seconds earlier on a real device — or, per D4, the widget target is excluded from the build entirely.
 
-**Plans**: 6 plans (4 executed + 2 gap closure)
+**Plans**: 4/4 plans executed
 Plans:
 
 - [x] 01-01-PLAN.md — Wire the widget's App Group entitlement (tracer) + complete the Privacy Manifest + delete the orphaned Info.plist
 - [x] 01-02-PLAN.md — Resolve widget data state as fresh/stale/empty and render it per the UI-SPEC
 - [x] 01-03-PLAN.md — checkpoint: Apple Developer Portal + Fastlane Match capability registration
 - [x] 01-04-PLAN.md — Correct privacy disclosure across docs and the privacy policy (D-01)
-- [ ] 01-05-PLAN.md — Gap closure: add CI test job for BUILD-04 + remove dangling scheme UITests reference
-- [ ] 01-06-PLAN.md — Gap closure: verification scripts + human checkpoint for BUILD-02/WIRE-01/BUILD-01
 
 **UI hint**: yes
 
