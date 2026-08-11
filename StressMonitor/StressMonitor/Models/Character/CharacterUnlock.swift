@@ -5,10 +5,12 @@ import SwiftData
 
 /// Tracks which characters the user has unlocked and their evolution progress.
 /// Persisted via SwiftData.
+///
+/// `characterId` uniqueness is enforced in application code (see
+/// `seedDefaultCharacterUnlocks`), not via `#Unique` — CloudKit sync does
+/// not support unique constraints (`NSCocoaErrorDomain` 134060).
 @Model
 final class CharacterUnlock {
-    #Unique<CharacterUnlock>([\.characterId])
-
     var characterId: String = ""   // "ripple", "blossom", etc.
     var isUnlocked: Bool = false
     var currentEvolution: String = EvolutionStage.droplet.rawValue   // EvolutionStage rawValue

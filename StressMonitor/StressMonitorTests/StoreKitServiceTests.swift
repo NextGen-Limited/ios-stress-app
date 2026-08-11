@@ -25,8 +25,15 @@ struct StoreKitServiceTests {
         return session
     }()
 
-    private func makeSession() throws -> SKTestSession {
+    private func makeSession() async throws -> SKTestSession {
         Self.sharedSession.clearTransactions()
+        // Product.products(for:) caches process-wide inside StoreKit itself
+        // (independent of StoreKitService's own productsByID cache). Without
+        // a settle tick after clearTransactions(), a product fetched by a
+        // prior test can be replayed with stale subscription metadata
+        // (introductoryOffer, price) instead of being re-resolved against
+        // the reset session.
+        try? await Task.sleep(for: .milliseconds(100))
         return Self.sharedSession
     }
 
@@ -45,14 +52,14 @@ struct StoreKitServiceTests {
 
     @Test("Available plans load all three products")
     func availablePlansLoadAllThree() async throws {
-        _ = try makeSession()
+        _ = try await makeSession()
         let plans = await makeService().availablePlans
         #expect(Set(plans.map(\.period)) == [.weekly, .monthly, .annual])
     }
 
     @Test("Annual plan carries the introductory offer, monthly does not")
     func introductoryOfferFlag() async throws {
-        _ = try makeSession()
+        _ = try await makeSession()
         let plans = await makeService().availablePlans
         let annual = try #require(plans.first(where: { $0.period == .annual }))
         let monthly = try #require(plans.first(where: { $0.period == .monthly }))
@@ -62,7 +69,7 @@ struct StoreKitServiceTests {
 
     @Test("Purchase grants premium entitlement")
     func purchaseGrantsEntitlement() async throws {
-        _ = try makeSession()
+        _ = try await makeSession()
         let service = makeService()
         #expect(service.isPremiumUser == false)
 
@@ -74,7 +81,7 @@ struct StoreKitServiceTests {
 
     @Test("Restore on a fresh service recovers entitlement")
     func restoreRecoversEntitlement() async throws {
-        _ = try makeSession()
+        _ = try await makeSession()
         let buyer = makeService()
         let annual = try #require(await buyer.availablePlans.first(where: { $0.period == .annual }))
         try await buyer.purchase(annual)
@@ -87,7 +94,7 @@ struct StoreKitServiceTests {
 
     @Test("Annual savings computed from real monthly vs annual prices")
     func annualSavingsComputedFromRealPrices() async throws {
-        _ = try makeSession()
+        _ = try await makeSession()
         let plans = await makeService().availablePlans
         let annual = try #require(plans.first(where: { $0.period == .annual }))
         let savings = try #require(annual.savingsPercent)
@@ -96,7 +103,7 @@ struct StoreKitServiceTests {
 
     @Test("Annual plan with no monthly comparator has nil savings, not a fabricated number")
     func annualSavingsNilWhenMonthlyMissing() async throws {
-        _ = try makeSession()
+        _ = try await makeSession()
         let catalog = StoreKitProductCatalog(
             weeklyProductID: nil,
             monthlyProductID: nil,
@@ -114,7 +121,7 @@ struct StoreKitServiceTests {
 
     @Test("Annual plan carries derived intro offer period unit, monthly does not")
     func introOfferPeriodUnitDerived() async throws {
-        _ = try makeSession()
+        _ = try await makeSession()
         let plans = await makeService().availablePlans
         let annual = try #require(plans.first(where: { $0.period == .annual }))
         let monthly = try #require(plans.first(where: { $0.period == .monthly }))
@@ -124,7 +131,7 @@ struct StoreKitServiceTests {
 
     @Test("Intro offer eligibility resolves for annual product")
     func introOfferEligibilityResolves() async throws {
-        _ = try makeSession()
+        _ = try await makeSession()
         let service = makeService()
         let eligible = await service.isEligibleForIntroOffer(for: .annual)
         #expect(eligible)
@@ -132,7 +139,7 @@ struct StoreKitServiceTests {
 
     @Test("Cancel via refund revokes premium entitlement on refresh")
     func cancelViaRefundRevokesEntitlement() async throws {
-        let session = try makeSession()
+        let session = try await makeSession()
         let service = makeService()
 
         let annual = try #require(await service.availablePlans.first(where: { $0.period == .annual }))
@@ -148,7 +155,7 @@ struct StoreKitServiceTests {
 
     @Test("Expiry revokes premium entitlement on refresh")
     func expiryRevokesEntitlement() async throws {
-        let session = try makeSession()
+        let session = try await makeSession()
         let service = makeService()
 
         let annual = try #require(await service.availablePlans.first(where: { $0.period == .annual }))
