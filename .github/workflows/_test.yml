@@ -182,9 +182,26 @@ jobs:
             -scheme "$SCHEME" \
             -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest' \
             -derivedDataPath build \
+            -resultBundlePath TestResults.xcresult \
             -skipPackagePluginValidation \
             -parallel-testing-enabled NO \
             -maximum-concurrent-test-simulator-destinations 1 \
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
-            | xcpretty
+            2>&1 | tee raw-test-output.log | xcpretty
+
+      - name: Upload raw test log on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: raw-test-output
+          path: raw-test-output.log
+          retention-days: 5
+
+      - name: Upload xcresult on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-xcresult
+          path: TestResults.xcresult
+          retention-days: 5
