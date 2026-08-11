@@ -78,8 +78,10 @@ final class CharacterCollectionViewModel {
         try? context.save()
     }
 
-    /// Reconciles premium-character unlocks with live subscription status:
-    /// unlocked while subscribed, re-locked on lapse; active selection falls back to Ripple.
+    /// Reconciles premium-character unlocks with live subscription status.
+    /// Premium unlocks are one-time-permanent: subscribing grants them, but a
+    /// subscription lapse does NOT re-lock them. Active selection of a premium
+    /// character falls back to Ripple on lapse so the user lands on a free char.
     @MainActor
     static func syncPremiumCharacterEntitlement(isPremium: Bool, in context: ModelContext) {
         let descriptor = FetchDescriptor<CharacterUnlock>()
@@ -89,7 +91,9 @@ final class CharacterCollectionViewModel {
 
         var activeReLocked = false
         for unlock in unlocks where premiumIds.contains(unlock.characterId) {
-            unlock.isUnlocked = isPremium
+            if isPremium {
+                unlock.isUnlocked = true
+            }
             if !isPremium && unlock.isActive {
                 unlock.isActive = false
                 activeReLocked = true
