@@ -15,9 +15,9 @@
 
 ### Data Integrity & Deletion (DATA)
 
-- [ ] **DATA-01**: On two signed-in devices, "Delete All" removes records from local storage, CloudKit, Keychain, and App Group cache — matching what the UI promises
-- [ ] **DATA-02**: Health data exports carry `.completeFileProtection`, are size-capped, and are cleaned up after share
-- [ ] **DATA-03**: CloudKit-synced health fields (`hrv`, `restingHeartRate`, `stressLevel`) are encrypted via `CKRecord.encryptedValues`, or the E2E-encryption claim is corrected in docs — depends on decision D2
+- [x] **DATA-01**: On two signed-in devices, "Delete All" removes records from local storage, CloudKit, Keychain, and App Group cache — matching what the UI promises
+- [x] **DATA-02**: Health data exports carry `.completeFileProtection`, are size-capped, and are cleaned up after share
+- [x] **DATA-03**: CloudKit-synced health fields (`hrv`, `restingHeartRate`, `stressLevel`) are encrypted via `CKRecord.encryptedValues`, or the E2E-encryption claim is corrected in docs — depends on decision D2
 
 ### Auth & Chat Availability (AUTH)
 
@@ -28,7 +28,7 @@
 ### Wire-Up Gap Closure (WIRE)
 
 - [ ] **WIRE-01**: The home screen widget reflects a measurement taken seconds earlier on a real device (wired to live data + `WidgetCenter.reloadAllTimelines()`, not permanent placeholder) — scope depends on decision D4
-- [ ] **WIRE-02**: No duplicate data-management implementation remains (`DataManagementService`/`CSVGenerator`/`JSONGenerator` vs. the retargeted `DataDeleterService`/`CloudKitResetService` chain)
+- [x] **WIRE-02**: No duplicate data-management implementation remains (`DataManagementService`/`CSVGenerator`/`JSONGenerator` vs. the retargeted `DataDeleterService`/`CloudKitResetService` chain)
 
 ### IAP Revenue Path (IAP)
 
@@ -89,10 +89,10 @@ Deferred — see `docs/project-roadmap.md` Version 1.1/2.0 for detail.
 | BUILD-03 | Phase 1 | Pending |
 | BUILD-04 | Phase 1 | Complete |
 | WIRE-01 | Phase 1 | Pending |
-| DATA-01 | Phase 2 | Pending |
-| DATA-02 | Phase 2 | Pending |
-| DATA-03 | Phase 2 | Pending |
-| WIRE-02 | Phase 2 | Pending |
+| DATA-01 | Phase 2 | Complete |
+| DATA-02 | Phase 2 | Complete |
+| DATA-03 | Phase 2 | Complete |
+| WIRE-02 | Phase 2 | Complete |
 | AUTH-01 | Phase 3 | Pending |
 | AUTH-02 | Phase 3 | Pending |
 | AUTH-03 | Phase 3 | Pending |

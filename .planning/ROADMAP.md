@@ -90,10 +90,10 @@ Plans:
   4. CloudKit-synced health fields (`hrv`, `restingHeartRate`, `stressLevel`) are encrypted via `CKRecord.encryptedValues`, or the E2E-encryption claim in docs is corrected to match actual behavior.
   5. Only one data-management implementation remains in the codebase — the duplicate `DataManagementService`/`CSVGenerator`/`JSONGenerator` stack is gone.
 
-**Plans**: 1/1 plans drafted
+**Plans**: 1/1 plans executed drafted
 Plans:
 
-- [ ] 02-01-PLAN.md — Retarget delete views onto DataDeleterService, close credential/cache gap, harden exports, delete dead code (DATA-01, DATA-02, DATA-03, WIRE-02)
+- [x] 02-01-PLAN.md — Retarget delete views onto DataDeleterService, close credential/cache gap, harden exports, delete dead code (DATA-01, DATA-02, DATA-03, WIRE-02)
 
 ### Phase 3: Auth & Chat Availability
 
@@ -151,7 +151,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5. Phase 3 (Auth) is co
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 1. Build Configuration & Widget Wiring | 5/6 | In Progress|  |
-| 2. Data Integrity, Deletion & Consolidation | 0/1 | Not started | - |
+| 2. Data Integrity, Deletion & Consolidation | 1/1 | In Progress|  |
 | 3. Auth & Chat Availability | 0/TBD | Not started | - |
 | 4. IAP Revenue Path | 0/TBD | Not started | - |
 | 5. Store Readiness & Accessibility | 0/TBD | Not started | - |

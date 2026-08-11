@@ -5,15 +5,15 @@ milestone_name: milestone
 current_phase: 2
 current_phase_name: Data Integrity, Deletion & Consolidation
 status: planning
-stopped_at: Completed 01-05-PLAN.md (CI test job + scheme UITests cleanup)
-last_updated: "2026-08-11T05:02:10.643Z"
+stopped_at: Completed 02-01-PLAN.md (tasks 1-3; task 4 deferred for two-device CloudKit sync)
+last_updated: "2026-08-11T05:34:26.950Z"
 last_activity: 2026-08-11
 last_activity_desc: Phase 01.1 complete, transitioned to Phase 2
 progress:
-  total_phases: 2
-  completed_phases: 1
-  total_plans: 7
-  completed_plans: 6
+  total_phases: 3
+  completed_phases: 2
+  total_plans: 8
+  completed_plans: 7
 ---
 
 # Project State
@@ -32,7 +32,7 @@ Plan: Not started
 Status: Ready to plan
 Last activity: 2026-08-11 — Phase 01.1 complete, transitioned to Phase 2
 
-Progress: [█████████░] 86%
+Progress: [█████████░] 88%
 
 ## Performance Metrics
 
@@ -59,6 +59,7 @@ Progress: [█████████░] 86%
 | Plan | Duration | Tasks | Files |
 |------|----------|-------|-------|
 | Phase 01 P05 | 3m | 2 tasks | 2 files |
+| Phase 02 P01 | 45min | 3 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -72,6 +73,9 @@ Recent decisions affecting current work:
 - [Roadmap]: Consolidated the source plan's 7 phases into 5 for coarse granularity — merged WIRE-01 into Phase 1 (shares App Group entitlement work with BUILD-02), merged WIRE-02 into Phase 2 (same underlying fix as DATA-01's retarget), merged Store Listing (old Phase 6) with Accessibility (old Phase 7) into Phase 5 (no shared files, both largely calendar-gated rather than code-sequenced). Auth (Phase 3) and IAP (Phase 4) kept standalone — merging either would obscure a blocking decision (D1) or create an oversized phase.
 - [Phase ?]: 01-05: CI test job uses iPhone 16 Simulator destination with no -only-testing filter; scheme TestAction scopes the bundle
 - [Phase ?]: 01-05: Test job cache keys matched lint-and-build verbatim so both jobs share DerivedData/SPM cache lines
+- [Phase ?]: Routed DataDeleteView scopes through DataDeleterService.deleteMeasurements(in:) — collapsed scope distinction for WIRE-02 consolidation
+- [Phase ?]: Moved ExportError from ExportModels.swift to DataExportView.swift before deleting dead ExportModels.swift
+- [Phase ?]: Added CharacterUnlock deletion to DataDeleterService.performFactoryReset to match UI contract
 
 ### Pending Todos
 
@@ -86,6 +90,7 @@ None yet.
 - Two non-blocking product questions gate Phase 4 acceptance (IAP-04, IAP-05): is the 7-day free trial real or aspirational copy; are the 3 premium character unlocks intentional one-time-permanent design or a bug.
 - External dependency: ASC product/subscription-group creation for Phase 4 has its own lead time — file it the same day Phase 1 starts, independent of code sequencing.
 - Repo is on `feature/spm-cache-integration` with substantial unrelated uncommitted changes; not assumed as a stable baseline until merged. `git.base_branch` (`main`) vs. current working branch needs resolution before milestone branching.
+- Task 4 (02-01): Two-device CloudKit sync verification deferred — requires two real iCloud-signed devices to confirm delete propagation
 
 ## Deferred Items
 
@@ -97,6 +102,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-08-11T05:02:10.630Z
-Stopped at: Completed 01-05-PLAN.md (CI test job + scheme UITests cleanup)
+Last session: 2026-08-11T05:34:06.809Z
+Stopped at: Completed 02-01-PLAN.md (tasks 1-3; task 4 deferred for two-device CloudKit sync)
 Resume file: None
