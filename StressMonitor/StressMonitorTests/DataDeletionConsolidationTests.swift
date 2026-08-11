@@ -45,3 +45,29 @@ struct DeleteAllCredentialClearanceTests {
         #expect(snapshot?[testKey] == nil)
     }
 }
+
+@Suite("Data Deleter Consolidation")
+struct DataDeleterConsolidationTests {
+
+    @Test("clearCredentialsAndSharedCaches removes Supabase refresh token from Keychain")
+    func factoryResetClearsRefreshToken() throws {
+        let service = "com.stressmonitor.app"
+        let account = "supabaseRefreshToken"
+
+        try KeychainService.save("test-refresh-token", service: service, account: account)
+
+        DataDeleterService.clearCredentialsAndSharedCaches()
+
+        let query: [String: Any] = [
+            kSecClass as String: kSecClassGenericPassword,
+            kSecAttrService as String: service,
+            kSecAttrAccount as String: account,
+            kSecReturnData as String: true,
+            kSecMatchLimit as String: kSecMatchLimitOne
+        ]
+        var result: AnyObject?
+        let status = SecItemCopyMatching(query as CFDictionary, &result)
+
+        #expect(status == errSecItemNotFound)
+    }
+}
