@@ -117,4 +117,35 @@ struct StoreKitServiceTests {
         let eligible = await service.isEligibleForIntroOffer(for: .annual)
         #expect(eligible)
     }
+
+    @Test("Cancel via refund revokes premium entitlement on refresh")
+    func cancelViaRefundRevokesEntitlement() async throws {
+        let session = try makeSession()
+        let service = makeService()
+
+        let annual = try #require(await service.availablePlans.first(where: { $0.period == .annual }))
+        try await service.purchase(annual)
+        #expect(service.isPremiumUser)
+
+        let transaction = try #require(session.allTransactions().first(where: { $0.productIdentifier == Self.annual }))
+        try session.refundTransaction(identifier: transaction.identifier)
+
+        await service.refreshEntitlements()
+        #expect(service.isPremiumUser == false)
+    }
+
+    @Test("Expiry revokes premium entitlement on refresh")
+    func expiryRevokesEntitlement() async throws {
+        let session = try makeSession()
+        let service = makeService()
+
+        let annual = try #require(await service.availablePlans.first(where: { $0.period == .annual }))
+        try await service.purchase(annual)
+        #expect(service.isPremiumUser)
+
+        try session.expireSubscription(productIdentifier: Self.annual)
+
+        await service.refreshEntitlements()
+        #expect(service.isPremiumUser == false)
+    }
 }

@@ -38,8 +38,8 @@ struct CharacterEntitlementSyncTests {
         #expect(unlock(in: ctx, for: "blossom").isUnlocked)
     }
 
-    @Test("Lapsing re-locks premium characters and falls back active selection to Ripple")
-    func lapsingReLocksAndResetsActive() throws {
+    @Test("Lapsing keeps premium characters unlocked (one-time-permanent) and falls back active selection to Ripple")
+    func lapsingKeepsPremiumUnlockedAndResetsActive() throws {
         let ctx = try makeSeededContext()
         CharacterCollectionViewModel.syncPremiumCharacterEntitlement(isPremium: true, in: ctx)
 
@@ -50,8 +50,8 @@ struct CharacterEntitlementSyncTests {
 
         CharacterCollectionViewModel.syncPremiumCharacterEntitlement(isPremium: false, in: ctx)
 
-        #expect(unlock(in: ctx, for: "ember").isUnlocked == false)
-        #expect(unlock(in: ctx, for: "zephyr").isUnlocked == false)
+        #expect(unlock(in: ctx, for: "ember").isUnlocked)
+        #expect(unlock(in: ctx, for: "zephyr").isUnlocked)
         #expect(unlock(in: ctx, for: "ember").isActive == false)
         #expect(unlock(in: ctx, for: "ripple").isActive)
         #expect(unlock(in: ctx, for: "ripple").isUnlocked)
