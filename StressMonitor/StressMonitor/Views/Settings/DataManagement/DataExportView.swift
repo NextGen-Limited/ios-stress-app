@@ -38,9 +38,12 @@ struct DataExportView: View {
         }
         .sheet(isPresented: $showingShareSheet) {
             if let url = exportURL {
-                ShareSheet(items: [url])
-                    .presentationDetents([.medium, .large])
-                    .presentationDragIndicator(.visible)
+                ShareSheet(items: [url]) {
+                    DataExportViewModel.cleanupExportTempFile(at: url)
+                    exportURL = nil
+                }
+                .presentationDetents([.medium, .large])
+                .presentationDragIndicator(.visible)
             }
         }
         .alert("Export Failed", isPresented: $showingError) {
@@ -317,6 +320,8 @@ class DataExportViewModel {
         recordsProcessed = 0
         exportProgress = 0
 
+        try Self.validateExportSize(recordCount: records.count, format: format)
+
         let fileName = "stress_export_\(Int(Date().timeIntervalSince1970))"
         let fileExtension = format == .csv ? "csv" : "json"
 
@@ -372,6 +377,30 @@ class DataExportViewModel {
                 try? fileManager.removeItem(at: url)
             }
         }
+    }
+
+    static let maxExportRecords = 10_000
+    private static let maxExportBytes = 10 * 1024 * 1024
+
+    static func validateExportSize(recordCount: Int, format: ExportFormat) throws {
+        let avgBytesPerRow: Double = format == .csv ? 80 : 160
+        let estimatedBytes = Double(recordCount) * avgBytesPerRow
+
+        if recordCount > maxExportRecords {
+            throw ExportError.exceedsSizeCap(
+                limitDescription: "\(maxExportRecords) record"
+            )
+        }
+        if estimatedBytes > Double(maxExportBytes) {
+            throw ExportError.exceedsSizeCap(
+                limitDescription: "\(maxExportBytes / 1024 / 1024) MB"
+            )
+        }
+    }
+
+    static func cleanupExportTempFile(at url: URL) {
+        guard url.lastPathComponent.hasPrefix("stress_export_") else { return }
+        try? FileManager.default.removeItem(at: url)
     }
 
     private func fetchRecords(modelContext: ModelContext, limit: Int?) -> [StressMeasurement] {
@@ -474,13 +503,43 @@ class DataExportViewModel {
 /// ShareSheet wrapper for SwiftUI
 struct ShareSheet: UIViewControllerRepresentable {
     let items: [Any]
+    var onDismiss: (() -> Void)?
 
     func makeUIViewController(context: Context) -> UIActivityViewController {
         let controller = UIActivityViewController(activityItems: items, applicationActivities: nil)
+        controller.completionWithItemsHandler = { _, completed, _, _ in
+            onDismiss?()
+        }
         return controller
     }
 
     func updateUIViewController(_ uiViewController: UIActivityViewController, context: Context) {}
+}
+
+enum ExportError: LocalizedError {
+    case noData
+    case encodingFailed
+    case fileWriteFailed(Error)
+    case invalidPath
+    case fileAccessFailed
+    case exceedsSizeCap(limitDescription: String)
+
+    var errorDescription: String? {
+        switch self {
+        case .noData:
+            return "No measurements available to export."
+        case .encodingFailed:
+            return "Failed to encode data for export."
+        case .fileWriteFailed(let error):
+            return "Failed to write file: \(error.localizedDescription)"
+        case .invalidPath:
+            return "Invalid file path for export."
+        case .fileAccessFailed:
+            return "Could not access file system"
+        case .exceedsSizeCap(let limitDescription):
+            return "Export exceeds the \(limitDescription) limit. Narrow the date range and try again."
+        }
+    }
 }
 
 #Preview {
