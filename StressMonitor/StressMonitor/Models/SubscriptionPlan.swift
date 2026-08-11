@@ -21,6 +21,7 @@ struct SubscriptionPlan: Identifiable {
     let displayPrice: String?
     let billingSummary: String?
     let hasIntroductoryOffer: Bool
+    let introOfferPeriodUnit: String?
 
     /// Human-readable period unit for display (e.g. "/week", "/month", "/year").
     var periodUnitDisplay: String {
@@ -65,7 +66,8 @@ struct SubscriptionPlan: Identifiable {
             productID: nil,
             displayPrice: nil,
             billingSummary: "Billed annually",
-            hasIntroductoryOffer: false
+            hasIntroductoryOffer: false,
+            introOfferPeriodUnit: nil
         ),
         SubscriptionPlan(
             id: .monthly,
@@ -79,7 +81,8 @@ struct SubscriptionPlan: Identifiable {
             productID: nil,
             displayPrice: nil,
             billingSummary: "Billed monthly",
-            hasIntroductoryOffer: false
+            hasIntroductoryOffer: false,
+            introOfferPeriodUnit: nil
         ),
         SubscriptionPlan(
             id: .weekly,
@@ -93,7 +96,8 @@ struct SubscriptionPlan: Identifiable {
             productID: nil,
             displayPrice: nil,
             billingSummary: "Billed weekly",
-            hasIntroductoryOffer: false
+            hasIntroductoryOffer: false,
+            introOfferPeriodUnit: nil
         )
     ]
 }

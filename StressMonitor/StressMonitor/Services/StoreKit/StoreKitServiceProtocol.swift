@@ -42,4 +42,5 @@ protocol StoreKitServiceProtocol {
     func restorePurchases() async throws
     func fetchPurchaseHistory() async -> [String]
     func refreshEntitlements() async
+    func isEligibleForIntroOffer(for period: SubscriptionPeriod) async -> Bool
 }

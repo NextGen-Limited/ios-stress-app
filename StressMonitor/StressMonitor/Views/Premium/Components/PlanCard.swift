@@ -161,7 +161,7 @@ struct PlanCard: View {
 
     private func leftFooter(for plan: SubscriptionPlan) -> String {
         switch plan.period {
-        case .annual:  return plan.savingsDisplay ?? "Save 37%"
+        case .annual:  return plan.savingsDisplay ?? plan.billingSummary ?? ""
         case .monthly: return "No commitment"
         case .weekly:  return "Cancel anytime"
         }

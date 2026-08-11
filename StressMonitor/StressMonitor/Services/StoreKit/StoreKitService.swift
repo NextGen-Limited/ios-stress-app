@@ -211,6 +211,19 @@ final class StoreKitService: StoreKitServiceProtocol {
         premiumState.isPremiumUser = hasActive
     }
 
+    func isEligibleForIntroOffer(for period: SubscriptionPeriod) async -> Bool {
+        guard let productID = catalog.productID(for: period) else { return false }
+        let product: Product?
+        if let cached = productsByID[productID] {
+            product = cached
+        } else {
+            product = (try? await Product.products(for: [productID]))?.first
+        }
+        guard let product else { return false }
+        guard let subscription = product.subscription else { return false }
+        return await subscription.isEligibleForIntroOffer
+    }
+
     // MARK: - Transaction listener
 
     private func listenForTransactions() -> Task<Void, Never> {
@@ -286,7 +299,8 @@ final class StoreKitService: StoreKitServiceProtocol {
             productID: product.id,
             displayPrice: product.displayPrice,
             billingSummary: billingSummary,
-            hasIntroductoryOffer: product.subscription?.introductoryOffer != nil
+            hasIntroductoryOffer: product.subscription?.introductoryOffer != nil,
+            introOfferPeriodUnit: Self.introOfferPeriodUnit(from: product)
         )
     }
 
@@ -296,6 +310,18 @@ final class StoreKitService: StoreKitServiceProtocol {
         case .annual:  0
         case .monthly: 1
         case .weekly:  2
+        }
+    }
+
+    private static func introOfferPeriodUnit(from product: Product) -> String? {
+        guard let offer = product.subscription?.introductoryOffer else { return nil }
+        let value = offer.period.value
+        switch offer.period.unit {
+        case .day:   return "\(value)-day"
+        case .week:  return "\(value * 7)-day"
+        case .month: return "\(value)-month"
+        case .year:  return "\(value)-year"
+        @unknown default: return nil
         }
     }
 }
