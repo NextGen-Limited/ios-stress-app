@@ -62,7 +62,7 @@ Plans:
 **Blocking Decisions**: D5 (does the pre-V2 installed base have real user data that must be preserved? Determines "reconstruct frozen V1 snapshots + custom MigrationStage" vs "accept data loss via `eraseDatabaseOnSchemaChange`" — the largest effort swing in this phase, 0.5 day vs 2-3 days)
 **Success Criteria** (what must be TRUE):
 
-  1. An app installed over an existing store created by any prior build shape launches without `loadIssueModelContainer` — verified by round-trip integration test (create V1 store, insert data, reopen with migration plan, assert data survives and `Habit` is queryable).
+  1. An app installed over an existing store created by any prior build shape launches without `loadIssueModelContainer` — verified by integration test that creates a divergent prior store, reopens through the app's real recovery path, and asserts `Habit` is queryable on the recovered (fresh) store (per D5 = Option A, data loss on schema mismatch is accepted for pre-release).
   2. `fatalError` at `StressMonitorApp.swift:82` is replaced with a non-fatal recovery path in RELEASE (fresh container + telemetry log), so a migration defect never permanently bricks the app.
   3. The `VersionedSchema` pair declares frozen `@Model` snapshots per version (not live class reuse), so the migration diff reflects reality — OR `eraseDatabaseOnSchemaChange` is DEBUG-gated with a documented data-loss acceptance (per D5).
   4. CloudKit configuration is consistent: either the SwiftData `ModelConfiguration` binds `cloudKitContainer: .identifier("iCloud.stress.ai.com")` matching entitlements and all `@Model` types are CloudKit-conformant, OR the CloudKit entitlement is removed and the app is local-only.
