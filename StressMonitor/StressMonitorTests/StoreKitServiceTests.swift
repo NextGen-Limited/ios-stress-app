@@ -72,4 +72,49 @@ struct StoreKitServiceTests {
         try await fresh.restorePurchases()
         #expect(fresh.isPremiumUser)
     }
+
+    @Test("Annual savings computed from real monthly vs annual prices")
+    func annualSavingsComputedFromRealPrices() async throws {
+        _ = try makeSession()
+        let plans = await makeService().availablePlans
+        let annual = try #require(plans.first(where: { $0.period == .annual }))
+        let savings = try #require(annual.savingsPercent)
+        #expect(savings == 37)
+    }
+
+    @Test("Annual plan with no monthly comparator has nil savings, not a fabricated number")
+    func annualSavingsNilWhenMonthlyMissing() async throws {
+        _ = try makeSession()
+        let catalog = StoreKitProductCatalog(
+            weeklyProductID: nil,
+            monthlyProductID: nil,
+            annualProductID: Self.annual,
+            subscriptionGroupID: nil
+        )
+        let suite = "StoreKitServiceTests-partial-\(UUID().uuidString)"
+        let state = PremiumState(defaults: UserDefaults(suiteName: suite)!, key: "isPremiumUser")
+        let service = StoreKitService(premiumState: state, catalog: catalog)
+        let plans = await service.availablePlans
+        let annual = try #require(plans.first(where: { $0.period == .annual }))
+        #expect(annual.savingsPercent == nil)
+        #expect(annual.savingsDisplay == nil)
+    }
+
+    @Test("Annual plan carries derived intro offer period unit, monthly does not")
+    func introOfferPeriodUnitDerived() async throws {
+        _ = try makeSession()
+        let plans = await makeService().availablePlans
+        let annual = try #require(plans.first(where: { $0.period == .annual }))
+        let monthly = try #require(plans.first(where: { $0.period == .monthly }))
+        #expect(annual.introOfferPeriodUnit == "7-day")
+        #expect(monthly.introOfferPeriodUnit == nil)
+    }
+
+    @Test("Intro offer eligibility resolves for annual product")
+    func introOfferEligibilityResolves() async throws {
+        _ = try makeSession()
+        let service = makeService()
+        let eligible = await service.isEligibleForIntroOffer(for: .annual)
+        #expect(eligible)
+    }
 }
