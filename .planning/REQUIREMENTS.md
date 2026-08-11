@@ -11,7 +11,7 @@
 - [ ] **BUILD-01**: Release archive uploads to App Store Connect without Privacy Manifest validation failure (remove invalid `NSPrivacyAccessedAPICategoryHealthKit`; declare chat content correctly per decision D3)
 - [ ] **BUILD-02**: Widget and complications read/write the same App Group suite as the app on a real device (one canonical suite ID, not the current three)
 - [ ] **BUILD-03**: `xcodebuild -showBuildSettings` shows a single Info.plist source of truth (`INFOPLIST_KEY_*`); orphaned `StressMonitor/Info.plist` removed
-- [ ] **BUILD-04**: `xcodebuild test` executes a real unit-test bundle (currently zero test targets exist in `project.pbxproj`)
+- [x] **BUILD-04**: `xcodebuild test` executes a real unit-test bundle (currently zero test targets exist in `project.pbxproj`)
 
 ### Data Integrity & Deletion (DATA)
 
@@ -87,7 +87,7 @@ Deferred — see `docs/project-roadmap.md` Version 1.1/2.0 for detail.
 | BUILD-01 | Phase 1 | Pending |
 | BUILD-02 | Phase 1 | Pending |
 | BUILD-03 | Phase 1 | Pending |
-| BUILD-04 | Phase 1 | Pending |
+| BUILD-04 | Phase 1 | Complete |
 | WIRE-01 | Phase 1 | Pending |
 | DATA-01 | Phase 2 | Pending |
 | DATA-02 | Phase 2 | Pending |
@@ -112,6 +112,7 @@ Deferred — see `docs/project-roadmap.md` Version 1.1/2.0 for detail.
 | A11Y-05 | Phase 5 | Pending |
 
 **Coverage:**
+
 - v1 requirements: 26 total
 - Mapped to phases: 26/26 ✓
 - Unmapped: 0 ✓

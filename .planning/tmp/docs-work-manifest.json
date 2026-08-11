@@ -1,0 +1,124 @@
+{
+  "created_at": "2026-08-10T00:00:00Z",
+  "project_root": "/Users/ddphuong/Projects/next-labs/stress-ai/ios-stress-app",
+  "project_type": "swift-ios-app",
+  "canonical_queue": [
+    {
+      "type": "readme",
+      "resolved_path": "README.md",
+      "mode": "skip",
+      "wave": 1,
+      "status": "skipped",
+      "reason": "hand-written, preserve"
+    },
+    {
+      "type": "architecture",
+      "resolved_path": "docs/ARCHITECTURE.md",
+      "mode": "create",
+      "wave": 1,
+      "status": "verified"
+    },
+    {
+      "type": "configuration",
+      "resolved_path": "docs/CONFIGURATION.md",
+      "mode": "create",
+      "wave": 1,
+      "status": "verified"
+    },
+    {
+      "type": "getting_started",
+      "resolved_path": "docs/GETTING-STARTED.md",
+      "mode": "create",
+      "wave": 2,
+      "status": "verified"
+    },
+    {
+      "type": "development",
+      "resolved_path": "docs/DEVELOPMENT.md",
+      "mode": "create",
+      "wave": 2,
+      "status": "verified"
+    },
+    {
+      "type": "testing",
+      "resolved_path": "docs/TESTING.md",
+      "mode": "create",
+      "wave": 2,
+      "status": "verified"
+    },
+    {
+      "type": "deployment",
+      "resolved_path": "docs/DEPLOYMENT.md",
+      "mode": "create",
+      "wave": 2,
+      "status": "verified"
+    }
+  ],
+  "review_queue": [
+    {
+      "path": "docs/system-architecture.md",
+      "status": "reviewed"
+    },
+    {
+      "path": "docs/system-architecture-core.md",
+      "status": "reviewed"
+    },
+    {
+      "path": "docs/system-architecture-platform.md",
+      "status": "reviewed"
+    },
+    {
+      "path": "docs/code-standards.md",
+      "status": "reviewed"
+    },
+    {
+      "path": "docs/code-standards-swift.md",
+      "status": "reviewed"
+    },
+    {
+      "path": "docs/code-standards-patterns.md",
+      "status": "reviewed"
+    },
+    {
+      "path": "docs/codebase-summary.md",
+      "status": "reviewed"
+    },
+    {
+      "path": "docs/deployment-guide.md",
+      "status": "reviewed"
+    },
+    {
+      "path": "docs/deployment-guide-environment.md",
+      "status": "reviewed"
+    },
+    {
+      "path": "docs/deployment-guide-release.md",
+      "status": "reviewed"
+    },
+    {
+      "path": "docs/design-guidelines.md",
+      "status": "reviewed"
+    },
+    {
+      "path": "docs/design-guidelines-visual.md",
+      "status": "reviewed"
+    },
+    {
+      "path": "docs/design-guidelines-ux.md",
+      "status": "reviewed"
+    },
+    {
+      "path": "docs/project-overview-pdr.md",
+      "status": "reviewed"
+    },
+    {
+      "path": "docs/project-roadmap.md",
+      "status": "reviewed"
+    },
+    {
+      "path": "docs/INDEX.md",
+      "status": "reviewed"
+    }
+  ],
+  "commit_docs": false
+}

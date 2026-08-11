@@ -68,10 +68,10 @@ Plans:
   4. CloudKit configuration is consistent: either the SwiftData `ModelConfiguration` binds `cloudKitContainer: .identifier("iCloud.stress.ai.com")` matching entitlements and all `@Model` types are CloudKit-conformant, OR the CloudKit entitlement is removed and the app is local-only.
   5. The orphaned root source set (`./StressMonitor/StressMonitorApp.swift`, `./StressMonitor/StressMonitorSchema.swift`, `./StressMonitor/Models/StressMeasurement.swift`) is deleted — only the active target's models remain.
 
-**Plans**: 1/1 plans drafted
+**Plans**: 1/1 plans executed drafted
 Plans:
 
-- [ ] 01.1-01-PLAN.md — Non-fatal ModelContainer recovery (tracer integration test + fix), property-level migration defaults, CloudKit config consistency, orphaned root source deletion (D5 = Option A)
+- [x] 01.1-01-PLAN.md — Non-fatal ModelContainer recovery (tracer integration test + fix), property-level migration defaults, CloudKit config consistency, orphaned root source deletion (D5 = Option A)
 
 ### Phase 2: Data Integrity, Deletion & Consolidation
 
