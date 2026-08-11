@@ -9,13 +9,11 @@ struct EntitlementForegroundCorrectionTests {
 
     private static let annual = "com.stressmonitor.app.premium.annual"
 
-    // StoreKitTest connects one SKTestSession to the process-wide daemon at
-    // a time; a second file's own SKTestSession(configurationFileNamed:)
-    // silently detaches any session already active (e.g. StoreKitServiceTests'
-    // shared session), and this file's own purchase consumes the annual
-    // product's introductory-offer eligibility for the rest of the process.
-    // Route through the single shared session in StoreKitTestSessionProvider
-    // so every StoreKit-backed test file resets the same daemon connection.
+    // Not registered in project.pbxproj / not part of the running test
+    // target yet — see StoreKitServiceTests.swift's disabled-suite comment.
+    // This test's purchase(annual) call hits the same unresolved
+    // productNotFound issue on CI; route through the shared session so it's
+    // ready to enable once that issue is diagnosed with a working simulator.
     private func makeSession() -> SKTestSession {
         StoreKitTestSessionProvider.session()
     }
