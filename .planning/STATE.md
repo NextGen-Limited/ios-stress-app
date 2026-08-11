@@ -5,15 +5,15 @@ milestone_name: milestone
 current_phase: 2
 current_phase_name: Data Integrity, Deletion & Consolidation
 status: planning
-stopped_at: Phase 1 planned and verified (4 plans, 2 waves)
-last_updated: "2026-08-11T04:34:18.727Z"
+stopped_at: Completed 01-05-PLAN.md (CI test job + scheme UITests cleanup)
+last_updated: "2026-08-11T05:02:10.643Z"
 last_activity: 2026-08-11
 last_activity_desc: Phase 01.1 complete, transitioned to Phase 2
 progress:
   total_phases: 2
   completed_phases: 1
   total_plans: 7
-  completed_plans: 5
+  completed_plans: 6
 ---
 
 # Project State
@@ -32,7 +32,7 @@ Plan: Not started
 Status: Ready to plan
 Last activity: 2026-08-11 — Phase 01.1 complete, transitioned to Phase 2
 
-Progress: [░░░░░░░░░░] 0%
+Progress: [█████████░] 86%
 
 ## Performance Metrics
 
@@ -54,6 +54,11 @@ Progress: [░░░░░░░░░░] 0%
 - Trend: -
 
 *Updated after each plan completion*
+**Per-Plan Metrics:**
+
+| Plan | Duration | Tasks | Files |
+|------|----------|-------|-------|
+| Phase 01 P05 | 3m | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -65,6 +70,8 @@ Recent decisions affecting current work:
 - [Init]: Replaced the initially-scoped "test infra only" milestone with the full 7-phase App Store remediation plan already drafted at `plans/0808-2042-appstore-submission-remediation/plan.md`.
 - [Init]: REQ-IDs map directly to that plan's phases rather than re-deriving requirements from scratch.
 - [Roadmap]: Consolidated the source plan's 7 phases into 5 for coarse granularity — merged WIRE-01 into Phase 1 (shares App Group entitlement work with BUILD-02), merged WIRE-02 into Phase 2 (same underlying fix as DATA-01's retarget), merged Store Listing (old Phase 6) with Accessibility (old Phase 7) into Phase 5 (no shared files, both largely calendar-gated rather than code-sequenced). Auth (Phase 3) and IAP (Phase 4) kept standalone — merging either would obscure a blocking decision (D1) or create an oversized phase.
+- [Phase ?]: 01-05: CI test job uses iPhone 16 Simulator destination with no -only-testing filter; scheme TestAction scopes the bundle
+- [Phase ?]: 01-05: Test job cache keys matched lint-and-build verbatim so both jobs share DerivedData/SPM cache lines
 
 ### Pending Todos
 
@@ -90,6 +97,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-08-08T17:37:45.864Z
-Stopped at: Phase 1 planned and verified (4 plans, 2 waves)
-Resume file: .planning/phases/01-build-configuration-widget-wiring/01-01-PLAN.md
+Last session: 2026-08-11T05:02:10.630Z
+Stopped at: Completed 01-05-PLAN.md (CI test job + scheme UITests cleanup)
+Resume file: None

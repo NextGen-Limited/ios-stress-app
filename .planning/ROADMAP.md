@@ -44,8 +44,11 @@ product decisions (D1-D4) that still gate specific scope.
   4. `xcodebuild test` executes a real unit-test bundle and reports pass/fail.
   5. The home-screen widget reflects a stress measurement taken seconds earlier on a real device — or, per D4, the widget target is excluded from the build entirely.
 
-**Plans**: 4/4 plans executed
+**Plans**: 5/6 plans executed
 Plans:
+
+- [x] 01-05-PLAN.md
+- [ ] 01-06-PLAN.md
 
 - [x] 01-01-PLAN.md — Wire the widget's App Group entitlement (tracer) + complete the Privacy Manifest + delete the orphaned Info.plist
 - [x] 01-02-PLAN.md — Resolve widget data state as fresh/stale/empty and render it per the UI-SPEC
@@ -144,7 +147,7 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5. Phase 3 (Auth) is co
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Build Configuration & Widget Wiring | 4/4 | In Progress|  |
+| 1. Build Configuration & Widget Wiring | 5/6 | In Progress|  |
 | 2. Data Integrity, Deletion & Consolidation | 0/TBD | Not started | - |
 | 3. Auth & Chat Availability | 0/TBD | Not started | - |
 | 4. IAP Revenue Path | 0/TBD | Not started | - |
