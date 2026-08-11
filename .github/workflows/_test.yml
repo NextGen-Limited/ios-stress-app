@@ -178,17 +178,37 @@ jobs:
         id: simulator
         run: |
           set -o pipefail
-          DESTINATIONS=$(xcodebuild -showdestinations -project StressMonitor/StressMonitor.xcodeproj -scheme "$SCHEME" 2>/dev/null)
-          MATCH=$(echo "$DESTINATIONS" | grep -E 'platform:iOS Simulator.*name:iPhone' | head -1)
-          if [ -z "$MATCH" ]; then
-            echo "::error::No iPhone Simulator destination found for scheme $SCHEME on this runner." >&2
-            echo "Full destination list:" >&2
-            echo "$DESTINATIONS" >&2
-            exit 1
-          fi
-          UDID=$(echo "$MATCH" | grep -oE 'id:[0-9A-F-]{36}' | cut -d: -f2)
+          resolve_udid() {
+            xcodebuild -showdestinations -project StressMonitor/StressMonitor.xcodeproj -scheme "$SCHEME" 2>/dev/null \
+              | grep -E 'platform:iOS Simulator.*name:iPhone' \
+              | head -1 \
+              | grep -oE 'id:[0-9A-F-]{36}' | cut -d: -f2
+          }
+
+          UDID=$(resolve_udid)
+
+          # Rare runner-image state with zero pre-provisioned concrete simulators
+          # (only "Any iOS Simulator Device" placeholder) — provision one instead
+          # of failing outright.
           if [ -z "$UDID" ]; then
-            echo "::error::Failed to extract a UDID from matched destination line: $MATCH" >&2
+            echo "No iPhone destination found for scheme $SCHEME — provisioning one." >&2
+            RUNTIME=$(xcrun simctl list runtimes available -j | python3 -c "import sys, json; runtimes=[r for r in json.load(sys.stdin)['runtimes'] if 'iOS' in r['name']]; runtimes.sort(key=lambda r: tuple(int(x) for x in r['version'].split('.'))); print(runtimes[-1]['identifier'] if runtimes else '')")
+            DEVTYPE=$(xcrun simctl list devicetypes -j | python3 -c "import sys, json; types=[d['identifier'] for d in json.load(sys.stdin)['devicetypes'] if d['identifier'].startswith('com.apple.CoreSimulator.SimDeviceType.iPhone')]; print(types[0] if types else '')")
+            if [ -z "$RUNTIME" ] || [ -z "$DEVTYPE" ]; then
+              echo "::error::No iOS runtime or iPhone device type available to provision a simulator." >&2
+              xcrun simctl list runtimes >&2
+              xcrun simctl list devicetypes >&2
+              exit 1
+            fi
+            echo "Creating simulator: device=$DEVTYPE runtime=$RUNTIME" >&2
+            xcrun simctl create "ci-iphone" "$DEVTYPE" "$RUNTIME" >&2
+            UDID=$(resolve_udid)
+          fi
+
+          if [ -z "$UDID" ]; then
+            echo "::error::No iPhone Simulator destination found for scheme $SCHEME on this runner, even after provisioning." >&2
+            echo "Full destination list:" >&2
+            xcodebuild -showdestinations -project StressMonitor/StressMonitor.xcodeproj -scheme "$SCHEME" 2>/dev/null >&2
             exit 1
           fi
           echo "udid=$UDID" >> "$GITHUB_OUTPUT"
