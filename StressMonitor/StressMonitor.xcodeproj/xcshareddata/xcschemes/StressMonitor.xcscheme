@@ -41,17 +41,6 @@
                ReferencedContainer = "container:StressMonitor.xcodeproj">
             </BuildableReference>
          </TestableReference>
-         <TestableReference
-            skipped = "NO"
-            parallelizable = "YES">
-            <BuildableReference
-               BuildableIdentifier = "primary"
-               BlueprintIdentifier = "F2E2EC012F1CC556000C2B53"
-               BuildableName = "StressMonitorUITests.xctest"
-               BlueprintName = "StressMonitorUITests"
-               ReferencedContainer = "container:StressMonitor.xcodeproj">
-            </BuildableReference>
-         </TestableReference>
       </Testables>
    </TestAction>
    <LaunchAction
