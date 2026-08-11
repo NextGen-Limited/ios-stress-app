@@ -20,6 +20,7 @@ final class DataDeleterService: DataDeleter {
 
     // MARK: - Dependencies
 
+    private let modelContext: ModelContext
     private let localWipeService: LocalDataWipeService
     private let cloudKitResetService: CloudKitResetService
     private let repository: StressRepositoryProtocol
@@ -33,6 +34,7 @@ final class DataDeleterService: DataDeleter {
         repository: StressRepositoryProtocol,
         logger: DataManagementLogger
     ) {
+        self.modelContext = modelContext
         self.localWipeService = LocalDataWipeService(modelContext: modelContext, logger: logger)
         self.cloudKitResetService = CloudKitResetService(container: cloudKitContainer, logger: logger)
         self.repository = repository
@@ -81,6 +83,8 @@ final class DataDeleterService: DataDeleter {
 
             // Clear cached baseline
             try await repository.updateBaseline(PersonalBaseline())
+
+            Self.clearCredentialsAndSharedCaches()
 
             deleteProgress = 1.0
             currentOperation = "Deletion complete"
@@ -295,12 +299,16 @@ final class DataDeleterService: DataDeleter {
             deleteProgress = 0.55
 
             try await localWipeService.deleteAllMeasurements()
+            try modelContext.delete(model: CharacterUnlock.self)
+            try modelContext.save()
 
             // Phase 3: Reset baseline (90% - 100%)
             currentOperation = "Resetting baseline"
             deleteProgress = 0.9
 
             try await repository.updateBaseline(PersonalBaseline())
+
+            Self.clearCredentialsAndSharedCaches()
 
             deleteProgress = 1.0
             currentOperation = "Factory reset complete"
@@ -347,6 +355,18 @@ final class DataDeleterService: DataDeleter {
         return await MainActor.run {
             localWipeService.totalCount()
         }
+    }
+
+    // MARK: - Credential & Shared Cache Clearance
+
+    /// Clears the Supabase session tokens from Keychain and wipes the App Group
+    /// widget/complication cache. Called from both delete-all and factory-reset
+    /// paths so a "deleted" user is actually signed out and the widget stops
+    /// showing deleted data.
+    static func clearCredentialsAndSharedCaches() {
+        SupabaseLLMService.clearStoredCredentials()
+        UserDefaults(suiteName: WidgetConstants.appGroupID)?
+            .removePersistentDomain(forName: WidgetConstants.appGroupID)
     }
 
     // MARK: - Error Recovery
