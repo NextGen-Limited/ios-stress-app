@@ -11,7 +11,7 @@ struct IAPNavBar: View {
                 Image(systemName: AppIconSystem.Nav.back.sfSymbol)
                     .font(.system(size: 16, weight: .bold))
                     .foregroundStyle(Color.iapTextSecondary)
-                    .frame(width: 38, height: 38)
+                    .frame(width: 44, height: 44)
                     .background(
                         Circle()
                             .fill(Color(light: Color.white.opacity(0.62), dark: Color.white.opacity(0.06)))
@@ -36,7 +36,7 @@ struct IAPNavBar: View {
                 Image(systemName: AppIconSystem.Nav.close.sfSymbol)
                     .font(.system(size: 14, weight: .bold))
                     .foregroundStyle(Color.iapTextSecondary)
-                    .frame(width: 38, height: 38)
+                    .frame(width: 44, height: 44)
                     .background(
                         Circle()
                             .fill(Color(light: Color.white.opacity(0.62), dark: Color.white.opacity(0.06)))

@@ -348,7 +348,7 @@ struct ChatBottomSheetView: View {
                 Image(systemName: "arrow.up")
                     .font(.system(size: 16, weight: .semibold))
                     .foregroundStyle(.white)
-                    .frame(width: 36, height: 36)
+                    .frame(width: 44, height: 44)
                     .background(canSend ? Color(hex: "#0288D1") : Color.Wellness.adaptiveSecondaryText.opacity(0.3))
                     .clipShape(Circle())
             }
