@@ -4,9 +4,9 @@ import SwiftUI
 
 @Model
 public final class StressMeasurement {
-  public var timestamp: Date
-  public var stressLevel: Double
-  public var hrv: Double
+  public var timestamp: Date = Date()
+  public var stressLevel: Double = 0
+  public var hrv: Double = 0
     public var restingHeartRate: Double = 0
     public var categoryRawValue: String = StressCategory.mild.rawValue
   public var confidences: [Double]?
