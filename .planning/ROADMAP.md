@@ -146,7 +146,11 @@ Plans:
   4. All interactive touch targets meet 44×44pt (paywall nav bar, chat composer), the flagged color-contrast failures are fixed (`CategoryFilterChip`, `StressHeroCard`), and Reduce Motion is respected on the breathing-exercise and mini-walk animations.
   5. Dynamic Type scales text app-wide through the existing (previously zero-call-site) helpers, and the orphaned unreachable redesign views are deleted.
 
-**Plans**: TBD
+**Plans**: 1/1 plans executed
+Plans:
+
+- [x] 05-01-PLAN.md — Delete orphaned views, fix touch targets/contrast/Reduce Motion/Dynamic Type, fix Fastlane release lane (A11Y-01..05, SHIP-02); SHIP-01/SHIP-03 deferred as checkpoint:human-verify
+
 **UI hint**: yes
 
 ## Progress
@@ -160,4 +164,4 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5. Phase 3 (Auth) is co
 | 2. Data Integrity, Deletion & Consolidation | 1/1 | In Progress|  |
 | 3. Auth & Chat Availability | 0/TBD | Not started | - |
 | 4. IAP Revenue Path | 1/1 | In Progress|  |
-| 5. Store Readiness & Accessibility | 0/TBD | Not started | - |
+| 5. Store Readiness & Accessibility | 1/1 | In Progress|  |

@@ -42,16 +42,16 @@
 ### Store Listing & Release Mechanics (SHIP)
 
 - [ ] **SHIP-01**: At least one iPhone screenshot set (6.9" or 6.5") exists for the App Store listing, captured with demo mode disabled
-- [ ] **SHIP-02**: The Fastlane `release` lane matches actual readiness for a first submission (manual ASC submission path, not blind `deliver --submit_for_review` against empty `fastlane/metadata/`)
+- [x] **SHIP-02**: The Fastlane `release` lane matches actual readiness for a first submission (manual ASC submission path, not blind `deliver --submit_for_review` against empty `fastlane/metadata/`)
 - [ ] **SHIP-03**: The ASC privacy questionnaire is answered consistently with decision D3's resolution
 
 ### Accessibility (A11Y)
 
-- [ ] **A11Y-01**: All interactive touch targets meet the 44×44pt minimum (paywall nav bar, chat composer currently below it)
-- [ ] **A11Y-02**: Color-contrast failures fixed (`CategoryFilterChip`, `StressHeroCard` yellow-on-white)
-- [ ] **A11Y-03**: `repeatForever` animations on stress-relief screens (breathing exercise, mini walk) respect Reduce Motion
-- [ ] **A11Y-04**: Dynamic Type is adopted app-wide — `Typography.swift`/`Font+WellnessType.swift` use relative sizing; existing but currently-unused helpers (`.accessibleDynamicType()`, `.stressDualCoding()`, `.minimumTouchTarget()`) are actually called from the 743+ current `.font(.system(size:))` call sites
-- [ ] **A11Y-05**: Orphaned, unreachable redesign views (`WeeklyHeatmapView`, `DailyTimelineView`, `LineChartView`, `StressChart7d`, `AccessibleStressTrendChart`) are deleted rather than made accessible
+- [x] **A11Y-01**: All interactive touch targets meet the 44×44pt minimum (paywall nav bar, chat composer currently below it)
+- [x] **A11Y-02**: Color-contrast failures fixed (`CategoryFilterChip`, `StressHeroCard` yellow-on-white)
+- [x] **A11Y-03**: `repeatForever` animations on stress-relief screens (breathing exercise, mini walk) respect Reduce Motion
+- [x] **A11Y-04**: Dynamic Type is adopted app-wide — `Typography.swift`/`Font+WellnessType.swift` use relative sizing; existing but currently-unused helpers (`.accessibleDynamicType()`, `.stressDualCoding()`, `.minimumTouchTarget()`) are actually called from the 743+ current `.font(.system(size:))` call sites
+- [x] **A11Y-05**: Orphaned, unreachable redesign views (`WeeklyHeatmapView`, `DailyTimelineView`, `LineChartView`, `StressChart7d`, `AccessibleStressTrendChart`) are deleted rather than made accessible
 
 ## v2 Requirements
 
@@ -103,13 +103,13 @@ Deferred — see `docs/project-roadmap.md` Version 1.1/2.0 for detail.
 | IAP-05 | Phase 4 | Complete |
 | IAP-06 | Phase 4 | Complete |
 | SHIP-01 | Phase 5 | Pending |
-| SHIP-02 | Phase 5 | Pending |
+| SHIP-02 | Phase 5 | Complete |
 | SHIP-03 | Phase 5 | Pending |
-| A11Y-01 | Phase 5 | Pending |
-| A11Y-02 | Phase 5 | Pending |
-| A11Y-03 | Phase 5 | Pending |
-| A11Y-04 | Phase 5 | Pending |
-| A11Y-05 | Phase 5 | Pending |
+| A11Y-01 | Phase 5 | Complete |
+| A11Y-02 | Phase 5 | Complete |
+| A11Y-03 | Phase 5 | Complete |
+| A11Y-04 | Phase 5 | Complete |
+| A11Y-05 | Phase 5 | Complete |
 
 **Coverage:**
 

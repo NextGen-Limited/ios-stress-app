@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_phase: 2
-current_phase_name: Data Integrity, Deletion & Consolidation
-status: planning
-stopped_at: Completed 04-01-PLAN.md
-last_updated: "2026-08-11T06:55:04.581Z"
+current_phase: 5
+current_phase_name: Store Readiness & Accessibility
+status: executing
+stopped_at: Completed 05-01-PLAN.md
+last_updated: "2026-08-11T07:12:00.000Z"
 last_activity: 2026-08-11
-last_activity_desc: Phase 01.1 complete, transitioned to Phase 2
+last_activity_desc: Phase 5 Plan 01 code tasks complete
 progress:
   total_phases: 5
   completed_phases: 4
@@ -27,10 +27,10 @@ See: .planning/PROJECT.md (updated 2026-08-08)
 
 ## Current Position
 
-Phase: 2 — Data Integrity, Deletion & Consolidation
-Plan: Not started
-Status: Ready to plan
-Last activity: 2026-08-11 — Phase 01.1 complete, transitioned to Phase 2
+Phase: 5 — Store Readiness & Accessibility
+Plan: 01 complete (code tasks); SHIP-01/SHIP-03 deferred as checkpoint:human-verify
+Status: Code tasks complete, process tasks deferred
+Last activity: 2026-08-11 — Phase 5 Plan 01 code tasks complete
 
 Progress: [█████████░] 90%
 
@@ -61,6 +61,7 @@ Progress: [█████████░] 90%
 | Phase 01 P05 | 3m | 2 tasks | 2 files |
 | Phase 02 P01 | 45min | 3 tasks | 8 files |
 | Phase 04 P01 | ~26 min | 3 tasks | 16 files |
+| Phase 05 P01 | ~11 min | 6 tasks | 19 files |
 
 ## Accumulated Context
 
@@ -79,6 +80,9 @@ Recent decisions affecting current work:
 - [Phase ?]: Added CharacterUnlock deletion to DataDeleterService.performFactoryReset to match UI contract
 - [Phase ?]: D-05: Premium character unlocks are one-time-permanent — persist after subscription lapse
 - [Phase ?]: D-01: StoreKitServiceEnvironment Release path uses real StoreKitService; DEBUG uses Mock
+- [Phase 5]: Moderate-stress yellow gets two accessible variants: #B8860B for text-on-light, #1A1A2E for text-on-yellow-fill
+- [Phase 5]: Dynamic Type applied at screen root via .accessibleDynamicType() rather than per-label (602 fixed-size sites out of scope)
+- [Phase 5]: Fastlane release lane uploads metadata only; review submission is manual in ASC
 
 ### Pending Todos
 
@@ -105,6 +109,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-08-11T06:55:04.360Z
-Stopped at: Completed 04-01-PLAN.md
+Last session: 2026-08-11T07:12:00.000Z
+Stopped at: Completed 05-01-PLAN.md
 Resume file: None
