@@ -9,19 +9,19 @@ import SwiftData
 final class CharacterUnlock {
     #Unique<CharacterUnlock>([\.characterId])
 
-    var characterId: String        // "ripple", "blossom", etc.
-    var isUnlocked: Bool
-    var currentEvolution: String   // EvolutionStage rawValue
-    var isActive: Bool             // Currently selected as active character
+    var characterId: String = ""   // "ripple", "blossom", etc.
+    var isUnlocked: Bool = false
+    var currentEvolution: String = EvolutionStage.droplet.rawValue   // EvolutionStage rawValue
+    var isActive: Bool = false     // Currently selected as active character
     var unlockedAt: Date?
     var lastEvolvedAt: Date?
 
     /// Streak days tracked for this character
-    var streakDays: Int
+    var streakDays: Int = 0
     /// Breathing/mindfulness sessions completed toward evolution
-    var sessionsCompleted: Int
+    var sessionsCompleted: Int = 0
     /// Resilience score at last check
-    var resilienceScore: Double
+    var resilienceScore: Double = 0
 
     init(
         characterId: String,

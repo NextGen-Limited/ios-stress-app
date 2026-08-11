@@ -60,12 +60,12 @@ enum HabitType: String, CaseIterable, Codable, Sendable, Identifiable {
 /// Persisted daily habit log. One row per habit per day.
 @Model
 final class Habit {
-    var id: UUID
-    var type: HabitType
-    var currentValue: Double
-    var goalValue: Double
-    var source: HabitSource
-    var date: Date
+    var id: UUID = UUID()
+    var type: HabitType = HabitType.hydration
+    var currentValue: Double = 0
+    var goalValue: Double = 0
+    var source: HabitSource = HabitSource.auto
+    var date: Date = Date()
 
     init(
         id: UUID = UUID(),

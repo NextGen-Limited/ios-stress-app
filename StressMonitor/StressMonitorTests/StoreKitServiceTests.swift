@@ -11,11 +11,23 @@ struct StoreKitServiceTests {
     private static let monthly = "com.stressmonitor.app.premium.monthly"
     private static let annual = "com.stressmonitor.app.premium.annual"
 
-    private func makeSession() throws -> SKTestSession {
-        let session = try SKTestSession(configurationFileNamed: "StressMonitorProducts.storekit")
+    // StoreKitTest ties product/transaction state to the process's single
+    // active SKTestSession — creating a new SKTestSession per test leaves
+    // the previous session's products stale for the StoreKitTest daemon,
+    // so every test after the first sees productNotFound. Apple's documented
+    // pattern is one session for the whole run, reset via clearTransactions().
+    // A `static let` is shared across the fresh struct instance Swift Testing
+    // creates for each @Test; `.serialized` prevents concurrent resets.
+    private static let sharedSession: SKTestSession = {
+        // swiftlint:disable:next force_try
+        let session = try! SKTestSession(configurationFileNamed: "StressMonitorProducts.storekit")
         session.disableDialogs = true
-        session.clearTransactions()
         return session
+    }()
+
+    private func makeSession() throws -> SKTestSession {
+        Self.sharedSession.clearTransactions()
+        return Self.sharedSession
     }
 
     private func makeService() -> StoreKitService {
