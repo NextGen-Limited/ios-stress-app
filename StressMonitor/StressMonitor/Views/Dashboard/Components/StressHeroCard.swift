@@ -120,7 +120,7 @@ struct StressHeroCard: View {
             Text(hasData ? category.displayName : "No Data")
                 .font(.system(size: 30, weight: .bold, design: .rounded))
                 .tracking(-0.8)
-                .foregroundStyle(fillColor)
+                .foregroundStyle(hasData ? category.readableTextColor : fillColor)
 
             Text(hasData ? substate : "Waiting for a reading")
                 .font(.system(size: 13, weight: .medium))
