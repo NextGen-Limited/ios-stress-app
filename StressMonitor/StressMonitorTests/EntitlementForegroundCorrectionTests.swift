@@ -9,11 +9,15 @@ struct EntitlementForegroundCorrectionTests {
 
     private static let annual = "com.stressmonitor.app.premium.annual"
 
-    private func makeSession() throws -> SKTestSession {
-        let session = try SKTestSession(configurationFileNamed: "StressMonitorProducts.storekit")
-        session.disableDialogs = true
-        session.clearTransactions()
-        return session
+    // StoreKitTest connects one SKTestSession to the process-wide daemon at
+    // a time; a second file's own SKTestSession(configurationFileNamed:)
+    // silently detaches any session already active (e.g. StoreKitServiceTests'
+    // shared session), and this file's own purchase consumes the annual
+    // product's introductory-offer eligibility for the rest of the process.
+    // Route through the single shared session in StoreKitTestSessionProvider
+    // so every StoreKit-backed test file resets the same daemon connection.
+    private func makeSession() -> SKTestSession {
+        StoreKitTestSessionProvider.session()
     }
 
     private func makeService() -> StoreKitService {
@@ -31,7 +35,7 @@ struct EntitlementForegroundCorrectionTests {
 
     @Test("Refresh after refund corrects stale-premium to false")
     func refreshCorrectsStalePremiumAfterRefund() async throws {
-        let session = try makeSession()
+        let session = makeSession()
         let service = makeService()
 
         let annual = try #require(await service.availablePlans.first(where: { $0.period == .annual }))

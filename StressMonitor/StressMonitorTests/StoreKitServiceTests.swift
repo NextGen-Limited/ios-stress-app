@@ -11,31 +11,12 @@ struct StoreKitServiceTests {
     private static let monthly = "com.stressmonitor.app.premium.monthly"
     private static let annual = "com.stressmonitor.app.premium.annual"
 
-    // StoreKitTest ties product/transaction state to the process's single
-    // active SKTestSession — creating a new SKTestSession per test leaves
-    // the previous session's products stale for the StoreKitTest daemon,
-    // so every test after the first sees productNotFound. Apple's documented
-    // pattern is one session for the whole run, reset via clearTransactions().
-    // A `static let` is shared across the fresh struct instance Swift Testing
-    // creates for each @Test; `.serialized` prevents concurrent resets.
-    private static let sharedSession: SKTestSession = {
-        // swiftlint:disable:next force_try
-        let session = try! SKTestSession(configurationFileNamed: "StressMonitorProducts.storekit")
-        session.disableDialogs = true
-        return session
-    }()
-
-    private func makeSession() throws -> SKTestSession {
-        // clearTransactions() only clears purchase history — it does NOT
-        // reset introductory-offer eligibility, which StoreKitTest tracks
-        // separately per session. A purchase test earlier in the (unordered)
-        // suite run permanently consumes the annual product's intro-offer
-        // eligibility for the rest of the process, causing
-        // hasIntroductoryOffer/isEligibleForIntroOffer to read false in
-        // later tests. resetToDefaultState() clears that too.
-        Self.sharedSession.resetToDefaultState()
-        Self.sharedSession.disableDialogs = true
-        return Self.sharedSession
+    // StoreKitTest connects one SKTestSession to the process-wide daemon at
+    // a time. All StoreKit-backed test files share StoreKitTestSessionProvider
+    // so no file's own SKTestSession(configurationFileNamed:) silently
+    // detaches another's — see that type's doc comment for the full story.
+    private func makeSession() -> SKTestSession {
+        StoreKitTestSessionProvider.session()
     }
 
     private func makeService() -> StoreKitService {
@@ -53,14 +34,14 @@ struct StoreKitServiceTests {
 
     @Test("Available plans load all three products")
     func availablePlansLoadAllThree() async throws {
-        _ = try makeSession()
+        _ = makeSession()
         let plans = await makeService().availablePlans
         #expect(Set(plans.map(\.period)) == [.weekly, .monthly, .annual])
     }
 
     @Test("Annual plan carries the introductory offer, monthly does not")
     func introductoryOfferFlag() async throws {
-        _ = try makeSession()
+        _ = makeSession()
         let plans = await makeService().availablePlans
         let annual = try #require(plans.first(where: { $0.period == .annual }))
         let monthly = try #require(plans.first(where: { $0.period == .monthly }))
@@ -70,7 +51,7 @@ struct StoreKitServiceTests {
 
     @Test("Purchase grants premium entitlement")
     func purchaseGrantsEntitlement() async throws {
-        _ = try makeSession()
+        _ = makeSession()
         let service = makeService()
         #expect(service.isPremiumUser == false)
 
@@ -82,7 +63,7 @@ struct StoreKitServiceTests {
 
     @Test("Restore on a fresh service recovers entitlement")
     func restoreRecoversEntitlement() async throws {
-        _ = try makeSession()
+        _ = makeSession()
         let buyer = makeService()
         let annual = try #require(await buyer.availablePlans.first(where: { $0.period == .annual }))
         try await buyer.purchase(annual)
@@ -95,7 +76,7 @@ struct StoreKitServiceTests {
 
     @Test("Annual savings computed from real monthly vs annual prices")
     func annualSavingsComputedFromRealPrices() async throws {
-        _ = try makeSession()
+        _ = makeSession()
         let plans = await makeService().availablePlans
         let annual = try #require(plans.first(where: { $0.period == .annual }))
         let savings = try #require(annual.savingsPercent)
@@ -104,7 +85,7 @@ struct StoreKitServiceTests {
 
     @Test("Annual plan with no monthly comparator has nil savings, not a fabricated number")
     func annualSavingsNilWhenMonthlyMissing() async throws {
-        _ = try makeSession()
+        _ = makeSession()
         let catalog = StoreKitProductCatalog(
             weeklyProductID: nil,
             monthlyProductID: nil,
@@ -122,7 +103,7 @@ struct StoreKitServiceTests {
 
     @Test("Annual plan carries derived intro offer period unit, monthly does not")
     func introOfferPeriodUnitDerived() async throws {
-        _ = try makeSession()
+        _ = makeSession()
         let plans = await makeService().availablePlans
         let annual = try #require(plans.first(where: { $0.period == .annual }))
         let monthly = try #require(plans.first(where: { $0.period == .monthly }))
@@ -132,7 +113,7 @@ struct StoreKitServiceTests {
 
     @Test("Intro offer eligibility resolves for annual product")
     func introOfferEligibilityResolves() async throws {
-        _ = try makeSession()
+        _ = makeSession()
         let service = makeService()
         let eligible = await service.isEligibleForIntroOffer(for: .annual)
         #expect(eligible)
@@ -140,7 +121,7 @@ struct StoreKitServiceTests {
 
     @Test("Cancel via refund revokes premium entitlement on refresh")
     func cancelViaRefundRevokesEntitlement() async throws {
-        let session = try makeSession()
+        let session = makeSession()
         let service = makeService()
 
         let annual = try #require(await service.availablePlans.first(where: { $0.period == .annual }))
@@ -156,7 +137,7 @@ struct StoreKitServiceTests {
 
     @Test("Expiry revokes premium entitlement on refresh")
     func expiryRevokesEntitlement() async throws {
-        let session = try makeSession()
+        let session = makeSession()
         let service = makeService()
 
         let annual = try #require(await service.availablePlans.first(where: { $0.period == .annual }))
