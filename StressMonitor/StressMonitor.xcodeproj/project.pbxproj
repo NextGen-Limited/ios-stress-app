@@ -30,6 +30,8 @@
 		F26968812F5DAE2400B40F0F /* BuildFile in Frameworks */ = {isa = PBXBuildFile; };
 		F2E2EC392F1CC605000C2B53 /* StressMonitorWatch Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = F2E2EC192F1CC602000C2B53 /* StressMonitorWatch Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		F2FCD7AF2F8FFBFF000DE6E8 /* BuildFile in Frameworks */ = {isa = PBXBuildFile; };
+		F1A1B2C3D4E500000000B001 /* ModelContainerRecoveryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A1B2C3D4E500000000A001 /* ModelContainerRecoveryTests.swift */; };
+		F1A1B2C3D4E500000000B002 /* StressMeasurementMigrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A1B2C3D4E500000000A002 /* StressMeasurementMigrationTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -104,6 +106,8 @@
 		F2E2EC252F1CC605000C2B53 /* StressMonitorWatch Watch AppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "StressMonitorWatch Watch AppTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		F2E2EC2F2F1CC605000C2B53 /* StressMonitorWatch Watch AppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "StressMonitorWatch Watch AppUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		FF19921F5E82175704921949 /* StressContextPayloadTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = StressContextPayloadTests.swift; path = StressMonitorTests/StressContextPayloadTests.swift; sourceTree = "<group>"; };
+		F1A1B2C3D4E500000000A001 /* ModelContainerRecoveryTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ModelContainerRecoveryTests.swift; path = StressMonitorTests/ModelContainerRecoveryTests.swift; sourceTree = "<group>"; };
+		F1A1B2C3D4E500000000A002 /* StressMeasurementMigrationTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = StressMeasurementMigrationTests.swift; path = StressMonitorTests/StressMeasurementMigrationTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -465,6 +469,8 @@
 				B31DF5E223857E730C1F1B04 /* SupabaseAuthServiceTests.swift in Sources */,
 				39419B30DE0EE4EDBA6A2CB4 /* WidgetPublisherKeyMatchingTests.swift in Sources */,
 				E8D9B7231036C614602516E5 /* WidgetDataStateTests.swift in Sources */,
+				F1A1B2C3D4E500000000B001 /* ModelContainerRecoveryTests.swift in Sources */,
+				F1A1B2C3D4E500000000B002 /* StressMeasurementMigrationTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -1,8 +1,6 @@
+import os
 import SwiftData
 import SwiftUI
-#if DEBUG
-import os
-#endif
 
 #if DEBUG
 enum DemoMode {
@@ -66,22 +64,92 @@ struct StressMonitorApp: App {
 
     static let modelConfiguration = ModelConfiguration(
         schema: schema,
-        isStoredInMemoryOnly: false
+        isStoredInMemoryOnly: false,
+        cloudKitDatabase: .automatic
     )
 
-    var sharedModelContainer: ModelContainer = {
+    private static let persistenceLogger = Logger(
+        subsystem: "com.stressmonitor.app",
+        category: "Persistence"
+    )
+
+    var sharedModelContainer: ModelContainer = { makeContainer() }()
+
+    // MARK: - ModelContainer Recovery
+
+    /// Creates the app's ModelContainer. When `url` is nil the default Application
+    /// Support location is used; tests pass an isolated URL under the temp dir.
+    /// On a schema mismatch the on-disk store is deleted and the container is
+    /// recreated without a migration plan (D5 = Option A: accept data loss).
+    internal static func makeContainer(at url: URL? = nil) -> ModelContainer {
         do {
-            let container = try ModelContainer(
-                for: schema,
-                migrationPlan: AppMigrationPlan.self,
-                configurations: [modelConfiguration]
-            )
+            let container = try makePrimaryContainer(at: url)
             seedDefaultCharacterUnlocks(in: container.mainContext)
             return container
         } catch {
-            fatalError("Could not create ModelContainer: \(error)")
+            persistenceLogger.error("ModelContainer primary creation failed: \(error.localizedDescription). Recovering.")
+            return makeRecoveredContainer(at: url)
         }
-    }()
+    }
+
+    private static func makePrimaryContainer(at url: URL?) throws -> ModelContainer {
+        try ModelContainer(
+            for: schema,
+            migrationPlan: AppMigrationPlan.self,
+            configurations: [makeConfiguration(at: url)]
+        )
+    }
+
+    private static func makeRecoveredContainer(at url: URL?) -> ModelContainer {
+        let storeURL = resolvedStoreURL(for: url)
+        removeStoreFiles(at: storeURL)
+
+        let recoveryConfig: ModelConfiguration
+        if let url {
+            recoveryConfig = ModelConfiguration(schema: schema, url: url, cloudKitDatabase: .none)
+        } else {
+            recoveryConfig = ModelConfiguration(schema: schema, isStoredInMemoryOnly: false, cloudKitDatabase: .none)
+        }
+
+        do {
+            let container = try ModelContainer(
+                for: schema,
+                configurations: [recoveryConfig]
+            )
+            seedDefaultCharacterUnlocks(in: container.mainContext)
+            persistenceLogger.notice("Recovered ModelContainer (local-only) after deleting incompatible store.")
+            return container
+        } catch {
+            persistenceLogger.fault("Recovery failed: \(error.localizedDescription). Using in-memory fallback.")
+            let memoryConfig = ModelConfiguration(schema: schema, isStoredInMemoryOnly: true, cloudKitDatabase: .none)
+            let container = try! ModelContainer(for: schema, configurations: [memoryConfig])
+            seedDefaultCharacterUnlocks(in: container.mainContext)
+            return container
+        }
+    }
+
+    private static func makeConfiguration(at url: URL?) -> ModelConfiguration {
+        if let url {
+            return ModelConfiguration(schema: schema, url: url, cloudKitDatabase: .none)
+        }
+        return ModelConfiguration(
+            schema: schema,
+            isStoredInMemoryOnly: false,
+            cloudKitDatabase: .automatic
+        )
+    }
+
+    private static func resolvedStoreURL(for url: URL?) -> URL {
+        url ?? URL.applicationSupportDirectory.appending(path: "default.store")
+    }
+
+    private static func removeStoreFiles(at storeURL: URL) {
+        let directory = storeURL.deletingLastPathComponent()
+        let baseName = storeURL.lastPathComponent
+        for suffix in ["", "-wal", "-shm"] {
+            try? FileManager.default.removeItem(at: directory.appending(path: baseName + suffix))
+        }
+    }
 
     init() {
         #if DEBUG
