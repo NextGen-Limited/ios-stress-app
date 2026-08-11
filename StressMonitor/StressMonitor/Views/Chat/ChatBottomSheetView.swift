@@ -371,13 +371,13 @@ struct ChatBottomSheetView: View {
         VStack(spacing: 20) {
             Image(systemName: "brain.head.profile.fill")
                 .font(.system(size: 48))
-                .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
+                .foregroundStyle(HomeCharacterDesignTokens.Ripple.primary.opacity(0.6))
 
-            Text("AI Chat needs backend auth")
+            Text("AI Coaching is coming soon")
                 .font(.system(size: 20, weight: .semibold))
                 .foregroundStyle(Color.Wellness.adaptivePrimaryText)
 
-            Text("Connect Supabase Auth and provide SUPABASE_ANON_KEY to stream through the StressMonitor backend.")
+            Text("Ripple's conversations arrive in our next update. Meanwhile, your stress readings and breathing exercises are fully available.")
                 .font(.system(size: 15))
                 .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
                 .multilineTextAlignment(.center)
