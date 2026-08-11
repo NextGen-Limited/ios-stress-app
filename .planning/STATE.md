@@ -5,15 +5,15 @@ milestone_name: milestone
 current_phase: 2
 current_phase_name: Data Integrity, Deletion & Consolidation
 status: planning
-stopped_at: Completed 02-01-PLAN.md (tasks 1-3; task 4 deferred for two-device CloudKit sync)
-last_updated: "2026-08-11T05:34:26.950Z"
+stopped_at: Completed 04-01-PLAN.md
+last_updated: "2026-08-11T06:55:04.581Z"
 last_activity: 2026-08-11
 last_activity_desc: Phase 01.1 complete, transitioned to Phase 2
 progress:
-  total_phases: 3
-  completed_phases: 2
-  total_plans: 8
-  completed_plans: 7
+  total_phases: 5
+  completed_phases: 4
+  total_plans: 10
+  completed_plans: 9
 ---
 
 # Project State
@@ -32,7 +32,7 @@ Plan: Not started
 Status: Ready to plan
 Last activity: 2026-08-11 — Phase 01.1 complete, transitioned to Phase 2
 
-Progress: [█████████░] 88%
+Progress: [█████████░] 90%
 
 ## Performance Metrics
 
@@ -60,6 +60,7 @@ Progress: [█████████░] 88%
 |------|----------|-------|-------|
 | Phase 01 P05 | 3m | 2 tasks | 2 files |
 | Phase 02 P01 | 45min | 3 tasks | 8 files |
+| Phase 04 P01 | ~26 min | 3 tasks | 16 files |
 
 ## Accumulated Context
 
@@ -76,6 +77,8 @@ Recent decisions affecting current work:
 - [Phase ?]: Routed DataDeleteView scopes through DataDeleterService.deleteMeasurements(in:) — collapsed scope distinction for WIRE-02 consolidation
 - [Phase ?]: Moved ExportError from ExportModels.swift to DataExportView.swift before deleting dead ExportModels.swift
 - [Phase ?]: Added CharacterUnlock deletion to DataDeleterService.performFactoryReset to match UI contract
+- [Phase ?]: D-05: Premium character unlocks are one-time-permanent — persist after subscription lapse
+- [Phase ?]: D-01: StoreKitServiceEnvironment Release path uses real StoreKitService; DEBUG uses Mock
 
 ### Pending Todos
 
@@ -102,6 +105,6 @@ Items acknowledged and carried forward from previous milestone close:
 
 ## Session Continuity
 
-Last session: 2026-08-11T05:34:06.809Z
-Stopped at: Completed 02-01-PLAN.md (tasks 1-3; task 4 deferred for two-device CloudKit sync)
+Last session: 2026-08-11T06:55:04.360Z
+Stopped at: Completed 04-01-PLAN.md
 Resume file: None

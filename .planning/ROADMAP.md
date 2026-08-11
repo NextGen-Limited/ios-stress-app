@@ -127,10 +127,10 @@ Plans:
   4. Displayed price matches `product.displayPrice` exactly, the savings percentage is computed rather than hardcoded, and the free-trial banner only appears when the user is actually eligible.
   5. Purchase, restore, cancel, and expiry are all verified against the `.storekit` session, and CI fails a Release archive when no product IDs resolve.
 
-**Plans**: 1/1 plans drafted
+**Plans**: 1/1 plans executed drafted
 Plans:
 
-- [ ] 04-01-PLAN.md — Release-compile fix + real product-ID wiring (tracer), display honesty (savings/trial), one-time-permanent unlocks + foreground correction + cancel/expiry verification
+- [x] 04-01-PLAN.md — Release-compile fix + real product-ID wiring (tracer), display honesty (savings/trial), one-time-permanent unlocks + foreground correction + cancel/expiry verification
 
 ### Phase 5: Store Readiness & Accessibility
 
@@ -159,5 +159,5 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5. Phase 3 (Auth) is co
 | 1. Build Configuration & Widget Wiring | 5/6 | In Progress|  |
 | 2. Data Integrity, Deletion & Consolidation | 1/1 | In Progress|  |
 | 3. Auth & Chat Availability | 0/TBD | Not started | - |
-| 4. IAP Revenue Path | 0/1 | In Progress|  |
+| 4. IAP Revenue Path | 1/1 | In Progress|  |
 | 5. Store Readiness & Accessibility | 0/TBD | Not started | - |

@@ -32,12 +32,12 @@
 
 ### IAP Revenue Path (IAP)
 
-- [ ] **IAP-01**: StoreKit product IDs resolve in Release configuration; the paywall shows real ASC prices, not mock data
-- [ ] **IAP-02**: `Transaction.updates` is owned at app scope and entitlement refreshes on `scenePhase == .active` (not bound to a view's `@State`)
-- [ ] **IAP-03**: A stale-premium user is corrected on next foreground even if `PaywallController.present()` had previously no-op'd
-- [ ] **IAP-04**: Premium character unlocks either re-lock correctly after cancellation, or are confirmed one-time-permanent by product decision (not a silent bug)
-- [ ] **IAP-05**: Displayed price matches `product.displayPrice` exactly; savings percentage is computed, not hardcoded; the free-trial banner only shows when `isEligibleForIntroOffer` is true
-- [ ] **IAP-06**: Purchase, restore, cancel, and expiry are all verified against a local `.storekit` session; CI fails a Release archive when `allProductIDs` is empty
+- [x] **IAP-01**: StoreKit product IDs resolve in Release configuration; the paywall shows real ASC prices, not mock data
+- [x] **IAP-02**: `Transaction.updates` is owned at app scope and entitlement refreshes on `scenePhase == .active` (not bound to a view's `@State`)
+- [x] **IAP-03**: A stale-premium user is corrected on next foreground even if `PaywallController.present()` had previously no-op'd
+- [x] **IAP-04**: Premium character unlocks either re-lock correctly after cancellation, or are confirmed one-time-permanent by product decision (not a silent bug)
+- [x] **IAP-05**: Displayed price matches `product.displayPrice` exactly; savings percentage is computed, not hardcoded; the free-trial banner only shows when `isEligibleForIntroOffer` is true
+- [x] **IAP-06**: Purchase, restore, cancel, and expiry are all verified against a local `.storekit` session; CI fails a Release archive when `allProductIDs` is empty
 
 ### Store Listing & Release Mechanics (SHIP)
 
@@ -96,12 +96,12 @@ Deferred — see `docs/project-roadmap.md` Version 1.1/2.0 for detail.
 | AUTH-01 | Phase 3 | Pending |
 | AUTH-02 | Phase 3 | Pending |
 | AUTH-03 | Phase 3 | Pending |
-| IAP-01 | Phase 4 | Pending |
-| IAP-02 | Phase 4 | Pending |
-| IAP-03 | Phase 4 | Pending |
-| IAP-04 | Phase 4 | Pending |
-| IAP-05 | Phase 4 | Pending |
-| IAP-06 | Phase 4 | Pending |
+| IAP-01 | Phase 4 | Complete |
+| IAP-02 | Phase 4 | Complete |
+| IAP-03 | Phase 4 | Complete |
+| IAP-04 | Phase 4 | Complete |
+| IAP-05 | Phase 4 | Complete |
+| IAP-06 | Phase 4 | Complete |
 | SHIP-01 | Phase 5 | Pending |
 | SHIP-02 | Phase 5 | Pending |
 | SHIP-03 | Phase 5 | Pending |
