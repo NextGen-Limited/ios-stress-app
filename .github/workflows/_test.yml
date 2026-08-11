@@ -183,6 +183,8 @@ jobs:
             -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest' \
             -derivedDataPath build \
             -skipPackagePluginValidation \
+            -parallel-testing-enabled NO \
+            -maximum-concurrent-test-simulator-destinations 1 \
             CODE_SIGN_IDENTITY="" \
             CODE_SIGNING_REQUIRED=NO \
             | xcpretty
