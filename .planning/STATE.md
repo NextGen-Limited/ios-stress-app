@@ -30,7 +30,7 @@ See: .planning/PROJECT.md (updated 2026-08-08)
 Phase: 5 — Store Readiness & Accessibility
 Plan: 01 complete (code tasks); SHIP-01/SHIP-03 deferred as checkpoint:human-verify
 Status: Code tasks complete, process tasks deferred
-Last activity: 2026-08-11 — Phase 5 Plan 01 code tasks complete
+Last activity: 2026-08-11 - Completed quick task 260811-t0l: Fix CI failure in .github/workflows/_test.yml — dynamic simulator destination
 
 Progress: [█████████░] 90%
 
@@ -98,6 +98,12 @@ None yet.
 - External dependency: ASC product/subscription-group creation for Phase 4 has its own lead time — file it the same day Phase 1 starts, independent of code sequencing.
 - Repo is on `feature/spm-cache-integration` with substantial unrelated uncommitted changes; not assumed as a stable baseline until merged. `git.base_branch` (`main`) vs. current working branch needs resolution before milestone branching.
 - Task 4 (02-01): Two-device CloudKit sync verification deferred — requires two real iCloud-signed devices to confirm delete propagation
+
+### Quick Tasks Completed
+
+| # | Description | Date | Commit | Directory |
+|---|-------------|------|--------|-----------|
+| 260811-t0l | Fix CI failure in .github/workflows/_test.yml: resolve iPhone Simulator UDID dynamically instead of hardcoding name=iPhone 16 | 2026-08-11 | 7864b95 | [260811-t0l-fix-ci-failure-in-github-workflows-test-](./quick/260811-t0l-fix-ci-failure-in-github-workflows-test-/) |
 
 ## Deferred Items
 
