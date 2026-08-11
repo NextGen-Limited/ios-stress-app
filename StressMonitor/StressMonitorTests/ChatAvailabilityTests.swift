@@ -16,4 +16,19 @@ struct ChatAvailabilityTests {
     func debugBuildStillCompilesSupabaseSecrets() {
         #expect(SupabaseSecrets.guestJWT.isEmpty == false)
     }
+
+    // MARK: - Task 2: ChatAvailability single source of truth + honest isConfigured (D-03, AUTH-02)
+
+    @Test("ChatAvailability exposes enabled/disabled states and resolves .enabled under DEBUG")
+    func chatAvailabilityContract() {
+        #expect(ChatAvailability.current == .enabled)
+        #expect(ChatAvailability.disabled(reason: .comingSoon) == .disabled(reason: .comingSoon))
+    }
+
+    @Test("SupabaseConfig rejects masked and asterisk-only anon keys")
+    func isConfiguredRejectsMaskedFallback() {
+        #expect(SupabaseConfig.isMaskedPlaceholder(SupabaseConfig.maskedFallback))
+        #expect(SupabaseConfig.isMaskedPlaceholder("****"))
+        #expect(!SupabaseConfig.isMaskedPlaceholder("eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.realkey"))
+    }
 }
