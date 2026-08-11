@@ -38,6 +38,7 @@ struct DashboardView: View {
             }
         }
         .background(HomeCharacterDesignTokens.homeBackground.ignoresSafeArea())
+        .accessibleDynamicType()
         .alert("Error", isPresented: .constant(viewModel.errorMessage != nil)) {
             Button("OK") {
                 viewModel.clearError()

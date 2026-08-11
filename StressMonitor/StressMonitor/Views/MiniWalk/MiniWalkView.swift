@@ -95,6 +95,7 @@ struct MiniWalkView: View {
         }
         .animation(.easeInOut(duration: 0.3), value: viewModel.showComplete)
         .navigationBarHidden(true)
+        .accessibleDynamicType()
         .onDisappear { viewModel.cleanup() }
     }
 

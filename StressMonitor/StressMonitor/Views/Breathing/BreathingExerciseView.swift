@@ -42,6 +42,7 @@ struct BreathingExerciseView: View {
             .padding(.bottom, 24)
         }
         .background(Color(hex: "#F2F2F7"))
+        .accessibleDynamicType()
         .navigationBarBackButtonHidden(true)
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {

@@ -82,6 +82,7 @@ struct IAPPremiumView: View {
                     )
                 }
             )
+            .accessibleDynamicType()
 
             // Sticky bottom CTA bar
             VStack(spacing: 0) {

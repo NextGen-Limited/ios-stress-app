@@ -19,6 +19,7 @@ struct MeasurementHistoryView: View {
             }
         }
         .background(Color.appBackground)
+        .accessibleDynamicType()
         .navigationTitle("Stress History")
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {

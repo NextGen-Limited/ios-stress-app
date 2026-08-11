@@ -47,6 +47,7 @@ struct SettingsView: View {
             .padding(.bottom, 24)
         }
         .background(Color.appBackground)
+        .accessibleDynamicType()
         .navigationTitle("Settings")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
