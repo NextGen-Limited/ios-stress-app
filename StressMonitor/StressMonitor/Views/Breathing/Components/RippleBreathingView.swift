@@ -15,6 +15,7 @@ struct RippleBreathingView: View {
     @State private var ringRotation: Double = 0
     @State private var sparkleOpacity: Double = 0
     @State private var trailOpacity: Double = 0
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     private let ringColor = HomeCharacterDesignTokens.Ripple.primary
     private let deepColor = HomeCharacterDesignTokens.Ripple.deep
@@ -73,7 +74,7 @@ struct RippleBreathingView: View {
         }
         .frame(width: size * 1.30, height: size * 1.30)
         .onAppear {
-            startRingRotation()
+            if !reduceMotion { startRingRotation() }
             updatePhaseEffects()
         }
         .onChange(of: phase) {

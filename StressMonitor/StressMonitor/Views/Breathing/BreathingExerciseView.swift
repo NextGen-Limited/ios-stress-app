@@ -11,6 +11,7 @@ import SwiftUI
 struct BreathingExerciseView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(AppRouter.self) private var router
+    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     @State private var currentHRV: Double = 0
     @State private var hrvTimestamp: Date?
@@ -121,7 +122,7 @@ struct BreathingExerciseView: View {
                         .foregroundStyle(.white)
                 )
         }
-        .onAppear { animateBox = true }
+        .onAppear { if !reduceMotion { animateBox = true } }
     }
 
     @State private var animateBox = false
