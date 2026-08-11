@@ -6,7 +6,7 @@ import Testing
 struct CharacterCollectionViewModelTests {
     @Test("Fetch unlocks returns persisted data")
     func fetchUnlocks() throws {
-        let config = ModelConfiguration(isStoredInMemoryOnly: true)
+        let config = ModelConfiguration(isStoredInMemoryOnly: true, cloudKitDatabase: .none)
         let container = try ModelContainer(for: CharacterUnlock.self, configurations: config)
         let ctx = container.mainContext
 
@@ -22,7 +22,7 @@ struct CharacterCollectionViewModelTests {
 
     @Test("Select character updates active state")
     func selectCharacter() throws {
-        let config = ModelConfiguration(isStoredInMemoryOnly: true)
+        let config = ModelConfiguration(isStoredInMemoryOnly: true, cloudKitDatabase: .none)
         let container = try ModelContainer(for: CharacterUnlock.self, configurations: config)
         let ctx = container.mainContext
 
@@ -42,7 +42,7 @@ struct CharacterCollectionViewModelTests {
 
     @Test("Unlock status returns nil for unknown character")
     func unknownCharacterReturnsNil() throws {
-        let config = ModelConfiguration(isStoredInMemoryOnly: true)
+        let config = ModelConfiguration(isStoredInMemoryOnly: true, cloudKitDatabase: .none)
         let container = try ModelContainer(for: CharacterUnlock.self, configurations: config)
         let ctx = container.mainContext
 
@@ -50,5 +50,14 @@ struct CharacterCollectionViewModelTests {
         vm.configure(modelContext: ctx)
 
         #expect(vm.unlockStatus(for: "nonexistent") == nil)
+    }
+
+    @Test("In-memory test container disables CloudKit sync")
+    func inMemoryContainerDisablesCloudKit() throws {
+        let config = ModelConfiguration(isStoredInMemoryOnly: true, cloudKitDatabase: .none)
+        let container = try ModelContainer(for: CharacterUnlock.self, configurations: config)
+        let cloudKitDatabases = container.configurations.map { String(describing: $0.cloudKitDatabase) }
+
+        #expect(cloudKitDatabases.allSatisfy { $0 == String(describing: ModelConfiguration.CloudKitDatabase.none) })
     }
 }

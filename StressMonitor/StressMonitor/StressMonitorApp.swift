@@ -128,6 +128,18 @@ struct StressMonitorApp: App {
         }
     }
 
+    /// True when the running process is a unit-test host launched by
+    /// xcodebuild/XCTest rather than a real user session. XCTest sets this
+    /// environment variable on every test-host launch. Real CloudKit account
+    /// setup can hang for tens of seconds when no iCloud account is present
+    /// (always true on CI simulators), and the app-level container is built
+    /// eagerly on every process launch — including test-host relaunches —
+    /// so leaving CloudKit enabled here risks killing the test host on a
+    /// per-launch timeout, unrelated to whatever test happens to be running.
+    private static var isRunningUnitTests: Bool {
+        ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
+    }
+
     private static func makeConfiguration(at url: URL?) -> ModelConfiguration {
         if let url {
             return ModelConfiguration(schema: schema, url: url, cloudKitDatabase: .none)
@@ -135,7 +147,7 @@ struct StressMonitorApp: App {
         return ModelConfiguration(
             schema: schema,
             isStoredInMemoryOnly: false,
-            cloudKitDatabase: .automatic
+            cloudKitDatabase: isRunningUnitTests ? .none : .automatic
         )
     }
 

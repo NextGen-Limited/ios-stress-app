@@ -120,11 +120,21 @@ struct CharacterSelectionSync {
         static let activeCharacterEvolution = "activeCharacterEvolution"
     }
 
+    /// XCTest sets this on every test-host launch. WidgetCenter's reload call is an
+    /// XPC round-trip to a system daemon that has nothing to reload in a unit-test
+    /// host (no widget extension is actually installed there) and can back up badly
+    /// when called repeatedly across a test run, so it's skipped under XCTest.
+    private var isRunningUnitTests: Bool {
+        ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
+    }
+
     func saveActiveCharacter(characterId: String, evolution: EvolutionStage) {
         guard let defaults = UserDefaults(suiteName: suiteName) else { return }
         defaults.set(characterId, forKey: Keys.activeCharacterId)
         defaults.set(evolution.rawValue, forKey: Keys.activeCharacterEvolution)
         defaults.synchronize()
+
+        guard !isRunningUnitTests else { return }
 
         WidgetCenter.shared.reloadTimelines(ofKind: "CircularComplication")
         WidgetCenter.shared.reloadTimelines(ofKind: "RectangularComplication")
