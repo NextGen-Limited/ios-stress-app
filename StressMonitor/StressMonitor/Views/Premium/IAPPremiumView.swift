@@ -55,7 +55,7 @@ struct IAPPremiumView: View {
                     .padding(.horizontal, 16)
                     .padding(.top, 24)
 
-                    if viewModel.selectedPlanDetails?.hasIntroductoryOffer == true {
+                    if viewModel.selectedPlanDetails?.hasIntroductoryOffer == true && viewModel.isEligibleForIntroOffer {
                         trialBanner
                             .padding(.horizontal, 16)
                             .padding(.top, 18)
@@ -82,6 +82,7 @@ struct IAPPremiumView: View {
                     )
                 }
             )
+            .accessibleDynamicType()
 
             // Sticky bottom CTA bar
             VStack(spacing: 0) {
@@ -155,7 +156,7 @@ struct IAPPremiumView: View {
                 .font(.system(size: 18, weight: .semibold))
                 .foregroundStyle(Color.iapAmber)
             VStack(alignment: .leading, spacing: 2) {
-                Text("7-day free trial")
+                Text(trialHeadline)
                     .font(Typography.iapPlanName)
                     .foregroundStyle(Color.iapTextPrimary)
                 Text("Then \(selectedPlanPriceDisplay). Cancel anytime during the trial.")
@@ -179,7 +180,7 @@ struct IAPPremiumView: View {
                 .stroke(Color.iapAmber.opacity(0.25), lineWidth: 1)
         )
         .accessibilityElement(children: .combine)
-        .accessibilityLabel("7-day free trial, then \(selectedPlanPriceDisplay). Cancel anytime during the trial.")
+        .accessibilityLabel("\(trialHeadline), then \(selectedPlanPriceDisplay). Cancel anytime during the trial.")
     }
 
     // MARK: - Derived
@@ -199,5 +200,12 @@ struct IAPPremiumView: View {
 
     private var selectedPlanPriceDisplay: String {
         viewModel.selectedPlanDetails?.priceDisplay ?? "—"
+    }
+
+    private var trialHeadline: String {
+        if let unit = viewModel.selectedPlanDetails?.introOfferPeriodUnit {
+            return "\(unit) free trial"
+        }
+        return "Free trial"
     }
 }

@@ -4,11 +4,11 @@ import SwiftUI
 
 @Model
 public final class StressMeasurement {
-  public var timestamp: Date
-  public var stressLevel: Double
-  public var hrv: Double
-  public var restingHeartRate: Double
-  public var categoryRawValue: String
+  public var timestamp: Date = Date()
+  public var stressLevel: Double = 0
+  public var hrv: Double = 0
+    public var restingHeartRate: Double = 0
+    public var categoryRawValue: String = StressCategory.mild.rawValue
   public var confidences: [Double]?
 
   // MARK: - Multi-Factor Component Fields (optional — lightweight migration)
@@ -20,9 +20,9 @@ public final class StressMeasurement {
   public var dataCompleteness: Double?
 
   // MARK: - CloudKit Sync Properties
-  public var isSynced: Bool
+    public var isSynced: Bool = false
   public var cloudKitRecordName: String?
-  public var deviceID: String
+    public var deviceID: String = CloudKitDeviceID.current
   public var cloudKitModTime: Date?
 
   public init(
@@ -47,6 +47,11 @@ public final class StressMeasurement {
     self.deviceID = deviceID
     self.cloudKitModTime = cloudKitModTime
   }
+
+    /// Lightweight-migratable convenience initializer for the original three-field shape.
+    public convenience init(timestamp: Date, stressLevel: Double, hrv: Double) {
+        self.init(timestamp: timestamp, stressLevel: stressLevel, hrv: hrv, restingHeartRate: 0)
+    }
 
   public var category: StressCategory {
     get { StressCategory(rawValue: categoryRawValue) ?? .mild }

@@ -348,7 +348,7 @@ struct ChatBottomSheetView: View {
                 Image(systemName: "arrow.up")
                     .font(.system(size: 16, weight: .semibold))
                     .foregroundStyle(.white)
-                    .frame(width: 36, height: 36)
+                    .frame(width: 44, height: 44)
                     .background(canSend ? Color(hex: "#0288D1") : Color.Wellness.adaptiveSecondaryText.opacity(0.3))
                     .clipShape(Circle())
             }
@@ -371,13 +371,13 @@ struct ChatBottomSheetView: View {
         VStack(spacing: 20) {
             Image(systemName: "brain.head.profile.fill")
                 .font(.system(size: 48))
-                .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
+                .foregroundStyle(HomeCharacterDesignTokens.Ripple.primary.opacity(0.6))
 
-            Text("AI Chat needs backend auth")
+            Text("AI Coaching is coming soon")
                 .font(.system(size: 20, weight: .semibold))
                 .foregroundStyle(Color.Wellness.adaptivePrimaryText)
 
-            Text("Connect Supabase Auth and provide SUPABASE_ANON_KEY to stream through the StressMonitor backend.")
+            Text("Ripple's conversations arrive in our next update. Meanwhile, your stress readings and breathing exercises are fully available.")
                 .font(.system(size: 15))
                 .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
                 .multilineTextAlignment(.center)

@@ -9,7 +9,11 @@ import SwiftUI
 /// be on screen — entitlement changes (renewal, refund, Family Sharing,
 /// delayed Ask-to-Buy) that arrive the rest of the time were never observed.
 private struct StoreKitServiceKey: EnvironmentKey {
+    #if DEBUG
     static let defaultValue: StoreKitServiceProtocol = MockStoreKitService(premiumState: .shared)
+    #else
+    static let defaultValue: StoreKitServiceProtocol = StoreKitService(premiumState: .shared)
+    #endif
 }
 
 extension EnvironmentValues {

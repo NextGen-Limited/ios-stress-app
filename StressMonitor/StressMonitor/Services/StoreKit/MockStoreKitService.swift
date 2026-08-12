@@ -29,5 +29,9 @@ final class MockStoreKitService: StoreKitServiceProtocol {
     func refreshEntitlements() async {
         // No-op for mock
     }
+
+    func isEligibleForIntroOffer(for period: SubscriptionPeriod) async -> Bool {
+        availablePlans.first(where: { $0.period == period })?.hasIntroductoryOffer ?? false
+    }
 }
 #endif

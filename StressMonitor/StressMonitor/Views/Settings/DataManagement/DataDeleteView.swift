@@ -397,92 +397,46 @@ class DataDeleteViewModel {
     }
 
     func performDelete(modelContext: ModelContext) async throws {
+        let service = DataDeleterService(
+            modelContext: modelContext,
+            cloudKitContainer: .default(),
+            repository: StressRepository(modelContext: modelContext),
+            logger: .default
+        )
+
+        let (start, end) = getDateRangeBounds()
+        let isAllTime = !useCustomDateRange && dateRange == .all
+
         isDeleting = true
         deleteProgress = 0
         currentOperation = "Preparing to delete..."
 
-        cancellationToken = Task {
-            await MainActor.run {
-                isDeleting = false
-                deleteProgress = 0
-                currentOperation = ""
+        let progressMirror = Task { @MainActor in
+            while service.isDeleting {
+                self.deleteProgress = service.deleteProgress
+                self.currentOperation = service.currentOperation ?? ""
+                try? await Task.sleep(for: .milliseconds(50))
             }
         }
 
-        let (start, end) = getDateRangeBounds()
-        var didDeleteSomething = false
-
-        // Local deletion — only for scopes that actually touch this device.
-        if deleteScope == .localOnly || deleteScope == .everything {
-            await MainActor.run {
-                currentOperation = "Fetching local data..."
-            }
-
-            let descriptor = FetchDescriptor<StressMeasurement>(
-                predicate: #Predicate { measurement in
-                    measurement.timestamp >= start && measurement.timestamp <= end
-                }
-            )
-            let measurements = try modelContext.fetch(descriptor)
-
-            if !measurements.isEmpty {
-                didDeleteSomething = true
-                for (index, measurement) in measurements.enumerated() {
-                    try Task.checkCancellation()
-
-                    await MainActor.run {
-                        deleteProgress = Double(index + 1) / Double(measurements.count) * 0.5
-                        currentOperation = "Deleting \(index + 1) of \(measurements.count) locally..."
-                    }
-
-                    modelContext.delete(measurement)
-                }
-                try modelContext.save()
-            }
+        defer {
+            progressMirror.cancel()
+            isDeleting = false
         }
 
-        // Cloud deletion — `.cloudOnly` and `.everything` promise this in
-        // DeleteConfirmationView's own copy; it must actually happen.
-        if deleteScope.includesCloud {
-            try Task.checkCancellation()
-            await MainActor.run {
-                currentOperation = "Deleting from iCloud..."
-            }
-            didDeleteSomething = true
-            let cloudService = CloudKitResetService(container: .default(), logger: .default)
-            try await cloudService.deleteRecords(ofType: .stressMeasurement, in: start...end)
-            await MainActor.run {
-                deleteProgress = max(deleteProgress, 0.9)
-            }
+        if deleteScope == .everything && isAllTime {
+            try await service.deleteAllMeasurements()
+        } else {
+            try await service.deleteMeasurements(in: start...end)
         }
 
-        // Delete baseline if scope includes it
-        if deleteScope.includesBaseline {
-            didDeleteSomething = true
-            try await deleteBaseline(modelContext: modelContext)
-        }
-
-        guard didDeleteSomething else {
-            throw DeleteError.noData
-        }
-
-        await MainActor.run {
-            deleteProgress = 1.0
-            currentOperation = "Delete complete"
-        }
+        deleteProgress = 1.0
+        currentOperation = "Delete complete"
     }
 
     func cancelDelete() {
         cancellationToken?.cancel()
         cancellationToken = nil
-    }
-
-    private func deleteBaseline(modelContext: ModelContext) async throws {
-        await MainActor.run {
-            currentOperation = "Removing baseline..."
-        }
-        let repository = StressRepository(modelContext: modelContext)
-        try await repository.updateBaseline(PersonalBaseline())
     }
 
     private func getDateRangeBounds() -> (start: Date, end: Date) {

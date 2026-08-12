@@ -11,13 +11,13 @@
 - [ ] **BUILD-01**: Release archive uploads to App Store Connect without Privacy Manifest validation failure (remove invalid `NSPrivacyAccessedAPICategoryHealthKit`; declare chat content correctly per decision D3)
 - [ ] **BUILD-02**: Widget and complications read/write the same App Group suite as the app on a real device (one canonical suite ID, not the current three)
 - [ ] **BUILD-03**: `xcodebuild -showBuildSettings` shows a single Info.plist source of truth (`INFOPLIST_KEY_*`); orphaned `StressMonitor/Info.plist` removed
-- [ ] **BUILD-04**: `xcodebuild test` executes a real unit-test bundle (currently zero test targets exist in `project.pbxproj`)
+- [x] **BUILD-04**: `xcodebuild test` executes a real unit-test bundle (currently zero test targets exist in `project.pbxproj`)
 
 ### Data Integrity & Deletion (DATA)
 
-- [ ] **DATA-01**: On two signed-in devices, "Delete All" removes records from local storage, CloudKit, Keychain, and App Group cache — matching what the UI promises
-- [ ] **DATA-02**: Health data exports carry `.completeFileProtection`, are size-capped, and are cleaned up after share
-- [ ] **DATA-03**: CloudKit-synced health fields (`hrv`, `restingHeartRate`, `stressLevel`) are encrypted via `CKRecord.encryptedValues`, or the E2E-encryption claim is corrected in docs — depends on decision D2
+- [x] **DATA-01**: On two signed-in devices, "Delete All" removes records from local storage, CloudKit, Keychain, and App Group cache — matching what the UI promises
+- [x] **DATA-02**: Health data exports carry `.completeFileProtection`, are size-capped, and are cleaned up after share
+- [x] **DATA-03**: CloudKit-synced health fields (`hrv`, `restingHeartRate`, `stressLevel`) are encrypted via `CKRecord.encryptedValues`, or the E2E-encryption claim is corrected in docs — depends on decision D2
 
 ### Auth & Chat Availability (AUTH)
 
@@ -28,30 +28,30 @@
 ### Wire-Up Gap Closure (WIRE)
 
 - [ ] **WIRE-01**: The home screen widget reflects a measurement taken seconds earlier on a real device (wired to live data + `WidgetCenter.reloadAllTimelines()`, not permanent placeholder) — scope depends on decision D4
-- [ ] **WIRE-02**: No duplicate data-management implementation remains (`DataManagementService`/`CSVGenerator`/`JSONGenerator` vs. the retargeted `DataDeleterService`/`CloudKitResetService` chain)
+- [x] **WIRE-02**: No duplicate data-management implementation remains (`DataManagementService`/`CSVGenerator`/`JSONGenerator` vs. the retargeted `DataDeleterService`/`CloudKitResetService` chain)
 
 ### IAP Revenue Path (IAP)
 
-- [ ] **IAP-01**: StoreKit product IDs resolve in Release configuration; the paywall shows real ASC prices, not mock data
-- [ ] **IAP-02**: `Transaction.updates` is owned at app scope and entitlement refreshes on `scenePhase == .active` (not bound to a view's `@State`)
-- [ ] **IAP-03**: A stale-premium user is corrected on next foreground even if `PaywallController.present()` had previously no-op'd
-- [ ] **IAP-04**: Premium character unlocks either re-lock correctly after cancellation, or are confirmed one-time-permanent by product decision (not a silent bug)
-- [ ] **IAP-05**: Displayed price matches `product.displayPrice` exactly; savings percentage is computed, not hardcoded; the free-trial banner only shows when `isEligibleForIntroOffer` is true
-- [ ] **IAP-06**: Purchase, restore, cancel, and expiry are all verified against a local `.storekit` session; CI fails a Release archive when `allProductIDs` is empty
+- [x] **IAP-01**: StoreKit product IDs resolve in Release configuration; the paywall shows real ASC prices, not mock data
+- [x] **IAP-02**: `Transaction.updates` is owned at app scope and entitlement refreshes on `scenePhase == .active` (not bound to a view's `@State`)
+- [x] **IAP-03**: A stale-premium user is corrected on next foreground even if `PaywallController.present()` had previously no-op'd
+- [x] **IAP-04**: Premium character unlocks either re-lock correctly after cancellation, or are confirmed one-time-permanent by product decision (not a silent bug)
+- [x] **IAP-05**: Displayed price matches `product.displayPrice` exactly; savings percentage is computed, not hardcoded; the free-trial banner only shows when `isEligibleForIntroOffer` is true
+- [x] **IAP-06**: Purchase, restore, cancel, and expiry are all verified against a local `.storekit` session; CI fails a Release archive when `allProductIDs` is empty
 
 ### Store Listing & Release Mechanics (SHIP)
 
 - [ ] **SHIP-01**: At least one iPhone screenshot set (6.9" or 6.5") exists for the App Store listing, captured with demo mode disabled
-- [ ] **SHIP-02**: The Fastlane `release` lane matches actual readiness for a first submission (manual ASC submission path, not blind `deliver --submit_for_review` against empty `fastlane/metadata/`)
+- [x] **SHIP-02**: The Fastlane `release` lane matches actual readiness for a first submission (manual ASC submission path, not blind `deliver --submit_for_review` against empty `fastlane/metadata/`)
 - [ ] **SHIP-03**: The ASC privacy questionnaire is answered consistently with decision D3's resolution
 
 ### Accessibility (A11Y)
 
-- [ ] **A11Y-01**: All interactive touch targets meet the 44×44pt minimum (paywall nav bar, chat composer currently below it)
-- [ ] **A11Y-02**: Color-contrast failures fixed (`CategoryFilterChip`, `StressHeroCard` yellow-on-white)
-- [ ] **A11Y-03**: `repeatForever` animations on stress-relief screens (breathing exercise, mini walk) respect Reduce Motion
-- [ ] **A11Y-04**: Dynamic Type is adopted app-wide — `Typography.swift`/`Font+WellnessType.swift` use relative sizing; existing but currently-unused helpers (`.accessibleDynamicType()`, `.stressDualCoding()`, `.minimumTouchTarget()`) are actually called from the 743+ current `.font(.system(size:))` call sites
-- [ ] **A11Y-05**: Orphaned, unreachable redesign views (`WeeklyHeatmapView`, `DailyTimelineView`, `LineChartView`, `StressChart7d`, `AccessibleStressTrendChart`) are deleted rather than made accessible
+- [x] **A11Y-01**: All interactive touch targets meet the 44×44pt minimum (paywall nav bar, chat composer currently below it)
+- [x] **A11Y-02**: Color-contrast failures fixed (`CategoryFilterChip`, `StressHeroCard` yellow-on-white)
+- [x] **A11Y-03**: `repeatForever` animations on stress-relief screens (breathing exercise, mini walk) respect Reduce Motion
+- [x] **A11Y-04**: Dynamic Type is adopted app-wide — `Typography.swift`/`Font+WellnessType.swift` use relative sizing; existing but currently-unused helpers (`.accessibleDynamicType()`, `.stressDualCoding()`, `.minimumTouchTarget()`) are actually called from the 743+ current `.font(.system(size:))` call sites
+- [x] **A11Y-05**: Orphaned, unreachable redesign views (`WeeklyHeatmapView`, `DailyTimelineView`, `LineChartView`, `StressChart7d`, `AccessibleStressTrendChart`) are deleted rather than made accessible
 
 ## v2 Requirements
 
@@ -87,31 +87,32 @@ Deferred — see `docs/project-roadmap.md` Version 1.1/2.0 for detail.
 | BUILD-01 | Phase 1 | Pending |
 | BUILD-02 | Phase 1 | Pending |
 | BUILD-03 | Phase 1 | Pending |
-| BUILD-04 | Phase 1 | Pending |
+| BUILD-04 | Phase 1 | Complete |
 | WIRE-01 | Phase 1 | Pending |
-| DATA-01 | Phase 2 | Pending |
-| DATA-02 | Phase 2 | Pending |
-| DATA-03 | Phase 2 | Pending |
-| WIRE-02 | Phase 2 | Pending |
+| DATA-01 | Phase 2 | Complete |
+| DATA-02 | Phase 2 | Complete |
+| DATA-03 | Phase 2 | Complete |
+| WIRE-02 | Phase 2 | Complete |
 | AUTH-01 | Phase 3 | Pending |
 | AUTH-02 | Phase 3 | Pending |
 | AUTH-03 | Phase 3 | Pending |
-| IAP-01 | Phase 4 | Pending |
-| IAP-02 | Phase 4 | Pending |
-| IAP-03 | Phase 4 | Pending |
-| IAP-04 | Phase 4 | Pending |
-| IAP-05 | Phase 4 | Pending |
-| IAP-06 | Phase 4 | Pending |
+| IAP-01 | Phase 4 | Complete |
+| IAP-02 | Phase 4 | Complete |
+| IAP-03 | Phase 4 | Complete |
+| IAP-04 | Phase 4 | Complete |
+| IAP-05 | Phase 4 | Complete |
+| IAP-06 | Phase 4 | Complete |
 | SHIP-01 | Phase 5 | Pending |
-| SHIP-02 | Phase 5 | Pending |
+| SHIP-02 | Phase 5 | Complete |
 | SHIP-03 | Phase 5 | Pending |
-| A11Y-01 | Phase 5 | Pending |
-| A11Y-02 | Phase 5 | Pending |
-| A11Y-03 | Phase 5 | Pending |
-| A11Y-04 | Phase 5 | Pending |
-| A11Y-05 | Phase 5 | Pending |
+| A11Y-01 | Phase 5 | Complete |
+| A11Y-02 | Phase 5 | Complete |
+| A11Y-03 | Phase 5 | Complete |
+| A11Y-04 | Phase 5 | Complete |
+| A11Y-05 | Phase 5 | Complete |
 
 **Coverage:**
+
 - v1 requirements: 26 total
 - Mapped to phases: 26/26 ✓
 - Unmapped: 0 ✓

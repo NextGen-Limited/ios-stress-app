@@ -26,7 +26,7 @@ struct CategoryFilterChip: View {
                 Text(category.rawValue.capitalized)
                     .font(.system(size: 12, weight: .heavy, design: .rounded))
                     .tracking(0.3)
-                    .foregroundStyle(isActive ? Color.white : Color.Wellness.adaptivePrimaryText)
+                    .foregroundStyle(isActive ? category.overlayTextColor : Color.Wellness.adaptivePrimaryText)
             }
             .padding(.horizontal, 11)
             .padding(.vertical, 7)

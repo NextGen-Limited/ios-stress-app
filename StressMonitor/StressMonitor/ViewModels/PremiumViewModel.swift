@@ -12,6 +12,7 @@ final class PremiumViewModel {
     var showError = false
     var errorMessage: String?
     var showSuccess = false
+    var isEligibleForIntroOffer = false
 
     init(storeKit: StoreKitServiceProtocol, premiumState: PremiumState) {
         self.storeKit = storeKit
@@ -31,6 +32,8 @@ final class PremiumViewModel {
         } else if let first = plans.first {
             selectedPlan = first.period
         }
+
+        isEligibleForIntroOffer = await storeKit.isEligibleForIntroOffer(for: selectedPlan)
     }
 
     func purchaseSelectedPlan() async {

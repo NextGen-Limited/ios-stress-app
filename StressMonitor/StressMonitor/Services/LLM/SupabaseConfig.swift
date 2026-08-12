@@ -12,6 +12,11 @@ enum SupabaseConfig {
         fallback: "https://sxlaxpnyadellgyvxofm.supabase.co"
     ))!
 
+    /// Masked placeholder used when no real anon key is configured. Exposed so
+    /// `isConfigured` and tests can recognize it without hardcoding the literal
+    /// in two places.
+    static let maskedFallback = "**********************************************"
+
     // Supabase anon/public key (safe to embed only when restricted by RLS).
     // Do not hardcode project keys in source; provide via Info.plist build setting,
     // process environment for tests, or UserDefaults during local QA.
@@ -19,11 +24,22 @@ enum SupabaseConfig {
         infoPlistKey: "SUPABASE_ANON_KEY",
         environmentKey: "SUPABASE_ANON_KEY",
         userDefaultsKey: "supabaseAnonKey",
-        fallback: "**********************************************"
+        fallback: maskedFallback
     )
 
+    /// True only when a real anon key is resolved. The masked placeholder and
+    /// asterisk-only strings read as "unconfigured" so `isAvailable` stays
+    /// honest even before the `ChatAvailability` entry-point gate applies.
     static var isConfigured: Bool {
-        !anonKey.trimmingCharacters(in: .whitespacesAndNewlines).isEmpty
+        let key = anonKey.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !key.isEmpty else { return false }
+        return !isMaskedPlaceholder(key)
+    }
+
+    /// Recognizes the masked fallback literal and any all-asterisks string.
+    static func isMaskedPlaceholder(_ key: String) -> Bool {
+        let trimmed = key.trimmingCharacters(in: .whitespacesAndNewlines)
+        return trimmed == maskedFallback || trimmed.allSatisfy { $0 == "*" }
     }
 
     // Edge Function base URL

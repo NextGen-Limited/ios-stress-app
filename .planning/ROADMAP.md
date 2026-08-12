@@ -44,8 +44,11 @@ product decisions (D1-D4) that still gate specific scope.
   4. `xcodebuild test` executes a real unit-test bundle and reports pass/fail.
   5. The home-screen widget reflects a stress measurement taken seconds earlier on a real device — or, per D4, the widget target is excluded from the build entirely.
 
-**Plans**: 4/4 plans executed
+**Plans**: 5/6 plans executed
 Plans:
+
+- [x] 01-05-PLAN.md
+- [ ] 01-06-PLAN.md
 
 - [x] 01-01-PLAN.md — Wire the widget's App Group entitlement (tracer) + complete the Privacy Manifest + delete the orphaned Info.plist
 - [x] 01-02-PLAN.md — Resolve widget data state as fresh/stale/empty and render it per the UI-SPEC
@@ -53,6 +56,25 @@ Plans:
 - [x] 01-04-PLAN.md — Correct privacy disclosure across docs and the privacy policy (D-01)
 
 **UI hint**: yes
+
+### Phase 01.1: SwiftData Schema Migration Safety (INSERTED)
+
+**Goal**: The app launches without crashing for any device regardless of prior store schema state — the ModelContainer either migrates correctly from any historical schema or recovers without `fatalError`, and the SwiftData layer has no orphaned source, no entitlement/config mismatch, and no silent data-loss paths.
+**Depends on**: Phase 1 (build configuration baseline — app must build/archive first)
+**Requirements**: BUILD-04 (test execution — a launch-path integration test must be runnable)
+**Blocking Decisions**: D5 (does the pre-V2 installed base have real user data that must be preserved? Determines "reconstruct frozen V1 snapshots + custom MigrationStage" vs "accept data loss via `eraseDatabaseOnSchemaChange`" — the largest effort swing in this phase, 0.5 day vs 2-3 days)
+**Success Criteria** (what must be TRUE):
+
+  1. An app installed over an existing store created by any prior build shape launches without `loadIssueModelContainer` — verified by integration test that creates a divergent prior store, reopens through the app's real recovery path, and asserts `Habit` is queryable on the recovered (fresh) store (per D5 = Option A, data loss on schema mismatch is accepted for pre-release).
+  2. `fatalError` at `StressMonitorApp.swift:82` is replaced with a non-fatal recovery path in RELEASE (fresh container + telemetry log), so a migration defect never permanently bricks the app.
+  3. The `VersionedSchema` pair declares frozen `@Model` snapshots per version (not live class reuse), so the migration diff reflects reality — OR `eraseDatabaseOnSchemaChange` is DEBUG-gated with a documented data-loss acceptance (per D5).
+  4. CloudKit configuration is consistent: either the SwiftData `ModelConfiguration` binds `cloudKitContainer: .identifier("iCloud.stress.ai.com")` matching entitlements and all `@Model` types are CloudKit-conformant, OR the CloudKit entitlement is removed and the app is local-only.
+  5. The orphaned root source set (`./StressMonitor/StressMonitorApp.swift`, `./StressMonitor/StressMonitorSchema.swift`, `./StressMonitor/Models/StressMeasurement.swift`) is deleted — only the active target's models remain.
+
+**Plans**: 1/1 plans executed drafted
+Plans:
+
+- [x] 01.1-01-PLAN.md — Non-fatal ModelContainer recovery (tracer integration test + fix), property-level migration defaults, CloudKit config consistency, orphaned root source deletion (D5 = Option A)
 
 ### Phase 2: Data Integrity, Deletion & Consolidation
 
@@ -68,7 +90,10 @@ Plans:
   4. CloudKit-synced health fields (`hrv`, `restingHeartRate`, `stressLevel`) are encrypted via `CKRecord.encryptedValues`, or the E2E-encryption claim in docs is corrected to match actual behavior.
   5. Only one data-management implementation remains in the codebase — the duplicate `DataManagementService`/`CSVGenerator`/`JSONGenerator` stack is gone.
 
-**Plans**: TBD
+**Plans**: 1/1 plans executed drafted
+Plans:
+
+- [x] 02-01-PLAN.md — Retarget delete views onto DataDeleterService, close credential/cache gap, harden exports, delete dead code (DATA-01, DATA-02, DATA-03, WIRE-02)
 
 ### Phase 3: Auth & Chat Availability
 
@@ -83,7 +108,10 @@ Plans:
   3. Dismissing the chat sheet mid-stream cancels the in-flight request within one runloop and does not charge a credit.
   4. A forced network drop mid-response preserves the partial text already received.
 
-**Plans**: TBD
+**Plans**: 1/1 plans drafted
+Plans:
+
+- [ ] 03-01-PLAN.md — Gate Chat off for v1 honestly: #if DEBUG-wrap SupabaseSecrets (AUTH-01), ChatAvailability gate at both entry points (AUTH-02), TDD-verify cancellation + partial-text preservation (AUTH-03)
 
 ### Phase 4: IAP Revenue Path
 
@@ -99,7 +127,10 @@ Plans:
   4. Displayed price matches `product.displayPrice` exactly, the savings percentage is computed rather than hardcoded, and the free-trial banner only appears when the user is actually eligible.
   5. Purchase, restore, cancel, and expiry are all verified against the `.storekit` session, and CI fails a Release archive when no product IDs resolve.
 
-**Plans**: TBD
+**Plans**: 1/1 plans executed drafted
+Plans:
+
+- [x] 04-01-PLAN.md — Release-compile fix + real product-ID wiring (tracer), display honesty (savings/trial), one-time-permanent unlocks + foreground correction + cancel/expiry verification
 
 ### Phase 5: Store Readiness & Accessibility
 
@@ -115,7 +146,11 @@ Plans:
   4. All interactive touch targets meet 44×44pt (paywall nav bar, chat composer), the flagged color-contrast failures are fixed (`CategoryFilterChip`, `StressHeroCard`), and Reduce Motion is respected on the breathing-exercise and mini-walk animations.
   5. Dynamic Type scales text app-wide through the existing (previously zero-call-site) helpers, and the orphaned unreachable redesign views are deleted.
 
-**Plans**: TBD
+**Plans**: 1/1 plans executed
+Plans:
+
+- [x] 05-01-PLAN.md — Delete orphaned views, fix touch targets/contrast/Reduce Motion/Dynamic Type, fix Fastlane release lane (A11Y-01..05, SHIP-02); SHIP-01/SHIP-03 deferred as checkpoint:human-verify
+
 **UI hint**: yes
 
 ## Progress
@@ -125,8 +160,8 @@ Phases execute in numeric order: 1 → 2 → 3 → 4 → 5. Phase 3 (Auth) is co
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 1. Build Configuration & Widget Wiring | 4/4 | In Progress|  |
-| 2. Data Integrity, Deletion & Consolidation | 0/TBD | Not started | - |
+| 1. Build Configuration & Widget Wiring | 5/6 | In Progress|  |
+| 2. Data Integrity, Deletion & Consolidation | 1/1 | In Progress|  |
 | 3. Auth & Chat Availability | 0/TBD | Not started | - |
-| 4. IAP Revenue Path | 0/TBD | Not started | - |
-| 5. Store Readiness & Accessibility | 0/TBD | Not started | - |
+| 4. IAP Revenue Path | 1/1 | In Progress|  |
+| 5. Store Readiness & Accessibility | 1/1 | In Progress|  |

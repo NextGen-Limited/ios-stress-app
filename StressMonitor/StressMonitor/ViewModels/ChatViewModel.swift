@@ -16,6 +16,10 @@ final class ChatViewModel {
     var errorMessage: String?
     var isAvailable: Bool = false
 
+    /// True while a streaming Task is alive. Exposed for tests and for any
+    /// UI that needs to distinguish "idle" from "actively streaming".
+    var isStreaming: Bool { streamingTask != nil }
+
     // MARK: - Quick Actions
 
     var quickActions: [ChatQuickAction] {
@@ -44,20 +48,34 @@ final class ChatViewModel {
 
     // MARK: - Initialization
 
-    init(
+    convenience init(
         stressResult: StressResult?,
         baseline: PersonalBaseline?,
         recentHistory: [StressMeasurement] = []
     ) {
+        self.init(
+            stressResult: stressResult,
+            baseline: baseline,
+            recentHistory: recentHistory,
+            llmService: SupabaseLLMService()
+        )
+    }
+
+    /// Test-injectable initializer. Existing call sites use the convenience
+    /// init above, which defaults to a real `SupabaseLLMService`. Tests pass a
+    /// controllable double so cancellation and partial-text preservation are
+    /// observable without a live network session.
+    init(
+        stressResult: StressResult?,
+        baseline: PersonalBaseline?,
+        recentHistory: [StressMeasurement] = [],
+        llmService: LLMServiceProtocol
+    ) {
         self.stressResult = stressResult
         self.baseline = baseline
         self.recentHistory = recentHistory
-
-        // Supabase BE strategy: iOS streams through the StressMonitor Supabase Edge Function.
-        // The service requires SUPABASE_ANON_KEY plus a Supabase Auth access token.
-        let supabaseService = SupabaseLLMService()
-        self.llmService = supabaseService
-        self.isAvailable = supabaseService.isAvailable()
+        self.llmService = llmService
+        self.isAvailable = llmService.isAvailable()
     }
 
     // MARK: - Send Message

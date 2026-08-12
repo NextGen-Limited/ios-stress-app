@@ -47,6 +47,7 @@ struct SettingsView: View {
             .padding(.bottom, 24)
         }
         .background(Color.appBackground)
+        .accessibleDynamicType()
         .navigationTitle("Settings")
         .navigationBarTitleDisplayMode(.inline)
         .onAppear {
@@ -130,8 +131,11 @@ struct SettingsView: View {
                     setting: .rippleCoach,
                     tint: .settingsIconPurple,
                     title: "Ripple Coach",
-                    value: "Active",
-                    action: { showChatSheet = true }
+                    value: chatAvailabilityLabel,
+                    action: {
+                        guard ChatAvailability.current.isAvailable else { return }
+                        showChatSheet = true
+                    }
                 )
             }
         }
@@ -433,6 +437,10 @@ struct SettingsView: View {
 
     private var bioAgeText: String {
         viewModel.bioAge.map { "\($0) yrs" } ?? "—"
+    }
+
+    private var chatAvailabilityLabel: String {
+        ChatAvailability.current.isAvailable ? "Active" : "Coming soon"
     }
 
     private var watchStatusText: String {

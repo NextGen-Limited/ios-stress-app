@@ -78,8 +78,10 @@ final class CharacterCollectionViewModel {
         try? context.save()
     }
 
-    /// Reconciles premium-character unlocks with live subscription status:
-    /// unlocked while subscribed, re-locked on lapse; active selection falls back to Ripple.
+    /// Reconciles premium-character unlocks with live subscription status.
+    /// Premium unlocks are one-time-permanent: subscribing grants them, but a
+    /// subscription lapse does NOT re-lock them. Active selection of a premium
+    /// character falls back to Ripple on lapse so the user lands on a free char.
     @MainActor
     static func syncPremiumCharacterEntitlement(isPremium: Bool, in context: ModelContext) {
         let descriptor = FetchDescriptor<CharacterUnlock>()
@@ -89,7 +91,9 @@ final class CharacterCollectionViewModel {
 
         var activeReLocked = false
         for unlock in unlocks where premiumIds.contains(unlock.characterId) {
-            unlock.isUnlocked = isPremium
+            if isPremium {
+                unlock.isUnlocked = true
+            }
             if !isPremium && unlock.isActive {
                 unlock.isActive = false
                 activeReLocked = true
@@ -116,11 +120,21 @@ struct CharacterSelectionSync {
         static let activeCharacterEvolution = "activeCharacterEvolution"
     }
 
+    /// XCTest sets this on every test-host launch. WidgetCenter's reload call is an
+    /// XPC round-trip to a system daemon that has nothing to reload in a unit-test
+    /// host (no widget extension is actually installed there) and can back up badly
+    /// when called repeatedly across a test run, so it's skipped under XCTest.
+    private var isRunningUnitTests: Bool {
+        ProcessInfo.processInfo.environment["XCTestConfigurationFilePath"] != nil
+    }
+
     func saveActiveCharacter(characterId: String, evolution: EvolutionStage) {
         guard let defaults = UserDefaults(suiteName: suiteName) else { return }
         defaults.set(characterId, forKey: Keys.activeCharacterId)
         defaults.set(evolution.rawValue, forKey: Keys.activeCharacterEvolution)
         defaults.synchronize()
+
+        guard !isRunningUnitTests else { return }
 
         WidgetCenter.shared.reloadTimelines(ofKind: "CircularComplication")
         WidgetCenter.shared.reloadTimelines(ofKind: "RectangularComplication")

@@ -125,9 +125,12 @@ final class SupabaseLLMService: LLMServiceProtocol, @unchecked Sendable {
     /// A session is established on demand inside `send()` (anonymous
     /// sign-in / refresh), so availability no longer requires a token to
     /// already be cached — only that the app itself is configured to talk
-    /// to Supabase at all.
+    /// to Supabase at all. Gated additionally on `ChatAvailability` so the
+    /// service's own availability matches the v1 entry-point gate: in
+    /// Release, Chat is honestly off even if a real anon key were present.
     func isAvailable() -> Bool {
-        SupabaseConfig.isConfigured
+        guard ChatAvailability.current.isAvailable else { return false }
+        return SupabaseConfig.isConfigured
     }
 
     func send(

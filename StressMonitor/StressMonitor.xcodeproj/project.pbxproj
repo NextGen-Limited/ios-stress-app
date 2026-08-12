@@ -15,6 +15,7 @@
 		39419B30DE0EE4EDBA6A2CB4 /* WidgetPublisherKeyMatchingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B6AC42E6137A72A55808876F /* WidgetPublisherKeyMatchingTests.swift */; };
 		4B42B91606B4D42E3CE7A998 /* CharacterEntitlementSyncTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 713235225361EAF1FE04D14B /* CharacterEntitlementSyncTests.swift */; };
 		9E36EB4221565C3D18AE9BF1 /* StoreKitServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 0ED711106429F77E210D3F60 /* StoreKitServiceTests.swift */; };
+		741F9DF5DA5A4E97A3918E94 /* StoreKitTestSessionProvider.swift in Sources */ = {isa = PBXBuildFile; fileRef = 38B4FDA585844AA492F5BFEB /* StoreKitTestSessionProvider.swift */; };
 		B31DF5E223857E730C1F1B04 /* SupabaseAuthServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 596464A7DA54461FFA3A015F /* SupabaseAuthServiceTests.swift */; };
 		D1858B03657E705B3A69F771 /* StoreKitProductCatalogTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = A41EC256A3DD566A20DAB84B /* StoreKitProductCatalogTests.swift */; };
 		E21535775B493D041FBC5E94 /* CharacterCollectionViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 21C3984665BFD5D2C50B51BC /* CharacterCollectionViewModelTests.swift */; };
@@ -30,6 +31,8 @@
 		F26968812F5DAE2400B40F0F /* BuildFile in Frameworks */ = {isa = PBXBuildFile; };
 		F2E2EC392F1CC605000C2B53 /* StressMonitorWatch Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = F2E2EC192F1CC602000C2B53 /* StressMonitorWatch Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 		F2FCD7AF2F8FFBFF000DE6E8 /* BuildFile in Frameworks */ = {isa = PBXBuildFile; };
+		F1A1B2C3D4E500000000B001 /* ModelContainerRecoveryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A1B2C3D4E500000000A001 /* ModelContainerRecoveryTests.swift */; };
+		F1A1B2C3D4E500000000B002 /* StressMeasurementMigrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A1B2C3D4E500000000A002 /* StressMeasurementMigrationTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -85,6 +88,7 @@
 		00D7CBDFC67338FE88016310 /* CharacterAssetResolverTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CharacterAssetResolverTests.swift; path = StressMonitorTests/CharacterAssetResolverTests.swift; sourceTree = "<group>"; };
 		0A2D695731CC6780A428E4AC /* BioAgeCalculatorTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = BioAgeCalculatorTests.swift; path = StressMonitorTests/BioAgeCalculatorTests.swift; sourceTree = "<group>"; };
 		0ED711106429F77E210D3F60 /* StoreKitServiceTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = StoreKitServiceTests.swift; path = StressMonitorTests/StoreKitServiceTests.swift; sourceTree = "<group>"; };
+		38B4FDA585844AA492F5BFEB /* StoreKitTestSessionProvider.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = StoreKitTestSessionProvider.swift; path = StressMonitorTests/StoreKitTestSessionProvider.swift; sourceTree = "<group>"; };
 		174DE64763F4E03018E24D7D /* WidgetDataStateTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = WidgetDataStateTests.swift; path = StressMonitorTests/WidgetDataStateTests.swift; sourceTree = "<group>"; };
 		21C3984665BFD5D2C50B51BC /* CharacterCollectionViewModelTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CharacterCollectionViewModelTests.swift; path = StressMonitorTests/CharacterCollectionViewModelTests.swift; sourceTree = "<group>"; };
 		4C67EAC979024C30F581AD22 /* StressMonitorProducts.storekit */ = {isa = PBXFileReference; includeInIndex = 1; name = StressMonitorProducts.storekit; path = StressMonitorTests/StressMonitorProducts.storekit; sourceTree = "<group>"; };
@@ -104,6 +108,8 @@
 		F2E2EC252F1CC605000C2B53 /* StressMonitorWatch Watch AppTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "StressMonitorWatch Watch AppTests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		F2E2EC2F2F1CC605000C2B53 /* StressMonitorWatch Watch AppUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = "StressMonitorWatch Watch AppUITests.xctest"; sourceTree = BUILT_PRODUCTS_DIR; };
 		FF19921F5E82175704921949 /* StressContextPayloadTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = StressContextPayloadTests.swift; path = StressMonitorTests/StressContextPayloadTests.swift; sourceTree = "<group>"; };
+		F1A1B2C3D4E500000000A001 /* ModelContainerRecoveryTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ModelContainerRecoveryTests.swift; path = StressMonitorTests/ModelContainerRecoveryTests.swift; sourceTree = "<group>"; };
+		F1A1B2C3D4E500000000A002 /* StressMeasurementMigrationTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = StressMeasurementMigrationTests.swift; path = StressMonitorTests/StressMeasurementMigrationTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -242,6 +248,7 @@
 				5F1E29FB29A0C0373818403F /* PremiumViewModelTests.swift */,
 				A41EC256A3DD566A20DAB84B /* StoreKitProductCatalogTests.swift */,
 				0ED711106429F77E210D3F60 /* StoreKitServiceTests.swift */,
+				38B4FDA585844AA492F5BFEB /* StoreKitTestSessionProvider.swift */,
 				FF19921F5E82175704921949 /* StressContextPayloadTests.swift */,
 				596464A7DA54461FFA3A015F /* SupabaseAuthServiceTests.swift */,
 				4C67EAC979024C30F581AD22 /* StressMonitorProducts.storekit */,
@@ -461,10 +468,13 @@
 				F14C2C7A012F5F2D048E8230 /* PremiumViewModelTests.swift in Sources */,
 				D1858B03657E705B3A69F771 /* StoreKitProductCatalogTests.swift in Sources */,
 				9E36EB4221565C3D18AE9BF1 /* StoreKitServiceTests.swift in Sources */,
+				741F9DF5DA5A4E97A3918E94 /* StoreKitTestSessionProvider.swift in Sources */,
 				19FF7CDE8F20585FB3F027EC /* StressContextPayloadTests.swift in Sources */,
 				B31DF5E223857E730C1F1B04 /* SupabaseAuthServiceTests.swift in Sources */,
 				39419B30DE0EE4EDBA6A2CB4 /* WidgetPublisherKeyMatchingTests.swift in Sources */,
 				E8D9B7231036C614602516E5 /* WidgetDataStateTests.swift in Sources */,
+				F1A1B2C3D4E500000000B001 /* ModelContainerRecoveryTests.swift in Sources */,
+				F1A1B2C3D4E500000000B002 /* StressMeasurementMigrationTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -768,6 +778,10 @@
 				INFOPLIST_KEY_NSHealthClinicalHealthRecordsShareUsageDescription = "We need access to your health data to monitor stress levels.";
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "We need access to your health data to monitor stress levels.";
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "We need to update your health data with stress measurements.";
+				INFOPLIST_KEY_STOREKIT_PREMIUM_ANNUAL_PRODUCT_ID = "com.stressmonitor.app.premium.annual";
+				INFOPLIST_KEY_STOREKIT_PREMIUM_MONTHLY_PRODUCT_ID = "com.stressmonitor.app.premium.monthly";
+				INFOPLIST_KEY_STOREKIT_PREMIUM_SUBSCRIPTION_GROUP_ID = SMPREMIUM01;
+				INFOPLIST_KEY_STOREKIT_PREMIUM_WEEKLY_PRODUCT_ID = "com.stressmonitor.app.premium.weekly";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UIBackgroundModes = "fetch processing";
@@ -819,6 +833,10 @@
 				INFOPLIST_KEY_NSHealthClinicalHealthRecordsShareUsageDescription = "We need access to your health data to monitor stress levels.";
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "We need access to your health data to monitor stress levels.";
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "We need to update your health data with stress measurements.";
+				INFOPLIST_KEY_STOREKIT_PREMIUM_ANNUAL_PRODUCT_ID = "com.stressmonitor.app.premium.annual";
+				INFOPLIST_KEY_STOREKIT_PREMIUM_MONTHLY_PRODUCT_ID = "com.stressmonitor.app.premium.monthly";
+				INFOPLIST_KEY_STOREKIT_PREMIUM_SUBSCRIPTION_GROUP_ID = SMPREMIUM01;
+				INFOPLIST_KEY_STOREKIT_PREMIUM_WEEKLY_PRODUCT_ID = "com.stressmonitor.app.premium.weekly";
 				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
 				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
 				INFOPLIST_KEY_UIBackgroundModes = "fetch processing";

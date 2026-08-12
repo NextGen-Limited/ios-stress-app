@@ -21,12 +21,27 @@ struct ActionView: View {
     /// (no data) — the recommendation card handles that case gracefully.
     var stressLevel: Double? = nil
 
+    /// True only when Chat is reachable in this build. Compile-time under
+    /// `#if DEBUG`, so the Release build elides the enabled branch entirely.
+    private var isChatAvailable: Bool {
+        ChatAvailability.current.isAvailable
+    }
+
     var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 18) {
                 sectionHeader
-                RippleRecommendationCard(stressLevel: stressLevel) {
-                    isChatPresented = true
+                VStack(spacing: 6) {
+                    RippleRecommendationCard(stressLevel: stressLevel) {
+                        presentChat()
+                    }
+                    if !isChatAvailable {
+                        Text("AI Coaching arrives in our next update")
+                            .font(.system(size: 11, weight: .medium, design: .rounded))
+                            .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
+                            .frame(maxWidth: .infinity, alignment: .leading)
+                            .padding(.horizontal, 4)
+                    }
                 }
                 breatheGroup
                 moveGroup
@@ -53,6 +68,14 @@ struct ActionView: View {
                 habitViewModel?.loadToday()
             }
         }
+    }
+
+    /// Opens the Chat sheet only when Chat is available in this build;
+    /// otherwise no-op. The disabled entry-point presentation is handled
+    /// inline by the cards that read `isChatAvailable`.
+    private func presentChat() {
+        guard isChatAvailable else { return }
+        isChatPresented = true
     }
 
     // MARK: - 1. Header
@@ -163,11 +186,13 @@ struct ActionView: View {
                     reflectRow(
                         icon: "bubble.left",
                         title: "Talk to Ripple",
-                        subtitle: "Process today's stressor · 5 min",
+                        subtitle: isChatAvailable
+                            ? "Process today's stressor · 5 min"
+                            : "Process today's stressor · coming soon",
                         tint: HomeCharacterDesignTokens.Ripple.primary,
                         action: {
                             HapticManager.shared.buttonPress()
-                            isChatPresented = true
+                            presentChat()
                         }
                     )
                 }

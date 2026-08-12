@@ -34,6 +34,10 @@ private final class FakeStoreKitService: StoreKitServiceProtocol {
     func refreshEntitlements() async {
         didCallRefresh = true
     }
+
+    func isEligibleForIntroOffer(for period: SubscriptionPeriod) async -> Bool {
+        stubbedPlans.first(where: { $0.period == period })?.hasIntroductoryOffer ?? false
+    }
 }
 
 // MARK: - Tests
@@ -89,7 +93,8 @@ struct PremiumViewModelTests {
                 productID: nil,
                 displayPrice: nil,
                 billingSummary: nil,
-                hasIntroductoryOffer: false
+                hasIntroductoryOffer: false,
+                introOfferPeriodUnit: nil
             )
         ]
         let state = makeIsolatedState()
