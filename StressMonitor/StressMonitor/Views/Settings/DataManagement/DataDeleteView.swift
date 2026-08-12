@@ -415,20 +415,6 @@ class DataDeleteViewModel {
         deleteProgress = 0
         currentOperation = "Preparing to delete..."
 
-        let progressMirror = Task { @MainActor in
-            while service.isDeleting {
-                self.deleteProgress = service.deleteProgress
-                self.currentOperation = service.currentOperation ?? ""
-                try? await Task.sleep(for: .milliseconds(50))
-            }
-        }
-
-        defer {
-            progressMirror.cancel()
-            cancellationToken = nil
-            isDeleting = false
-        }
-
         let scope = deleteScope
         let deletionTask = Task {
             if scope == .everything && isAllTime {
@@ -442,6 +428,20 @@ class DataDeleteViewModel {
             }
         }
         cancellationToken = deletionTask
+
+        let progressMirror = Task { @MainActor in
+            repeat {
+                self.deleteProgress = service.deleteProgress
+                self.currentOperation = service.currentOperation ?? ""
+                try? await Task.sleep(for: .milliseconds(50))
+            } while service.isDeleting
+        }
+
+        defer {
+            progressMirror.cancel()
+            cancellationToken = nil
+            isDeleting = false
+        }
 
         try await deletionTask.value
 
