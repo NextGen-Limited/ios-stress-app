@@ -16,7 +16,6 @@ final class DataDeleterService: DataDeleter {
     public private(set) var isDeleting = false
     public private(set) var deleteProgress: Double = 0.0
     public private(set) var currentOperation: String?
-    public private(set) var errorMessage: String?
 
     // MARK: - Dependencies
 
@@ -65,7 +64,6 @@ final class DataDeleterService: DataDeleter {
         isDeleting = true
         deleteProgress = 0.0
         currentOperation = "Preparing to delete all measurements"
-        errorMessage = nil
 
         defer {
             isDeleting = false
@@ -113,18 +111,15 @@ final class DataDeleterService: DataDeleter {
             logger.log("Successfully deleted all measurements from both storage locations")
 
         } catch let error as DeletionError {
-            errorMessage = error.localizedDescription
             logger.log("Delete all failed: \(error.localizedDescription)")
             throw error
         } catch let error as CloudKitResetError {
-            errorMessage = error.localizedDescription
             logger.log("Delete all failed: \(error.localizedDescription)")
             throw DeletionError.cloudKitError(error)
         } catch is CancellationError {
             logger.log("Delete all cancelled")
             throw DeletionError.operationCancelled
         } catch {
-            errorMessage = error.localizedDescription
             logger.log("Delete all failed with unexpected error: \(error.localizedDescription)")
             throw DeletionError.repositoryError(error)
         }
@@ -138,7 +133,6 @@ final class DataDeleterService: DataDeleter {
         isDeleting = true
         deleteProgress = 0.0
         currentOperation = "Preparing to delete measurements before \(date)"
-        errorMessage = nil
 
         defer {
             isDeleting = false
@@ -178,15 +172,12 @@ final class DataDeleterService: DataDeleter {
             logger.log("Successfully deleted measurements before \(date)")
 
         } catch let error as DeletionError {
-            errorMessage = error.localizedDescription
             logger.log("Delete before failed: \(error.localizedDescription)")
             throw error
         } catch let error as CloudKitResetError {
-            errorMessage = error.localizedDescription
             logger.log("Delete before failed: \(error.localizedDescription)")
             throw DeletionError.cloudKitError(error)
         } catch {
-            errorMessage = error.localizedDescription
             logger.log("Delete before failed with unexpected error: \(error.localizedDescription)")
             throw DeletionError.repositoryError(error)
         }
@@ -200,7 +191,6 @@ final class DataDeleterService: DataDeleter {
         isDeleting = true
         deleteProgress = 0.0
         currentOperation = "Preparing to delete measurements in range"
-        errorMessage = nil
 
         defer {
             isDeleting = false
@@ -240,15 +230,12 @@ final class DataDeleterService: DataDeleter {
             logger.log("Successfully deleted measurements in range \(range)")
 
         } catch let error as DeletionError {
-            errorMessage = error.localizedDescription
             logger.log("Delete in range failed: \(error.localizedDescription)")
             throw error
         } catch let error as CloudKitResetError {
-            errorMessage = error.localizedDescription
             logger.log("Delete in range failed: \(error.localizedDescription)")
             throw DeletionError.cloudKitError(error)
         } catch {
-            errorMessage = error.localizedDescription
             logger.log("Delete in range failed with unexpected error: \(error.localizedDescription)")
             throw DeletionError.repositoryError(error)
         }
@@ -269,7 +256,6 @@ final class DataDeleterService: DataDeleter {
         isDeleting = true
         deleteProgress = 0.0
         currentOperation = "Preparing to delete measurements in range"
-        errorMessage = nil
 
         defer {
             isDeleting = false
@@ -315,18 +301,15 @@ final class DataDeleterService: DataDeleter {
             logger.log("Successfully deleted measurements in range \(range) (local: \(includeLocal), cloud: \(includeCloud))")
 
         } catch let error as DeletionError {
-            errorMessage = error.localizedDescription
             logger.log("Delete in range (scoped) failed: \(error.localizedDescription)")
             throw error
         } catch let error as CloudKitResetError {
-            errorMessage = error.localizedDescription
             logger.log("Delete in range (scoped) failed: \(error.localizedDescription)")
             throw DeletionError.cloudKitError(error)
         } catch is CancellationError {
             logger.log("Delete in range (scoped) cancelled")
             throw DeletionError.operationCancelled
         } catch {
-            errorMessage = error.localizedDescription
             logger.log("Delete in range (scoped) failed with unexpected error: \(error.localizedDescription)")
             throw DeletionError.repositoryError(error)
         }
@@ -338,7 +321,6 @@ final class DataDeleterService: DataDeleter {
         isDeleting = true
         deleteProgress = 0.0
         currentOperation = "Preparing CloudKit reset"
-        errorMessage = nil
 
         defer {
             isDeleting = false
@@ -366,15 +348,12 @@ final class DataDeleterService: DataDeleter {
             logger.log("Successfully reset all CloudKit data")
 
         } catch let error as DeletionError {
-            errorMessage = error.localizedDescription
             logger.log("CloudKit reset failed: \(error.localizedDescription)")
             throw error
         } catch let error as CloudKitResetError {
-            errorMessage = error.localizedDescription
             logger.log("CloudKit reset failed: \(error.localizedDescription)")
             throw DeletionError.cloudKitError(error)
         } catch {
-            errorMessage = error.localizedDescription
             logger.log("CloudKit reset failed with unexpected error: \(error.localizedDescription)")
             throw DeletionError.cloudKitError(error)
         }
@@ -386,7 +365,6 @@ final class DataDeleterService: DataDeleter {
         isDeleting = true
         deleteProgress = 0.0
         currentOperation = "Preparing factory reset"
-        errorMessage = nil
 
         defer {
             isDeleting = false
@@ -430,15 +408,12 @@ final class DataDeleterService: DataDeleter {
             logger.log("Successfully performed factory reset")
 
         } catch let error as DeletionError {
-            errorMessage = error.localizedDescription
             logger.log("Factory reset failed: \(error.localizedDescription)")
             throw error
         } catch let error as CloudKitResetError {
-            errorMessage = error.localizedDescription
             logger.log("Factory reset failed: \(error.localizedDescription)")
             throw DeletionError.cloudKitError(error)
         } catch {
-            errorMessage = error.localizedDescription
             logger.log("Factory reset failed with unexpected error: \(error.localizedDescription)")
             throw DeletionError.repositoryError(error)
         }
@@ -482,12 +457,5 @@ final class DataDeleterService: DataDeleter {
         SupabaseLLMService.clearStoredCredentials()
         UserDefaults(suiteName: WidgetConstants.appGroupID)?
             .removePersistentDomain(forName: WidgetConstants.appGroupID)
-    }
-
-    // MARK: - Error Recovery
-
-    /// Clear any pending error state
-    func clearError() {
-        errorMessage = nil
     }
 }
