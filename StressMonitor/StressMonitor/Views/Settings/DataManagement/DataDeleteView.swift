@@ -374,37 +374,27 @@ class DataDeleteViewModel {
         }
 
         let (start, end) = getDateRangeBounds()
+        let service = makeDeleterService(modelContext: modelContext)
+        let count = await service.getDeletionStats(in: start...end)
 
-        // Count stress measurements
-        let measurementDescriptor = FetchDescriptor<StressMeasurement>(
-            predicate: #Predicate { measurement in
-                measurement.timestamp >= start && measurement.timestamp <= end
-            }
-        )
-
-        do {
-            let measurements = try modelContext.fetch(measurementDescriptor)
-            await MainActor.run {
-                affectedMeasurementCount = measurements.count
-                affectedBaselineCount = deleteScope.includesBaseline ? 1 : 0
-                currentOperation = ""
-            }
-        } catch {
-            await MainActor.run {
-                affectedMeasurementCount = 0
-                affectedBaselineCount = 0
-                currentOperation = ""
-            }
+        await MainActor.run {
+            affectedMeasurementCount = count
+            affectedBaselineCount = deleteScope.includesBaseline ? 1 : 0
+            currentOperation = ""
         }
     }
 
-    func performDelete(modelContext: ModelContext) async throws {
-        let service = DataDeleterService(
+    private func makeDeleterService(modelContext: ModelContext) -> DataDeleterService {
+        DataDeleterService(
             modelContext: modelContext,
             cloudKitContainer: .default(),
             repository: StressRepository(modelContext: modelContext),
             logger: .default
         )
+    }
+
+    func performDelete(modelContext: ModelContext) async throws {
+        let service = makeDeleterService(modelContext: modelContext)
 
         let (start, end) = getDateRangeBounds()
         let isAllTime = !useCustomDateRange && dateRange == .all
