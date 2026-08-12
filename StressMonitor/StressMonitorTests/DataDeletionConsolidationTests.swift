@@ -173,7 +173,7 @@ struct DataDeleterScopedDeletionTests {
 /// Test double for ``CloudKitResetServiceProtocol`` that can simulate a CloudKit
 /// failure or a mid-flight cancellation without any network access.
 @MainActor
-final class FakeCloudKitResetService: CloudKitResetServiceProtocol {
+final class FakeCloudKitResetService: CloudKitResetServiceProtocol, @unchecked Sendable {
     enum Behavior {
         case succeed
         case throwError(CloudKitResetError)
