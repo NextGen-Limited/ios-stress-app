@@ -149,6 +149,11 @@ final class DataDeleterService: DataDeleter {
                 }
             }
 
+            // Last safe checkpoint before the operation becomes irreversible —
+            // once CloudKit deletion starts, local deletion always follows so the
+            // two stores never diverge (see CR-01).
+            try Task.checkCancellation()
+
             // Phase 1: Delete from CloudKit
             currentOperation = "Deleting from CloudKit"
             deleteProgress = 0.1
@@ -177,6 +182,9 @@ final class DataDeleterService: DataDeleter {
         } catch let error as CloudKitResetError {
             logger.log("Delete before failed: \(error.localizedDescription)")
             throw DeletionError.cloudKitError(error)
+        } catch is CancellationError {
+            logger.log("Delete before cancelled")
+            throw DeletionError.operationCancelled
         } catch {
             logger.log("Delete before failed with unexpected error: \(error.localizedDescription)")
             throw DeletionError.repositoryError(error)
@@ -207,6 +215,11 @@ final class DataDeleterService: DataDeleter {
                 }
             }
 
+            // Last safe checkpoint before the operation becomes irreversible —
+            // once CloudKit deletion starts, local deletion always follows so the
+            // two stores never diverge (see CR-01).
+            try Task.checkCancellation()
+
             // Phase 1: Delete from CloudKit
             currentOperation = "Deleting from CloudKit"
             deleteProgress = 0.1
@@ -235,6 +248,9 @@ final class DataDeleterService: DataDeleter {
         } catch let error as CloudKitResetError {
             logger.log("Delete in range failed: \(error.localizedDescription)")
             throw DeletionError.cloudKitError(error)
+        } catch is CancellationError {
+            logger.log("Delete in range cancelled")
+            throw DeletionError.operationCancelled
         } catch {
             logger.log("Delete in range failed with unexpected error: \(error.localizedDescription)")
             throw DeletionError.repositoryError(error)
@@ -337,6 +353,11 @@ final class DataDeleterService: DataDeleter {
                 }
             }
 
+            // Last safe checkpoint before the operation becomes irreversible —
+            // a cancellation after this point must be classified as
+            // DeletionError.operationCancelled, not a misleading cloudKitError/repositoryError.
+            try Task.checkCancellation()
+
             // Delete all CloudKit records
             try await cloudKitResetService.deleteAllRecords(
                 confirmation: nil, // Already confirmed above
@@ -353,6 +374,9 @@ final class DataDeleterService: DataDeleter {
         } catch let error as CloudKitResetError {
             logger.log("CloudKit reset failed: \(error.localizedDescription)")
             throw DeletionError.cloudKitError(error)
+        } catch is CancellationError {
+            logger.log("CloudKit reset cancelled")
+            throw DeletionError.operationCancelled
         } catch {
             logger.log("CloudKit reset failed with unexpected error: \(error.localizedDescription)")
             throw DeletionError.cloudKitError(error)
