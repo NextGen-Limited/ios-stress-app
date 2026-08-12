@@ -14,6 +14,7 @@ struct DataManageView: View {
     @State private var showingFactoryReset = false
     @State private var resultMessage: String?
     @State private var showingResult = false
+    @State private var snapshotCount = 0
 
     var body: some View {
         Form {
@@ -24,6 +25,9 @@ struct DataManageView: View {
         }
         .navigationTitle("Manage Data")
         .navigationBarTitleDisplayMode(.inline)
+        .task {
+            await refreshSnapshotCount()
+        }
         .alert("Done", isPresented: $showingResult) {
             Button("OK", role: .cancel) {}
         } message: {
@@ -143,13 +147,6 @@ struct DataManageView: View {
         .padding(.vertical, 4)
     }
 
-    // MARK: - Derived
-
-    private var snapshotCount: Int {
-        let descriptor = FetchDescriptor<StressMeasurement>()
-        return ((try? modelContext.fetchCount(descriptor)) ?? 0)
-    }
-
     // MARK: - Actions
 
     private func makeDeleterService() -> DataDeleterService {
@@ -161,11 +158,16 @@ struct DataManageView: View {
         )
     }
 
+    private func refreshSnapshotCount() async {
+        snapshotCount = await makeDeleterService().getTotalCount()
+    }
+
     private func performDeleteAll() async {
         let service = makeDeleterService()
         do {
             try await service.deleteAllMeasurements()
             resultMessage = "All stress snapshots were deleted."
+            await refreshSnapshotCount()
         } catch let DeletionError.cloudKitError(cloudKitError) {
             resultMessage = "iCloud data couldn't be removed (\(cloudKitError.localizedDescription)). Local snapshots were not deleted — resolve the iCloud issue and try again."
         } catch DeletionError.operationCancelled {
@@ -181,6 +183,7 @@ struct DataManageView: View {
         do {
             try await service.performFactoryReset()
             resultMessage = "Local data cleared. Relaunch the app to begin setup."
+            await refreshSnapshotCount()
         } catch let DeletionError.cloudKitError(cloudKitError) {
             resultMessage = "iCloud reset failed (\(cloudKitError.localizedDescription)). Local data, sign-in, and shared caches were not cleared — resolve the iCloud issue and try again."
         } catch DeletionError.operationCancelled {
