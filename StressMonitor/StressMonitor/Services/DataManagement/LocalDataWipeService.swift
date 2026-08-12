@@ -304,13 +304,13 @@ final class LocalDataWipeService: Sendable {
 
 // MARK: - Local Data Error
 
-enum LocalDataError: Error {
+enum LocalDataError: LocalizedError {
     case deletionFailed(underlying: Error)
     case operationCancelled
     case unauthorizedAccess
     case contextNotFound
 
-    var localizedDescription: String {
+    var errorDescription: String? {
         switch self {
         case .deletionFailed(let error):
             return "Failed to delete data: \(error.localizedDescription)"

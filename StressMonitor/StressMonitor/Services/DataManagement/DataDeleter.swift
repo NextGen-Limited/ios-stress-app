@@ -36,9 +36,22 @@ extension DataDeleter {
 }
 
 // MARK: - Delete Error
-enum DeletionError: Error {
+enum DeletionError: LocalizedError {
     case repositoryError(Error)
     case cloudKitError(Error)
     case unauthorizedAccess
     case operationCancelled
+
+    var errorDescription: String? {
+        switch self {
+        case .repositoryError(let error):
+            return error.localizedDescription
+        case .cloudKitError(let error):
+            return error.localizedDescription
+        case .unauthorizedAccess:
+            return "Unauthorized access to data"
+        case .operationCancelled:
+            return "Operation was cancelled"
+        }
+    }
 }

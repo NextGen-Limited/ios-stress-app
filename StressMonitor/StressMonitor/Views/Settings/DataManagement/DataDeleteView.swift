@@ -236,6 +236,18 @@ struct DataDeleteView: View {
             dismiss()
         } catch DeletionError.operationCancelled {
             return
+        } catch let DeletionError.cloudKitError(cloudKitError) {
+            await MainActor.run {
+                errorMessage = "iCloud data couldn't be removed (\(cloudKitError.localizedDescription)). Resolve the iCloud issue and try again."
+                showingError = true
+                HapticManager.shared.error()
+            }
+        } catch let DeletionError.repositoryError(repositoryError) {
+            await MainActor.run {
+                errorMessage = "Delete failed: \(repositoryError.localizedDescription)"
+                showingError = true
+                HapticManager.shared.error()
+            }
         } catch {
             await MainActor.run {
                 errorMessage = error.localizedDescription

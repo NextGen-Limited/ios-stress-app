@@ -476,7 +476,7 @@ final class CloudKitResetService: Sendable {
 
 // MARK: - CloudKit Reset Error
 
-enum CloudKitResetError: Error {
+enum CloudKitResetError: LocalizedError {
     case deletionFailed(underlying: Error)
     case cloudKitError(Error)
     case operationCancelled
@@ -488,7 +488,7 @@ enum CloudKitResetError: Error {
     case zoneNotFound
     case recordNotFound
 
-    var localizedDescription: String {
+    var errorDescription: String? {
         switch self {
         case .deletionFailed(let error):
             return "Failed to delete CloudKit data: \(error.localizedDescription)"
