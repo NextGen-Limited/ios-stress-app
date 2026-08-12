@@ -21,61 +21,66 @@ Every feature that ships in the binary must actually work end-to-end for a real 
 
 ### Validated
 
-<!-- Shipped and confirmed actually working — cross-checked against the remediation plan's "What's Solid" section and .planning/codebase/ARCHITECTURE.md, not just "exists in code." -->
+<!-- Shipped AND independently verified by a gsd-verifier pass this milestone — not just self-reported "Complete" in REQUIREMENTS.md's traceability table. See "v1.0 Verification Reality Check" in Context below for why this list is deliberately shorter than REQUIREMENTS.md's Complete count. -->
 
 - ✓ Multi-factor stress scoring algorithm (HRV · HR · Sleep · Activity · Recovery, weight redistribution) — existing, not flagged by any audit
 - ✓ HealthKit integration, read-only, 7 data types — existing
-- ✓ SwiftData local persistence with correct versioned schema migration (V1→V2) — existing, explicitly called out as solid
 - ✓ Networking layer — HTTPS-only, no ATS exceptions, correct Keychain accessibility, async/await `URLSession` — explicitly called out as solid
-- ✓ StoreKit verification logic itself (`checkVerified` throws on `.unverified`, `.finish()` called on both paths) — existing, sound; the *wiring around it* is what's broken (see Active)
+- ✓ StoreKit verification logic itself (`checkVerified` throws on `.unverified`, `.finish()` called on both paths) — existing, sound
 - ✓ Apple Watch companion app with WidgetKit complications — existing
 - ✓ Character collection gamification (5 creatures, evolution) — existing
 - ✓ Breathing exercises and Mini Walk wellness tools — existing
 - ✓ Haptic feedback — wired once, at the correct call site
+- ✓ Non-fatal SwiftData `ModelContainer` recovery across any prior store schema state — v1.0 Phase 1.1, verification `passed`
+- ✓ DATA-02: Export protection (size cap, `.completeFileProtection`, on-dismiss cleanup) — v1.0 Phase 2, independently verified in code + tests
+- ✓ DATA-03: CloudKit field encryption via `encryptedValues` for hrv/restingHeartRate/stressLevel — v1.0 Phase 2, independently verified in code + tests
+- ✓ WIRE-02: Single canonical data-management implementation (`DataDeleterService`); duplicate `DataExporter`/`ExportModels` stack deleted — v1.0 Phase 2, independently verified
 
 ### Active
 
-<!-- This milestone: the 7-phase remediation plan at plans/0808-2042-appstore-submission-remediation/plan.md. REQ-IDs map 1:1 to that plan's phases; consult it for full detail, file locations, and acceptance criteria. -->
+<!-- Carried into v1.1. Status reflects the honest per-requirement verification state at v1.0 close, not REQUIREMENTS.md's self-reported "Complete" — see Context. -->
 
-**BUILD — Phase 1 (build configuration correctness, ~4h, clears 3 CRITICALs)**
-- [ ] BUILD-01: `PrivacyInfo.xcprivacy` passes ASC upload validation (remove invalid `NSPrivacyAccessedAPICategoryHealthKit`; declare chat content correctly — depends on D3)
-- [ ] BUILD-02: One canonical App Group suite ID adopted across all 3 targets (currently 3 different IDs in use; widget `fatalError`s without it)
-- [ ] BUILD-03: Info.plist consolidated onto `INFOPLIST_KEY_*` build settings; orphaned `StressMonitor/Info.plist` deleted
-- [ ] BUILD-04: A real unit-test target is wired into `StressMonitor.xcodeproj` so `xcodebuild test` executes (prerequisite gap not called out by the remediation plan itself, but required for the TDD mode already active in `.planning/config.json` to mean anything — corroborated by `.planning/codebase/CONCERNS.md`)
+**BUILD — carried from v1.0 Phase 1**
+- [ ] BUILD-01: `PrivacyInfo.xcprivacy` passes ASC upload validation — unchecked, still blocked on D3
+- [ ] BUILD-02: One canonical App Group suite ID across all 3 targets — unchecked
+- [ ] BUILD-03: Info.plist consolidated onto `INFOPLIST_KEY_*` — unchecked
+- [ ] BUILD-04: `xcodebuild test` executes and reports pass/fail — code/wiring done (test bundle compiles, 11+ files registered) but never actually observed to complete a run; this host's CoreSimulator has a persistent, reproducible device-pairing failure (`No matching device ... in XCTestDevices`) blocking every attempt across all 6 phases this milestone
 
-**DATA — Phase 2 (data integrity & deletion, 2–3d, depends on BUILD-02 + decision D2)**
-- [ ] DATA-01: Every delete/reset path actually deletes — local + CloudKit + Keychain JWT + App Group cache (today several are no-ops while the UI claims "permanently delete from iCloud")
-- [ ] DATA-02: Health data exports (`DataExportView`) use complete file protection, are size-capped, and are cleaned up after share
-- [ ] DATA-03: CloudKit field encryption implemented for `hrv`/`restingHeartRate`/`stressLevel` (`CKRecord.encryptedValues`), or the E2E-encryption claim is corrected in docs — **blocked on decision D2**
+**DATA — carried from v1.0 Phase 2**
+- [ ] DATA-01: Delete actually deletes everywhere (local + CloudKit + Keychain JWT + App Group cache) — Keychain/App-Group half verified; the requirement's own defining two-device CloudKit-propagation test (02-01-PLAN.md Task 4) was deferred, never run; a genuine "CloudKit delete silently reports success on failure" bug (CR-01) was found and fixed mid-milestone but ships with zero regression test coverage
 
-**AUTH — Phase 3 (auth & chat availability, 3d–2wk, blocked on decision D1)**
-- [ ] AUTH-01: No credential (expired or otherwise) ships hardcoded in the Release binary
-- [ ] AUTH-02: Chat entry point reflects real authentication state — either a working sign-in flow ships, or Chat is honestly gated off for v1 — **blocked on decision D1**
-- [ ] AUTH-03: Dismissing the chat sheet mid-stream cancels the SSE request within one runloop and does not burn a credit; a forced network drop preserves partial text
+**AUTH — carried from v1.0 Phase 3 (blocked on decision D1)**
+- [ ] AUTH-01: No credential ships extractable from the Release binary via `strings` — fix applied (`#if DEBUG` wrap) but the empirical `strings` confirmation is blocked by an unrelated pre-existing Release-compile failure (see Constraints)
+- [ ] AUTH-02: Chat entry point reflects real auth state — implemented as "honestly gated off" (`ChatAvailability` compile flag), but D1 (ship real auth vs. stay gated off) remains open, so the requirement can't be called fully resolved either way
+- [ ] AUTH-03: Chat dismiss-mid-stream cancels SSE within one runloop, no credit charged — TDD tests exist and compile; never executed (same CoreSimulator blocker as BUILD-04)
 
-**WIRE — Phase 4 (wire-up gap closure, 2–3d)**
-- [ ] WIRE-01: Widget renders live data (wired to `StressViewModel`/`SyncManager` + `WidgetCenter.reloadAllTimelines()`), not permanent placeholder — scope depends on decision D4 (ship widget in v1, or exclude the target)
-- [ ] WIRE-02: Duplicate `DataManagementService`/`CSVGenerator`/`JSONGenerator` implementation consolidated (resolved by DATA-01's retarget)
+**WIRE — carried from v1.0 Phase 4 (WIRE-01 only; WIRE-02 validated above)**
+- [ ] WIRE-01: Widget renders live data on a real device, not placeholder — depends on decision D4; no v1.0 phase VERIFICATION.md exists for this
 
-**IAP — Phase 5 (IAP revenue path, 3–4d, external ASC dependency — start product creation early)**
-- [ ] IAP-01: StoreKit product IDs resolve in Release configuration (ASC product creation + `INFOPLIST_KEY_STOREKIT_PREMIUM_*`)
-- [ ] IAP-02: `Transaction.updates` listener owned at app scope (not a view's `@State`), refreshes entitlement on `scenePhase == .active`
-- [ ] IAP-03: Stale-premium correction path is reachable (`PaywallController.present()` no longer no-ops when already premium, permanently hiding the one path that would correct it)
-- [ ] IAP-04: Permanent character-unlock entitlement bypass fixed, or confirmed as intentional one-time-unlock design
-- [ ] IAP-05: Pricing display is accurate — no misleading `pricePerMonth` next to `/year`, computed savings percentage, gated free-trial banner behind `isEligibleForIntroOffer`
-- [ ] IAP-06: A `.storekit` local testing file exists; purchase/restore/cancel/expiry verified against it; CI fails a Release archive when `allProductIDs` is empty
+**IAP — carried from v1.0 Phase 5 (no phase VERIFICATION.md exists — all 6 below are self-reported "Complete" in REQUIREMENTS.md, none independently re-verified this milestone)**
+- [ ] IAP-01: StoreKit product IDs resolve in Release configuration
+- [ ] IAP-02: `Transaction.updates` listener owned at app scope
+- [ ] IAP-03: Stale-premium correction path reachable
+- [ ] IAP-04: Character-unlock entitlement bypass fixed or confirmed intentional (confirmed intentional per D-05: one-time-permanent)
+- [ ] IAP-05: Pricing display accuracy (savings %, trial gating)
+- [ ] IAP-06: Purchase/restore/cancel/expiry verified against a `.storekit` file — the dedicated `StoreKitServiceTests` suite is `@Suite(.disabled(...))` in CI per the v1.0 milestone audit; coverage claim does not hold today
 
-**SHIP — Phase 6 (store listing & release mechanics, 4–6h + design, mostly gates on 1–5 substantially done)**
-- [ ] SHIP-01: App Store screenshot set captured (min one iPhone set at 6.9" or 6.5"; demo mode disabled before capture)
-- [ ] SHIP-02: Fastlane `release` lane matches actual readiness — manual ASC submission path for this first release rather than blind `deliver --submit_for_review`
-- [ ] SHIP-03: ASC privacy questionnaire answered per decision D3's resolution
+**SHIP — carried from v1.0 Phase 5 (no phase VERIFICATION.md exists)**
+- [ ] SHIP-01: App Store screenshot set captured with demo mode disabled — deferred as checkpoint:human-verify, never done
+- [ ] SHIP-02: Fastlane `release` lane matches actual readiness (metadata-only upload)
+- [ ] SHIP-03: ASC privacy questionnaire answered per D3 — blocked on D3, unchecked
 
-**A11Y — Phase 7 (accessibility, ~1d + 1–2wk, parallelizable with everything above)**
-- [ ] A11Y-01: Sub-44pt touch targets fixed (paywall nav bar, chat composer)
-- [ ] A11Y-02: Color-contrast fixes (`CategoryFilterChip`, `StressHeroCard`)
-- [ ] A11Y-03: Reduce Motion guards added to `repeatForever` animations (breathing exercise, mini walk)
-- [ ] A11Y-04: Dynamic Type adopted app-wide — `Typography.swift`/`Font+WellnessType.swift` reworked onto relative sizing; 743+ `.font(.system(size:))` call sites migrated; existing but zero-call-site helpers (`.accessibleDynamicType()`, `.stressDualCoding()`, `.minimumTouchTarget()`) actually adopted
-- [ ] A11Y-05: Orphaned, unreachable redesign views (`WeeklyHeatmapView`, `DailyTimelineView`, `LineChartView`, `StressChart7d`, `AccessibleStressTrendChart`) deleted rather than fixed
+**A11Y — carried from v1.0 Phase 5 (no phase VERIFICATION.md exists)**
+- [ ] A11Y-01: Sub-44pt touch targets fixed
+- [ ] A11Y-02: Color-contrast fixes
+- [ ] A11Y-03: Reduce Motion guards added
+- [ ] A11Y-04: Dynamic Type adopted app-wide
+- [ ] A11Y-05: Orphaned redesign views deleted
+
+**NEW — surfaced during v1.0 close, not in the original remediation plan**
+- [ ] BUILD-05 (new): `StoreKitServiceEnvironment.swift:12`'s `defaultValue` references `MockStoreKitService` unconditionally outside `#if DEBUG` — every Release build fails to compile. Pre-existing, found during Phase 3 verification, blocks AUTH-01's own acceptance test.
+- [ ] TEST-01 (new): This development host's CoreSimulator cannot complete an `xcodebuild test` launch session — reproduced across every phase's verification attempt this milestone (4+ independent occurrences). Needs a working CI runner or a different host before any of BUILD-04/AUTH-03/DATA-01's test-execution claims can be closed.
+- [ ] DATA-04 (new): Add a regression test for CR-01 (CloudKit batch-delete failure propagation) — the fix is correct by code inspection but has zero automated coverage; requires a new test seam below `CloudKitResetServiceProtocol`.
 
 ### Out of Scope
 
@@ -98,6 +103,7 @@ Every feature that ships in the binary must actually work end-to-end for a real 
   - **D4** (Widget in v1: ship it — Phase 4 becomes a blocker — or exclude the target) — blocks Phase 4 (WIRE) priority
   - Two more, non-blocking but needed before Phase 6: is the "7-day free trial" real or aspirational copy; are the 3 premium characters permanent one-time unlocks by design or a bug.
 - Repo is currently on `feature/spm-cache-integration` with substantial unrelated uncommitted changes (CloudKit, DataManagement refactor/deletion, chat, paywall, watch complications) — not assumed as a stable baseline for this milestone until merged.
+- **v1.0 Verification Reality Check** (added at milestone close, 2026-08-12): v1.0 was closed with `override_closeout` — 5/6 phases un-verified or partially verified, 9/26 requirements still unchecked. Only Phase 1.1 (SwiftData migration safety) has a `passed` verification. Phase 1 verification is `gaps_found`; Phase 2 (this session, after 3 code-review/fix rounds that found and fixed a genuine data-integrity bug) is `human_needed` with 3 pending UAT items; Phases 3/4/5 were never formally verified at all — their REQUIREMENTS.md "Complete" marks are self-reported by SUMMARY.md, not independently confirmed. Treat every "Complete" mark in the archived `milestones/v1.0-REQUIREMENTS.md` for Phases 3-5 as **unverified until re-checked**, not as ground truth. Full detail: `.planning/v1.0-MILESTONE-AUDIT.md` (archived) and `02-VERIFICATION.md` (archived under `milestones/v1.0-phases/`).
 
 ## Constraints
 
@@ -113,11 +119,13 @@ Every feature that ships in the binary must actually work end-to-end for a real 
 
 | Decision | Rationale | Outcome |
 |----------|-----------|---------|
-| Replace the initially-scoped "test infra only" milestone with the full 7-phase App Store remediation plan | Discovered mid-setup that `plans/0808-2042-appstore-submission-remediation/plan.md` already exists — same-day, more thorough (65 findings vs. 1 KANBAN blocker), decision-gated, and ready to execute. Running a narrower parallel GSD track would duplicate/conflict on shared files (StoreKitService, SyncManager, PrivacyInfo.xcprivacy). User confirmed the replacement after reviewing the trade-off. | — Pending |
+| Replace the initially-scoped "test infra only" milestone with the full 7-phase App Store remediation plan | Discovered mid-setup that `plans/0808-2042-appstore-submission-remediation/plan.md` already exists — same-day, more thorough (65 findings vs. 1 KANBAN blocker), decision-gated, and ready to execute. Running a narrower parallel GSD track would duplicate/conflict on shared files (StoreKitService, SyncManager, PrivacyInfo.xcprivacy). User confirmed the replacement after reviewing the trade-off. | ✓ Good — plan executed across 6 phases |
 | REQ-IDs map directly to the existing plan's phases rather than re-deriving requirements independently | The plan is already audit-grounded with file-level specificity; re-deriving from scratch would be lower-fidelity and duplicate work already done today | ✓ Good |
-| D1–D4 (and the 2 non-blocking product questions) are deferred to `/gsd-discuss-phase` for the phases they gate, not resolved during project init | These are product decisions with real trade-offs (e.g., D1 affects submission date directly); premature resolution during setup risks a wrong call made under time pressure | — Pending |
-| Roadmap phase mode set to Horizontal Layers (`standard`), not the auto-mode default Vertical MVP | This is bug-fix/integration remediation across build config, data, auth, wiring, IAP, listing, and accessibility — not new user-facing feature slices. MVP/SPIDR framing doesn't fit; horizontal phases matching the plan's own structure do. | — Pending |
-| Granularity: Coarse (3–5 phases) — set before the scope pivot, kept after | Still fits: the roadmapper may consolidate the plan's 7 phases toward the coarse end (e.g., Phase 6+7 are both explicitly parallelizable/non-blocking) without losing the plan's substance | — Pending |
+| D1–D4 (and the 2 non-blocking product questions) are deferred to `/gsd-discuss-phase` for the phases they gate, not resolved during project init | These are product decisions with real trade-offs (e.g., D1 affects submission date directly); premature resolution during setup risks a wrong call made under time pressure | ⚠️ Revisit — D1/D2/D3/D4 all remained open through v1.0 close; carry into v1.1 discuss-phase gates |
+| Roadmap phase mode set to Horizontal Layers (`standard`), not the auto-mode default Vertical MVP | This is bug-fix/integration remediation across build config, data, auth, wiring, IAP, listing, and accessibility — not new user-facing feature slices. MVP/SPIDR framing doesn't fit; horizontal phases matching the plan's own structure do. | ✓ Good |
+| Granularity: Coarse (3–5 phases) — set before the scope pivot, kept after | Still fits: the roadmapper may consolidate the plan's 7 phases toward the coarse end (e.g., Phase 6+7 are both explicitly parallelizable/non-blocking) without losing the plan's substance | ✓ Good — 7 phases consolidated to 6 (5 + a mid-milestone insert, 01.1) |
+| v1.0 closed via `override_closeout` rather than blocking on full verification | 5/6 phases lacked a `passed` verification at close time; user explicitly chose to ship with gaps recorded as tech debt rather than block indefinitely on verification work (2 real devices, a CI host, test-seam design) this session couldn't perform | ⚠️ Revisit — re-verify Phases 3/4/5 and close Phase 02's 3 UAT items early in v1.1 |
+| Phase 02's code review ran 3 rounds instead of 1 — each re-review found something the prior fix missed | Standard-depth review + fix is not exhaustive on data-integrity-critical code; a genuine "CloudKit delete reports success on failure" bug (CR-01) surfaced only on the 3rd pass | ✓ Good — process worked as designed (re-review after fix caught real regressions), but signals this subsystem specifically needs deeper review depth or dedicated test-seam work before being trusted |
 
 ## Evolution
 
@@ -137,4 +145,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-08-08 after initialization (re-scoped after discovering the existing remediation plan)*
+*Last updated: 2026-08-12 after v1.0 milestone close (override_closeout — see "v1.0 Verification Reality Check" in Context)*

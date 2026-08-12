@@ -2,18 +2,18 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-current_phase: 5
-current_phase_name: Store Readiness & Accessibility
-status: executing
+status: Awaiting next milestone
 stopped_at: Completed 05-01-PLAN.md
-last_updated: "2026-08-11T07:12:00.000Z"
-last_activity: 2026-08-11
-last_activity_desc: Phase 5 Plan 01 code tasks complete
+last_updated: "2026-08-12T16:14:17.099Z"
+last_activity: 2026-08-12
+last_activity_desc: Phase 02 execution started
 progress:
-  total_phases: 5
-  completed_phases: 4
-  total_plans: 10
-  completed_plans: 9
+  total_phases: 6
+  completed_phases: 5
+  total_plans: 11
+  completed_plans: 10
+current_phase: 02
+current_phase_name: data-integrity-deletion-consolidation
 ---
 
 # Project State
@@ -23,16 +23,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-08-08)
 
 **Core value:** Every feature that ships in the binary must actually work end-to-end for a real user — not just compile.
-**Current focus:** Phase 01 — build-configuration-widget-wiring
+**Current focus:** Phase 02 — data-integrity-deletion-consolidation
 
 ## Current Position
 
-Phase: 5 — Store Readiness & Accessibility
-Plan: 01 complete (code tasks); SHIP-01/SHIP-03 deferred as checkpoint:human-verify
-Status: Code tasks complete, process tasks deferred
-Last activity: 2026-08-11 - Completed quick task 260811-t0l: Fix CI failure in .github/workflows/_test.yml — dynamic simulator destination
-
-Progress: [█████████░] 90%
+Phase: Milestone v1.0 complete
+Plan: —
+Status: Awaiting next milestone
+Last activity: 2026-08-12 — Milestone v1.0 completed and archived
 
 ## Performance Metrics
 
@@ -109,14 +107,22 @@ None yet.
 
 ## Deferred Items
 
-Items acknowledged and carried forward from previous milestone close:
+Items acknowledged and deferred at v1.0 milestone close on 2026-08-12:
 
-| Category | Item | Status | Deferred At |
-|----------|------|--------|-------------|
-| *(none — first milestone)* | | | |
+| Category | Item | Status |
+|----------|------|--------|
+| uat_gap | Phase 01.1 — 01.1-UAT.md | passed (0 pending scenarios) |
+| uat_gap | Phase 02 — 02-UAT.md | testing (3 pending scenarios: two-device CloudKit sync, DataDeletionConsolidationTests execution, CR-01 regression test) |
+| verification_gap | Phase 01 — 01-VERIFICATION.md | gaps_found |
+| verification_gap | Phase 02 — 02-VERIFICATION.md | human_needed (4/7 must-haves verified) |
+| deferred_item | Phase 03 — StoreKitServiceEnvironment.swift:12 references MockStoreKitService unconditionally, but it is #if DEBUG-only; every Release build fails to compile | open (pre-existing, not caused by Phase 3; blocks AUTH-01's local Release strings gate) |
 
 ## Session Continuity
 
 Last session: 2026-08-11T07:12:00.000Z
 Stopped at: Completed 05-01-PLAN.md
 Resume file: None
+
+## Operator Next Steps
+
+- Start the next milestone with /gsd-new-milestone
