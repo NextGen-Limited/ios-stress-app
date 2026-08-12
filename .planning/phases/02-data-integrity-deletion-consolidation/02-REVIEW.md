@@ -2,10 +2,13 @@
 phase: 02-data-integrity-deletion-consolidation
 reviewed: 2026-08-12T00:00:00Z
 depth: standard
-files_reviewed: 6
+files_reviewed: 9
 files_reviewed_list:
   - StressMonitor/StressMonitorTests/DataDeletionConsolidationTests.swift
   - StressMonitor/StressMonitor/Services/DataManagement/DataDeleterService.swift
+  - StressMonitor/StressMonitor/Services/DataManagement/CloudKitResetService.swift
+  - StressMonitor/StressMonitor/Services/DataManagement/LocalDataWipeService.swift
+  - StressMonitor/StressMonitor/Services/DataManagement/DataDeleter.swift
   - StressMonitor/StressMonitor/Views/Settings/DataManagement/DataManageView.swift
   - StressMonitor/StressMonitor/Views/Settings/DataManagement/DataDeleteView.swift
   - StressMonitor/StressMonitor/Views/Settings/DataManagement/DataExportView.swift
@@ -18,122 +21,143 @@ findings:
 status: issues_found
 ---
 
-# Phase 02: Code Review Report (Re-Review)
+# Phase 02: Code Review Report (Pass 3)
 
 **Reviewed:** 2026-08-12
 **Depth:** standard
-**Files Reviewed:** 6
+**Files Reviewed:** 9
 **Status:** issues_found
 
 ## Summary
 
-This is a fresh re-review of the six files after the prior round's CR-01..CR-04 / WR-01..WR-03 fixes (commits 65a5881, 14d538f, b531522, c9e2797, 87b3c5f, 3445a47, d06d9c0). I verified each of the seven prior fixes directly against the current source and confirmed all seven are genuinely resolved:
+This is the third review pass. The five iteration-2 fixes were re-verified against the actual code (not just the fix report) and **all five hold**:
 
-- **CR-01** (stale CloudKit-first-order messaging) — fixed. `DataManageView.swift:170,185` now correctly say local data was *not* touched when the CloudKit phase fails.
-- **CR-02** (scope picker not enforced) — fixed. `DataDeleteViewModel.performDelete` now threads `includeLocal`/`includeCloud` from `DataDeleteScope` into `DataDeleterService.deleteMeasurements(in:includeLocal:includeCloud:)`, and `DataDeleterScopedDeletionTests` locks in both directions.
-- **CR-03** (CloudKit errors swallowed as generic `.repositoryError`) — fixed. `deleteAllMeasurements`, `deleteMeasurements(before:)`, and the unscoped `deleteMeasurements(in:)` now all have a dedicated `catch let error as CloudKitResetError` clause.
-- **CR-04** (export toggles had no effect) — fixed. `csvHeaderColumns`/`csvRow`/`jsonFields` now gate on `includeHRV`/`includeHeartRate`/`includeStressLevels`, and baseline sections are only emitted when `includeBaseline` is set. `DataExportFieldSelectionTests` covers this directly.
-- **WR-01** (`cancellationToken` never assigned) — fixed. `DataDeleteViewModel.performDelete` now assigns the `deletionTask` to `cancellationToken`.
-- **WR-02** (dead stats methods / duplicate counting) — **partially** fixed; see WR-02 below, reopened as a residual finding.
-- **WR-03** (no tests for the risky paths) — **partially** fixed; the new suite covers CR-02 and CR-04 well but still has no coverage for the CloudKit-failure-ordering paths or cancellation, see WR-03 below.
+1. `CloudKitResetServiceProtocol` DI seam (`cbf023d`) — protocol, `CloudKitResetService`, and the test double `FakeCloudKitResetService` all have matching signatures; `DataDeleterService` has both a `CKContainer`-based convenience initializer and a direct protocol-injecting initializer. Confirmed wired correctly.
+2. `LocalizedError` conformance (`505d7a6`) — `CloudKitResetError`, `LocalDataError`, `DeletionError`, and `ExportError` all implement `errorDescription`. Confirmed present.
+3. Cancel-mid-delete split-brain fix — `deleteAllMeasurements()` and the scoped `deleteMeasurements(in:includeLocal:includeCloud:)` both call `Task.checkCancellation()` once, before the CloudKit phase, and have no further cancellation checks between the CloudKit and local phases. This correctly guarantees that once CloudKit deletion has started, local deletion always follows (matches the two dedicated regression tests). Confirmed.
+4. `deleteAllMeasurements()`/`performFactoryReset()` correctly gate `clearCredentialsAndSharedCaches()` behind full-success paths only.
+5. `CloudKitEncryptionTests` still validates that health fields round-trip through `encryptedValues` and are absent from plaintext CKRecord keys.
 
-While verifying the fixes, adversarial re-reading of the "fixed" cancellation/error-propagation code turned up one new correctness bug that undermines the phase's own data-integrity goal (a cancel-mid-delete split-brain state), plus a subtler but consequential defect in how CloudKit/local error detail is (or isn't) actually surfaced to the user despite CR-01/CR-03. Findings below.
+However, this pass is not a rubber stamp. A fresh read of `CloudKitResetService.swift` (not part of the iteration-1/2 fix set, and never exercised by the `CloudKitResetServiceProtocol` fake) surfaced a genuine, previously-unreported **data-loss/privacy bug**: CloudKit batch-delete failures are silently swallowed and reported as success (CR-01 below). This means the "Delete all data" / factory-reset promise the app makes to the user is not actually guaranteed on the CloudKit side, and no existing test can catch it because the test seam bypasses `CloudKitResetService`'s internals entirely.
+
+A handful of secondary issues (cancellation-fix inconsistency across sibling methods, a UI progress-mirroring race, a missing `Sendable` conformance on the new test double, and some dead code) round out the findings.
 
 ## Critical Issues
 
-### CR-01: Cancelling a delete mid-flight can leave CloudKit and local storage out of sync
+### CR-01: CloudKit batch-delete failures are silently swallowed and reported as success
 
-**File:** `StressMonitor/StressMonitor/Services/DataManagement/DataDeleterService.swift:73-84` (also `268-290`)
+**File:** `StressMonitor/StressMonitor/Services/DataManagement/CloudKitResetService.swift:368`
 **Issue:**
-`deleteAllMeasurements` (and the scoped `deleteMeasurements(in:includeLocal:includeCloud:)` used by the "Delete by range" flow) delete from CloudKit first, then call `try Task.checkCancellation()`, and only then delete from local storage:
-
 ```swift
-try await cloudKitResetService.deleteRecords(ofType: .stressMeasurement, expectedProgress: 0.1...0.4)
-try Task.checkCancellation()          // <-- cancellation observed here
-try await localWipeService.deleteAllMeasurements()
+let deletedInBatch = (try? await performModifyOperationHelper(operation: operation, database: database, batchCount: batch.count)) ?? batch.count
+totalDeleted += deletedInBatch
 ```
+`performModifyOperationHelper` is the only fallible call in `deleteBatchRecords`. Converting its result with `try?` and falling back to `?? batch.count` means: if the `CKModifyRecordsOperation` genuinely fails (network drop, quota exceeded, permission/zone error, partial failure with `isAtomic = false`), the code assumes the *entire* batch was deleted anyway. `deleteBatchRecords` itself is declared `async throws` but, with this pattern, it can never actually throw for a CloudKit-side failure — only `Task.sleep` cancellation can throw out of this loop. As a result:
+- `deleteRecords(ofType:...)` never sees the failure and logs `"Successfully deleted N ... records"`.
+- `DataDeleterService.deleteAllMeasurements()` reports `"Successfully deleted all measurements from both storage locations"`.
+- `DataManageView.performDeleteAll()` shows the user `"All stress snapshots were deleted."`.
+- The same path is reused by `performDatabaseReset()` / `resetCloudKitData()` / factory reset.
 
-`DataDeleteView`'s toolbar "Cancel" button, while `isDeleting` is true, calls `viewModel.cancelDelete()`, which cancels the exact `Task` running this code (`DataDeleteViewModel.swift:440-443`, wired via WR-01's fix). `Task.cancel()` is cooperative — it does not abort the in-flight CloudKit network call — so if the user taps Cancel while `cloudKitResetService.deleteRecords` is executing, that call still runs to completion (CloudKit data is now gone), and only the *next* checkpoint (`Task.checkCancellation()`) throws, aborting before `localWipeService` ever runs. The user asked to stop the deletion and instead gets an irreversible partial deletion: CloudKit measurements removed, local measurements intact, with no indication that anything happened (the UI just dismisses/returns on `DeletionError.operationCancelled`, per `DataDeleteView.swift:237-238`). This directly contradicts the phase's "data integrity" goal — the two stores can now silently diverge, which will also manifest as odd resync behavior next time CloudKit sync runs.
+A user who explicitly asked to delete their data (or invoked "Delete all" for privacy reasons) can be told deletion succeeded while the records still exist in their private CloudKit database. This is exactly the kind of "feature-complete but not actually working" defect this milestone's remediation is meant to close, and it is completely untested: `DataDeletionConsolidationTests.swift` only exercises `CloudKitResetServiceProtocol` through the `FakeCloudKitResetService` seam, which bypasses `CloudKitResetService.deleteBatchRecords` entirely, so this bug cannot be caught by the current test suite regardless of how thorough it looks.
 
-The same shape of bug exists in the scoped variant (`includeCloud` branch completes, `try Task.checkCancellation()` at line 280 aborts before the `includeLocal` branch).
-
-**Fix:** Treat "CloudKit deletion has started" as a point of no return — don't check cancellation between the two phases; only check cancellation *before* any network/storage call begins:
-
+**Fix:** Propagate the failure instead of defaulting to "success":
 ```swift
-try Task.checkCancellation()   // last safe checkpoint before the operation becomes irreversible
-try await cloudKitResetService.deleteRecords(ofType: .stressMeasurement, expectedProgress: 0.1...0.4)
-try await localWipeService.deleteAllMeasurements()   // always run once CloudKit succeeded, no cancellation gate here
-```
-Apply the same change to `deleteMeasurements(in:includeLocal:includeCloud:)` (remove the `try Task.checkCancellation()` at line 280, between the CloudKit and local blocks). If genuine mid-flight cancellation of the CloudKit call itself is desired, that has to be implemented via `CKOperation.cancel()`/cooperative checks inside `CloudKitResetService`, not via a `Task.checkCancellation()` checkpoint placed *after* the call already returned.
+for (index, batch) in batches.enumerated() {
+    let operation = CKModifyRecordsOperation(recordsToSave: nil, recordIDsToDelete: batch)
+    operation.isAtomic = false
 
-## Warnings
-
-### WR-01: CloudKit/local failure detail never reaches the user despite CR-01/CR-03's fix
-
-**File:** `StressMonitor/StressMonitor/Views/Settings/DataManagement/DataManageView.swift:169-175, 184-190`; `StressMonitor/StressMonitor/Views/Settings/DataManagement/DataDeleteView.swift:237-245`; `StressMonitor/StressMonitor/Services/DataManagement/DataDeleterService.swift` (all `errorMessage = error.localizedDescription` sites)
-**Issue:**
-`CloudKitResetError` and `LocalDataError` each hand-write a `var localizedDescription: String` computed property (e.g. `CloudKitResetService.swift:491-514`), but **neither conforms to `LocalizedError`**, and `DeletionError` (`DataDeleter.swift:39-44`) is declared as:
-
-```swift
-enum DeletionError: Error {
-    case repositoryError(Error)
-    case cloudKitError(Error)   // payload typed as `Error`, not `CloudKitResetError`
+    let deletedInBatch = try await performModifyOperationHelper(
+        operation: operation, database: database, batchCount: batch.count
+    )
+    totalDeleted += deletedInBatch
     ...
 }
 ```
+and let the existing `catch let error as CKError` / `catch` blocks in `deleteRecords(ofType:...)` map it to `CloudKitResetError` as they already do for the fetch phase. If partial-batch failures need to be tolerated deliberately, that has to be an explicit, logged decision (e.g. collect failed IDs and surface a `CloudKitResetError.partialDeletionFailure(remaining: [CKRecord.ID])`), not a silent `?? batch.count`. Add a test that injects a `CKDatabase`/operation double which fails `modifyRecordsResultBlock`, to prove `deleteRecords(ofType:...)` now surfaces the failure.
 
-A type's own ad-hoc `localizedDescription` property is only visible when the *static* type of the value is known to be that concrete type. Once a `CloudKitResetError` is boxed into `DeletionError.cloudKitError(Error)` and later unwrapped through a `catch let DeletionError.cloudKitError(cloudKitError)` pattern, `cloudKitError`'s static type is `Error` (per the case's declared payload type) — so `cloudKitError.localizedDescription` resolves through Foundation's `Error → NSError` bridging, which only special-cases `LocalizedError`/`CustomNSError` conformances. Since neither `CloudKitResetError` nor `DeletionError` conforms to `LocalizedError`, this produces Foundation's generic fallback string ("The operation couldn't be completed…") instead of the carefully-written message ("iCloud account is not available", "Network is unavailable", etc.).
+## Warnings
 
-Concretely:
-- `DataManageView.swift:170` — `"iCloud data couldn't be removed (\(cloudKitError.localizedDescription))..."` will show the generic NSError string, not the actual CloudKit failure reason, defeating the entire point of CR-01/CR-03's fix.
-- `DataDeleteView.swift:239-244` — the catch-all `catch { errorMessage = error.localizedDescription; ... }` never even pattern-matches on `DeletionError` cases (unlike `DataManageView`), so *every* deletion failure in the primary "Delete by range" screen — local or cloud, whatever the cause — shows the same generic Foundation string. CR-03's careful error-type differentiation at the service layer has zero observable effect in this screen.
-- Inside `DataDeleterService` itself, the concretely-typed catch clauses (`catch let error as CloudKitResetError`) *do* get the correct message when setting the service's own `errorMessage` — but see WR-04, nothing reads that property.
+### WR-01: Delete progress UI can silently never animate due to a Task-ordering race
 
-**Fix:** Conform `CloudKitResetError`, `LocalDataError`, and `DeletionError` to `LocalizedError` (rename the existing `localizedDescription` switches to `errorDescription: String?`). For `DeletionError.cloudKitError`/`.repositoryError`, this alone is enough — once the *boxed* `CloudKitResetError`/`LocalDataError` conform to `LocalizedError`, Foundation's bridging will find `errorDescription` dynamically even through the `Error` existential. Additionally, give `DataDeleteView.swift` a `catch let DeletionError.cloudKitError(...)` / `.repositoryError(...)` branch mirroring `DataManageView`, so local-vs-cloud failures are distinguishable in that screen too.
+**File:** `StressMonitor/StressMonitor/Views/Settings/DataManagement/DataDeleteView.swift:418-444`
+**Issue:**
+```swift
+let progressMirror = Task { @MainActor in
+    while service.isDeleting {
+        self.deleteProgress = service.deleteProgress
+        self.currentOperation = service.currentOperation ?? ""
+        try? await Task.sleep(for: .milliseconds(50))
+    }
+}
+...
+let deletionTask = Task {
+    if scope == .everything && isAllTime {
+        try await service.deleteAllMeasurements()
+    } else { ... }
+}
+```
+`progressMirror` is created and enqueued *before* `deletionTask`. `service.isDeleting` only flips to `true` once `deletionTask`'s body actually starts executing `deleteAllMeasurements()`/`deleteMeasurements(...)`. If the `progressMirror` job runs first on the MainActor executor (plausible, since it was enqueued first and both are non-detached `@MainActor`-affine tasks), its `while service.isDeleting` check reads `false` and the loop body never executes even once — the task exits immediately, and the progress ring/label never updates until the final `deleteProgress = 1.0` / `"Delete complete"` assignment after `try await deletionTask.value` returns. The deletion itself still completes correctly (this doesn't affect CR-01/data-loss), but the "0% → 100%" progress UI silently becomes a no-op, contradicting the intent of `ExportProgressBarView`/the circular progress indicator in `DataDeleteView`.
+**Fix:** Create `deletionTask` first, or explicitly wait for `service.isDeleting == true` (or a small pre-flight `await Task.yield()`) before starting the polling loop, e.g.:
+```swift
+let deletionTask = Task { ... }
+cancellationToken = deletionTask
+let progressMirror = Task { @MainActor in
+    repeat {
+        self.deleteProgress = service.deleteProgress
+        self.currentOperation = service.currentOperation ?? ""
+        try? await Task.sleep(for: .milliseconds(50))
+    } while service.isDeleting
+}
+```
+using `repeat/while` (post-condition) removes the dependency on which task's first iteration runs first.
 
-### WR-02 (residual from prior review): dead deletion/count API surface only partially closed
+### WR-02: The "no split-brain" cancellation fix was not mirrored to sibling deletion methods
 
-**File:** `StressMonitor/StressMonitor/Services/DataManagement/DataDeleterService.swift:117-173, 316-360, 431-452`; `StressMonitor/StressMonitor/Views/Settings/DataManagement/DataManageView.swift:148-151`
-**Issue:** `getDeletionStats(in:)` is now wired up (`DataDeleteViewModel.loadAffectedCounts` calls it) — real progress since the last review. But `deleteMeasurements(before:)`, the unscoped `deleteMeasurements(in:)`, `resetCloudKitData`, `getDeletionStats(before:)`, and `getTotalCount()` are still never called by any view/viewmodel (verified via repo-wide grep). `DataManageView.snapshotCount` (line 148-151) still hand-rolls its own `FetchDescriptor<StressMeasurement>()` + `fetchCount` instead of calling `getTotalCount()`, which exists on `DataDeleterService` for exactly this purpose — the "two independent counting code paths for the same data" problem from the original WR-02 is still present, just one layer smaller.
-**Fix:** Either wire `DataManageView.snapshotCount` through `DataDeleterService.getTotalCount()` (consistent with how `DataDeleteView` now uses `getDeletionStats(in:)`), or delete the still-unused methods (`deleteMeasurements(before:)`, unscoped `deleteMeasurements(in:)`, `resetCloudKitData`, `getDeletionStats(before:)`) if there's no near-term caller, per YAGNI.
+**File:** `StressMonitor/StressMonitor/Services/DataManagement/DataDeleterService.swift:132-242, 320-360`
+**Issue:** `deleteAllMeasurements()` and `deleteMeasurements(in:includeLocal:includeCloud:)` both got the iteration-2 treatment: a `try Task.checkCancellation()` checkpoint immediately before the CloudKit phase, and a `catch is CancellationError` clause mapping to `DeletionError.operationCancelled`. The unscoped `deleteMeasurements(before:)` (lines 132-184), the unscoped `deleteMeasurements(in:)` (lines 186-242), and `resetCloudKitData(confirmation:)` (lines 320-360) do **not** have either — no pre-CloudKit cancellation checkpoint and no explicit `CancellationError` catch (a stray cancellation would fall into the final generic `catch { throw DeletionError.repositoryError(error) }`, which is a misleading error type for a cancellation). These three methods are currently unreachable from any UI in the app (confirmed via repo-wide grep — nothing calls them except the `DataDeleter` protocol's own default-argument wrappers), so there is no live user-facing risk today, but they are public API on `DataDeleterService`/`DataDeleter` and the very next feature that wires one of them up will silently reintroduce the bug class iteration 2 just fixed, with no comment warning them why the checkpoint matters.
+**Fix:** Either delete the three unused methods (`deleteMeasurements(before:)`, unscoped `deleteMeasurements(in:)`, `resetCloudKitData`) if they're genuinely obsolete now that the scoped variant covers their use cases, or apply the same `try Task.checkCancellation()` + `catch is CancellationError` pattern used in `deleteAllMeasurements()` for consistency.
 
-### WR-03 (residual from prior review): risky ordering/cancellation paths still untested
+### WR-03: `FakeCloudKitResetService` conforms to a `Sendable`-requiring protocol without declaring `Sendable`
 
-**File:** `StressMonitor/StressMonitorTests/DataDeletionConsolidationTests.swift`
-**Issue:** The new `DataDeleterScopedDeletionTests` and `DataExportFieldSelectionTests` suites are solid, targeted regression coverage for CR-02 and CR-04. However, there is still no test that (a) simulates a `CloudKitResetError` thrown mid-`deleteAllMeasurements`/mid-`performFactoryReset` to lock in CR-01's/CR-03's fixed behavior (message accuracy, correct error-case propagation), or (b) cancels the deletion `Task` mid-flight to catch the split-brain regression described in CR-01 above. Both would require a fake/mock `CloudKitResetService` seam, which doesn't currently exist (the service is constructed concretely inside `DataDeleterService.init`).
-**Fix:** Introduce a `CloudKitResetServiceProtocol` (mirroring the existing `StressRepositoryProtocol`/`HealthKitServiceProtocol` DI pattern) so tests can inject a failing/cancellable fake and assert on the resulting `DeletionError` case and on-disk state after cancellation.
+**File:** `StressMonitor/StressMonitorTests/DataDeletionConsolidationTests.swift:175-217`
+**Issue:** `CloudKitResetServiceProtocol` is declared `@MainActor protocol CloudKitResetServiceProtocol: Sendable`. `FakeCloudKitResetService` is a `final class` with a mutable `var behavior: Behavior` and conforms to that protocol, but is declared only as `@MainActor final class FakeCloudKitResetService: CloudKitResetServiceProtocol` — no `Sendable` or `@unchecked Sendable`. The project's own established convention (per repo docs) is that mutable-state mocks/fakes explicitly opt in with `@unchecked Sendable` (e.g. `MockHealthKitService`, `SimulatorHealthKitService`). Swift does not implicitly synthesize `Sendable` for classes regardless of `@MainActor` isolation or finality; whether this currently compiles clean depends on the test target's concurrency-checking level (the project builds under `SWIFT_VERSION = 5.0` with `SWIFT_APPROACHABLE_CONCURRENCY = YES` but no explicit `SWIFT_STRICT_CONCURRENCY = complete`, so this is likely a warning today rather than a hard error) — but it is inconsistent with the codebase's own convention and is one settings change away from becoming a build break.
+**Fix:** Add an explicit conformance for clarity and future-proofing:
+```swift
+@MainActor
+final class FakeCloudKitResetService: CloudKitResetServiceProtocol, @unchecked Sendable {
+```
 
-### WR-04: `DataDeleterService.errorMessage` is fully maintained but never read
+### WR-04: Scoped deletion's cancellation-ordering fix has no dedicated regression test
 
-**File:** `StressMonitor/StressMonitor/Services/DataManagement/DataDeleterService.swift:19, 96, 100, 107, 161, 165, 169, 223, 227, 231, 297, 301, 308, 348, 352, 356, 412, 416, 420, 469-471`
-**Issue:** Every one of the five public methods sets `self.errorMessage` in every catch branch (13 call sites), and `clearError()` exists to reset it — real, deliberate effort. But no caller (`DataManageView`, `DataDeleteView`, `DataDeleteViewModel`) ever reads `service.errorMessage`; both views construct a fresh, short-lived `DataDeleterService` per action and instead handle the *thrown* error directly at the call site. This is dead published state that could mislead a future maintainer into thinking they can observe `errorMessage` as an alternative to catching the throw (they can't — the two paths currently diverge in content per WR-01 above, compounding the confusion).
-**Fix:** Either remove `errorMessage`/`clearError()` from `DataDeleterService` (simplify per YAGNI — the throw is already the source of truth), or actually bind a view to it instead of maintaining a parallel `@State private var errorMessage` in each screen.
+**File:** `StressMonitor/StressMonitorTests/DataDeletionConsolidationTests.swift` (whole file) / `StressMonitor/StressMonitor/Services/DataManagement/DataDeleterService.swift:250-316`
+**Issue:** `DataDeleterFailureAndCancellationTests` (the suite that validates "no split-brain") only exercises `deleteAllMeasurements()`. The scoped `deleteMeasurements(in:includeLocal:includeCloud:)` — the method actually invoked by `DataDeleteView`'s primary user-facing flow for anything other than "everything, all time" — implements the identical `Task.checkCancellation()` + no-further-checks pattern (lines 274-297) but has zero test coverage for the cancellation-ordering behavior specifically. `DataDeleterScopedDeletionTests` only covers the `includeLocal`/`includeCloud` gating, not cancellation timing.
+**Fix:** Add a `FakeCloudKitResetService`-based test analogous to `cancellationAfterCloudKitStartsStillDeletesLocal`/`cancellationBeforeCloudKitStartsAbortsOperation`, but calling `deleteMeasurements(in:includeLocal:true,includeCloud:true)` instead of `deleteAllMeasurements()`, so the actually-used code path is the one under regression protection.
 
 ## Info
 
-### IN-01 (residual): `DeleteError` enum still dead code
+### IN-01: `DeleteError` enum is unused dead code with a name that invites confusion with `DeletionError`
 
-**File:** `StressMonitor/StressMonitor/Views/Settings/DataManagement/DataDeleteView.swift:462-471`
-**Issue:** `enum DeleteError { case noData, operationFailed }` is declared but never thrown or caught anywhere in the file (confirmed unchanged since the prior review).
-**Fix:** Delete it, or use it where `viewModel.performDelete` currently just propagates whatever `DataDeleterService` throws.
+**File:** `StressMonitor/StressMonitor/Views/Settings/DataManagement/DataDeleteView.swift:474-484`
+**Issue:** `enum DeleteError: LocalizedError { case noData, operationFailed ... }` is defined but never thrown or caught anywhere in the codebase (confirmed via grep). It sits a few hundred lines away from the actually-used `DeletionError` (defined in `DataDeleter.swift`), and the near-identical name is a maintenance trap for whoever edits this file next.
+**Fix:** Delete `DeleteError` unless there's a near-term plan to use it.
 
-### IN-02 (residual): unused `ExportError` cases
+### IN-02: `CloudKitResetService`'s progress-tracking properties are dead state
 
-**File:** `StressMonitor/StressMonitor/Views/Settings/DataManagement/DataExportView.swift:584-608`
-**Issue:** `.noData`, `.fileWriteFailed(Error)`, and `.invalidPath` are declared but never thrown in this flow (only `.exceedsSizeCap`, `.fileAccessFailed`, and `.encodingFailed` are actually used, confirmed unchanged since the prior review).
-**Fix:** Remove the unused cases, or throw `.noData` from `exportData` when `records.isEmpty` (currently an empty export silently produces a header-only CSV / empty-array JSON rather than surfacing anything to the user).
+**File:** `StressMonitor/StressMonitor/Services/DataManagement/CloudKitResetService.swift:30-38`
+**Issue:** `isDeleting`, `deleteProgress`, `currentOperation`, and `recordsDeleted` are maintained throughout the class but `CloudKitResetServiceProtocol` doesn't expose them, and nothing outside this file reads them (confirmed via grep) — `DataDeleterService` tracks its own `isDeleting`/`deleteProgress`/`currentOperation` independently and never reads these. They add bookkeeping overhead for no observable benefit.
+**Fix:** Either remove the unused properties or expose them via the protocol if a future caller is expected to observe fine-grained CloudKit-only progress.
 
-### IN-03 (residual): progress-mirroring task still races the deletion task it observes
+### IN-03: `DataExportView` repeats six near-identical `.onChange` blocks
 
-**File:** `StressMonitor/StressMonitor/Views/Settings/DataManagement/DataDeleteView.swift:406-418`
-**Issue:** `progressMirror` and `deletionTask` are both freshly-created `Task {}`s with no ordering guarantee; `progressMirror`'s `while service.isDeleting { ... }` loop can observe `isDeleting == false` and exit immediately if it happens to run before `deletionTask` sets it `true`. Unchanged since the prior review's IN-04 — noted here as still relevant given the CR-01 cancellation fix above now depends on this same task-timing behavior more than before.
-**Fix:** Bind the view directly to the `@Observable` `DataDeleterService` instance (pass it into the view/viewmodel instead of creating it fresh per-call and polling its state via a separate task), or await `deletionTask` while updating progress from within `deletionTask`'s own body rather than a sibling task.
+**File:** `StressMonitor/StressMonitor/Views/Settings/DataManagement/DataExportView.swift:59-88`
+**Issue:** Six separate `.onChange(of: viewModel.<field>) { _, _ in Task { await viewModel.loadPreviewData(modelContext: modelContext) } }` blocks differ only in which field they observe. This is a maintainability smell — any future toggle added to the export view requires remembering to add a seventh copy of this boilerplate.
+**Fix:** Consider a single computed "export selection changed" signal (e.g. combine the relevant `@Observable` fields into one derived value, or debounce via `.onChange` of a single tuple/hash) to reduce duplication.
 
-### IN-04: cosmetic phase-percentage comments don't match the values they annotate
+### IN-04: Three `DataDeleter` protocol methods are unreachable from any UI
 
-**File:** `StressMonitor/StressMonitor/Services/DataManagement/DataDeleterService.swift:69-82, 385-401`
-**Issue:** Comments like `// Phase 1: Delete from CloudKit (0% - 40%)` are followed by `deleteProgress = 0.1`, and `// Phase 2: Delete from local storage (40% - 100%)` is followed by `deleteProgress = 0.5` — the stated ranges don't match the assigned values (repeats in `performFactoryReset`'s phase comments too). Purely cosmetic; no functional impact.
-**Fix:** Align the comments with the actual `deleteProgress` values, or drop the percentage annotations from the comments.
+**File:** `StressMonitor/StressMonitor/Services/DataManagement/DataDeleterService.swift:132-242, 320-360`
+**Issue:** `deleteMeasurements(before:)`, the unscoped `deleteMeasurements(in:)`, and `resetCloudKitData(confirmation:)` are never called from any View or ViewModel in the app (only from their own protocol default-argument wrappers and their own declarations). Combined with WR-02, this is inert surface area that increases the chance of a future regression if wired up without re-applying the cancellation fix.
+**Fix:** See WR-02 — remove if unused, or bring to parity and add a call site/test if they're meant to stay.
 
 ---
 
