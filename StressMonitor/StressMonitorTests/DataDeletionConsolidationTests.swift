@@ -1,6 +1,7 @@
 import Foundation
 import CloudKit
 import Security
+import SwiftData
 import Testing
 @testable import StressMonitor
 
@@ -107,6 +108,118 @@ struct ExportProtectionTests {
         DataExportViewModel.cleanupExportTempFile(at: tempFile)
 
         #expect(!FileManager.default.fileExists(atPath: tempFile.path))
+    }
+}
+
+@Suite("Data Deletion Scope Enforcement")
+@MainActor
+struct DataDeleterScopedDeletionTests {
+
+    private func makeService(modelContext: ModelContext) -> DataDeleterService {
+        DataDeleterService(
+            modelContext: modelContext,
+            cloudKitContainer: CKContainer(identifier: "iCloud.com.stressmonitor.tests"),
+            repository: StressRepository(modelContext: modelContext),
+            logger: .default
+        )
+    }
+
+    @Test("includeLocal: true, includeCloud: false deletes local data without touching CloudKit")
+    func localOnlyScopeDeletesLocalWithoutTouchingCloud() async throws {
+        let config = ModelConfiguration(isStoredInMemoryOnly: true, cloudKitDatabase: .none)
+        let container = try ModelContainer(for: StressMeasurement.self, configurations: config)
+        let ctx = container.mainContext
+
+        let now = Date()
+        ctx.insert(StressMeasurement(timestamp: now, stressLevel: 50, hrv: 40, restingHeartRate: 65))
+        try ctx.save()
+
+        let service = makeService(modelContext: ctx)
+
+        try await service.deleteMeasurements(
+            in: now.addingTimeInterval(-60)...now.addingTimeInterval(60),
+            includeLocal: true,
+            includeCloud: false
+        )
+
+        let remaining = try ctx.fetch(FetchDescriptor<StressMeasurement>())
+        #expect(remaining.isEmpty)
+    }
+
+    @Test("includeLocal: false leaves local data untouched")
+    func scopeExcludingLocalLeavesLocalDataIntact() async throws {
+        let config = ModelConfiguration(isStoredInMemoryOnly: true, cloudKitDatabase: .none)
+        let container = try ModelContainer(for: StressMeasurement.self, configurations: config)
+        let ctx = container.mainContext
+
+        let now = Date()
+        ctx.insert(StressMeasurement(timestamp: now, stressLevel: 50, hrv: 40, restingHeartRate: 65))
+        try ctx.save()
+
+        let service = makeService(modelContext: ctx)
+
+        // includeCloud is also false so this exercises the scope gate without any network access.
+        try await service.deleteMeasurements(
+            in: now.addingTimeInterval(-60)...now.addingTimeInterval(60),
+            includeLocal: false,
+            includeCloud: false
+        )
+
+        let remaining = try ctx.fetch(FetchDescriptor<StressMeasurement>())
+        #expect(remaining.count == 1)
+    }
+}
+
+@Suite("Data Export Field Selection")
+@MainActor
+struct DataExportFieldSelectionTests {
+
+    private func makeContext() throws -> ModelContext {
+        let config = ModelConfiguration(isStoredInMemoryOnly: true, cloudKitDatabase: .none)
+        let container = try ModelContainer(for: StressMeasurement.self, configurations: config)
+        return container.mainContext
+    }
+
+    @Test("CSV export omits fields whose toggle is disabled")
+    func csvExportHonorsToggles() async throws {
+        let ctx = try makeContext()
+        ctx.insert(StressMeasurement(timestamp: Date(), stressLevel: 62.5, hrv: 48.0, restingHeartRate: 72.0))
+        try ctx.save()
+
+        let viewModel = DataExportViewModel()
+        viewModel.dateRange = .all
+        viewModel.format = .csv
+        viewModel.includeHRV = false
+        viewModel.includeHeartRate = true
+        viewModel.includeStressLevels = false
+        viewModel.includeBaseline = false
+
+        let url = try await viewModel.exportData(modelContext: ctx)
+        defer { DataExportViewModel.cleanupExportTempFile(at: url) }
+
+        let content = try String(contentsOf: url, encoding: .utf8)
+        #expect(content.contains("Heart Rate"))
+        #expect(!content.contains("HRV"))
+        #expect(!content.contains("Stress Level"))
+    }
+
+    @Test("JSON export includes a baseline section only when the toggle is enabled")
+    func jsonExportIncludesBaselineWhenRequested() async throws {
+        let ctx = try makeContext()
+        ctx.insert(StressMeasurement(timestamp: Date(), stressLevel: 62.5, hrv: 48.0, restingHeartRate: 72.0))
+        try ctx.save()
+
+        let viewModel = DataExportViewModel()
+        viewModel.dateRange = .all
+        viewModel.format = .json
+        viewModel.includeBaseline = true
+
+        let url = try await viewModel.exportData(modelContext: ctx)
+        defer { DataExportViewModel.cleanupExportTempFile(at: url) }
+
+        let content = try String(contentsOf: url, encoding: .utf8)
+        #expect(content.contains("\"baseline\""))
+        #expect(content.contains("\"restingHeartRate\""))
     }
 }
 
