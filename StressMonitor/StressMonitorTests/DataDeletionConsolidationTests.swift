@@ -314,6 +314,38 @@ struct DataDeleterFailureAndCancellationTests {
         let remaining = try ctx.fetch(FetchDescriptor<StressMeasurement>())
         #expect(remaining.count == 1)
     }
+
+    @Test("scoped deleteMeasurements(in:includeLocal:includeCloud:) still deletes local data when cancelled mid-flight (no split-brain)")
+    func scopedDeleteInRangeCancellationAfterCloudKitStartsStillDeletesLocal() async throws {
+        let ctx = try makeContextWithOneMeasurement()
+        let now = Date()
+
+        let fakeCloudKit = FakeCloudKitResetService()
+        fakeCloudKit.behavior = .cancelCallingTask
+
+        let service = DataDeleterService(
+            modelContext: ctx,
+            cloudKitResetService: fakeCloudKit,
+            repository: StressRepository(modelContext: ctx),
+            logger: .default
+        )
+
+        // Exercises the same cancellation-ordering guarantee as
+        // cancellationAfterCloudKitStartsStillDeletesLocal, but through the scoped
+        // deleteMeasurements(in:includeLocal:includeCloud:) path — the one DataDeleteView
+        // actually calls for anything other than "everything, all time" (WR-04).
+        let deletionTask = Task {
+            try await service.deleteMeasurements(
+                in: now.addingTimeInterval(-60)...now.addingTimeInterval(60),
+                includeLocal: true,
+                includeCloud: true
+            )
+        }
+        try await deletionTask.value
+
+        let remaining = try ctx.fetch(FetchDescriptor<StressMeasurement>())
+        #expect(remaining.isEmpty)
+    }
 }
 
 @Suite("Data Export Field Selection")
