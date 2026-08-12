@@ -427,7 +427,11 @@ class DataDeleteViewModel {
         if deleteScope == .everything && isAllTime {
             try await service.deleteAllMeasurements()
         } else {
-            try await service.deleteMeasurements(in: start...end)
+            try await service.deleteMeasurements(
+                in: start...end,
+                includeLocal: deleteScope != .cloudOnly,
+                includeCloud: deleteScope.includesCloud
+            )
         }
 
         deleteProgress = 1.0
