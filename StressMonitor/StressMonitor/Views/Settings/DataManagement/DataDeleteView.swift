@@ -234,6 +234,8 @@ struct DataDeleteView: View {
             try await viewModel.performDelete(modelContext: modelContext)
             HapticManager.shared.success()
             dismiss()
+        } catch DeletionError.operationCancelled {
+            return
         } catch {
             await MainActor.run {
                 errorMessage = error.localizedDescription
@@ -318,7 +320,7 @@ class DataDeleteViewModel {
     var isDeleting: Bool = false
     var deleteProgress: Double = 0
     var currentOperation: String = ""
-    private var cancellationToken: Task<Void, Never>?
+    private var cancellationToken: Task<Void, Error>?
 
     private(set) var affectedMeasurementCount: Int = 0
     private(set) var affectedBaselineCount: Int = 0
@@ -421,18 +423,25 @@ class DataDeleteViewModel {
 
         defer {
             progressMirror.cancel()
+            cancellationToken = nil
             isDeleting = false
         }
 
-        if deleteScope == .everything && isAllTime {
-            try await service.deleteAllMeasurements()
-        } else {
-            try await service.deleteMeasurements(
-                in: start...end,
-                includeLocal: deleteScope != .cloudOnly,
-                includeCloud: deleteScope.includesCloud
-            )
+        let scope = deleteScope
+        let deletionTask = Task {
+            if scope == .everything && isAllTime {
+                try await service.deleteAllMeasurements()
+            } else {
+                try await service.deleteMeasurements(
+                    in: start...end,
+                    includeLocal: scope != .cloudOnly,
+                    includeCloud: scope.includesCloud
+                )
+            }
         }
+        cancellationToken = deletionTask
+
+        try await deletionTask.value
 
         deleteProgress = 1.0
         currentOperation = "Delete complete"
