@@ -2,10 +2,22 @@ import CloudKit
 import Foundation
 import os.log
 
+// MARK: - CloudKit Reset Service Protocol
+/// Seam over ``CloudKitResetService`` so tests can inject a failing or
+/// cancellable fake instead of talking to a real CKContainer.
+@MainActor
+protocol CloudKitResetServiceProtocol: Sendable {
+    func deleteRecords(ofType recordType: CloudKitRecordType, expectedProgress: ClosedRange<Double>) async throws
+    func deleteRecords(ofType recordType: CloudKitRecordType, in range: ClosedRange<Date>) async throws
+    func deleteRecords(ofType recordType: CloudKitRecordType, before date: Date) async throws
+    func deleteAllRecords(confirmation: (() async -> Bool)?, includeBaseline: Bool) async throws
+    func performDatabaseReset(confirmation: (() async -> Bool)?) async throws
+}
+
 // MARK: - CloudKit Reset Service
 /// Handles deletion of CloudKit records and database reset operations
 @MainActor
-final class CloudKitResetService: Sendable {
+final class CloudKitResetService: CloudKitResetServiceProtocol {
 
     // MARK: - Properties
 

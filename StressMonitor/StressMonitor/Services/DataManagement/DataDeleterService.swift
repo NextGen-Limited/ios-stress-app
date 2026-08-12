@@ -22,21 +22,37 @@ final class DataDeleterService: DataDeleter {
 
     private let modelContext: ModelContext
     private let localWipeService: LocalDataWipeService
-    private let cloudKitResetService: CloudKitResetService
+    private let cloudKitResetService: CloudKitResetServiceProtocol
     private let repository: StressRepositoryProtocol
     private nonisolated let logger: DataManagementLogger
 
     // MARK: - Initialization
 
-    init(
+    convenience init(
         modelContext: ModelContext,
         cloudKitContainer: CKContainer,
         repository: StressRepositoryProtocol,
         logger: DataManagementLogger
     ) {
+        self.init(
+            modelContext: modelContext,
+            cloudKitResetService: CloudKitResetService(container: cloudKitContainer, logger: logger),
+            repository: repository,
+            logger: logger
+        )
+    }
+
+    /// Injects a ``CloudKitResetServiceProtocol`` directly — the seam tests use to substitute
+    /// a failing/cancellable fake instead of a real CKContainer.
+    init(
+        modelContext: ModelContext,
+        cloudKitResetService: CloudKitResetServiceProtocol,
+        repository: StressRepositoryProtocol,
+        logger: DataManagementLogger
+    ) {
         self.modelContext = modelContext
         self.localWipeService = LocalDataWipeService(modelContext: modelContext, logger: logger)
-        self.cloudKitResetService = CloudKitResetService(container: cloudKitContainer, logger: logger)
+        self.cloudKitResetService = cloudKitResetService
         self.repository = repository
         self.logger = logger
     }

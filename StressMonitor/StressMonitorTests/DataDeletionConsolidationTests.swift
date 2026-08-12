@@ -170,6 +170,152 @@ struct DataDeleterScopedDeletionTests {
     }
 }
 
+/// Test double for ``CloudKitResetServiceProtocol`` that can simulate a CloudKit
+/// failure or a mid-flight cancellation without any network access.
+@MainActor
+final class FakeCloudKitResetService: CloudKitResetServiceProtocol {
+    enum Behavior {
+        case succeed
+        case throwError(CloudKitResetError)
+        /// Cancels the Task currently executing the CloudKit call, simulating the
+        /// user tapping Cancel while the network request is already in flight.
+        case cancelCallingTask
+    }
+
+    var behavior: Behavior = .succeed
+
+    private func resolve() async throws {
+        switch behavior {
+        case .succeed:
+            return
+        case .throwError(let error):
+            throw error
+        case .cancelCallingTask:
+            withUnsafeCurrentTask { $0?.cancel() }
+        }
+    }
+
+    func deleteRecords(ofType recordType: CloudKitRecordType, expectedProgress: ClosedRange<Double>) async throws {
+        try await resolve()
+    }
+
+    func deleteRecords(ofType recordType: CloudKitRecordType, in range: ClosedRange<Date>) async throws {
+        try await resolve()
+    }
+
+    func deleteRecords(ofType recordType: CloudKitRecordType, before date: Date) async throws {
+        try await resolve()
+    }
+
+    func deleteAllRecords(confirmation: (() async -> Bool)?, includeBaseline: Bool) async throws {
+        try await resolve()
+    }
+
+    func performDatabaseReset(confirmation: (() async -> Bool)?) async throws {
+        try await resolve()
+    }
+}
+
+@Suite("CloudKit Failure & Cancellation Ordering")
+@MainActor
+struct DataDeleterFailureAndCancellationTests {
+
+    private func makeContextWithOneMeasurement() throws -> ModelContext {
+        let config = ModelConfiguration(isStoredInMemoryOnly: true, cloudKitDatabase: .none)
+        let container = try ModelContainer(for: StressMeasurement.self, configurations: config)
+        let ctx = container.mainContext
+        ctx.insert(StressMeasurement(timestamp: Date(), stressLevel: 50, hrv: 40, restingHeartRate: 65))
+        try ctx.save()
+        return ctx
+    }
+
+    @Test("deleteAllMeasurements surfaces a CloudKitResetError as DeletionError.cloudKitError with the correct message")
+    func deleteAllMeasurementsPropagatesCloudKitFailureMessage() async throws {
+        let ctx = try makeContextWithOneMeasurement()
+
+        let fakeCloudKit = FakeCloudKitResetService()
+        fakeCloudKit.behavior = .throwError(.accountNotAvailable)
+
+        let service = DataDeleterService(
+            modelContext: ctx,
+            cloudKitResetService: fakeCloudKit,
+            repository: StressRepository(modelContext: ctx),
+            logger: .default
+        )
+
+        do {
+            try await service.deleteAllMeasurements()
+            Issue.record("Expected deleteAllMeasurements to throw")
+        } catch let DeletionError.cloudKitError(underlying) {
+            #expect(underlying.localizedDescription == CloudKitResetError.accountNotAvailable.errorDescription)
+        } catch {
+            Issue.record("Expected DeletionError.cloudKitError, got \(error)")
+        }
+
+        // CloudKit failed before local deletion started, so local data must remain intact.
+        let remaining = try ctx.fetch(FetchDescriptor<StressMeasurement>())
+        #expect(remaining.count == 1)
+    }
+
+    @Test("cancelling after CloudKit deletion has started still deletes local data (no split-brain)")
+    func cancellationAfterCloudKitStartsStillDeletesLocal() async throws {
+        let ctx = try makeContextWithOneMeasurement()
+
+        let fakeCloudKit = FakeCloudKitResetService()
+        fakeCloudKit.behavior = .cancelCallingTask
+
+        let service = DataDeleterService(
+            modelContext: ctx,
+            cloudKitResetService: fakeCloudKit,
+            repository: StressRepository(modelContext: ctx),
+            logger: .default
+        )
+
+        // The fake cancels its own running Task from inside the CloudKit call, simulating
+        // the user tapping Cancel while the network request is in flight (CR-01). Once
+        // CloudKit deletion has started, local deletion must still run to completion.
+        let deletionTask = Task {
+            try await service.deleteAllMeasurements()
+        }
+        try await deletionTask.value
+
+        let remaining = try ctx.fetch(FetchDescriptor<StressMeasurement>())
+        #expect(remaining.isEmpty)
+    }
+
+    @Test("cancelling before CloudKit deletion starts aborts the whole operation")
+    func cancellationBeforeCloudKitStartsAbortsOperation() async throws {
+        let ctx = try makeContextWithOneMeasurement()
+
+        let fakeCloudKit = FakeCloudKitResetService()
+
+        let service = DataDeleterService(
+            modelContext: ctx,
+            cloudKitResetService: fakeCloudKit,
+            repository: StressRepository(modelContext: ctx),
+            logger: .default
+        )
+
+        let deletionTask = Task {
+            try await service.deleteAllMeasurements()
+        }
+        deletionTask.cancel()
+
+        do {
+            try await deletionTask.value
+            Issue.record("Expected deleteAllMeasurements to throw after cancellation")
+        } catch DeletionError.operationCancelled {
+            // Expected: cancelled before the irreversible CloudKit phase began.
+        } catch {
+            Issue.record("Expected DeletionError.operationCancelled, got \(error)")
+        }
+
+        // Cancelled before CloudKit deletion started, so nothing should have been touched.
+        let remaining = try ctx.fetch(FetchDescriptor<StressMeasurement>())
+        #expect(remaining.count == 1)
+    }
+}
+
 @Suite("Data Export Field Selection")
 @MainActor
 struct DataExportFieldSelectionTests {
