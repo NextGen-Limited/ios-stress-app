@@ -365,7 +365,9 @@ final class CloudKitResetService: CloudKitResetServiceProtocol {
             let operation = CKModifyRecordsOperation(recordsToSave: nil, recordIDsToDelete: batch)
             operation.isAtomic = false
 
-            let deletedInBatch = (try? await performModifyOperationHelper(operation: operation, database: database, batchCount: batch.count)) ?? batch.count
+            let deletedInBatch = try await performModifyOperationHelper(
+                operation: operation, database: database, batchCount: batch.count
+            )
             totalDeleted += deletedInBatch
 
             // Update progress
