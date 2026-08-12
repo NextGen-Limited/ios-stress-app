@@ -75,6 +75,8 @@ final class DataDeleterService: DataDeleter {
                 expectedProgress: 0.1...0.4
             )
 
+            try Task.checkCancellation()
+
             // Phase 2: Delete from local storage (40% - 100%)
             currentOperation = "Deleting from local storage"
             deleteProgress = 0.5
@@ -94,6 +96,13 @@ final class DataDeleterService: DataDeleter {
             errorMessage = error.localizedDescription
             logger.log("Delete all failed: \(error.localizedDescription)")
             throw error
+        } catch let error as CloudKitResetError {
+            errorMessage = error.localizedDescription
+            logger.log("Delete all failed: \(error.localizedDescription)")
+            throw DeletionError.cloudKitError(error)
+        } catch is CancellationError {
+            logger.log("Delete all cancelled")
+            throw DeletionError.operationCancelled
         } catch {
             errorMessage = error.localizedDescription
             logger.log("Delete all failed with unexpected error: \(error.localizedDescription)")
@@ -152,6 +161,10 @@ final class DataDeleterService: DataDeleter {
             errorMessage = error.localizedDescription
             logger.log("Delete before failed: \(error.localizedDescription)")
             throw error
+        } catch let error as CloudKitResetError {
+            errorMessage = error.localizedDescription
+            logger.log("Delete before failed: \(error.localizedDescription)")
+            throw DeletionError.cloudKitError(error)
         } catch {
             errorMessage = error.localizedDescription
             logger.log("Delete before failed with unexpected error: \(error.localizedDescription)")
@@ -210,9 +223,90 @@ final class DataDeleterService: DataDeleter {
             errorMessage = error.localizedDescription
             logger.log("Delete in range failed: \(error.localizedDescription)")
             throw error
+        } catch let error as CloudKitResetError {
+            errorMessage = error.localizedDescription
+            logger.log("Delete in range failed: \(error.localizedDescription)")
+            throw DeletionError.cloudKitError(error)
         } catch {
             errorMessage = error.localizedDescription
             logger.log("Delete in range failed with unexpected error: \(error.localizedDescription)")
+            throw DeletionError.repositoryError(error)
+        }
+    }
+
+    /// Delete measurements within a date range, honoring which storage locations to affect.
+    /// - Parameters:
+    ///   - range: Date range for deletion
+    ///   - includeLocal: Whether to delete from local SwiftData storage
+    ///   - includeCloud: Whether to delete from CloudKit
+    ///   - confirmation: Optional confirmation callback
+    public func deleteMeasurements(
+        in range: ClosedRange<Date>,
+        includeLocal: Bool,
+        includeCloud: Bool,
+        confirmation: (() async -> Bool)? = nil
+    ) async throws {
+        isDeleting = true
+        deleteProgress = 0.0
+        currentOperation = "Preparing to delete measurements in range"
+        errorMessage = nil
+
+        defer {
+            isDeleting = false
+            currentOperation = nil
+        }
+
+        do {
+            if let confirmation = confirmation {
+                let confirmed = await confirmation()
+                guard confirmed else {
+                    logger.log("Delete in range (scoped) cancelled by user")
+                    throw DeletionError.operationCancelled
+                }
+            }
+
+            try Task.checkCancellation()
+
+            if includeCloud {
+                currentOperation = "Deleting from CloudKit"
+                deleteProgress = 0.1
+
+                try await cloudKitResetService.deleteRecords(
+                    ofType: .stressMeasurement,
+                    in: range
+                )
+            }
+
+            try Task.checkCancellation()
+
+            if includeLocal {
+                currentOperation = "Deleting from local storage"
+                deleteProgress = 0.6
+
+                try await localWipeService.deleteMeasurements(in: range)
+
+                // Baseline is scoped to local data — only reset it when local storage is affected.
+                try await repository.updateBaseline(PersonalBaseline())
+            }
+
+            deleteProgress = 1.0
+            currentOperation = "Deletion complete"
+            logger.log("Successfully deleted measurements in range \(range) (local: \(includeLocal), cloud: \(includeCloud))")
+
+        } catch let error as DeletionError {
+            errorMessage = error.localizedDescription
+            logger.log("Delete in range (scoped) failed: \(error.localizedDescription)")
+            throw error
+        } catch let error as CloudKitResetError {
+            errorMessage = error.localizedDescription
+            logger.log("Delete in range (scoped) failed: \(error.localizedDescription)")
+            throw DeletionError.cloudKitError(error)
+        } catch is CancellationError {
+            logger.log("Delete in range (scoped) cancelled")
+            throw DeletionError.operationCancelled
+        } catch {
+            errorMessage = error.localizedDescription
+            logger.log("Delete in range (scoped) failed with unexpected error: \(error.localizedDescription)")
             throw DeletionError.repositoryError(error)
         }
     }
