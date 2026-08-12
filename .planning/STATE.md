@@ -20,10 +20,10 @@ current_phase_name: data-integrity-deletion-consolidation
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-08-08)
+See: .planning/PROJECT.md (updated 2026-08-12 after v1.0 close)
 
 **Core value:** Every feature that ships in the binary must actually work end-to-end for a real user — not just compile.
-**Current focus:** Phase 02 — data-integrity-deletion-consolidation
+**Current focus:** Planning next milestone (v1.1) — see PROJECT.md Active requirements for carried-forward scope
 
 ## Current Position
 
@@ -65,22 +65,7 @@ Last activity: 2026-08-12 — Milestone v1.0 completed and archived
 
 ### Decisions
 
-Decisions are logged in PROJECT.md Key Decisions table.
-Recent decisions affecting current work:
-
-- [Init]: Replaced the initially-scoped "test infra only" milestone with the full 7-phase App Store remediation plan already drafted at `plans/0808-2042-appstore-submission-remediation/plan.md`.
-- [Init]: REQ-IDs map directly to that plan's phases rather than re-deriving requirements from scratch.
-- [Roadmap]: Consolidated the source plan's 7 phases into 5 for coarse granularity — merged WIRE-01 into Phase 1 (shares App Group entitlement work with BUILD-02), merged WIRE-02 into Phase 2 (same underlying fix as DATA-01's retarget), merged Store Listing (old Phase 6) with Accessibility (old Phase 7) into Phase 5 (no shared files, both largely calendar-gated rather than code-sequenced). Auth (Phase 3) and IAP (Phase 4) kept standalone — merging either would obscure a blocking decision (D1) or create an oversized phase.
-- [Phase ?]: 01-05: CI test job uses iPhone 16 Simulator destination with no -only-testing filter; scheme TestAction scopes the bundle
-- [Phase ?]: 01-05: Test job cache keys matched lint-and-build verbatim so both jobs share DerivedData/SPM cache lines
-- [Phase ?]: Routed DataDeleteView scopes through DataDeleterService.deleteMeasurements(in:) — collapsed scope distinction for WIRE-02 consolidation
-- [Phase ?]: Moved ExportError from ExportModels.swift to DataExportView.swift before deleting dead ExportModels.swift
-- [Phase ?]: Added CharacterUnlock deletion to DataDeleterService.performFactoryReset to match UI contract
-- [Phase ?]: D-05: Premium character unlocks are one-time-permanent — persist after subscription lapse
-- [Phase ?]: D-01: StoreKitServiceEnvironment Release path uses real StoreKitService; DEBUG uses Mock
-- [Phase 5]: Moderate-stress yellow gets two accessible variants: #B8860B for text-on-light, #1A1A2E for text-on-yellow-fill
-- [Phase 5]: Dynamic Type applied at screen root via .accessibleDynamicType() rather than per-label (602 fixed-size sites out of scope)
-- [Phase 5]: Fastlane release lane uploads metadata only; review submission is manual in ASC
+Full v1.0 decision log archived in PROJECT.md Key Decisions table (see "v1.0 Verification Reality Check" for close-time evolution). Cleared here at milestone close per `/gsd-complete-milestone`'s `update_state` step — start fresh for v1.1.
 
 ### Pending Todos
 
@@ -88,16 +73,15 @@ None yet.
 
 ### Blockers/Concerns
 
-- **D1 (Auth strategy)** — blocks Phase 3 scope and the submission date. Ship Supabase Auth vs. gate Chat off for v1. Surface at `/gsd-discuss-phase 3`.
-- **D2 (CloudKit encryption)** — blocks Phase 2's DATA-03. Implement `CKRecord.encryptedValues` vs. retract the E2E-encryption claim in docs. Harder to change post-launch. Surface at `/gsd-discuss-phase 2`.
-- **D3 (Privacy contract authority)** — blocks Phase 1's BUILD-01 and Phase 5's SHIP-03. Root `CLAUDE.md`'s "HealthKit never sent" claim vs. `StressContextPayload.swift`'s actual behavior. Surface at `/gsd-discuss-phase 1`.
-- **D4 (Widget in v1)** — blocks Phase 1's WIRE-01 scope. Ship the widget (becomes a real blocker) or exclude the target. Surface at `/gsd-discuss-phase 1`.
-- Two non-blocking product questions gate Phase 4 acceptance (IAP-04, IAP-05): is the 7-day free trial real or aspirational copy; are the 3 premium character unlocks intentional one-time-permanent design or a bug.
-- External dependency: ASC product/subscription-group creation for Phase 4 has its own lead time — file it the same day Phase 1 starts, independent of code sequencing.
-- Repo is on `feature/spm-cache-integration` with substantial unrelated uncommitted changes; not assumed as a stable baseline until merged. `git.base_branch` (`main`) vs. current working branch needs resolution before milestone branching.
-- Task 4 (02-01): Two-device CloudKit sync verification deferred — requires two real iCloud-signed devices to confirm delete propagation
-- **D6 RESOLVED** (`.planning/debug/resolved/swiftdata-migration-crash.md`, commit `4e9628f`) — the originally-suspected `CoreData Code=134504` staged-migration error was a red herring (harmless diagnostic noise from passing recovery tests). Real cause: real CloudKit account-status IPC running inside unit-test-hosted processes with no iCloud account — 6 in-memory `ModelConfiguration` test call sites missing `cloudKitDatabase: .none`, plus `StressMonitorApp`'s real `sharedModelContainer` requesting `.automatic` unconditionally on every process launch including test-host launches. Fixed by explicit `.none` on the test configs and an `XCTestConfigurationFilePath` gate on the app's real config. Verified: 3 independent full local `xcodebuild test` runs, zero host restarts (vs. ~9 crashing runs before).
-- **New (from D6 investigation):** `CharacterEntitlementSyncTests` reliably hangs the test host for a reason not confirmed after 5 ruled-out hypotheses (CloudKit setup, WidgetCenter XPC, save error-handling style, `.serialized` concurrency, suite ordering). Quarantined with `@Suite(.disabled(...))`, mirroring the `StoreKitServiceTests` precedent (`9faa3a6`) — `syncPremiumCharacterEntitlement` now has no dedicated test coverage until this is diagnosed on a working local simulator. Full trail in the resolved D6 debug file's Evidence log.
+Carried into v1.1 (still open at v1.0 close — see PROJECT.md Active requirements for the requirements they gate):
+
+- **D1 (Auth strategy)** — Ship Supabase Auth vs. gate Chat off for v1.1. Surface at `/gsd-discuss-phase` for the auth phase.
+- **D2 (CloudKit encryption)** — Resolved in practice (encryptedValues implemented, verified in v1.0 Phase 2) but never formally closed as a decision record.
+- **D3 (Privacy contract authority)** — Root `CLAUDE.md`'s "HealthKit never sent" claim vs. `StressContextPayload.swift`'s actual behavior. Still gates BUILD-01/SHIP-03.
+- **D4 (Widget in v1)** — Ship the widget or exclude the target. Still gates WIRE-01.
+- Pre-existing Release-build compile blocker (new, found at v1.0 close): `StoreKitServiceEnvironment.swift:12` references `MockStoreKitService` unconditionally outside `#if DEBUG`.
+- This development host's CoreSimulator cannot complete an `xcodebuild test` launch session — reproduced across every v1.0 phase's verification attempt. Needs a working host/CI before test-execution claims can be trusted.
+- `CharacterEntitlementSyncTests` remains quarantined (`@Suite(.disabled(...))`) — root cause not diagnosed after 5 ruled-out hypotheses; no dedicated coverage for `syncPremiumCharacterEntitlement` until resolved on a working simulator.
 
 ### Quick Tasks Completed
 
