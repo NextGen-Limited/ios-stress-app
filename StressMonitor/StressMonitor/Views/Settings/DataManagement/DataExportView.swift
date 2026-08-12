@@ -66,6 +66,26 @@ struct DataExportView: View {
                 await viewModel.loadPreviewData(modelContext: modelContext)
             }
         }
+        .onChange(of: viewModel.includeHRV) { _, _ in
+            Task {
+                await viewModel.loadPreviewData(modelContext: modelContext)
+            }
+        }
+        .onChange(of: viewModel.includeHeartRate) { _, _ in
+            Task {
+                await viewModel.loadPreviewData(modelContext: modelContext)
+            }
+        }
+        .onChange(of: viewModel.includeStressLevels) { _, _ in
+            Task {
+                await viewModel.loadPreviewData(modelContext: modelContext)
+            }
+        }
+        .onChange(of: viewModel.includeBaseline) { _, _ in
+            Task {
+                await viewModel.loadPreviewData(modelContext: modelContext)
+            }
+        }
     }
 
     private var dateRangeSection: some View {
@@ -303,12 +323,13 @@ class DataExportViewModel {
         // Simulate loading preview data
         let records = fetchRecords(modelContext: modelContext, limit: 3)
         estimatedRecordCount = fetchRecords(modelContext: modelContext, limit: nil).count
+        let baseline = await fetchBaseline(modelContext: modelContext)
 
         await MainActor.run {
             if format == .csv {
-                previewData = generateCSVPreview(records: records)
+                previewData = generateCSVPreview(records: records, baseline: baseline)
             } else {
-                previewData = generateJSONPreview(records: records)
+                previewData = generateJSONPreview(records: records, baseline: baseline)
             }
             currentOperation = ""
         }
@@ -340,11 +361,13 @@ class DataExportViewModel {
             currentOperation = "Generating \(fileExtension.uppercased())..."
         }
 
+        let baseline = await fetchBaseline(modelContext: modelContext)
+
         let content: String
         if format == .csv {
-            content = try await generateCSV(records: records)
+            content = try await generateCSV(records: records, baseline: baseline)
         } else {
-            content = try await generateJSON(records: records)
+            content = try await generateJSON(records: records, baseline: baseline)
         }
 
         try content.write(to: fileURL, atomically: true, encoding: .utf8)
@@ -424,43 +447,89 @@ class DataExportViewModel {
         }
     }
 
-    private func generateCSVPreview(records: [StressMeasurement]) -> String {
+    /// Fetches the personal baseline only when the caller asked to include it —
+    /// avoids the repository round-trip otherwise.
+    private func fetchBaseline(modelContext: ModelContext) async -> PersonalBaseline? {
+        guard includeBaseline else { return nil }
+        return try? await StressRepository(modelContext: modelContext).getBaseline()
+    }
+
+    private func csvHeaderColumns() -> [String] {
+        var columns = ["Timestamp"]
+        if includeHRV { columns.append("HRV") }
+        if includeHeartRate { columns.append("Heart Rate") }
+        if includeStressLevels {
+            columns.append("Stress Level")
+            columns.append("Confidence")
+        }
+        return columns
+    }
+
+    private func csvRow(for record: StressMeasurement) -> String {
+        let formatter = ISO8601DateFormatter()
+        var fields = [formatter.string(from: record.timestamp)]
+        if includeHRV { fields.append(String(format: "%.1f", record.hrv)) }
+        if includeHeartRate { fields.append(String(format: "%.0f", record.restingHeartRate)) }
+        if includeStressLevels {
+            fields.append(String(format: "%.0f", record.stressLevel))
+            fields.append(String(format: "%.2f", record.confidences?.first ?? 0.0))
+        }
+        return fields.joined(separator: ",")
+    }
+
+    private func csvBaselineSection(_ baseline: PersonalBaseline) -> String {
+        "\nBaseline\nResting Heart Rate,\(String(format: "%.0f", baseline.restingHeartRate))\n"
+            + "Baseline HRV,\(String(format: "%.1f", baseline.baselineHRV))\n"
+    }
+
+    private func jsonFields(for record: StressMeasurement) -> [String: Any] {
+        var fields: [String: Any] = ["timestamp": ISO8601DateFormatter().string(from: record.timestamp)]
+        if includeHRV { fields["hrv"] = record.hrv }
+        if includeHeartRate { fields["heartRate"] = record.restingHeartRate }
+        if includeStressLevels {
+            fields["stressLevel"] = record.stressLevel
+            fields["confidence"] = record.confidences?.first ?? 0.0
+        }
+        return fields
+    }
+
+    private func jsonBaselineFields(_ baseline: PersonalBaseline) -> [String: Any] {
+        [
+            "restingHeartRate": baseline.restingHeartRate,
+            "baselineHRV": baseline.baselineHRV
+        ]
+    }
+
+    private func generateCSVPreview(records: [StressMeasurement], baseline: PersonalBaseline?) -> String {
         guard !records.isEmpty else { return "No data to export" }
 
-        var csv = "Timestamp,HRV,Heart Rate,Stress Level,Confidence\n"
+        var csv = csvHeaderColumns().joined(separator: ",") + "\n"
         for record in records {
-            let formatter = ISO8601DateFormatter()
-            csv += "\(formatter.string(from: record.timestamp)),"
-            csv += "\(String(format: "%.1f", record.hrv)),"
-            csv += "\(String(format: "%.0f", record.restingHeartRate)),"
-            csv += "\(String(format: "%.0f", record.stressLevel)),"
-            csv += "\(String(format: "%.2f", (record.confidences?.first ?? 0.0)))\n"
+            csv += csvRow(for: record) + "\n"
+        }
+        if let baseline {
+            csv += csvBaselineSection(baseline)
         }
         return csv
     }
 
-    private func generateJSONPreview(records: [StressMeasurement]) -> String {
+    private func generateJSONPreview(records: [StressMeasurement], baseline: PersonalBaseline?) -> String {
         guard !records.isEmpty else { return "No data to export" }
 
         let previewRecords = Array(records.prefix(2))
-        let dict = previewRecords.map { record in
-            [
-                "timestamp": ISO8601DateFormatter().string(from: record.timestamp),
-                "hrv": record.hrv,
-                "heartRate": record.restingHeartRate,
-                "stressLevel": record.stressLevel,
-                "confidence": (record.confidences?.first ?? 0.0)
-            ]
+        var payload: [String: Any] = ["measurements": previewRecords.map { jsonFields(for: $0) }]
+        if let baseline {
+            payload["baseline"] = jsonBaselineFields(baseline)
         }
-        if let jsonData = try? JSONSerialization.data(withJSONObject: dict, options: .prettyPrinted),
+        if let jsonData = try? JSONSerialization.data(withJSONObject: payload, options: .prettyPrinted),
            let json = String(data: jsonData, encoding: .utf8) {
             return json
         }
         return "Error generating preview"
     }
 
-    private func generateCSV(records: [StressMeasurement]) async throws -> String {
-        var csv = "Timestamp,HRV,Heart Rate,Stress Level,Confidence\n"
+    private func generateCSV(records: [StressMeasurement], baseline: PersonalBaseline?) async throws -> String {
+        var csv = csvHeaderColumns().joined(separator: ",") + "\n"
 
         for (index, record) in records.enumerated() {
             await MainActor.run {
@@ -469,29 +538,25 @@ class DataExportViewModel {
                 currentOperation = "Processing record \(index + 1) of \(records.count)..."
             }
 
-            let formatter = ISO8601DateFormatter()
-            csv += "\(formatter.string(from: record.timestamp)),"
-            csv += "\(String(format: "%.1f", record.hrv)),"
-            csv += "\(String(format: "%.0f", record.restingHeartRate)),"
-            csv += "\(String(format: "%.0f", record.stressLevel)),"
-            csv += "\(String(format: "%.2f", (record.confidences?.first ?? 0.0)))\n"
+            csv += csvRow(for: record) + "\n"
+        }
+
+        if let baseline {
+            csv += csvBaselineSection(baseline)
         }
 
         return csv
     }
 
-    private func generateJSON(records: [StressMeasurement]) async throws -> String {
-        let dict = records.map { record in
-            [
-                "timestamp": ISO8601DateFormatter().string(from: record.timestamp),
-                "hrv": record.hrv,
-                "heartRate": record.restingHeartRate,
-                "stressLevel": record.stressLevel,
-                "confidence": (record.confidences?.first ?? 0.0)
-            ]
+    private func generateJSON(records: [StressMeasurement], baseline: PersonalBaseline?) async throws -> String {
+        let measurements = records.map { jsonFields(for: $0) }
+
+        var payload: [String: Any] = ["measurements": measurements]
+        if let baseline {
+            payload["baseline"] = jsonBaselineFields(baseline)
         }
 
-        let jsonData = try JSONSerialization.data(withJSONObject: dict, options: .prettyPrinted)
+        let jsonData = try JSONSerialization.data(withJSONObject: payload, options: .prettyPrinted)
         guard let json = String(data: jsonData, encoding: .utf8) else {
             throw ExportError.encodingFailed
         }
