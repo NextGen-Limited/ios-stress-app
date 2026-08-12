@@ -66,6 +66,12 @@ final class DataDeleterService: DataDeleter {
                 }
             }
 
+            // Last safe checkpoint before the operation becomes irreversible —
+            // once CloudKit deletion starts, local deletion always follows so the
+            // two stores never diverge (see CR-01: cancelling mid-flight can't
+            // remove data from CloudKit only).
+            try Task.checkCancellation()
+
             // Phase 1: Delete from CloudKit (0% - 40%)
             currentOperation = "Deleting from CloudKit"
             deleteProgress = 0.1
@@ -74,8 +80,6 @@ final class DataDeleterService: DataDeleter {
                 ofType: .stressMeasurement,
                 expectedProgress: 0.1...0.4
             )
-
-            try Task.checkCancellation()
 
             // Phase 2: Delete from local storage (40% - 100%)
             currentOperation = "Deleting from local storage"
@@ -265,6 +269,9 @@ final class DataDeleterService: DataDeleter {
                 }
             }
 
+            // Last safe checkpoint before the operation becomes irreversible —
+            // once CloudKit deletion starts, local deletion always follows so the
+            // two stores never diverge (see CR-01).
             try Task.checkCancellation()
 
             if includeCloud {
@@ -276,8 +283,6 @@ final class DataDeleterService: DataDeleter {
                     in: range
                 )
             }
-
-            try Task.checkCancellation()
 
             if includeLocal {
                 currentOperation = "Deleting from local storage"
