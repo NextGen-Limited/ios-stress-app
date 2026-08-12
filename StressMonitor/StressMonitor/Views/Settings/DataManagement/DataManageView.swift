@@ -167,7 +167,7 @@ struct DataManageView: View {
             try await service.deleteAllMeasurements()
             resultMessage = "All stress snapshots were deleted."
         } catch let DeletionError.cloudKitError(cloudKitError) {
-            resultMessage = "Local snapshots were deleted. iCloud data couldn't be removed (\(cloudKitError.localizedDescription)) — it may reappear after your next sync."
+            resultMessage = "iCloud data couldn't be removed (\(cloudKitError.localizedDescription)). Local snapshots were not deleted — resolve the iCloud issue and try again."
         } catch DeletionError.operationCancelled {
             return
         } catch {
@@ -182,7 +182,7 @@ struct DataManageView: View {
             try await service.performFactoryReset()
             resultMessage = "Local data cleared. Relaunch the app to begin setup."
         } catch let DeletionError.cloudKitError(cloudKitError) {
-            resultMessage = "Local data, sign-in, and shared caches were cleared. iCloud reset failed (\(cloudKitError.localizedDescription)) — relaunch the app to begin setup; remaining iCloud data will be cleared on the next sync attempt."
+            resultMessage = "iCloud reset failed (\(cloudKitError.localizedDescription)). Local data, sign-in, and shared caches were not cleared — resolve the iCloud issue and try again."
         } catch DeletionError.operationCancelled {
             return
         } catch {
