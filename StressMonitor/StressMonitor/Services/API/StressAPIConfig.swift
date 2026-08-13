@@ -6,12 +6,12 @@ import Foundation
 /// Resolves the base URL via a 3-tier lookup:
 /// Info.plist build setting → process environment → UserDefaults → fallback.
 enum StressAPIConfig {
-    static let baseURL = URL(string: configuredString(
-        infoPlistKey: "STRESS_API_BASE_URL",
-        environmentKey: "STRESS_API_BASE_URL",
-        userDefaultsKey: "stressAPIBaseURL",
+    static let baseURL: URL = resolveBaseURL(
+        infoPlistValue: Bundle.main.object(forInfoDictionaryKey: "STRESS_API_BASE_URL") as? String,
+        environmentValue: ProcessInfo.processInfo.environment["STRESS_API_BASE_URL"],
+        userDefaultsValue: UserDefaults.standard.string(forKey: "stressAPIBaseURL"),
         fallback: "https://stress-api.dropitx.site"
-    ))!
+    )
 
     // MARK: - Endpoints
 
@@ -21,26 +21,43 @@ enum StressAPIConfig {
     /// The fallback URL is always valid, so the service is always configured.
     static var isConfigured: Bool { true }
 
-    private static func configuredString(
-        infoPlistKey: String,
-        environmentKey: String,
-        userDefaultsKey: String,
+    /// Testable 3-tier resolution seam (D-03): Info.plist → environment →
+    /// UserDefaults → fallback. The static `baseURL` captures the resolved
+    /// value at type-load time, so precedence is asserted against this helper
+    /// rather than the captured property.
+    static func resolveBaseURL(
+        infoPlistValue: String?,
+        environmentValue: String?,
+        userDefaultsValue: String?,
+        fallback: String
+    ) -> URL {
+        let resolved = resolveString(
+            infoPlistValue: infoPlistValue,
+            environmentValue: environmentValue,
+            userDefaultsValue: userDefaultsValue,
+            fallback: fallback
+        )
+        return URL(string: resolved)!
+    }
+
+    private static func resolveString(
+        infoPlistValue: String?,
+        environmentValue: String?,
+        userDefaultsValue: String?,
         fallback: String
     ) -> String {
-        if let value = Bundle.main.object(forInfoDictionaryKey: infoPlistKey) as? String,
-           !value.isEmpty,
-           !value.hasPrefix("$(") {
-            return value
+        if let infoPlistValue,
+           !infoPlistValue.isEmpty,
+           !infoPlistValue.hasPrefix("$(") {
+            return infoPlistValue
         }
 
-        let environment = ProcessInfo.processInfo.environment[environmentKey]
-        if let environment, !environment.isEmpty {
-            return environment
+        if let environmentValue, !environmentValue.isEmpty {
+            return environmentValue
         }
 
-        let defaultsValue = UserDefaults.standard.string(forKey: userDefaultsKey)
-        if let defaultsValue, !defaultsValue.isEmpty {
-            return defaultsValue
+        if let userDefaultsValue, !userDefaultsValue.isEmpty {
+            return userDefaultsValue
         }
 
         return fallback

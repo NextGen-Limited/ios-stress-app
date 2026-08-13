@@ -120,7 +120,11 @@ final class StressLLMService: LLMServiceProtocol, @unchecked Sendable {
 
     // MARK: - Error Mapping
 
-    private static func mapHTTPError(_ statusCode: Int) -> LLMServiceError? {
+    /// Maps the `/chat` HTTP status code to the `LLMServiceError` case the
+    /// chat UI surfaces. Internal so the status-code → error-case contract
+    /// (D-07: 402 → `.insufficientCredits`) is pinned by an automated test
+    /// rather than only the live streaming path.
+    static func mapHTTPError(_ statusCode: Int) -> LLMServiceError? {
         switch statusCode {
         case 200...299: return nil
         case 401: return .unavailable(reason: "Please sign in to use AI Chat.")
