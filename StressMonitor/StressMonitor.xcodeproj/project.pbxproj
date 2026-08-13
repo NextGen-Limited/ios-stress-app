@@ -35,6 +35,8 @@
 		FB1A00010000000000000007 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = FB1A00010000000000000006 /* GoogleSignIn */; };
 		F1A1B2C3D4E500000000B001 /* ModelContainerRecoveryTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A1B2C3D4E500000000A001 /* ModelContainerRecoveryTests.swift */; };
 		F1A1B2C3D4E500000000B002 /* StressMeasurementMigrationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A1B2C3D4E500000000A002 /* StressMeasurementMigrationTests.swift */; };
+		F1A1B2C3D4E500000000B003 /* StressAPIConfigTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A1B2C3D4E500000000A003 /* StressAPIConfigTests.swift */; };
+		F1A1B2C3D4E500000000B004 /* StressAPIClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A1B2C3D4E500000000A004 /* StressAPIClientTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -111,6 +113,8 @@
 		FF19921F5E82175704921949 /* StressContextPayloadTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = StressContextPayloadTests.swift; path = StressMonitorTests/StressContextPayloadTests.swift; sourceTree = "<group>"; };
 		F1A1B2C3D4E500000000A001 /* ModelContainerRecoveryTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ModelContainerRecoveryTests.swift; path = StressMonitorTests/ModelContainerRecoveryTests.swift; sourceTree = "<group>"; };
 		F1A1B2C3D4E500000000A002 /* StressMeasurementMigrationTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = StressMeasurementMigrationTests.swift; path = StressMonitorTests/StressMeasurementMigrationTests.swift; sourceTree = "<group>"; };
+		F1A1B2C3D4E500000000A003 /* StressAPIConfigTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = StressAPIConfigTests.swift; path = StressMonitorTests/StressAPIConfigTests.swift; sourceTree = "<group>"; };
+		F1A1B2C3D4E500000000A004 /* StressAPIClientTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = StressAPIClientTests.swift; path = StressMonitorTests/StressAPIClientTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -254,6 +258,8 @@
 				0ED711106429F77E210D3F60 /* StoreKitServiceTests.swift */,
 				38B4FDA585844AA492F5BFEB /* StoreKitTestSessionProvider.swift */,
 				FF19921F5E82175704921949 /* StressContextPayloadTests.swift */,
+				F1A1B2C3D4E500000000A003 /* StressAPIConfigTests.swift */,
+				F1A1B2C3D4E500000000A004 /* StressAPIClientTests.swift */,
 				4C67EAC979024C30F581AD22 /* StressMonitorProducts.storekit */,
 			);
 			sourceTree = "<group>";
@@ -482,6 +488,8 @@
 				E8D9B7231036C614602516E5 /* WidgetDataStateTests.swift in Sources */,
 				F1A1B2C3D4E500000000B001 /* ModelContainerRecoveryTests.swift in Sources */,
 				F1A1B2C3D4E500000000B002 /* StressMeasurementMigrationTests.swift in Sources */,
+				F1A1B2C3D4E500000000B003 /* StressAPIConfigTests.swift in Sources */,
+				F1A1B2C3D4E500000000B004 /* StressAPIClientTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
