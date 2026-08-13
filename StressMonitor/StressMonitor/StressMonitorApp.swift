@@ -1,5 +1,6 @@
 import os
 import SwiftData
+import FirebaseCore
 import SwiftUI
 
 #if DEBUG
@@ -164,6 +165,7 @@ struct StressMonitorApp: App {
     }
 
     init() {
+        FirebaseApp.configure()
         #if DEBUG
         os_signpost(.begin, log: OSLog(subsystem: "com.stressmonitor.app", category: "Launch"), name: "AppInit")
         #endif

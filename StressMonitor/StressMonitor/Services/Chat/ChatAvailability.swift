@@ -12,15 +12,8 @@ enum ChatAvailability: Sendable, Equatable {
     case enabled
     case disabled(reason: DisabledReason)
 
-    /// Compile-time gate. DEBUG/local-dev keeps Chat reachable; Release ships
-    /// honestly disabled until v1.1 wires real Supabase auth + ASC anon key.
-    static var current: ChatAvailability {
-        #if DEBUG
-        return .enabled
-        #else
-        return .disabled(reason: .comingSoon)
-        #endif
-    }
+    /// v1.1 wires real Firebase auth, so Chat is reachable in every config.
+    static var current: ChatAvailability { .enabled }
 
     var isAvailable: Bool {
         self == .enabled

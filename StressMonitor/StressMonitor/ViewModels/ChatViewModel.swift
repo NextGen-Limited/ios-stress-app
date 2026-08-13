@@ -57,12 +57,12 @@ final class ChatViewModel {
             stressResult: stressResult,
             baseline: baseline,
             recentHistory: recentHistory,
-            llmService: SupabaseLLMService()
+            llmService: StressLLMService()
         )
     }
 
     /// Test-injectable initializer. Existing call sites use the convenience
-    /// init above, which defaults to a real `SupabaseLLMService`. Tests pass a
+    /// init above, which defaults to a real `StressLLMService`. Tests pass a
     /// controllable double so cancellation and partial-text preservation are
     /// observable without a live network session.
     init(
@@ -116,13 +116,13 @@ final class ChatViewModel {
         }
 
         // Build stress context for the backend (backend builds system prompt from this)
-        SupabaseLLMService.currentStressContext = StressContextPayload.build(
+        StressLLMService.currentStressContext = StressContextPayload.build(
             stressResult: stressResult,
             baseline: baseline,
             recentHistory: recentHistory
         )
 
-        // systemPrompt is ignored by SupabaseLLMService — backend builds it
+        // systemPrompt is ignored by StressLLMService — backend builds it
         let systemPrompt = contextBuilder.buildSystemPrompt(
             stressResult: stressResult,
             baseline: baseline,
@@ -141,7 +141,7 @@ final class ChatViewModel {
             }
 
             if !currentStreamingText.isEmpty {
-                let sessionId = (llmService as? SupabaseLLMService)?.currentSessionId
+                let sessionId = (llmService as? StressLLMService)?.currentSessionId
                 if let lastUserIndex = messages.lastIndex(where: { $0.role == .user }) {
                     messages[lastUserIndex].sessionId = sessionId
                     messages[lastUserIndex].isSynced = sessionId != nil
@@ -209,6 +209,6 @@ final class ChatViewModel {
         cancelResponse()
         messages.removeAll()
         errorMessage = nil
-        (llmService as? SupabaseLLMService)?.resetSession()
+        (llmService as? StressLLMService)?.resetSession()
     }
 }
