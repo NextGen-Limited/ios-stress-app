@@ -27,7 +27,7 @@ Full phase detail archived at `.planning/milestones/v1.0-ROADMAP.md` and `.plann
   - Depends on: nothing (foundational)
   - **Plans:** 3 plans
   - Plans:
-    - [ ] 01-01-PLAN.md — Tracer: Firebase Anonymous auth → StressAPIClient → POST /chat end-to-end + config/error/SSE foundation
+    - [x] 01-01-PLAN.md — Tracer: Firebase Anonymous auth → StressAPIClient → POST /chat end-to-end + config/error/SSE foundation
     - [ ] 01-02-PLAN.md — Google Sign-In upgrade path + Supabase source removal (D-04) + DataDeleterService rewire
     - [ ] 01-03-PLAN.md — TDD test coverage for StressAPIConfig, StressAPIClient, FirebaseAuthService
 - [ ] **Phase 2: Credits System + IAP Transition** — Integrate /credits API, transition StoreKit from subscription to consumable credit packs, credits-gated chat access (402 INSUFFICIENT_CREDITS → paywall), new paywall UX with balance display.

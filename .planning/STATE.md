@@ -5,15 +5,15 @@ milestone_name: milestone
 current_phase: 01
 current_phase_name: Firebase Auth + API Client + Chat Migration
 status: executing
-stopped_at: Completed 05-01-PLAN.md
-last_updated: "2026-08-13T08:47:47.218Z"
+stopped_at: Completed 01-01-PLAN.md (code+build; end-to-end chat verify blocked by backend outage)
+last_updated: "2026-08-13T09:38:19.698Z"
 last_activity: 2026-08-13
 last_activity_desc: Phase 01 execution started
 progress:
   total_phases: 1
   completed_phases: 0
   total_plans: 3
-  completed_plans: 0
+  completed_plans: 1
 ---
 
 # Project State
@@ -28,8 +28,8 @@ See: .planning/PROJECT.md (updated 2026-08-12 after v1.0 close)
 ## Current Position
 
 Phase: 01 (Firebase Auth + API Client + Chat Migration) — EXECUTING
-Plan: 1 of 3
-Status: Executing Phase 01
+Plan: 2 of 3
+Status: Ready to execute
 Last activity: 2026-08-13 — Phase 01 execution started
 
 ## Performance Metrics
@@ -60,12 +60,17 @@ Last activity: 2026-08-13 — Phase 01 execution started
 | Phase 02 P01 | 45min | 3 tasks | 8 files |
 | Phase 04 P01 | ~26 min | 3 tasks | 16 files |
 | Phase 05 P01 | ~11 min | 6 tasks | 19 files |
+| Phase 01 P01 | 42m | 3 tasks | 12 files |
 
 ## Accumulated Context
 
 ### Decisions
 
 Full v1.0 decision log archived in PROJECT.md Key Decisions table (see "v1.0 Verification Reality Check" for close-time evolution). Cleared here at milestone close per `/gsd-complete-milestone`'s `update_state` step — start fresh for v1.1.
+
+- [Phase ?]: Firebase 11.x API: forcingRefresh label, non-optional expirationDate, FirebaseApp.configure() entry point (verified against resolved SDK)
+- [Phase ?]: Added firebase-ios-sdk via standard XCRemoteSwiftPackageReference (existing spm-cache umbrella is unlinked)
+- [Phase ?]: Proceeded with Task 2/3 code despite backend /health 404 (deployment down); code+build are backend-independent, end-to-end verify surfaced as checkpoint
 
 ### Pending Todos
 
@@ -103,8 +108,8 @@ Items acknowledged and deferred at v1.0 milestone close on 2026-08-12:
 
 ## Session Continuity
 
-Last session: 2026-08-11T07:12:00.000Z
-Stopped at: Completed 05-01-PLAN.md
+Last session: 2026-08-13T09:38:19.684Z
+Stopped at: Completed 01-01-PLAN.md (code+build; end-to-end chat verify blocked by backend outage)
 Resume file: None
 
 ## Operator Next Steps
