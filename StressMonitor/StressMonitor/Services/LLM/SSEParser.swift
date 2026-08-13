@@ -18,6 +18,7 @@ struct SSEMetadata: Sendable {
     let sessionId: UUID?
     let creditsRemaining: Int?
     let modelUsed: String?
+    let quickActions: [String]?
 }
 
 // MARK: - SSE Parser
@@ -54,7 +55,8 @@ struct SSEParser {
             return .metadata(SSEMetadata(
                 sessionId: sessionId,
                 creditsRemaining: json["credits_remaining"] as? Int,
-                modelUsed: json["model_used"] as? String
+                modelUsed: json["model_used"] as? String,
+                quickActions: json["quick_actions"] as? [String]
             ))
         }
 

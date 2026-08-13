@@ -10,6 +10,7 @@ enum LLMServiceError: Error, LocalizedError {
     case rateLimited
     case refused
     case concurrentRequests
+    case insufficientCredits
     case decodingFailure
     case cancelled
     case unknown(Error)
@@ -28,6 +29,8 @@ enum LLMServiceError: Error, LocalizedError {
             return "I'd prefer to keep our chat focused on wellness topics."
         case .concurrentRequests:
             return "I'm still thinking. Please wait for my response."
+        case .insufficientCredits:
+            return "Out of credits. Monthly credits reset automatically."
         case .decodingFailure:
             return "Something went wrong processing that response."
         case .cancelled:
