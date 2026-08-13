@@ -1,3 +1,4 @@
+import FirebaseAuth
 import os
 import SwiftData
 import FirebaseCore
@@ -166,6 +167,7 @@ struct StressMonitorApp: App {
 
     init() {
         FirebaseApp.configure()
+        Task { try? await Auth.auth().signInAnonymously() }
         #if DEBUG
         os_signpost(.begin, log: OSLog(subsystem: "com.stressmonitor.app", category: "Launch"), name: "AppInit")
         #endif
