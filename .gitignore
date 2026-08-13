@@ -173,3 +173,6 @@ StressMonitor/build_output.log
 StressMonitor/test_output.log
 .claude/
 StressMonitor/StressMonitor.xcodeproj/StressMonitor.xcodeproj/
+
+# Firebase config (per-app, contains API keys)
+StressMonitor/StressMonitor/GoogleService-Info.plist
