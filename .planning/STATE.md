@@ -5,15 +5,15 @@ milestone_name: milestone
 current_phase: 01
 current_phase_name: Firebase Auth + API Client + Chat Migration
 status: executing
-stopped_at: Completed 01-01-PLAN.md (code+build; end-to-end chat verify blocked by backend outage)
-last_updated: "2026-08-13T09:38:19.698Z"
+stopped_at: Completed 01-03-PLAN.md (TDD backfill for auth + API client)
+last_updated: "2026-08-13T11:22:14.785Z"
 last_activity: 2026-08-13
 last_activity_desc: Phase 01 execution started
 progress:
   total_phases: 1
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 3
-  completed_plans: 1
+  completed_plans: 3
 ---
 
 # Project State
@@ -28,7 +28,7 @@ See: .planning/PROJECT.md (updated 2026-08-12 after v1.0 close)
 ## Current Position
 
 Phase: 01 (Firebase Auth + API Client + Chat Migration) — EXECUTING
-Plan: 2 of 3
+Plan: 3 of 3
 Status: Ready to execute
 Last activity: 2026-08-13 — Phase 01 execution started
 
@@ -61,6 +61,7 @@ Last activity: 2026-08-13 — Phase 01 execution started
 | Phase 04 P01 | ~26 min | 3 tasks | 16 files |
 | Phase 05 P01 | ~11 min | 6 tasks | 19 files |
 | Phase 01 P01 | 42m | 3 tasks | 12 files |
+| Phase 01 P03 | 32m | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -71,6 +72,8 @@ Full v1.0 decision log archived in PROJECT.md Key Decisions table (see "v1.0 Ver
 - [Phase ?]: Firebase 11.x API: forcingRefresh label, non-optional expirationDate, FirebaseApp.configure() entry point (verified against resolved SDK)
 - [Phase ?]: Added firebase-ios-sdk via standard XCRemoteSwiftPackageReference (existing spm-cache umbrella is unlinked)
 - [Phase ?]: Proceeded with Task 2/3 code despite backend /health 404 (deployment down); code+build are backend-independent, end-to-end verify surfaced as checkpoint
+- [Phase ?]: mapHTTPError lives on StressLLMService (streaming consumer owning error contract), exposed internal for 402 mapping tests
+- [Phase ?]: Task 2 required no production changes - FirebaseAuthService.init was already lazy from Plan 01-01; tests pin the contract
 
 ### Pending Todos
 
@@ -108,8 +111,8 @@ Items acknowledged and deferred at v1.0 milestone close on 2026-08-12:
 
 ## Session Continuity
 
-Last session: 2026-08-13T09:38:19.684Z
-Stopped at: Completed 01-01-PLAN.md (code+build; end-to-end chat verify blocked by backend outage)
+Last session: 2026-08-13T11:22:14.567Z
+Stopped at: Completed 01-03-PLAN.md (TDD backfill for auth + API client)
 Resume file: None
 
 ## Operator Next Steps
