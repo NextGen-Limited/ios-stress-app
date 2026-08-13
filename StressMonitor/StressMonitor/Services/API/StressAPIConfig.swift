@@ -3,7 +3,7 @@ import Foundation
 // MARK: - Stress API Configuration
 
 /// Centralized configuration for the standalone StressMonitor backend.
-/// Mirrors the 3-tier resolution pattern from `SupabaseConfig`:
+/// Resolves the base URL via a 3-tier lookup:
 /// Info.plist build setting → process environment → UserDefaults → fallback.
 enum StressAPIConfig {
     static let baseURL = URL(string: configuredString(
@@ -19,7 +19,6 @@ enum StressAPIConfig {
     static let chatURL = baseURL.appendingPathComponent("chat")
 
     /// The fallback URL is always valid, so the service is always configured.
-    /// Unlike `SupabaseConfig`, there is no masked-placeholder state to detect.
     static var isConfigured: Bool { true }
 
     private static func configuredString(

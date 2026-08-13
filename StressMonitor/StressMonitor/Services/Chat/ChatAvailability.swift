@@ -6,7 +6,7 @@ import Foundation
 ///
 /// Read by the two Chat entry points (`ActionView` RippleRecommendationCard CTA,
 /// `SettingsView` chat row), by `ChatViewModel.isAvailable`, and by
-/// `SupabaseLLMService.isAvailable()`. Flipping `current` to `.enabled` in a
+/// `StressLLMService.isAvailable()`. Flipping `current` to `.enabled` in a
 /// Release build re-enables Chat everywhere without touching call sites.
 enum ChatAvailability: Sendable, Equatable {
     case enabled

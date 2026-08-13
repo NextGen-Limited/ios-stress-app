@@ -473,12 +473,12 @@ final class DataDeleterService: DataDeleter {
 
     // MARK: - Credential & Shared Cache Clearance
 
-    /// Clears the Supabase session tokens from Keychain and wipes the App Group
-    /// widget/complication cache. Called from both delete-all and factory-reset
-    /// paths so a "deleted" user is actually signed out and the widget stops
-    /// showing deleted data.
+    /// Clears the Firebase auth session and legacy Keychain tokens, then wipes
+    /// the App Group widget/complication cache. Called from both delete-all and
+    /// factory-reset paths so a "deleted" user is actually signed out and the
+    /// widget stops showing deleted data.
     static func clearCredentialsAndSharedCaches() {
-        SupabaseLLMService.clearStoredCredentials()
+        FirebaseAuthService.clearStoredCredentials()
         UserDefaults(suiteName: WidgetConstants.appGroupID)?
             .removePersistentDomain(forName: WidgetConstants.appGroupID)
     }

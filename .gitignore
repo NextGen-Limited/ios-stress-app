@@ -161,8 +161,6 @@ vendor/bundle
 build/
 .worktrees/
 
-# Supabase local secrets (auto-generated, do not commit)
-StressMonitor/StressMonitor/Services/LLM/SupabaseSecrets.swift
 supabase/.temp/
 
 # spm-cache (sandbox, lockfile, build artifacts - regenerated locally)

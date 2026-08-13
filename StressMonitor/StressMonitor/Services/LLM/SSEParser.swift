@@ -49,7 +49,7 @@ struct SSEParser {
             return .error(errorMsg)
         }
 
-        // Extract metadata emitted by the StressMonitor Supabase Edge Function.
+        // Extract metadata emitted by the stress-api backend.
         if let type = json["type"] as? String, type == "metadata" {
             let sessionId = (json["session_id"] as? String).flatMap(UUID.init(uuidString:))
             return .metadata(SSEMetadata(

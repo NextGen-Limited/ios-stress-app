@@ -38,8 +38,7 @@ final class FirebaseAuthService: AuthServiceProtocol, @unchecked Sendable {
     }
 
     /// Returns a valid Firebase ID token, forcing a refresh when the cached
-    /// token is within `tokenRefreshMargin` of expiry. Mirrors the 60-second
-    /// margin `SupabaseLLMService.ensureValidSession` used for its JWT.
+    /// token is within `tokenRefreshMargin` of expiry.
     func getIDToken() async throws -> String {
         guard let user = Auth.auth().currentUser else {
             throw LLMServiceError.unavailable(reason: "Please sign in to use AI Chat.")

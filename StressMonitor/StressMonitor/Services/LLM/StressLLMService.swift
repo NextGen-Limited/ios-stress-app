@@ -4,8 +4,8 @@ import Foundation
 
 /// LLM service that connects to the standalone StressMonitor backend's
 /// `/chat` endpoint via `StressAPIClient`. Streams SSE responses and
-/// conforms to `LLMServiceProtocol` so `ChatViewModel` needs only a
-/// class-name swap from `SupabaseLLMService` (D-06).
+/// conforms to `LLMServiceProtocol` so `ChatViewModel` consumes it
+/// through the same protocol seam (D-06).
 ///
 /// Auth and request building live in `StressAPIClient` / `FirebaseAuthService`;
 /// this type owns the SSE consumption loop, session/credits state, and the
@@ -115,8 +115,7 @@ final class StressLLMService: LLMServiceProtocol, @unchecked Sendable {
     // MARK: - Stress Context
 
     /// The latest stress context, set by ChatViewModel before each message.
-    /// Static to avoid Sendable issues with the nonisolated `send` contract,
-    /// matching the `SupabaseLLMService` precedent.
+    /// Static to avoid Sendable issues with the nonisolated `send` contract.
     static var currentStressContext: StressContextPayload?
 
     // MARK: - Error Mapping

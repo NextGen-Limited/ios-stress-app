@@ -2,7 +2,7 @@ import Foundation
 
 // MARK: - Stress Context Payload
 
-/// Structured health context sent to the Supabase Edge Function `/chat`.
+/// Structured health context sent to the stress-api backend `/chat` endpoint.
 /// The backend builds the system prompt from this data — the iOS app no longer
 /// builds the prompt locally.
 struct StressContextPayload: Codable, Sendable {
