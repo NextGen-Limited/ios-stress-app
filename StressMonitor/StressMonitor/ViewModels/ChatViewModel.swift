@@ -20,6 +20,11 @@ final class ChatViewModel {
     /// UI that needs to distinguish "idle" from "actively streaming".
     var isStreaming: Bool { streamingTask != nil }
 
+    /// Presents the paywall when a send is rejected for insufficient credits
+    /// (HTTP 402). Injected by the owning view from the environment so this
+    /// view model never constructs UI; tests inject a recording closure.
+    var presentPaywall: ((PaywallReason) -> Void)?
+
     // MARK: - Quick Actions
 
     var quickActions: [ChatQuickAction] {
@@ -156,7 +161,12 @@ final class ChatViewModel {
                 messages.append(response)
             }
         } catch let error as LLMServiceError {
-            if case .exceededContext = error {
+            if case .insufficientCredits = error {
+                // The paywall carries the detail (DEC-1: subscription-led) —
+                // the in-chat message stays a one-line nudge.
+                errorMessage = error.localizedDescription
+                presentPaywall?(.outOfCredits)
+            } else if case .exceededContext = error {
                 // Intentionally discards any partial text — the whole
                 // conversation is being cleared to recover from overflow.
                 messages.removeAll()
@@ -211,5 +221,14 @@ final class ChatViewModel {
         messages.removeAll()
         errorMessage = nil
         (llmService as? StressLLMService)?.resetSession()
+    }
+
+    // MARK: - Credit Balance Convergence
+
+    /// Routes metadata `credits_remaining` values from the chat stream into
+    /// the app's credit-balance convergence sink (`CreditService`). Optional —
+    /// unset in unit tests, which inject doubles instead.
+    func setCreditsConvergenceSink(_ sink: (@MainActor (_ remaining: Int) -> Void)?) {
+        (llmService as? StressLLMService)?.onCreditsRemainingChange = sink
     }
 }

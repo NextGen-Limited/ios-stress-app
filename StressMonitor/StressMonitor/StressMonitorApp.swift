@@ -20,6 +20,9 @@ struct StressMonitorApp: App {
     // listener started in its init runs the whole time, not just while the
     // paywall happens to be on screen. See StoreKitServiceEnvironment.swift.
     @State private var storeKitService: StoreKitServiceProtocol = Self.makeStoreKitService()
+    /// App-scope credit balance cache: paywall + chat surfaces read this one
+    /// instance so every convergence source updates the same displayed value.
+    @State private var creditService = CreditService()
     @Environment(\.scenePhase) private var scenePhase
     // MARK: - Versioned Schema (V1 → V2 adds Habit)
     //
@@ -73,6 +76,11 @@ struct StressMonitorApp: App {
     private static let persistenceLogger = Logger(
         subsystem: "com.stressmonitor.app",
         category: "Persistence"
+    )
+
+    private static let appLogger = Logger(
+        subsystem: "com.stressmonitor.app",
+        category: "App"
     )
 
     var sharedModelContainer: ModelContainer = { makeContainer() }()
@@ -183,6 +191,7 @@ struct StressMonitorApp: App {
             OnboardingContainerView()
                 .environment(appRouter)
                 .environment(paywall)
+                .environment(creditService)
                 .environment(\.storeKitService, storeKitService)
                 .preferredColorScheme(AppearanceManager.shared.colorScheme)
                 #if DEBUG
@@ -200,6 +209,15 @@ struct StressMonitorApp: App {
             guard newPhase == .active else { return }
             Task { @MainActor in
                 await storeKitService.refreshEntitlements()
+                // Also refreshes the credit balance on every foreground; a
+                // 401 here doubles as the AUTH-02 stale-session probe.
+                do {
+                    try await creditService.refreshBalance()
+                } catch {
+                    Self.appLogger.notice(
+                        "Credit balance refresh failed: \(error.localizedDescription, privacy: .public)"
+                    )
+                }
                 CharacterCollectionViewModel.syncPremiumCharacterEntitlement(
                     isPremium: PremiumState.shared.isPremiumUser,
                     in: sharedModelContainer.mainContext

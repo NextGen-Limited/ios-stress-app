@@ -11,7 +11,7 @@ final class StressAPIClient {
 
     private let authService: AuthServiceProtocol
     private let baseURL: URL
-    private let session: URLSession
+    let session: URLSession
 
     init(
         authService: AuthServiceProtocol? = nil,

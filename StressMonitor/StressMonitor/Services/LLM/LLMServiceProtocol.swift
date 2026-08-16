@@ -30,7 +30,7 @@ enum LLMServiceError: Error, LocalizedError {
         case .concurrentRequests:
             return "I'm still thinking. Please wait for my response."
         case .insufficientCredits:
-            return "Out of credits. Monthly credits reset automatically."
+            return "Out of credits. Subscribe or buy more to keep chatting."
         case .decodingFailure:
             return "Something went wrong processing that response."
         case .cancelled:

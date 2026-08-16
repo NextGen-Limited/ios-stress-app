@@ -10,6 +10,10 @@ enum PaywallReason: Hashable {
     case characters
     case breathingAdvanced
     case feature(named: String)
+    /// A chat send was rejected with HTTP 402 INSUFFICIENT_CREDITS. A
+    /// server-side premium user never receives 402, so this reason presents
+    /// regardless of local premium state — see `present(reason:)`.
+    case outOfCredits
 }
 
 /// Identifiable presentation envelope so `.fullScreenCover(item:)` can drive
@@ -53,9 +57,17 @@ final class PaywallController {
     }
 
     /// Present the paywall full-screen for `reason`.
-    /// No-ops when the user already has premium.
+    ///
+    /// No-ops when the user already has premium — except for `.outOfCredits`:
+    /// the backend never 402s a server-side premium subscriber, so a 402
+    /// reaching the client means the server does not consider this user
+    /// premium, and the resubscribe/buy-credits paywall is exactly the path
+    /// they need (a locally-premium user hitting 402 is in a divergence
+    /// state; suppressing the paywall would leave a dead-end error string).
     func present(reason: PaywallReason) {
-        guard !premiumState.isPremiumUser else { return }
+        if reason != .outOfCredits {
+            guard !premiumState.isPremiumUser else { return }
+        }
         presentation = PaywallPresentation(reason: reason)
     }
 

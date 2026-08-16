@@ -10,6 +10,8 @@ import SwiftUI
 /// the user's current stress level.
 struct ChatBottomSheetView: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(PaywallController.self) private var paywall
+    @Environment(CreditService.self) private var creditService
     @State private var viewModel: ChatViewModel
     @State private var inputText = ""
 
@@ -40,6 +42,16 @@ struct ChatBottomSheetView: View {
             }
             .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
+            // Wire the view model to app-scope services from the environment:
+            // the 402 paywall presentation and the credits convergence sink.
+            // The environment is not reachable in `init`, so this happens on
+            // first appear, before any message can be sent.
+            .onAppear {
+                viewModel.presentPaywall = { paywall.present(reason: $0) }
+                viewModel.setCreditsConvergenceSink { [weak creditService] remaining in
+                    creditService?.apply(creditsRemaining: remaining)
+                }
+            }
             // Covers swipe-to-dismiss too, not just the Close button — without
             // this the SSE stream and its owning objects outlive the sheet.
             .onDisappear { viewModel.cancelResponse() }

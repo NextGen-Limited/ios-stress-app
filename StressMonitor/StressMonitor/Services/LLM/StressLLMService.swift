@@ -22,6 +22,12 @@ final class StressLLMService: LLMServiceProtocol, @unchecked Sendable {
 
     private let stressAPIClient: StressAPIClient
 
+    /// Convergence sink for metadata `credits_remaining` values: `apply(metadata:)`
+    /// forwards each terminal-event remaining count here so the chat path can
+    /// update the app's display-only balance cache without a hard dependency
+    /// on `CreditService`.
+    var onCreditsRemainingChange: (@MainActor (_ remaining: Int) -> Void)?
+
     private static let sessionIdDefaultsKey = "stressChatSessionId"
 
     /// Clears the persisted chat session. Firebase token cache is owned by the
@@ -32,8 +38,12 @@ final class StressLLMService: LLMServiceProtocol, @unchecked Sendable {
 
     // MARK: - Init
 
-    init(stressAPIClient: StressAPIClient? = nil) {
+    init(
+        stressAPIClient: StressAPIClient? = nil,
+        onCreditsRemainingChange: (@MainActor (_ remaining: Int) -> Void)? = nil
+    ) {
         self.stressAPIClient = stressAPIClient ?? StressAPIClient()
+        self.onCreditsRemainingChange = onCreditsRemainingChange
         if let storedSessionId = UserDefaults.standard.string(forKey: Self.sessionIdDefaultsKey) {
             self.currentSessionId = UUID(uuidString: storedSessionId)
         }
@@ -109,6 +119,9 @@ final class StressLLMService: LLMServiceProtocol, @unchecked Sendable {
         creditsRemaining = metadata.creditsRemaining
         modelUsed = metadata.modelUsed
         quickActions = metadata.quickActions
+        if let creditsRemaining {
+            onCreditsRemainingChange?(creditsRemaining)
+        }
     }
 
     // MARK: - Error Mapping
