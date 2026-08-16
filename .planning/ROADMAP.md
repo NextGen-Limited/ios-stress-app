@@ -49,9 +49,17 @@ Plans:
 **Plans:** 4 plans
 
 Plans:
+**Wave 1**
+
 - [ ] 02-01-PLAN.md — Monetization decision gates (DEC-1/DEC-2) + orphaned-suite repair + CR-01 closure + credits tracer (402 → paywall → live balance)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
 - [ ] 02-02-PLAN.md — Backend POST /credits/redeem: Apple JWS verification, idempotent 'purchase' ledger grants (cross-repo, TDD)
 - [ ] 02-03-PLAN.md — StoreKit consumable packs + deferred-grant purchase flow (redeem → finish) + Release-build proof (BUILD-05)
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
 - [ ] 02-04-PLAN.md — Packs-era paywall UX + balance surfaces (DEC-2 placements) + live money-path verification
 
 **Waves:** 1: 02-01 → 2: 02-02, 02-03 (parallel, contract-pinned) → 3: 02-04

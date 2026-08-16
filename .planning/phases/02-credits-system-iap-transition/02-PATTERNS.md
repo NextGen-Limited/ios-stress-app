@@ -83,7 +83,7 @@ func getHealth() async throws -> Bool {
     return (response as? HTTPURLResponse)?.statusCode == 200
 }
 ```
-Adaptation for `getBalance()`: `try await authorizedRequest(path: "credits", method: "GET")` → `session.data(for:)` → decode `CreditBalance` from `data`; map non-2xx (research: 401/500 possible). For `redeemPurchase(jws:)`: `method: "POST"` with `body` = `{"transaction_jws": <string>}` (exact body key TBD against the new backend endpoint — do NOT invent it silently; pin it in a test once the endpoint contract lands).
+Adaptation for `getBalance()`: `try await authorizedRequest(path: "credits", method: "GET")` → `session.data(for:)` → decode `CreditBalance` from `data`; map non-2xx (research: 401/500 possible). For `redeemPurchase(jws:)`: `method: "POST"` with `body` = `{"transaction_jws": <string>}` (body key pinned by 02-02/02-03 contract: `transaction_jws` — keep the pinning test).
 
 **Error handling:** follow `sendChat`'s guard style (lines 99-103): `guard let httpResponse = response as? HTTPURLResponse else { throw … }`. Non-streaming methods should throw `LLMServiceError.unavailable(reason:)`-style errors or decode the backend's `{error, code}` body — mirror what `StressLLMService.mapHTTPError` does for `/chat` but keep it local to the extension (the D-07 mapper is chat-specific).
 
