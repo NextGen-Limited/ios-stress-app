@@ -55,13 +55,12 @@ final class StressLLMService: LLMServiceProtocol, @unchecked Sendable {
 
     func send(
         messages: [ChatMessage],
-        systemPrompt: String
+        systemPrompt: String,
+        stressContext: StressContextPayload?
     ) async throws -> AsyncThrowingStream<String, Error> {
         AsyncThrowingStream { (continuation: AsyncThrowingStream<String, Error>.Continuation) in
-            let task = _Concurrency.Task { [stressAPIClient, currentSessionId] in
+            let task = _Concurrency.Task { [stressAPIClient, currentSessionId, stressContext] in
                 do {
-                    let stressContext = Self.currentStressContext
-
                     let (bytes, httpResponse) = try await stressAPIClient.sendChat(
                         messages: messages,
                         sessionId: currentSessionId,
@@ -111,12 +110,6 @@ final class StressLLMService: LLMServiceProtocol, @unchecked Sendable {
         modelUsed = metadata.modelUsed
         quickActions = metadata.quickActions
     }
-
-    // MARK: - Stress Context
-
-    /// The latest stress context, set by ChatViewModel before each message.
-    /// Static to avoid Sendable issues with the nonisolated `send` contract.
-    static var currentStressContext: StressContextPayload?
 
     // MARK: - Error Mapping
 

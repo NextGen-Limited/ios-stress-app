@@ -116,7 +116,7 @@ final class ChatViewModel {
         }
 
         // Build stress context for the backend (backend builds system prompt from this)
-        StressLLMService.currentStressContext = StressContextPayload.build(
+        let stressContext = StressContextPayload.build(
             stressResult: stressResult,
             baseline: baseline,
             recentHistory: recentHistory
@@ -132,7 +132,8 @@ final class ChatViewModel {
         do {
             let stream = try await llmService.send(
                 messages: messages,
-                systemPrompt: systemPrompt
+                systemPrompt: systemPrompt,
+                stressContext: stressContext
             )
 
             for try await token in stream {
