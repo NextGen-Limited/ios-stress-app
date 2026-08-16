@@ -46,12 +46,12 @@ Plans:
 
 **Goal:** Integrate /credits API, transition StoreKit from subscription to consumable credit packs, credits-gated chat access (402 INSUFFICIENT_CREDITS → paywall), new paywall UX with balance display.
 **Depends on:** Phase 1 (auth + API client)
-**Plans:** 4 plans
+**Plans:** 1/4 plans executed
 
 Plans:
 **Wave 1**
 
-- [ ] 02-01-PLAN.md — Monetization decision gates (DEC-1/DEC-2) + orphaned-suite repair + CR-01 closure + credits tracer (402 → paywall → live balance)
+- [x] 02-01-PLAN.md — Monetization decision gates (DEC-1/DEC-2) + orphaned-suite repair + CR-01 closure + credits tracer (402 → paywall → live balance)
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
