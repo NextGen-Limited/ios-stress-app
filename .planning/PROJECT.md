@@ -35,6 +35,10 @@ Every feature that ships in the binary must actually work end-to-end for a real 
 - ✓ DATA-02: Export protection (size cap, `.completeFileProtection`, on-dismiss cleanup) — v1.0 Phase 2, independently verified in code + tests
 - ✓ DATA-03: CloudKit field encryption via `encryptedValues` for hrv/restingHeartRate/stressLevel — v1.0 Phase 2, independently verified in code + tests
 - ✓ WIRE-02: Single canonical data-management implementation (`DataDeleterService`); duplicate `DataExporter`/`ExportModels` stack deleted — v1.0 Phase 2, independently verified
+- ✓ v1.1 D-01/D-02: Firebase Auth — Anonymous sign-in at launch + Google Sign-In with anonymous-account linking (uid/credits/history preserved) — v1.1 Phase 01, human-verified on simulator 2026-08-16 (UAT Test 2)
+- ✓ v1.1 D-03/D-07: `StressAPIClient` with Bearer Firebase ID token + backend `/chat` SSE streaming (terminal metadata event, 402 → insufficient-credits) — v1.1 Phase 01, human-verified end-to-end (UAT Test 1) + 87-test suite green
+- ✓ v1.1 D-04: Supabase fully removed from source tree (services, config, Keychain tokens) — v1.1 Phase 01, verified in code + 01-REVIEW.md
+- ✓ v1.1 G-01-2: Google Sign-In reachable from app UI (Settings → Sync & devices) with post-link email display — v1.1 Phase 01 Plan 01-04, human-verified 2026-08-16
 
 ### Active
 
@@ -44,14 +48,14 @@ Every feature that ships in the binary must actually work end-to-end for a real 
 - [ ] BUILD-01: `PrivacyInfo.xcprivacy` passes ASC upload validation — unchecked, still blocked on D3
 - [ ] BUILD-02: One canonical App Group suite ID across all 3 targets — unchecked
 - [ ] BUILD-03: Info.plist consolidated onto `INFOPLIST_KEY_*` — unchecked
-- [ ] BUILD-04: `xcodebuild test` executes and reports pass/fail — code/wiring done (test bundle compiles, 11+ files registered) but never actually observed to complete a run; this host's CoreSimulator has a persistent, reproducible device-pairing failure (`No matching device ... in XCTestDevices`) blocking every attempt across all 6 phases this milestone
+- [ ] BUILD-04: `xcodebuild test` executes and reports pass/fail — **unblocked 2026-08-16**: full suite (87 tests / 14 suites) ran and passed on this host with `-parallel-testing-enabled NO`; the XCTestDevices clone failure persists only for parallel-testing clones. Pin the no-parallel flag in dev docs/CI
 
 **DATA — carried from v1.0 Phase 2**
 - [ ] DATA-01: Delete actually deletes everywhere (local + CloudKit + Keychain JWT + App Group cache) — Keychain/App-Group half verified; the requirement's own defining two-device CloudKit-propagation test (02-01-PLAN.md Task 4) was deferred, never run; a genuine "CloudKit delete silently reports success on failure" bug (CR-01) was found and fixed mid-milestone but ships with zero regression test coverage
 
 **AUTH — carried from v1.0 Phase 3 (blocked on decision D1)**
 - [ ] AUTH-01: No credential ships extractable from the Release binary via `strings` — fix applied (`#if DEBUG` wrap) but the empirical `strings` confirmation is blocked by an unrelated pre-existing Release-compile failure (see Constraints)
-- [ ] AUTH-02: Chat entry point reflects real auth state — implemented as "honestly gated off" (`ChatAvailability` compile flag), but D1 (ship real auth vs. stay gated off) remains open, so the requirement can't be called fully resolved either way
+- [ ] AUTH-02: Chat entry point reflects real auth state — v1.1 Phase 01 shipped real Firebase auth (`ChatAvailability.current == .enabled`, no compile-time gate); chat round-trip verified live (UAT Test 1). Residual: stale-session masking (REVIEW WR-06) — keep open until Phase 2 credit-state surface lands
 - [ ] AUTH-03: Chat dismiss-mid-stream cancels SSE within one runloop, no credit charged — TDD tests exist and compile; never executed (same CoreSimulator blocker as BUILD-04)
 
 **WIRE — carried from v1.0 Phase 4 (WIRE-01 only; WIRE-02 validated above)**
@@ -126,6 +130,10 @@ Every feature that ships in the binary must actually work end-to-end for a real 
 | Granularity: Coarse (3–5 phases) — set before the scope pivot, kept after | Still fits: the roadmapper may consolidate the plan's 7 phases toward the coarse end (e.g., Phase 6+7 are both explicitly parallelizable/non-blocking) without losing the plan's substance | ✓ Good — 7 phases consolidated to 6 (5 + a mid-milestone insert, 01.1) |
 | v1.0 closed via `override_closeout` rather than blocking on full verification | 5/6 phases lacked a `passed` verification at close time; user explicitly chose to ship with gaps recorded as tech debt rather than block indefinitely on verification work (2 real devices, a CI host, test-seam design) this session couldn't perform | ⚠️ Revisit — re-verify Phases 3/4/5 and close Phase 02's 3 UAT items early in v1.1 |
 | Phase 02's code review ran 3 rounds instead of 1 — each re-review found something the prior fix missed | Standard-depth review + fix is not exhaustive on data-integrity-critical code; a genuine "CloudKit delete reports success on failure" bug (CR-01) surfaced only on the 3rd pass | ✓ Good — process worked as designed (re-review after fix caught real regressions), but signals this subsystem specifically needs deeper review depth or dedicated test-seam work before being trusted |
+| v1.1 Phase 01 executed directly on `main` (milestone branch `gsd/v1.1-backend-api-migration` never created) | Prior-session context exhaustion left work half-committed; adopting + committing on `main` was the pragmatic resume path; repo is now 27+ commits ahead of origin | ⚠️ Revisit — at Phase 02 start: create the milestone branch going forward or accept `main`; push before starting Phase 2 |
+| D1 (ship real auth vs. stay gated off) resolved by execution — v1.1 Phase 01 shipped real Firebase auth | Gap-closure plan 01-04 made the Google flow user-reachable and UAT-verified it; staying gated off would have shipped dead code | ✓ Good |
+| Test invocations pinned to `-parallel-testing-enabled NO` on this host | Parallel-testing clones fail to prepare (`No matching device ... in XCTestDevices`, Mach -308); disabling clones is the reliable workaround — suite runs green in ~60s | ✓ Good — codify in dev docs/CI |
+| Plan 01-04 adopted prior-session uncommitted work instead of re-executing | Tasks 1-2 were fully implemented matching the plan; verification (build + 4/4 targeted + 87 full-suite tests) confirmed quality before committing per task | ✓ Good — safe-resume gate worked as designed |
 
 ## Evolution
 
@@ -145,4 +153,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-08-12 after v1.0 milestone close (override_closeout — see "v1.0 Verification Reality Check" in Context)*
+*Last updated: 2026-08-16 after v1.1 Phase 01 close (Firebase Auth + API client + chat migration, UAT 2/2, SECURITY threats_open 0)*

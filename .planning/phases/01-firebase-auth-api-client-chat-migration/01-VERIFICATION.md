@@ -1,15 +1,17 @@
 ---
 phase: 01-firebase-auth-api-client-chat-migration
 verified: 2026-08-13T22:15:00Z
-status: human_needed
+status: passed
 score: 9/11
 behavior_unverified: 2
 overrides_applied: 0
 behavior_unverified_items:
+
   - truth: "POST https://stress-api.dropitx.site/chat with a Bearer token streams SSE content tokens to ChatViewModel"
     test: "Launch StressMonitor.app on a booted iOS Simulator → open AI Coaching Chat → type 'hello' → confirm a streamed response appears within 15 seconds"
     expected: "Streamed text tokens appear in the chat UI; no error toast"
     why_human: "Requires live Firebase Anonymous auth (network round-trip to Firebase servers) + live backend SSE streaming + simulator UI interaction. Grep cannot prove the end-to-end path fires at runtime; the data-race on currentStressContext (CR-01) also means the stress_context payload may not arrive correctly without execution."
+
   - truth: "FirebaseAuthService.signInWithGoogle() completes the Google Sign-In flow and links the credential to the current anonymous user"
     test: "Trigger a Google Sign-In entry point (if a UI button exists) → confirm the OAuth sheet presents → complete the flow → confirm the anonymous user is linked (not replaced)"
     expected: "Google OAuth flow completes; currentUser.uid unchanged after linking (credit balance + chat history preserved)"
