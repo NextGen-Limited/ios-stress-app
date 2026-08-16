@@ -52,8 +52,8 @@ coverage:
     requirement: D-02
     verification:
       - kind: manual_procedural
-        ref: "01-04-PLAN.md Task 3 human-verify checkpoint (Google OAuth on simulator)"
-        status: unknown
+        ref: "01-04-PLAN.md Task 3 human-verify checkpoint — approved 2026-08-16 on iPhone 17 simulator (OAuth presents, account links, email displayed)"
+        status: pass
 actuals:
   tokens: 15000
   tasks: 3
@@ -102,4 +102,4 @@ Made FirebaseAuthService.signInWithGoogle(presenting:) — implemented in Plan 0
 
 ## Open Items
 
-- Task 3 human-verify checkpoint: confirm OAuth sheet presents, anonymous account links (uid unchanged), linked email renders, second tap does not re-present OAuth, cancel is silent.
+- Task 3 human-verify checkpoint: APPROVED 2026-08-16 — OAuth sheet presents from the Settings row, flow completes, anonymous account links with the linked email displayed on row value and MeHeroCard. Recorded in 01-UAT.md (Test 2 → pass; gap G-01-2 → closed).

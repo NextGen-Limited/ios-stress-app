@@ -1,9 +1,9 @@
 ---
-status: diagnosed
+status: testing
 phase: 01-firebase-auth-api-client-chat-migration
 source: [01-VERIFICATION.md]
 started: 2026-08-13T15:15:32Z
-updated: "2026-08-15T09:47:22Z"
+updated: "2026-08-16T10:15:00Z"
 ---
 
 ## Current Test
@@ -14,6 +14,7 @@ expected: |
   Launch app on simulator → open Chat → type "hello" → confirm a streamed response arrives within 15 seconds. The full pipeline is: ChatViewModel → StressLLMService → StressAPIClient.sendChat (Bearer token from FirebaseAuthService) → SSE stream → SSEParser → ChatViewModel display. Firebase Anonymous auth must succeed silently at launch.
 awaiting: user response
 
+
 ## Tests
 
 ### 1. End-to-end chat streaming via Firebase Anonymous auth + backend SSE
@@ -23,16 +24,17 @@ result: [pending]
 
 ### 2. Google Sign-In upgrade path with anonymous-account linking
 
-expected: Trigger the Google Sign-In OAuth flow → confirm the anonymous account is linked (not replaced). The code path is FirebaseAuthService.signInWithGoogle(presenting:) → GIDSignIn v9 OAuth → OAuthProvider "google.com" credential → currentUser.link(with:) (falls back to signIn(with:) on credentialAlreadyInUse). Note: no UI entry point was wired in this phase — verify via debugger or a temporary button if needed.
-result: issue
-reported: "No UI entry point exists — the signInWithGoogle code path is unreachable from anywhere in the app (no button or screen triggers FirebaseAuthService.signInWithGoogle). Verified by grep: zero call sites in Views."
-severity: major
+expected: Trigger the Google Sign-In OAuth flow → confirm the anonymous account is linked (not replaced). The code path is FirebaseAuthService.signInWithGoogle(presenting:) → GIDSignIn v9 OAuth → OAuthProvider "google.com" credential → currentUser.link(with:) (falls back to signIn(with:) on credentialAlreadyInUse). Entry point: Settings → Sync & devices → 'Sign in with Google' row (added by Plan 01-04).
+result: pass
+verified: "2026-08-16 — human-verify checkpoint on iPhone 17 simulator (iOS 26.5), plan 01-04 Task 3. User approved: OAuth sheet presents from the Settings row, flow completes, anonymous account links with the linked email displayed on the row value and MeHeroCard."
+resolved: "Gap G-01-2 closed by plan 01-04 (commits 3fb0ec8, cb665cd, c548d9a)."
+
 
 ## Summary
 
 total: 2
-passed: 0
-issues: 1
+passed: 1
+issues: 0
 pending: 1
 skipped: 0
 blocked: 0
@@ -43,21 +45,20 @@ blocked: 0
 
 - gap_id: G-01-2
   truth: "Google Sign-In flow is triggerable from the app UI and links the anonymous account (currentUser.uid unchanged, credits + chat history preserved)"
-  status: failed
-  reason: "User reported: No UI entry point exists — the signInWithGoogle code path is unreachable from anywhere in the app."
-  severity: major
+  status: closed
+  reason: "Closed by plan 01-04: 'Sign in with Google' row added to SettingsView.syncDevicesSection, wired through AccountViewModel. Human-verified 2026-08-16 (checkpoint approval) — OAuth presents, account links, linked email displayed."
+  severity: none
   test: 2
-  root_cause: "UI entry point explicitly descoped in Plan 01-02 Task 1 ('this task only ships the service method'), deferred to a 'future settings-phase' that does not exist — the deferral dead-ends with no owner. UAT truth #9 was authored broader ('triggerable from the app UI') than any planned deliverable."
-  artifacts:
+  root_cause: "(historical) UI entry point explicitly descoped in Plan 01-02 Task 1, deferred to a 'future settings-phase' that did not exist."
+  resolution:
 
-    - path: "StressMonitor/StressMonitor/Views/Settings/SettingsView.swift"
-      issue: "Missing 'Sign in with Google' row; syncDevicesSection (line 146) is the natural home"
+    - plan: "01-04 (gap_closure: true, commits 3fb0ec8 / cb665cd / c548d9a / b2ebc8d)"
+      files:
 
-    - path: "StressMonitor/StressMonitor/Services/Auth/FirebaseAuthService.swift"
-      issue: "Nothing wrong — signInWithGoogle(presenting:) fully implemented at line 64; simply unreachable from UI"
-
-    - path: ".planning/phases/01-firebase-auth-api-client-chat-migration/01-02-PLAN.md"
-      issue: "Deferral source — Task 1 scope note pushes UI to a nonexistent future phase"
+        - "StressMonitor/StressMonitor/ViewModels/AccountViewModel.swift"
+        - "StressMonitor/StressMonitor/Views/Settings/SettingsView.swift"
+        - "StressMonitor/StressMonitor/Services/Auth/FirebaseAuthService.swift"
+        - "StressMonitor/StressMonitorTests/AccountViewModelTests.swift"
   missing:
 
     - "ViewModel surface (SettingsViewModel or small AccountViewModel) holding injected AuthServiceProtocol — none currently exists outside Services"
