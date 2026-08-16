@@ -170,4 +170,105 @@ struct StoreKitProductCatalogTests {
         )
         #expect(catalog.monthlyProductID == "env.monthly")
     }
+
+    // MARK: - Credit pack resolution (DEC-2)
+
+    @Test("Pack product IDs resolve from the injected environment dictionary")
+    func packIDsResolveFromInjectedEnvironment() {
+        let catalog = StoreKitProductCatalog(
+            bundle: Bundle.main,
+            environment: [
+                "STOREKIT_CREDITS_SMALL_PRODUCT_ID": "env.credits.small",
+                "STOREKIT_CREDITS_LARGE_PRODUCT_ID": "env.credits.large"
+            ],
+            defaults: nil
+        )
+        #expect(catalog.smallPackProductID == "env.credits.small")
+        #expect(catalog.largePackProductID == "env.credits.large")
+    }
+
+    @Test("Pack product IDs resolve from injected UserDefaults")
+    func packIDsResolveFromInjectedDefaults() {
+        let defaults = UserDefaults(suiteName: "StoreKitProductCatalogPackTests")!
+        defaults.set("defaults.credits.small", forKey: "storeKitCreditsSmallProductID")
+        defaults.set("defaults.credits.large", forKey: "storeKitCreditsLargeProductID")
+
+        defer {
+            defaults.removeSuite(named: "StoreKitProductCatalogPackTests")
+        }
+
+        let catalog = StoreKitProductCatalog(
+            bundle: Bundle.main,
+            environment: [:],
+            defaults: defaults
+        )
+        #expect(catalog.smallPackProductID == "defaults.credits.small")
+        #expect(catalog.largePackProductID == "defaults.credits.large")
+    }
+
+    @Test("Pack environment key takes priority over the defaults key")
+    func packEnvironmentBeatsDefaults() {
+        let defaults = UserDefaults(suiteName: "StoreKitProductCatalogPackPrecedenceTests")!
+        defaults.set("defaults.credits.small", forKey: "storeKitCreditsSmallProductID")
+
+        defer {
+            defaults.removeSuite(named: "StoreKitProductCatalogPackPrecedenceTests")
+        }
+
+        let catalog = StoreKitProductCatalog(
+            bundle: Bundle.main,
+            environment: [
+                "STOREKIT_CREDITS_SMALL_PRODUCT_ID": "env.credits.small"
+            ],
+            defaults: defaults
+        )
+        #expect(catalog.smallPackProductID == "env.credits.small")
+    }
+
+    @Test("Pack IDs stay additive — subscription resolution is unchanged by pack keys")
+    func packKeysDoNotAffectSubscriptionResolution() {
+        let catalog = StoreKitProductCatalog(
+            weeklyProductID: "weekly.id",
+            monthlyProductID: "monthly.id",
+            annualProductID: "annual.id",
+            subscriptionGroupID: nil,
+            smallPackProductID: "credits.small",
+            largePackProductID: "credits.large"
+        )
+        #expect(catalog.productID(for: .monthly) == "monthly.id")
+        #expect(catalog.period(for: "monthly.id") == .monthly)
+        #expect(catalog.allProductIDs.count == 3)
+    }
+
+    // MARK: - CreditPack model (DEC-2)
+
+    @Test("defaultPacks match DEC-2 — small 10 credits, large 150 credits")
+    func defaultPacksMatchDEC2() {
+        let packs = CreditPack.defaultPacks
+        #expect(packs.count == 2)
+
+        let small = packs.first(where: { $0.id == .small })
+        #expect(small?.credits == 10)
+        #expect(small?.productID == nil)
+        #expect(small?.displayPrice == "$1.99")
+
+        let large = packs.first(where: { $0.id == .large })
+        #expect(large?.credits == 150)
+        #expect(large?.productID == nil)
+        #expect(large?.displayPrice == "$19.99")
+    }
+
+    @Test("pack(for:) and packID(for:) round-trip every configured pack")
+    func packLookupRoundTrips() {
+        let catalog = StoreKitProductCatalog(
+            smallPackProductID: "com.stressmonitor.app.credits.small",
+            largePackProductID: "com.stressmonitor.app.credits.large"
+        )
+        #expect(catalog.packID(for: .small) == "com.stressmonitor.app.credits.small")
+        #expect(catalog.packID(for: .large) == "com.stressmonitor.app.credits.large")
+        #expect(catalog.pack(for: "com.stressmonitor.app.credits.small") == .small)
+        #expect(catalog.pack(for: "com.stressmonitor.app.credits.large") == .large)
+        #expect(catalog.pack(for: "com.stressmonitor.app.premium.monthly") == nil)
+        #expect(catalog.pack(for: "unknown.id") == nil)
+    }
 }
