@@ -53,12 +53,14 @@ final class MockAuthService: AuthServiceProtocol, @unchecked Sendable {
     }
 }
 
-/// Stub `URLProtocol` that captures the outgoing request and returns an empty
-/// 200 response so `StressAPIClient`'s header behavior can be asserted without
-/// hitting the network. Reset `lastRequest` before each test that inspects it.
+/// Stub `URLProtocol` that captures the outgoing request and returns a stubbed
+/// status/body so `StressAPIClient`'s header and decoding behavior can be
+/// asserted without hitting the network. Reset `lastRequest` (and set
+/// `statusCode` / `responseBody`) before each test that inspects them.
 final class RequestCaptureURLProtocol: URLProtocol, @unchecked Sendable {
     nonisolated(unsafe) static var lastRequest: URLRequest?
     nonisolated(unsafe) static var statusCode: Int = 200
+    nonisolated(unsafe) static var responseBody: Data?
 
     override class func canInit(with request: URLRequest) -> Bool { true }
     override class func canonicalRequest(for request: URLRequest) -> URLRequest { request }
@@ -66,6 +68,7 @@ final class RequestCaptureURLProtocol: URLProtocol, @unchecked Sendable {
     override func startLoading() {
         Self.lastRequest = request
         let code = Self.statusCode
+        let body = Self.responseBody ?? Data()
         let response = HTTPURLResponse(
             url: request.url!,
             statusCode: code,
@@ -73,7 +76,7 @@ final class RequestCaptureURLProtocol: URLProtocol, @unchecked Sendable {
             headerFields: nil
         )!
         client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
-        client?.urlProtocol(self, didLoad: Data())
+        client?.urlProtocol(self, didLoad: body)
         client?.urlProtocolDidFinishLoading(self)
     }
 

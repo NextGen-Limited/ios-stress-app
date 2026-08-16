@@ -119,6 +119,50 @@ struct ChatLifecycleTests {
         #expect(fake.receivedStressContexts.first??.stressLevel == 20)
         #expect(fake.receivedStressContexts.last??.stressLevel == 85)
     }
+
+    // MARK: - 402 out-of-credits routes to the paywall (derived-CR-03)
+
+    @Test("a 402 insufficientCredits send sets a short message and presents the out-of-credits paywall")
+    func insufficientCreditsPresentsOutOfCreditsPaywall() async throws {
+        let fake = FakeLLMService(tokens: [], streamError: .insufficientCredits)
+        var presentedReasons: [PaywallReason] = []
+        let viewModel = ChatViewModel(
+            stressResult: nil,
+            baseline: nil,
+            llmService: fake
+        )
+        viewModel.presentPaywall = { presentedReasons.append($0) }
+
+        viewModel.send("hello")
+
+        try await waitFor { viewModel.errorMessage?.isEmpty == false }
+
+        #expect(presentedReasons == [.outOfCredits])
+    }
+}
+
+/// Pins the PaywallController guard semantics for the out-of-credits reason
+/// (threat T-2-03): a server-side 402 means the backend does NOT consider
+/// this user premium, so the out-of-credits paywall must present regardless
+/// of local premium state — a locally-premium user hitting 402 is in a
+/// divergence state where the resubscribe-led paywall is the correct path.
+@MainActor
+struct PaywallOutOfCreditsGuardTests {
+
+    @Test("outOfCredits bypasses the premium guard; other reasons still respect it")
+    func outOfCreditsBypassesPremiumGuard() {
+        let suite = "PaywallGuard-\(UUID().uuidString)"
+        let state = PremiumState(defaults: UserDefaults(suiteName: suite)!, key: "isPremiumUser")
+        state.isPremiumUser = true
+        let paywall = PaywallController(premiumState: state)
+
+        paywall.present(reason: .outOfCredits)
+        #expect(paywall.presentation?.reason == .outOfCredits)
+
+        paywall.dismiss()
+        paywall.present(reason: .general)
+        #expect(paywall.presentation == nil)
+    }
 }
 
 // MARK: - Fake LLM Service
@@ -133,11 +177,13 @@ struct ChatLifecycleTests {
 final class FakeLLMService: LLMServiceProtocol {
     let tokens: [String]
     let shouldThrow: Bool
+    let streamError: LLMServiceError?
     private(set) var receivedStressContexts: [StressContextPayload?] = []
 
-    init(tokens: [String], shouldThrow: Bool = false) {
+    init(tokens: [String], shouldThrow: Bool = false, streamError: LLMServiceError? = nil) {
         self.tokens = tokens
         self.shouldThrow = shouldThrow
+        self.streamError = streamError
     }
 
     func isAvailable() -> Bool { true }
@@ -150,12 +196,15 @@ final class FakeLLMService: LLMServiceProtocol {
         receivedStressContexts.append(stressContext)
         let tokens = self.tokens
         let shouldThrow = self.shouldThrow
+        let streamError = self.streamError
         return AsyncThrowingStream { continuation in
             let producer = Task { @MainActor in
                 for token in tokens {
                     continuation.yield(token)
                 }
-                if shouldThrow {
+                if let streamError {
+                    continuation.finish(throwing: streamError)
+                } else if shouldThrow {
                     continuation.finish(throwing: LLMServiceError.unavailable(reason: "network dropped"))
                 } else {
                     try? await Task.sleep(for: .seconds(60))
