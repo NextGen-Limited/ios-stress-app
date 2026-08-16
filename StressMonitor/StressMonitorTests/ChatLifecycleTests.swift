@@ -89,6 +89,36 @@ struct ChatLifecycleTests {
         #expect(viewModel.messages.count == countBefore)
         #expect(viewModel.messages.allSatisfy { $0.role == .user })
     }
+
+    // MARK: - CR-01: stress context flows per-call through send()
+
+    @Test("each send delivers its own freshly built stress context, not a leftover from a previous send")
+    func eachSendDeliversItsOwnStressContext() async throws {
+        let fake = FakeLLMService(tokens: [], shouldThrow: false)
+
+        let lowStress = ChatViewModel(
+            stressResult: StressResult(
+                level: 20, category: .relaxed, confidence: 0.9, hrv: 70, heartRate: 55
+            ),
+            baseline: nil,
+            llmService: fake
+        )
+        lowStress.send("hello")
+        try await waitFor { fake.receivedStressContexts.count == 1 }
+
+        let highStress = ChatViewModel(
+            stressResult: StressResult(
+                level: 85, category: .high, confidence: 0.9, hrv: 25, heartRate: 95
+            ),
+            baseline: nil,
+            llmService: fake
+        )
+        highStress.send("hello")
+        try await waitFor { fake.receivedStressContexts.count == 2 }
+
+        #expect(fake.receivedStressContexts.first??.stressLevel == 20)
+        #expect(fake.receivedStressContexts.last??.stressLevel == 85)
+    }
 }
 
 // MARK: - Fake LLM Service
@@ -96,11 +126,14 @@ struct ChatLifecycleTests {
 /// Protocol-level double for `LLMServiceProtocol`. Yields `tokens` then either
 /// blocks (simulating an in-flight stream, so cancellation is observable) or
 /// throws (simulating a network drop). Sets `onTermination` so the consumer's
-/// cancellation propagates to the producer, mirroring `SupabaseLLMService.send`.
+/// cancellation propagates to the producer, mirroring `StressLLMService.send`.
+/// Records the stress context each `send` call receives so tests can pin that
+/// context travels per-call, not through shared mutable state (CR-01).
 @MainActor
 final class FakeLLMService: LLMServiceProtocol {
     let tokens: [String]
     let shouldThrow: Bool
+    private(set) var receivedStressContexts: [StressContextPayload?] = []
 
     init(tokens: [String], shouldThrow: Bool = false) {
         self.tokens = tokens
@@ -109,7 +142,12 @@ final class FakeLLMService: LLMServiceProtocol {
 
     func isAvailable() -> Bool { true }
 
-    func send(messages: [ChatMessage], systemPrompt: String) async throws -> AsyncThrowingStream<String, Error> {
+    func send(
+        messages: [ChatMessage],
+        systemPrompt: String,
+        stressContext: StressContextPayload?
+    ) async throws -> AsyncThrowingStream<String, Error> {
+        receivedStressContexts.append(stressContext)
         let tokens = self.tokens
         let shouldThrow = self.shouldThrow
         return AsyncThrowingStream { continuation in
