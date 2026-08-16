@@ -4,7 +4,34 @@
 
   ],
   "products" : [
-
+    {
+      "displayPrice" : "1.99",
+      "internalID" : "SMCP0010",
+      "localizations" : [
+        {
+          "description" : "10 AI chat credits",
+          "displayName" : "10 Credits",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "com.stressmonitor.app.credits.small",
+      "referenceName" : "CreditPack10",
+      "type" : "Consumable"
+    },
+    {
+      "displayPrice" : "19.99",
+      "internalID" : "SMCP0150",
+      "localizations" : [
+        {
+          "description" : "150 AI chat credits",
+          "displayName" : "150 Credits",
+          "locale" : "en_US"
+        }
+      ],
+      "productID" : "com.stressmonitor.app.credits.large",
+      "referenceName" : "CreditPack150",
+      "type" : "Consumable"
+    }
   ],
   "settings" : {
 
