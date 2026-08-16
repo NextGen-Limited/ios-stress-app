@@ -1,18 +1,14 @@
 ---
-status: testing
+status: complete
 phase: 01-firebase-auth-api-client-chat-migration
 source: [01-VERIFICATION.md]
 started: 2026-08-13T15:15:32Z
-updated: "2026-08-16T10:15:00Z"
+updated: "2026-08-16T10:30:00Z"
 ---
 
 ## Current Test
 
-number: 1
-name: End-to-end chat streaming via Firebase Anonymous auth + backend SSE
-expected: |
-  Launch app on simulator → open Chat → type "hello" → confirm a streamed response arrives within 15 seconds. The full pipeline is: ChatViewModel → StressLLMService → StressAPIClient.sendChat (Bearer token from FirebaseAuthService) → SSE stream → SSEParser → ChatViewModel display. Firebase Anonymous auth must succeed silently at launch.
-awaiting: user response
+[testing complete]
 
 
 ## Tests
@@ -20,7 +16,8 @@ awaiting: user response
 ### 1. End-to-end chat streaming via Firebase Anonymous auth + backend SSE
 
 expected: Launch app on simulator → open Chat → type "hello" → confirm a streamed response arrives within 15 seconds. The full pipeline is: ChatViewModel → StressLLMService → StressAPIClient.sendChat (Bearer token from FirebaseAuthService) → SSE stream → SSEParser → ChatViewModel display. Firebase Anonymous auth must succeed silently at launch.
-result: [pending]
+result: pass
+verified: "2026-08-16 — user confirmed streamed response arrives in chat UI on simulator."
 
 ### 2. Google Sign-In upgrade path with anonymous-account linking
 
@@ -33,9 +30,9 @@ resolved: "Gap G-01-2 closed by plan 01-04 (commits 3fb0ec8, cb665cd, c548d9a)."
 ## Summary
 
 total: 2
-passed: 1
+passed: 2
 issues: 0
-pending: 1
+pending: 0
 skipped: 0
 blocked: 0
 
