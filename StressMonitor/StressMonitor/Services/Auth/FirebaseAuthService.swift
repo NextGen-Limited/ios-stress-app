@@ -9,6 +9,7 @@ import UIKit
 /// Abstraction over the Firebase authentication surface so the API client
 /// and tests can substitute a non-Firebase double.
 protocol AuthServiceProtocol: Sendable {
+    var currentAccountEmail: String? { get }
     func signInAnonymously() async throws
     func getIDToken() async throws -> String
     func signOut() throws
@@ -27,9 +28,13 @@ final class FirebaseAuthService: AuthServiceProtocol, @unchecked Sendable {
 
     private let tokenRefreshMargin: TimeInterval = 60
 
-    init() {}
+    nonisolated init() {}
 
     // MARK: - AuthServiceProtocol
+
+    var currentAccountEmail: String? {
+        Auth.auth().currentUser?.email
+    }
 
     func signInAnonymously() async throws {
         if Auth.auth().currentUser != nil { return }

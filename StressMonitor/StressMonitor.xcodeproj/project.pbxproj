@@ -38,6 +38,7 @@
 		F1A1B2C3D4E500000000B003 /* StressAPIConfigTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A1B2C3D4E500000000A003 /* StressAPIConfigTests.swift */; };
 		F1A1B2C3D4E500000000B004 /* StressAPIClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A1B2C3D4E500000000A004 /* StressAPIClientTests.swift */; };
 		F1A1B2C3D4E500000000B005 /* FirebaseAuthServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A1B2C3D4E500000000A005 /* FirebaseAuthServiceTests.swift */; };
+		F1A1B2C3D4E500000000B006 /* AccountViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A1B2C3D4E500000000A006 /* AccountViewModelTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -117,6 +118,7 @@
 		F1A1B2C3D4E500000000A003 /* StressAPIConfigTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = StressAPIConfigTests.swift; path = StressMonitorTests/StressAPIConfigTests.swift; sourceTree = "<group>"; };
 		F1A1B2C3D4E500000000A004 /* StressAPIClientTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = StressAPIClientTests.swift; path = StressMonitorTests/StressAPIClientTests.swift; sourceTree = "<group>"; };
 		F1A1B2C3D4E500000000A005 /* FirebaseAuthServiceTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = FirebaseAuthServiceTests.swift; path = StressMonitorTests/FirebaseAuthServiceTests.swift; sourceTree = "<group>"; };
+		F1A1B2C3D4E500000000A006 /* AccountViewModelTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AccountViewModelTests.swift; path = StressMonitorTests/AccountViewModelTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -263,6 +265,7 @@
 				F1A1B2C3D4E500000000A003 /* StressAPIConfigTests.swift */,
 				F1A1B2C3D4E500000000A004 /* StressAPIClientTests.swift */,
 				F1A1B2C3D4E500000000A005 /* FirebaseAuthServiceTests.swift */,
+				F1A1B2C3D4E500000000A006 /* AccountViewModelTests.swift */,
 				4C67EAC979024C30F581AD22 /* StressMonitorProducts.storekit */,
 			);
 			sourceTree = "<group>";
@@ -494,6 +497,7 @@
 				F1A1B2C3D4E500000000B003 /* StressAPIConfigTests.swift in Sources */,
 				F1A1B2C3D4E500000000B004 /* StressAPIClientTests.swift in Sources */,
 				F1A1B2C3D4E500000000B005 /* FirebaseAuthServiceTests.swift in Sources */,
+				F1A1B2C3D4E500000000B006 /* AccountViewModelTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

@@ -11,16 +11,21 @@ import UIKit
 final class MockAuthService: AuthServiceProtocol, @unchecked Sendable {
     let token: String
     let googleSignInError: Error?
+    var email: String?
     private(set) var signOutCallCount = 0
     private(set) var anonymousSignInCallCount = 0
     private(set) var tokenCallCount = 0
+    private(set) var googleSignInCallCount = 0
+    private(set) var lastPresentingViewController: UIViewController?
 
     init(
         token: String = "fake-token",
-        googleSignInError: Error? = LLMServiceError.unavailable(reason: "Google Sign-In not supported in mock.")
+        googleSignInError: Error? = LLMServiceError.unavailable(reason: "Google Sign-In not supported in mock."),
+        email: String? = nil
     ) {
         self.token = token
         self.googleSignInError = googleSignInError
+        self.email = email
     }
 
     func signInAnonymously() async throws {
@@ -32,11 +37,18 @@ final class MockAuthService: AuthServiceProtocol, @unchecked Sendable {
         return token
     }
 
+    var currentAccountEmail: String? {
+        email
+    }
+
     func signOut() throws {
         signOutCallCount += 1
     }
 
     func signInWithGoogle(presenting viewController: UIViewController) async throws {
+        googleSignInCallCount += 1
+        lastPresentingViewController = viewController
+        try await Task.sleep(nanoseconds: 50_000_000)
         if let googleSignInError { throw googleSignInError }
     }
 }
