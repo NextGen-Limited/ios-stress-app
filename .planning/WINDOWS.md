@@ -1,10 +1,10 @@
 ---
 schema_version: 1
-open_count: 5
+open_count: 8
 waived_count: 0
 fixed_count: 0
-total_count: 5
-last_updated: 2026-08-13T09:37:49.786Z
+total_count: 8
+last_updated: 2026-08-16T17:28:41.937Z
 ---
 
 # Broken Windows Ledger
@@ -20,6 +20,9 @@ last_updated: 2026-08-13T09:37:49.786Z
 | 3 | 02 | unrun-verify | .planning/phases/02-data-integrity-deletion-consolidation/02-01-PLAN.md |  | Task 4 two-device CloudKit sync verification deferred — needs real devices | open |  | 2026-08-11T05:34:27.039Z |  |
 | 4 | 01 | stub | StressMonitor/StressMonitor/Services/Auth/FirebaseAuthService.swift | 57 | signInWithGoogle() throws not-yet-available; Google Sign-In deferred to Plan 02 (D-02) | open |  | 2026-08-13T09:37:49.691Z |  |
 | 5 | 01 | unrun-verify | StressMonitor/StressMonitor/Services/LLM/StressLLMService.swift |  | End-to-end /chat round-trip unverified: backend deployment down (404 on all endpoints) | open |  | 2026-08-13T09:37:49.786Z |  |
+| 6 | 02 | skipped-test | StressMonitor/StressMonitorTests/EntitlementForegroundCorrectionTests.swift |  | Suite disabled: StoreKitTest purchase throws productNotFound (IAP-01 — no product IDs resolve); re-enable in 02-03 | open |  | 2026-08-16T17:28:36.992Z |  |
+| 7 | 02 | skipped-test | StressMonitor/StressMonitorTests/StoreKitProductCatalogLiveTests.swift |  | Suite disabled: custom INFOPLIST_KEY_STOREKIT_* settings never reach the generated Info.plist so live catalog resolves empty (IAP-01); re-enable in 02-03 | open |  | 2026-08-16T17:28:40.914Z |  |
+| 8 | 02 | deviation | StressMonitor/StressMonitorTests/DataDeletionConsolidationTests.swift |  | Full-suite xcodebuild exit 65 despite 84/84 tests passing: 6 cold-launch host restarts clustered on CloudKit Failure & Cancellation and Data Export Field Selection suites (pre-existing TEST-01 host flakiness) | open |  | 2026-08-16T17:28:41.937Z |  |
 
 ````json
 [
@@ -81,6 +84,42 @@ last_updated: 2026-08-13T09:37:49.786Z
     "status": "open",
     "reason": "",
     "recorded_at": "2026-08-13T09:37:49.786Z",
+    "resolved_at": null
+  },
+  {
+    "id": 6,
+    "kind": "skipped-test",
+    "phase": "02",
+    "file": "StressMonitor/StressMonitorTests/EntitlementForegroundCorrectionTests.swift",
+    "line": null,
+    "description": "Suite disabled: StoreKitTest purchase throws productNotFound (IAP-01 — no product IDs resolve); re-enable in 02-03",
+    "status": "open",
+    "reason": "",
+    "recorded_at": "2026-08-16T17:28:36.992Z",
+    "resolved_at": null
+  },
+  {
+    "id": 7,
+    "kind": "skipped-test",
+    "phase": "02",
+    "file": "StressMonitor/StressMonitorTests/StoreKitProductCatalogLiveTests.swift",
+    "line": null,
+    "description": "Suite disabled: custom INFOPLIST_KEY_STOREKIT_* settings never reach the generated Info.plist so live catalog resolves empty (IAP-01); re-enable in 02-03",
+    "status": "open",
+    "reason": "",
+    "recorded_at": "2026-08-16T17:28:40.914Z",
+    "resolved_at": null
+  },
+  {
+    "id": 8,
+    "kind": "deviation",
+    "phase": "02",
+    "file": "StressMonitor/StressMonitorTests/DataDeletionConsolidationTests.swift",
+    "line": null,
+    "description": "Full-suite xcodebuild exit 65 despite 84/84 tests passing: 6 cold-launch host restarts clustered on CloudKit Failure & Cancellation and Data Export Field Selection suites (pre-existing TEST-01 host flakiness)",
+    "status": "open",
+    "reason": "",
+    "recorded_at": "2026-08-16T17:28:41.937Z",
     "resolved_at": null
   }
 ]
