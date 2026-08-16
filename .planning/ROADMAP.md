@@ -24,13 +24,30 @@ Full phase detail archived at `.planning/milestones/v1.0-ROADMAP.md` and `.plann
 ### v1.1 Backend API Migration
 
 - [ ] **Phase 1: Firebase Auth + API Client + Chat Migration** — Add FirebaseAuth SDK (Anonymous + Google Sign-In), build StressAPIClient, migrate /chat to new backend SSE protocol (terminal metadata event), config migration (remove Supabase, add Firebase + API base URL). Blocks Phase 2 and 3.
-  - Depends on: nothing (foundational)
-  - **Plans:** 3 plans
-  - Plans:
-    - [x] 01-01-PLAN.md — Tracer: Firebase Anonymous auth → StressAPIClient → POST /chat end-to-end + config/error/SSE foundation
-    - [x] 01-02-PLAN.md — Google Sign-In upgrade path + Supabase source removal (D-04) + DataDeleterService rewire
-    - [x] 01-03-PLAN.md — TDD test coverage for StressAPIConfig, StressAPIClient, FirebaseAuthService
 - [ ] **Phase 2: Credits System + IAP Transition** — Integrate /credits API, transition StoreKit from subscription to consumable credit packs, credits-gated chat access (402 INSUFFICIENT_CREDITS → paywall), new paywall UX with balance display.
-  - Depends on: Phase 1 (auth + API client)
 - [ ] **Phase 3: Sessions, Preferences, Quick Actions + Cleanup** — Integrate /sessions (server-side chat history), /preferences sync, /quick-actions, remove all Supabase remnants, final integration testing.
-  - Depends on: Phase 1 (auth + API client)
+
+#### Phase 1: Firebase Auth + API Client + Chat Migration
+
+**Goal:** Add FirebaseAuth SDK (Anonymous + Google Sign-In), build StressAPIClient, migrate /chat to new backend SSE protocol (terminal metadata event), config migration (remove Supabase, add Firebase + API base URL). Blocks Phase 2 and 3.
+**Depends on:** Nothing (foundational)
+
+Plans:
+
+- [x] 01-01-PLAN.md
+- [x] 01-04-PLAN.md
+
+4/4 plans executed
+
+- [x] 01-02-PLAN.md — Google Sign-In upgrade path + Supabase source removal (D-04) + DataDeleterService rewire
+- [x] 01-03-PLAN.md — TDD test coverage for StressAPIConfig, StressAPIClient, FirebaseAuthService
+
+#### Phase 2: Credits System + IAP Transition
+
+**Goal:** Integrate /credits API, transition StoreKit from subscription to consumable credit packs, credits-gated chat access (402 INSUFFICIENT_CREDITS → paywall), new paywall UX with balance display.
+**Depends on:** Phase 1 (auth + API client)
+
+#### Phase 3: Sessions, Preferences, Quick Actions + Cleanup
+
+**Goal:** Integrate /sessions (server-side chat history), /preferences sync, /quick-actions, remove all Supabase remnants, final integration testing.
+**Depends on:** Phase 1 (auth + API client)
