@@ -62,4 +62,89 @@ struct StressAPIClientCreditsTests {
             try await client.getBalance()
         }
     }
+
+    // MARK: - redeemPurchase (POST /credits/redeem — pinned 02-02/02-03 contract)
+
+    /// URLProtocol delivers the request body as a stream, not `httpBody`.
+    private func body(of request: URLRequest) -> Data {
+        if let data = request.httpBody { return data }
+        guard let stream = request.httpBodyStream else { return Data() }
+        stream.open()
+        defer { stream.close() }
+        var data = Data()
+        let capacity = 4096
+        let buffer = UnsafeMutablePointer<UInt8>.allocate(capacity: capacity)
+        defer { buffer.deallocate() }
+        while stream.hasBytesAvailable {
+            let read = stream.read(buffer, maxLength: capacity)
+            if read <= 0 { break }
+            data.append(buffer, count: read)
+        }
+        return data
+    }
+
+    @Test("redeemPurchase posts the pinned contract to credits/redeem and decodes the balance")
+    func redeemPurchasePostsPinnedContract() async throws {
+        let client = makeClient(statusCode: 200, body: Data(Self.balanceFixture.utf8))
+
+        let balance = try await client.redeemPurchase(jws: "jws.token.value")
+
+        #expect(balance.total == 50)
+        #expect(balance.remaining == 43)
+
+        let request = try #require(RequestCaptureURLProtocol.lastRequest)
+        #expect(request.httpMethod == "POST")
+        #expect(request.url?.absoluteString == "https://api.test/credits/redeem")
+        #expect(request.value(forHTTPHeaderField: "Authorization") == "Bearer fake-token")
+
+        let json = try #require(
+            JSONSerialization.jsonObject(with: body(of: request)) as? [String: Any]
+        )
+        #expect(json["transaction_jws"] as? String == "jws.token.value")
+        #expect(json.count == 1)
+    }
+
+    @Test("redeemPurchase maps the pinned 400 code to the invalid-transaction error")
+    func redeemPurchaseMaps400ToInvalidTransaction() async throws {
+        let client = makeClient(
+            statusCode: 400,
+            body: Data(#"{"error":"Invalid transaction","code":"INVALID_TRANSACTION"}"#.utf8)
+        )
+
+        await #expect(throws: CreditsAPIError.invalidTransaction) {
+            try await client.redeemPurchase(jws: "garbage.jws")
+        }
+    }
+
+    @Test("redeemPurchase maps 401 to the unauthorized error case")
+    func redeemPurchaseMaps401ToUnauthorized() async throws {
+        let client = makeClient(statusCode: 401, body: Data("{}".utf8))
+
+        await #expect(throws: CreditsAPIError.unauthorized) {
+            try await client.redeemPurchase(jws: "jws")
+        }
+    }
+
+    // MARK: - verifySubscription (POST /premium/verify — DEC-1 server premium)
+
+    @Test("verifySubscription posts the subscription JWS to premium/verify")
+    func verifySubscriptionPostsToPremiumVerify() async throws {
+        let premiumFixture = #"{"total":999999,"used":0,"remaining":999999,"plan_type":"premium","free_reset_at":null}"#
+        let client = makeClient(statusCode: 200, body: Data(premiumFixture.utf8))
+
+        let balance = try await client.verifySubscription(jws: "sub.jws")
+
+        #expect(balance.planType == .premium)
+
+        let request = try #require(RequestCaptureURLProtocol.lastRequest)
+        #expect(request.httpMethod == "POST")
+        #expect(request.url?.absoluteString == "https://api.test/premium/verify")
+        #expect(request.value(forHTTPHeaderField: "Authorization") == "Bearer fake-token")
+
+        let json = try #require(
+            JSONSerialization.jsonObject(with: body(of: request)) as? [String: Any]
+        )
+        #expect(json["transaction_jws"] as? String == "sub.jws")
+        #expect(json.count == 1)
+    }
 }
