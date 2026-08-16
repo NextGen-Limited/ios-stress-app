@@ -6,12 +6,15 @@ import Foundation
 /// can distinguish a stale session (the AUTH-02 probe) from server faults.
 enum CreditsAPIError: Error, LocalizedError, Equatable, Sendable {
     case unauthorized
+    case invalidResponse
     case server(statusCode: Int)
 
     var errorDescription: String? {
         switch self {
         case .unauthorized:
             return "Please sign in to view your credits."
+        case .invalidResponse:
+            return "Couldn't load credits (invalid server response)."
         case .server(let statusCode):
             return "Couldn't load credits (server error \(statusCode))."
         }
@@ -27,7 +30,7 @@ extension StressAPIClient {
         let request = try await authorizedRequest(path: "credits", method: "GET")
         let (data, response) = try await session.data(for: request)
         guard let httpResponse = response as? HTTPURLResponse else {
-            throw CreditsAPIError.server(statusCode: -1)
+            throw CreditsAPIError.invalidResponse
         }
         switch httpResponse.statusCode {
         case 200...299:
