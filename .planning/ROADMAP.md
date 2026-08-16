@@ -46,6 +46,15 @@ Plans:
 
 **Goal:** Integrate /credits API, transition StoreKit from subscription to consumable credit packs, credits-gated chat access (402 INSUFFICIENT_CREDITS → paywall), new paywall UX with balance display.
 **Depends on:** Phase 1 (auth + API client)
+**Plans:** 4 plans
+
+Plans:
+- [ ] 02-01-PLAN.md — Monetization decision gates (DEC-1/DEC-2) + orphaned-suite repair + CR-01 closure + credits tracer (402 → paywall → live balance)
+- [ ] 02-02-PLAN.md — Backend POST /credits/redeem: Apple JWS verification, idempotent 'purchase' ledger grants (cross-repo, TDD)
+- [ ] 02-03-PLAN.md — StoreKit consumable packs + deferred-grant purchase flow (redeem → finish) + Release-build proof (BUILD-05)
+- [ ] 02-04-PLAN.md — Packs-era paywall UX + balance surfaces (DEC-2 placements) + live money-path verification
+
+**Waves:** 1: 02-01 → 2: 02-02, 02-03 (parallel, contract-pinned) → 3: 02-04
 
 #### Phase 3: Sessions, Preferences, Quick Actions + Cleanup
 
