@@ -8,8 +8,10 @@ struct SettingsView: View {
     @Environment(PaywallController.self) private var paywall
     @State private var viewModel: SettingsViewModel
     @State private var habitViewModel: HabitViewModel?
+    @State private var accountViewModel = AccountViewModel()
     @State private var docsURL: URL? = nil
     @State private var showChatSheet = false
+    @State private var showSignInErrorAlert = false
 
     @Query(filter: #Predicate<CharacterUnlock> { $0.isActive })
     private var activeUnlocks: [CharacterUnlock]
@@ -58,6 +60,7 @@ struct SettingsView: View {
                 habitViewModel?.loadToday()
             }
             Task { await viewModel.loadUserProfile() }
+            accountViewModel.refreshAccountState()
             refreshHealthAuthStatus()
         }
         .sheet(item: $docsURL) { url in
@@ -75,6 +78,11 @@ struct SettingsView: View {
             Button("Not Now", role: .cancel) {}
         } message: {
             Text("Ripple needs Health access to read your stress data. Please enable it in Settings → Privacy → Health.")
+        }
+        .alert("Sign-In Failed", isPresented: $showSignInErrorAlert) {
+            Button("OK", role: .cancel) {}
+        } message: {
+            Text(accountViewModel.errorMessage ?? "Google Sign-In could not be completed.")
         }
     }
 
@@ -96,7 +104,7 @@ struct SettingsView: View {
             stressLevel: viewModel.latestStressLevel,
             streakDays: viewModel.streakDays,
             displayName: viewModel.displayName,
-            email: viewModel.displayEmail,
+            email: viewModel.displayEmail ?? accountViewModel.linkedEmail,
             onPlusTap: { paywall.present(reason: .general) }
         )
     }
@@ -153,6 +161,14 @@ struct SettingsView: View {
                     title: "Apple Health",
                     value: healthStatusText,
                     action: healthAuthStatus == .sharingAuthorized ? nil : { requestHealthPermission() }
+                )
+                hairlineDivider
+                navRow(
+                    icon: "g.circle",
+                    tint: .settingsRippleBlue,
+                    title: "Sign in with Google",
+                    value: accountViewModel.linkedEmail ?? "Link account",
+                    action: signInWithGoogleTapped
                 )
                 hairlineDivider
                 navRow(
@@ -320,6 +336,31 @@ struct SettingsView: View {
             .foregroundStyle(Color.Wellness.adaptiveSecondaryText.opacity(0.6))
             .frame(maxWidth: .infinity)
             .padding(.top, 4)
+    }
+
+    private func signInWithGoogleTapped() {
+        guard accountViewModel.linkedEmail == nil else { return }
+        // GIDSignIn requires a UIKit presenter, which pure SwiftUI does not expose.
+        guard let viewController = UIApplication.shared.connectedScenes
+            .compactMap({ $0 as? UIWindowScene })
+            .first(where: { $0.activationState == .foregroundActive })?
+            .keyWindow?
+            .rootViewController
+        else {
+            accountViewModel.errorMessage = "Google Sign-In is unavailable right now."
+            showSignInErrorAlert = true
+            return
+        }
+
+        Task {
+            do {
+                try await accountViewModel.signInWithGoogle(presenting: viewController)
+            } catch {
+                if accountViewModel.errorMessage != nil {
+                    showSignInErrorAlert = true
+                }
+            }
+        }
     }
 
     // MARK: - Row builders
