@@ -21,7 +21,7 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-08-12 after v1.0 close)
+See: .planning/PROJECT.md (updated 2026-08-16 after v1.1 Phase 01 close)
 
 **Core value:** Every feature that ships in the binary must actually work end-to-end for a real user — not just compile.
 **Current focus:** Phase 2 — Credits System + IAP Transition
