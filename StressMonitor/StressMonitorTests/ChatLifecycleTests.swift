@@ -57,7 +57,12 @@ struct ChatLifecycleTests {
 
         viewModel.send("hello")
 
-        try await waitFor { viewModel.isLoading == false }
+        // Wait for the terminal state, not `isLoading == false`: isLoading is
+        // still false in the gap between send() returning and the streaming
+        // task setting it true, so that predicate can pass before the stream
+        // starts. errorMessage is set only in the catch block, after the
+        // stream has delivered its tokens and the error.
+        try await waitFor { viewModel.errorMessage?.isEmpty == false }
 
         let assistantContents = viewModel.messages
             .filter { $0.role == .assistant }

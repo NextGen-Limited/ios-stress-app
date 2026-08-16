@@ -6,6 +6,7 @@ import Testing
 @testable import StressMonitor
 
 @Suite("Delete All Credential Clearance")
+@MainActor
 struct DeleteAllCredentialClearanceTests {
 
     @Test("clearCredentialsAndSharedCaches removes Supabase JWT from Keychain")
@@ -49,6 +50,7 @@ struct DeleteAllCredentialClearanceTests {
 }
 
 @Suite("Data Deleter Consolidation")
+@MainActor
 struct DataDeleterConsolidationTests {
 
     @Test("clearCredentialsAndSharedCaches removes Supabase refresh token from Keychain")
@@ -173,7 +175,7 @@ struct DataDeleterScopedDeletionTests {
 /// Test double for ``CloudKitResetServiceProtocol`` that can simulate a CloudKit
 /// failure or a mid-flight cancellation without any network access.
 @MainActor
-final class FakeCloudKitResetService: CloudKitResetServiceProtocol, @unchecked Sendable {
+final class FakeCloudKitResetService: CloudKitResetServiceProtocol {
     enum Behavior {
         case succeed
         case throwError(CloudKitResetError)
