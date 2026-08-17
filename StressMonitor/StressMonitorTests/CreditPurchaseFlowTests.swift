@@ -73,16 +73,23 @@ final class RedemptionSpy {
     }
 }
 
-/// Records subscription-verify invocations (DEC-1 server-premium sync).
+/// Records subscription-verify invocations (DEC-1 server-premium sync),
+/// including the transaction's finish count at verify time — the
+/// post-before-finish ordering probe for the demotion signal.
 @MainActor
 final class SubscriptionVerifySpy {
     private(set) var callCount = 0
     private(set) var receivedJWS: [String] = []
+    private(set) var finishCountAtVerify: Int?
     var error: Error?
 
-    func verifier(_ jws: String) async throws -> CreditBalance {
+    func verifier(
+        _ jws: String,
+        transaction: FakePurchaseTransaction? = nil
+    ) async throws -> CreditBalance {
         callCount += 1
         receivedJWS.append(jws)
+        if let transaction { finishCountAtVerify = transaction.finishCallCount }
         if let error { throw error }
         return CreditBalance(total: 999_999, used: 0, remaining: 999_999, planType: .premium, freeResetAt: nil)
     }
@@ -265,25 +272,28 @@ struct CreditPurchaseFlowTests {
         #expect(!state.isPremiumUser)
     }
 
-    // MARK: Guard-before-sync — a revoked or expired JWS must never reach the server
+    // MARK: Posting policy — a revoked JWS is a demotion signal; an expired JWS never reaches the server
 
-    @Test("Revoked subscription transaction is never synced to the server and still finishes")
-    func revokedSubscriptionNeverSyncs() async throws {
+    @Test("Revoked subscription transaction is posted as a demotion signal before finish, never grants premium")
+    func revokedSubscriptionPostsDemotionSignalWithoutGranting() async throws {
         let state = makeState()
         let fake = FakePurchaseTransaction(
             productID: Self.monthlySubID,
+            jwsRepresentation: "jws.sub.revoked",
             revocationDate: Date(),
             expirationDate: Date.distantFuture
         )
         let verifier = SubscriptionVerifySpy()
         let service = makeService(
             state: state,
-            subscriptionVerifier: { jws in try await verifier.verifier(jws) }
+            subscriptionVerifier: { jws in try await verifier.verifier(jws, transaction: fake) }
         )
 
         try await service.completePurchase(fake, jwsRepresentation: fake.jwsRepresentation)
 
-        #expect(verifier.callCount == 0)
+        #expect(verifier.callCount == 1)
+        #expect(verifier.receivedJWS == ["jws.sub.revoked"])
+        #expect(verifier.finishCountAtVerify == 0)
         #expect(fake.finishCallCount == 1)
         #expect(!state.isPremiumUser)
     }
