@@ -17,6 +17,12 @@ final class MockStoreKitService: StoreKitServiceProtocol {
         premiumState.isPremiumUser = true
     }
 
+    func purchase(pack: CreditPack) async throws {
+        // Packs never flip premium — they grant credits, and this DEBUG
+        // double has no backend to redeem against.
+        try await Task.sleep(for: .seconds(1))
+    }
+
     func restorePurchases() async throws {
         try await Task.sleep(for: .seconds(1))
         premiumState.isPremiumUser = true

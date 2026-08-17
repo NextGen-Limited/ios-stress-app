@@ -112,14 +112,14 @@ struct CreditPurchaseFlowTests {
 
     private func makeService(
         state: PremiumState,
-        creditService: MockCreditService = MockCreditService(),
+        creditService: MockCreditService? = nil,
         redeemer: PurchaseRedeemer? = nil,
         subscriptionVerifier: PurchaseRedeemer? = nil
     ) -> StoreKitService {
         StoreKitService(
             premiumState: state,
             catalog: makeCatalog(),
-            creditService: creditService,
+            creditService: creditService ?? MockCreditService(),
             redeemer: redeemer,
             subscriptionVerifier: subscriptionVerifier
         )
@@ -139,7 +139,7 @@ struct CreditPurchaseFlowTests {
             redeemer: { jws in try await spy.redeemer(jws, transaction: fake) }
         )
 
-        try await service.completePurchase(fake)
+        try await service.completePurchase(fake, jwsRepresentation: fake.jwsRepresentation)
 
         #expect(spy.callCount == 1)
         #expect(spy.receivedJWS == ["jws.small.pack"])
@@ -163,7 +163,7 @@ struct CreditPurchaseFlowTests {
         )
 
         await #expect(throws: CreditsAPIError.invalidTransaction) {
-            try await service.completePurchase(fake)
+            try await service.completePurchase(fake, jwsRepresentation: fake.jwsRepresentation)
         }
 
         #expect(spy.callCount == 1)
@@ -182,7 +182,7 @@ struct CreditPurchaseFlowTests {
             redeemer: { jws in try await spy.redeemer(jws, transaction: fake) }
         )
 
-        await service.handle(transaction: fake)
+        await service.handle(transaction: fake, jwsRepresentation: fake.jwsRepresentation)
 
         #expect(spy.callCount == 1)
         #expect(spy.finishCountAtRedeem == 0)
@@ -199,7 +199,7 @@ struct CreditPurchaseFlowTests {
             redeemer: { jws in try await spy.redeemer(jws, transaction: fake) }
         )
 
-        await service.handle(transaction: fake)
+        await service.handle(transaction: fake, jwsRepresentation: fake.jwsRepresentation)
 
         #expect(spy.callCount == 1)
         #expect(fake.finishCallCount == 0)
@@ -219,7 +219,7 @@ struct CreditPurchaseFlowTests {
             subscriptionVerifier: { jws in try await verifier.verifier(jws) }
         )
 
-        try await service.completePurchase(fake)
+        try await service.completePurchase(fake, jwsRepresentation: fake.jwsRepresentation)
 
         #expect(redeemer.callCount == 0)
         #expect(verifier.callCount == 1)
@@ -239,7 +239,7 @@ struct CreditPurchaseFlowTests {
             subscriptionVerifier: { jws in try await verifier.verifier(jws) }
         )
 
-        try await service.completePurchase(fake)
+        try await service.completePurchase(fake, jwsRepresentation: fake.jwsRepresentation)
 
         #expect(verifier.callCount == 1)
         #expect(fake.finishCallCount == 1)
@@ -259,7 +259,7 @@ struct CreditPurchaseFlowTests {
             subscriptionVerifier: { jws in try await verifier.verifier(jws) }
         )
 
-        try await service.completePurchase(fake)
+        try await service.completePurchase(fake, jwsRepresentation: fake.jwsRepresentation)
 
         #expect(fake.finishCallCount == 1)
         #expect(!state.isPremiumUser)
