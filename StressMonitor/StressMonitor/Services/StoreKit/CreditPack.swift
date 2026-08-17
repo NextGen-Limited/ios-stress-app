@@ -15,6 +15,9 @@ struct CreditPack: Identifiable {
     let displayName: String
     let productID: String?
     let displayPrice: String?
+    /// Numeric price for per-unit savings math; `displayPrice` stays the
+    /// locale-correct rendering. Nil only for hand-built display packs.
+    var pricePerPack: Decimal? = nil
 
     /// Fallback display packs when no product IDs resolve, mirroring
     /// `SubscriptionPlan.defaultPlans`. Amounts/prices are DEC-2's decision.
@@ -24,14 +27,16 @@ struct CreditPack: Identifiable {
             credits: 10,
             displayName: "10 Credits",
             productID: nil,
-            displayPrice: "$1.99"
+            displayPrice: "$1.99",
+            pricePerPack: 1.99
         ),
         CreditPack(
             id: .large,
             credits: 150,
             displayName: "150 Credits",
             productID: nil,
-            displayPrice: "$19.99"
+            displayPrice: "$19.99",
+            pricePerPack: 19.99
         )
     ]
 }

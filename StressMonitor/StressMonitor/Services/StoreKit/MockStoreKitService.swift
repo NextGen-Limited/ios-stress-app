@@ -6,6 +6,10 @@ final class MockStoreKitService: StoreKitServiceProtocol {
 
     let availablePlans: [SubscriptionPlan] = SubscriptionPlan.defaultPlans
 
+    var availablePacks: [CreditPack] {
+        get async { CreditPack.defaultPacks }
+    }
+
     var isPremiumUser: Bool { premiumState.isPremiumUser }
 
     init(premiumState: PremiumState) {

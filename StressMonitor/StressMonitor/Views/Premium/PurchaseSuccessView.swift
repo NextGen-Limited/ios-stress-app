@@ -1,28 +1,47 @@
 import SwiftData
 import SwiftUI
 
-/// Confirmation screen shown after a successful Premium purchase.
+/// Confirmation screen shown after a successful purchase.
 ///
-/// Unlocks the premium characters (Ember, Zephyr) and the streak-gated Lumi
-/// by updating existing `CharacterUnlock` rows additively, then renders the
-/// newly-available SwiftUI character views at 80pt.
+/// Premium mode (default): unlocks the premium characters (Ember, Zephyr) and
+/// the streak-gated Lumi by updating existing `CharacterUnlock` rows
+/// additively, then renders the newly-available SwiftUI character views at
+/// 80pt.
+///
+/// Pack mode (`purchasedPack` non-nil): a consumable credit-pack top-up —
+/// shows the granted credits and the new balance. No character unlock and no
+/// restore affordance: consumables are one-time grants that cannot be
+/// restored (DEC-2 / packs-era restore copy).
 struct PurchaseSuccessView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(\.dismiss) private var dismiss
 
+    let purchasedPack: CreditPack?
+    let newBalanceText: String
+
     /// Character ids unlocked by Premium.
     private static let unlockedByPremium = CharacterCreature.allCharacters.filter { $0.unlockType == .premium }.map(\.id)
+
+    init(purchasedPack: CreditPack? = nil, newBalanceText: String = "") {
+        self.purchasedPack = purchasedPack
+        self.newBalanceText = newBalanceText
+    }
 
     var body: some View {
         ScrollView {
             VStack(spacing: 28) {
-                header
+                if let pack = purchasedPack {
+                    packHeader(pack)
+                    actions
+                } else {
+                    header
 
-                unlockedCharactersPreview
+                    unlockedCharactersPreview
 
-                benefitsList
+                    benefitsList
 
-                actions
+                    actions
+                }
             }
             .padding(.horizontal, 20)
             .padding(.vertical, 28)
@@ -32,19 +51,11 @@ struct PurchaseSuccessView: View {
         .accessibilityElement(children: .contain)
     }
 
-    // MARK: - Header
+    // MARK: - Header (Premium)
 
     private var header: some View {
         VStack(spacing: 14) {
-            ZStack {
-                Circle()
-                    .fill(HomeCharacterDesignTokens.Ripple.light.opacity(0.32))
-                    .frame(width: 110, height: 110)
-                Image(systemName: "checkmark.seal.fill")
-                    .font(.system(size: 52))
-                    .foregroundStyle(Color(hex: "#4FC01B"))
-            }
-            .accessibilityHidden(true)
+            successSeal
 
             Text("Welcome to Premium")
                 .font(.system(size: 26, weight: .bold, design: .rounded))
@@ -56,6 +67,41 @@ struct PurchaseSuccessView: View {
                 .multilineTextAlignment(.center)
         }
         .padding(.top, 8)
+    }
+
+    // MARK: - Header (Credit pack)
+
+    private func packHeader(_ pack: CreditPack) -> some View {
+        VStack(spacing: 14) {
+            successSeal
+
+            Text("\(pack.credits) Credits Added")
+                .font(.system(size: 26, weight: .bold, design: .rounded))
+                .foregroundStyle(Color.Wellness.adaptivePrimaryText)
+                .accessibilityAddTraits(.isHeader)
+
+            Text("New balance: \(newBalanceText)")
+                .font(.subheadline.weight(.medium))
+                .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
+
+            Text("Your credits are ready to use right away — no unlock needed.")
+                .font(.subheadline)
+                .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
+                .multilineTextAlignment(.center)
+        }
+        .padding(.top, 8)
+    }
+
+    private var successSeal: some View {
+        ZStack {
+            Circle()
+                .fill(HomeCharacterDesignTokens.Ripple.light.opacity(0.32))
+                .frame(width: 110, height: 110)
+            Image(systemName: "checkmark.seal.fill")
+                .font(.system(size: 52))
+                .foregroundStyle(Color(hex: "#4FC01B"))
+        }
+        .accessibilityHidden(true)
     }
 
     // MARK: - Unlocked Characters
@@ -140,23 +186,25 @@ struct PurchaseSuccessView: View {
             Button {
                 dismiss()
             } label: {
-                Text("Back to Home")
+                Text(purchasedPack == nil ? "Back to Home" : "Done")
                     .font(.headline)
                     .frame(maxWidth: .infinity)
                     .padding(.vertical, 14)
             }
             .buttonStyle(.borderedProminent)
             .tint(HomeCharacterDesignTokens.Ripple.deep)
-            .accessibilityLabel("Back to Home")
+            .accessibilityLabel(purchasedPack == nil ? "Back to Home" : "Done")
 
-            Button {
-                Task { await restoreOrDismiss() }
-            } label: {
-                Text("Restore purchases")
-                    .font(.subheadline.weight(.semibold))
-                    .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
+            if purchasedPack == nil {
+                Button {
+                    Task { await restoreOrDismiss() }
+                } label: {
+                    Text("Restore purchases")
+                        .font(.subheadline.weight(.semibold))
+                        .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
+                }
+                .accessibilityLabel("Restore purchases")
             }
-            .accessibilityLabel("Restore purchases")
         }
         .padding(.top, 8)
     }

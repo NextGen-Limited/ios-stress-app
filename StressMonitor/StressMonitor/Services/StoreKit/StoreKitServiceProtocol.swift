@@ -37,6 +37,7 @@ enum StoreKitError: LocalizedError, Equatable {
 
 protocol StoreKitServiceProtocol {
     var availablePlans: [SubscriptionPlan] { get async }
+    var availablePacks: [CreditPack] { get async }
     var isPremiumUser: Bool { get async }
     func purchase(_ plan: SubscriptionPlan) async throws
     func purchase(pack: CreditPack) async throws
