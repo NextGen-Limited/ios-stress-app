@@ -264,4 +264,47 @@ struct CreditPurchaseFlowTests {
         #expect(fake.finishCallCount == 1)
         #expect(!state.isPremiumUser)
     }
+
+    // MARK: Guard-before-sync — a revoked or expired JWS must never reach the server
+
+    @Test("Revoked subscription transaction is never synced to the server and still finishes")
+    func revokedSubscriptionNeverSyncs() async throws {
+        let state = makeState()
+        let fake = FakePurchaseTransaction(
+            productID: Self.monthlySubID,
+            revocationDate: Date(),
+            expirationDate: Date.distantFuture
+        )
+        let verifier = SubscriptionVerifySpy()
+        let service = makeService(
+            state: state,
+            subscriptionVerifier: { jws in try await verifier.verifier(jws) }
+        )
+
+        try await service.completePurchase(fake, jwsRepresentation: fake.jwsRepresentation)
+
+        #expect(verifier.callCount == 0)
+        #expect(fake.finishCallCount == 1)
+        #expect(!state.isPremiumUser)
+    }
+
+    @Test("Expired subscription transaction is never synced to the server and still finishes")
+    func expiredSubscriptionNeverSyncs() async throws {
+        let state = makeState()
+        let fake = FakePurchaseTransaction(
+            productID: Self.monthlySubID,
+            expirationDate: Date.distantPast
+        )
+        let verifier = SubscriptionVerifySpy()
+        let service = makeService(
+            state: state,
+            subscriptionVerifier: { jws in try await verifier.verifier(jws) }
+        )
+
+        try await service.completePurchase(fake, jwsRepresentation: fake.jwsRepresentation)
+
+        #expect(verifier.callCount == 0)
+        #expect(fake.finishCallCount == 1)
+        #expect(!state.isPremiumUser)
+    }
 }
