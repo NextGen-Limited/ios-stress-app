@@ -241,4 +241,45 @@ struct CreditsViewModelTests {
         let premium = makeBalance(total: 999_999, used: 0, planType: .premium, freeResetAt: nil)
         #expect(CreditBalanceFormatter.resetDateText(premium) == nil)
     }
+
+    // MARK: - DEC-2 placement surfaces (chat row + Plus row)
+
+    @Test("chat row value combines availability with the shared balance string")
+    func chatRowValueCombinesAvailabilityAndBalance() {
+        #expect(
+            CreditBalanceFormatter.chatRowValue(
+                available: true,
+                balance: makeBalance(total: 50, used: 7)
+            ) == "Active · 43 credits"
+        )
+
+        var premium = makeBalance(total: 999_999, used: 0, planType: .premium, freeResetAt: nil)
+        premium.remaining = 999_999
+        #expect(
+            CreditBalanceFormatter.chatRowValue(available: true, balance: premium)
+                == "Active · Unlimited"
+        )
+
+        #expect(
+            CreditBalanceFormatter.chatRowValue(available: true, balance: nil) == "Active"
+        )
+
+        #expect(
+            CreditBalanceFormatter.chatRowValue(
+                available: false,
+                balance: makeBalance()
+            ) == "Coming soon"
+        )
+    }
+
+    @Test("plus row value reflects live state instead of the static teaser")
+    func plusRowValueReflectsLiveState() {
+        var premium = makeBalance(total: 999_999, used: 0, planType: .premium, freeResetAt: nil)
+        premium.remaining = 999_999
+        #expect(CreditBalanceFormatter.plusRowValue(premium) == "Active")
+
+        #expect(CreditBalanceFormatter.plusRowValue(makeBalance(total: 50, used: 7)) == "43 credits left")
+
+        #expect(CreditBalanceFormatter.plusRowValue(nil) == "Try free")
+    }
 }
