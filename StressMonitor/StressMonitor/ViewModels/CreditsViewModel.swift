@@ -36,6 +36,24 @@ enum CreditBalanceFormatter {
         return balance.remaining < shortResponseThreshold
     }
 
+    /// Settings chat-row value: availability beside the shared balance
+    /// string. A not-yet-converged balance keeps the plain availability
+    /// label rather than inventing a count.
+    static func chatRowValue(available: Bool, balance: CreditBalance?) -> String {
+        guard available else { return "Coming soon" }
+        guard let balance else { return "Active" }
+        return "Active · \(balanceText(balance))"
+    }
+
+    /// Settings "StressMonitor Plus" row value: live subscription state
+    /// instead of the static teaser — premium is active, a free tier shows
+    /// the remaining count, and an unknown balance falls back to the teaser.
+    static func plusRowValue(_ balance: CreditBalance?) -> String {
+        guard let balance else { return "Try free" }
+        if balance.isUnlimited { return "Active" }
+        return "\(balance.remaining) credits left"
+    }
+
     private static let isoParser = ISO8601DateFormatter()
 }
 

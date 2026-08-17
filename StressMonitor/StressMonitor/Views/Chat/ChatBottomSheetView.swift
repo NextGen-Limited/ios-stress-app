@@ -143,6 +143,11 @@ struct ChatBottomSheetView: View {
 
             Spacer()
 
+            // DEC-2 placement-a: live balance pill. Informational while the
+            // user still has credits; tappable straight to the paywall when
+            // the remaining count hits zero.
+            balancePill
+
             // Overflow menu
             Image(systemName: "ellipsis")
                 .font(.system(size: 20))
@@ -154,6 +159,50 @@ struct ChatBottomSheetView: View {
         .overlay(alignment: .bottom) {
             Divider()
         }
+    }
+
+    // MARK: - Balance Pill
+
+    private var isOutOfCredits: Bool {
+        guard let balance = creditService.balance else { return false }
+        return !balance.isUnlimited && balance.remaining <= 0
+    }
+
+    @ViewBuilder
+    private var balancePill: some View {
+        if isOutOfCredits {
+            Button {
+                paywall.present(reason: .outOfCredits)
+            } label: {
+                pillLabel(systemImage: "exclamationmark.circle.fill", tint: Color(hex: "#FF9500"))
+            }
+            .buttonStyle(.plain)
+            .frame(minHeight: 44)
+            .accessibilityLabel("Out of credits. Tap to view options.")
+        } else {
+            pillLabel(
+                systemImage: "circlebadge.2",
+                tint: Color.Wellness.adaptiveSecondaryText
+            )
+            .accessibilityLabel("Credit balance: \(CreditBalanceFormatter.balanceText(creditService.balance))")
+        }
+    }
+
+    private func pillLabel(systemImage: String, tint: Color) -> some View {
+        HStack(spacing: 4) {
+            Image(systemName: systemImage)
+                .font(.system(size: 11, weight: .semibold))
+            Text(CreditBalanceFormatter.balanceText(creditService.balance))
+                .font(.system(size: 12, weight: .semibold, design: .rounded))
+        }
+        .foregroundStyle(tint)
+        .padding(.horizontal, 10)
+        .padding(.vertical, 6)
+        .background(Color.Wellness.adaptiveCardBackground)
+        .clipShape(Capsule())
+        .overlay(
+            Capsule().stroke(Color.Wellness.adaptiveSecondaryText.opacity(0.15), lineWidth: 1)
+        )
     }
 
     /// Subtitle reflecting current stress state.

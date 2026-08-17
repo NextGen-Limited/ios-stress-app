@@ -6,6 +6,7 @@ struct SettingsView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(AppRouter.self) private var router
     @Environment(PaywallController.self) private var paywall
+    @Environment(CreditService.self) private var creditService
     @State private var viewModel: SettingsViewModel
     @State private var habitViewModel: HabitViewModel?
     @State private var accountViewModel = AccountViewModel()
@@ -61,6 +62,7 @@ struct SettingsView: View {
             }
             Task { await viewModel.loadUserProfile() }
             accountViewModel.refreshAccountState()
+            Task { try? await creditService.refreshBalance() }
             refreshHealthAuthStatus()
         }
         .sheet(item: $docsURL) { url in
@@ -139,7 +141,10 @@ struct SettingsView: View {
                     setting: .rippleCoach,
                     tint: .settingsIconPurple,
                     title: "Ripple Coach",
-                    value: chatAvailabilityLabel,
+                    value: CreditBalanceFormatter.chatRowValue(
+                        available: ChatAvailability.current.isAvailable,
+                        balance: creditService.balance
+                    ),
                     action: {
                         guard ChatAvailability.current.isAvailable else { return }
                         showChatSheet = true
@@ -265,7 +270,7 @@ struct SettingsView: View {
                     setting: .stressMonitorPlus,
                     tint: .premiumGold,
                     title: "StressMonitor Plus",
-                    value: "Try free",
+                    value: CreditBalanceFormatter.plusRowValue(creditService.balance),
                     valueTint: .premiumGold,
                     action: { paywall.present(reason: .general) }
                 )
@@ -478,10 +483,6 @@ struct SettingsView: View {
 
     private var bioAgeText: String {
         viewModel.bioAge.map { "\($0) yrs" } ?? "—"
-    }
-
-    private var chatAvailabilityLabel: String {
-        ChatAvailability.current.isAvailable ? "Active" : "Coming soon"
     }
 
     private var watchStatusText: String {
