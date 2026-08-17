@@ -8,6 +8,7 @@ private final class FakeStoreKitService: StoreKitServiceProtocol {
     var stubbedPlans: [SubscriptionPlan] = SubscriptionPlan.defaultPlans
     var stubbedIsPremiumUser: Bool = false
     var purchaseStub: (() async throws -> Void)?
+    var packPurchaseStub: (() async throws -> Void)?
     var restoreStub: (() async throws -> Void)?
     var didCallRefresh = false
 
@@ -21,6 +22,10 @@ private final class FakeStoreKitService: StoreKitServiceProtocol {
 
     func purchase(_ plan: SubscriptionPlan) async throws {
         try await purchaseStub?()
+    }
+
+    func purchase(pack: CreditPack) async throws {
+        try await packPurchaseStub?()
     }
 
     func restorePurchases() async throws {
