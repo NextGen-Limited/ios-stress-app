@@ -66,6 +66,7 @@ struct StoreKitProductCatalog: Sendable {
 
     init(
         bundle: Bundle = .main,
+        infoDictionary: [String: String]? = nil,
         environment: [String: String]? = nil,
         defaults: UserDefaults? = nil
     ) {
@@ -76,6 +77,7 @@ struct StoreKitProductCatalog: Sendable {
             infoKey: "STOREKIT_PREMIUM_WEEKLY_PRODUCT_ID",
             envKey: "STOREKIT_PREMIUM_WEEKLY_PRODUCT_ID",
             defaultsKey: "storeKitPremiumWeeklyProductID",
+            infoDictionary: infoDictionary,
             bundle: bundle,
             environment: env,
             defaults: defs
@@ -85,6 +87,7 @@ struct StoreKitProductCatalog: Sendable {
             infoKey: "STOREKIT_PREMIUM_MONTHLY_PRODUCT_ID",
             envKey: "STOREKIT_PREMIUM_MONTHLY_PRODUCT_ID",
             defaultsKey: "storeKitPremiumMonthlyProductID",
+            infoDictionary: infoDictionary,
             bundle: bundle,
             environment: env,
             defaults: defs
@@ -94,6 +97,7 @@ struct StoreKitProductCatalog: Sendable {
             infoKey: "STOREKIT_PREMIUM_ANNUAL_PRODUCT_ID",
             envKey: "STOREKIT_PREMIUM_ANNUAL_PRODUCT_ID",
             defaultsKey: "storeKitPremiumAnnualProductID",
+            infoDictionary: infoDictionary,
             bundle: bundle,
             environment: env,
             defaults: defs
@@ -103,6 +107,7 @@ struct StoreKitProductCatalog: Sendable {
             infoKey: "STOREKIT_PREMIUM_SUBSCRIPTION_GROUP_ID",
             envKey: "STOREKIT_PREMIUM_SUBSCRIPTION_GROUP_ID",
             defaultsKey: "storeKitPremiumSubscriptionGroupID",
+            infoDictionary: infoDictionary,
             bundle: bundle,
             environment: env,
             defaults: defs
@@ -112,6 +117,7 @@ struct StoreKitProductCatalog: Sendable {
             infoKey: "STOREKIT_CREDITS_SMALL_PRODUCT_ID",
             envKey: "STOREKIT_CREDITS_SMALL_PRODUCT_ID",
             defaultsKey: "storeKitCreditsSmallProductID",
+            infoDictionary: infoDictionary,
             bundle: bundle,
             environment: env,
             defaults: defs
@@ -121,6 +127,7 @@ struct StoreKitProductCatalog: Sendable {
             infoKey: "STOREKIT_CREDITS_LARGE_PRODUCT_ID",
             envKey: "STOREKIT_CREDITS_LARGE_PRODUCT_ID",
             defaultsKey: "storeKitCreditsLargeProductID",
+            infoDictionary: infoDictionary,
             bundle: bundle,
             environment: env,
             defaults: defs
@@ -148,13 +155,20 @@ struct StoreKitProductCatalog: Sendable {
         infoKey: String,
         envKey: String,
         defaultsKey: String,
+        infoDictionary: [String: String]?,
         bundle: Bundle,
         environment: [String: String],
         defaults: UserDefaults
     ) -> String? {
+        let infoValue: String?
+        if let infoDictionary {
+            infoValue = infoDictionary[infoKey]
+        } else {
+            infoValue = bundle.object(forInfoDictionaryKey: infoKey) as? String
+        }
+
         // 1. Bundle Info.plist
-        if let value = bundle.object(forInfoDictionaryKey: infoKey) as? String,
-           clean(value) != nil {
+        if let value = infoValue, clean(value) != nil {
             return clean(value)
         }
 

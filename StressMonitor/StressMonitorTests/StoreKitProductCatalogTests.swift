@@ -102,6 +102,7 @@ struct StoreKitProductCatalogTests {
     func resolvesFromInjectedEnvironment() {
         let catalog = StoreKitProductCatalog(
             bundle: Bundle.main,
+            infoDictionary: [:],
             environment: [
                 "STOREKIT_PREMIUM_WEEKLY_PRODUCT_ID": "env.weekly",
                 "STOREKIT_PREMIUM_MONTHLY_PRODUCT_ID": "env.monthly",
@@ -130,6 +131,7 @@ struct StoreKitProductCatalogTests {
 
         let catalog = StoreKitProductCatalog(
             bundle: Bundle.main,
+            infoDictionary: [:],
             environment: [:],
             defaults: defaults
         )
@@ -159,16 +161,17 @@ struct StoreKitProductCatalogTests {
 
     @Test("Bundle Info.plist key takes priority over environment")
     func bundlePriorityOverEnvironment() {
-        // Since Bundle.main won't have the Info.plist keys in tests,
-        // environment values should be used as fallback
         let catalog = StoreKitProductCatalog(
             bundle: Bundle.main,
+            infoDictionary: [
+                "STOREKIT_PREMIUM_MONTHLY_PRODUCT_ID": "info.monthly"
+            ],
             environment: [
                 "STOREKIT_PREMIUM_MONTHLY_PRODUCT_ID": "env.monthly"
             ],
             defaults: nil
         )
-        #expect(catalog.monthlyProductID == "env.monthly")
+        #expect(catalog.monthlyProductID == "info.monthly")
     }
 
     // MARK: - Credit pack resolution (DEC-2)
@@ -177,6 +180,7 @@ struct StoreKitProductCatalogTests {
     func packIDsResolveFromInjectedEnvironment() {
         let catalog = StoreKitProductCatalog(
             bundle: Bundle.main,
+            infoDictionary: [:],
             environment: [
                 "STOREKIT_CREDITS_SMALL_PRODUCT_ID": "env.credits.small",
                 "STOREKIT_CREDITS_LARGE_PRODUCT_ID": "env.credits.large"
@@ -199,6 +203,7 @@ struct StoreKitProductCatalogTests {
 
         let catalog = StoreKitProductCatalog(
             bundle: Bundle.main,
+            infoDictionary: [:],
             environment: [:],
             defaults: defaults
         )
@@ -217,6 +222,7 @@ struct StoreKitProductCatalogTests {
 
         let catalog = StoreKitProductCatalog(
             bundle: Bundle.main,
+            infoDictionary: [:],
             environment: [
                 "STOREKIT_CREDITS_SMALL_PRODUCT_ID": "env.credits.small"
             ],
