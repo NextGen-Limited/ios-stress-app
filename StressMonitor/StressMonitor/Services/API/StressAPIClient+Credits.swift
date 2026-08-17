@@ -53,11 +53,11 @@ extension StressAPIClient {
         try await postTransaction(jws: jws, path: "credits/redeem")
     }
 
-    /// POST /premium/verify — maps an active subscription transaction to
-    /// server-side premium (DEC-1). Mirrors the redemption contract; the
+    /// POST /credits/premium/verify — maps an active subscription transaction
+    /// to server-side premium (DEC-1). Mirrors the redemption contract; the
     /// endpoint is the server half of the subscription entitlement sync.
     func verifySubscription(jws: String) async throws -> CreditBalance {
-        try await postTransaction(jws: jws, path: "premium/verify")
+        try await postTransaction(jws: jws, path: "credits/premium/verify")
     }
 
     private func postTransaction(jws: String, path: String) async throws -> CreditBalance {

@@ -125,10 +125,10 @@ struct StressAPIClientCreditsTests {
         }
     }
 
-    // MARK: - verifySubscription (POST /premium/verify — DEC-1 server premium)
+    // MARK: - verifySubscription (POST /credits/premium/verify — DEC-1 server premium)
 
-    @Test("verifySubscription posts the subscription JWS to premium/verify")
-    func verifySubscriptionPostsToPremiumVerify() async throws {
+    @Test("verifySubscription posts the subscription JWS to credits/premium/verify")
+    func verifySubscriptionPostsToCreditsPremiumVerify() async throws {
         let premiumFixture = #"{"total":999999,"used":0,"remaining":999999,"plan_type":"premium","free_reset_at":null}"#
         let client = makeClient(statusCode: 200, body: Data(premiumFixture.utf8))
 
@@ -138,7 +138,7 @@ struct StressAPIClientCreditsTests {
 
         let request = try #require(RequestCaptureURLProtocol.lastRequest)
         #expect(request.httpMethod == "POST")
-        #expect(request.url?.absoluteString == "https://api.test/premium/verify")
+        #expect(request.url?.absoluteString == "https://api.test/credits/premium/verify")
         #expect(request.value(forHTTPHeaderField: "Authorization") == "Bearer fake-token")
 
         let json = try #require(
