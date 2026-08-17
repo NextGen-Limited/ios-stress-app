@@ -351,7 +351,10 @@ final class StoreKitService: StoreKitServiceProtocol {
     ///
     /// Pack productIDs use the deferred grant: the backend redeems the JWS
     /// BEFORE `finish()`, because a finished consumable is gone forever — an
-    /// unfinished one is redelivered and retried. Subscription productIDs
+    /// unfinished one is redelivered and retried. A refunded (revoked) pack
+    /// is finished WITHOUT any redemption — the server permanently rejects
+    /// its JWS, and retrying it would wedge the transaction queue forever.
+    /// Subscription productIDs
     /// keep the legacy immediate finish (restorable via currentEntitlements)
     /// plus a best-effort server premium sync (DEC-1). Posting policy, in
     /// evaluation order: a revoked (refunded) subscription JWS IS posted —
@@ -365,6 +368,13 @@ final class StoreKitService: StoreKitServiceProtocol {
         jwsRepresentation: String
     ) async throws {
         if catalog.pack(for: transaction.productID) != nil {
+            if transaction.revocationDate != nil {
+                // Refunded pack: already-granted credits are intentionally
+                // left in place (no clawback) — the fix's contract is queue
+                // hygiene, and the server rejects this JWS permanently.
+                await transaction.finish()
+                return
+            }
             let balance = try await redeemer(jwsRepresentation)
             await transaction.finish()
             creditService?.apply(balance)
