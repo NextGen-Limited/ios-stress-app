@@ -5,16 +5,16 @@ milestone_name: Backend API Migration
 current_phase: 2
 current_phase_name: Credits System + IAP Transition
 status: executing
-stopped_at: context exhaustion at 79% (2026-08-13)
-last_updated: "2026-08-16T15:55:36.407Z"
+stopped_at: Completed 02-02-PLAN.md (backend redeem + premium verify, undeployed)
+last_updated: "2026-08-17T02:04:07.116Z"
 last_activity: 2026-08-16
 last_activity_desc: Phase 01 execution started
 progress:
   total_phases: 3
   completed_phases: 1
   total_plans: 8
-  completed_plans: 4
-  percent: 33
+  completed_plans: 6
+  percent: 75
 ---
 
 # Project State
@@ -29,8 +29,8 @@ See: .planning/PROJECT.md (updated 2026-08-16 after v1.1 Phase 01 close)
 ## Current Position
 
 Phase: 2 (Credits System + IAP Transition) — EXECUTING
-Plan: 1 of 4
-Status: Executing Phase 2
+Plan: 3 of 4
+Status: Ready to execute
 Last activity: 2026-08-16 — Phase 2 execution started
 
 ## Performance Metrics
@@ -64,6 +64,7 @@ Last activity: 2026-08-16 — Phase 2 execution started
 | Phase 05 P01 | ~11 min | 6 tasks | 19 files |
 | Phase 01 P01 | 42m | 3 tasks | 12 files |
 | Phase 01 P03 | 32m | 2 tasks | 6 files |
+| Phase 02 P02 | ~75min | 5 tasks | 17 files |
 
 ## Accumulated Context
 
@@ -79,6 +80,8 @@ Full v1.0 decision log archived in PROJECT.md Key Decisions table (see "v1.0 Ver
 - [Phase 01, closed 2026-08-16]: D1 resolved by execution — real Firebase auth shipped (Anonymous + Google linking), chat ungated, UAT-verified
 - [Phase 01, 2026-08-16]: xcodebuild test works with `-parallel-testing-enabled NO` (parallel clones fail: XCTestDevices/Mach -308) — pin this flag in CI/dev docs
 - [Phase 01, 2026-08-16]: AccountViewModel/SettingsView Google row pattern established: ViewModel wraps service state, rethrows errors, silent on GIDSignIn code -5 cancellation
+- [Phase 02]: Backend IAP: @apple/app-store-server-library@3.1.0 user-verified; Apple Root CA G2+G3 embedded; premium endpoint pinned as POST /credits/premium/verify
+- [Phase 02]: Grant idempotency keyed on iap_redemptions PK shared by packs and subscriptions; premium_until = greatest(existing, expiry), demoted by monthly cron before free reset
 
 ### Pending Todos
 
@@ -118,8 +121,8 @@ Items acknowledged and deferred at v1.0 milestone close on 2026-08-12:
 
 ## Session Continuity
 
-Last session: 2026-08-16
-Stopped at: Phase 01 complete (UAT 2/2, SECURITY threats_open 0), ready to plan Phase 2 — Credits System + IAP Transition
+Last session: 2026-08-17T02:04:07.091Z
+Stopped at: Completed 02-02-PLAN.md (backend redeem + premium verify, undeployed)
 Resume file: None
 
 ## Operator Next Steps

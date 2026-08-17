@@ -1,10 +1,10 @@
 ---
 schema_version: 1
-open_count: 8
+open_count: 10
 waived_count: 0
 fixed_count: 0
-total_count: 8
-last_updated: 2026-08-16T17:28:41.937Z
+total_count: 10
+last_updated: 2026-08-17T02:05:07.194Z
 ---
 
 # Broken Windows Ledger
@@ -23,6 +23,8 @@ last_updated: 2026-08-16T17:28:41.937Z
 | 6 | 02 | skipped-test | StressMonitor/StressMonitorTests/EntitlementForegroundCorrectionTests.swift |  | Suite disabled: StoreKitTest purchase throws productNotFound (IAP-01 — no product IDs resolve); re-enable in 02-03 | open |  | 2026-08-16T17:28:36.992Z |  |
 | 7 | 02 | skipped-test | StressMonitor/StressMonitorTests/StoreKitProductCatalogLiveTests.swift |  | Suite disabled: custom INFOPLIST_KEY_STOREKIT_* settings never reach the generated Info.plist so live catalog resolves empty (IAP-01); re-enable in 02-03 | open |  | 2026-08-16T17:28:40.914Z |  |
 | 8 | 02 | deviation | StressMonitor/StressMonitorTests/DataDeletionConsolidationTests.swift |  | Full-suite xcodebuild exit 65 despite 84/84 tests passing: 6 cold-launch host restarts clustered on CloudKit Failure & Cancellation and Data Export Field Selection suites (pre-existing TEST-01 host flakiness) | open |  | 2026-08-16T17:28:41.937Z |  |
+| 9 | 02 | deviation | stress-app-be/src/routes/credits.ts |  | Redeem + premium/verify endpoints and 2 migrations committed but NOT deployed; production apply deferred to 02-04 user_setup with user confirmation | open |  | 2026-08-17T02:05:07.102Z |  |
+| 10 | 02 | unmet-truth | stress-app-be/src/lib/iap.ts |  | Real-Apple success path of verifyAndDecodeTransaction untestable without an Apple-signed JWS fixture; covered only via route-seam fakes and rejection-path tests until live sandbox UAT in 02-04 | open |  | 2026-08-17T02:05:07.194Z |  |
 
 ````json
 [
@@ -120,6 +122,30 @@ last_updated: 2026-08-16T17:28:41.937Z
     "status": "open",
     "reason": "",
     "recorded_at": "2026-08-16T17:28:41.937Z",
+    "resolved_at": null
+  },
+  {
+    "id": 9,
+    "kind": "deviation",
+    "phase": "02",
+    "file": "stress-app-be/src/routes/credits.ts",
+    "line": null,
+    "description": "Redeem + premium/verify endpoints and 2 migrations committed but NOT deployed; production apply deferred to 02-04 user_setup with user confirmation",
+    "status": "open",
+    "reason": "",
+    "recorded_at": "2026-08-17T02:05:07.102Z",
+    "resolved_at": null
+  },
+  {
+    "id": 10,
+    "kind": "unmet-truth",
+    "phase": "02",
+    "file": "stress-app-be/src/lib/iap.ts",
+    "line": null,
+    "description": "Real-Apple success path of verifyAndDecodeTransaction untestable without an Apple-signed JWS fixture; covered only via route-seam fakes and rejection-path tests until live sandbox UAT in 02-04",
+    "status": "open",
+    "reason": "",
+    "recorded_at": "2026-08-17T02:05:07.194Z",
     "resolved_at": null
   }
 ]
