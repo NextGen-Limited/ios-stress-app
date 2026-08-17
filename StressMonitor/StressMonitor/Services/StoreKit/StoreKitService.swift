@@ -353,7 +353,10 @@ final class StoreKitService: StoreKitServiceProtocol {
     /// BEFORE `finish()`, because a finished consumable is gone forever — an
     /// unfinished one is redelivered and retried. Subscription productIDs
     /// keep the legacy immediate finish (restorable via currentEntitlements)
-    /// plus a best-effort server premium sync (DEC-1).
+    /// plus a best-effort server premium sync (DEC-1). The activity guard
+    /// runs BEFORE that sync: a revoked (refunded) or expired JWS must never
+    /// be posted to the server or granted locally — it is only finished so
+    /// the queue clears and the updates listener stops redelivering it.
     func completePurchase(
         _ transaction: any PurchaseTransactionHandle,
         jwsRepresentation: String
@@ -365,12 +368,12 @@ final class StoreKitService: StoreKitServiceProtocol {
             return
         }
 
-        await syncSubscriptionEntitlementToServer(transaction, jwsRepresentation: jwsRepresentation)
+        let isActive = catalog.period(for: transaction.productID) != nil &&
+            transaction.revocationDate == nil &&
+            (transaction.expirationDate.map { $0 > Date() } ?? true)
 
-        // Only grant entitlement for known products with active transaction
-        if catalog.period(for: transaction.productID) != nil,
-           transaction.revocationDate == nil,
-           transaction.expirationDate.map({ $0 > Date() }) ?? true {
+        if isActive {
+            await syncSubscriptionEntitlementToServer(transaction, jwsRepresentation: jwsRepresentation)
             premiumState.isPremiumUser = true
         }
 
