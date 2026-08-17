@@ -5,15 +5,15 @@ milestone_name: Backend API Migration
 current_phase: 2
 current_phase_name: Credits System + IAP Transition
 status: executing
-stopped_at: Completed 02-07-PLAN.md (revocation/expiry rejection at the verify seam, effective premium at live gates, iOS guard-before-sync — CR-02+CR-03 closed; phase 2 plans 7/7)
-last_updated: "2026-08-17T08:00:13.780Z"
+stopped_at: Completed 02-08-PLAN.md (CR-05 refund demotion + WR-10 refunded-pack loop break closed; gap closure cycle 2 done)
+last_updated: "2026-08-17T08:52:42.939Z"
 last_activity: 2026-08-17
 last_activity_desc: Phase 2 execution started
 progress:
   total_phases: 3
   completed_phases: 2
-  total_plans: 11
-  completed_plans: 11
+  total_plans: 12
+  completed_plans: 12
   percent: 67
 ---
 
@@ -28,10 +28,10 @@ See: .planning/PROJECT.md (updated 2026-08-16 after v1.1 Phase 01 close)
 
 ## Current Position
 
-Phase: 2 (Credits System + IAP Transition) — EXECUTING (all plans done, close-out pending)
-Plan: 7 of 7 executed (02-07 complete: CR-02+CR-03 closed; all four verification gaps CR-01..CR-04 now code-closed)
+Phase: 2 (Credits System + IAP Transition) — EXECUTING (all 8 plans done incl. gap-closure cycles, close-out pending)
+Plan: 8 of 8 executed (02-08 complete: CR-05 refund demotion + WR-10 refunded-pack loop break closed; review residue WR-01..WR-09/IN-01..IN-08 all advisory)
 Status: Phase 2 ready for verification re-run / close-out
-Last activity: 2026-08-17 — Completed 02-07-PLAN.md
+Last activity: 2026-08-17 — Completed 02-08-PLAN.md
 
 ## Performance Metrics
 
@@ -67,6 +67,7 @@ Last activity: 2026-08-17 — Completed 02-07-PLAN.md
 | Phase 02 P02 | ~75min | 5 tasks | 17 files |
 | Phase 02 P06 | 10min | 2 tasks | 6 files |
 | Phase 02 P07 | 21min | 3 tasks | 9 files |
+| Phase 02 P08 | 18min | 3 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -89,6 +90,9 @@ Full v1.0 decision log archived in PROJECT.md Key Decisions table (see "v1.0 Ver
 - [Phase 02]: Revocation policy applied as rejectingRevoked verifier wrapper at the creditsRoutes factory — one seam covers both credit endpoints including injected test verifiers; decode-level throw stays defense-in-depth (02-07)
 - [Phase 02]: Effective premium = plan_type AND (premium_until IS NULL OR > now()) enforced at deductCredit (SQL-derived under FOR UPDATE) and the chat 402 gate; cron demoted to janitor; balanceJson unchanged (02-07)
 - [Phase 02]: iOS completePurchase evaluates the revocation/expiry guard BEFORE syncSubscriptionEntitlementToServer — revoked/expired JWS never posted, never granted, still finished (02-07)
+- [Phase ?]: Refund handling split per route: /credits/premium/verify treats a revoked subscription JWS as a demotion signal (guarded least() UPDATE, convergent on re-post, never an iap_redemptions insert); /credits/redeem keeps absolute revoked rejection (02-08)
+- [Phase ?]: No clawback of already-granted pack credits on refund — iOS finishes a revoked pack with zero redemption attempts on both entry points; the fix's contract is queue hygiene, not clawback (WR-10, 02-08)
+- [Phase ?]: Replay-window guard on demotion: premium_until <= revoked.expiresAt — an old revocation cannot shorten a newer term granted by a later transaction (02-08)
 
 ### Pending Todos
 
@@ -128,8 +132,8 @@ Items acknowledged and deferred at v1.0 milestone close on 2026-08-12:
 
 ## Session Continuity
 
-Last session: 2026-08-17T08:00:13.763Z
-Stopped at: Completed 02-07-PLAN.md (revocation/expiry rejection at the verify seam, effective premium at live gates, iOS guard-before-sync — CR-02+CR-03 closed; phase 2 plans 7/7)
+Last session: 2026-08-17T08:52:34.661Z
+Stopped at: Completed 02-08-PLAN.md (CR-05 refund demotion + WR-10 refunded-pack loop break closed; gap closure cycle 2 done)
 Resume file: None
 
 ## Operator Next Steps
