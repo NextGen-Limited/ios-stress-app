@@ -113,6 +113,35 @@ final class StoreKitService: StoreKitServiceProtocol {
         premiumState.isPremiumUser
     }
 
+    /// Pack catalog with locale-correct prices when the StoreKit products
+    /// resolve; the DEC-2 display packs otherwise (mirrors `availablePlans`).
+    var availablePacks: [CreditPack] {
+        get async {
+            let packIDs = CreditPackID.allCases.compactMap { catalog.packID(for: $0) }
+            guard !packIDs.isEmpty else { return CreditPack.defaultPacks }
+
+            do {
+                let products = try await Product.products(for: packIDs)
+                guard !products.isEmpty else { return CreditPack.defaultPacks }
+
+                for product in products {
+                    productsByID[product.id] = product
+                }
+
+                return CreditPackID.allCases.map { id in
+                    let fallback = CreditPack.defaultPacks.first { $0.id == id } ?? CreditPack.defaultPacks[0]
+                    guard let productID = catalog.packID(for: id),
+                          let product = products.first(where: { $0.id == productID }) else {
+                        return fallback
+                    }
+                    return Self.packFromProduct(product, id: id, fallback: fallback)
+                }
+            } catch {
+                return CreditPack.defaultPacks
+            }
+        }
+    }
+
     func purchase(_ plan: SubscriptionPlan) async throws {
         // 1. Resolve product ID
         let productID = plan.productID ?? catalog.productID(for: plan.period)
@@ -445,6 +474,21 @@ final class StoreKitService: StoreKitServiceProtocol {
         case .monthly: 1
         case .weekly:  2
         }
+    }
+
+    private static func packFromProduct(
+        _ product: Product,
+        id: CreditPackID,
+        fallback: CreditPack
+    ) -> CreditPack {
+        CreditPack(
+            id: id,
+            credits: fallback.credits,
+            displayName: product.displayName.isEmpty ? fallback.displayName : product.displayName,
+            productID: product.id,
+            displayPrice: product.displayPrice,
+            pricePerPack: product.price
+        )
     }
 
     private static func introOfferPeriodUnit(from product: Product) -> String? {

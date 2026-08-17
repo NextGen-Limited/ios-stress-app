@@ -16,6 +16,10 @@ private final class FakeStoreKitService: StoreKitServiceProtocol {
         get async { stubbedPlans }
     }
 
+    var availablePacks: [CreditPack] {
+        get async { CreditPack.defaultPacks }
+    }
+
     var isPremiumUser: Bool {
         get async { stubbedIsPremiumUser }
     }

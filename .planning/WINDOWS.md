@@ -1,10 +1,10 @@
 ---
 schema_version: 1
-open_count: 10
+open_count: 11
 waived_count: 0
 fixed_count: 0
-total_count: 10
-last_updated: 2026-08-17T02:05:07.194Z
+total_count: 11
+last_updated: 2026-08-17T04:32:14.498Z
 ---
 
 # Broken Windows Ledger
@@ -25,6 +25,7 @@ last_updated: 2026-08-17T02:05:07.194Z
 | 8 | 02 | deviation | StressMonitor/StressMonitorTests/DataDeletionConsolidationTests.swift |  | Full-suite xcodebuild exit 65 despite 84/84 tests passing: 6 cold-launch host restarts clustered on CloudKit Failure & Cancellation and Data Export Field Selection suites (pre-existing TEST-01 host flakiness) | open |  | 2026-08-16T17:28:41.937Z |  |
 | 9 | 02 | deviation | stress-app-be/src/routes/credits.ts |  | Redeem + premium/verify endpoints and 2 migrations committed but NOT deployed; production apply deferred to 02-04 user_setup with user confirmation | open |  | 2026-08-17T02:05:07.102Z |  |
 | 10 | 02 | unmet-truth | stress-app-be/src/lib/iap.ts |  | Real-Apple success path of verifyAndDecodeTransaction untestable without an Apple-signed JWS fixture; covered only via route-seam fakes and rejection-path tests until live sandbox UAT in 02-04 | open |  | 2026-08-17T02:05:07.194Z |  |
+| 11 | 02 | unrun-verify | .planning/phases/02-credits-system-iap-transition/02-04-PLAN.md |  | 02-04 Task 3 live money-path smoke (provision->402->sandbox purchase->server grant->persisted balance) blocked on backend deploy + ASC consumable filing; see 02-04-SUMMARY Deferred Issues | open |  | 2026-08-17T04:32:14.498Z |  |
 
 ````json
 [
@@ -146,6 +147,18 @@ last_updated: 2026-08-17T02:05:07.194Z
     "status": "open",
     "reason": "",
     "recorded_at": "2026-08-17T02:05:07.194Z",
+    "resolved_at": null
+  },
+  {
+    "id": 11,
+    "kind": "unrun-verify",
+    "phase": "02",
+    "file": ".planning/phases/02-credits-system-iap-transition/02-04-PLAN.md",
+    "line": null,
+    "description": "02-04 Task 3 live money-path smoke (provision->402->sandbox purchase->server grant->persisted balance) blocked on backend deploy + ASC consumable filing; see 02-04-SUMMARY Deferred Issues",
+    "status": "open",
+    "reason": "",
+    "recorded_at": "2026-08-17T04:32:14.498Z",
     "resolved_at": null
   }
 ]
