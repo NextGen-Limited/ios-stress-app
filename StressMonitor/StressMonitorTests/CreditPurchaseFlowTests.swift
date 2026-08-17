@@ -178,6 +178,27 @@ struct CreditPurchaseFlowTests {
         #expect(creditService.applyBalanceCallCount == 0)
     }
 
+    @Test("Revoked pack transaction is finished without any redemption attempt")
+    func revokedPackFinishesWithoutRedemption() async throws {
+        let creditService = MockCreditService()
+        let fake = FakePurchaseTransaction(
+            productID: Self.smallPackID,
+            revocationDate: Date()
+        )
+        let spy = RedemptionSpy()
+        let service = makeService(
+            state: makeState(),
+            creditService: creditService,
+            redeemer: { jws in try await spy.redeemer(jws, transaction: fake) }
+        )
+
+        try await service.completePurchase(fake, jwsRepresentation: fake.jwsRepresentation)
+
+        #expect(spy.callCount == 0)
+        #expect(fake.finishCallCount == 1)
+        #expect(creditService.applyBalanceCallCount == 0)
+    }
+
     // MARK: Updates-listener path — same orchestration, retry semantics
 
     @Test("Updates-listener path routes a pack through the same redeem-before-finish ordering")
@@ -210,6 +231,25 @@ struct CreditPurchaseFlowTests {
 
         #expect(spy.callCount == 1)
         #expect(fake.finishCallCount == 0)
+    }
+
+    @Test("Updates-listener path finishes a revoked pack instead of retrying forever")
+    func updatesListenerRevokedPackBreaksRetryLoop() async throws {
+        let fake = FakePurchaseTransaction(
+            productID: Self.smallPackID,
+            revocationDate: Date()
+        )
+        let spy = RedemptionSpy()
+        spy.error = CreditsAPIError.invalidTransaction
+        let service = makeService(
+            state: makeState(),
+            redeemer: { jws in try await spy.redeemer(jws, transaction: fake) }
+        )
+
+        await service.handle(transaction: fake, jwsRepresentation: fake.jwsRepresentation)
+
+        #expect(spy.callCount == 0)
+        #expect(fake.finishCallCount == 1)
     }
 
     // MARK: Subscription path — legacy grant, no regression
