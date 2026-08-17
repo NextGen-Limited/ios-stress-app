@@ -46,7 +46,7 @@ Plans:
 
 **Goal:** Integrate /credits API, transition StoreKit from subscription to consumable credit packs, credits-gated chat access (402 INSUFFICIENT_CREDITS → paywall), new paywall UX with balance display.
 **Depends on:** Phase 1 (auth + API client)
-**Plans:** 7/7 plans executed (4 executed, 3 gap closure from verification CR-01..CR-04)
+**Plans:** 7/8 executed (4 executed, 4 gap closure: 3 from verification CR-01..CR-04, 1 from review CR-05/WR-10)
 
 Plans:
 **Wave 1**
@@ -67,8 +67,9 @@ Plans:
 - [x] 02-05-PLAN.md — CR-04 gap: pack product-ID build settings (both configurations) + verified Info.plist delivery + re-enabled live catalog suite (wave 1, iOS)
 - [x] 02-06-PLAN.md — CR-01 gap: purchased_credits schema separation, free-first consumption, reset preservation (wave 1, cross-repo TDD)
 - [x] 02-07-PLAN.md — CR-02+CR-03 gap: revocation/expiry rejection at verify, effective premium at live gates, iOS guard-before-sync (wave 2, after 02-06 — shared credits.ts; cross-repo TDD)
+- [ ] 02-08-PLAN.md — CR-05/WR-10 review gap (cycle 2): revocation as premium demotion signal on /premium/verify (replay-safe least(), plan_type flip) + iOS revoked-JWS demotion post + revoked-pack finish-without-redeem loop break (wave 1, cross-repo TDD)
 
-**Waves:** 1: 02-01 → 2: 02-02, 02-03 (parallel, contract-pinned) → 3: 02-04 → gap closure 1: 02-05, 02-06 (parallel) → gap closure 2: 02-07
+**Waves:** 1: 02-01 → 2: 02-02, 02-03 (parallel, contract-pinned) → 3: 02-04 → gap closure 1: 02-05, 02-06 (parallel) → gap closure 2: 02-07 → gap closure 3: 02-08
 
 #### Phase 3: Sessions, Preferences, Quick Actions + Cleanup
 
