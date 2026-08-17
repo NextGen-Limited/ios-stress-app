@@ -847,6 +847,8 @@
 				INFOPLIST_KEY_NSHealthClinicalHealthRecordsShareUsageDescription = "We need access to your health data to monitor stress levels.";
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "We need access to your health data to monitor stress levels.";
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "We need to update your health data with stress measurements.";
+				INFOPLIST_KEY_STOREKIT_CREDITS_LARGE_PRODUCT_ID = "com.stressmonitor.app.credits.large";
+				INFOPLIST_KEY_STOREKIT_CREDITS_SMALL_PRODUCT_ID = "com.stressmonitor.app.credits.small";
 				INFOPLIST_KEY_STOREKIT_PREMIUM_ANNUAL_PRODUCT_ID = "com.stressmonitor.app.premium.annual";
 				INFOPLIST_KEY_STOREKIT_PREMIUM_MONTHLY_PRODUCT_ID = "com.stressmonitor.app.premium.monthly";
 				INFOPLIST_KEY_STOREKIT_PREMIUM_SUBSCRIPTION_GROUP_ID = SMPREMIUM01;
@@ -902,6 +904,8 @@
 				INFOPLIST_KEY_NSHealthClinicalHealthRecordsShareUsageDescription = "We need access to your health data to monitor stress levels.";
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "We need access to your health data to monitor stress levels.";
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "We need to update your health data with stress measurements.";
+				INFOPLIST_KEY_STOREKIT_CREDITS_LARGE_PRODUCT_ID = "com.stressmonitor.app.credits.large";
+				INFOPLIST_KEY_STOREKIT_CREDITS_SMALL_PRODUCT_ID = "com.stressmonitor.app.credits.small";
 				INFOPLIST_KEY_STOREKIT_PREMIUM_ANNUAL_PRODUCT_ID = "com.stressmonitor.app.premium.annual";
 				INFOPLIST_KEY_STOREKIT_PREMIUM_MONTHLY_PRODUCT_ID = "com.stressmonitor.app.premium.monthly";
 				INFOPLIST_KEY_STOREKIT_PREMIUM_SUBSCRIPTION_GROUP_ID = SMPREMIUM01;
