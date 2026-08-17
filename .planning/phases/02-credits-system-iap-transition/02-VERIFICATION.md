@@ -1,171 +1,136 @@
 ---
 phase: 02-credits-system-iap-transition
-verified: 2026-08-17T05:05:00Z
-status: gaps_found
-score: 20/26 must-haves verified
+verified: 2026-08-17T09:25:00Z
+status: human_needed
+score: 27/29 must-haves verified
 behavior_unverified: 2 # Live end-to-end money path (deployment-gated) + design-system visual conformance
 overrides_applied: 0
-gaps:
-  - truth: "Purchasing a credit pack is possible in a real build — pack product IDs resolve through the 3-tier mechanism (Info.plist build setting → env → UserDefaults)"
-    status: failed
-    reason: "CR-04 (02-REVIEW, independently confirmed): project.pbxproj contains ZERO `STOREKIT_CREDITS_*` keys (grep count 0) while `INFOPLIST_KEY_STOREKIT_PREMIUM_*` keys exist at lines 850-853/905-908. `StoreKitProductCatalog.packID(for:)` therefore returns nil on any real device (no build setting, no env var, no UserDefaults entry), `availablePacks` falls back to `defaultPacks` with `productID: nil`, and `purchase(pack:)` throws `StoreKitError.missingProductConfiguration` (StoreKitService.swift:177). Pack purchase is dead in every real build; even the disabled StoreKitProductCatalogLiveTests documents that custom INFOPLIST_KEY_* values never reach the generated Info.plist, so the premium keys' delivery mechanism is equally unproven. The .storekit file only affects Xcode-run Debug sessions — and Debug sessions use MockStoreKitService (a purchase no-op)."
-    artifacts:
-      - path: "StressMonitor/StressMonitor.xcodeproj/project.pbxproj"
-        issue: "No STOREKIT_CREDITS_SMALL/LARGE_PRODUCT_ID build settings in either configuration; premium subscription keys present but their Info.plist delivery is also unverified"
-      - path: "StressMonitor/StressMonitor/Services/StoreKit/StoreKitService.swift"
-        issue: "purchase(pack:) throws missingProductConfiguration when productID is nil — the only outcome possible on-device today"
-    missing:
-      - "Add pack product-ID build settings in both app-target configurations alongside the premium keys"
-      - "Verify the chosen delivery mechanism actually lands in Bundle.main (real Info.plist key or build-phase injection) — custom INFOPLIST_KEY_* never reach the generated Info.plist"
-      - "Re-enable StoreKitProductCatalogLiveTests with pack assertions once resolution is real"
-  - truth: "Purchased pack credits persist until spent (packs are one-time top-ups per user-confirmed DEC-2)"
-    status: failed
-    reason: "CR-01 (02-REVIEW, independently confirmed): stress-app-be cron `resetMonthlyCredits` runs `set total_credits = 50, used_credits = 0 where plan_type = 'free'` (src/lib/cron.ts:4-11) while `redeemCredits` adds purchased credits to the SAME `total_credits` column (`total_credits = total_credits + N`, src/lib/credits.ts:95-99). A free-tier user's remaining purchased credits are hard-reset to 50 on the 1st of every month — direct paid-value data loss on the phase's headline feature."
-    artifacts:
-      - path: "stress-app-be/src/lib/cron.ts"
-        issue: "Monthly reset overwrites total_credits, destroying purchased pack credits"
-      - path: "stress-app-be/src/lib/credits.ts"
-        issue: "Purchased and free credits share the single total_credits column"
-    missing:
-      - "Separate purchased from granted balances (e.g. purchased_credits column; reset only the free allotment) and derive total accordingly in getBalance/deductCredit"
-  - truth: "POST /credits/premium/verify rejects invalid transactions — an expired or revoked Apple transaction never activates server-side premium, and iOS never posts revoked/expired JWS to the server"
-    status: failed
-    reason: "CR-02 (02-REVIEW, independently confirmed): `VerifiedTransaction` (src/lib/iap.ts:19-23) extracts only transactionId/productId/expiresAt — no revocationDate anywhere. The route (src/routes/credits.ts:103-108) rejects only `expiresAt === null`, so an expired subscription's Apple-signed JWS activates premium and `greatest(premium_until, pastDate)` stores a past expiry; a refunded (revoked) transaction re-activates premium. iOS compounds it: `completePurchase` calls `syncSubscriptionEntitlementToServer` (StoreKitService.swift:368) BEFORE the `revocationDate == nil` / not-expired guard (lines 371-373), so revocations delivered via Transaction.updates are actively POSTed to the server."
-    artifacts:
-      - path: "stress-app-be/src/lib/iap.ts"
-        issue: "No revocationDate extraction/check in verifyAndDecodeTransaction"
-      - path: "stress-app-be/src/routes/credits.ts"
-        issue: "/premium/verify rejects only null expiry — expired (non-null, past) transactions pass"
-      - path: "StressMonitor/StressMonitor/Services/StoreKit/StoreKitService.swift"
-        issue: "Server entitlement sync runs before the revocation/expiry guard in completePurchase"
-    missing:
-      - "Backend: extract revocationDate, throw on it; reject expiresAt <= now in /premium/verify"
-      - "iOS: move the revocationDate == nil && not-expired guard ahead of syncSubscriptionEntitlementToServer"
-  - truth: "Premium entitlement is enforced at live gates — an expired premium user does not retain unlimited chat"
-    status: failed
-    reason: "CR-03 (02-REVIEW, independently confirmed; same root concern as CR-02): `deductCredit` checks only `plan_type === 'premium'` (src/lib/credits.ts:44) and the chat 402 gate checks `credits.plan_type !== 'premium'` (src/routes/chat.ts:34) — neither consults `premium_until`. Demotion happens only in the monthly cron ('0 0 1 * *'), so a subscriber whose term ends mid-month keeps unlimited chat for up to ~31 days."
-    artifacts:
-      - path: "stress-app-be/src/lib/credits.ts"
-        issue: "deductCredit premium branch ignores premium_until"
-      - path: "stress-app-be/src/routes/chat.ts"
-        issue: "402 gate ignores premium_until"
-    missing:
-      - "Derive effective premium (plan_type = 'premium' AND premium_until > now()) inside deductCredit and the chat gate; keep the cron as janitor only"
+re_verification:
+  previous_status: gaps_found
+  previous_score: 20/26
+  gaps_closed:
+    - "Truth 13 / CR-04 — pack product-ID build settings + verified Info.plist delivery + re-enabled live suite (02-05)"
+    - "Truth 24 / CR-01 — purchased_credits bucket, free-first consumption, usage-only reset (02-06)"
+    - "Truth 25 / CR-02 — expired/revoked transactions never activate premium; iOS posting guard (02-07), superseded and extended by CR-05 demotion semantics (02-08)"
+    - "Truth 26 / CR-03 — effective premium enforced at deductCredit + chat 402 live gates (02-07)"
+  gaps_remaining: []
+  regressions: []
+human_verification: # external deployment/ASC/live-smoke + visual conformance — recorded as human items, not code gaps
+  - test: "Deploy stress-app-be (image rebuild with --force, apply all unapplied migrations through 20260817120000_purchased_credits — incl. 20260816120000_redeem, 20260816120100_premium_until — and set APPLE_APP_LE_ID), file the two DEC-2 consumables in App Store Connect, then run the 5-step live money-path smoke on a Release build"
+    expected: "Fresh user provisions 50 credits; chat 402 presents outOfCredits paywall; sandbox small-pack purchase increments balance exactly +10 once; relaunch shows server-persisted balance; restore shows packs-era copy. If feasible, a real sandbox refund of a subscription should demote server-side premium (CR-05 end-to-end) and a refunded pack should clear without retry loops (WR-10 end-to-end)"
+    why_human: "Requires external deployment, ASC product filing, and a sandbox tester — outward-facing actions with lead time; DEBUG builds route purchases through MockStoreKitService (WR-03), so only a Release build against deployed infra can exercise the live path"
+  - test: "Visual design-system inspection of the packs-era paywall (subscription grid + OR TOP UP ONCE section + balance header), chat balance pill, and Settings rows at standard and accessibility Dynamic Type sizes"
+    expected: "Dual coding (color always paired with icon/text), accessible type scaling, >=44pt targets, haptic feedback on selection/purchase"
+    why_human: "Visual/layout properties grep cannot measure; PackCard and ChatBottomSheetView show zero accessibleDynamicType usages statically"
 behavior_unverified_items:
   - truth: "A real sandbox purchase of the small pack against the deployed backend increments the displayed balance exactly once"
-    test: "Release-config build on simulator, sandbox-purchase small pack, observe balance; relaunch and re-check (5-step smoke from 02-04-SUMMARY)"
-    expected: "Balance increments +10 exactly once; server-persisted after relaunch; 402 mid-chat lands on outOfCredits paywall; restore shows packs-era copy"
-    why_human: "Backend (stress-api.dropitx.site) is not deployed with the new migrations, ASC consumables are not filed, and the deployed auth middleware 401s every /credits/* path so route presence is indistinguishable without a Firebase token; DEBUG builds route the money path through MockStoreKitService (purchase no-op), so only a Release build against deployed infra can exercise this"
+    test: "Release-config build on simulator, sandbox-purchase small pack, observe balance; relaunch and re-check (5-step smoke)"
+    expected: "Balance increments +10 exactly once; server-persisted after relaunch; 402 mid-chat lands on outOfCredits paywall"
+    why_human: "Backend not yet deployed with the new migrations, ASC consumables not filed; DEBUG builds route the money path through MockStoreKitService (purchase no-op), so only a Release build against deployed infra can exercise this"
   - truth: "New paywall UX meets the design system (dual coding, accessibleDynamicType, >=44pt targets, HapticManager feedback)"
-    test: "Visual inspection of paywall (subscription grid + OR TOP UP ONCE pack section + balance header), chat pill, and Settings rows across Dynamic Type sizes"
+    test: "Visual inspection of paywall, chat pill, and Settings rows across Dynamic Type sizes"
     expected: "Color always paired with icon/text; text scales accessibly; all targets >=44pt; selection/purchase haptics fire"
-    why_human: "Grep shows PaywallView/IAPPremiumView carry dynamicType+haptics and PackCard/pill carry accessibility labels, but PackCard and ChatBottomSheetView show zero accessibleDynamicType usages and 44pt conformance is a layout property grep cannot measure"
-human_verification: # surfaced for the end-of-phase checkpoint even though overall status is gaps_found
-  - test: "Deploy stress-app-be (image rebuild + migrations 20260816120000/20260816120100 + APPLE_APPLE_ID), file the two DEC-2 consumables in ASC, then run the 5-step live money-path smoke on a Release build"
-    expected: "Fresh user provisions 50 credits; chat 402 presents outOfCredits paywall; sandbox small-pack purchase increments balance exactly +10 once; relaunch shows server-persisted balance; restore shows packs-era copy"
-    why_human: "Requires external deployment + App Store Connect filing + a sandbox tester — outward-facing actions with lead time that cannot be executed or observed from the codebase"
-  - test: "Visual design-system inspection of the packs-era paywall, chat balance pill, and Settings balance rows"
-    expected: "Dual coding, accessible Dynamic Type, >=44pt targets, haptic feedback on selection/purchase"
-    why_human: "Visual/layout conformance is not measurable by grep; partial static evidence only"
+    why_human: "Layout/visual conformance is not measurable by grep; partial static evidence only"
 ---
 
-# Phase 2: Credits System + IAP Transition Verification Report
+# Phase 2: Credits System + IAP Transition — Final Re-Verification Report
 
 **Phase Goal:** Integrate /credits API, transition StoreKit from subscription to consumable credit packs, credits-gated chat access (402 INSUFFICIENT_CREDITS → paywall), new paywall UX with balance display.
-**Verified:** 2026-08-17T05:05:00Z
-**Status:** gaps_found
-**Re-verification:** No — initial verification
+**Verified:** 2026-08-17T09:25:00Z
+**Status:** human_needed
+**Re-verification:** Yes — final, after two gap-closure cycles (02-05..02-08)
 
 ## Goal Achievement
 
-The client-side credits spine, the 402→paywall routing, the packs-era paywall UX, and the backend redemption endpoint are genuinely built, wired, and test-pinned — every targeted suite I ran passed and the Release build compiles. However, the money path has four verified integrity holes (02-REVIEW CR-01..CR-04, each independently re-confirmed in code during this verification): pack purchases cannot succeed in ANY real build (CR-04), purchased credits are destroyed by the monthly reset (CR-01), and the premium path accepts expired/revoked transactions with expiry enforced only monthly (CR-02/CR-03). "Transition StoreKit to consumable credit packs" is not yet achieved end-to-end for a real user.
+All four prior verification gaps (CR-01..CR-04) are closed in code and pinned by tests **that I re-ran in this verification**: the backend suite passed 17 tests / 50 steps against the live local postgres (8 migrations applied), the two behavior-dense iOS suites passed 17 tests / 2 suites on the simulator, and the Release build exited 0. The cycle-2 review findings (CR-05 refund demotion, WR-10 refunded-pack loop) are likewise implemented and test-pinned; the 02-07 pin inversion left no contradictory pair (`revokedSubscriptionNeverSyncs` = 0 occurrences; `revokedSubscriptionPostsDemotionSignalWithoutGranting` passes; the `expiredSubscriptionNeverSyncs` pin is retained and passing). Every code-level must-have of the phase goal is now verified. What remains is external by nature: backend deployment + ASC filing + the live money-path smoke, and visual design-system conformance — both recorded as human verification items, not code gaps.
 
 ### Observable Truths
 
 | # | Truth | Status | Evidence |
 | --- | --- | --- | --- |
-| 1 | Authenticated balance fetched from GET /credits, visible in paywall header; premium renders "Unlimited", never the 999999 sentinel | ✓ VERIFIED | `StressAPIClient+Credits.getBalance()` (authorizedRequest "credits" → CreditBalance decode, :32-46); `CreditBalance.displayDescription` premium→"Unlimited" (Model:35-37); PaywallView balanceHeader :41-70; sentinel literal count in shipped sources = 0; CreditServiceTests + StressAPIClientCreditsTests ran green in this verification (26 tests/3 suites) |
-| 2 | Chat 402 INSUFFICIENT_CREDITS routes to paywall `present(reason: .outOfCredits)` | ✓ VERIFIED | ChatViewModel :164-168 (`insufficientCredits` → message + `presentPaywall?(.outOfCredits)`); PaywallController :68-69 (outOfCredits bypasses premium guard); ChatBottomSheetView :50 injects the closure; ChatLifecycleTests ran green in this verification (12 tests/2 suites) |
-| 3 | Terminal SSE metadata (credits_remaining) converges the balance; no client-side decrement arithmetic | ✓ VERIFIED | StressLLMService `apply(metadata:)` → `onCreditsRemainingChange` sink (:114-123); ChatBottomSheetView :51-52 wires sink → `creditService.apply(creditsRemaining:)`; CreditService.swift contains only refresh/apply — no arithmetic |
-| 4 | 01-REVIEW CR-01 closed: stress context flows through send(), static side-channel gone | ✓ VERIFIED | `currentStressContext` count across app sources = 0; `LLMServiceProtocol.send(stressContext:)` parameter present (:59-62) |
-| 5 | No orphaned test suites; new suites pbxproj-registered | ✓ VERIFIED | Orphan check re-run: 28/28 StressMonitorTests files in Sources phase 3828578ADDAD4AC5925394DB |
-| 6 | Every xcodebuild invocation uses -parallel-testing-enabled NO | ✓ VERIFIED | Both verifier-run test invocations used it; plan-pinned |
-| 7 | POST /credits/redeem verifies Apple JWS; credits from server-side map; client-asserted amounts ignored | ✓ VERIFIED | routes/credits.ts :66-89 (reads only `transaction_jws`; PACK_CREDITS lookup); iap.ts SignedDataVerifier with embedded Apple Root CA G2+G3; iap.test.ts ran green in this verification (rejection paths); route test cases enumerated on disk ("forged amount fields in the body are ignored") |
-| 8 | Redeem idempotent on Apple transaction id; replay 200, no double-credit | ✓ VERIFIED | credits.ts :85-109: PK insert into `iap_redemptions` is the FIRST statement of one `sql.begin` — unique violation aborts the grant atomically; replay catch returns current balance without writes; migration has `apple_transaction_id TEXT PRIMARY KEY`. Test existence proven ("replaying the same jws returns unchanged balance", "grants pack credits once with a purchase ledger row"); DB-backed re-run blocked at verification time (executor's local postgres on :5433 is down — environment, not code) |
-| 9 | Invalid/unverified JWS → 400 INVALID_TRANSACTION, writes nothing | ✓ VERIFIED | iap.ts wraps all verifier failures in InvalidTransactionError; route catches → 400 before any write; iap.test.ts ran green (garbage/empty/forged rejection) |
-| 10 | Every grant leaves a 'purchase' ledger row + idempotency row | ✓ VERIFIED | credits.ts :87-94 inserts both rows inside the transaction; test case enumerated |
-| 11 | Pack purchase: Product.purchase → verify → server redeem → finish() only after ack | ✓ VERIFIED | StoreKitService `completePurchase` :361-364 (redeemer → finish → apply); CreditPurchaseFlowTests ran green in this verification incl. "redeems exactly once with the JWS before finish" and "Redeem failure propagates and never finishes the transaction" |
-| 12 | Crash between purchase and server-ack recovered at next launch via Transaction.updates | ✓ VERIFIED | `handle(transaction:jwsRepresentation:)` :383-394 runs identical orchestration; suite cases "Updates-listener path routes a pack through the same redeem-before-finish ordering" + "leaves the transaction unfinished for redelivery" ran green |
-| 13 | Pack product IDs resolve through the 3-tier mechanism in real builds | ✗ FAILED | CR-04 (see gaps): `grep -c STOREKIT_CREDITS project.pbxproj` = 0; packID nil on device → `purchase(pack:)` throws missingProductConfiguration (StoreKitService.swift:177). Pack purchase dead in every real build |
-| 14 | Packs appear in StressMonitorProducts.storekit as Consumable entries | ✓ VERIFIED | JSON parses: 2 Consumable products, `com.stressmonitor.app.credits.small` $1.99 + `.large` $19.99 (matches DEC-2 packs-2) |
-| 15 | Restore copy no longer claims subscription-only semantics | ✓ VERIFIED | Comment-filtered restore copy in StoreKitService = 0 legacy occurrences; pack-mode success view omits restore affordance |
+| 1 | Authenticated balance from GET /credits visible in paywall header; premium renders "Unlimited", never the 999999 sentinel | ✓ VERIFIED | `StressAPIClient+Credits.getBalance()` present; sentinel literal count in shipped app sources = 0 (re-grepped this run); regression greps green |
+| 2 | Chat 402 INSUFFICIENT_CREDITS routes to paywall `present(reason: .outOfCredits)` | ✓ VERIFIED | ChatViewModel :164-168 re-grepped; ChatBottomSheetView closure injection intact |
+| 3 | Terminal SSE metadata (credits_remaining) converges balance; no client-side decrement arithmetic | ✓ VERIFIED | StressLLMService `onCreditsRemainingChange` :29/:123 → ChatBottomSheetView :52 `creditService?.apply(creditsRemaining:)`; CreditService has no arithmetic (unchanged) |
+| 4 | 01-REVIEW CR-01 closed: stress context flows through send(), static side-channel gone | ✓ VERIFIED | `currentStressContext` count across app sources = 0 (re-grepped) |
+| 5 | No orphaned test suites | ✓ VERIFIED | 28 StressMonitorTests files, all pbxproj-registered (re-checked); no new unregistered files |
+| 6 | xcodebuild invocations use -parallel-testing-enabled NO | ✓ VERIFIED | Both verifier-run invocations used it |
+| 7 | POST /credits/redeem verifies Apple JWS; client-asserted amounts ignored | ✓ VERIFIED | routes/credits.ts reads only `transaction_jws`, PACK_CREDITS server-side map (:84-92); iap rejection tests green in my run |
+| 8 | Redeem idempotent on Apple transaction id | ✓ VERIFIED | PK insert first in `sql.begin` (:100-103); "replaying the same jws returns unchanged balance" passed in my backend run |
+| 9 | Invalid/unverified JWS → 400 INVALID_TRANSACTION, writes nothing | ✓ VERIFIED | iap.test.ts garbage/empty/forged cases green in my run |
+| 10 | Every grant leaves 'purchase' ledger row + idempotency row | ✓ VERIFIED | redeemCredits :104-107; ledger cases green in my run |
+| 11 | Pack purchase: redeem → finish only after ack | ✓ VERIFIED | "Pack purchase redeems exactly once with the JWS before finish" passed in my iOS run |
+| 12 | Crash between purchase and ack recovered at next launch | ✓ VERIFIED | "Updates-listener path routes a pack through the same redeem-before-finish ordering" + "…leaves the transaction unfinished for redelivery" passed in my iOS run |
+| 13 | Pack product IDs resolve through the 3-tier mechanism in real builds (CR-04) | ✓ VERIFIED | pbxproj `INFOPLIST_KEY_STOREKIT_CREDITS_{SMALL,LARGE}_PRODUCT_ID` at :850-851 (Debug) / :907-908 (Release), both inside the `stress.ai.com` app-target blocks (PRODUCT_BUNDLE_IDENTIFIER :868/:925); Info.plist carries 6 literal STOREKIT_* keys, `plutil -lint` OK; `INFOPLIST_FILE` wired :842/:899; **StoreKitProductCatalogLiveTests 6/6 passed in my simulator run — small + large pack IDs and round-trip resolved from the hosted app's Bundle.main** (empirical delivery proof) |
+| 14 | Packs appear in StressMonitorProducts.storekit as Consumable entries | ✓ VERIFIED | 2 `"type": "Consumable"` entries, credits.small + credits.large (re-grepped) |
+| 15 | Restore copy no longer claims subscription-only semantics | ✓ VERIFIED | Legacy restore-copy grep count = 0 (re-run) |
 | 16 | Release-configuration build compiles (BUILD-05) | ✓ VERIFIED | Re-ran in this verification: `xcodebuild build -configuration Release` exit 0 |
-| 17 | Transaction.updates listener owned at app scope for process lifetime | ✓ VERIFIED | StoreKitService init :52 starts `listenForTransactions()`; single app-scope service built in StressMonitorApp.init |
-| 18 | Paywall presents pack cards with prices + per-unit savings, live balance header, reset date, premium Unlimited | ✓ VERIFIED | IAPPremiumView "OR TOP UP ONCE" :189, PackCard :197, `savingsPercent(for:)` computed per-unit (:277-279, not hardcoded — the "33" literal is a #Preview fixture); PaywallView header + reset line :41-70; CreditsViewModelTests display-rule cases ran green |
-| 19 | Purchase success derived from post-purchase server balance, not the call's return | ✓ VERIFIED | CreditsViewModel.purchaseSelectedPack compares `creditService.balance` before/after; CreditsViewModelTests ran green (part of 26-test run) |
-| 20 | Balance at every DEC-2 placement (chat pill + paywall header + Settings row) | ✓ VERIFIED | ChatBottomSheetView balancePill :149-195 (tap→paywall at 0); SettingsView :144-146 + :273 via shared `CreditBalanceFormatter` |
+| 17 | Transaction.updates listener owned at app scope | ✓ VERIFIED | StoreKitService init :52 `listenForTransactions()` (re-grepped) |
+| 18 | Paywall presents pack cards + per-unit savings + live balance header + reset date + premium Unlimited | ✓ VERIFIED | IAPPremiumView "OR TOP UP ONCE" :189, PackCard :197; header/reset lines intact |
+| 19 | Purchase success derived from post-purchase server balance | ✓ VERIFIED | CreditsViewModel :112-117 `balanceBefore` comparison (re-read this run) |
+| 20 | Balance at every DEC-2 placement (chat pill + paywall header + Settings row) | ✓ VERIFIED | balancePill (2 refs) + CreditBalanceFormatter in SettingsView (2 refs) re-grepped |
 | 21 | Real sandbox purchase against deployed backend increments balance exactly once | ⚠️ PRESENT_BEHAVIOR_UNVERIFIED | Code path complete and unit-pinned; blocked on backend deployment + ASC filing (external). See behavior_unverified_items |
-| 22 | User who exhausts credits mid-chat lands on paywall, no dead-end | ✓ VERIFIED | ChatViewModel one-line message + presentation; PaywallView "You're out of credits" heading variant :43-44 |
-| 23 | UI meets design system (dual coding, accessibleDynamicType, >=44pt, Haptics) | ⚠️ PRESENT_BEHAVIOR_UNVERIFIED | PaywallView/IAPPremiumView: dynamicType + haptics present; PackCard/ChatBottomSheetView: 0 accessibleDynamicType usages; 44pt/visual conformance unmeasurable by grep |
-| 24 | Purchased pack credits persist until spent (one-time top-ups) | ✗ FAILED | CR-01 (see gaps): monthly cron resets total_credits to 50, destroying purchased credits |
-| 25 | Premium verify rejects expired/revoked transactions; iOS never syncs them | ✗ FAILED | CR-02 (see gaps): no revocationDate check; only null-expiry rejected; iOS syncs before the revocation guard |
-| 26 | Premium expiry enforced at live gates (not only monthly cron) | ✗ FAILED | CR-03 (see gaps): deductCredit + chat 402 gate check plan_type alone |
+| 22 | User who exhausts credits mid-chat lands on paywall, no dead-end | ✓ VERIFIED | ChatViewModel presentation + PaywallView "You're out of credits" :44 (re-grepped) |
+| 23 | UI meets design system (dual coding, accessibleDynamicType, >=44pt, Haptics) | ⚠️ PRESENT_BEHAVIOR_UNVERIFIED | Visual conformance unmeasurable by grep; zero accessibleDynamicType usages in PackCard/ChatBottomSheetView. See behavior_unverified_items |
+| 24 | Purchased pack credits persist until spent (CR-01, 02-06) | ✓ VERIFIED | Migration `20260817120000_purchased_credits.sql` (ADD COLUMN + `user_credits_purchased_nonnegative` CHECK + legacy normalization — exactly 3 statements); **live DB check: column + constraint present, 8 migrations in schema_migrations**; `redeemCredits` increments `purchased_credits` (:110), `resetMonthlyCredits` sets `used_credits = 0` only; **"resetMonthlyCredits preserves purchased balance", "redeemCredits purchased bucket", "deductCredit free-first consumption" all passed in my backend run** |
+| 25 | Premium verify rejects invalid transactions; iOS never posts expired JWS; revoked JWS handled per CR-05 (CR-02, 02-07 + 02-08) | ✓ VERIFIED | `/premium/verify` rejects `expiresAt === null \|\| <= now` (:128-133) and revoked-with-null-expiry (:117); `/redeem` uses `redeemVerify` = rejectingRevoked-wrapped (:39, :80); `verifyAndDecodeTransaction` returns revoked payloads with revocationDate (signature chain untouched); **"expired subscription jws is rejected 400 without activating premium", "revoked pack jws is rejected 400" (both routes), and iOS `expiredSubscriptionNeverSyncs` all passed in my runs** |
+| 26 | Premium expiry enforced at live gates, not only the cron (CR-03, 02-07) | ✓ VERIFIED | `deductCredit` selects `(premium_until is null or premium_until > now()) as premium_active` under FOR UPDATE and requires `plan_type === "premium" && premium_active` (:40-50); chat 402 gate mirrors the rule (chat.ts :35-45); **"deductCredit effective premium" and "chat route premium gate" (expired+empty → 402, active+empty → streams) passed in my backend run** |
+| 27 | CR-05 backend: revoked subscription JWS DEMOTES premium (`least(premium_until, revocationDate)` under replay-window guard), 200; /redeem still rejects revoked; no idempotency insert on demotion | ✓ VERIFIED | `demotePremiumOnRevocation` (credits.ts :168-187): guarded `least()` UPDATE + plan_type flip, WHERE `premium_until is not null AND premium_until <= expiresAt AND premium_until > revocationDate`, zero `iap_redemptions` inserts; route branch :116-126 before expiry rejection; **all 6 cases passed in my backend run: demotion-to-revocation-date, replay convergent no-op, old-revocation-cannot-shorten-newer-term, dead-term plan_type flip, same-jws activation-then-revocation (no 23505→500), null-until immunity** |
+| 28 | CR-05 iOS: revoked known-subscription JWS POSTed before finish, never grants/clears premiumState; 02-07 pin inversion left no contradictory pair | ✓ VERIFIED | completePurchase :386-390 revoked-subscription branch textually precedes `isActive` (:392), calls sync then finish, no premiumState write; **`revokedSubscriptionPostsDemotionSignalWithoutGranting` passed in my iOS run (callCount 1, receivedJWS, finishCountAtVerify == 0 — POST precedes finish —, finish 1, !isPremiumUser)**; `revokedSubscriptionNeverSyncs` grep count = 0 |
+| 29 | WR-10: refunded pack finished with ZERO redemption attempts on both entry points; no clawback (pinned decision) | ✓ VERIFIED | Pack-arm guard :371-377 (finish + return before redeemer) with the no-clawback WHY-note; `handle()` routes the updates-listener path through the same `completePurchase`; **"Revoked pack transaction is finished without any redemption attempt" AND "Updates-listener path finishes a revoked pack instead of retrying forever" (redeemer throwing invalidTransaction, finish 1) both passed in my iOS run** |
 
-**Score:** 20/26 truths verified (2 present, behavior-unverified; 4 failed)
+**Score:** 27/29 truths verified (2 present, behavior-unverified; 0 failed)
 
 ### Deferred Items
 
-None. Phase 3 (Sessions, Preferences, Quick Actions + Cleanup) does not cover any of the four failed truths — they are not scheduled in any later phase and remain actionable gaps. The deployment/ASC/live-smoke items are external user actions recorded under Human Verification, not later-phase work.
+None. No later phase in the milestone covers the two behavior-unverified items — they are external user actions (deployment/ASC/smoke) and a visual inspection, recorded under Human Verification.
 
 ### Required Artifacts
 
 | Artifact | Expected | Status | Details |
 | -------- | -------- | ------ | ------- |
-| `StressMonitor/StressMonitor/Models/CreditBalance.swift` | Codable balance model with premium display rule | ✓ VERIFIED | 38 lines, CodingKeys for snake_case, isUnlimited/displayDescription |
-| `StressMonitor/StressMonitor/Services/Credits/CreditServiceProtocol.swift` | Protocol | ✓ VERIFIED | 21 lines |
-| `StressMonitor/StressMonitor/Services/Credits/CreditService.swift` | @MainActor @Observable display cache, no arithmetic | ✓ VERIFIED | 41 lines; wired via StressMonitorApp environment + foreground refresh (:180-221) |
-| `StressMonitor/StressMonitor/Services/API/StressAPIClient+Credits.swift` | getBalance/redeemPurchase/verifySubscription | ✓ VERIFIED | 81 lines; verifySubscription posts `credits/premium/verify` (reconciled to backend) |
-| `StressMonitor/StressMonitor/Services/StoreKit/CreditPack.swift` | Pack model + defaultPacks | ✓ VERIFIED | 42 lines, packs-2 small/large |
-| `StressMonitor/StressMonitor/ViewModels/CreditsViewModel.swift` | Purchase state machine + formatter | ✓ VERIFIED | 136 lines; success from observed balance |
-| `StressMonitor/StressMonitor/Views/Premium/Components/PackCard.swift` | Pack card view | ✓ VERIFIED | 183 lines |
-| `StressMonitorTests/CreditServiceTests.swift` etc. (5 suites) | pbxproj-registered test suites | ✓ VERIFIED | All present; 38 tests across 5 suites ran green in this verification |
-| `stress-app-be/src/lib/iap.ts` | JWS verification + product maps | ✓ VERIFIED (with CR-02 defect) | 70 lines; see gap 3 |
-| `stress-app-be/src/routes/credits.ts` | POST /credits/redeem + /premium/verify | ✓ VERIFIED (with CR-02/CR-03 defects) | 121 lines; see gaps 3-4 |
-| `stress-app-be/migrations/20260816120000_redeem.sql` | Idempotency table | ✓ VERIFIED | PK on apple_transaction_id, additive |
-| `stress-app-be/migrations/20260816120100_premium_until.sql` | premium_until column | ✓ VERIFIED | Single ALTER ADD COLUMN |
+| `project.pbxproj` pack build settings | 2 keys x 2 app-target configs | ✓ VERIFIED | 4 lines (:850-851/:907-908) inside the two `stress.ai.com` blocks; watch/widget/test blocks untouched |
+| `StressMonitor/StressMonitor/Info.plist` | 6 STOREKIT_* literal keys | ✓ VERIFIED | plutil OK; values match DEC-2 SKUs + premium IDs/group |
+| `StressMonitorTests/StoreKitProductCatalogLiveTests.swift` | Enabled, 6 tests incl. pack assertions | ✓ VERIFIED | 0 disabled markers; 6/6 passed in my run |
+| `stress-app-be/migrations/20260817120000_purchased_credits.sql` | Additive column + CHECK + normalization | ✓ VERIFIED | Applied in live local DB (psql-confirmed); migrate.test.ts expects 8 and passed |
+| `stress-app-be/src/lib/credits.ts` | Purchased bucket + free-first + effective premium + demotion | ✓ VERIFIED | All four behaviors present; pinned by my test run |
+| `stress-app-be/src/lib/cron.ts` | Usage-only reset | ✓ VERIFIED | `used_credits = 0` + `free_reset_at` only; pinned by "preserves purchased balance" |
+| `stress-app-be/src/lib/iap.ts` | revocationDate extraction; rejectingRevoked (/redeem-only) | ✓ VERIFIED | Decode-level throw removed (revoked payloads returned); signature verification untouched |
+| `stress-app-be/src/routes/credits.ts` | Per-route revocation policy + demotion branch | ✓ VERIFIED | redeemVerify on /redeem; raw verifier + demotion branch on /premium/verify |
+| `StressMonitor/…/StoreKitService.swift` completePurchase | Revoked-sub demotion post; revoked-pack guard; expired unposted | ✓ VERIFIED | Source read :346-418; ordering verified textually and behaviorally |
 
 ### Key Link Verification
 
 | From | To | Via | Status | Details |
 | ---- | -- | --- | ------ | ------- |
-| StressMonitorApp (@State creditService) | PaywallView/ChatViewModel/SettingsView/ChatBottomSheetView | `.environment(creditService)` + init-composed StoreKitService | ✓ WIRED | StressMonitorApp :180-200; Release path passes creditService into StoreKitService (:242-243); NOTE DEBUG branch discards it (MockStoreKitService — WR-03) |
-| StressLLMService.apply(metadata:) | CreditService.apply(creditsRemaining:) | onCreditsRemainingChange sink injected by ChatBottomSheetView | ✓ WIRED | StressLLMService :114-123; ChatBottomSheetView :51-52 |
-| ChatViewModel catch insufficientCredits | PaywallController.present(.outOfCredits) | injected presentPaywall closure | ✓ WIRED | ChatViewModel :164-168; ChatBottomSheetView :50 |
-| StressAPIClient.getBalance() | GET credits, Bearer auth, CreditBalance decode | authorizedRequest(path: "credits") | ✓ WIRED | StressAPIClient+Credits :32-46 |
-| StoreKitService.completePurchase | POST /credits/redeem → finish only after ack | redeemer seam → apiClient.redeemPurchase | ✓ WIRED | :50, :361-364; pinned by CreditPurchaseFlowTests (ran green) |
-| CreditsViewModel | StoreKitService.purchase(pack:) + CreditService | injected protocols | ✓ WIRED | purchaseSelectedPack; CreditsViewModelTests ran green |
-| Pack product IDs | Real-build resolution (build settings) | INFOPLIST_KEY_STOREKIT_CREDITS_* | ✗ NOT WIRED | CR-04: keys absent from pbxproj entirely — packs unresolvable on device |
+| pbxproj/Info.plist STOREKIT_* keys | Bundle.main → StoreKitProductCatalog tier 1 → packID(for:) → purchase | INFOPLIST_FILE merge | ✓ WIRED | Empirically proven by hosted live suite (6/6) reading the app bundle |
+| `rejectingRevoked(verifyTransaction)` | `/credits/redeem` ONLY | `redeemVerify` binding at route factory :39 | ✓ WIRED | Pinned by revoked-pack-400 route case |
+| Raw verifier + revocation branch | `/credits/premium/verify` → demotePremiumOnRevocation | Branch :116-126 before expiry rejection | ✓ WIRED | Pinned by 6 demotion route cases |
+| completePurchase revoked-subscription branch | syncSubscriptionEntitlementToServer → POST → demotion UPDATE | seam :386-390 | ✓ WIRED | Pinned by inverted spy case (finishCountAtVerify == 0) |
+| Pack-arm revocation guard | transaction.finish() with redeemer never invoked | :371-377, both entry points (handle → completePurchase) | ✓ WIRED | Pinned by 2 WR-10 cases |
+| deductCredit premium_active / chat gate premiumActive | Same effective-premium rule at both gates | SQL-derived under FOR UPDATE / TS-derived from row | ✓ WIRED | Pinned by effective-premium + chat-gate cases |
+| redeemCredits → purchased_credits → derivedTotal → balanceJson → iOS CreditBalance | SQL projection | `total_credits + purchased_credits as total_credits` | ✓ WIRED | Route suites unchanged and green; contract byte-identical |
+| StressMonitorApp → creditService environment → paywall/chat/settings | `.environment(creditService)` | unchanged from initial verification | ✓ WIRED | Quick regression grep green; Release path composes StoreKitService + creditService (DEBUG branch still mock — WR-03 warning) |
 
 ### Data-Flow Trace (Level 4)
 
 | Artifact | Data Variable | Source | Produces Real Data | Status |
 | -------- | ------------- | ------ | ------------------ | ------ |
-| PaywallView balance header | creditService.balance | GET /credits via refreshBalance (foreground/paywall) | Yes (server-authoritative; nil renders "—" placeholder) | ✓ FLOWING |
-| Chat pill / Settings rows | creditService.balance | Same source + SSE metadata convergence | Yes | ✓ FLOWING |
-| Paywall pack cards | packs | storeKit.availablePacks → Product.products | Local .storekit only in Xcode-run Debug; nil-ID fallback on device | ⚠️ STATIC on device (CR-04) |
-| CreditsViewModel.showSuccess | balance before/after | redeemer response → creditService.apply | Yes at unit level; end-to-end gated on deployment | ✓ FLOWING (unit-pinned) / ⚠️ live-gated |
+| PaywallView balance header / chat pill / Settings rows | creditService.balance | GET /credits via refreshBalance + SSE metadata | Yes (server-authoritative; "—" pre-convergence by design) | ✓ FLOWING |
+| Paywall pack cards | packs | storeKit.availablePacks → Product.products | Yes — product IDs now resolve from Bundle.main in real builds (live suite proof); ASC filing still required for sandbox/device purchases | ✓ FLOWING (device-purchasable after ASC filing) |
+| CreditsViewModel.showSuccess | balance before/after | redeemer response → creditService.apply | Yes at unit level; end-to-end gated on deployment | ✓ FLOWING (unit-pinned) / live-gated |
 
-### Behavioral Spot-Checks
+### Behavioral Spot-Checks (all run by this verifier, 2026-08-17)
 
 | Behavior | Command | Result | Status |
 | -------- | ------- | ------ | ------ |
-| Deferred-grant ordering (redeem-before-finish, exactly once, redelivery) | `xcodebuild test -only-testing:.../CreditPurchaseFlowTests -only-testing:.../ChatLifecycleTests` | 12 tests / 2 suites passed, TEST SUCCEEDED | ✓ PASS |
-| 402→paywall routing + lifecycle | (same run) | ChatLifecycleTests green | ✓ PASS |
-| Balance decode/no-arithmetic/sentinel + purchase-success-from-balance + API contracts | `xcodebuild test -only-testing:.../CreditsViewModelTests -only-testing:.../CreditServiceTests -only-testing:.../StressAPIClientCreditsTests` | 26 tests / 3 suites passed, TEST SUCCEEDED | ✓ PASS |
-| Backend JWS rejection paths | `deno test src/lib/iap.test.ts` | 2 passed (4 steps), 0 failed | ✓ PASS |
-| Backend type integrity | `deno task check` | exit 0 | ✓ PASS |
-| Backend DB-backed suites (idempotency, routes, cron) | not re-runnable | local postgres :5433 down at verification time; test cases enumerated on disk; executor reported 25 passed | ? SKIP (environment) |
-| Release build (BUILD-05) | `xcodebuild build -configuration Release` | exit 0 | ✓ PASS |
+| Backend full gap-closure suite (CR-01/02/03/05: purchased bucket, free-first, reset preservation, revocation/expiry rejection, effective premium at both gates, demotion 6-case block, chat premium gate, idempotency, migrations) | `DATABASE_URL=…5433/stress_app deno test src/lib/credits.test.ts src/lib/cron.test.ts src/lib/iap.test.ts src/routes/credits.test.ts src/routes/chat.test.ts scripts/migrate.test.ts` | **17 passed (50 steps), 0 failed** | ✓ PASS |
+| iOS money-path flow: redeem-before-finish, redelivery, revoked-pack loop break (both paths), revoked-sub demotion post, expired never synced, active grants | `xcodebuild test -only-testing:…/CreditPurchaseFlowTests …` | **11/11 passed** | ✓ PASS |
+| iOS real-build product-ID resolution (Bundle.main delivery tier) | `xcodebuild test -only-testing:…/StoreKitProductCatalogLiveTests …` | **6/6 passed** (incl. small/large pack + round-trip) | ✓ PASS |
+| Live DB schema state | `psql -h 127.0.0.1 -p 5433 …` | 8 rows in schema_migrations (incl. 20260817120000); `purchased_credits` column + `user_credits_purchased_nonnegative` constraint present | ✓ PASS |
+| Release build (BUILD-05) | `xcodebuild build -configuration Release` | exit 0, BUILD SUCCEEDED | ✓ PASS |
+| Backend type/lint/format | `deno task check` / `deno lint` / `deno fmt --check` | all clean (39 files) | ✓ PASS |
+
+Note: the executor-reported full-suite figure (97 tests / 17 suites on the merged branch) was not re-run in full per the single-run constraint; the targeted runs above are the independent evidence for every behavior-dependent truth.
 
 ### Probe Execution
 
@@ -173,61 +138,57 @@ No probe scripts declared in plans and no `scripts/*/tests/probe-*.sh` found —
 
 ### Requirements Coverage
 
-No active `.planning/REQUIREMENTS.md` exists (v1.0 archive at `.planning/milestones/v1.0-REQUIREMENTS.md`); plans declare requirement IDs directly.
+No active `.planning/REQUIREMENTS.md` (v1.0 archive only); plans declare requirement IDs directly.
 
 | Requirement | Source Plan | Description | Status | Evidence |
 | ----------- | ---------- | ----------- | ------ | -------- |
-| AUTH-02 | 02-01, 02-04 | Live-session probe via credit surface, typed 401 | ✓ SATISFIED (live kill-check rides gated smoke) | Foreground refreshBalance; CreditsAPIError.unauthorized |
-| IAP-01 | 02-03 | Product IDs resolve in Release configuration | ✗ BLOCKED | CR-04 + ASC consumables not filed; StoreKitProductCatalogLiveTests still disabled-with-reason |
-| IAP-02 | 02-03 | Transaction.updates listener app-scope lifetime | ✓ SATISFIED | StoreKitService init :52 |
+| AUTH-02 | 02-01, 02-04 | Live-session probe via credit surface, typed 401 | ✓ SATISFIED (live kill-check rides gated smoke) | unchanged from initial verification |
+| IAP-01 | 02-03, 02-05 | Product IDs resolve in Release configuration | ✓ SATISFIED (ID-resolution half empirically closed; sandbox purchase rides the gated smoke) | Live suite 6/6 against hosted Bundle.main |
+| IAP-02 | 02-03 | Transaction.updates listener app-scope lifetime | ✓ SATISFIED | init :52 |
 | IAP-03 | 02-03 | Foreground entitlement refresh | ✓ SATISFIED | refreshEntitlements at entry points |
-| IAP-04 | 02-01, 02-04 | Premium gating semantics intentional | ✓ SATISFIED | outOfCredits bypasses guard; PremiumState stays client-side |
-| IAP-05 | 02-04 | Pricing display accuracy (computed savings) | ✓ SATISFIED | savingsPercent(for:) computed per-unit; "33" is a preview fixture |
-| IAP-06 | 02-02, 02-04 | E2E money path verified | ? NEEDS HUMAN | Deployment-gated live smoke (see Human Verification) |
-| BUILD-05 | 02-03 | Release build compiles | ✓ SATISFIED | Re-ran: exit 0 |
-| derived-CR-01..07 | 02-01/02-02/02-03 | Contract/integrity pins | ✓ SATISFIED (CR-05/07 via suites ran green; CR-06 formatter pinned) | Test cases enumerated + targeted runs |
+| IAP-04 | 02-01, 02-04 | Premium gating semantics intentional | ✓ SATISFIED | unchanged |
+| IAP-05 | 02-04 | Pricing display accuracy | ✓ SATISFIED | computed per-unit savings (unchanged) |
+| IAP-06 | 02-02..02-08 | E2E money path verified | ? NEEDS HUMAN | Deployment-gated live smoke (see Human Verification) |
+| BUILD-05 | 02-03, 02-05..08 | Release build compiles | ✓ SATISFIED | Re-ran: exit 0 |
+| derived-CR-01 (02-06) | Purchased credits persist | ✓ SATISFIED | Backend suite green in my run |
+| derived-CR-02/CR-03 (02-07) | Revocation/expiry rejection; effective premium at gates | ✓ SATISFIED | Backend + iOS suites green in my runs |
+| derived-CR-05 / derived-WR-10 (02-08) | Refund demotion; refunded-pack loop break | ✓ SATISFIED | 6 backend demotion cases + 3 iOS cases green in my runs |
 
 ### Anti-Patterns Found
 
 | File | Line | Pattern | Severity | Impact |
 | ---- | ---- | ------- | -------- | ------ |
-| project.pbxproj | 850-853, 905-908 | Pack product-ID keys absent (CR-04) | 🛑 Blocker | Pack purchase impossible in real builds |
-| stress-app-be/src/lib/cron.ts | 4-11 | Monthly reset destroys purchased credits (CR-01) | 🛑 Blocker | Paid-value data loss |
-| stress-app-be/src/lib/iap.ts + routes/credits.ts | 19-23, 103-108 | No revocation/expiry enforcement (CR-02) | 🛑 Blocker | Free premium from expired/refunded transactions |
-| stress-app-be/src/lib/credits.ts + routes/chat.ts | 44, 34 | plan_type-only premium gates (CR-03) | 🛑 Blocker | Up to ~31 days free premium after expiry |
-| StressMonitor/StressMonitor/StressMonitorApp.swift | 237-240 | DEBUG money path is a no-op mock (WR-03, review) | ⚠️ Warning | All Debug/simulator UAT of purchases silently does nothing; Release-only verification required |
-| StressMonitor/Services/StoreKit/StoreKitService.swift | 314-318 | .unverified consumables finished, destroying recovery proof (WR-04, review) | ⚠️ Warning | Paid pack unrecoverable on transient verification failure |
-| StressMonitor/Views/Settings/SettingsView.swift | 549-558 | Preview missing CreditService environment (WR-06, confirmed: preview injects only AppRouter/PaywallController) | ⚠️ Warning | Dead preview |
-| StressMonitor/Views/Chat/ChatBottomSheetView.swift | 387, 437 | "not yet implemented" comment + "coming soon" copy | ℹ️ Info | Pre-existing v1.0 baseline (commit 4405668), not phase-introduced |
+| StressMonitor/StressMonitor/StressMonitorApp.swift | 239 | DEBUG money path routes to MockStoreKitService (WR-03, review) | ⚠️ Warning | Debug/simulator UAT of purchases is a no-op; live smoke must use Release config |
+| StressMonitor/StressMonitor/Views/Settings/SettingsView.swift | 549-559 | `SettingsView_Previews` injects AppRouter/PaywallController but not CreditService (WR-06, review) | ⚠️ Warning | Dead/crashing preview; outside gap-closure scope, unchanged |
+| StressMonitor/…/StoreKitService.swift | ~314-318 | `.unverified` consumables finished (WR-04, review — open) | ⚠️ Warning | Paid pack unrecoverable on transient verification failure |
+| stress-app-be/src/routes/chat.ts | 78 | `getMaxTokens(remaining, credits.plan_type)` uses raw plan_type while gates use effective premium (IN-07, review) | ℹ️ Info | Expired-premium user gets premium-sized token budget funded from finite buckets |
+| stress-app-be/src/routes/credits.ts | 117 | Revoked-subscription-with-null-expiresAt 400 guard has no dedicated test case (verifier disconfirmation pass) | ℹ️ Info | Guard exists in code; untested edge |
+| stress-app-be — iap coverage | — | Demotion/rejection cases use injected fake verifiers; no real Apple-signed revoked fixture exists (IN-05, review — open) | ℹ️ Info | Policy logic fully pinned; real-decode-of-revoked-payload unproven until a sandbox refund |
+| StressMonitor/…/ChatBottomSheetView.swift | 387, 437 | "not yet implemented" comment + "coming soon" copy | ℹ️ Info | Pre-existing v1.0 baseline (commit 4405668), not phase-introduced |
+
+Debt-marker gate: 0 `TBD`/`FIXME`/`XXX` across all 33 phase-modified code files (iOS + backend). Stub-language hits in phase files all resolve to loading skeletons overwritten by fetch, documented neutral labels, or #Preview fixtures.
 
 ### Human Verification Required
 
 ### 1. Live money-path smoke (deployment + ASC gated)
 
-**Test:** Deploy stress-app-be (image rebuild with `--force`, apply migrations 20260816120000 + 20260816120100, set APPLE_APPLE_ID), file the two DEC-2 consumables in App Store Connect, then on a Release build: fresh user → 50 credits everywhere; chat to 402 → outOfCredits paywall; sandbox small-pack purchase → +10 exactly once; relaunch → server-persisted balance; restore → packs-era copy.
-**Expected:** Balance increments exactly once and persists; paywall carries balance/reset date; no phantom local credit.
+**Test:** Deploy stress-app-be (image rebuild, apply all unapplied migrations through `20260817120000_purchased_credits`, set `APPLE_APP_LE_ID`), file the two DEC-2 consumables (`com.stressmonitor.app.credits.small` $1.99/10, `.large` $19.99/150) in App Store Connect, then on a Release build: fresh user → 50 credits everywhere; chat to 402 → outOfCredits paywall; sandbox small-pack purchase → +10 exactly once; relaunch → server-persisted balance; restore → packs-era copy. If feasible: sandbox-refund a subscription (expect server-side demotion at the refund date, CR-05) and a pack (expect one-pass queue clear, WR-10).
+**Expected:** Balance increments exactly once and persists; paywall carries balance/reset date; refund demotes server-side premium; refunded pack never wedges the queue.
 **Why human:** Requires deployed backend, ASC products, sandbox tester, and a Release build (Debug routes purchases through a no-op mock) — none observable from the codebase.
 
 ### 2. Design-system conformance of the new surfaces
 
-**Test:** Visually inspect paywall (subscription-led grid + OR TOP UP ONCE section), chat pill, Settings rows at standard and accessibility Dynamic Type sizes.
+**Test:** Visually inspect paywall (subscription-led grid + OR TOP UP ONCE section + balance header), chat pill, Settings rows at standard and accessibility Dynamic Type sizes.
 **Expected:** Dual coding everywhere, accessible type scaling, >=44pt targets, haptics on selection/purchase.
 **Why human:** Layout/visual properties; static grep found zero accessibleDynamicType usages in PackCard and ChatBottomSheetView.
 
 ### Gaps Summary
 
-Four verified defects block the phase goal, all cited from 02-REVIEW and independently re-confirmed in code during this verification:
+No code gaps. All four previously failed truths (CR-01..CR-04) and both cycle-2 review findings (CR-05, WR-10) are implemented, wired, and pinned by tests this verifier independently re-ran: backend 17 tests / 50 steps green against the live local postgres (8 migrations applied, purchased_credits schema confirmed in-database), iOS 17 tests / 2 suites green on the simulator (including the live catalog suite proving Bundle.main product-ID delivery and the three refund-path flow cases), Release build exit 0, deno check/lint/fmt clean. The 02-07→02-08 pin inversion is clean: the contradictory `revokedSubscriptionNeverSyncs` pin is deleted, its replacement passes, and the retained `expiredSubscriptionNeverSyncs` pin still passes.
 
-1. **CR-04 — packs unpurchasable in any real build** (gap 1). The 3-tier resolution code exists and the .storekit entries are correct, but the build-settings tier was never configured: zero `STOREKIT_CREDITS_*` keys in the pbxproj, and the delivery mechanism itself (custom INFOPLIST_KEY_*) is unproven even for the premium keys added this phase. On device, `purchase(pack:)` throws `missingProductConfiguration`. This is the direct blocker for "transition StoreKit to consumable credit packs".
-2. **CR-01 — monthly reset destroys purchased credits** (gap 2). Free and purchased credits share `total_credits`; the cron hard-resets it to 50 on the 1st of each month. Directly contradicts the user-confirmed "one-time top-ups" model.
-3. **CR-02 — premium verify accepts expired/revoked transactions; iOS syncs them** (gap 3). No `revocationDate` anywhere; only null-expiry rejected; iOS posts the JWS before checking revocation/expiry.
-4. **CR-03 — premium expiry enforced only by the monthly cron** (gap 4). Same entitlement-integrity concern as CR-02; grouped for the planner.
-
-Gaps 3+4 share a root cause (server-side premium entitlement integrity) and could be planned as one fix sweep; gaps 1 and 2 are independent (iOS build configuration; backend balance schema).
-
-What IS solid: the balance spine (GET /credits → CreditService → three placement-a surfaces), the 402→paywall routing with premium-guard bypass, SSE metadata convergence with zero client arithmetic, the deferred-grant ordering pinned by passing protocol tests, backend idempotency by PK construction, and a green Release build — 38 tests across 5 iOS suites plus backend rejection-path tests all ran green during this verification.
+The phase goal is achieved at the code level for a real build. Remaining items are external by definition — backend deployment + ASC filing + live sandbox smoke, and visual design-system conformance — carried as the two human verification items above. Advisory review residue (WR-02..04, WR-06..09, IN-01..IN-08) remains at its recorded 02-REVIEW status; none is a phase must-have, and the money-path-relevant ones (WR-03/WR-04) are flagged above.
 
 ---
 
-_Verified: 2026-08-17T05:05:00Z_
+_Verified: 2026-08-17T09:25:00Z_
 _Verifier: Claude (gsd-verifier)_
