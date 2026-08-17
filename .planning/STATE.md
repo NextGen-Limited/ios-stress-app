@@ -5,16 +5,16 @@ milestone_name: Backend API Migration
 current_phase: 2
 current_phase_name: Credits System + IAP Transition
 status: executing
-stopped_at: Completed 02-02-PLAN.md (backend redeem + premium verify, undeployed)
-last_updated: "2026-08-17T06:40:03.513Z"
-last_activity: 2026-08-16
-last_activity_desc: Phase 01 execution started
+stopped_at: Completed 02-06-PLAN.md (purchased-credits bucket, free-first consumption, reset preservation — CR-01 closed)
+last_updated: "2026-08-17T07:10:14.707Z"
+last_activity: 2026-08-17
+last_activity_desc: Phase 2 execution started
 progress:
   total_phases: 3
   completed_phases: 1
   total_plans: 11
-  completed_plans: 6
-  percent: 33
+  completed_plans: 9
+  percent: 82
 ---
 
 # Project State
@@ -29,9 +29,9 @@ See: .planning/PROJECT.md (updated 2026-08-16 after v1.1 Phase 01 close)
 ## Current Position
 
 Phase: 2 (Credits System + IAP Transition) — EXECUTING
-Plan: 3 of 4
+Plan: 2 of 7
 Status: Ready to execute
-Last activity: 2026-08-16 — Phase 2 execution started
+Last activity: 2026-08-17 — Phase 2 execution started
 
 ## Performance Metrics
 
@@ -65,6 +65,7 @@ Last activity: 2026-08-16 — Phase 2 execution started
 | Phase 01 P01 | 42m | 3 tasks | 12 files |
 | Phase 01 P03 | 32m | 2 tasks | 6 files |
 | Phase 02 P02 | ~75min | 5 tasks | 17 files |
+| Phase 02 P06 | 10min | 2 tasks | 6 files |
 
 ## Accumulated Context
 
@@ -82,6 +83,8 @@ Full v1.0 decision log archived in PROJECT.md Key Decisions table (see "v1.0 Ver
 - [Phase 01, 2026-08-16]: AccountViewModel/SettingsView Google row pattern established: ViewModel wraps service state, rethrows errors, silent on GIDSignIn code -5 cancellation
 - [Phase 02]: Backend IAP: @apple/app-store-server-library@3.1.0 user-verified; Apple Root CA G2+G3 embedded; premium endpoint pinned as POST /credits/premium/verify
 - [Phase 02]: Grant idempotency keyed on iap_redemptions PK shared by packs and subscriptions; premium_until = greatest(existing, expiry), demoted by monthly cron before free reset
+- [Phase 02]: Purchased credits live in purchased_credits (CHECK >= 0); total_credits is the immutable free allotment; API contract preserved via derived-total SQL alias — routes and iOS decode unchanged
+- [Phase 02]: Credit consumption is free-first (used_credits pins at total, purchased drains the overflow); monthly reset restores used_credits only — CR-01 closed and pinned by cron test
 
 ### Pending Todos
 
@@ -121,8 +124,8 @@ Items acknowledged and deferred at v1.0 milestone close on 2026-08-12:
 
 ## Session Continuity
 
-Last session: 2026-08-17T02:04:07.091Z
-Stopped at: Completed 02-02-PLAN.md (backend redeem + premium verify, undeployed)
+Last session: 2026-08-17T07:10:14.691Z
+Stopped at: Completed 02-06-PLAN.md (purchased-credits bucket, free-first consumption, reset preservation — CR-01 closed)
 Resume file: None
 
 ## Operator Next Steps
