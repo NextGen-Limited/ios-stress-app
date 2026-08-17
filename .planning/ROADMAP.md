@@ -46,7 +46,7 @@ Plans:
 
 **Goal:** Integrate /credits API, transition StoreKit from subscription to consumable credit packs, credits-gated chat access (402 INSUFFICIENT_CREDITS → paywall), new paywall UX with balance display.
 **Depends on:** Phase 1 (auth + API client)
-**Plans:** 5/7 plans executed (4 executed, 3 gap closure from verification CR-01..CR-04)
+**Plans:** 6/7 plans executed (4 executed, 3 gap closure from verification CR-01..CR-04)
 
 Plans:
 **Wave 1**
@@ -64,7 +64,7 @@ Plans:
 
 **Gap closure** *(from 02-VERIFICATION: 20/26, gaps CR-01..CR-04)*
 
-- [ ] 02-05-PLAN.md — CR-04 gap: pack product-ID build settings (both configurations) + verified Info.plist delivery + re-enabled live catalog suite (wave 1, iOS)
+- [x] 02-05-PLAN.md — CR-04 gap: pack product-ID build settings (both configurations) + verified Info.plist delivery + re-enabled live catalog suite (wave 1, iOS)
 - [x] 02-06-PLAN.md — CR-01 gap: purchased_credits schema separation, free-first consumption, reset preservation (wave 1, cross-repo TDD)
 - [ ] 02-07-PLAN.md — CR-02+CR-03 gap: revocation/expiry rejection at verify, effective premium at live gates, iOS guard-before-sync (wave 2, after 02-06 — shared credits.ts; cross-repo TDD)
 
