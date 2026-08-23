@@ -51,6 +51,7 @@
 		F1A1B2C3D4E500000000B016 /* CreditPurchaseFlowTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A1B2C3D4E500000000A016 /* CreditPurchaseFlowTests.swift */; };
 		F1A1B2C3D4E500000000B017 /* CreditsViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A1B2C3D4E500000000A017 /* CreditsViewModelTests.swift */; };
 		F1A1B2C3D4E500000000B018 /* StressAPIClientSessionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A1B2C3D4E500000000A018 /* StressAPIClientSessionsTests.swift */; };
+		F1A1B2C3D4E500000000B019 /* ChatHistoryRestoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A1B2C3D4E500000000A019 /* ChatHistoryRestoreTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -143,6 +144,7 @@
 		F1A1B2C3D4E500000000A016 /* CreditPurchaseFlowTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CreditPurchaseFlowTests.swift; path = StressMonitorTests/CreditPurchaseFlowTests.swift; sourceTree = "<group>"; };
 		F1A1B2C3D4E500000000A017 /* CreditsViewModelTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CreditsViewModelTests.swift; path = StressMonitorTests/CreditsViewModelTests.swift; sourceTree = "<group>"; };
 		F1A1B2C3D4E500000000A018 /* StressAPIClientSessionsTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = StressAPIClientSessionsTests.swift; path = StressMonitorTests/StressAPIClientSessionsTests.swift; sourceTree = "<group>"; };
+		F1A1B2C3D4E500000000A019 /* ChatHistoryRestoreTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ChatHistoryRestoreTests.swift; path = StressMonitorTests/ChatHistoryRestoreTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -302,6 +304,7 @@
 				F1A1B2C3D4E500000000A016 /* CreditPurchaseFlowTests.swift */,
 				F1A1B2C3D4E500000000A017 /* CreditsViewModelTests.swift */,
 				F1A1B2C3D4E500000000A018 /* StressAPIClientSessionsTests.swift */,
+				F1A1B2C3D4E500000000A019 /* ChatHistoryRestoreTests.swift */,
 				4C67EAC979024C30F581AD22 /* StressMonitorProducts.storekit */,
 			);
 			sourceTree = "<group>";
@@ -546,6 +549,7 @@
 				F1A1B2C3D4E500000000B016 /* CreditPurchaseFlowTests.swift in Sources */,
 				F1A1B2C3D4E500000000B017 /* CreditsViewModelTests.swift in Sources */,
 				F1A1B2C3D4E500000000B018 /* StressAPIClientSessionsTests.swift in Sources */,
+				F1A1B2C3D4E500000000B019 /* ChatHistoryRestoreTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
