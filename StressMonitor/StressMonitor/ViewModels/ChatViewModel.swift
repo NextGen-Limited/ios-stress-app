@@ -38,7 +38,17 @@ final class ChatViewModel {
         return RippleMood.from(stressLevel: level)
     }
 
+    /// API client for server-side chat history. Set by the owning view on
+    /// appear (mirrors the `presentPaywall` injection seam); unset in unit
+    /// tests unless a test injects one.
+    var apiClient: StressAPIClient?
+
     // MARK: - Private State
+
+    /// One history fetch per presentation — `onAppear` can fire more than
+    /// once per sheet presentation, and a second fetch could duplicate or
+    /// clobber messages.
+    private var restoredHistory = false
 
     private let llmService: LLMServiceProtocol
     private var streamingTask: Task<Void, Never>?
@@ -160,6 +170,7 @@ final class ChatViewModel {
                 )
                 messages.append(response)
             }
+
         } catch let error as LLMServiceError {
             if case .insufficientCredits = error {
                 // The paywall carries the detail (DEC-1: subscription-led) —
@@ -178,6 +189,48 @@ final class ChatViewModel {
         } catch {
             preservePartialResponseIfNeeded()
             errorMessage = error.localizedDescription
+        }
+    }
+
+    // MARK: - History Restore
+
+    /// Renders the persisted rolling session's server-side history into the
+    /// conversation (derived-SES-01). The server is the authoritative message
+    /// store — nothing is cached locally. A 404 means the stored session is
+    /// gone server-side: clear the id and keep the chat empty rather than
+    /// surfacing an error. Never clobbers messages the user already sent
+    /// while the fetch was in flight.
+    func restoreHistory() async {
+        guard !restoredHistory, messages.isEmpty else { return }
+        restoredHistory = true
+
+        guard let sessionId = (llmService as? StressLLMService)?.currentSessionId,
+              let apiClient else { return }
+
+        do {
+            let dtos = try await apiClient.fetchMessages(sessionId: sessionId)
+            // Re-check after the async gap: the user may have sent a message
+            // while the fetch was in flight — live content wins.
+            guard messages.isEmpty else { return }
+            messages = dtos
+                .filter { $0.role != .system }
+                .map { dto in
+                    ChatMessage(
+                        role: dto.role,
+                        content: dto.content,
+                        remoteId: dto.id,
+                        sessionId: dto.sessionId,
+                        isSynced: true,
+                        tokensUsed: dto.tokensUsed
+                    )
+                }
+        } catch SessionsAPIError.notFound {
+            // Dangling stored id (session deleted server-side or a pre-Phase-3
+            // install): start fresh instead of bricking chat open.
+            (llmService as? StressLLMService)?.resetSession()
+        } catch {
+            // Auth/network failures leave the chat usable but empty — the
+            // next send re-establishes a session server-side.
         }
     }
 

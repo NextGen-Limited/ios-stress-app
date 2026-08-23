@@ -51,6 +51,11 @@ struct ChatBottomSheetView: View {
                 viewModel.setCreditsConvergenceSink { [weak creditService] remaining in
                     creditService?.apply(creditsRemaining: remaining)
                 }
+                // Server-authoritative history restore (derived-SES-01): the
+                // VM is fresh per presentation, and restoreHistory guards
+                // re-appear within one presentation.
+                viewModel.apiClient = StressAPIClient()
+                Task { await viewModel.restoreHistory() }
             }
             // Covers swipe-to-dismiss too, not just the Close button — without
             // this the SSE stream and its owning objects outlive the sheet.

@@ -69,11 +69,28 @@ final class StressLLMService: LLMServiceProtocol, @unchecked Sendable {
         stressContext: StressContextPayload?
     ) async throws -> AsyncThrowingStream<String, Error> {
         AsyncThrowingStream { (continuation: AsyncThrowingStream<String, Error>.Continuation) in
-            let task = _Concurrency.Task { [stressAPIClient, currentSessionId, stressContext] in
+            let task = _Concurrency.Task { [stressAPIClient, stressContext] in
                 do {
+                    // Session creation strictly precedes /chat (Pitfall 5): a
+                    // /chat without session_id makes the backend auto-create
+                    // an untitled twin session. Fail-soft — a failed title
+                    // creation falls through with a nil id and never blocks
+                    // the chat (the backend then creates the session itself).
+                    var sessionId = self.currentSessionId
+                    if sessionId == nil {
+                        let title = Self.sessionTitle(for: messages)
+                        if let created = try? await stressAPIClient.createSession(
+                            title: title,
+                            stressContext: stressContext
+                        ) {
+                            sessionId = created.id
+                            await self.adopt(sessionId: created.id)
+                        }
+                    }
+
                     let (bytes, httpResponse) = try await stressAPIClient.sendChat(
                         messages: messages,
-                        sessionId: currentSessionId,
+                        sessionId: sessionId,
                         stressContext: stressContext
                     )
 
@@ -109,12 +126,35 @@ final class StressLLMService: LLMServiceProtocol, @unchecked Sendable {
         }
     }
 
+    // MARK: - Session Adoption
+
+    /// Adopts a server-issued session id as the current rolling session —
+    /// the single write-through shared by titled-session creation and SSE
+    /// metadata application.
+    private func adopt(sessionId: UUID) {
+        currentSessionId = sessionId
+        UserDefaults.standard.set(sessionId.uuidString, forKey: Self.sessionIdDefaultsKey)
+    }
+
+    /// Derives the session title from the conversation's last user message:
+    /// whitespace collapsed to single spaces, truncated to 50 characters with
+    /// an ellipsis when longer. Matches the backend's "New Conversation"
+    /// default when the conversation has no user text.
+    private static func sessionTitle(for messages: [ChatMessage]) -> String {
+        let content = messages.last(where: { $0.role == .user })?.content ?? ""
+        let collapsed = content
+            .split(whereSeparator: \.isWhitespace)
+            .joined(separator: " ")
+        guard !collapsed.isEmpty else { return "New Conversation" }
+        let prefix = collapsed.prefix(50)
+        return prefix.count < collapsed.count ? "\(prefix)…" : String(prefix)
+    }
+
     // MARK: - Metadata Application
 
     private func apply(metadata: SSEMetadata) {
         if let sessionId = metadata.sessionId {
-            currentSessionId = sessionId
-            UserDefaults.standard.set(sessionId.uuidString, forKey: Self.sessionIdDefaultsKey)
+            adopt(sessionId: sessionId)
         }
         creditsRemaining = metadata.creditsRemaining
         modelUsed = metadata.modelUsed
