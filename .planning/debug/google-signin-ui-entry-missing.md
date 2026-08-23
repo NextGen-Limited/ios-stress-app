@@ -1,8 +1,8 @@
 ---
-status: diagnosed
+status: resolved
 trigger: "UAT Test 2: No UI entry point exists — signInWithGoogle code path is unreachable from anywhere in the app (no button or screen triggers FirebaseAuthService.signInWithGoogle)"
 created: 2026-08-15T00:00:00Z
-updated: 2026-08-15T00:00:00Z
+updated: 2026-08-23T23:58:00Z
 ---
 
 ## Current Focus
@@ -10,7 +10,7 @@ updated: 2026-08-15T00:00:00Z
 hypothesis: CONFIRMED — The Google Sign-In UI entry point was explicitly descoped during planning: Plan 01-02 Task 1 shipped only the service method and deferred the UI button to "Plan 03 or a future settings-phase", but Plan 01-03 (a testing-only plan) also skipped it, and no later plan/phase exists. The UI button was never planned as a task in any of the three phase plans.
 test: Cross-referenced the three PLAN/SUMMARY files, VERIFICATION.md, and a full-repo grep for UI call sites.
 expecting: Zero Views call sites + explicit descope language in plans = scope gap, not an implementation regression.
-next_action: Diagnose-only mode (goal: find_root_cause_only) — return ROOT CAUSE FOUND to caller. No fix.
+next_action: RESOLVED at v1.1 close (2026-08-23) — stale at audit time. Gap-closure plan 01-04 (executed 2026-08-16, one day after this session's last update) shipped the exact fix recommended by the diagnosis: 'Sign in with Google' row in SettingsView.syncDevicesSection (SettingsView.swift:178-180), AccountViewModel with injected AuthServiceProtocol (:13, :450), key-window rootViewController presentation. Human-verified 2026-08-16 (PROJECT.md Validated: G-01-2). Debug session was never re-checked after 01-04 landed.
 
 bug_class: Bohrbug (deterministic absence of code — not a runtime failure; the feature is provably unreachable)
 

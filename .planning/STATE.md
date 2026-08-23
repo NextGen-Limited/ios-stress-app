@@ -2,18 +2,18 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Backend API Migration
-current_phase: 3
-status: completed
-stopped_at: Phase 3 complete (verification passed 21/21, 5 UAT scenarios human-validated 2026-08-23) — milestone v1.1 complete, lifecycle pending
-last_updated: "2026-08-23T15:08:32.391Z"
-last_activity: 2026-08-23
-last_activity_desc: Phase 2 complete, transitioned to Phase 3
+status: Awaiting next milestone
+stopped_at: Milestone v1.1 complete — all 3 phases passed verification; lifecycle (audit → complete → cleanup) pending
+last_updated: "2026-08-23T17:23:03.618Z"
+last_activity: 2026-08-24
+last_activity_desc: Milestone v1.1 completed and archived
 progress:
   total_phases: 3
   completed_phases: 3
   total_plans: 17
   completed_plans: 17
   percent: 100
+current_phase: 3
 current_phase_name: Sessions, Preferences, Quick Actions + Cleanup
 ---
 
@@ -28,10 +28,10 @@ See: .planning/PROJECT.md (updated 2026-08-23 after v1.1 Phase 03 close — mile
 
 ## Current Position
 
-Phase: 3
-Plan: Not started
-Status: All phases complete
-Last activity: 2026-08-23 — Phase 3 complete
+Phase: Milestone v1.1 complete
+Plan: —
+Status: Awaiting next milestone
+Last activity: 2026-08-24 — Milestone v1.1 completed and archived
 
 ## Performance Metrics
 
@@ -150,6 +150,8 @@ Items acknowledged and deferred at v1.0 milestone close on 2026-08-12:
 | verification_gap | Phase 01 — 01-VERIFICATION.md | gaps_found |
 | verification_gap | Phase 02 — 02-VERIFICATION.md | human_needed (4/7 must-haves verified) |
 | deferred_item | Phase 03 — StoreKitServiceEnvironment.swift:12 references MockStoreKitService unconditionally, but it is #if DEBUG-only; every Release build fails to compile | open (pre-existing, not caused by Phase 3; blocks AUTH-01's local Release strings gate) |
+
+Items acknowledged and deferred at v1.1 milestone close on 2026-08-23: none — the sole audit-open item (google-signin-ui-entry-missing) was verified already resolved by gap-closure plan 01-04 (UI shipped + human-verified 2026-08-16); debug session marked resolved at close.
 
 ## Session Continuity
 

@@ -2,9 +2,11 @@
 
 ## What This Is
 
-StressMonitor is an iOS/watchOS app that scores stress 0–100 from HealthKit biometrics (HRV, heart rate, sleep, activity, recovery) via a five-factor algorithm, paired with an AI coaching chat, CloudKit sync, a gamified character system, and a credits-based monetization system (consumable credit packs + premium tier, server-verified against Apple JWS). The product is feature-complete by line count, but a same-day audit (6 audits, 65 findings) found it is **not submittable**: AI Chat and in-app purchase — both shipped in the binary — are non-functional in every real build.
+StressMonitor is an iOS/watchOS app that scores stress 0–100 from HealthKit biometrics (HRV, heart rate, sleep, activity, recovery) via a five-factor algorithm, paired with an AI coaching chat, CloudKit sync, a gamified character system, and a credits-based monetization system (consumable credit packs + premium tier, server-verified against Apple JWS).
 
-This milestone executes the remediation plan already drafted at `plans/0808-2042-appstore-submission-remediation/plan.md`: get StressMonitor from "feature-complete" to "actually works when a real user or App Review taps it."
+As of v1.1 close (2026-08-23) the app runs end-to-end against its own deployed backend (`stress-api.dropitx.site`): Firebase Auth (anonymous + Google linking with account preservation), credit-metered chat streaming with server-side session history, preferences that shape the coach's system prompt, Apple-verified purchases with idempotent grants and refund demotion, and a factory reset that wipes server history. The money path and all 4 E2E flows are live-verified against deployed infrastructure.
+
+What blocks submission now is the v1.0-carryover list — privacy manifest validation (BUILD-01, gated on D3), ship readiness (SHIP-01..03), accessibility (A11Y-01..05), and the widget decision (WIRE-01/D4) — plus environment debt (WINDOWS.md #8 host crash lineage, quarantined CharacterEntitlementSyncTests). The v1.1 milestone audit recommends a v1.2 "submission readiness" milestone to close exactly that list.
 
 ## Core Value
 
@@ -57,44 +59,48 @@ Every feature that ships in the binary must actually work end-to-end for a real 
 - ✓ v1.1 Phase 3, SES-03 + CLEAN-01: Factory reset wipes ALL server sessions (page-1 re-query loop after CR-01 review fix, deletion-aware fake pins 42-session case) + stressChatSessionId cleared; Supabase remnants 0/0 with exactly 2 protected keep-sites
 - ✓ v1.1 Phase 3, CR-02: Trend direction + window selection fixed in StressContextPayload.build (>5-element fixtures pin both directions)
 - ✓ v1.1 Phase 3, integration gate: full suite 215 passed (only accepted #8 crash lineage), Release build green, backend deno 29/100 green, remnant/revenue/orphan/quarantine gates green
+- ✓ v1.0 AUTH-02: Chat entry point reflects real auth state — closed via v1.1 Phase 2 verification (`passed`); live kill-check (typed 401 / stale-session) rode the human-validated live smoke of 2026-08-23
+- ✓ v1.0 AUTH-03: Chat dismiss-mid-stream cancels SSE within one runloop, no credit charged — closed via v1.1 Phase 3: ChatLifecycleTests green in every Phase-3 fence run
+- ✓ v1.0 TEST-01: Host CoreSimulator test execution — resolved 2026-08-16: full suite runs green with `-parallel-testing-enabled NO` (215 tests at v1.1 close); only parallel-testing clones fail
 
 ### Active
 
-<!-- Carried into v1.1. Status reflects the honest per-requirement verification state at v1.0 close, not REQUIREMENTS.md's self-reported "Complete" — see Context. -->
+<!-- Carried into v1.2 "submission readiness" (per v1.1 milestone audit recommendation). Status reflects honest per-requirement verification state, not self-reported marks. -->
 
 **BUILD — carried from v1.0 Phase 1**
 - [ ] BUILD-01: `PrivacyInfo.xcprivacy` passes ASC upload validation — unchecked, still blocked on D3
 - [ ] BUILD-02: One canonical App Group suite ID across all 3 targets — unchecked
 - [ ] BUILD-03: Info.plist consolidated onto `INFOPLIST_KEY_*` — unchecked
-- [ ] BUILD-04: `xcodebuild test` executes and reports pass/fail — **unblocked 2026-08-16**: full suite (87 tests / 14 suites) ran and passed on this host with `-parallel-testing-enabled NO`; the XCTestDevices clone failure persists only for parallel-testing clones. Pin the no-parallel flag in dev docs/CI
+- [ ] BUILD-04 residual: pin `-parallel-testing-enabled NO` in dev docs/CI — suite itself green (see Validated TEST-01)
 
 **DATA — carried from v1.0 Phase 2**
-- [ ] DATA-01: Delete actually deletes everywhere (local + CloudKit + Keychain JWT + App Group cache) — Keychain/App-Group half verified; the requirement's own defining two-device CloudKit-propagation test (02-01-PLAN.md Task 4) was deferred, never run; a genuine "CloudKit delete silently reports success on failure" bug (CR-01) was found and fixed mid-milestone but ships with zero regression test coverage
+- [ ] DATA-01 residual: two-device CloudKit-propagation delete test never run (local + Keychain + App-Group + server-session halves all verified; server wipe live-verified in v1.1 Phase 3 UAT scenario 5)
+- [ ] DATA-04: Add a regression test for v1.0 CR-01 (CloudKit batch-delete failure propagation) — fix correct by inspection, zero automated coverage; needs a test seam below `CloudKitResetServiceProtocol`
 
-**AUTH — carried from v1.0 Phase 3 (blocked on decision D1)**
-- [ ] AUTH-01: No credential ships extractable from the Release binary via `strings` — fix applied (`#if DEBUG` wrap) but the empirical `strings` confirmation is blocked by an unrelated pre-existing Release-compile failure (see Constraints)
-- [x] AUTH-02: Chat entry point reflects real auth state — v1.1 Phase 01 shipped real Firebase auth; Phase 2 credit-surface landed and the live kill-check (typed 401 / stale-session behavior) rode the human-validated live smoke of 2026-08-23. Closed via v1.1 Phase 2 verification (`passed`)
-- [x] AUTH-03: Chat dismiss-mid-stream cancels SSE within one runloop, no credit charged — closed via v1.1 Phase 3: ChatLifecycleTests executed green in every Phase-3 fence run + the verifier's own runs on a working simulator (the old CoreSimulator blocker no longer applies with `-parallel-testing-enabled NO`)
+**AUTH — carried from v1.0 Phase 3**
+- [ ] AUTH-01: Empirical `strings` check of the Release binary for extractable credentials — `#if DEBUG` fix applied and Release build compiles since v1.1 Phase 2 (BUILD-05); the empirical confirmation itself never run
 
-**WIRE — carried from v1.0 Phase 4 (WIRE-01 only; WIRE-02 validated above)**
-- [ ] WIRE-01: Widget renders live data on a real device, not placeholder — depends on decision D4; no v1.0 phase VERIFICATION.md exists for this
+**WIRE — carried from v1.0 Phase 4**
+- [ ] WIRE-01: Widget renders live data on a real device, not placeholder — depends on decision D4 (still open)
 
-
-**SHIP — carried from v1.0 Phase 5 (no phase VERIFICATION.md exists)**
-- [ ] SHIP-01: App Store screenshot set captured with demo mode disabled — deferred as checkpoint:human-verify, never done
+**SHIP — carried from v1.0 Phase 5**
+- [ ] SHIP-01: App Store screenshot set captured with demo mode disabled
 - [ ] SHIP-02: Fastlane `release` lane matches actual readiness (metadata-only upload)
-- [ ] SHIP-03: ASC privacy questionnaire answered per D3 — blocked on D3, unchecked
+- [ ] SHIP-03: ASC privacy questionnaire answered per D3 — blocked on D3
 
-**A11Y — carried from v1.0 Phase 5 (no phase VERIFICATION.md exists)**
+**A11Y — carried from v1.0 Phase 5**
 - [ ] A11Y-01: Sub-44pt touch targets fixed
 - [ ] A11Y-02: Color-contrast fixes
 - [ ] A11Y-03: Reduce Motion guards added
 - [ ] A11Y-04: Dynamic Type adopted app-wide
 - [ ] A11Y-05: Orphaned redesign views deleted
 
-**NEW — surfaced during v1.0 close, not in the original remediation plan**
-- [ ] TEST-01 (new): This development host's CoreSimulator cannot complete an `xcodebuild test` launch session — reproduced across every phase's verification attempt this milestone (4+ independent occurrences). Needs a working CI runner or a different host before any of BUILD-04/AUTH-03/DATA-01's test-execution claims can be closed.
-- [ ] DATA-04 (new): Add a regression test for CR-01 (CloudKit batch-delete failure propagation) — the fix is correct by code inspection but has zero automated coverage; requires a new test seam below `CloudKitResetServiceProtocol`.
+**ENV/ADVISORY — surfaced during v1.1, carried to v1.2**
+- [ ] WINDOWS.md #8: host CoreSimulator cold-launch crash restarts on DataDeletion/DataExport suites (exit 65, 0 assertion failures) — accepted lineage, still open
+- [ ] CharacterEntitlementSyncTests quarantine (`@Suite(.disabled)`) — root cause undiagnosed; no coverage for `syncPremiumCharacterEntitlement` until resolved
+- [ ] Phase 2 advisory residue WR-02..04/06..09, IN-01..08 (02-REVIEW.md) — none must-have; WR-03 (DEBUG money path mocks StoreKit) and WR-04 (`.unverified` consumables finished) are the notable ones
+- [ ] Backend: POST /quick-actions unmetered completion route — meter/gate tracked as phuongddx/stress-app-be#2 (iOS grep-gated against wiring it)
+- [ ] (optional) Nyquist coverage TODO: VALIDATION.md files for phases 1-3 seeded but never reconciled by validate-phase (per #2117, coverage TODO not compliance failure)
 
 ### Out of Scope
 
@@ -110,24 +116,19 @@ Every feature that ships in the binary must actually work end-to-end for a real 
 - Brownfield, previously believed feature-complete per `docs/project-roadmap.md` (Jul 19, 2026) and `docs/KANBAN-SHIP-READINESS.md` (Jun 12, 2026), both of which named the test suite as the sole remaining blocker.
 - A same-day, far more thorough source (`plans/0808-2042-appstore-submission-remediation/plan.md`, 6 audits / 65 findings, generated 2026-08-08 20:42 — ~2.5h before this milestone's initialization) found the real gap: **a systemic integration pattern, not isolated bugs** — "correct code written, then never wired up," repeated across accessibility helpers, data-deletion services, the widget data provider, the data-management stack, and the StoreKit transaction listener. This document is the authoritative scope source for this milestone, superseding the older KANBAN/roadmap framing.
 - `.planning/codebase/CONCERNS.md` (generated independently, same day) corroborates the auth/privacy findings from a different angle (static codebase analysis vs. targeted audit), which is why both agree D1/D3 are real and unresolved.
-- **Four blocking decisions are still open** (from the remediation plan) and gate specific phases — not resolved here, deliberately deferred to `/gsd-discuss-phase` for the phases they block:
-  - **D1** (Auth strategy: ship Supabase Auth vs. gate Chat off for v1) — blocks Phase 3 (AUTH) and the submission date
-  - **D2** (CloudKit encryption: implement `encryptedValues` vs. retract the E2E claim) — blocks Phase 2 (DATA); harder to change after launch
-  - **D3** (Privacy contract authority: `CLAUDE.md`'s "never sent" claim vs. `StressContextPayload.swift`'s actual behavior) — blocks the ASC privacy nutrition label and BUILD-01
-  - **D4** (Widget in v1: ship it — Phase 4 becomes a blocker — or exclude the target) — blocks Phase 4 (WIRE) priority
-  - Two more, non-blocking but needed before Phase 6: is the "7-day free trial" real or aspirational copy; are the 3 premium characters permanent one-time unlocks by design or a bug.
-- Repo is currently on `feature/spm-cache-integration` with substantial unrelated uncommitted changes (CloudKit, DataManagement refactor/deletion, chat, paywall, watch complications) — not assumed as a stable baseline for this milestone until merged.
-- **v1.0 Verification Reality Check** (added at milestone close, 2026-08-12): v1.0 was closed with `override_closeout` — 5/6 phases un-verified or partially verified, 9/26 requirements still unchecked. Only Phase 1.1 (SwiftData migration safety) has a `passed` verification. Phase 1 verification is `gaps_found`; Phase 2 (this session, after 3 code-review/fix rounds that found and fixed a genuine data-integrity bug) is `human_needed` with 3 pending UAT items; Phases 3/4/5 were never formally verified at all — their REQUIREMENTS.md "Complete" marks are self-reported by SUMMARY.md, not independently confirmed. Treat every "Complete" mark in the archived `milestones/v1.0-REQUIREMENTS.md` for Phases 3-5 as **unverified until re-checked**, not as ground truth. Full detail: `.planning/v1.0-MILESTONE-AUDIT.md` (archived) and `02-VERIFICATION.md` (archived under `milestones/v1.0-phases/`).
+- **Decision status at v1.1 close**: D1 RESOLVED (real Firebase auth shipped, v1.1 Phase 01); D2 RESOLVED in practice (encryptedValues shipped, v1.0 Phase 2 — never formally recorded); D3 (privacy contract authority) and D4 (widget in v1) STILL OPEN and gate BUILD-01/SHIP-03 and WIRE-01 respectively — the two decisions v1.2 must make first. The two non-blocking product questions (7-day trial copy, premium character unlock semantics) also remain open.
+- Repo state at v1.1 close: work shipped on milestone branch `gsd/v1.1-backend-api-migration` (branch created retroactively for Phase 02+; Phase 01 landed on `main`), tagged `v1.1` at close; backend lives in the separate `stress-app-be` repo, deployed at `stress-api.dropitx.site`.
+- **v1.0 Verification Reality Check** (kept for history, from 2026-08-12 close): v1.0 was closed with `override_closeout` — 5/6 phases un-verified or partially verified, 9/26 requirements unchecked. **v1.1 answered that debt**: every v1.1 phase closed with `passed` verification + human-validated UAT, and v1.1 itself closed `verified_closeout` (milestone audit 21/21 requirements, 3/3 phases, 7/7 integration seams, 4/4 E2E flows; zero gaps, documented tech debt only).
 
 ## Constraints
 
 - **Tech stack**: Swift 5.9+ (compiles at `SWIFT_VERSION = 5.0` under a Swift 6.x toolchain), iOS 18.6+ / watchOS 11.6+ deployment targets.
 - **No shared framework**: iOS and watchOS duplicate algorithm/model code by file — a fix applied to one must be mirrored in the other where relevant.
 - **External dependency with its own lead time**: ASC product/subscription-group creation for Phase 5 (IAP) should be filed the same day Phase 1 starts, independent of code sequencing.
-- **No `.storekit` local testing config exists yet** — must be created before any IAP acceptance criterion can be verified even locally.
-- **`git.base_branch` currently configured as `main`** for milestone branching, but active work is on `feature/spm-cache-integration` — needs resolution before a `gsd/v1.0-milestone`-style branch is cut (flagged as an unresolved question in the remediation plan itself).
-- **Dependency policy**: 8 third-party SPM packages already resolved (Chat, SwiftUICharts + transitive incl. Kingfisher, GiphySDK); the remediation plan flags evaluating whether Giphy/Kingfisher/exyte media features are even shipping in v1 — removing unused ones closes a privacy-manifest rejection risk for free.
-- **CI shape**: GitHub Actions on `macos-15`/Xcode 26.3 with SPM+DerivedData caching already wired; a real test job (once BUILD-04 lands) must fit inside that pipeline.
+- **`.storekit` local testing config**: `StressMonitorTests/StressMonitorProducts.storekit` now exists; ASC consumables (`credits.small` $1.99/10, `credits.large` $19.99/150) filed and sandbox-verified 2026-08-23.
+- **`git.base_branch` is `main`**; milestone work rides `gsd/v1.1-*` branches (strategy: milestone). The v1.0-era `feature/spm-cache-integration` ambiguity is resolved — that work was absorbed.
+- **Dependency policy**: 8 third-party SPM packages resolved (Chat, SwiftUICharts + transitive incl. Kingfisher, GiphySDK) + firebase-ios-sdk + GoogleSignIn added in v1.1; the unused-media evaluation (Giphy/Kingfisher/exyte) is still open and folds into BUILD-01's privacy-manifest work.
+- **CI shape**: GitHub Actions on `macos-15`/Xcode 26.3 with SPM+DerivedData caching wired; the real test job must pin `-parallel-testing-enabled NO` (BUILD-04 residual).
 
 ## Key Decisions
 
@@ -151,6 +152,8 @@ Every feature that ships in the binary must actually work end-to-end for a real 
 | v1.1 Phase 3: continuous history restore (single rolling session, fetch-on-open, no local cache) over a multi-session picker UI | Server-authoritative matches Phase 2's balance precedent; offline chat is impossible anyway (SSE needs network); titled sessions keep a future list trivial | ✓ Good — UAT-validated |
 | v1.1 Phase 3: chip taps ride /chat; POST /quick-actions permanently unwired (grep-gated) | The POST route returns unmetered 512-token completions — wiring it would bypass the credits revenue model; metering note filed as phuongddx/stress-app-be#2 | ✓ Good — revenue gate green |
 | v1.1 Phase 3 review CR-01: wipe loop re-queries page 1 instead of advancing offset | Backend paginates over live rows — advancing offset after deletion skips every page past the first (>20 sessions → residue while reset reports success) | ✓ Good — deletion-aware fake + 42-session regression pin it; caught only because review used a deletion-aware fake |
+| v1.1 closed `verified_closeout` — audit full scores, zero gaps; v1.2 "submission readiness" recommended for the v1.0-carryover list | The v1.0 override debt (unverified phases, unchecked requirements) was fully answered: 3/3 v1.1 phases passed verification with human-validated UAT (live money-path smoke, 5 backend scenarios), milestone audit cross-checked 21/21 requirements | ✓ Good — carryover list is now purely submission-blocking items, not verification debt |
+| Debug session `google-signin-ui-entry-missing` closed as stale-resolved at v1.1 close | audit-open flagged it open (status `diagnosed`, updated 2026-08-15), but gap-closure plan 01-04 had shipped the exact diagnosed fix on 2026-08-16 — the session was never re-checked. Lesson: re-run audit-open after gap-closure lands, not just at milestone close | ✓ Good — caught by cross-referencing PROJECT.md Validated entries before archiving |
 
 ## Evolution
 
@@ -170,4 +173,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-08-23 after v1.1 Phase 03 close (sessions/preferences/quick-actions + cleanup; 21/21 verified, 5 UAT scenarios human-validated) — milestone v1.1 complete*
+*Last updated: 2026-08-23 after v1.1 milestone close (Backend API Migration — verified_closeout, audit 21/21 requirements · 3/3 phases · 7/7 integration · 4/4 flows; UAT 9/9 human-validated; SECURITY.md 3/3 phases, threats_open 0)*
