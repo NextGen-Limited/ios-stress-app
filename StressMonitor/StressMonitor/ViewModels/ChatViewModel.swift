@@ -201,10 +201,13 @@ final class ChatViewModel {
     /// surfacing an error. Never clobbers messages the user already sent
     /// while the fetch was in flight.
     func restoreHistory() async {
+        // One fetch per presentation (Pitfall 2), and never over a
+        // conversation that already has content.
         guard !restoredHistory, messages.isEmpty else { return }
         restoredHistory = true
 
-        guard let sessionId = (llmService as? StressLLMService)?.currentSessionId,
+        guard let service = llmService as? StressLLMService,
+              let sessionId = service.currentSessionId,
               let apiClient else { return }
 
         do {
@@ -214,24 +217,29 @@ final class ChatViewModel {
             guard messages.isEmpty else { return }
             messages = dtos
                 .filter { $0.role != .system }
-                .map { dto in
-                    ChatMessage(
-                        role: dto.role,
-                        content: dto.content,
-                        remoteId: dto.id,
-                        sessionId: dto.sessionId,
-                        isSynced: true,
-                        tokensUsed: dto.tokensUsed
-                    )
-                }
+                .map(Self.restoredMessage(from:))
         } catch SessionsAPIError.notFound {
             // Dangling stored id (session deleted server-side or a pre-Phase-3
             // install): start fresh instead of bricking chat open.
-            (llmService as? StressLLMService)?.resetSession()
+            service.resetSession()
         } catch {
             // Auth/network failures leave the chat usable but empty — the
             // next send re-establishes a session server-side.
         }
+    }
+
+    /// Maps a server history row to the display model. `timestamp` is
+    /// cosmetic (the bubble shows wall-clock time only); ordering comes from
+    /// the server's `created_at asc` delivery order.
+    private static func restoredMessage(from dto: ChatSessionMessage) -> ChatMessage {
+        ChatMessage(
+            role: dto.role,
+            content: dto.content,
+            remoteId: dto.id,
+            sessionId: dto.sessionId,
+            isSynced: true,
+            tokensUsed: dto.tokensUsed
+        )
     }
 
     /// Mirrors the partial-text preservation `cancelResponse()` already does —
