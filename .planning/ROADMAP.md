@@ -74,12 +74,12 @@ Plans:
 #### Phase 3: Sessions, Preferences, Quick Actions + Cleanup
 
 **Depends on:** Phase 1 (auth + API client)
-**Plans:** 5 plans (serialized waves — every plan registers test files in project.pbxproj)
+**Plans:** 1/5 plans executed (serialized waves — every plan registers test files in project.pbxproj)
 
 Plans:
 **Wave 1**
 
-- [ ] 03-01-PLAN.md — Sessions tracer: titled session creation (POST /sessions) + history restore (GET /sessions/{id}/messages) end-to-end, 404-tolerant (wave 1)
+- [x] 03-01-PLAN.md — Sessions tracer: titled session creation (POST /sessions) + history restore (GET /sessions/{id}/messages) end-to-end, 404-tolerant (wave 1)
 
 **Wave 2** *(blocked on Wave 1 completion)*
 

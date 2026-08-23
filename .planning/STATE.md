@@ -5,15 +5,15 @@ milestone_name: Backend API Migration
 current_phase: 3
 current_phase_name: Sessions, Preferences, Quick Actions + Cleanup
 status: executing
-stopped_at: Phase 2 complete (verification passed — human items validated 2026-08-23) — Phase 3 ready to plan
-last_updated: "2026-08-23T09:02:15.735Z"
+stopped_at: Completed 03-01-PLAN.md (sessions tracer)
+last_updated: "2026-08-23T09:53:58.747Z"
 last_activity: 2026-08-23
 last_activity_desc: Phase 2 complete, transitioned to Phase 3
 progress:
   total_phases: 3
   completed_phases: 2
   total_plans: 17
-  completed_plans: 12
+  completed_plans: 13
   percent: 67
 ---
 
@@ -28,10 +28,10 @@ See: .planning/PROJECT.md (updated 2026-08-23 after v1.1 Phase 02 close)
 
 ## Current Position
 
-Phase: 3 — Sessions, Preferences, Quick Actions + Cleanup
-Plan: Not started
+Phase: 3 (Sessions, Preferences, Quick Actions + Cleanup) — EXECUTING
+Plan: 2 of 5
 Status: Ready to execute
-Last activity: 2026-08-23 — Phase 2 complete, transitioned to Phase 3
+Last activity: 2026-08-23 — Phase 3 execution started
 
 ## Performance Metrics
 
@@ -69,6 +69,7 @@ Last activity: 2026-08-23 — Phase 2 complete, transitioned to Phase 3
 | Phase 02 P06 | 10min | 2 tasks | 6 files |
 | Phase 02 P07 | 21min | 3 tasks | 9 files |
 | Phase 02 P08 | 18min | 3 tasks | 6 files |
+| Phase 03 P01 | 2448s | 2 tasks | 11 files |
 
 ## Accumulated Context
 
@@ -94,6 +95,8 @@ Full v1.0 decision log archived in PROJECT.md Key Decisions table (see "v1.0 Ver
 - [Phase ?]: Refund handling split per route: /credits/premium/verify treats a revoked subscription JWS as a demotion signal (guarded least() UPDATE, convergent on re-post, never an iap_redemptions insert); /credits/redeem keeps absolute revoked rejection (02-08)
 - [Phase ?]: No clawback of already-granted pack credits on refund — iOS finishes a revoked pack with zero redemption attempts on both entry points; the fix's contract is queue hygiene, not clawback (WR-10, 02-08)
 - [Phase ?]: Replay-window guard on demotion: premium_until <= revoked.expiresAt — an old revocation cannot shorten a newer term granted by a later transaction (02-08)
+- [Phase ?]: Phase 3: query-carrying API endpoints must build URLs via URLComponents + authorizedRequest(url:) — appendingPathComponent percent-encodes '?'; pinned by exact-URL assertions
+- [Phase ?]: Phase 3: session creation fail-soft inside StressLLMService.send (try? createSession before sendChat); 404 restore -> resetSession clears stressChatSessionId
 
 ### Pending Todos
 
@@ -135,8 +138,8 @@ Items acknowledged and deferred at v1.0 milestone close on 2026-08-12:
 
 ## Session Continuity
 
-Last session: 2026-08-23T07:40:00Z
-Stopped at: Phase 2 complete, ready to plan Phase 3
+Last session: 2026-08-23T09:53:58.728Z
+Stopped at: Completed 03-01-PLAN.md (sessions tracer)
 Resume file: None
 
 ## Operator Next Steps
