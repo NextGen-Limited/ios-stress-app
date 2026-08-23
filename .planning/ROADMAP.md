@@ -74,7 +74,7 @@ Plans:
 #### Phase 3: Sessions, Preferences, Quick Actions + Cleanup
 
 **Depends on:** Phase 1 (auth + API client)
-**Plans:** 2/5 plans executed (serialized waves — every plan registers test files in project.pbxproj)
+**Plans:** 3/5 plans executed (serialized waves — every plan registers test files in project.pbxproj)
 
 Plans:
 **Wave 1**
@@ -87,7 +87,7 @@ Plans:
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
-- [ ] 03-03-PLAN.md — Server-driven chips (GET /quick-actions, fallback swap on the live surface) + prefs-fed payload call site + dead-code cutover (wave 3)
+- [x] 03-03-PLAN.md — Server-driven chips (GET /quick-actions, fallback swap on the live surface) + prefs-fed payload call site + dead-code cutover (wave 3)
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
