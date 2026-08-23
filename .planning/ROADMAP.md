@@ -73,5 +73,28 @@ Plans:
 
 #### Phase 3: Sessions, Preferences, Quick Actions + Cleanup
 
-**Goal:** Integrate /sessions (server-side chat history), /preferences sync, /quick-actions, remove all Supabase remnants, final integration testing.
 **Depends on:** Phase 1 (auth + API client)
+**Plans:** 5 plans (serialized waves — every plan registers test files in project.pbxproj)
+
+Plans:
+**Wave 1**
+
+- [ ] 03-01-PLAN.md — Sessions tracer: titled session creation (POST /sessions) + history restore (GET /sessions/{id}/messages) end-to-end, 404-tolerant (wave 1)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
+- [ ] 03-02-PLAN.md — PreferencesService + GET/PUT /preferences pair + CR-02 trend fix + Settings AI Coach section (wave 2)
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
+- [ ] 03-03-PLAN.md — Server-driven chips (GET /quick-actions, fallback swap on the live surface) + prefs-fed payload call site + dead-code cutover (wave 3)
+
+**Wave 4** *(blocked on Wave 3 completion)*
+
+- [ ] 03-04-PLAN.md — Factory-reset server-session wipe (ServerSessionWiping seam) + Supabase remnants + backend metering issue (wave 4)
+
+**Wave 5** *(blocked on Wave 4 completion)*
+
+- [ ] 03-05-PLAN.md — Milestone integration gate: full suite + Release build + backend deno suite (postgres 5433 restart) + 03-UAT.md (wave 5)
+
+Waves: 1: 03-01 → 2: 03-02 → 3: 03-03 → 4: 03-04 → 5: 03-05 (pbxproj-registration serialization; source deps: 03-03 ⊂ {03-01, 03-02}, 03-04 ⊂ {03-01}, 03-05 ⊂ all)
