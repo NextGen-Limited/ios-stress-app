@@ -57,26 +57,40 @@ final class MockAuthService: AuthServiceProtocol, @unchecked Sendable {
 /// status/body so `StressAPIClient`'s header and decoding behavior can be
 /// asserted without hitting the network. Reset `lastRequest` (and set
 /// `statusCode` / `responseBody`) before each test that inspects them.
+///
+/// Multi-request flows set `responseByPath` (keyed by URL path) so several
+/// endpoints can be stubbed in one test; while it is non-nil it takes
+/// precedence over `statusCode` / `responseBody`. `capturedRequests`
+/// accumulates every request in dispatch order for ordering assertions —
+/// reset both alongside the single-response statics.
 final class RequestCaptureURLProtocol: URLProtocol, @unchecked Sendable {
     nonisolated(unsafe) static var lastRequest: URLRequest?
     nonisolated(unsafe) static var statusCode: Int = 200
     nonisolated(unsafe) static var responseBody: Data?
+    nonisolated(unsafe) static var responseByPath: [String: (statusCode: Int, body: Data?)]?
+    nonisolated(unsafe) static var capturedRequests: [URLRequest] = []
 
     override class func canInit(with request: URLRequest) -> Bool { true }
     override class func canonicalRequest(for request: URLRequest) -> URLRequest { request }
 
     override func startLoading() {
         Self.lastRequest = request
-        let code = Self.statusCode
-        let body = Self.responseBody ?? Data()
+        Self.capturedRequests.append(request)
+        let stub: (statusCode: Int, body: Data?)
+        if let responseByPath = Self.responseByPath,
+           let pathStub = responseByPath[request.url?.path ?? ""] {
+            stub = pathStub
+        } else {
+            stub = (Self.statusCode, Self.responseBody ?? Data())
+        }
         let response = HTTPURLResponse(
             url: request.url!,
-            statusCode: code,
+            statusCode: stub.statusCode,
             httpVersion: nil,
             headerFields: nil
         )!
         client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
-        client?.urlProtocol(self, didLoad: body)
+        client?.urlProtocol(self, didLoad: stub.body ?? Data())
         client?.urlProtocolDidFinishLoading(self)
     }
 
