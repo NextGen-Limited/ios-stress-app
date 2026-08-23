@@ -25,11 +25,17 @@ final class ChatViewModel {
     /// view model never constructs UI; tests inject a recording closure.
     var presentPaywall: ((PaywallReason) -> Void)?
 
-    // MARK: - Quick Actions
+    // MARK: - Quick Action Chips
 
-    var quickActions: [ChatQuickAction] {
-        ChatQuickActions.actions(for: stressResult?.category)
-    }
+    /// Chip row state: renders the local fallback instantly at init and is
+    /// swapped for server suggestions when `fetchQuickActions()` lands
+    /// (derived-QA-01). Swap replaces chip data only — messages and the
+    /// composer are never touched.
+    private(set) var quickReplies: [ChatQuickAction]
+
+    /// One chips fetch per presentation — mirrors `restoredHistory`. A
+    /// failure keeps the fallback set; there is no loading or empty state.
+    private var fetchedQuickActions = false
 
     /// Ripple avatar mood derived from the current stress level, so the chat
     /// companion reacts visibly to the user's state.
@@ -42,6 +48,12 @@ final class ChatViewModel {
     /// appear (mirrors the `presentPaywall` injection seam); unset in unit
     /// tests unless a test injects one.
     var apiClient: StressAPIClient?
+
+    /// App-scope preferences (language + coaching style) feeding both the
+    /// chips query and the stress-context payload — one source of truth
+    /// (derived-PREF-02). Set by the owning view on appear; unset in unit
+    /// tests, which get the `"en"`/`"supportive"` defaults.
+    var preferencesService: PreferencesService?
 
     // MARK: - Private State
 
@@ -91,6 +103,8 @@ final class ChatViewModel {
         self.recentHistory = recentHistory
         self.llmService = llmService
         self.isAvailable = llmService.isAvailable()
+        // Instant local chips — the server suggestions swap in later.
+        self.quickReplies = ChatQuickActions.actions(for: stressResult?.category)
     }
 
     // MARK: - Send Message
@@ -113,9 +127,36 @@ final class ChatViewModel {
         }
     }
 
-    /// Send a quick action prompt
-    func sendQuickAction(_ action: ChatQuickAction) {
-        send(action.prompt)
+    // MARK: - Quick Actions Fetch
+
+    /// Swaps the chip row for server-suggested actions (derived-QA-01).
+    /// One fetch per presentation; a failure keeps the local fallback set —
+    /// no loading state, no empty state. Rows whose id has no local prompt
+    /// are dropped rather than rendered as dead chips. Chip taps resolve
+    /// prompts on-device and send through the credit-metered `/chat` path —
+    /// never the backend's unmetered completion route.
+    func fetchQuickActions() async {
+        guard !fetchedQuickActions else { return }
+        fetchedQuickActions = true
+        guard let apiClient else { return }
+
+        do {
+            let serverActions = try await apiClient.getQuickActions(
+                stressLevel: stressResult.map { Int($0.level) } ?? 50,
+                language: preferencesService?.language ?? "en",
+                coachingStyle: preferencesService?.coachingStyle ?? "supportive"
+            )
+            quickReplies = serverActions.compactMap { action in
+                guard let prompt = ChatQuickActions.prompt(forServerActionId: action.id) else {
+                    return nil
+                }
+                // The live chip surface renders the title only; the icon is
+                // required by the model but never shown.
+                return ChatQuickAction(title: action.title, icon: "sparkles", prompt: prompt)
+            }
+        } catch {
+            // Keep the fallback set — suggestions are best-effort.
+        }
     }
 
     // MARK: - Streaming
@@ -130,11 +171,16 @@ final class ChatViewModel {
             }
         }
 
-        // Build stress context for the backend (backend builds system prompt from this)
+        // Build stress context for the backend (backend builds system prompt
+        // from this). Language/coaching style come from PreferencesService —
+        // one source of truth (derived-PREF-02); the defaults only cover the
+        // unset injection seam (tests, previews).
         let stressContext = StressContextPayload.build(
             stressResult: stressResult,
             baseline: baseline,
-            recentHistory: recentHistory
+            recentHistory: recentHistory,
+            language: preferencesService?.language ?? "en",
+            coachingStyle: preferencesService?.coachingStyle ?? "supportive"
         )
 
         // systemPrompt is ignored by StressLLMService — backend builds it

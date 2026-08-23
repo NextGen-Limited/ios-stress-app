@@ -12,6 +12,7 @@ struct ChatBottomSheetView: View {
     @Environment(\.dismiss) private var dismiss
     @Environment(PaywallController.self) private var paywall
     @Environment(CreditService.self) private var creditService
+    @Environment(PreferencesService.self) private var preferencesService
     @State private var viewModel: ChatViewModel
     @State private var inputText = ""
 
@@ -56,6 +57,11 @@ struct ChatBottomSheetView: View {
                 // re-appear within one presentation.
                 viewModel.apiClient = StressAPIClient()
                 Task { await viewModel.restoreHistory() }
+                // Server-suggested chips swap over the instant local set once
+                // the GET lands (derived-QA-01); the prefs seam feeds both
+                // the query and the send-time payload (derived-PREF-02).
+                viewModel.preferencesService = preferencesService
+                Task { await viewModel.fetchQuickActions() }
             }
             // Covers swipe-to-dismiss too, not just the Close button — without
             // this the SSE stream and its owning objects outlive the sheet.
@@ -322,20 +328,15 @@ struct ChatBottomSheetView: View {
 
     private var quickRepliesSection: some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text("QUICK REPLIES")
-                .font(.system(size: 10, weight: .semibold, design: .monospaced))
-                .tracking(0.8)
-                .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
-                .padding(.horizontal, 16)
-
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 6) {
-                    ForEach(defaultQuickReplies, id: \.self) { reply in
+                    ForEach(viewModel.quickReplies) { reply in
                         Button {
-                            inputText = reply
-                            sendMessage()
+                            // Sends the chip's resolved prompt directly — the
+                            // long prompt must not echo into the composer.
+                            viewModel.send(reply.prompt)
                         } label: {
-                            Text(reply)
+                            Text(reply.title)
                                 .font(.system(size: 13, weight: .medium))
                                 .foregroundStyle(Color(hex: "#0288D1"))
                                 .padding(.horizontal, 14)
@@ -354,11 +355,6 @@ struct ChatBottomSheetView: View {
             }
         }
         .padding(.vertical, 6)
-    }
-
-    /// Default quick replies matching the HTML design.
-    private var defaultQuickReplies: [String] {
-        ["Why is my HRV low?", "Suggest a walk", "Set a 5pm check-in", "Read me a poem"]
     }
 
     // MARK: - Error Banner
