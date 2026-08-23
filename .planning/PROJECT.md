@@ -51,6 +51,12 @@ Every feature that ships in the binary must actually work end-to-end for a real 
 - ✓ v1.1 Phase 2, IAP-06: Live purchase/restore/refund cycle — human-validated 2026-08-23 on Release build against deployed backend (balance +10 exactly once, server-persisted across relaunch, packs-era restore copy, refund demotion CR-05, refunded-pack one-pass clear WR-10)
 - ✓ v1.1 Phase 2, BUILD-05: Release-configuration build compiles (`xcodebuild build -configuration Release` exit 0, re-run at verification)
 - ✓ v1.1 Phase 2, AUTH-02 residual closed: live kill-check rode the validated live smoke (see Active note removed)
+- ✓ v1.1 Phase 3, SES-01/02: Server-side chat history — titled POST /sessions strictly before first /chat (order-pinned), continuous history restore on open (no duplication, 404-tolerant, async no-clobber); UAT-validated on deployed backend 2026-08-23
+- ✓ v1.1 Phase 3, PREF-01/02: Preferences sync — PreferencesService (seed-once at chat open + Settings, optimistic update w/ serialized reverts), AI Coach Settings section (en/vi + supportive/direct/educational), stress_context reads live prefs; round-trip UAT-validated
+- ✓ v1.1 Phase 3, QA-01: Server-driven quick-action chips — instant local fallback → server swap on chat open, taps ride credit-metered /chat; POST /quick-actions prohibited (grep-gated) with backend metering issue phuongddx/stress-app-be#2 filed
+- ✓ v1.1 Phase 3, SES-03 + CLEAN-01: Factory reset wipes ALL server sessions (page-1 re-query loop after CR-01 review fix, deletion-aware fake pins 42-session case) + stressChatSessionId cleared; Supabase remnants 0/0 with exactly 2 protected keep-sites
+- ✓ v1.1 Phase 3, CR-02: Trend direction + window selection fixed in StressContextPayload.build (>5-element fixtures pin both directions)
+- ✓ v1.1 Phase 3, integration gate: full suite 215 passed (only accepted #8 crash lineage), Release build green, backend deno 29/100 green, remnant/revenue/orphan/quarantine gates green
 
 ### Active
 
@@ -68,7 +74,7 @@ Every feature that ships in the binary must actually work end-to-end for a real 
 **AUTH — carried from v1.0 Phase 3 (blocked on decision D1)**
 - [ ] AUTH-01: No credential ships extractable from the Release binary via `strings` — fix applied (`#if DEBUG` wrap) but the empirical `strings` confirmation is blocked by an unrelated pre-existing Release-compile failure (see Constraints)
 - [x] AUTH-02: Chat entry point reflects real auth state — v1.1 Phase 01 shipped real Firebase auth; Phase 2 credit-surface landed and the live kill-check (typed 401 / stale-session behavior) rode the human-validated live smoke of 2026-08-23. Closed via v1.1 Phase 2 verification (`passed`)
-- [ ] AUTH-03: Chat dismiss-mid-stream cancels SSE within one runloop, no credit charged — TDD tests exist and compile; never executed (same CoreSimulator blocker as BUILD-04)
+- [x] AUTH-03: Chat dismiss-mid-stream cancels SSE within one runloop, no credit charged — closed via v1.1 Phase 3: ChatLifecycleTests executed green in every Phase-3 fence run + the verifier's own runs on a working simulator (the old CoreSimulator blocker no longer applies with `-parallel-testing-enabled NO`)
 
 **WIRE — carried from v1.0 Phase 4 (WIRE-01 only; WIRE-02 validated above)**
 - [ ] WIRE-01: Widget renders live data on a real device, not placeholder — depends on decision D4; no v1.0 phase VERIFICATION.md exists for this
@@ -142,6 +148,9 @@ Every feature that ships in the binary must actually work end-to-end for a real 
 | Purchased credits in a separate `purchased_credits` bucket (CHECK ≥ 0); `total_credits` stays the immutable free allotment; API contract preserved via derived-total SQL alias | Monthly reset must restore free allotment without clawing back paid credits; alias keeps iOS decode unchanged | ✓ Good — CR-01 closed, test-pinned |
 | Refund policy split per route: revoked subscription JWS on /premium/verify = demotion signal (replay-safe `least(premium_until, revocationDate)`); /redeem keeps absolute revoked rejection; no clawback of granted pack credits | Refunds must demote server-side premium without double-grant risk; pack clawback would need ledger reversal complexity for marginal value | ✓ Good — 6-case demotion suite green; sandbox refund validated CR-05 |
 | WR-10: refunded pack finished with zero redemption attempts on both entry points (purchase + updates listener) | A revoked pack can never grant credits; finishing it clears the queue so it isn't redelivered forever | ✓ Good — both flow tests green |
+| v1.1 Phase 3: continuous history restore (single rolling session, fetch-on-open, no local cache) over a multi-session picker UI | Server-authoritative matches Phase 2's balance precedent; offline chat is impossible anyway (SSE needs network); titled sessions keep a future list trivial | ✓ Good — UAT-validated |
+| v1.1 Phase 3: chip taps ride /chat; POST /quick-actions permanently unwired (grep-gated) | The POST route returns unmetered 512-token completions — wiring it would bypass the credits revenue model; metering note filed as phuongddx/stress-app-be#2 | ✓ Good — revenue gate green |
+| v1.1 Phase 3 review CR-01: wipe loop re-queries page 1 instead of advancing offset | Backend paginates over live rows — advancing offset after deletion skips every page past the first (>20 sessions → residue while reset reports success) | ✓ Good — deletion-aware fake + 42-session regression pin it; caught only because review used a deletion-aware fake |
 
 ## Evolution
 
@@ -161,4 +170,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-08-23 after v1.1 Phase 02 close (credits system + IAP transition; verification passed 29/29, live money-path smoke + visual inspection human-validated)*
+*Last updated: 2026-08-23 after v1.1 Phase 03 close (sessions/preferences/quick-actions + cleanup; 21/21 verified, 5 UAT scenarios human-validated) — milestone v1.1 complete*

@@ -2,8 +2,8 @@
 status: testing
 phase: 03-sessions-preferences-quick-actions-cleanup
 source: [03-CONTEXT.md, 03-05-PLAN.md, COVERAGE.md]
-started: 2026-08-23T18:15:00+07:00
-updated: 2026-08-23T18:15:00+07:00
+status: passed
+updated: 2026-08-23T19:45:00+07:00
 ---
 
 # Phase 3 UAT — Live-Backend Scenario Script (v1.1 close-out)
@@ -25,11 +25,11 @@ If this is not 200, stop — the backend is down/stale and every scenario below 
 
 | # | Scenario | Server-side check | Result |
 |---|----------|-------------------|--------|
-| 1 | History restore across relaunch — one titled session, no duplicates | `GET /sessions` — exactly 1 session, title = truncated first message | [pending] |
-| 2 | Preferences round-trip — Settings → backend → next reply | `GET /preferences` — `language: "vi"`, `coaching_style: "direct"` | [pending] |
-| 3 | Chip fetch on chat open — instant fallback, server swap, metered tap | optional `GET /quick-actions?stress_level=75&language=en&coaching_style=supportive` → breathing + grounding | [pending] |
-| 4 | 402 → paywall regression (AUTH-03) | none (client-side) | [pending] |
-| 5 | Factory reset wipes server history (DATA-01) | `GET /sessions` with the **pre-reset** token — empty after reset | [pending] |
+| 1 | History restore across relaunch — one titled session, no duplicates | `GET /sessions` — exactly 1 session, title = truncated first message | ✅ pass |
+| 2 | Preferences round-trip — Settings → backend → next reply | `GET /preferences` — `language: "vi"`, `coaching_style: "direct"` | ✅ pass |
+| 3 | Chip fetch on chat open — instant fallback, server swap, metered tap | optional `GET /quick-actions?stress_level=75&language=en&coaching_style=supportive` → breathing + grounding | ✅ pass |
+| 4 | 402 → paywall regression (AUTH-03) | none (client-side) | ✅ pass |
+| 5 | Factory reset wipes server history (DATA-01) | `GET /sessions` with the **pre-reset** token — empty after reset | ✅ pass |
 
 ### 1. History restore across relaunch
 
