@@ -24,6 +24,7 @@ final class DataDeleterService: DataDeleter {
     private let cloudKitResetService: CloudKitResetServiceProtocol
     private let repository: StressRepositoryProtocol
     private nonisolated let logger: DataManagementLogger
+    private let serverSessionWiper: ServerSessionWiping?
 
     // MARK: - Initialization
 
@@ -41,18 +42,21 @@ final class DataDeleterService: DataDeleter {
         )
     }
 
-    /// Injects a ``CloudKitResetServiceProtocol`` directly — the seam tests use to substitute
-    /// a failing/cancellable fake instead of a real CKContainer.
+    /// Injects a ``CloudKitResetServiceProtocol`` and a ``ServerSessionWiping``
+    /// directly — the seams tests use to substitute failing/cancellable fakes
+    /// instead of a real CKContainer or a live backend.
     init(
         modelContext: ModelContext,
         cloudKitResetService: CloudKitResetServiceProtocol,
         repository: StressRepositoryProtocol,
+        serverSessionWiper: ServerSessionWiping? = nil,
         logger: DataManagementLogger
     ) {
         self.modelContext = modelContext
         self.localWipeService = LocalDataWipeService(modelContext: modelContext, logger: logger)
         self.cloudKitResetService = cloudKitResetService
         self.repository = repository
+        self.serverSessionWiper = serverSessionWiper ?? StressAPIClient()
         self.logger = logger
     }
 
@@ -405,6 +409,14 @@ final class DataDeleterService: DataDeleter {
                 }
             }
 
+            // Phase 0: Delete server chat history while authentication is
+            // still live — clearCredentialsAndSharedCaches (the final phase)
+            // signs the user out, after which the token is unobtainable.
+            currentOperation = "Deleting server chat history"
+            deleteProgress = 0.02
+
+            try await wipeServerSessionsOrSkip()
+
             // Phase 1: Reset CloudKit (0% - 50%)
             currentOperation = "Resetting CloudKit data"
             deleteProgress = 0.05
@@ -443,6 +455,65 @@ final class DataDeleterService: DataDeleter {
         }
     }
 
+    // MARK: - Server Session Wipe
+
+    /// Runs the server-session wipe, classifying failures per the locked Q2
+    /// decision: auth-unavailability (no Firebase user → `LLMServiceError.unavailable`
+    /// from `getIDToken()`, or a 401 → `SessionsAPIError.unauthorized`) means
+    /// there is no authenticated identity to wipe — log and skip so an
+    /// offline-of-auth factory reset stays possible. Every other failure
+    /// fails the whole reset loudly (the CloudKit precedent) — never a
+    /// silent partial success.
+    private func wipeServerSessionsOrSkip() async throws {
+        do {
+            try await wipeServerSessions()
+        } catch LLMServiceError.unavailable(let reason) {
+            logger.log("Server session wipe skipped — no authenticated identity: \(reason)")
+        } catch SessionsAPIError.unauthorized {
+            logger.log("Server session wipe skipped — session token rejected (401)")
+        } catch is CancellationError {
+            throw DeletionError.operationCancelled
+        } catch {
+            throw DeletionError.serverSessionError(error)
+        }
+    }
+
+    /// Deletes every server-side chat session owned by the signed-in user:
+    /// page `GET /sessions`, issue `DELETE /sessions?id=` per row (messages
+    /// cascade server-side), repeat until an empty page. The query offset
+    /// stays pinned at 0: the backend paginates `order by updated_at desc
+    /// limit/offset` over live rows, so deleting a page shifts every later
+    /// row up — advancing the offset would skip those rows and strand
+    /// sessions while the reset reports success (CR-01). A hard page cap
+    /// guards against a misbehaving server that never runs out of rows.
+    private func wipeServerSessions() async throws {
+        guard let serverSessionWiper else {
+            logger.log("Server session wipe skipped — no wiper configured")
+            return
+        }
+
+        let pageSize = 20
+        let maxPages = 50
+        var pagesFetched = 0
+
+        while pagesFetched < maxPages {
+            // Every fetched row is deleted before the next page is read, so
+            // the window must stay pinned at 0 — rows 21+ shift into
+            // positions 1-20 after the previous page's deletion.
+            let page = try await serverSessionWiper.listSessions(limit: pageSize, offset: 0)
+            if page.isEmpty {
+                return
+            }
+            for session in page {
+                try await serverSessionWiper.deleteSession(id: session.id)
+            }
+            pagesFetched += 1
+        }
+
+        logger.log("Server session wipe aborted after \(maxPages) non-empty pages — server misbehaving")
+        throw URLError(.badServerResponse)
+    }
+
     // MARK: - Convenience Methods
 
     /// Get statistics about measurements that would be affected by deletion
@@ -473,12 +544,14 @@ final class DataDeleterService: DataDeleter {
 
     // MARK: - Credential & Shared Cache Clearance
 
-    /// Clears the Firebase auth session and legacy Keychain tokens, then wipes
-    /// the App Group widget/complication cache. Called from both delete-all and
-    /// factory-reset paths so a "deleted" user is actually signed out and the
-    /// widget stops showing deleted data.
+    /// Clears the Firebase auth session, the stored chat session id, and
+    /// legacy Keychain tokens, then wipes the App Group widget/complication
+    /// cache. Called from both delete-all and factory-reset paths so a
+    /// "deleted" user is actually signed out, never carries a dangling
+    /// session id, and the widget stops showing deleted data.
     static func clearCredentialsAndSharedCaches() {
         FirebaseAuthService.clearStoredCredentials()
+        StressLLMService.clearStoredCredentials()
         UserDefaults(suiteName: WidgetConstants.appGroupID)?
             .removePersistentDomain(forName: WidgetConstants.appGroupID)
     }

@@ -39,6 +39,23 @@
 		F1A1B2C3D4E500000000B004 /* StressAPIClientTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A1B2C3D4E500000000A004 /* StressAPIClientTests.swift */; };
 		F1A1B2C3D4E500000000B005 /* FirebaseAuthServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A1B2C3D4E500000000A005 /* FirebaseAuthServiceTests.swift */; };
 		F1A1B2C3D4E500000000B006 /* AccountViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A1B2C3D4E500000000A006 /* AccountViewModelTests.swift */; };
+		F1A1B2C3D4E500000000B007 /* ChatAvailabilityTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A1B2C3D4E500000000A007 /* ChatAvailabilityTests.swift */; };
+		F1A1B2C3D4E500000000B008 /* ChatLifecycleTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A1B2C3D4E500000000A008 /* ChatLifecycleTests.swift */; };
+		F1A1B2C3D4E500000000B009 /* SSEParserTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A1B2C3D4E500000000A009 /* SSEParserTests.swift */; };
+		F1A1B2C3D4E500000000B010 /* LLMServiceErrorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A1B2C3D4E500000000A010 /* LLMServiceErrorTests.swift */; };
+		F1A1B2C3D4E500000000B011 /* EntitlementForegroundCorrectionTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A1B2C3D4E500000000A011 /* EntitlementForegroundCorrectionTests.swift */; };
+		F1A1B2C3D4E500000000B012 /* DataDeletionConsolidationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A1B2C3D4E500000000A012 /* DataDeletionConsolidationTests.swift */; };
+		F1A1B2C3D4E500000000B013 /* StoreKitProductCatalogLiveTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A1B2C3D4E500000000A013 /* StoreKitProductCatalogLiveTests.swift */; };
+		F1A1B2C3D4E500000000B014 /* CreditServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A1B2C3D4E500000000A014 /* CreditServiceTests.swift */; };
+		F1A1B2C3D4E500000000B015 /* StressAPIClientCreditsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A1B2C3D4E500000000A015 /* StressAPIClientCreditsTests.swift */; };
+		F1A1B2C3D4E500000000B016 /* CreditPurchaseFlowTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A1B2C3D4E500000000A016 /* CreditPurchaseFlowTests.swift */; };
+		F1A1B2C3D4E500000000B017 /* CreditsViewModelTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A1B2C3D4E500000000A017 /* CreditsViewModelTests.swift */; };
+		F1A1B2C3D4E500000000B018 /* StressAPIClientSessionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A1B2C3D4E500000000A018 /* StressAPIClientSessionsTests.swift */; };
+		F1A1B2C3D4E500000000B019 /* ChatHistoryRestoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A1B2C3D4E500000000A019 /* ChatHistoryRestoreTests.swift */; };
+		F1A1B2C3D4E500000000B020 /* StressAPIClientPreferencesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A1B2C3D4E500000000A020 /* StressAPIClientPreferencesTests.swift */; };
+		F1A1B2C3D4E500000000B021 /* PreferencesServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A1B2C3D4E500000000A021 /* PreferencesServiceTests.swift */; };
+		F1A1B2C3D4E500000000B022 /* StressAPIClientQuickActionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A1B2C3D4E500000000A022 /* StressAPIClientQuickActionsTests.swift */; };
+		F1A1B2C3D4E500000000B023 /* DataDeleterServerWipeTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A1B2C3D4E500000000A023 /* DataDeleterServerWipeTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -119,6 +136,23 @@
 		F1A1B2C3D4E500000000A004 /* StressAPIClientTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = StressAPIClientTests.swift; path = StressMonitorTests/StressAPIClientTests.swift; sourceTree = "<group>"; };
 		F1A1B2C3D4E500000000A005 /* FirebaseAuthServiceTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = FirebaseAuthServiceTests.swift; path = StressMonitorTests/FirebaseAuthServiceTests.swift; sourceTree = "<group>"; };
 		F1A1B2C3D4E500000000A006 /* AccountViewModelTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = AccountViewModelTests.swift; path = StressMonitorTests/AccountViewModelTests.swift; sourceTree = "<group>"; };
+		F1A1B2C3D4E500000000A007 /* ChatAvailabilityTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ChatAvailabilityTests.swift; path = StressMonitorTests/ChatAvailabilityTests.swift; sourceTree = "<group>"; };
+		F1A1B2C3D4E500000000A008 /* ChatLifecycleTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ChatLifecycleTests.swift; path = StressMonitorTests/ChatLifecycleTests.swift; sourceTree = "<group>"; };
+		F1A1B2C3D4E500000000A009 /* SSEParserTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = SSEParserTests.swift; path = StressMonitorTests/SSEParserTests.swift; sourceTree = "<group>"; };
+		F1A1B2C3D4E500000000A010 /* LLMServiceErrorTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = LLMServiceErrorTests.swift; path = StressMonitorTests/LLMServiceErrorTests.swift; sourceTree = "<group>"; };
+		F1A1B2C3D4E500000000A011 /* EntitlementForegroundCorrectionTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = EntitlementForegroundCorrectionTests.swift; path = StressMonitorTests/EntitlementForegroundCorrectionTests.swift; sourceTree = "<group>"; };
+		F1A1B2C3D4E500000000A012 /* DataDeletionConsolidationTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = DataDeletionConsolidationTests.swift; path = StressMonitorTests/DataDeletionConsolidationTests.swift; sourceTree = "<group>"; };
+		F1A1B2C3D4E500000000A013 /* StoreKitProductCatalogLiveTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = StoreKitProductCatalogLiveTests.swift; path = StressMonitorTests/StoreKitProductCatalogLiveTests.swift; sourceTree = "<group>"; };
+		F1A1B2C3D4E500000000A014 /* CreditServiceTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CreditServiceTests.swift; path = StressMonitorTests/CreditServiceTests.swift; sourceTree = "<group>"; };
+		F1A1B2C3D4E500000000A015 /* StressAPIClientCreditsTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = StressAPIClientCreditsTests.swift; path = StressMonitorTests/StressAPIClientCreditsTests.swift; sourceTree = "<group>"; };
+		F1A1B2C3D4E500000000A016 /* CreditPurchaseFlowTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CreditPurchaseFlowTests.swift; path = StressMonitorTests/CreditPurchaseFlowTests.swift; sourceTree = "<group>"; };
+		F1A1B2C3D4E500000000A017 /* CreditsViewModelTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = CreditsViewModelTests.swift; path = StressMonitorTests/CreditsViewModelTests.swift; sourceTree = "<group>"; };
+		F1A1B2C3D4E500000000A018 /* StressAPIClientSessionsTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = StressAPIClientSessionsTests.swift; path = StressMonitorTests/StressAPIClientSessionsTests.swift; sourceTree = "<group>"; };
+		F1A1B2C3D4E500000000A019 /* ChatHistoryRestoreTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ChatHistoryRestoreTests.swift; path = StressMonitorTests/ChatHistoryRestoreTests.swift; sourceTree = "<group>"; };
+		F1A1B2C3D4E500000000A020 /* StressAPIClientPreferencesTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = StressAPIClientPreferencesTests.swift; path = StressMonitorTests/StressAPIClientPreferencesTests.swift; sourceTree = "<group>"; };
+		F1A1B2C3D4E500000000A021 /* PreferencesServiceTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = PreferencesServiceTests.swift; path = StressMonitorTests/PreferencesServiceTests.swift; sourceTree = "<group>"; };
+		F1A1B2C3D4E500000000A022 /* StressAPIClientQuickActionsTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = StressAPIClientQuickActionsTests.swift; path = StressMonitorTests/StressAPIClientQuickActionsTests.swift; sourceTree = "<group>"; };
+		F1A1B2C3D4E500000000A023 /* DataDeleterServerWipeTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = DataDeleterServerWipeTests.swift; path = StressMonitorTests/DataDeleterServerWipeTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -266,6 +300,23 @@
 				F1A1B2C3D4E500000000A004 /* StressAPIClientTests.swift */,
 				F1A1B2C3D4E500000000A005 /* FirebaseAuthServiceTests.swift */,
 				F1A1B2C3D4E500000000A006 /* AccountViewModelTests.swift */,
+				F1A1B2C3D4E500000000A007 /* ChatAvailabilityTests.swift */,
+				F1A1B2C3D4E500000000A008 /* ChatLifecycleTests.swift */,
+				F1A1B2C3D4E500000000A009 /* SSEParserTests.swift */,
+				F1A1B2C3D4E500000000A010 /* LLMServiceErrorTests.swift */,
+				F1A1B2C3D4E500000000A011 /* EntitlementForegroundCorrectionTests.swift */,
+				F1A1B2C3D4E500000000A012 /* DataDeletionConsolidationTests.swift */,
+				F1A1B2C3D4E500000000A013 /* StoreKitProductCatalogLiveTests.swift */,
+				F1A1B2C3D4E500000000A014 /* CreditServiceTests.swift */,
+				F1A1B2C3D4E500000000A015 /* StressAPIClientCreditsTests.swift */,
+				F1A1B2C3D4E500000000A016 /* CreditPurchaseFlowTests.swift */,
+				F1A1B2C3D4E500000000A017 /* CreditsViewModelTests.swift */,
+				F1A1B2C3D4E500000000A018 /* StressAPIClientSessionsTests.swift */,
+				F1A1B2C3D4E500000000A019 /* ChatHistoryRestoreTests.swift */,
+				F1A1B2C3D4E500000000A020 /* StressAPIClientPreferencesTests.swift */,
+				F1A1B2C3D4E500000000A021 /* PreferencesServiceTests.swift */,
+				F1A1B2C3D4E500000000A022 /* StressAPIClientQuickActionsTests.swift */,
+				F1A1B2C3D4E500000000A023 /* DataDeleterServerWipeTests.swift */,
 				4C67EAC979024C30F581AD22 /* StressMonitorProducts.storekit */,
 			);
 			sourceTree = "<group>";
@@ -498,6 +549,23 @@
 				F1A1B2C3D4E500000000B004 /* StressAPIClientTests.swift in Sources */,
 				F1A1B2C3D4E500000000B005 /* FirebaseAuthServiceTests.swift in Sources */,
 				F1A1B2C3D4E500000000B006 /* AccountViewModelTests.swift in Sources */,
+				F1A1B2C3D4E500000000B007 /* ChatAvailabilityTests.swift in Sources */,
+				F1A1B2C3D4E500000000B008 /* ChatLifecycleTests.swift in Sources */,
+				F1A1B2C3D4E500000000B009 /* SSEParserTests.swift in Sources */,
+				F1A1B2C3D4E500000000B010 /* LLMServiceErrorTests.swift in Sources */,
+				F1A1B2C3D4E500000000B011 /* EntitlementForegroundCorrectionTests.swift in Sources */,
+				F1A1B2C3D4E500000000B012 /* DataDeletionConsolidationTests.swift in Sources */,
+				F1A1B2C3D4E500000000B013 /* StoreKitProductCatalogLiveTests.swift in Sources */,
+				F1A1B2C3D4E500000000B014 /* CreditServiceTests.swift in Sources */,
+				F1A1B2C3D4E500000000B015 /* StressAPIClientCreditsTests.swift in Sources */,
+				F1A1B2C3D4E500000000B016 /* CreditPurchaseFlowTests.swift in Sources */,
+				F1A1B2C3D4E500000000B017 /* CreditsViewModelTests.swift in Sources */,
+				F1A1B2C3D4E500000000B018 /* StressAPIClientSessionsTests.swift in Sources */,
+				F1A1B2C3D4E500000000B019 /* ChatHistoryRestoreTests.swift in Sources */,
+				F1A1B2C3D4E500000000B020 /* StressAPIClientPreferencesTests.swift in Sources */,
+				F1A1B2C3D4E500000000B021 /* PreferencesServiceTests.swift in Sources */,
+				F1A1B2C3D4E500000000B022 /* StressAPIClientQuickActionsTests.swift in Sources */,
+				F1A1B2C3D4E500000000B023 /* DataDeleterServerWipeTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -558,6 +626,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/StressMonitor.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/StressMonitor";
@@ -578,6 +647,7 @@
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SDKROOT = iphoneos;
 				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
 				SWIFT_VERSION = 5.0;
 				TARGETED_DEVICE_FAMILY = "1,2";
 				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/StressMonitor.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/StressMonitor";
@@ -801,6 +871,8 @@
 				INFOPLIST_KEY_NSHealthClinicalHealthRecordsShareUsageDescription = "We need access to your health data to monitor stress levels.";
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "We need access to your health data to monitor stress levels.";
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "We need to update your health data with stress measurements.";
+				INFOPLIST_KEY_STOREKIT_CREDITS_LARGE_PRODUCT_ID = "com.stressmonitor.app.credits.large";
+				INFOPLIST_KEY_STOREKIT_CREDITS_SMALL_PRODUCT_ID = "com.stressmonitor.app.credits.small";
 				INFOPLIST_KEY_STOREKIT_PREMIUM_ANNUAL_PRODUCT_ID = "com.stressmonitor.app.premium.annual";
 				INFOPLIST_KEY_STOREKIT_PREMIUM_MONTHLY_PRODUCT_ID = "com.stressmonitor.app.premium.monthly";
 				INFOPLIST_KEY_STOREKIT_PREMIUM_SUBSCRIPTION_GROUP_ID = SMPREMIUM01;
@@ -856,6 +928,8 @@
 				INFOPLIST_KEY_NSHealthClinicalHealthRecordsShareUsageDescription = "We need access to your health data to monitor stress levels.";
 				INFOPLIST_KEY_NSHealthShareUsageDescription = "We need access to your health data to monitor stress levels.";
 				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "We need to update your health data with stress measurements.";
+				INFOPLIST_KEY_STOREKIT_CREDITS_LARGE_PRODUCT_ID = "com.stressmonitor.app.credits.large";
+				INFOPLIST_KEY_STOREKIT_CREDITS_SMALL_PRODUCT_ID = "com.stressmonitor.app.credits.small";
 				INFOPLIST_KEY_STOREKIT_PREMIUM_ANNUAL_PRODUCT_ID = "com.stressmonitor.app.premium.annual";
 				INFOPLIST_KEY_STOREKIT_PREMIUM_MONTHLY_PRODUCT_ID = "com.stressmonitor.app.premium.monthly";
 				INFOPLIST_KEY_STOREKIT_PREMIUM_SUBSCRIPTION_GROUP_ID = SMPREMIUM01;

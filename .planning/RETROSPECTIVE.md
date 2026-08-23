@@ -39,6 +39,45 @@
 
 ---
 
+## Milestone: v1.1 — Backend API Migration
+
+**Shipped:** 2026-08-24 (`verified_closeout`)
+**Phases:** 3 | **Plans:** 17 | **Tasks:** 25 | 164 commits over 12 days (2026-08-12 → 2026-08-23)
+
+### What Was Built
+- Firebase Auth (Anonymous + Google linking with account preservation) + `StressAPIClient`; chat migrated to the backend SSE protocol; Supabase fully removed
+- Credits monetization: consumable packs + premium tier, Apple-JWS-verified server-side with idempotent grants, free-first consumption, refund demotion; 402 → paywall gating; live money path human-validated on Release build vs deployed backend
+- Server-backed chat sessions with cross-relaunch restore, preferences round-trip shaping the coach's system prompt, server-driven quick-action chips (metered taps)
+- Factory reset now wipes server history (live-verified with a pre-reset token)
+
+### What Worked
+- Every phase closed with `passed` verification + human-validated UAT — the exact rigor v1.0's retrospective demanded. v1.0's "9/26 unchecked" debt was fully answered; v1.1 closed `verified_closeout` with a same-day milestone audit (21/21 requirements, 7/7 seams, 4/4 E2E flows).
+- TDD discipline held throughout: every plan led with RED tests (URLProtocol-pinned seams, Swift Testing), and the money path is pinned by behavioral suites that were independently re-run at verification.
+- Gap-closure loop worked: plan 01-04 shipped the Google UI the base plans descoped; CR-01..CR-05 + WR-10 all closed with regression pins inside the milestone rather than deferred.
+- Security reviews (retroactive secure-phase for Phases 2-3) reconciled cleanly because every plan carried a `<threat_model>` block authored at plan time — 54 threats classified, threats_open 0.
+
+### What Was Inefficient
+- The stale debug session (`google-signin-ui-entry-missing`) sat "open" for 8 days after its fix (plan 01-04, 2026-08-16) shipped — audit-open only surfaced it at milestone close. Re-run audit-open after gap-closure lands, not just at close.
+- VALIDATION.md files for all 3 phases were seeded by plan-phase but never reconciled by validate-phase (Nyquist coverage TODO) — verify-work's checks didn't notice either.
+- The v1.0-carryover submission blockers (BUILD-01, SHIP-01..03, A11Y-01..05) sat untouched through v1.1 — correct scoping, but they now form the entire critical path to submission and deserve a decision-forcing milestone (D3/D4) immediately.
+- Phase 2 needed 2 gap-closure cycles (CR-04 build-settings, CR-01..CR-03 backend arithmetic/entitlements) after its base 4 plans — the initial plan set underweighted Release-config/build-settings risk on the money path.
+
+### Patterns Established
+- `<threat_model>` blocks authored at plan time make retroactive security review a reconciliation exercise instead of a fresh audit — keep this.
+- Server-authoritative state + display-only client caches as the default posture for anything money- or integrity-bearing (balance, entitlements, sessions).
+- Grep gates as regression fences for prohibitions (POST /quick-actions unwired, Supabase remnants, sentinel absence) — cheap, verifier-rerunnable, and they pin decisions that tests can't express.
+
+### Key Lessons
+1. Human-verification items with external lead time (ASC filing, sandbox testers, deployed infra) must be authored as UAT scenarios up front — Phase 3's scenario script made the end-of-phase human pass a 30-minute checklist instead of an open-ended session.
+2. Cross-referencing the audit tool's open-items list against PROJECT.md's Validated entries before acting on it caught a stale "open" item that would have been wrongly deferred to v1.2.
+3. A same-day milestone audit at close (before complete-milestone) is cheap and catches both stale state and score regressions — make it standard.
+
+### Cost Observations
+- Sessions: multiple, spanning 2026-08-12 → 2026-08-23 (12 days wall-clock; execution concentrated in 4 working days)
+- Notable: Phase 2 consumed 8 of 17 plans (2 gap-closure cycles) — money-path correctness dominated cost, as expected; Phase 3 closed in one pass with zero gap cycles.
+
+---
+
 ## Cross-Milestone Trends
 
 ### Process Evolution
@@ -46,12 +85,14 @@
 | Milestone | Sessions | Phases | Key Change |
 |-----------|----------|--------|------------|
 | v1.0 | multiple | 6 | First milestone. Established: independent build re-verification after every fixer pass; re-review after fix as standard practice for data-integrity code. |
+| v1.1 | multiple | 3 | Verification-first close: every phase passed verification + human UAT; milestone audit before close; `<threat_model>` at plan time; grep-gate regression fences. |
 
 ### Cumulative Quality
 
 | Milestone | Tests | Coverage | Zero-Dep Additions |
 |-----------|-------|----------|-------------------|
 | v1.0 | Never executed (host CoreSimulator blocker) — compile-verified only | Unknown | 0 |
+| v1.1 | 215 iOS tests green (host, `-parallel-testing-enabled NO`); backend 29 tests/100 steps green | Unknown (Nyquist TODO) | 0 new third-party beyond required Firebase/GoogleSignIn SDKs |
 
 ### Top Lessons (Verified Across Milestones)
 

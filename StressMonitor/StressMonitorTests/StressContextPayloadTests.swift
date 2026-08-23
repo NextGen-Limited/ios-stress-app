@@ -46,4 +46,107 @@ final class StressContextPayloadTests: XCTestCase {
         XCTAssertNil(json?["baseline_hr"], "baseline_hr key must be absent from the wire payload.")
         XCTAssertNotNil(json?["stress_level"], "Derived stress level must still be present.")
     }
+
+    // MARK: - CR-02 trend direction (repository delivers newest-first)
+
+    /// `StressRepository.fetchRecent` hands `build` a newest-first history
+    /// (SortDescriptor reverse), so the trend must be computed after
+    /// restoring chronological order. These cases pin that contract (CR-02).
+    private func measurement(level: Double, minutesAgo: Int) -> StressMeasurement {
+        StressMeasurement(
+            timestamp: Date(timeIntervalSinceNow: -TimeInterval(minutesAgo * 60)),
+            stressLevel: level,
+            hrv: 40,
+            restingHeartRate: 60
+        )
+    }
+
+    func testTrendIncreasingWhenStressRoseOverTime() {
+        // Newest-first [70, 40]: chronologically the user went 40 → 70.
+        let history = [
+            measurement(level: 70, minutesAgo: 0),
+            measurement(level: 40, minutesAgo: 60)
+        ]
+
+        let payload = StressContextPayload.build(stressResult: nil, baseline: nil, recentHistory: history)
+
+        XCTAssertEqual(payload.stressTrend, "increasing", "A newest-first [70, 40] history rose over time.")
+        XCTAssertEqual(payload.stressTrendDelta, "+30%")
+    }
+
+    func testTrendDecreasingWhenStressFellOverTime() {
+        // Newest-first [40, 70]: chronologically the user went 70 → 40.
+        let history = [
+            measurement(level: 40, minutesAgo: 0),
+            measurement(level: 70, minutesAgo: 60)
+        ]
+
+        let payload = StressContextPayload.build(stressResult: nil, baseline: nil, recentHistory: history)
+
+        XCTAssertEqual(payload.stressTrend, "decreasing", "A newest-first [40, 70] history fell over time.")
+        XCTAssertEqual(payload.stressTrendDelta, "-30%")
+    }
+
+    func testTrendStableWhenFluctuationWithinThreshold() {
+        // ±5 either order is stable — direction is irrelevant at this delta.
+        let history = [
+            measurement(level: 52, minutesAgo: 0),
+            measurement(level: 50, minutesAgo: 60)
+        ]
+
+        let payload = StressContextPayload.build(stressResult: nil, baseline: nil, recentHistory: history)
+
+        XCTAssertEqual(payload.stressTrend, "stable")
+    }
+
+    func testTrendNilForSingleMeasurement() {
+        let history = [measurement(level: 55, minutesAgo: 0)]
+
+        let payload = StressContextPayload.build(stressResult: nil, baseline: nil, recentHistory: history)
+
+        XCTAssertNil(payload.stressTrend, "One measurement has no direction.")
+        XCTAssertNil(payload.stressTrendDelta)
+    }
+
+    // MARK: - WR-01 window selection (>5 newest-first measurements)
+
+    func testTrendUsesTheNewestWindowBeyondFiveMeasurements() {
+        // Newest-first [80, 20, 20, 20, 20, 20]: the five newest rows are
+        // [80, 20, 20, 20, 20] → chronologically 20 → 80 = increasing.
+        // `suffix(5)` on this newest-first array would keep [20, 20, 20,
+        // 20, 20] and report "stable" — wrong window, wrong delta (WR-01).
+        let history = [
+            measurement(level: 80, minutesAgo: 0),
+            measurement(level: 20, minutesAgo: 30),
+            measurement(level: 20, minutesAgo: 60),
+            measurement(level: 20, minutesAgo: 90),
+            measurement(level: 20, minutesAgo: 120),
+            measurement(level: 20, minutesAgo: 150)
+        ]
+
+        let payload = StressContextPayload.build(stressResult: nil, baseline: nil, recentHistory: history)
+
+        XCTAssertEqual(payload.stressTrend, "increasing", "The trend window must be the NEWEST five measurements, not the oldest.")
+        XCTAssertEqual(payload.stressTrendDelta, "+60%")
+    }
+
+    func testTrendIgnoresRowsOlderThanTheWindow() {
+        // Newest-first [20, 20, 20, 20, 20, 80]: the oldest row (80) sits
+        // outside the five-newest window, and within it the level never
+        // moved — stable. `suffix(5)` would include the 80 and report a
+        // fall (WR-01).
+        let history = [
+            measurement(level: 20, minutesAgo: 0),
+            measurement(level: 20, minutesAgo: 30),
+            measurement(level: 20, minutesAgo: 60),
+            measurement(level: 20, minutesAgo: 90),
+            measurement(level: 20, minutesAgo: 120),
+            measurement(level: 80, minutesAgo: 150)
+        ]
+
+        let payload = StressContextPayload.build(stressResult: nil, baseline: nil, recentHistory: history)
+
+        XCTAssertEqual(payload.stressTrend, "stable", "Rows older than the five-newest window must not drive the trend.")
+        XCTAssertEqual(payload.stressTrendDelta, "+0%")
+    }
 }

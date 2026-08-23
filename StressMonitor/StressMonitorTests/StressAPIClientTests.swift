@@ -53,27 +53,50 @@ final class MockAuthService: AuthServiceProtocol, @unchecked Sendable {
     }
 }
 
-/// Stub `URLProtocol` that captures the outgoing request and returns an empty
-/// 200 response so `StressAPIClient`'s header behavior can be asserted without
-/// hitting the network. Reset `lastRequest` before each test that inspects it.
+/// Stub `URLProtocol` that captures the outgoing request and returns a stubbed
+/// status/body so `StressAPIClient`'s header and decoding behavior can be
+/// asserted without hitting the network. Reset `lastRequest` (and set
+/// `statusCode` / `responseBody`) before each test that inspects them.
+///
+/// Multi-request flows set `responseByPath` (keyed by URL path) so several
+/// endpoints can be stubbed in one test; while it is non-nil it takes
+/// precedence over `statusCode` / `responseBody`. `capturedRequests`
+/// accumulates every request in dispatch order for ordering assertions —
+/// reset both alongside the single-response statics.
 final class RequestCaptureURLProtocol: URLProtocol, @unchecked Sendable {
     nonisolated(unsafe) static var lastRequest: URLRequest?
     nonisolated(unsafe) static var statusCode: Int = 200
+    nonisolated(unsafe) static var responseBody: Data?
+    /// Per-request statuses consumed in dispatch order (overlapping-request
+    /// tests); empty by default. Takes precedence over the single
+    /// `statusCode`, but not over `responseByPath`.
+    nonisolated(unsafe) static var statusCodeSequence: [Int] = []
+    nonisolated(unsafe) static var responseByPath: [String: (statusCode: Int, body: Data?)]?
+    nonisolated(unsafe) static var capturedRequests: [URLRequest] = []
 
     override class func canInit(with request: URLRequest) -> Bool { true }
     override class func canonicalRequest(for request: URLRequest) -> URLRequest { request }
 
     override func startLoading() {
         Self.lastRequest = request
-        let code = Self.statusCode
+        Self.capturedRequests.append(request)
+        let stub: (statusCode: Int, body: Data?)
+        if let responseByPath = Self.responseByPath,
+           let pathStub = responseByPath[request.url?.path ?? ""] {
+            stub = pathStub
+        } else if !Self.statusCodeSequence.isEmpty {
+            stub = (Self.statusCodeSequence.removeFirst(), Self.responseBody ?? Data())
+        } else {
+            stub = (Self.statusCode, Self.responseBody ?? Data())
+        }
         let response = HTTPURLResponse(
             url: request.url!,
-            statusCode: code,
+            statusCode: stub.statusCode,
             httpVersion: nil,
             headerFields: nil
         )!
         client?.urlProtocol(self, didReceive: response, cacheStoragePolicy: .notAllowed)
-        client?.urlProtocol(self, didLoad: Data())
+        client?.urlProtocol(self, didLoad: stub.body ?? Data())
         client?.urlProtocolDidFinishLoading(self)
     }
 

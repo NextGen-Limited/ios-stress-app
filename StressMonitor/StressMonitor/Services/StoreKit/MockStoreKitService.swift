@@ -6,6 +6,10 @@ final class MockStoreKitService: StoreKitServiceProtocol {
 
     let availablePlans: [SubscriptionPlan] = SubscriptionPlan.defaultPlans
 
+    var availablePacks: [CreditPack] {
+        get async { CreditPack.defaultPacks }
+    }
+
     var isPremiumUser: Bool { premiumState.isPremiumUser }
 
     init(premiumState: PremiumState) {
@@ -15,6 +19,12 @@ final class MockStoreKitService: StoreKitServiceProtocol {
     func purchase(_ plan: SubscriptionPlan) async throws {
         try await Task.sleep(for: .seconds(1))
         premiumState.isPremiumUser = true
+    }
+
+    func purchase(pack: CreditPack) async throws {
+        // Packs never flip premium — they grant credits, and this DEBUG
+        // double has no backend to redeem against.
+        try await Task.sleep(for: .seconds(1))
     }
 
     func restorePurchases() async throws {

@@ -1,11 +1,36 @@
 import Foundation
 import StoreKit
 
+/// Minimal transaction surface the grant flow needs, abstracted so the
+/// redeem-before-finish ordering is pinnable by unit tests without a
+/// StoreKitTest session (whose suite is disabled for session-isolation
+/// reasons — see StoreKitServiceTests.swift).
+///
+/// The signed JWS is deliberately NOT part of this surface: StoreKit 2
+/// exposes it on `VerificationResult.jwsRepresentation`, not on
+/// `Transaction`, so it travels as an explicit parameter alongside the
+/// handle.
+protocol PurchaseTransactionHandle: Sendable {
+    var productID: String { get }
+    var revocationDate: Date? { get }
+    var expirationDate: Date? { get }
+    func finish() async
+}
+
+extension Transaction: PurchaseTransactionHandle {}
+
+/// Sends a signed purchase JWS to the backend and returns the
+/// server-authoritative post-call balance.
+typealias PurchaseRedeemer = @MainActor (String) async throws -> CreditBalance
+
 @MainActor
 final class StoreKitService: StoreKitServiceProtocol {
 
     private let premiumState: PremiumState
     private let catalog: StoreKitProductCatalog
+    private let creditService: CreditServiceProtocol?
+    private let redeemer: PurchaseRedeemer
+    private let subscriptionVerifier: PurchaseRedeemer
     private var productsByID: [String: Product] = [:]
     private var transactionUpdatesTask: Task<Void, Never>?
 
@@ -13,10 +38,17 @@ final class StoreKitService: StoreKitServiceProtocol {
 
     init(
         premiumState: PremiumState? = nil,
-        catalog: StoreKitProductCatalog? = nil
+        catalog: StoreKitProductCatalog? = nil,
+        creditService: CreditServiceProtocol? = nil,
+        redeemer: PurchaseRedeemer? = nil,
+        subscriptionVerifier: PurchaseRedeemer? = nil
     ) {
         self.premiumState = premiumState ?? .shared
         self.catalog = catalog ?? .live
+        self.creditService = creditService
+        let apiClient = StressAPIClient()
+        self.redeemer = redeemer ?? { jws in try await apiClient.redeemPurchase(jws: jws) }
+        self.subscriptionVerifier = subscriptionVerifier ?? { jws in try await apiClient.verifySubscription(jws: jws) }
         self.transactionUpdatesTask = listenForTransactions()
         Task { await refreshEntitlements() }
     }
@@ -81,6 +113,35 @@ final class StoreKitService: StoreKitServiceProtocol {
         premiumState.isPremiumUser
     }
 
+    /// Pack catalog with locale-correct prices when the StoreKit products
+    /// resolve; the DEC-2 display packs otherwise (mirrors `availablePlans`).
+    var availablePacks: [CreditPack] {
+        get async {
+            let packIDs = CreditPackID.allCases.compactMap { catalog.packID(for: $0) }
+            guard !packIDs.isEmpty else { return CreditPack.defaultPacks }
+
+            do {
+                let products = try await Product.products(for: packIDs)
+                guard !products.isEmpty else { return CreditPack.defaultPacks }
+
+                for product in products {
+                    productsByID[product.id] = product
+                }
+
+                return CreditPackID.allCases.map { id in
+                    let fallback = CreditPack.defaultPacks.first { $0.id == id } ?? CreditPack.defaultPacks[0]
+                    guard let productID = catalog.packID(for: id),
+                          let product = products.first(where: { $0.id == productID }) else {
+                        return fallback
+                    }
+                    return Self.packFromProduct(product, id: id, fallback: fallback)
+                }
+            } catch {
+                return CreditPack.defaultPacks
+            }
+        }
+    }
+
     func purchase(_ plan: SubscriptionPlan) async throws {
         // 1. Resolve product ID
         let productID = plan.productID ?? catalog.productID(for: plan.period)
@@ -88,43 +149,45 @@ final class StoreKitService: StoreKitServiceProtocol {
             throw StoreKitError.missingProductConfiguration
         }
 
-        // 2. Fetch / cache product
-        let product: Product
-        if let cached = productsByID[productID] {
-            product = cached
-        } else {
-            let fetched = try await Product.products(for: [productID])
-            guard let first = fetched.first else {
-                throw StoreKitError.productNotFound
-            }
-            product = first
-            productsByID[product.id] = product
-        }
-
-        // 3. Purchase with availability guard
-        let result: Product.PurchaseResult
-        if #available(iOS 18.2, *),
-           let scene = UIApplication.shared.connectedScenes
-            .compactMap({ $0 as? UIWindowScene }).first {
-            result = try await product.purchase(confirmIn: scene)
-        } else {
-            result = try await product.purchase()
-        }
+        // 2–3. Shared purchase steps (fetch/cache product, run purchase sheet)
+        let result = try await purchaseProduct(resolving: productID)
 
         // 4. Handle result
         switch result {
         case .success(let verification):
             let transaction = try checkVerified(verification)
-
-            // Only grant entitlement for known products with active transaction
-            if catalog.period(for: transaction.productID) != nil,
-               transaction.revocationDate == nil,
-               transaction.expirationDate.map({ $0 > Date() }) ?? true {
-                premiumState.isPremiumUser = true
-            }
-
-            await transaction.finish()
+            try await completePurchase(transaction, jwsRepresentation: verification.jwsRepresentation)
             await refreshEntitlements()
+
+        case .userCancelled:
+            throw StoreKitError.purchaseCancelled
+
+        case .pending:
+            throw StoreKitError.purchasePending
+
+        @unknown default:
+            throw StoreKitError.purchaseFailed
+        }
+    }
+
+    func purchase(pack: CreditPack) async throws {
+        // 1. Resolve product ID
+        let productID = pack.productID ?? catalog.packID(for: pack.id)
+        guard let productID else {
+            throw StoreKitError.missingProductConfiguration
+        }
+
+        // 2–3. Shared purchase steps (fetch/cache product, run purchase sheet)
+        let result = try await purchaseProduct(resolving: productID)
+
+        // 4. Handle result — deferred grant: the server redeems the signed
+        // transaction and only the server's ack finishes it (see
+        // completePurchase). A crash before the ack leaves the transaction
+        // unfinished, so Transaction.updates redelivers and retries.
+        switch result {
+        case .success(let verification):
+            let transaction = try checkVerified(verification)
+            try await completePurchase(transaction, jwsRepresentation: verification.jwsRepresentation)
 
         case .userCancelled:
             throw StoreKitError.purchaseCancelled
@@ -183,6 +246,15 @@ final class StoreKitService: StoreKitServiceProtocol {
 
                 if notRevoked && notExpired {
                     hasActive = true
+                    // DEC-1: re-sync server-side premium from the durable
+                    // entitlement source; fire-and-forget so a foreground
+                    // refresh never blocks on the network.
+                    Task {
+                        await self.syncSubscriptionEntitlementToServer(
+                            transaction,
+                            jwsRepresentation: result.jwsRepresentation
+                        )
+                    }
                 }
             case .unverified:
                 break
@@ -237,13 +309,128 @@ final class StoreKitService: StoreKitServiceProtocol {
     private func handle(transactionVerification result: VerificationResult<Transaction>) async {
         switch result {
         case .verified(let transaction):
-            // Refresh entitlements (handles revoke/grant)
-            await refreshEntitlements()
-            await transaction.finish()
+            await handle(transaction: transaction, jwsRepresentation: result.jwsRepresentation)
 
         case .unverified(let transaction, _):
-            // Do not grant entitlement. Finish to clear the queue.
+            // No grant occurs for an unverified payload, so finishing is
+            // safe and clears the queue.
             await transaction.finish()
+        }
+    }
+
+    // MARK: - Grant orchestration
+
+    /// Steps 2–3 shared by both purchase entry points: fetch/cache the
+    /// product, then run the purchase sheet with the iOS 18.2 scene variant.
+    private func purchaseProduct(resolving productID: String) async throws -> Product.PurchaseResult {
+        let product: Product
+        if let cached = productsByID[productID] {
+            product = cached
+        } else {
+            let fetched = try await Product.products(for: [productID])
+            guard let first = fetched.first else {
+                throw StoreKitError.productNotFound
+            }
+            product = first
+            productsByID[product.id] = product
+        }
+
+        if #available(iOS 18.2, *),
+           let scene = UIApplication.shared.connectedScenes
+            .compactMap({ $0 as? UIWindowScene }).first {
+            return try await product.purchase(confirmIn: scene)
+        }
+        return try await product.purchase()
+    }
+
+    /// Unified grant choke point for a verified transaction — both
+    /// `purchase(...)` entry points and the `Transaction.updates` listener
+    /// route through here. Grant/finish ordering ONLY — the authoritative
+    /// `refreshEntitlements()` correction stays at the calling entry points
+    /// so this orchestration remains unit-pinnable without StoreKit state.
+    ///
+    /// Pack productIDs use the deferred grant: the backend redeems the JWS
+    /// BEFORE `finish()`, because a finished consumable is gone forever — an
+    /// unfinished one is redelivered and retried. A refunded (revoked) pack
+    /// is finished WITHOUT any redemption — the server permanently rejects
+    /// its JWS, and retrying it would wedge the transaction queue forever.
+    /// Subscription productIDs
+    /// keep the legacy immediate finish (restorable via currentEntitlements)
+    /// plus a best-effort server premium sync (DEC-1). Posting policy, in
+    /// evaluation order: a revoked (refunded) subscription JWS IS posted —
+    /// as a demotion signal the server shortens premium_until with, never
+    /// an activation — and never grants or clears local premium
+    /// (`refreshEntitlements` stays the sole local corrector, so a user
+    /// holding a different still-active subscription keeps it). An expired
+    /// JWS is never posted. Both are still finished so the queue clears.
+    func completePurchase(
+        _ transaction: any PurchaseTransactionHandle,
+        jwsRepresentation: String
+    ) async throws {
+        if catalog.pack(for: transaction.productID) != nil {
+            if transaction.revocationDate != nil {
+                // Refunded pack: already-granted credits are intentionally
+                // left in place (no clawback) — the fix's contract is queue
+                // hygiene, and the server rejects this JWS permanently.
+                await transaction.finish()
+                return
+            }
+            let balance = try await redeemer(jwsRepresentation)
+            await transaction.finish()
+            creditService?.apply(balance)
+            return
+        }
+
+        let isKnownSubscription = catalog.period(for: transaction.productID) != nil
+
+        if isKnownSubscription && transaction.revocationDate != nil {
+            await syncSubscriptionEntitlementToServer(transaction, jwsRepresentation: jwsRepresentation)
+            await transaction.finish()
+            return
+        }
+
+        let isActive = isKnownSubscription &&
+            transaction.revocationDate == nil &&
+            (transaction.expirationDate.map { $0 > Date() } ?? true)
+
+        if isActive {
+            await syncSubscriptionEntitlementToServer(transaction, jwsRepresentation: jwsRepresentation)
+            premiumState.isPremiumUser = true
+        }
+
+        await transaction.finish()
+    }
+
+    /// Updates-listener entry: identical ordering to the purchase path, but
+    /// a redemption failure must NOT propagate — the transaction stays
+    /// unfinished so StoreKit redelivers it and the grant retries.
+    func handle(
+        transaction: any PurchaseTransactionHandle,
+        jwsRepresentation: String
+    ) async {
+        do {
+            try await completePurchase(transaction, jwsRepresentation: jwsRepresentation)
+        } catch {
+            // Leave unfinished — redelivery through Transaction.updates is
+            // the crash/failure retry path for consumables.
+        }
+        await refreshEntitlements()
+    }
+
+    /// Best-effort mirror of a subscription transaction into server-side
+    /// premium (DEC-1). Never blocks the caller's success path on server
+    /// state — a subscription is re-derivable from
+    /// `Transaction.currentEntitlements`, unlike a consumable, so a later
+    /// foreground refresh re-runs this.
+    private func syncSubscriptionEntitlementToServer(
+        _ transaction: any PurchaseTransactionHandle,
+        jwsRepresentation: String
+    ) async {
+        do {
+            _ = try await subscriptionVerifier(jwsRepresentation)
+        } catch {
+            // Endpoint absence or a network failure converges on the next
+            // refresh; the local grant below still proceeds.
         }
     }
 
@@ -311,6 +498,21 @@ final class StoreKitService: StoreKitServiceProtocol {
         case .monthly: 1
         case .weekly:  2
         }
+    }
+
+    private static func packFromProduct(
+        _ product: Product,
+        id: CreditPackID,
+        fallback: CreditPack
+    ) -> CreditPack {
+        CreditPack(
+            id: id,
+            credits: fallback.credits,
+            displayName: product.displayName.isEmpty ? fallback.displayName : product.displayName,
+            productID: product.id,
+            displayPrice: product.displayPrice,
+            pricePerPack: product.price
+        )
     }
 
     private static func introOfferPeriodUnit(from product: Product) -> String? {

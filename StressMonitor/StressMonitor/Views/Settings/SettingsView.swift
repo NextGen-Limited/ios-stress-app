@@ -6,6 +6,8 @@ struct SettingsView: View {
     @Environment(\.modelContext) private var modelContext
     @Environment(AppRouter.self) private var router
     @Environment(PaywallController.self) private var paywall
+    @Environment(CreditService.self) private var creditService
+    @Environment(PreferencesService.self) private var preferencesService
     @State private var viewModel: SettingsViewModel
     @State private var habitViewModel: HabitViewModel?
     @State private var accountViewModel = AccountViewModel()
@@ -40,6 +42,8 @@ struct SettingsView: View {
                 notificationsSection
                 sectionLabel("Preferences")
                 preferencesSection
+                sectionLabel("AI Coach")
+                aiCoachSection
                 sectionLabel("Data & support")
                 dataSupportSection
                 versionFooter
@@ -61,6 +65,8 @@ struct SettingsView: View {
             }
             Task { await viewModel.loadUserProfile() }
             accountViewModel.refreshAccountState()
+            Task { try? await creditService.refreshBalance() }
+            Task { await preferencesService.seedIfNeeded() }
             refreshHealthAuthStatus()
         }
         .sheet(item: $docsURL) { url in
@@ -139,7 +145,10 @@ struct SettingsView: View {
                     setting: .rippleCoach,
                     tint: .settingsIconPurple,
                     title: "Ripple Coach",
-                    value: chatAvailabilityLabel,
+                    value: CreditBalanceFormatter.chatRowValue(
+                        available: ChatAvailability.current.isAvailable,
+                        balance: creditService.balance
+                    ),
                     action: {
                         guard ChatAvailability.current.isAvailable else { return }
                         showChatSheet = true
@@ -265,7 +274,7 @@ struct SettingsView: View {
                     setting: .stressMonitorPlus,
                     tint: .premiumGold,
                     title: "StressMonitor Plus",
-                    value: "Try free",
+                    value: CreditBalanceFormatter.plusRowValue(creditService.balance),
                     valueTint: .premiumGold,
                     action: { paywall.present(reason: .general) }
                 )
@@ -296,6 +305,90 @@ struct SettingsView: View {
                 )
             }
         }
+    }
+
+    // MARK: - 7b. AI Coach (server-synced preference pair)
+
+    /// Language + coaching-style pickers riding `PreferencesService`. The
+    /// closed option sets mirror the backend's accepted vocabulary; a current
+    /// value outside the set still displays (the row text comes from state,
+    /// not the option list). A failed PUT reverts inside the service — the
+    /// footnote under the card is the user-facing signal.
+    private var aiCoachSection: some View {
+        VStack(spacing: 6) {
+            SettingsCard {
+                VStack(spacing: 0) {
+                    aiCoachPickerRow(
+                        icon: "globe",
+                        tint: .settingsRippleBlue,
+                        title: "Language",
+                        currentValue: preferencesService.language,
+                        options: [("en", "English"), ("vi", "Tiếng Việt")],
+                        pickerLabel: "AI Coach language"
+                    ) { newValue in
+                        Task { await preferencesService.update(language: newValue) }
+                    }
+                    hairlineDivider
+                    aiCoachPickerRow(
+                        icon: "text.bubble.fill",
+                        tint: .settingsIconPurple,
+                        title: "Coaching Style",
+                        currentValue: preferencesService.coachingStyle,
+                        options: [
+                            ("supportive", "Supportive"),
+                            ("direct", "Direct"),
+                            ("educational", "Educational")
+                        ],
+                        pickerLabel: "AI Coach coaching style"
+                    ) { newValue in
+                        Task { await preferencesService.update(coachingStyle: newValue) }
+                    }
+                }
+            }
+            if let message = preferencesService.errorMessage {
+                Text(message)
+                    .font(.system(size: 12, weight: .regular, design: .rounded))
+                    .foregroundStyle(Color.error)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+        }
+    }
+
+    private func aiCoachPickerRow(
+        icon: String,
+        tint: Color,
+        title: String,
+        currentValue: String,
+        options: [(raw: String, label: String)],
+        pickerLabel: String,
+        onChange: @escaping (String) -> Void
+    ) -> some View {
+        HStack(spacing: 12) {
+            iconBadge(systemName: icon, tint: tint)
+            Text(title)
+                .font(.system(size: 15, weight: .semibold, design: .rounded))
+                .foregroundStyle(Color.Wellness.adaptivePrimaryText)
+                .lineLimit(1)
+            Spacer(minLength: 8)
+            if !options.contains(where: { $0.raw == currentValue }) {
+                Text(currentValue.capitalized)
+                    .font(.system(size: 13, weight: .medium, design: .rounded))
+                    .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
+            }
+            Picker(title, selection: Binding(
+                get: { currentValue },
+                set: { onChange($0) }
+            )) {
+                ForEach(options, id: \.raw) { option in
+                    Text(option.label).tag(option.raw)
+                }
+            }
+            .pickerStyle(.menu)
+            .labelsHidden()
+            .tint(Color.Wellness.adaptiveSecondaryText)
+            .accessibilityLabel(pickerLabel)
+        }
+        .padding(.vertical, 10)
     }
 
     // MARK: - 8. Data & support
@@ -480,10 +573,6 @@ struct SettingsView: View {
         viewModel.bioAge.map { "\($0) yrs" } ?? "—"
     }
 
-    private var chatAvailabilityLabel: String {
-        ChatAvailability.current.isAvailable ? "Active" : "Coming soon"
-    }
-
     private var watchStatusText: String {
         PhoneConnectivityManager.shared.isWatchAppInstalled ? "Connected" : "Not paired"
     }
@@ -553,6 +642,7 @@ struct SettingsView_Previews: PreviewProvider {
         }
         .environment(AppRouter())
         .environment(PaywallController())
+        .environment(PreferencesService())
         .modelContainer(for: [StressMeasurement.self, CharacterUnlock.self], inMemory: true)
     }
 }

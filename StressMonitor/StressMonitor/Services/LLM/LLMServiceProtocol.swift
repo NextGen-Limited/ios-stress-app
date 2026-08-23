@@ -30,7 +30,7 @@ enum LLMServiceError: Error, LocalizedError {
         case .concurrentRequests:
             return "I'm still thinking. Please wait for my response."
         case .insufficientCredits:
-            return "Out of credits. Monthly credits reset automatically."
+            return "Out of credits. Subscribe or buy more to keep chatting."
         case .decodingFailure:
             return "Something went wrong processing that response."
         case .cancelled:
@@ -52,9 +52,13 @@ protocol LLMServiceProtocol: Sendable {
     /// - Parameters:
     ///   - messages: Conversation history (user + assistant messages)
     ///   - systemPrompt: System-level instructions with health context
+    ///   - stressContext: Stress context payload built for THIS call. Passed
+    ///     per-call (not through shared state) so each send observes its own
+    ///     payload — see CR-01.
     /// - Returns: Async stream of response tokens
     func send(
         messages: [ChatMessage],
-        systemPrompt: String
+        systemPrompt: String,
+        stressContext: StressContextPayload?
     ) async throws -> AsyncThrowingStream<String, Error>
 }

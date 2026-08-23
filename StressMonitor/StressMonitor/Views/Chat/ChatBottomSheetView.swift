@@ -10,6 +10,9 @@ import SwiftUI
 /// the user's current stress level.
 struct ChatBottomSheetView: View {
     @Environment(\.dismiss) private var dismiss
+    @Environment(PaywallController.self) private var paywall
+    @Environment(CreditService.self) private var creditService
+    @Environment(PreferencesService.self) private var preferencesService
     @State private var viewModel: ChatViewModel
     @State private var inputText = ""
 
@@ -40,6 +43,27 @@ struct ChatBottomSheetView: View {
             }
             .navigationTitle("")
             .navigationBarTitleDisplayMode(.inline)
+            // Wire the view model to app-scope services from the environment:
+            // the 402 paywall presentation and the credits convergence sink.
+            // The environment is not reachable in `init`, so this happens on
+            // first appear, before any message can be sent.
+            .onAppear {
+                viewModel.presentPaywall = { paywall.present(reason: $0) }
+                viewModel.setCreditsConvergenceSink { [weak creditService] remaining in
+                    creditService?.apply(creditsRemaining: remaining)
+                }
+                // Server-authoritative history restore (derived-SES-01): the
+                // VM is fresh per presentation, and restoreHistory guards
+                // re-appear within one presentation.
+                viewModel.apiClient = StressAPIClient()
+                Task { await viewModel.restoreHistory() }
+                // Server-suggested chips swap over the instant local set once
+                // the GET lands (derived-QA-01); preferences seed first so
+                // the query carries the server pair, not install defaults
+                // (WR-02 — COVERAGE row 14's chat-open seed).
+                viewModel.preferencesService = preferencesService
+                Task { await viewModel.hydratePreferencesAndFetchQuickActions() }
+            }
             // Covers swipe-to-dismiss too, not just the Close button — without
             // this the SSE stream and its owning objects outlive the sheet.
             .onDisappear { viewModel.cancelResponse() }
@@ -131,6 +155,11 @@ struct ChatBottomSheetView: View {
 
             Spacer()
 
+            // DEC-2 placement-a: live balance pill. Informational while the
+            // user still has credits; tappable straight to the paywall when
+            // the remaining count hits zero.
+            balancePill
+
             // Overflow menu
             Image(systemName: "ellipsis")
                 .font(.system(size: 20))
@@ -142,6 +171,50 @@ struct ChatBottomSheetView: View {
         .overlay(alignment: .bottom) {
             Divider()
         }
+    }
+
+    // MARK: - Balance Pill
+
+    private var isOutOfCredits: Bool {
+        guard let balance = creditService.balance else { return false }
+        return !balance.isUnlimited && balance.remaining <= 0
+    }
+
+    @ViewBuilder
+    private var balancePill: some View {
+        if isOutOfCredits {
+            Button {
+                paywall.present(reason: .outOfCredits)
+            } label: {
+                pillLabel(systemImage: "exclamationmark.circle.fill", tint: Color(hex: "#FF9500"))
+            }
+            .buttonStyle(.plain)
+            .frame(minHeight: 44)
+            .accessibilityLabel("Out of credits. Tap to view options.")
+        } else {
+            pillLabel(
+                systemImage: "circlebadge.2",
+                tint: Color.Wellness.adaptiveSecondaryText
+            )
+            .accessibilityLabel("Credit balance: \(CreditBalanceFormatter.balanceText(creditService.balance))")
+        }
+    }
+
+    private func pillLabel(systemImage: String, tint: Color) -> some View {
+        HStack(spacing: 4) {
+            Image(systemName: systemImage)
+                .font(.system(size: 11, weight: .semibold))
+            Text(CreditBalanceFormatter.balanceText(creditService.balance))
+                .font(.system(size: 12, weight: .semibold, design: .rounded))
+        }
+        .foregroundStyle(tint)
+        .padding(.horizontal, 10)
+        .padding(.vertical, 6)
+        .background(Color.Wellness.adaptiveCardBackground)
+        .clipShape(Capsule())
+        .overlay(
+            Capsule().stroke(Color.Wellness.adaptiveSecondaryText.opacity(0.15), lineWidth: 1)
+        )
     }
 
     /// Subtitle reflecting current stress state.
@@ -256,20 +329,15 @@ struct ChatBottomSheetView: View {
 
     private var quickRepliesSection: some View {
         VStack(alignment: .leading, spacing: 4) {
-            Text("QUICK REPLIES")
-                .font(.system(size: 10, weight: .semibold, design: .monospaced))
-                .tracking(0.8)
-                .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
-                .padding(.horizontal, 16)
-
             ScrollView(.horizontal, showsIndicators: false) {
                 HStack(spacing: 6) {
-                    ForEach(defaultQuickReplies, id: \.self) { reply in
+                    ForEach(viewModel.quickReplies) { reply in
                         Button {
-                            inputText = reply
-                            sendMessage()
+                            // Sends the chip's resolved prompt directly — the
+                            // long prompt must not echo into the composer.
+                            viewModel.send(reply.prompt)
                         } label: {
-                            Text(reply)
+                            Text(reply.title)
                                 .font(.system(size: 13, weight: .medium))
                                 .foregroundStyle(Color(hex: "#0288D1"))
                                 .padding(.horizontal, 14)
@@ -288,11 +356,6 @@ struct ChatBottomSheetView: View {
             }
         }
         .padding(.vertical, 6)
-    }
-
-    /// Default quick replies matching the HTML design.
-    private var defaultQuickReplies: [String] {
-        ["Why is my HRV low?", "Suggest a walk", "Set a 5pm check-in", "Read me a poem"]
     }
 
     // MARK: - Error Banner

@@ -161,8 +161,6 @@ vendor/bundle
 build/
 .worktrees/
 
-supabase/.temp/
-
 # spm-cache (sandbox, lockfile, build artifacts - regenerated locally)
 StressMonitor/spm-cache/
 StressMonitor/spm-cache.lock

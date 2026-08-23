@@ -10,8 +10,10 @@ import Foundation
 final class StressAPIClient {
 
     private let authService: AuthServiceProtocol
-    private let baseURL: URL
-    private let session: URLSession
+    /// Internal like `session`: the endpoint-group extensions build full URLs
+    /// (query strings via `URLComponents`) around this base.
+    let baseURL: URL
+    let session: URLSession
 
     init(
         authService: AuthServiceProtocol? = nil,
@@ -28,15 +30,37 @@ final class StressAPIClient {
     /// Builds an authenticated URLRequest against the backend. Every
     /// non-`/health` endpoint requires a Firebase ID token (backend verifies
     /// via Firebase Admin `verifyIdToken`).
+    ///
+    /// Relative-path convenience for endpoints without query strings. Query-
+    /// carrying endpoints must build their URL with `URLComponents` and call
+    /// `authorizedRequest(url:)` instead — `appendingPathComponent` percent-
+    /// encodes `?`, turning `sessions?limit=20` into a literal path segment.
     func authorizedRequest(
         path: String,
         method: String,
         body: Data? = nil,
         accept: String? = nil
     ) async throws -> URLRequest {
+        try await authorizedRequest(
+            url: baseURL.appendingPathComponent(path),
+            method: method,
+            body: body,
+            accept: accept
+        )
+    }
+
+    /// URL-based variant of the request builder. Callers that assemble URLs
+    /// themselves (query strings via `URLComponents`) share the same Bearer,
+    /// Content-Type, and timeout handling as the path variant.
+    func authorizedRequest(
+        url: URL,
+        method: String,
+        body: Data? = nil,
+        accept: String? = nil
+    ) async throws -> URLRequest {
         let token = try await authService.getIDToken()
 
-        var request = URLRequest(url: baseURL.appendingPathComponent(path))
+        var request = URLRequest(url: url)
         request.httpMethod = method
         request.setValue("Bearer \(token)", forHTTPHeaderField: "Authorization")
         request.setValue("application/json", forHTTPHeaderField: "Content-Type")

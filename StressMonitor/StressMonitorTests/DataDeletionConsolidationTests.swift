@@ -6,6 +6,7 @@ import Testing
 @testable import StressMonitor
 
 @Suite("Delete All Credential Clearance")
+@MainActor
 struct DeleteAllCredentialClearanceTests {
 
     @Test("clearCredentialsAndSharedCaches removes Supabase JWT from Keychain")
@@ -30,6 +31,15 @@ struct DeleteAllCredentialClearanceTests {
         #expect(status == errSecItemNotFound)
     }
 
+    @Test("clearCredentialsAndSharedCaches removes the stored chat session id")
+    func clearsStressChatSessionId() throws {
+        UserDefaults.standard.set("seed-session-id", forKey: "stressChatSessionId")
+
+        DataDeleterService.clearCredentialsAndSharedCaches()
+
+        #expect(UserDefaults.standard.string(forKey: "stressChatSessionId") == nil)
+    }
+
     @Test("clearCredentialsAndSharedCaches removes App Group widget cache")
     func clearsAppGroupWidgetCache() throws {
         let suiteID = WidgetConstants.appGroupID
@@ -49,6 +59,7 @@ struct DeleteAllCredentialClearanceTests {
 }
 
 @Suite("Data Deleter Consolidation")
+@MainActor
 struct DataDeleterConsolidationTests {
 
     @Test("clearCredentialsAndSharedCaches removes Supabase refresh token from Keychain")
@@ -173,7 +184,7 @@ struct DataDeleterScopedDeletionTests {
 /// Test double for ``CloudKitResetServiceProtocol`` that can simulate a CloudKit
 /// failure or a mid-flight cancellation without any network access.
 @MainActor
-final class FakeCloudKitResetService: CloudKitResetServiceProtocol, @unchecked Sendable {
+final class FakeCloudKitResetService: CloudKitResetServiceProtocol {
     enum Behavior {
         case succeed
         case throwError(CloudKitResetError)

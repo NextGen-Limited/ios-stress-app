@@ -1,11 +1,13 @@
 import Foundation
 
-/// Configurable product-ID catalog for StoreKit subscriptions.
+/// Configurable product-ID catalog for StoreKit subscriptions and credit packs.
 ///
 /// Product IDs are resolved in this order:
-/// 1. `Bundle.main` Info.plist keys (`STOREKIT_PREMIUM_MONTHLY_PRODUCT_ID`, etc.)
+/// 1. `Bundle.main` Info.plist keys (`STOREKIT_PREMIUM_MONTHLY_PRODUCT_ID`,
+///    `STOREKIT_CREDITS_SMALL_PRODUCT_ID`, etc.)
 /// 2. `ProcessInfo.processInfo.environment` (same keys, useful for CI)
-/// 3. `UserDefaults.standard` (`storeKitPremiumMonthlyProductID`, etc.)
+/// 3. `UserDefaults.standard` (`storeKitPremiumMonthlyProductID` etc. —
+///    one camelCase key per resolvable product)
 ///
 /// Empty strings and unresolved build-setting placeholders (e.g. `$(…)` ) are treated as nil.
 struct StoreKitProductCatalog: Sendable {
@@ -16,6 +18,8 @@ struct StoreKitProductCatalog: Sendable {
     let monthlyProductID: String?
     let annualProductID: String?
     let subscriptionGroupID: String?
+    let smallPackProductID: String?
+    let largePackProductID: String?
 
     /// All non-nil product IDs.
     var allProductIDs: Set<String> {
@@ -39,6 +43,22 @@ struct StoreKitProductCatalog: Sendable {
         return nil
     }
 
+    /// Returns the product ID for a given credit pack.
+    func packID(for pack: CreditPackID) -> String? {
+        switch pack {
+        case .small: smallPackProductID
+        case .large: largePackProductID
+        }
+    }
+
+    /// Returns the pack identity for a given product ID, or nil if unknown.
+    /// Non-nil means the product ID is a consumable credit pack.
+    func pack(for productID: String) -> CreditPackID? {
+        if productID == smallPackProductID { return .small }
+        if productID == largePackProductID { return .large }
+        return nil
+    }
+
     // MARK: - Live (production) initializer
 
     /// Creates a catalog that resolves IDs from Bundle → Environment → UserDefaults.
@@ -46,6 +66,7 @@ struct StoreKitProductCatalog: Sendable {
 
     init(
         bundle: Bundle = .main,
+        infoDictionary: [String: String]? = nil,
         environment: [String: String]? = nil,
         defaults: UserDefaults? = nil
     ) {
@@ -56,6 +77,7 @@ struct StoreKitProductCatalog: Sendable {
             infoKey: "STOREKIT_PREMIUM_WEEKLY_PRODUCT_ID",
             envKey: "STOREKIT_PREMIUM_WEEKLY_PRODUCT_ID",
             defaultsKey: "storeKitPremiumWeeklyProductID",
+            infoDictionary: infoDictionary,
             bundle: bundle,
             environment: env,
             defaults: defs
@@ -65,6 +87,7 @@ struct StoreKitProductCatalog: Sendable {
             infoKey: "STOREKIT_PREMIUM_MONTHLY_PRODUCT_ID",
             envKey: "STOREKIT_PREMIUM_MONTHLY_PRODUCT_ID",
             defaultsKey: "storeKitPremiumMonthlyProductID",
+            infoDictionary: infoDictionary,
             bundle: bundle,
             environment: env,
             defaults: defs
@@ -74,6 +97,7 @@ struct StoreKitProductCatalog: Sendable {
             infoKey: "STOREKIT_PREMIUM_ANNUAL_PRODUCT_ID",
             envKey: "STOREKIT_PREMIUM_ANNUAL_PRODUCT_ID",
             defaultsKey: "storeKitPremiumAnnualProductID",
+            infoDictionary: infoDictionary,
             bundle: bundle,
             environment: env,
             defaults: defs
@@ -83,6 +107,27 @@ struct StoreKitProductCatalog: Sendable {
             infoKey: "STOREKIT_PREMIUM_SUBSCRIPTION_GROUP_ID",
             envKey: "STOREKIT_PREMIUM_SUBSCRIPTION_GROUP_ID",
             defaultsKey: "storeKitPremiumSubscriptionGroupID",
+            infoDictionary: infoDictionary,
+            bundle: bundle,
+            environment: env,
+            defaults: defs
+        )
+
+        self.smallPackProductID = Self.resolve(
+            infoKey: "STOREKIT_CREDITS_SMALL_PRODUCT_ID",
+            envKey: "STOREKIT_CREDITS_SMALL_PRODUCT_ID",
+            defaultsKey: "storeKitCreditsSmallProductID",
+            infoDictionary: infoDictionary,
+            bundle: bundle,
+            environment: env,
+            defaults: defs
+        )
+
+        self.largePackProductID = Self.resolve(
+            infoKey: "STOREKIT_CREDITS_LARGE_PRODUCT_ID",
+            envKey: "STOREKIT_CREDITS_LARGE_PRODUCT_ID",
+            defaultsKey: "storeKitCreditsLargeProductID",
+            infoDictionary: infoDictionary,
             bundle: bundle,
             environment: env,
             defaults: defs
@@ -93,11 +138,15 @@ struct StoreKitProductCatalog: Sendable {
     init(weeklyProductID: String? = nil,
          monthlyProductID: String? = nil,
          annualProductID: String? = nil,
-         subscriptionGroupID: String? = nil) {
+         subscriptionGroupID: String? = nil,
+         smallPackProductID: String? = nil,
+         largePackProductID: String? = nil) {
         self.weeklyProductID = Self.clean(weeklyProductID)
         self.monthlyProductID = Self.clean(monthlyProductID)
         self.annualProductID = Self.clean(annualProductID)
         self.subscriptionGroupID = Self.clean(subscriptionGroupID)
+        self.smallPackProductID = Self.clean(smallPackProductID)
+        self.largePackProductID = Self.clean(largePackProductID)
     }
 
     // MARK: - Resolution helpers
@@ -106,13 +155,20 @@ struct StoreKitProductCatalog: Sendable {
         infoKey: String,
         envKey: String,
         defaultsKey: String,
+        infoDictionary: [String: String]?,
         bundle: Bundle,
         environment: [String: String],
         defaults: UserDefaults
     ) -> String? {
+        let infoValue: String?
+        if let infoDictionary {
+            infoValue = infoDictionary[infoKey]
+        } else {
+            infoValue = bundle.object(forInfoDictionaryKey: infoKey) as? String
+        }
+
         // 1. Bundle Info.plist
-        if let value = bundle.object(forInfoDictionaryKey: infoKey) as? String,
-           clean(value) != nil {
+        if let value = infoValue, clean(value) != nil {
             return clean(value)
         }
 

@@ -30,15 +30,17 @@ enum StoreKitError: LocalizedError, Equatable {
         case .missingProductConfiguration:
             return "Premium purchases are not configured for this build."
         case .noActiveSubscription:
-            return "No active subscription was found for this Apple ID."
+            return "No restorable subscription was found for this Apple ID. Credit packs are one-time purchases and can't be restored — if a pack you bought didn't reach your balance, contact purchase support."
         }
     }
 }
 
 protocol StoreKitServiceProtocol {
     var availablePlans: [SubscriptionPlan] { get async }
+    var availablePacks: [CreditPack] { get async }
     var isPremiumUser: Bool { get async }
     func purchase(_ plan: SubscriptionPlan) async throws
+    func purchase(pack: CreditPack) async throws
     func restorePurchases() async throws
     func fetchPurchaseHistory() async -> [String]
     func refreshEntitlements() async

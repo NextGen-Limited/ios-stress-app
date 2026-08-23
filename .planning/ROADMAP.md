@@ -2,8 +2,8 @@
 
 ## Milestones
 
-- ✅ **v1.0 App Store Submission Remediation** — Phases 1, 1.1, 2, 3, 4, 5 (closed 2026-08-12, `override_closeout` — see `.planning/milestones/v1.0-ROADMAP.md` and PROJECT.md's "v1.0 Verification Reality Check")
-- 🔄 **v1.1 Backend API Migration** — Migrate iOS app from Supabase to standalone Deno/Hono backend (stress-api.dropitx.site). Firebase Auth + 11 endpoints + credits monetization.
+- ✅ **v1.0 App Store Submission Remediation** — Phases 1, 1.1, 2, 3, 4, 5 (closed 2026-08-12, `override_closeout`)
+- ✅ **v1.1 Backend API Migration** — Phases 1-3 (closed 2026-08-24, `verified_closeout`)
 
 ## Phases
 
@@ -21,50 +21,19 @@ Full phase detail archived at `.planning/milestones/v1.0-ROADMAP.md` and `.plann
 
 </details>
 
-### v1.1 Backend API Migration
+<details>
+<summary>✅ v1.1 Backend API Migration (Phases 1-3) — CLOSED 2026-08-24 (verified_closeout)</summary>
 
-- [x] **Phase 1: Firebase Auth + API Client + Chat Migration** — Add FirebaseAuth SDK (Anonymous + Google Sign-In), build StressAPIClient, migrate /chat to new backend SSE protocol (terminal metadata event), config migration (remove Supabase, add Firebase + API base URL). Blocks Phase 2 and 3. (completed 2026-08-16)
-- [ ] **Phase 2: Credits System + IAP Transition** — Integrate /credits API, transition StoreKit from subscription to consumable credit packs, credits-gated chat access (402 INSUFFICIENT_CREDITS → paywall), new paywall UX with balance display.
-- [ ] **Phase 3: Sessions, Preferences, Quick Actions + Cleanup** — Integrate /sessions (server-side chat history), /preferences sync, /quick-actions, remove all Supabase remnants, final integration testing.
+- [x] Phase 1: Firebase Auth + API Client + Chat Migration (4/4 plans; verification `passed`, UAT 2/2) — completed 2026-08-16
+- [x] Phase 2: Credits System + IAP Transition (8/8 plans; verification `passed` 29/29, live money-path smoke human-validated 2026-08-23) — completed 2026-08-23
+- [x] Phase 3: Sessions, Preferences, Quick Actions + Cleanup (5/5 plans; verification `passed` 21/21, 5 live-backend UAT scenarios human-validated 2026-08-23) — completed 2026-08-23
 
-#### Phase 1: Firebase Auth + API Client + Chat Migration
+Milestone audit: 21/21 requirements, 3/3 phases, 7/7 integration seams, 4/4 E2E flows, 0 gaps (status `tech_debt` — documented carryover only). SECURITY.md present for all phases, threats_open 0.
 
-**Goal:** Add FirebaseAuth SDK (Anonymous + Google Sign-In), build StressAPIClient, migrate /chat to new backend SSE protocol (terminal metadata event), config migration (remove Supabase, add Firebase + API base URL). Blocks Phase 2 and 3.
-**Depends on:** Nothing (foundational)
+Full phase detail archived at `.planning/milestones/v1.1-ROADMAP.md` and `.planning/milestones/v1.1-phases/`.
 
-Plans:
+</details>
 
-- [x] 01-01-PLAN.md
-- [x] 01-04-PLAN.md
+## Next
 
-4/4 plans executed
-
-- [x] 01-02-PLAN.md — Google Sign-In upgrade path + Supabase source removal (D-04) + DataDeleterService rewire
-- [x] 01-03-PLAN.md — TDD test coverage for StressAPIConfig, StressAPIClient, FirebaseAuthService
-
-#### Phase 2: Credits System + IAP Transition
-
-**Goal:** Integrate /credits API, transition StoreKit from subscription to consumable credit packs, credits-gated chat access (402 INSUFFICIENT_CREDITS → paywall), new paywall UX with balance display.
-**Depends on:** Phase 1 (auth + API client)
-**Plans:** 4 plans
-
-Plans:
-**Wave 1**
-
-- [ ] 02-01-PLAN.md — Monetization decision gates (DEC-1/DEC-2) + orphaned-suite repair + CR-01 closure + credits tracer (402 → paywall → live balance)
-
-**Wave 2** *(blocked on Wave 1 completion)*
-
-- [ ] 02-02-PLAN.md — Backend POST /credits/redeem: Apple JWS verification, idempotent 'purchase' ledger grants (cross-repo, TDD)
-- [ ] 02-03-PLAN.md — StoreKit consumable packs + deferred-grant purchase flow (redeem → finish) + Release-build proof (BUILD-05)
-
-**Wave 3** *(blocked on Wave 2 completion)*
-
-- [ ] 02-04-PLAN.md — Packs-era paywall UX + balance surfaces (DEC-2 placements) + live money-path verification
-
-**Waves:** 1: 02-01 → 2: 02-02, 02-03 (parallel, contract-pinned) → 3: 02-04
-
-#### Phase 3: Sessions, Preferences, Quick Actions + Cleanup
-
-**Goal:** Integrate /sessions (server-side chat history), /preferences sync, /quick-actions, remove all Supabase remnants, final integration testing.
-**Depends on:** Phase 1 (auth + API client)
+No active milestone. Recommended (per v1.1 audit conclusion): a **v1.2 "submission readiness"** milestone closing the v1.0-carryover list — BUILD-01 (privacy manifest, gated on D3), BUILD-02/03/04-residual, DATA-01-residual/DATA-04, AUTH-01, WIRE-01 (gated on D4), SHIP-01..03, A11Y-01..05, plus environment debt (WINDOWS.md #8, CharacterEntitlementSyncTests quarantine). Start with `/gsd-new-milestone`.

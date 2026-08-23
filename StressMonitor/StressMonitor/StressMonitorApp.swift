@@ -19,7 +19,17 @@ struct StressMonitorApp: App {
     // Owned once for the app's process lifetime so the Transaction.updates
     // listener started in its init runs the whole time, not just while the
     // paywall happens to be on screen. See StoreKitServiceEnvironment.swift.
-    @State private var storeKitService: StoreKitServiceProtocol = Self.makeStoreKitService()
+    // Built in `init` so it can hold the app-scope `CreditService` — every
+    // server grant (purchase path and Transaction.updates redelivery) then
+    // converges the same balance instance the UI displays.
+    @State private var storeKitService: StoreKitServiceProtocol
+    /// App-scope credit balance cache: paywall + chat surfaces read this one
+    /// instance so every convergence source updates the same displayed value.
+    @State private var creditService: CreditService
+    /// App-scope AI-coach preference pair (language + coaching style): the
+    /// Settings pickers and the stress-context payload read this one instance
+    /// so every surface converges on the same seeded state.
+    @State private var preferencesService = PreferencesService()
     @Environment(\.scenePhase) private var scenePhase
     // MARK: - Versioned Schema (V1 → V2 adds Habit)
     //
@@ -73,6 +83,11 @@ struct StressMonitorApp: App {
     private static let persistenceLogger = Logger(
         subsystem: "com.stressmonitor.app",
         category: "Persistence"
+    )
+
+    private static let appLogger = Logger(
+        subsystem: "com.stressmonitor.app",
+        category: "App"
     )
 
     var sharedModelContainer: ModelContainer = { makeContainer() }()
@@ -166,6 +181,9 @@ struct StressMonitorApp: App {
     }
 
     init() {
+        let creditService = CreditService()
+        _creditService = State(initialValue: creditService)
+        _storeKitService = State(initialValue: Self.makeStoreKitService(creditService: creditService))
         FirebaseApp.configure()
         Task { try? await Auth.auth().signInAnonymously() }
         #if DEBUG
@@ -183,6 +201,8 @@ struct StressMonitorApp: App {
             OnboardingContainerView()
                 .environment(appRouter)
                 .environment(paywall)
+                .environment(creditService)
+                .environment(preferencesService)
                 .environment(\.storeKitService, storeKitService)
                 .preferredColorScheme(AppearanceManager.shared.colorScheme)
                 #if DEBUG
@@ -200,6 +220,15 @@ struct StressMonitorApp: App {
             guard newPhase == .active else { return }
             Task { @MainActor in
                 await storeKitService.refreshEntitlements()
+                // Also refreshes the credit balance on every foreground; a
+                // 401 here doubles as the AUTH-02 stale-session probe.
+                do {
+                    try await creditService.refreshBalance()
+                } catch {
+                    Self.appLogger.notice(
+                        "Credit balance refresh failed: \(error.localizedDescription, privacy: .public)"
+                    )
+                }
                 CharacterCollectionViewModel.syncPremiumCharacterEntitlement(
                     isPremium: PremiumState.shared.isPremiumUser,
                     in: sharedModelContainer.mainContext
@@ -211,12 +240,12 @@ struct StressMonitorApp: App {
     // MARK: - StoreKit factory (DEBUG vs Release)
 
     #if DEBUG
-    private static func makeStoreKitService() -> StoreKitServiceProtocol {
+    private static func makeStoreKitService(creditService: CreditService) -> StoreKitServiceProtocol {
         MockStoreKitService(premiumState: .shared)
     }
     #else
-    private static func makeStoreKitService() -> StoreKitServiceProtocol {
-        StoreKitService(premiumState: .shared)
+    private static func makeStoreKitService(creditService: CreditService) -> StoreKitServiceProtocol {
+        StoreKitService(premiumState: .shared, creditService: creditService)
     }
     #endif
 
