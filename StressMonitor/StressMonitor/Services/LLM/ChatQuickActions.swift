@@ -59,4 +59,34 @@ enum ChatQuickActions {
 
         return baseActions
     }
+
+    /// Resolves a server-suggested chip id to the prompt its tap sends.
+    ///
+    /// Verbatim mirror of the backend's own table
+    /// (stress-app-be/src/lib/quick-actions.ts, `getQuickActionPrompt`) — the
+    /// server's `GET /quick-actions` returns ids + titles only, so taps must
+    /// resolve prompts on-device through the credit-metered `/chat` path
+    /// instead of the unmetered `POST /quick-actions` completion route.
+    /// Update the two tables in lockstep. Unknown ids return nil and are
+    /// dropped from the chip row.
+    static func prompt(forServerActionId id: String) -> String? {
+        switch id {
+        case "breathing":
+            return "Guide me through a box breathing exercise right now."
+        case "grounding":
+            return "Help me with the 5-4-3-2-1 grounding technique."
+        case "sleep_tips":
+            return "Give me practical tips to sleep better tonight."
+        case "mini_walk":
+            return "Suggest a simple 5-minute movement routine I can do right now."
+        case "recovery":
+            return "What recovery strategies should I focus on given my current state?"
+        case "resilience":
+            return "How can I build long-term stress resilience?"
+        case "talk":
+            return "I want to talk more about how I'm feeling right now."
+        default:
+            return nil
+        }
+    }
 }
