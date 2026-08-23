@@ -86,7 +86,12 @@ struct StressContextPayload: Codable, Sendable {
         var trendDelta: String? = nil
         let recent = recentHistory.suffix(min(5, max(2, recentHistory.count)))
         if recent.count >= 2 {
-            let levels = recent.map(\.stressLevel)
+            // CR-02: the repository delivers newest-first, so restore
+            // chronological order before the delta — `last - first` must be
+            // newest − oldest for the direction (and sign of trendDelta) to
+            // match what the user actually experienced.
+            let chronological = Array(recent.reversed())
+            let levels = chronological.map(\.stressLevel)
             let first = levels.first!
             let last = levels.last!
             let diff = last - first
