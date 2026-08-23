@@ -24,7 +24,7 @@
 | 14 | `GET /preferences` | INTEGRATE | Phase 3 — one-time seed at first surface (chat open / Settings onAppear); chat-relevant pair only (`derived-PREF-01`) |
 | 15 | `PUT /preferences` | INTEGRATE | Phase 3 — single-field local-writer-wins updates (`language` / `coaching_style` only) (`derived-PREF-01`) |
 | 16 | `GET /quick-actions` | INTEGRATE | Phase 3 — server-suggested chips at chat open with live stress context; local static set renders instantly as fallback (`derived-QA-01`) |
-| 17 | `POST /quick-actions` | OPT-OUT | **Deliberately unwired per CONTEXT lock** — returns a full 512-token completion with **no `deductCredit` anywhere in the route** (verified: `quick-actions.ts:44-61`); wiring it would open an unmetered chat path bypassing the Phase 2 revenue model. Chip taps ride the existing credit-metered `/chat` path instead. Metering/gating note filed on `phuongddx/stress-app-be` (plan 03-04); iOS grep-gate pins that no POST to this route ever appears in app sources |
+| 17 | `POST /quick-actions` | OPT-OUT | **Deliberately unwired per CONTEXT lock** — returns a full 512-token completion with **no `deductCredit` anywhere in the route** (verified: `quick-actions.ts:44-61`); wiring it would open an unmetered chat path bypassing the Phase 2 revenue model. Chip taps ride the existing credit-metered `/chat` path instead. Metering/gating note filed on `phuongddx/stress-app-be` (plan 03-04) — tracked as https://github.com/phuongddx/stress-app-be/issues/2; iOS grep-gate pins that no POST to this route ever appears in app sources |
 | 18 | `GET /` (OpenAPI docs HTML page) | OPT-OUT | Browser-facing documentation surface, not an app capability |
 
 ## Field-level scope note (preferences)
