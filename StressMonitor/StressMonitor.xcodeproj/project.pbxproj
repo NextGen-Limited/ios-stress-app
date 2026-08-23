@@ -54,6 +54,7 @@
 		F1A1B2C3D4E500000000B019 /* ChatHistoryRestoreTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A1B2C3D4E500000000A019 /* ChatHistoryRestoreTests.swift */; };
 		F1A1B2C3D4E500000000B020 /* StressAPIClientPreferencesTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A1B2C3D4E500000000A020 /* StressAPIClientPreferencesTests.swift */; };
 		F1A1B2C3D4E500000000B021 /* PreferencesServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A1B2C3D4E500000000A021 /* PreferencesServiceTests.swift */; };
+		F1A1B2C3D4E500000000B022 /* StressAPIClientQuickActionsTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = F1A1B2C3D4E500000000A022 /* StressAPIClientQuickActionsTests.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -149,6 +150,7 @@
 		F1A1B2C3D4E500000000A019 /* ChatHistoryRestoreTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = ChatHistoryRestoreTests.swift; path = StressMonitorTests/ChatHistoryRestoreTests.swift; sourceTree = "<group>"; };
 		F1A1B2C3D4E500000000A020 /* StressAPIClientPreferencesTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = StressAPIClientPreferencesTests.swift; path = StressMonitorTests/StressAPIClientPreferencesTests.swift; sourceTree = "<group>"; };
 		F1A1B2C3D4E500000000A021 /* PreferencesServiceTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = PreferencesServiceTests.swift; path = StressMonitorTests/PreferencesServiceTests.swift; sourceTree = "<group>"; };
+		F1A1B2C3D4E500000000A022 /* StressAPIClientQuickActionsTests.swift */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = sourcecode.swift; name = StressAPIClientQuickActionsTests.swift; path = StressMonitorTests/StressAPIClientQuickActionsTests.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedBuildFileExceptionSet section */
@@ -311,6 +313,7 @@
 				F1A1B2C3D4E500000000A019 /* ChatHistoryRestoreTests.swift */,
 				F1A1B2C3D4E500000000A020 /* StressAPIClientPreferencesTests.swift */,
 				F1A1B2C3D4E500000000A021 /* PreferencesServiceTests.swift */,
+				F1A1B2C3D4E500000000A022 /* StressAPIClientQuickActionsTests.swift */,
 				4C67EAC979024C30F581AD22 /* StressMonitorProducts.storekit */,
 			);
 			sourceTree = "<group>";
@@ -558,6 +561,7 @@
 				F1A1B2C3D4E500000000B019 /* ChatHistoryRestoreTests.swift in Sources */,
 				F1A1B2C3D4E500000000B020 /* StressAPIClientPreferencesTests.swift in Sources */,
 				F1A1B2C3D4E500000000B021 /* PreferencesServiceTests.swift in Sources */,
+				F1A1B2C3D4E500000000B022 /* StressAPIClientQuickActionsTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
