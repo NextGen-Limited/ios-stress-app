@@ -74,7 +74,7 @@ Plans:
 #### Phase 3: Sessions, Preferences, Quick Actions + Cleanup
 
 **Depends on:** Phase 1 (auth + API client)
-**Plans:** 1/5 plans executed (serialized waves — every plan registers test files in project.pbxproj)
+**Plans:** 2/5 plans executed (serialized waves — every plan registers test files in project.pbxproj)
 
 Plans:
 **Wave 1**
@@ -83,7 +83,7 @@ Plans:
 
 **Wave 2** *(blocked on Wave 1 completion)*
 
-- [ ] 03-02-PLAN.md — PreferencesService + GET/PUT /preferences pair + CR-02 trend fix + Settings AI Coach section (wave 2)
+- [x] 03-02-PLAN.md — PreferencesService + GET/PUT /preferences pair + CR-02 trend fix + Settings AI Coach section (wave 2)
 
 **Wave 3** *(blocked on Wave 2 completion)*
 

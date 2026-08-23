@@ -5,15 +5,15 @@ milestone_name: Backend API Migration
 current_phase: 3
 current_phase_name: Sessions, Preferences, Quick Actions + Cleanup
 status: executing
-stopped_at: Completed 03-01-PLAN.md (sessions tracer)
-last_updated: "2026-08-23T09:53:58.747Z"
+stopped_at: Completed 03-02-PLAN.md (preferences sync + CR-02)
+last_updated: "2026-08-23T10:14:43.982Z"
 last_activity: 2026-08-23
 last_activity_desc: Phase 2 complete, transitioned to Phase 3
 progress:
   total_phases: 3
   completed_phases: 2
   total_plans: 17
-  completed_plans: 13
+  completed_plans: 14
   percent: 67
 ---
 
@@ -29,7 +29,7 @@ See: .planning/PROJECT.md (updated 2026-08-23 after v1.1 Phase 02 close)
 ## Current Position
 
 Phase: 3 (Sessions, Preferences, Quick Actions + Cleanup) — EXECUTING
-Plan: 2 of 5
+Plan: 3 of 5
 Status: Ready to execute
 Last activity: 2026-08-23 — Phase 3 execution started
 
@@ -70,6 +70,7 @@ Last activity: 2026-08-23 — Phase 3 execution started
 | Phase 02 P07 | 21min | 3 tasks | 9 files |
 | Phase 02 P08 | 18min | 3 tasks | 6 files |
 | Phase 03 P01 | 2448s | 2 tasks | 11 files |
+| Phase 03 P02 | 14min | 3 tasks | 10 files |
 
 ## Accumulated Context
 
@@ -97,6 +98,10 @@ Full v1.0 decision log archived in PROJECT.md Key Decisions table (see "v1.0 Ver
 - [Phase ?]: Replay-window guard on demotion: premium_until <= revoked.expiresAt — an old revocation cannot shorten a newer term granted by a later transaction (02-08)
 - [Phase ?]: Phase 3: query-carrying API endpoints must build URLs via URLComponents + authorizedRequest(url:) — appendingPathComponent percent-encodes '?'; pinned by exact-URL assertions
 - [Phase ?]: Phase 3: session creation fail-soft inside StressLLMService.send (try? createSession before sendChat); 404 restore -> resetSession clears stressChatSessionId
+- [Phase ?]: PreferencesServiceProtocol not needed: same-module consumers + URLProtocol-injected concrete StressAPIClient in tests
+- [Phase ?]: Preferences update success keeps the optimistic value (server persisted exactly it); revert only on throw — no response re-mapping
+- [Phase ?]: CR-02 closed: StressContextPayload trend computed chronologically from newest-first history, pinned by 4 regression cases
+- [Phase ?]: AI Coach pickers closed to backend vocabulary (en/vi; supportive/direct/educational); value text labeled from state so out-of-set server values still display
 
 ### Pending Todos
 
@@ -138,8 +143,8 @@ Items acknowledged and deferred at v1.0 milestone close on 2026-08-12:
 
 ## Session Continuity
 
-Last session: 2026-08-23T09:53:58.728Z
-Stopped at: Completed 03-01-PLAN.md (sessions tracer)
+Last session: 2026-08-23T10:14:43.968Z
+Stopped at: Completed 03-02-PLAN.md (preferences sync + CR-02)
 Resume file: None
 
 ## Operator Next Steps
