@@ -144,7 +144,9 @@ final class ChatViewModel {
     /// no loading state, no empty state. Rows whose id has no local prompt
     /// are dropped rather than rendered as dead chips. Chip taps resolve
     /// prompts on-device and send through the credit-metered `/chat` path —
-    /// never the backend's unmetered completion route.
+    /// never the backend's unmetered completion route. If NO id resolves
+    /// (backend drift ahead of an app update), the fallback set stays — the
+    /// row never goes empty.
     func fetchQuickActions() async {
         guard !fetchedQuickActions else { return }
         fetchedQuickActions = true
@@ -156,13 +158,18 @@ final class ChatViewModel {
                 language: preferencesService?.language ?? "en",
                 coachingStyle: preferencesService?.coachingStyle ?? "supportive"
             )
-            quickReplies = serverActions.compactMap { action in
+            let resolved: [ChatQuickAction] = serverActions.compactMap { action in
                 guard let prompt = ChatQuickActions.prompt(forServerActionId: action.id) else {
                     return nil
                 }
                 // The live chip surface renders the title only; the icon is
                 // required by the model but never shown.
                 return ChatQuickAction(title: action.title, icon: "sparkles", prompt: prompt)
+            }
+            // Backend drift — every id unknown to the local mirror — must
+            // not blank the chip row; the local fallback stays (WR-03).
+            if !resolved.isEmpty {
+                quickReplies = resolved
             }
         } catch {
             // Keep the fallback set — suggestions are best-effort.

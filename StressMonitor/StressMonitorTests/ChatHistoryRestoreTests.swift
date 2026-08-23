@@ -389,6 +389,29 @@ struct ChatHistoryRestoreTests {
         #expect(viewModel.messages.isEmpty)
     }
 
+    @Test("a chips page whose ids are all unknown keeps the fallback row (no empty state)")
+    func allUnknownChipsKeepFallbackSet() async throws {
+        defer { RequestCaptureURLProtocol.responseByPath = nil }
+        let fixture = """
+        {"quick_actions":[{"id":"future_one","title":"Mystery A","type":"brand_new"},{"id":"future_two","title":"Mystery B","type":"also_new"}]}
+        """
+        let client = makeStubbedClient(responseByPath: [
+            "/quick-actions": (200, Data(fixture.utf8)),
+        ])
+        let stress = StressResult(level: 70, category: .moderate, confidence: 0.9, hrv: 40, heartRate: 70)
+        let viewModel = ChatViewModel(stressResult: stress, baseline: nil, llmService: FakeLLMService(tokens: []))
+        viewModel.apiClient = client
+        let fallback = ChatQuickActions.actions(for: .moderate)
+
+        await viewModel.fetchQuickActions()
+
+        // Full backend drift (every id unknown to the local mirror) must not
+        // blank the chip row — the fallback stays (WR-03).
+        #expect(!viewModel.quickReplies.isEmpty)
+        #expect(viewModel.quickReplies.map(\.title) == fallback.map(\.title))
+        #expect(viewModel.quickReplies.map(\.prompt) == fallback.map(\.prompt))
+    }
+
     @Test("chip tap sends its resolved prompt with the preferences-fed payload and query")
     func chipTapSendsPromptWithPrefsFedPayload() async throws {
         let fake = FakeLLMService(tokens: [])
