@@ -107,4 +107,46 @@ final class StressContextPayloadTests: XCTestCase {
         XCTAssertNil(payload.stressTrend, "One measurement has no direction.")
         XCTAssertNil(payload.stressTrendDelta)
     }
+
+    // MARK: - WR-01 window selection (>5 newest-first measurements)
+
+    func testTrendUsesTheNewestWindowBeyondFiveMeasurements() {
+        // Newest-first [80, 20, 20, 20, 20, 20]: the five newest rows are
+        // [80, 20, 20, 20, 20] → chronologically 20 → 80 = increasing.
+        // `suffix(5)` on this newest-first array would keep [20, 20, 20,
+        // 20, 20] and report "stable" — wrong window, wrong delta (WR-01).
+        let history = [
+            measurement(level: 80, minutesAgo: 0),
+            measurement(level: 20, minutesAgo: 30),
+            measurement(level: 20, minutesAgo: 60),
+            measurement(level: 20, minutesAgo: 90),
+            measurement(level: 20, minutesAgo: 120),
+            measurement(level: 20, minutesAgo: 150)
+        ]
+
+        let payload = StressContextPayload.build(stressResult: nil, baseline: nil, recentHistory: history)
+
+        XCTAssertEqual(payload.stressTrend, "increasing", "The trend window must be the NEWEST five measurements, not the oldest.")
+        XCTAssertEqual(payload.stressTrendDelta, "+60%")
+    }
+
+    func testTrendIgnoresRowsOlderThanTheWindow() {
+        // Newest-first [20, 20, 20, 20, 20, 80]: the oldest row (80) sits
+        // outside the five-newest window, and within it the level never
+        // moved — stable. `suffix(5)` would include the 80 and report a
+        // fall (WR-01).
+        let history = [
+            measurement(level: 20, minutesAgo: 0),
+            measurement(level: 20, minutesAgo: 30),
+            measurement(level: 20, minutesAgo: 60),
+            measurement(level: 20, minutesAgo: 90),
+            measurement(level: 20, minutesAgo: 120),
+            measurement(level: 80, minutesAgo: 150)
+        ]
+
+        let payload = StressContextPayload.build(stressResult: nil, baseline: nil, recentHistory: history)
+
+        XCTAssertEqual(payload.stressTrend, "stable", "Rows older than the five-newest window must not drive the trend.")
+        XCTAssertEqual(payload.stressTrendDelta, "+0%")
+    }
 }
