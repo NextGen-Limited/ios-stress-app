@@ -1,10 +1,10 @@
 ---
 schema_version: 1
-open_count: 11
+open_count: 12
 waived_count: 0
 fixed_count: 0
-total_count: 11
-last_updated: 2026-08-17T04:32:14.498Z
+total_count: 12
+last_updated: 2026-08-23T11:21:42.696Z
 ---
 
 # Broken Windows Ledger
@@ -26,6 +26,7 @@ last_updated: 2026-08-17T04:32:14.498Z
 | 9 | 02 | deviation | stress-app-be/src/routes/credits.ts |  | Redeem + premium/verify endpoints and 2 migrations committed but NOT deployed; production apply deferred to 02-04 user_setup with user confirmation | open |  | 2026-08-17T02:05:07.102Z |  |
 | 10 | 02 | unmet-truth | stress-app-be/src/lib/iap.ts |  | Real-Apple success path of verifyAndDecodeTransaction untestable without an Apple-signed JWS fixture; covered only via route-seam fakes and rejection-path tests until live sandbox UAT in 02-04 | open |  | 2026-08-17T02:05:07.194Z |  |
 | 11 | 02 | unrun-verify | .planning/phases/02-credits-system-iap-transition/02-04-PLAN.md |  | 02-04 Task 3 live money-path smoke (provision->402->sandbox purchase->server grant->persisted balance) blocked on backend deploy + ASC consumable filing; see 02-04-SUMMARY Deferred Issues | open |  | 2026-08-17T04:32:14.498Z |  |
+| 12 | 3 | deviation | StressMonitor/StressMonitorTests/StressAPIClientTests.swift | 80 | Order-dependent test pollution (found at 03-05 gate): ChatHistoryRestoreTests leaves static RequestCaptureURLProtocol.responseByPath['/preferences'] set; PreferencesServiceTests + StressAPIClientPreferencesTests stub via the single-response statics and receive the stale vi/direct 200 because responseByPath takes precedence (StressAPIClientTests.swift:80-81) — 10 assertion failures / exit 65 in a crash-free 10-suite targeted run; masked in full-suite runs by the #8 crash-restart boundary sitting between polluter (launch 1) and victims (later launch). Fix seam: per-test reset/clear of RequestCaptureURLProtocol statics (or teardown in ChatHistoryRestoreTests.makeStubbedClient). | open |  | 2026-08-23T11:21:42.696Z |  |
 
 ````json
 [
@@ -159,6 +160,18 @@ last_updated: 2026-08-17T04:32:14.498Z
     "status": "open",
     "reason": "",
     "recorded_at": "2026-08-17T04:32:14.498Z",
+    "resolved_at": null
+  },
+  {
+    "id": 12,
+    "kind": "deviation",
+    "phase": "3",
+    "file": "StressMonitor/StressMonitorTests/StressAPIClientTests.swift",
+    "line": 80,
+    "description": "Order-dependent test pollution (found at 03-05 gate): ChatHistoryRestoreTests leaves static RequestCaptureURLProtocol.responseByPath['/preferences'] set; PreferencesServiceTests + StressAPIClientPreferencesTests stub via the single-response statics and receive the stale vi/direct 200 because responseByPath takes precedence (StressAPIClientTests.swift:80-81) — 10 assertion failures / exit 65 in a crash-free 10-suite targeted run; masked in full-suite runs by the #8 crash-restart boundary sitting between polluter (launch 1) and victims (later launch). Fix seam: per-test reset/clear of RequestCaptureURLProtocol statics (or teardown in ChatHistoryRestoreTests.makeStubbedClient).",
+    "status": "open",
+    "reason": "",
+    "recorded_at": "2026-08-23T11:21:42.696Z",
     "resolved_at": null
   }
 ]

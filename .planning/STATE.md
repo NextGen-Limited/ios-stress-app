@@ -4,17 +4,17 @@ milestone: v1.1
 milestone_name: Backend API Migration
 current_phase: 3
 current_phase_name: Sessions, Preferences, Quick Actions + Cleanup
-status: executing
-stopped_at: Completed 03-04-PLAN.md
-last_updated: "2026-08-23T10:56:48.799Z"
+status: verifying
+stopped_at: Completed 03-05-PLAN.md (phase 3 execution complete — ready for verification)
+last_updated: "2026-08-23T11:24:04.449Z"
 last_activity: 2026-08-23
 last_activity_desc: Phase 2 complete, transitioned to Phase 3
 progress:
   total_phases: 3
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 17
-  completed_plans: 16
-  percent: 67
+  completed_plans: 17
+  percent: 100
 ---
 
 # Project State
@@ -30,7 +30,7 @@ See: .planning/PROJECT.md (updated 2026-08-23 after v1.1 Phase 02 close)
 
 Phase: 3 (Sessions, Preferences, Quick Actions + Cleanup) — EXECUTING
 Plan: 5 of 5
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-08-23 — Phase 3 execution started
 
 ## Performance Metrics
@@ -73,6 +73,7 @@ Last activity: 2026-08-23 — Phase 3 execution started
 | Phase 03 P02 | 14min | 3 tasks | 10 files |
 | Phase 03 P03 | 14min | 2 tasks | 9 files |
 | Phase 03 P04 | 22min | 3 tasks | 9 files |
+| Phase 03 P05 | 28min | 3 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -108,6 +109,8 @@ Full v1.0 decision log archived in PROJECT.md Key Decisions table (see "v1.0 Ver
 - [Phase ?]: 03-03 chips: instant local fallback at init, one guarded GET per presentation, failure keeps fallback — no loading/empty state; +QuickActions extension structurally GET-only (revenue-bypass guard)
 - [Phase ?]: 03-04: factory-reset server wipe — auth-unavailable (LLMServiceError.unavailable / SessionsAPIError.unauthorized 401) skips with log; every other wipe error fails the reset loudly via DeletionError.serverSessionError (CloudKit precedent)
 - [Phase ?]: 03-04: in-memory ModelContainer must outlive its mainContext in tests — return-context-only fixtures are the WINDOWS.md #8 crash lineage; suite fixtures return (ModelContainer, ModelContext)
+- [Phase ?]: 03-05 gate: full-suite exit 65 classified as accepted WINDOWS.md #8 lineage (209/6/15/230, 0 assertion failures, same family+count as 03-03) — not a new failure
+- [Phase ?]: 03-05 GAP-1 (ledger #12): ChatHistoryRestoreTests leaks static responseByPath['/preferences']; preferences suites get stale vi/direct because responseByPath outranks single-response statics — masked in full-suite by #8 restarts between polluter and victims; fix = per-test reset of RequestCaptureURLProtocol statics
 
 ### Pending Todos
 
@@ -149,8 +152,8 @@ Items acknowledged and deferred at v1.0 milestone close on 2026-08-12:
 
 ## Session Continuity
 
-Last session: 2026-08-23T10:56:48.784Z
-Stopped at: Completed 03-04-PLAN.md
+Last session: 2026-08-23T11:24:04.435Z
+Stopped at: Completed 03-05-PLAN.md (phase 3 execution complete — ready for verification)
 Resume file: None
 
 ## Operator Next Steps

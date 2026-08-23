@@ -74,7 +74,7 @@ Plans:
 #### Phase 3: Sessions, Preferences, Quick Actions + Cleanup
 
 **Depends on:** Phase 1 (auth + API client)
-**Plans:** 4/5 plans executed (serialized waves — every plan registers test files in project.pbxproj)
+**Plans:** 5/5 plans executed (serialized waves — every plan registers test files in project.pbxproj)
 
 Plans:
 **Wave 1**
@@ -95,6 +95,6 @@ Plans:
 
 **Wave 5** *(blocked on Wave 4 completion)*
 
-- [ ] 03-05-PLAN.md — Milestone integration gate: full suite + Release build + backend deno suite (postgres 5433 restart) + 03-UAT.md (wave 5)
+- [x] 03-05-PLAN.md — Milestone integration gate: full suite + Release build + backend deno suite (postgres 5433 restart) + 03-UAT.md (wave 5)
 
 Waves: 1: 03-01 → 2: 03-02 → 3: 03-03 → 4: 03-04 → 5: 03-05 (pbxproj-registration serialization; source deps: 03-03 ⊂ {03-01, 03-02}, 03-04 ⊂ {03-01}, 03-05 ⊂ all)
