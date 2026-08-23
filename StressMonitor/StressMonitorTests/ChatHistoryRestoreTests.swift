@@ -275,6 +275,127 @@ struct ChatHistoryRestoreTests {
         #expect(viewModel.messages.first?.content == "live message sent during restore")
         #expect(viewModel.messages.first?.isSynced == false)
     }
+
+    // MARK: - Quick-action chips (derived-QA-01)
+
+    private func waitFor(_ predicate: @MainActor () -> Bool, timeoutMS: Int = 2000) async throws {
+        let ticks = timeoutMS / 10
+        for _ in 0..<ticks {
+            if predicate() { return }
+            try await Task.sleep(for: .milliseconds(10))
+        }
+        Issue.record("waitFor timed out waiting for condition")
+    }
+
+    @Test("a fresh ChatViewModel renders the local fallback chips with zero network")
+    func freshViewModelRendersLocalFallbackChips() {
+        let stress = StressResult(level: 70, category: .moderate, confidence: 0.9, hrv: 40, heartRate: 70)
+        let viewModel = ChatViewModel(stressResult: stress, baseline: nil, llmService: FakeLLMService(tokens: []))
+
+        let expected = ChatQuickActions.actions(for: .moderate)
+        #expect(viewModel.quickReplies.map(\.title) == expected.map(\.title))
+        #expect(viewModel.quickReplies.map(\.prompt) == expected.map(\.prompt))
+        #expect(!viewModel.quickReplies.isEmpty)
+    }
+
+    @Test("fetchQuickActions swaps chips for server titles, drops unknown ids, and GETs once per presentation")
+    func fetchQuickActionsSwapsChipsForServerSuggestions() async throws {
+        let fixture = """
+        {"quick_actions":[{"id":"breathing","title":"Box Breathing","type":"exercise"},{"id":"future_action","title":"Mystery Chip","type":"brand_new_kind"},{"id":"talk","title":"Tell Me More","type":"conversation"}]}
+        """
+        let client = makeStubbedClient(responseByPath: [
+            "/quick-actions": (200, Data(fixture.utf8)),
+        ])
+        let stress = StressResult(level: 70, category: .moderate, confidence: 0.9, hrv: 40, heartRate: 70)
+        let viewModel = ChatViewModel(stressResult: stress, baseline: nil, llmService: FakeLLMService(tokens: []))
+        viewModel.apiClient = client
+
+        await viewModel.fetchQuickActions()
+
+        // Unknown server id row dropped; known ids carry server titles with
+        // locally resolved prompts.
+        #expect(viewModel.quickReplies.count == 2)
+        #expect(viewModel.quickReplies[0].title == "Box Breathing")
+        #expect(viewModel.quickReplies[0].prompt == ChatQuickActions.prompt(forServerActionId: "breathing"))
+        #expect(viewModel.quickReplies[1].title == "Tell Me More")
+
+        // The fetch carries the live stress level with the unset-seam
+        // preference defaults — one GET, never re-fetched in the same
+        // presentation.
+        let request = try #require(RequestCaptureURLProtocol.lastRequest)
+        #expect(request.httpMethod == "GET")
+        #expect(
+            request.url?.absoluteString
+                == "https://api.test/quick-actions?stress_level=70&language=en&coaching_style=supportive"
+        )
+        #expect(RequestCaptureURLProtocol.capturedRequests.count == 1)
+        await viewModel.fetchQuickActions()
+        #expect(RequestCaptureURLProtocol.capturedRequests.count == 1)
+    }
+
+    @Test("a failed chips fetch keeps the local fallback set untouched")
+    func failedChipsFetchKeepsFallbackSet() async throws {
+        let client = makeStubbedClient(responseByPath: [
+            "/quick-actions": (500, Data(#"{"error":"boom"}"#.utf8)),
+        ])
+        let viewModel = ChatViewModel(stressResult: nil, baseline: nil, llmService: FakeLLMService(tokens: []))
+        viewModel.apiClient = client
+        let fallbackTitles = viewModel.quickReplies.map(\.title)
+
+        await viewModel.fetchQuickActions()
+
+        #expect(viewModel.quickReplies.map(\.title) == fallbackTitles)
+        #expect(viewModel.errorMessage == nil)
+        #expect(viewModel.messages.isEmpty)
+    }
+
+    @Test("chip tap sends its resolved prompt with the preferences-fed payload and query")
+    func chipTapSendsPromptWithPrefsFedPayload() async throws {
+        let fake = FakeLLMService(tokens: [])
+        let preferencesFixture = """
+        {"user_id":"00000000-0000-0000-0000-000000000001","language":"vi","coaching_style":"direct","display_name":null,"theme":"system","notification_enabled":true,"stress_alert_threshold":75,"custom_settings":{}}
+        """
+        let quickActionsFixture = """
+        {"quick_actions":[{"id":"talk","title":"Tell Me More","type":"conversation"}]}
+        """
+        let client = makeStubbedClient(responseByPath: [
+            "/preferences": (200, Data(preferencesFixture.utf8)),
+            "/quick-actions": (200, Data(quickActionsFixture.utf8)),
+        ])
+        let preferences = PreferencesService(apiClient: client)
+        await preferences.seedIfNeeded()
+        let stress = StressResult(level: 82, category: .high, confidence: 0.9, hrv: 25, heartRate: 95)
+        let viewModel = ChatViewModel(stressResult: stress, baseline: nil, llmService: fake)
+        viewModel.apiClient = client
+        viewModel.preferencesService = preferences
+
+        await viewModel.fetchQuickActions()
+        let chipsRequest = try #require(RequestCaptureURLProtocol.capturedRequests.first { $0.url?.path == "/quick-actions" })
+        #expect(
+            chipsRequest.url?.absoluteString
+                == "https://api.test/quick-actions?stress_level=82&language=vi&coaching_style=direct"
+        )
+
+        let reply = viewModel.quickReplies[0]
+        viewModel.send(reply.prompt)
+        try await waitFor { fake.receivedStressContexts.count == 1 }
+
+        #expect(viewModel.messages.first?.content == reply.prompt)
+        #expect(fake.receivedStressContexts.first??.language == "vi")
+        #expect(fake.receivedStressContexts.first??.coachingStyle == "direct")
+    }
+
+    @Test("without a preferences service the send payload falls back to en/supportive")
+    func unsetPreferencesFallBackToPayloadDefaults() async throws {
+        let fake = FakeLLMService(tokens: [])
+        let viewModel = ChatViewModel(stressResult: nil, baseline: nil, llmService: fake)
+
+        viewModel.send("hello")
+        try await waitFor { fake.receivedStressContexts.count == 1 }
+
+        #expect(fake.receivedStressContexts.first??.language == "en")
+        #expect(fake.receivedStressContexts.first??.coachingStyle == "supportive")
+    }
 }
 
 // MARK: - Delayed Response URLProtocol
