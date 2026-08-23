@@ -31,6 +31,15 @@ struct DeleteAllCredentialClearanceTests {
         #expect(status == errSecItemNotFound)
     }
 
+    @Test("clearCredentialsAndSharedCaches removes the stored chat session id")
+    func clearsStressChatSessionId() throws {
+        UserDefaults.standard.set("seed-session-id", forKey: "stressChatSessionId")
+
+        DataDeleterService.clearCredentialsAndSharedCaches()
+
+        #expect(UserDefaults.standard.string(forKey: "stressChatSessionId") == nil)
+    }
+
     @Test("clearCredentialsAndSharedCaches removes App Group widget cache")
     func clearsAppGroupWidgetCache() throws {
         let suiteID = WidgetConstants.appGroupID
