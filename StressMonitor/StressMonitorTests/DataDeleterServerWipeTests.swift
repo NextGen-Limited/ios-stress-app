@@ -85,8 +85,11 @@ struct DataDeleterServerWipeTests {
     }
 
     /// In-memory context mirroring the consolidation tests' setup, plus
-    /// CharacterUnlock (performFactoryReset deletes that model too).
-    private func makeContextWithOneMeasurement() throws -> ModelContext {
+    /// CharacterUnlock (performFactoryReset deletes that model too). The
+    /// container is returned alongside its context and must stay alive for
+    /// the whole test — dropping it first crashes SwiftData (the WINDOWS.md
+    /// #8 lineage this suite must not add to).
+    private func makeContextWithOneMeasurement() throws -> (ModelContainer, ModelContext) {
         let config = ModelConfiguration(isStoredInMemoryOnly: true, cloudKitDatabase: .none)
         let container = try ModelContainer(
             for: StressMeasurement.self, CharacterUnlock.self,
@@ -95,7 +98,7 @@ struct DataDeleterServerWipeTests {
         let ctx = container.mainContext
         ctx.insert(StressMeasurement(timestamp: Date(), stressLevel: 50, hrv: 40, restingHeartRate: 65))
         try ctx.save()
-        return ctx
+        return (container, ctx)
     }
 
     private func makeService(
@@ -120,7 +123,7 @@ struct DataDeleterServerWipeTests {
 
     @Test("factory reset lists, deletes per row, and pages to exhaustion before the local wipe")
     func factoryResetWipesEveryServerSessionPageByPage() async throws {
-        let ctx = try makeContextWithOneMeasurement()
+        let (container, ctx) = try makeContextWithOneMeasurement()
         let cloudKit = RecordingCloudKitResetService()
         let wiper = FakeServerSessionWiper(behavior: .pages([
             [makeSession(Self.sessionA), makeSession(Self.sessionB)],
@@ -145,13 +148,14 @@ struct DataDeleterServerWipeTests {
         #expect(remaining.isEmpty)
 
         #expect(UserDefaults.standard.string(forKey: "stressChatSessionId") == nil)
+        _ = container // keep the in-memory store alive until the assertions are done
     }
 
     // MARK: - Safety cap
 
     @Test("a server that never runs out of rows terminates at the page cap and fails the reset")
     func runawayWipeLoopTerminatesAtPageCapAndFailsReset() async throws {
-        let ctx = try makeContextWithOneMeasurement()
+        let (container, ctx) = try makeContextWithOneMeasurement()
         let cloudKit = RecordingCloudKitResetService()
         let wiper = FakeServerSessionWiper(behavior: .always([makeSession(Self.sessionA)]))
         let service = makeService(ctx, cloudKit: cloudKit, wiper: wiper)
@@ -172,13 +176,14 @@ struct DataDeleterServerWipeTests {
         let remaining = try ctx.fetch(FetchDescriptor<StressMeasurement>())
         #expect(remaining.count == 1)
         #expect(cloudKit.databaseResetCallCount == 0)
+        _ = container
     }
 
     // MARK: - Auth-unavailable skip (Q2)
 
     @Test("no authenticated identity (signed out) skips the wipe, logs, and still resets locally")
     func signedOutSkipsServerWipeAndStillCompletesReset() async throws {
-        let ctx = try makeContextWithOneMeasurement()
+        let (container, ctx) = try makeContextWithOneMeasurement()
         let cloudKit = RecordingCloudKitResetService()
         let wiper = FakeServerSessionWiper(
             behavior: .throwOnList(LLMServiceError.unavailable(reason: "Please sign in to use AI Chat."))
@@ -197,11 +202,12 @@ struct DataDeleterServerWipeTests {
         #expect(remaining.isEmpty)
 
         #expect(UserDefaults.standard.string(forKey: "stressChatSessionId") == nil)
+        _ = container
     }
 
     @Test("a 401 from the sessions endpoint also skips the wipe (stale token, no identity)")
     func unauthorizedSkipsServerWipeAndStillCompletesReset() async throws {
-        let ctx = try makeContextWithOneMeasurement()
+        let (container, ctx) = try makeContextWithOneMeasurement()
         let cloudKit = RecordingCloudKitResetService()
         let wiper = FakeServerSessionWiper(behavior: .throwOnList(SessionsAPIError.unauthorized))
         let service = makeService(ctx, cloudKit: cloudKit, wiper: wiper)
@@ -211,13 +217,14 @@ struct DataDeleterServerWipeTests {
         #expect(wiper.calls == ["list(limit:20, offset:0)"])
         let remaining = try ctx.fetch(FetchDescriptor<StressMeasurement>())
         #expect(remaining.isEmpty)
+        _ = container
     }
 
     // MARK: - Fail loudly on server/network errors (Q2)
 
     @Test("a network error fails the whole reset before the local wipe (no silent partial success)")
     func serverWipeNetworkErrorFailsWholeResetBeforeLocalWipe() async throws {
-        let ctx = try makeContextWithOneMeasurement()
+        let (container, ctx) = try makeContextWithOneMeasurement()
         let cloudKit = RecordingCloudKitResetService()
         let wiper = FakeServerSessionWiper(behavior: .throwOnList(URLError(.notConnectedToInternet)))
         let service = makeService(ctx, cloudKit: cloudKit, wiper: wiper)
@@ -235,5 +242,6 @@ struct DataDeleterServerWipeTests {
         let remaining = try ctx.fetch(FetchDescriptor<StressMeasurement>())
         #expect(remaining.count == 1)
         #expect(cloudKit.databaseResetCallCount == 0)
+        _ = container
     }
 }

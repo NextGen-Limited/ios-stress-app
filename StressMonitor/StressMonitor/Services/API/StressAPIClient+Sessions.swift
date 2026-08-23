@@ -166,3 +166,10 @@ private struct SessionsListResponse: Codable, Sendable {
 private struct MessagesListResponse: Codable, Sendable {
     let messages: [ChatSessionMessage]
 }
+
+// MARK: - Server Session Wiping (factory reset)
+
+/// `DataDeleterService` wipes the user's server chat history through this
+/// seam during factory reset (derived-SES-03). Both requirements are already
+/// implemented above — this conformance only ties them to the protocol.
+extension StressAPIClient: ServerSessionWiping {}

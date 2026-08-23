@@ -35,10 +35,21 @@ extension DataDeleter {
     }
 }
 
+// MARK: - Server Session Wiping
+
+/// Narrow seam over the sessions API so `DataDeleterService`'s factory-reset
+/// wipe loop is unit-testable without a live network (derived-SES-03).
+/// `StressAPIClient` conforms; tests substitute a fake.
+protocol ServerSessionWiping: Sendable {
+    func listSessions(limit: Int, offset: Int) async throws -> [ChatSession]
+    func deleteSession(id: UUID) async throws
+}
+
 // MARK: - Delete Error
 enum DeletionError: LocalizedError {
     case repositoryError(Error)
     case cloudKitError(Error)
+    case serverSessionError(Error)
     case unauthorizedAccess
     case operationCancelled
 
@@ -47,6 +58,8 @@ enum DeletionError: LocalizedError {
         case .repositoryError(let error):
             return error.localizedDescription
         case .cloudKitError(let error):
+            return error.localizedDescription
+        case .serverSessionError(let error):
             return error.localizedDescription
         case .unauthorizedAccess:
             return "Unauthorized access to data"
