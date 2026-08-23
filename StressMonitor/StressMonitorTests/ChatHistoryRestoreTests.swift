@@ -333,6 +333,46 @@ struct ChatHistoryRestoreTests {
         #expect(RequestCaptureURLProtocol.capturedRequests.count == 1)
     }
 
+    @Test("chat open seeds preferences before the chips query so it carries the server pair")
+    func chatOpenSeedsPreferencesBeforeChipsFetch() async throws {
+        // ChatHistoryRestoreTests leaves responseByPath set after each test
+        // (WINDOWS.md #12) — clear the /preferences stub so later suites'
+        // single-response stubbing isn't overridden.
+        defer { RequestCaptureURLProtocol.responseByPath = nil }
+        let preferencesFixture = """
+        {"user_id":"00000000-0000-0000-0000-000000000001","language":"vi","coaching_style":"direct","display_name":null,"theme":"system","notification_enabled":true,"stress_alert_threshold":75,"custom_settings":{}}
+        """
+        let quickActionsFixture = """
+        {"quick_actions":[{"id":"breathing","title":"Box Breathing","type":"exercise"}]}
+        """
+        let client = makeStubbedClient(responseByPath: [
+            "/preferences": (200, Data(preferencesFixture.utf8)),
+            "/quick-actions": (200, Data(quickActionsFixture.utf8)),
+        ])
+        let preferences = PreferencesService(apiClient: client)
+        let viewModel = ChatViewModel(stressResult: nil, baseline: nil, llmService: FakeLLMService(tokens: []))
+        viewModel.apiClient = client
+        viewModel.preferencesService = preferences
+
+        await viewModel.hydratePreferencesAndFetchQuickActions()
+
+        // The pair hydrated before anything queried with it — without the
+        // chat-open seed the query would carry the install defaults (WR-02).
+        #expect(preferences.hasSeeded)
+        #expect(preferences.language == "vi")
+        #expect(preferences.coachingStyle == "direct")
+
+        // GET /preferences strictly precedes GET /quick-actions, and the
+        // chips query carries the seeded pair.
+        let paths = RequestCaptureURLProtocol.capturedRequests.map(\.url?.path)
+        #expect(paths == ["/preferences", "/quick-actions"])
+        let chipsRequest = try #require(RequestCaptureURLProtocol.capturedRequests.last)
+        #expect(
+            chipsRequest.url?.absoluteString
+                == "https://api.test/quick-actions?stress_level=50&language=vi&coaching_style=direct"
+        )
+    }
+
     @Test("a failed chips fetch keeps the local fallback set untouched")
     func failedChipsFetchKeepsFallbackSet() async throws {
         let client = makeStubbedClient(responseByPath: [

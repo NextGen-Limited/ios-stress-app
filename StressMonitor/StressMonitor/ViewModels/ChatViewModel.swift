@@ -129,6 +129,16 @@ final class ChatViewModel {
 
     // MARK: - Quick Actions Fetch
 
+    /// Chat-open startup for the chips seam: seed the preference pair
+    /// (seed-once, best-effort) so the suggestions query carries the
+    /// server's language/coaching style rather than install defaults, then
+    /// swap the local fallback chips for server suggestions. Order matters —
+    /// seeding after the fetch would query with the wrong pair (WR-02).
+    func hydratePreferencesAndFetchQuickActions() async {
+        await preferencesService?.seedIfNeeded()
+        await fetchQuickActions()
+    }
+
     /// Swaps the chip row for server-suggested actions (derived-QA-01).
     /// One fetch per presentation; a failure keeps the local fallback set —
     /// no loading state, no empty state. Rows whose id has no local prompt

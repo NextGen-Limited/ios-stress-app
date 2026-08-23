@@ -58,10 +58,11 @@ struct ChatBottomSheetView: View {
                 viewModel.apiClient = StressAPIClient()
                 Task { await viewModel.restoreHistory() }
                 // Server-suggested chips swap over the instant local set once
-                // the GET lands (derived-QA-01); the prefs seam feeds both
-                // the query and the send-time payload (derived-PREF-02).
+                // the GET lands (derived-QA-01); preferences seed first so
+                // the query carries the server pair, not install defaults
+                // (WR-02 — COVERAGE row 14's chat-open seed).
                 viewModel.preferencesService = preferencesService
-                Task { await viewModel.fetchQuickActions() }
+                Task { await viewModel.hydratePreferencesAndFetchQuickActions() }
             }
             // Covers swipe-to-dismiss too, not just the Close button — without
             // this the SSE stream and its owning objects outlive the sheet.
