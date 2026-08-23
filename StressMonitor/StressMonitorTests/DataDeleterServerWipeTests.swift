@@ -17,14 +17,24 @@ final class FakeServerSessionWiper: ServerSessionWiping, @unchecked Sendable {
         case always([ChatSession])
         /// Throws from the first list call (auth-unavailable / network).
         case throwOnList(Error)
+        /// Mirrors the backend's live-row pagination: `listSessions` windows
+        /// the remaining rows (`order by updated_at desc limit/offset` over
+        /// the store) and `deleteSession(id:)` removes the row, so the fake
+        /// shrinks as the wipe progresses — exactly like `sessions.ts`
+        /// (CR-01).
+        case store([ChatSession])
     }
 
     private(set) var calls: [String] = []
     private(set) var listCallCount = 0
     var behavior: Behavior
+    private var store: [ChatSession] = []
 
     init(behavior: Behavior) {
         self.behavior = behavior
+        if case .store(let sessions) = behavior {
+            store = sessions
+        }
     }
 
     func listSessions(limit: Int, offset: Int) async throws -> [ChatSession] {
@@ -38,12 +48,21 @@ final class FakeServerSessionWiper: ServerSessionWiping, @unchecked Sendable {
             return page
         case .throwOnList(let error):
             throw error
+        case .store:
+            return Array(store.dropFirst(offset).prefix(limit))
         }
     }
 
     func deleteSession(id: UUID) async throws {
         calls.append("delete(\(id.uuidString))")
+        if case .store = behavior {
+            store.removeAll { $0.id == id }
+        }
     }
+
+    /// Rows left in the live-store simulation — non-empty after a "successful"
+    /// reset means the wipe stranded sessions (CR-01).
+    var remainingSessions: [ChatSession] { store }
 }
 
 /// CloudKit double that records whether the factory reset ever reached the
@@ -134,19 +153,61 @@ struct DataDeleterServerWipeTests {
 
         try await service.performFactoryReset()
 
+        // The offset stays pinned at 0 across pages — every page's rows are
+        // deleted before the next fetch (CR-01).
         #expect(wiper.calls == [
             "list(limit:20, offset:0)",
             "delete(\(Self.sessionA.uuidString))",
             "delete(\(Self.sessionB.uuidString))",
-            "list(limit:20, offset:2)",
+            "list(limit:20, offset:0)",
             "delete(\(Self.sessionC.uuidString))",
-            "list(limit:20, offset:3)",
+            "list(limit:20, offset:0)",
         ])
         #expect(cloudKit.databaseResetCallCount == 1)
 
         let remaining = try ctx.fetch(FetchDescriptor<StressMeasurement>())
         #expect(remaining.isEmpty)
 
+        #expect(UserDefaults.standard.string(forKey: "stressChatSessionId") == nil)
+        _ = container // keep the in-memory store alive until the assertions are done
+    }
+
+    // MARK: - Live-row pagination regression (CR-01)
+
+    /// The backend paginates over live rows — deleting a page shifts every
+    /// later row up — so the wipe must keep its query offset pinned at 0.
+    /// With 42 sessions (> 2× page size) the advancing-offset loop deleted
+    /// one page and one tail row-set, then read past the survivors and
+    /// reported success while 20 rows stayed on the server.
+    @Test("42 sessions in a live-shrinking store are all deleted — no residue past page 1")
+    func factoryResetDeletesEverySessionInLivePaginatedStore() async throws {
+        let (container, ctx) = try makeContextWithOneMeasurement()
+        let cloudKit = RecordingCloudKitResetService()
+        let sessions = (0..<42).map { _ in makeSession(UUID()) }
+        let wiper = FakeServerSessionWiper(behavior: .store(sessions))
+        seedStoredChatSessionId()
+        let service = makeService(ctx, cloudKit: cloudKit, wiper: wiper)
+
+        try await service.performFactoryReset()
+
+        // The reset reported success — every server row must actually be gone.
+        #expect(wiper.remainingSessions.isEmpty)
+
+        // Every list re-queries page 1; pages of 20, 20, 2, then an empty
+        // page confirms exhaustion (42 rows at pageSize 20).
+        let listCalls = wiper.calls.filter { $0.hasPrefix("list") }
+        #expect(listCalls == [
+            "list(limit:20, offset:0)",
+            "list(limit:20, offset:0)",
+            "list(limit:20, offset:0)",
+            "list(limit:20, offset:0)",
+        ])
+        #expect(wiper.calls.filter { $0.hasPrefix("delete") }.count == 42)
+
+        // The reset still ran to completion after a full wipe.
+        #expect(cloudKit.databaseResetCallCount == 1)
+        let remaining = try ctx.fetch(FetchDescriptor<StressMeasurement>())
+        #expect(remaining.isEmpty)
         #expect(UserDefaults.standard.string(forKey: "stressChatSessionId") == nil)
         _ = container // keep the in-memory store alive until the assertions are done
     }

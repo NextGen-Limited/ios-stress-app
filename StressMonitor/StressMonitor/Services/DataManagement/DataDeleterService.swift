@@ -480,9 +480,12 @@ final class DataDeleterService: DataDeleter {
 
     /// Deletes every server-side chat session owned by the signed-in user:
     /// page `GET /sessions`, issue `DELETE /sessions?id=` per row (messages
-    /// cascade server-side), advance the offset, repeat until an empty page.
-    /// A hard page cap guards against a misbehaving server that never runs
-    /// out of rows.
+    /// cascade server-side), repeat until an empty page. The query offset
+    /// stays pinned at 0: the backend paginates `order by updated_at desc
+    /// limit/offset` over live rows, so deleting a page shifts every later
+    /// row up — advancing the offset would skip those rows and strand
+    /// sessions while the reset reports success (CR-01). A hard page cap
+    /// guards against a misbehaving server that never runs out of rows.
     private func wipeServerSessions() async throws {
         guard let serverSessionWiper else {
             logger.log("Server session wipe skipped — no wiper configured")
@@ -491,18 +494,19 @@ final class DataDeleterService: DataDeleter {
 
         let pageSize = 20
         let maxPages = 50
-        var offset = 0
         var pagesFetched = 0
 
         while pagesFetched < maxPages {
-            let page = try await serverSessionWiper.listSessions(limit: pageSize, offset: offset)
+            // Every fetched row is deleted before the next page is read, so
+            // the window must stay pinned at 0 — rows 21+ shift into
+            // positions 1-20 after the previous page's deletion.
+            let page = try await serverSessionWiper.listSessions(limit: pageSize, offset: 0)
             if page.isEmpty {
                 return
             }
             for session in page {
                 try await serverSessionWiper.deleteSession(id: session.id)
             }
-            offset += page.count
             pagesFetched += 1
         }
 
