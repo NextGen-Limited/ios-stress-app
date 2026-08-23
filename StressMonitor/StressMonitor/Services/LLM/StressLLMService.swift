@@ -84,7 +84,7 @@ final class StressLLMService: LLMServiceProtocol, @unchecked Sendable {
                             stressContext: stressContext
                         ) {
                             sessionId = created.id
-                            await self.adopt(sessionId: created.id)
+                            self.adopt(sessionId: created.id)
                         }
                     }
 
