@@ -1,9 +1,9 @@
 ---
 phase: 02-credits-system-iap-transition
-verified: 2026-08-17T09:25:00Z
-status: human_needed
-score: 27/29 must-haves verified
-behavior_unverified: 2 # Live end-to-end money path (deployment-gated) + design-system visual conformance
+verified: 2026-08-23T00:00:00Z
+status: passed
+score: 29/29 must-haves verified
+behavior_unverified: 0 # Both human items validated by user 2026-08-23 (live money-path smoke on deployed backend + design-system visual inspection)
 overrides_applied: 0
 re_verification:
   previous_status: gaps_found
@@ -167,6 +167,8 @@ No active `.planning/REQUIREMENTS.md` (v1.0 archive only); plans declare require
 | StressMonitor/…/ChatBottomSheetView.swift | 387, 437 | "not yet implemented" comment + "coming soon" copy | ℹ️ Info | Pre-existing v1.0 baseline (commit 4405668), not phase-introduced |
 
 Debt-marker gate: 0 `TBD`/`FIXME`/`XXX` across all 33 phase-modified code files (iOS + backend). Stub-language hits in phase files all resolve to loading skeletons overwritten by fetch, documented neutral labels, or #Preview fixtures.
+
+> ✅ **Human validation completed 2026-08-23** — user confirmed both items: live money-path smoke on the deployed backend (balance increments once and persists, 402 → paywall, restore copy) and design-system visual inspection (dual coding, type scaling, ≥44pt targets, haptics). Status advanced to passed.
 
 ### Human Verification Required
 

@@ -2,13 +2,13 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Backend API Migration
-current_phase: 2
-current_phase_name: Credits System + IAP Transition
-status: executing
-stopped_at: Completed 02-08-PLAN.md (CR-05 refund demotion + WR-10 refunded-pack loop break closed; gap closure cycle 2 done)
-last_updated: "2026-08-17T08:52:42.939Z"
-last_activity: 2026-08-17
-last_activity_desc: Phase 2 execution started
+current_phase: 3
+current_phase_name: Sessions, Preferences, Quick Actions + Cleanup
+status: planning
+stopped_at: Phase 2 complete (verification passed — human items validated 2026-08-23) — Phase 3 ready to plan
+last_updated: "2026-08-23T07:39:53.953Z"
+last_activity: 2026-08-23
+last_activity_desc: Phase 2 complete, transitioned to Phase 3
 progress:
   total_phases: 3
   completed_phases: 2
@@ -21,23 +21,23 @@ progress:
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-08-16 after v1.1 Phase 01 close)
+See: .planning/PROJECT.md (updated 2026-08-23 after v1.1 Phase 02 close)
 
 **Core value:** Every feature that ships in the binary must actually work end-to-end for a real user — not just compile.
-**Current focus:** Phase 2 — Credits System + IAP Transition
+**Current focus:** Phase 3 — Sessions, Preferences, Quick Actions + Cleanup
 
 ## Current Position
 
-Phase: 2 (Credits System + IAP Transition) — EXECUTING (all 8 plans done incl. gap-closure cycles, close-out pending)
-Plan: 8 of 8 executed (02-08 complete: CR-05 refund demotion + WR-10 refunded-pack loop break closed; review residue WR-01..WR-09/IN-01..IN-08 all advisory)
-Status: Phase 2 ready for verification re-run / close-out
-Last activity: 2026-08-17 — Completed 02-08-PLAN.md
+Phase: 3 — Sessions, Preferences, Quick Actions + Cleanup
+Plan: Not started
+Status: Ready to plan
+Last activity: 2026-08-23 — Phase 2 complete, transitioned to Phase 3
 
 ## Performance Metrics
 
 **Velocity:**
 
-- Total plans completed: 5
+- Total plans completed: 13
 - Average duration: - min
 - Total execution time: 0 hours
 
@@ -47,6 +47,7 @@ Last activity: 2026-08-17 — Completed 02-08-PLAN.md
 |-------|-------|-------|----------|
 | 01.1 | 1 | - | - |
 | 01 | 4 | - | - |
+| 2 | 8 | - | - |
 
 **Recent Trend:**
 
@@ -106,11 +107,13 @@ Carried into v1.1 (still open at v1.0 close — see PROJECT.md Active requiremen
 - **D2 (CloudKit encryption)** — Resolved in practice (encryptedValues implemented, verified in v1.0 Phase 2) but never formally closed as a decision record.
 - **D3 (Privacy contract authority)** — Root `CLAUDE.md`'s "HealthKit never sent" claim vs. `StressContextPayload.swift`'s actual behavior (derived scores only — mitigated T-01-02). Still gates BUILD-01/SHIP-03.
 - **D4 (Widget in v1)** — Ship the widget or exclude the target. Still gates WIRE-01.
-- Pre-existing Release-build compile blocker (new, found at v1.0 close): `StoreKitServiceEnvironment.swift:12` references `MockStoreKitService` unconditionally outside `#if DEBUG`.
+- ~~Pre-existing Release-build compile blocker: `StoreKitServiceEnvironment.swift:12` references `MockStoreKitService` unconditionally~~ — RESOLVED in v1.1 Phase 2: `xcodebuild build -configuration Release` exit 0, re-verified 2026-08-17 (BUILD-05 validated).
 - ~~Host CoreSimulator cannot complete `xcodebuild test`~~ — PARTIALLY RESOLVED 2026-08-16: full suite runs green with `-parallel-testing-enabled NO`; only parallel clones fail. Pin the flag in CI.
 - `CharacterEntitlementSyncTests` remains quarantined (`@Suite(.disabled(...))`) — root cause not diagnosed after 5 ruled-out hypotheses; no dedicated coverage for `syncPremiumCharacterEntitlement` until resolved on a working simulator.
-- [Phase 01 → Phase 2] REVIEW CR-01: data race + stale context on `StressLLMService.currentStressContext`; CR-02: trend direction inverted (recentHistory newest-first). Both advisory-open — fold into Phase 2 planning or `$gsd-code-review 01 --fix`.
-- [Phase 01 → Phase 2] 27+ commits on `main` unpushed (no milestone branch). Decide branch strategy + push before starting Phase 2.
+- ~~[Phase 01] REVIEW CR-01: data race + stale context on `StressLLMService.currentStressContext`~~ — CLOSED in v1.1 Phase 2 (stress context flows through `send()`; static side-channel deleted; verification truth 4).
+- [Phase 01 → Phase 3] REVIEW CR-02: trend direction inverted in `StressContextPayload.build` (recentHistory newest-first) — DEFERRED to Phase 3 by 02-01 explicit_deferrals; the fix belongs with Phase 3's session/history work that constructs recentHistory inputs. Self-contained one-function fix with an obvious test.
+- [Branch] Milestone branch `gsd/v1.1-backend-api-migration` active (strategy resolved); 51 commits ahead of `origin/main`, branch not pushed — decide push timing before milestone close.
+- [Phase 2 residue] Advisory review findings WR-02..04/06..09, IN-01..08 recorded in 02-REVIEW.md — none phase must-haves; WR-03 (DEBUG money path uses MockStoreKitService) and WR-04 (`.unverified` consumables finished) are the money-path-relevant ones to consider in later work.
 
 ### Quick Tasks Completed
 
@@ -132,8 +135,8 @@ Items acknowledged and deferred at v1.0 milestone close on 2026-08-12:
 
 ## Session Continuity
 
-Last session: 2026-08-17T08:52:34.661Z
-Stopped at: Completed 02-08-PLAN.md (CR-05 refund demotion + WR-10 refunded-pack loop break closed; gap closure cycle 2 done)
+Last session: 2026-08-23T07:40:00Z
+Stopped at: Phase 2 complete, ready to plan Phase 3
 Resume file: None
 
 ## Operator Next Steps

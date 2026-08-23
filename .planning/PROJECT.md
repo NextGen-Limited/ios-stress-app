@@ -2,7 +2,7 @@
 
 ## What This Is
 
-StressMonitor is an iOS/watchOS app that scores stress 0–100 from HealthKit biometrics (HRV, heart rate, sleep, activity, recovery) via a five-factor algorithm, paired with an AI coaching chat, CloudKit sync, a gamified character system, and a StoreKit premium subscription. The product is feature-complete by line count, but a same-day audit (6 audits, 65 findings) found it is **not submittable**: AI Chat and in-app purchase — both shipped in the binary — are non-functional in every real build.
+StressMonitor is an iOS/watchOS app that scores stress 0–100 from HealthKit biometrics (HRV, heart rate, sleep, activity, recovery) via a five-factor algorithm, paired with an AI coaching chat, CloudKit sync, a gamified character system, and a credits-based monetization system (consumable credit packs + premium tier, server-verified against Apple JWS). The product is feature-complete by line count, but a same-day audit (6 audits, 65 findings) found it is **not submittable**: AI Chat and in-app purchase — both shipped in the binary — are non-functional in every real build.
 
 This milestone executes the remediation plan already drafted at `plans/0808-2042-appstore-submission-remediation/plan.md`: get StressMonitor from "feature-complete" to "actually works when a real user or App Review taps it."
 
@@ -13,7 +13,7 @@ Every feature that ships in the binary must actually work end-to-end for a real 
 ## Business Context
 
 - **Customer**: Individual consumers tracking personal stress/wellness via HRV.
-- **Revenue model**: StoreKit 2 subscription (weekly/monthly/annual) gating premium features and characters — confirmed real intent by the remediation plan's Phase 5 ("IAP revenue path"), which supersedes `docs/project-roadmap.md`'s stale "IAP Revenue: Not planned." Currently **zero product IDs resolve in any build configuration** — every purchase attempt throws.
+- **Revenue model**: credits-based — server-authoritative credit balance (50 free/month, free-first consumption) spent by chat messages; consumable credit packs (`credits.small` $1.99/10, `credits.large` $19.99/150) redeem server-side against Apple-verified JWS; premium tier (subscription, `premium_until` expiry gating) = unlimited chat. Superseded the original weekly/monthly/annual subscription-only model in v1.1 Phase 2 (DEC-1/DEC-2); live money path human-verified 2026-08-23 against the deployed backend.
 - **Success metric**: A release archive uploads to App Store Connect without manifest validation failure; a real purchase/restore/cancel/expiry cycle verifies against a local `.storekit` file; Chat reflects real auth state instead of a dead, expired credential.
 - **Strategy notes**: `plans/0808-2042-appstore-submission-remediation/plan.md` (the authoritative scope for this milestone), `plans/reports/appstore-audit-0808-*.md` (6 source audits), `.planning/codebase/{ARCHITECTURE,STACK,TESTING,CONCERNS}.md` (codebase map, corroborates several findings), `docs/project-roadmap.md`, `docs/KANBAN-SHIP-READINESS.md` (both partially stale relative to the fresher audit).
 
@@ -39,6 +39,18 @@ Every feature that ships in the binary must actually work end-to-end for a real 
 - ✓ v1.1 D-03/D-07: `StressAPIClient` with Bearer Firebase ID token + backend `/chat` SSE streaming (terminal metadata event, 402 → insufficient-credits) — v1.1 Phase 01, human-verified end-to-end (UAT Test 1) + 87-test suite green
 - ✓ v1.1 D-04: Supabase fully removed from source tree (services, config, Keychain tokens) — v1.1 Phase 01, verified in code + 01-REVIEW.md
 - ✓ v1.1 G-01-2: Google Sign-In reachable from app UI (Settings → Sync & devices) with post-link email display — v1.1 Phase 01 Plan 01-04, human-verified 2026-08-16
+- ✓ v1.1 Phase 2: Credits system — server-authoritative balance (GET /credits + SSE terminal metadata), 402 INSUFFICIENT_CREDITS → outOfCredits paywall, balance at all DEC-2 placements — verification `passed` + live smoke human-validated 2026-08-23
+- ✓ v1.1 Phase 2: Backend IAP — POST /credits/redeem with Apple JWS verification (@apple/app-store-server-library 3.1.0, embedded Apple Root CA G2+G3), idempotent on transaction id, purchase ledger — backend suite 17 tests / 50 steps green
+- ✓ v1.1 Phase 2: CR-01 free-first consumption + purchased_credits bucket separation (monthly reset preserves purchased) — migration applied + test-pinned
+- ✓ v1.1 Phase 2: CR-02/CR-03/CR-05 revocation & expiry semantics — expired/revoked never activate premium; effective premium enforced at deductCredit + chat gate; revoked subscription JWS demotes premium (replay-safe `least()`); WR-10 refunded pack finishes without redemption on both entry points — test-pinned
+- ✓ v1.1 Phase 2, IAP-01: Pack + premium product IDs resolve from Bundle.main in both configurations — StoreKitProductCatalogLiveTests 6/6 on simulator (CR-04 closed)
+- ✓ v1.1 Phase 2, IAP-02: `Transaction.updates` listener owned at app scope (StoreKitService init)
+- ✓ v1.1 Phase 2, IAP-03: Foreground entitlement refresh reachable at entry points
+- ✓ v1.1 Phase 2, IAP-04: Premium gating semantics intentional (DEC-1)
+- ✓ v1.1 Phase 2, IAP-05: Pricing display accuracy — computed per-unit pack savings
+- ✓ v1.1 Phase 2, IAP-06: Live purchase/restore/refund cycle — human-validated 2026-08-23 on Release build against deployed backend (balance +10 exactly once, server-persisted across relaunch, packs-era restore copy, refund demotion CR-05, refunded-pack one-pass clear WR-10)
+- ✓ v1.1 Phase 2, BUILD-05: Release-configuration build compiles (`xcodebuild build -configuration Release` exit 0, re-run at verification)
+- ✓ v1.1 Phase 2, AUTH-02 residual closed: live kill-check rode the validated live smoke (see Active note removed)
 
 ### Active
 
@@ -55,19 +67,12 @@ Every feature that ships in the binary must actually work end-to-end for a real 
 
 **AUTH — carried from v1.0 Phase 3 (blocked on decision D1)**
 - [ ] AUTH-01: No credential ships extractable from the Release binary via `strings` — fix applied (`#if DEBUG` wrap) but the empirical `strings` confirmation is blocked by an unrelated pre-existing Release-compile failure (see Constraints)
-- [ ] AUTH-02: Chat entry point reflects real auth state — v1.1 Phase 01 shipped real Firebase auth (`ChatAvailability.current == .enabled`, no compile-time gate); chat round-trip verified live (UAT Test 1). Residual: stale-session masking (REVIEW WR-06) — keep open until Phase 2 credit-state surface lands
+- [x] AUTH-02: Chat entry point reflects real auth state — v1.1 Phase 01 shipped real Firebase auth; Phase 2 credit-surface landed and the live kill-check (typed 401 / stale-session behavior) rode the human-validated live smoke of 2026-08-23. Closed via v1.1 Phase 2 verification (`passed`)
 - [ ] AUTH-03: Chat dismiss-mid-stream cancels SSE within one runloop, no credit charged — TDD tests exist and compile; never executed (same CoreSimulator blocker as BUILD-04)
 
 **WIRE — carried from v1.0 Phase 4 (WIRE-01 only; WIRE-02 validated above)**
 - [ ] WIRE-01: Widget renders live data on a real device, not placeholder — depends on decision D4; no v1.0 phase VERIFICATION.md exists for this
 
-**IAP — carried from v1.0 Phase 5 (no phase VERIFICATION.md exists — all 6 below are self-reported "Complete" in REQUIREMENTS.md, none independently re-verified this milestone)**
-- [ ] IAP-01: StoreKit product IDs resolve in Release configuration
-- [ ] IAP-02: `Transaction.updates` listener owned at app scope
-- [ ] IAP-03: Stale-premium correction path reachable
-- [ ] IAP-04: Character-unlock entitlement bypass fixed or confirmed intentional (confirmed intentional per D-05: one-time-permanent)
-- [ ] IAP-05: Pricing display accuracy (savings %, trial gating)
-- [ ] IAP-06: Purchase/restore/cancel/expiry verified against a `.storekit` file — the dedicated `StoreKitServiceTests` suite is `@Suite(.disabled(...))` in CI per the v1.0 milestone audit; coverage claim does not hold today
 
 **SHIP — carried from v1.0 Phase 5 (no phase VERIFICATION.md exists)**
 - [ ] SHIP-01: App Store screenshot set captured with demo mode disabled — deferred as checkpoint:human-verify, never done
@@ -82,7 +87,6 @@ Every feature that ships in the binary must actually work end-to-end for a real 
 - [ ] A11Y-05: Orphaned redesign views deleted
 
 **NEW — surfaced during v1.0 close, not in the original remediation plan**
-- [ ] BUILD-05 (new): `StoreKitServiceEnvironment.swift:12`'s `defaultValue` references `MockStoreKitService` unconditionally outside `#if DEBUG` — every Release build fails to compile. Pre-existing, found during Phase 3 verification, blocks AUTH-01's own acceptance test.
 - [ ] TEST-01 (new): This development host's CoreSimulator cannot complete an `xcodebuild test` launch session — reproduced across every phase's verification attempt this milestone (4+ independent occurrences). Needs a working CI runner or a different host before any of BUILD-04/AUTH-03/DATA-01's test-execution claims can be closed.
 - [ ] DATA-04 (new): Add a regression test for CR-01 (CloudKit batch-delete failure propagation) — the fix is correct by code inspection but has zero automated coverage; requires a new test seam below `CloudKitResetServiceProtocol`.
 
@@ -134,6 +138,10 @@ Every feature that ships in the binary must actually work end-to-end for a real 
 | D1 (ship real auth vs. stay gated off) resolved by execution — v1.1 Phase 01 shipped real Firebase auth | Gap-closure plan 01-04 made the Google flow user-reachable and UAT-verified it; staying gated off would have shipped dead code | ✓ Good |
 | Test invocations pinned to `-parallel-testing-enabled NO` on this host | Parallel-testing clones fail to prepare (`No matching device ... in XCTestDevices`, Mach -308); disabling clones is the reliable workaround — suite runs green in ~60s | ✓ Good — codify in dev docs/CI |
 | Plan 01-04 adopted prior-session uncommitted work instead of re-executing | Tasks 1-2 were fully implemented matching the plan; verification (build + 4/4 targeted + 87 full-suite tests) confirmed quality before committing per task | ✓ Good — safe-resume gate worked as designed |
+| v1.1 Phase 2 DEC-1/DEC-2: monetization = credits (50 free/mo, free-first consumption) + consumable packs + premium tier for unlimited chat; subscriptions demoted to premium-until entitlement | Usage-based pricing fits an AI-coaching chat product better than subscription-only; server-authoritative balance removes client arithmetic entirely | ✓ Good — live money path human-validated 2026-08-23 |
+| Purchased credits in a separate `purchased_credits` bucket (CHECK ≥ 0); `total_credits` stays the immutable free allotment; API contract preserved via derived-total SQL alias | Monthly reset must restore free allotment without clawing back paid credits; alias keeps iOS decode unchanged | ✓ Good — CR-01 closed, test-pinned |
+| Refund policy split per route: revoked subscription JWS on /premium/verify = demotion signal (replay-safe `least(premium_until, revocationDate)`); /redeem keeps absolute revoked rejection; no clawback of granted pack credits | Refunds must demote server-side premium without double-grant risk; pack clawback would need ledger reversal complexity for marginal value | ✓ Good — 6-case demotion suite green; sandbox refund validated CR-05 |
+| WR-10: refunded pack finished with zero redemption attempts on both entry points (purchase + updates listener) | A revoked pack can never grant credits; finishing it clears the queue so it isn't redelivered forever | ✓ Good — both flow tests green |
 
 ## Evolution
 
@@ -153,4 +161,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-08-16 after v1.1 Phase 01 close (Firebase Auth + API client + chat migration, UAT 2/2, SECURITY threats_open 0)*
+*Last updated: 2026-08-23 after v1.1 Phase 02 close (credits system + IAP transition; verification passed 29/29, live money-path smoke + visual inspection human-validated)*

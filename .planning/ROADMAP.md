@@ -24,7 +24,7 @@ Full phase detail archived at `.planning/milestones/v1.0-ROADMAP.md` and `.plann
 ### v1.1 Backend API Migration
 
 - [x] **Phase 1: Firebase Auth + API Client + Chat Migration** — Add FirebaseAuth SDK (Anonymous + Google Sign-In), build StressAPIClient, migrate /chat to new backend SSE protocol (terminal metadata event), config migration (remove Supabase, add Firebase + API base URL). Blocks Phase 2 and 3. (completed 2026-08-16)
-- [ ] **Phase 2: Credits System + IAP Transition** — Integrate /credits API, transition StoreKit from subscription to consumable credit packs, credits-gated chat access (402 INSUFFICIENT_CREDITS → paywall), new paywall UX with balance display.
+- [x] **Phase 2: Credits System + IAP Transition** — Integrate /credits API, transition StoreKit from subscription to consumable credit packs, credits-gated chat access (402 INSUFFICIENT_CREDITS → paywall), new paywall UX with balance display. (completed 2026-08-23)
 - [ ] **Phase 3: Sessions, Preferences, Quick Actions + Cleanup** — Integrate /sessions (server-side chat history), /preferences sync, /quick-actions, remove all Supabase remnants, final integration testing.
 
 #### Phase 1: Firebase Auth + API Client + Chat Migration
@@ -46,7 +46,7 @@ Plans:
 
 **Goal:** Integrate /credits API, transition StoreKit from subscription to consumable credit packs, credits-gated chat access (402 INSUFFICIENT_CREDITS → paywall), new paywall UX with balance display.
 **Depends on:** Phase 1 (auth + API client)
-**Plans:** 8/8 plans executed
+**Plans:** 8/8 plans complete
 
 Plans:
 **Wave 1**
