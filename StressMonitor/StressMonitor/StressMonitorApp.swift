@@ -26,6 +26,10 @@ struct StressMonitorApp: App {
     /// App-scope credit balance cache: paywall + chat surfaces read this one
     /// instance so every convergence source updates the same displayed value.
     @State private var creditService: CreditService
+    /// App-scope AI-coach preference pair (language + coaching style): the
+    /// Settings pickers and the stress-context payload read this one instance
+    /// so every surface converges on the same seeded state.
+    @State private var preferencesService = PreferencesService()
     @Environment(\.scenePhase) private var scenePhase
     // MARK: - Versioned Schema (V1 → V2 adds Habit)
     //
@@ -198,6 +202,7 @@ struct StressMonitorApp: App {
                 .environment(appRouter)
                 .environment(paywall)
                 .environment(creditService)
+                .environment(preferencesService)
                 .environment(\.storeKitService, storeKitService)
                 .preferredColorScheme(AppearanceManager.shared.colorScheme)
                 #if DEBUG
