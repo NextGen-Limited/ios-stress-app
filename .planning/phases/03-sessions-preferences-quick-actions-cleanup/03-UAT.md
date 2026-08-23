@@ -47,7 +47,7 @@ If this is not 200, stop — the backend is down/stale and every scenario below 
 
 **Server-side check:** `GET /sessions` (see Appendix) lists **exactly ONE session** for the account, and its `title` is the first message truncated (≈50 chars, ellipsis if cut). **Two sessions for one first message = FAIL** (Pitfall 5 — session-creation raced the first `/chat` and the backend auto-created an untitled second session).
 
-**Result:** ✅ pass
+result: pass
 
 ### 2. Preferences round-trip
 
@@ -66,7 +66,7 @@ If this is not 200, stop — the backend is down/stale and every scenario below 
 
 **Server-side check:** `GET /preferences` shows `"language": "vi"` and `"coaching_style": "direct"` (check between steps 3 and 4). After step 4 it shows `"en"` / `"supportive"` again.
 
-**Result:** ✅ pass
+result: pass
 
 ### 3. Chip fetch on chat open
 
@@ -84,7 +84,7 @@ If this is not 200, stop — the backend is down/stale and every scenario below 
 
 **Server-side check (optional):** `GET /quick-actions?stress_level=75&language=en&coaching_style=supportive` returns suggestions including `breathing` and `grounding` (the ≥75 rule).
 
-**Result:** ✅ pass
+result: pass
 
 ### 4. 402 → paywall regression (AUTH-03)
 
@@ -101,7 +101,7 @@ If this is not 200, stop — the backend is down/stale and every scenario below 
 
 **Server-side check:** none (client-side regression pin; the backend 402 gate is covered by the backend suite).
 
-**Result:** ✅ pass
+result: pass
 
 ### 5. Factory reset wipes server history
 
@@ -120,7 +120,7 @@ If this is not 200, stop — the backend is down/stale and every scenario below 
 
 **Why the same token:** the post-reset sign-in creates a *new* anonymous uid; `GET /sessions` with the new identity is trivially empty and proves nothing. Only the pre-reset token proves the old account's rows were actually deleted. (Firebase ID tokens stay valid ~1 h after sign-out — re-run step 3 promptly after step 2.)
 
-**Result:** ✅ pass
+result: pass
 
 ## Verification Appendix — reading `/sessions`, `/preferences`, `/quick-actions` as the app's account
 
