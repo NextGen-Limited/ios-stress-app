@@ -74,7 +74,7 @@ Plans:
 #### Phase 3: Sessions, Preferences, Quick Actions + Cleanup
 
 **Depends on:** Phase 1 (auth + API client)
-**Plans:** 3/5 plans executed (serialized waves — every plan registers test files in project.pbxproj)
+**Plans:** 4/5 plans executed (serialized waves — every plan registers test files in project.pbxproj)
 
 Plans:
 **Wave 1**
@@ -91,7 +91,7 @@ Plans:
 
 **Wave 4** *(blocked on Wave 3 completion)*
 
-- [ ] 03-04-PLAN.md — Factory-reset server-session wipe (ServerSessionWiping seam) + Supabase remnants + backend metering issue (wave 4)
+- [x] 03-04-PLAN.md — Factory-reset server-session wipe (ServerSessionWiping seam) + Supabase remnants + backend metering issue (wave 4)
 
 **Wave 5** *(blocked on Wave 4 completion)*
 
