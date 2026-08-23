@@ -67,6 +67,10 @@ final class RequestCaptureURLProtocol: URLProtocol, @unchecked Sendable {
     nonisolated(unsafe) static var lastRequest: URLRequest?
     nonisolated(unsafe) static var statusCode: Int = 200
     nonisolated(unsafe) static var responseBody: Data?
+    /// Per-request statuses consumed in dispatch order (overlapping-request
+    /// tests); empty by default. Takes precedence over the single
+    /// `statusCode`, but not over `responseByPath`.
+    nonisolated(unsafe) static var statusCodeSequence: [Int] = []
     nonisolated(unsafe) static var responseByPath: [String: (statusCode: Int, body: Data?)]?
     nonisolated(unsafe) static var capturedRequests: [URLRequest] = []
 
@@ -80,6 +84,8 @@ final class RequestCaptureURLProtocol: URLProtocol, @unchecked Sendable {
         if let responseByPath = Self.responseByPath,
            let pathStub = responseByPath[request.url?.path ?? ""] {
             stub = pathStub
+        } else if !Self.statusCodeSequence.isEmpty {
+            stub = (Self.statusCodeSequence.removeFirst(), Self.responseBody ?? Data())
         } else {
             stub = (Self.statusCode, Self.responseBody ?? Data())
         }

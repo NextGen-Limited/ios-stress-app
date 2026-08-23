@@ -21,6 +21,8 @@ struct PreferencesServiceTests {
         RequestCaptureURLProtocol.lastRequest = nil
         RequestCaptureURLProtocol.capturedRequests = []
         RequestCaptureURLProtocol.statusCode = statusCode
+        RequestCaptureURLProtocol.statusCodeSequence = []
+        RequestCaptureURLProtocol.responseByPath = nil
         RequestCaptureURLProtocol.responseBody = body
         let config = URLSessionConfiguration.ephemeral
         config.protocolClasses = [RequestCaptureURLProtocol.self]
@@ -136,5 +138,34 @@ struct PreferencesServiceTests {
         )
         #expect(json["coaching_style"] as? String == "direct")
         #expect(json.count == 1)
+    }
+
+    @Test("overlapping updates serialize: a failed first PUT never reverts past a newer value")
+    func overlappingUpdatesSerializeSoStaleRevertsCannotClobber() async throws {
+        // PUT #1 (vi) fails, PUT #2 (fr) succeeds — dispatched in tap order.
+        RequestCaptureURLProtocol.statusCodeSequence = [500, 200]
+        let service = makeService(statusCode: 200, body: Data(Self.seededFixture.utf8))
+
+        async let first: Void = service.update(language: "vi")
+        async let second: Void = service.update(language: "fr")
+        _ = await (first, second)
+
+        // The server kept "fr" (PUT #2 succeeded) — the local value must
+        // match it. Unserialized, the first failure reverts to the value
+        // captured before either tap ("en") and local state silently
+        // contradicts the server row (WR-04).
+        #expect(service.language == "fr")
+        #expect(service.errorMessage == nil)
+
+        let puts = capturedPutRequests
+        #expect(puts.count == 2)
+        let firstPayload = try #require(
+            JSONSerialization.jsonObject(with: body(of: puts[0])) as? [String: Any]
+        )
+        #expect(firstPayload["language"] as? String == "vi")
+        let secondPayload = try #require(
+            JSONSerialization.jsonObject(with: body(of: puts[1])) as? [String: Any]
+        )
+        #expect(secondPayload["language"] as? String == "fr")
     }
 }

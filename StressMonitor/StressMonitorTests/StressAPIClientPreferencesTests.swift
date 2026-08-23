@@ -23,6 +23,8 @@ struct StressAPIClientPreferencesTests {
         RequestCaptureURLProtocol.lastRequest = nil
         RequestCaptureURLProtocol.capturedRequests = []
         RequestCaptureURLProtocol.statusCode = statusCode
+        RequestCaptureURLProtocol.statusCodeSequence = []
+        RequestCaptureURLProtocol.responseByPath = nil
         RequestCaptureURLProtocol.responseBody = body
         let config = URLSessionConfiguration.ephemeral
         config.protocolClasses = [RequestCaptureURLProtocol.self]

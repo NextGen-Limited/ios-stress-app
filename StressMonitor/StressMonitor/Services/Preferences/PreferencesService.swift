@@ -51,28 +51,63 @@ final class PreferencesService {
     }
 
     func update(language newValue: String) async {
-        await updateField("language", newValue: newValue, revertValue: language) { self.language = $0 }
+        await enqueueUpdate {
+            await self.updateField(
+                "language",
+                newValue: newValue,
+                read: { self.language },
+                set: { self.language = $0 }
+            )
+        }
     }
 
     func update(coachingStyle newValue: String) async {
-        await updateField("coaching_style", newValue: newValue, revertValue: coachingStyle) { self.coachingStyle = $0 }
+        await enqueueUpdate {
+            await self.updateField(
+                "coaching_style",
+                newValue: newValue,
+                read: { self.coachingStyle },
+                set: { self.coachingStyle = $0 }
+            )
+        }
+    }
+
+    /// Serializes optimistic updates: each runs only after the previous one
+    /// fully settled (PUT resolved, revert applied, error surfaced).
+    /// `@MainActor` serializes the synchronous parts but not the awaits —
+    /// without this chain, two rapid picker taps interleave and a stale
+    /// revert can clobber the newer optimistic value (WR-04).
+    private var updateChain: Task<Void, Never>?
+
+    private func enqueueUpdate(_ operation: @escaping @MainActor () async -> Void) async {
+        let predecessor = updateChain
+        let task = Task {
+            await predecessor?.value
+            await operation()
+        }
+        updateChain = task
+        await task.value
     }
 
     /// Shared optimistic-update skeleton: set, PUT the single field, keep the
     /// optimistic value on success (the server persisted exactly it), revert
-    /// and surface the error on failure.
+    /// and surface the error on failure. Runs serialized (see
+    /// `updateChain`) and reads its revert value inside the serialized
+    /// section — after every earlier update settled — so a failure always
+    /// reverts to the value the user actually saw.
     private func updateField(
         _ field: String,
         newValue: String,
-        revertValue: String,
-        apply: (String) -> Void
+        read: () -> String,
+        set: (String) -> Void
     ) async {
-        apply(newValue)
+        let revertValue = read()
+        set(newValue)
         do {
             _ = try await apiClient.updatePreferences(fields: [field: newValue])
             errorMessage = nil
         } catch {
-            apply(revertValue)
+            set(revertValue)
             errorMessage = error.localizedDescription
         }
     }
