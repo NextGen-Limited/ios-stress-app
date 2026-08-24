@@ -227,7 +227,16 @@ final class FakeCloudKitResetService: CloudKitResetServiceProtocol {
     }
 }
 
-@Suite("CloudKit Failure & Cancellation Ordering")
+// WINDOWS.md #8: this suite stalls the test host after its first test settles
+// and every cold relaunch then wedges inside XCTest's startup symbolication
+// enumeration — accepted lineage locally (exit 65 tolerated), fatal on CI
+// where the job fails. Disabled on CI runners via GSD_CI (set by _test.yml as
+// TEST_RUNNER_GSD_CI so xcodebuild forwards it into the test host). Re-enable
+// everywhere once #8 is root-caused.
+@Suite(
+    "CloudKit Failure & Cancellation Ordering",
+    .enabled(if: ProcessInfo.processInfo.environment["GSD_CI"] == nil)
+)
 @MainActor
 struct DataDeleterFailureAndCancellationTests {
 
@@ -359,7 +368,12 @@ struct DataDeleterFailureAndCancellationTests {
     }
 }
 
-@Suite("Data Export Field Selection")
+// WINDOWS.md #8 lineage — same host-stall/relaunch pattern as the Cancellation
+// suite above; CI-only skip, runs locally.
+@Suite(
+    "Data Export Field Selection",
+    .enabled(if: ProcessInfo.processInfo.environment["GSD_CI"] == nil)
+)
 @MainActor
 struct DataExportFieldSelectionTests {
 
