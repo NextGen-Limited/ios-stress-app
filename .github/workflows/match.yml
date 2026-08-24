@@ -44,14 +44,18 @@ jobs:
           MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
           MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
           MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
-        run: bundle exec fastlane setup_match
-
       - name: Verify profile entitlements
         run: |
-          echo "## Regenerated profile entitlements"
-          for profile in ~/Library/MobileDevice/Provisioning Profiles/*.mobileprovision; do
-            name=$(security cms -D -P "$profile" 2>/dev/null | plutil -extract Name raw -o - - 2>/dev/null)
-            echo "### $name"
-            security cms -D -P "$profile" 2>/dev/null | plutil -extract Entitlements xml1 -o - - 2>/dev/null \
-              | grep -E "application-groups|icloud-container|com.apple.developer" || echo "(no capability entitlements found)"
+          shopt -s nullglob
+          profiles=(
+            "$HOME/Library/Developer/Xcode/UserData/Provisioning Profiles"/*.mobileprovision
+            "$HOME/Library/MobileDevice/Provisioning Profiles"/*.mobileprovision
+          )
+          echo "## Regenerated profile entitlements (${#profiles[@]} profile(s))"
+          for profile in "${profiles[@]}"; do
+            echo "### $(basename "$profile")"
+            security cms -D -P "$profile" 2>/dev/null \
+              | plutil -extract Entitlements xml1 -o - - 2>/dev/null \
+              | grep -E "Name|application-groups|icloud-container|com.apple.developer" \
+              || echo "(no capability entitlements found)"
           done
