@@ -175,6 +175,11 @@ jobs:
             spm-${{ runner.os }}-
 
       - name: Run Tests
+        env:
+          # Forwarded by xcodebuild (TEST_RUNNER_ prefix stripped) into the
+          # test host; gates WINDOWS.md #8-lineage suites off on CI — they
+          # stall the host and exit 65 with zero assertion failures.
+          TEST_RUNNER_GSD_CI: "1"
         run: |
           set -o pipefail
           xcodebuild test \
