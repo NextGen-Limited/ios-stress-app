@@ -57,6 +57,21 @@ struct PreferencesServiceTests {
         RequestCaptureURLProtocol.capturedRequests.filter { $0.httpMethod == "PUT" }
     }
 
+    /// `async let` guarantees no child-task start order — on CI runners the
+    /// second update occasionally reached the serialized chain first and
+    /// consumed the 500, flipping the scenario. Gate on the first PUT
+    /// reaching the wire before dispatching the second update; the updates
+    /// still overlap (PUT #1 is mid-flight, unsettled), so the
+    /// serialization contract stays exercised deterministically.
+    private static func waitUntilCapturedPutCount(_ count: Int) async {
+        let deadline = Date().addingTimeInterval(5)
+        while RequestCaptureURLProtocol.capturedRequests.filter({ $0.httpMethod == "PUT" }).count < count,
+              Date() < deadline {
+            await Task.yield()
+            try? await Task.sleep(nanoseconds: 1_000_000)
+        }
+    }
+
     @Test("defaults before any seed match the backend migration defaults")
     func defaultsMatchBackendMigration() {
         let service = makeService(statusCode: 200, body: Data(Self.seededFixture.utf8))
@@ -147,13 +162,14 @@ struct PreferencesServiceTests {
         let service = makeService(statusCode: 200, body: Data(Self.seededFixture.utf8))
 
         async let first: Void = service.update(language: "vi")
+        await Self.waitUntilCapturedPutCount(1)
         async let second: Void = service.update(language: "fr")
         _ = await (first, second)
 
-        // The server kept "fr" (PUT #2 succeeded) — the local value must
-        // match it. Unserialized, the first failure reverts to the value
-        // captured before either tap ("en") and local state silently
-        // contradicts the server row (WR-04).
+        // Both updates settled. The server kept "fr" (PUT #2 succeeded) —
+        // the local value must match it. Unserialized, the first failure
+        // reverts to the value captured before either tap ("en") and local
+        // state silently contradicts the server row (WR-04).
         #expect(service.language == "fr")
         #expect(service.errorMessage == nil)
 
