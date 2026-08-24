@@ -47,16 +47,27 @@ jobs:
         run: bundle exec fastlane setup_match
       - name: Verify profile entitlements
         run: |
-          shopt -s nullglob
-          profiles=(
-            "$HOME/Library/Developer/Xcode/UserData/Provisioning Profiles"/*.mobileprovision
-            "$HOME/Library/MobileDevice/Provisioning Profiles"/*.mobileprovision
-          )
-          echo "## Regenerated profile entitlements (${#profiles[@]} profile(s))"
-          for profile in "${profiles[@]}"; do
-            echo "### $(basename "$profile")"
-            security cms -D -P "$profile" 2>/dev/null \
-              | plutil -extract Entitlements xml1 -o - - 2>/dev/null \
-              | grep -E "Name|application-groups|icloud-container|com.apple.developer" \
-              || echo "(no capability entitlements found)"
-          done
+          python3 - <<'EOF'
+          import glob, os, plistlib, subprocess
+          paths = []
+          for pat in ("~/Library/Developer/Xcode/UserData/Provisioning Profiles/*.mobileprovision",
+                      "~/Library/MobileDevice/Provisioning Profiles/*.mobileprovision"):
+              paths += glob.glob(os.path.expanduser(pat))
+          print(f"## Regenerated profile entitlements ({len(paths)} profile(s))")
+          for p in paths:
+              xml = subprocess.run(["security", "cms", "-D", "-P", p],
+                                   capture_output=True).stdout
+              try:
+                  prof = plistlib.loads(xml)
+              except Exception:
+                  print(f"### {os.path.basename(p)}: UNPARSEABLE")
+                  continue
+              ent = prof.get("Entitlements", {})
+              keys = [k for k in ent if k.startswith("com.apple.developer")]
+              groups = ent.get("com.apple.security.application-groups")
+              icloud = ent.get("com.apple.developer.icloud-container-identifiers")
+              print(f"### {prof.get('Name', '?')}")
+              print(f"    capability keys: {keys or 'NONE'}")
+              print(f"    app groups: {groups or 'NONE'}")
+              print(f"    icloud containers: {icloud or 'NONE'}")
+          EOF
