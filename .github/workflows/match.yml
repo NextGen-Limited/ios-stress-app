@@ -55,7 +55,7 @@ jobs:
               paths += glob.glob(os.path.expanduser(pat))
           print(f"## Regenerated profile entitlements ({len(paths)} profile(s))")
           for p in paths:
-              xml = subprocess.run(["security", "cms", "-D", "-P", p],
+              xml = subprocess.run(["security", "cms", "-D", "-i", p],
                                    capture_output=True).stdout
               try:
                   prof = plistlib.loads(xml)
