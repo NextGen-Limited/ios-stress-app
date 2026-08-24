@@ -30,13 +30,26 @@ final class FirebaseAuthService: AuthServiceProtocol, @unchecked Sendable {
 
     nonisolated init() {}
 
+    /// `Auth.auth()` traps with a fatal error when no FIRApp is configured —
+    /// the state of any fresh checkout missing the gitignored
+    /// GoogleService-Info.plist (CI runners). Every Auth access funnels
+    /// through this check; unconfigured reads degrade exactly like a
+    /// signed-out user instead of crashing the host.
+    private var isFirebaseConfigured: Bool {
+        FirebaseApp.app() != nil
+    }
+
     // MARK: - AuthServiceProtocol
 
     var currentAccountEmail: String? {
-        Auth.auth().currentUser?.email
+        guard isFirebaseConfigured else { return nil }
+        return Auth.auth().currentUser?.email
     }
 
     func signInAnonymously() async throws {
+        guard isFirebaseConfigured else {
+            throw LLMServiceError.unavailable(reason: "Firebase is not configured.")
+        }
         if Auth.auth().currentUser != nil { return }
         let result = try await Auth.auth().signInAnonymously()
         _ = result.user
@@ -45,7 +58,7 @@ final class FirebaseAuthService: AuthServiceProtocol, @unchecked Sendable {
     /// Returns a valid Firebase ID token, forcing a refresh when the cached
     /// token is within `tokenRefreshMargin` of expiry.
     func getIDToken() async throws -> String {
-        guard let user = Auth.auth().currentUser else {
+        guard isFirebaseConfigured, let user = Auth.auth().currentUser else {
             throw LLMServiceError.unavailable(reason: "Please sign in to use AI Chat.")
         }
 
@@ -57,6 +70,7 @@ final class FirebaseAuthService: AuthServiceProtocol, @unchecked Sendable {
     }
 
     func signOut() throws {
+        guard isFirebaseConfigured else { return }
         try Auth.auth().signOut()
     }
 
@@ -114,7 +128,7 @@ final class FirebaseAuthService: AuthServiceProtocol, @unchecked Sendable {
     /// returning user does not carry dead tokens across the migration. Called
     /// by data-deletion flows (factory reset, full account wipe).
     static func clearStoredCredentials() {
-        try? Auth.auth().signOut()
+        if FirebaseApp.app() != nil { try? Auth.auth().signOut() }
         let service = "com.stressmonitor.app"
         for account in ["supabaseAccessToken", "supabaseRefreshToken"] {
             try? KeychainService.delete(service: service, account: account)
