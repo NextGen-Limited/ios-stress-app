@@ -56,6 +56,30 @@ platform :ios do
     )
   end
 
+  desc "Dump App ID capability state from the ASC API (portal debugging)"
+  lane :dump_capabilities do
+    require "spaceship"
+    key_path = File.expand_path(ENV["APP_STORE_CONNECT_API_KEY_PATH"] || "~/.appstoreconnect/AuthKey.p8")
+    unless File.exist?(key_path) && !ENV["APP_STORE_CONNECT_API_KEY_P8"]
+      dir = File.dirname(key_path)
+      FileUtils.mkdir_p(dir)
+      File.write(key_path, ENV["APP_STORE_CONNECT_API_KEY_P8"])
+    end
+    Spaceship::ConnectAPI.token = Spaceship::ConnectAPI::Token.create(
+      key_id: ENV["APP_STORE_CONNECT_API_KEY_ID"],
+      issuer_id: ENV["APP_STORE_CONNECT_ISSUER_ID"],
+      key_filepath: key_path
+    )
+    ["stress.ai.com", "stress.ai.com.watchkitapp", "stress.ai.com.widget"].each do |bid|
+      bundle = Spaceship::ConnectAPI::BundleId.all(filter: { identifier: bid, platform: "IOS" }).first
+      UI.message("=== #{bid}: bundle_id=#{bundle ? bundle.id : 'NOT FOUND'}")
+      next unless bundle
+      Spaceship::ConnectAPI::BundleIdCapability.all(bundle_id_id: bundle.id).each do |cap|
+        UI.message("    #{cap.capability_type} settings=#{cap.settings}")
+      end
+    end
+  end
+
   # ────────────────────── SETUP MATCH ──────────────────────
   desc "One-time local setup: generate certs and profiles into the Match repo"
   lane :setup_match do
