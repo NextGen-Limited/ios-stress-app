@@ -2,7 +2,7 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Backend API Migration
-status: "Milestone v1.1 shipped — PR #48 (squash-merge pending CI)"
+status: "Milestone v1.1 shipped — PR #48 (squash-merge pending CI; conflicts resolved)"
 stopped_at: Milestone v1.1 complete — all 3 phases passed verification; lifecycle (audit → complete → cleanup) pending
 last_updated: "2026-08-24T02:47:52.891Z"
 last_activity: 2026-08-24
