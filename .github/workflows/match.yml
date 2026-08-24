@@ -1,0 +1,57 @@
+name: Match Profiles
+
+on:
+  workflow_dispatch:
+    inputs:
+      force:
+        description: "Force profile regeneration (setup_match always forces)"
+        required: false
+        default: true
+        type: boolean
+
+concurrency:
+  group: match-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  LANG: en_US.UTF-8
+
+jobs:
+  regenerate:
+    name: Regenerate App Store profiles
+    runs-on: macos-15
+    timeout-minutes: 20
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Cache Ruby Gems
+        uses: actions/cache@v4
+        with:
+          path: vendor/bundle
+          key: gems-${{ runner.os }}-${{ hashFiles('**/Gemfile.lock') }}
+
+      - name: Install Dependencies
+        run: |
+          bundle config path vendor/bundle
+          bundle install --jobs 4 --retry 3
+
+      - name: Regenerate profiles via setup_match
+        env:
+          APP_STORE_CONNECT_API_KEY_ID: ${{ secrets.APP_STORE_CONNECT_API_KEY_ID }}
+          APP_STORE_CONNECT_ISSUER_ID: ${{ secrets.APP_STORE_CONNECT_ISSUER_ID }}
+          APP_STORE_CONNECT_API_KEY_P8: ${{ secrets.APP_STORE_CONNECT_API_KEY_P8 }}
+          MATCH_PASSWORD: ${{ secrets.MATCH_PASSWORD }}
+          MATCH_GIT_URL: ${{ secrets.MATCH_GIT_URL }}
+          MATCH_GIT_BASIC_AUTHORIZATION: ${{ secrets.MATCH_GIT_BASIC_AUTHORIZATION }}
+        run: bundle exec fastlane setup_match
+
+      - name: Verify profile entitlements
+        run: |
+          echo "## Regenerated profile entitlements"
+          for profile in ~/Library/MobileDevice/Provisioning Profiles/*.mobileprovision; do
+            name=$(security cms -D -P "$profile" 2>/dev/null | plutil -extract Name raw -o - - 2>/dev/null)
+            echo "### $name"
+            security cms -D -P "$profile" 2>/dev/null | plutil -extract Entitlements xml1 -o - - 2>/dev/null \
+              | grep -E "application-groups|icloud-container|com.apple.developer" || echo "(no capability entitlements found)"
+          done
