@@ -3,7 +3,7 @@ phase: quick-260829-kby
 plan: 01
 subsystem: auth
 tags: [firebase, auth, error-handling, app-bundle]
-status: incomplete
+status: complete
 requires:
   - "GOOGLE_SERVICE_INFO_PLIST_BASE64 CI secret (Task 1 — deferred)"
   - "ci_scripts/provision_firebase_config.sh (Task 2 — deferred)"
@@ -273,3 +273,44 @@ Commits — both present on `worktree-agent-a742319862ae7a112`:
 
 Note: this self-check verifies artifact existence only. It does **not** verify that the
 code compiles or that any test passes — see "Verification: NOT RUN" above.
+
+
+## Verification (orchestrator, 2026-08-29)
+
+Executed on iPhone 17 / iOS 26.3 after installing the watchOS 26.2 simulator
+runtime, which had been the standing blocker (`xcodebuild -downloadPlatform
+watchOS`, detached).
+
+| Run | total | passed | failed | skipped |
+|-----|-------|--------|--------|---------|
+| before target-membership fix | 237 | 216 | 6 | 15 |
+| after fix (`6227803`) | 244 | 223 | 6 | 15 |
+
+Both new suites now execute and pass: `Auth Service Error`, `Firebase Bootstrap`.
+`Data Deleter Server Session Wipe` and `AccountViewModelTests` pass, including
+`AuthServiceError.notSignedIn skips the wipe and still resets locally` — the
+factory-reset guard.
+
+**The 6 failures are pre-existing and not a regression.** They match
+`WINDOWS.md` entry #8 exactly (recorded 2026-08-16): 4 in `CloudKit Failure &
+Cancellation Ordering`, 2 in `Data Export Field Selection`, cold-launch host
+restarts with the tests themselves passing. Count, suites, and signature are
+identical. The 15 skips are the documented `CharacterEntitlementSyncTests`
+quarantine plus StoreKit-config-dependent suites (no `.storekit` file exists).
+
+### Defect found and fixed during verification
+
+`StressMonitorTests` uses an explicit `PBXSourcesBuildPhase` file list, NOT a
+`PBXFileSystemSynchronizedRootGroup` like the app target. `FirebaseBootstrapTests.swift`
+and `AuthServiceErrorTests.swift` were committed to disk but never added to it,
+so they could not compile or run — and the suite still reported green. Fixed in
+`6227803`. Any future test file added to this target needs four `pbxproj`
+entries; creating the file is not sufficient.
+
+### Still open
+
+Tasks 1-2 (CI provisioning) remain deferred per user scope decision. Every
+CI-produced build still ships without `GoogleService-Info.plist`, so Firebase
+is unconfigured in TestFlight and App Store builds — anonymous auth, AI Chat,
+credits, IAP grant, and Google Sign-In all dead there. This work makes that
+failure loud; it does not fix it.
