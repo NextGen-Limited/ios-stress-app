@@ -266,6 +266,29 @@ struct DataDeleterServerWipeTests {
         _ = container
     }
 
+    /// `getIDToken()` now raises `AuthServiceError.notSignedIn` rather than
+    /// `LLMServiceError.unavailable`. Without a matching skip arm a signed-out
+    /// factory reset would fail outright instead of proceeding locally.
+    @Test("AuthServiceError.notSignedIn skips the wipe and still resets locally")
+    func authNotSignedInSkipsServerWipeAndStillCompletesReset() async throws {
+        let (container, ctx) = try makeContextWithOneMeasurement()
+        let cloudKit = RecordingCloudKitResetService()
+        let wiper = FakeServerSessionWiper(behavior: .throwOnList(AuthServiceError.notSignedIn))
+        seedStoredChatSessionId()
+        let service = makeService(ctx, cloudKit: cloudKit, wiper: wiper)
+
+        try await service.performFactoryReset()
+
+        #expect(wiper.calls == ["list(limit:20, offset:0)"])
+        #expect(cloudKit.databaseResetCallCount == 1)
+
+        let remaining = try ctx.fetch(FetchDescriptor<StressMeasurement>())
+        #expect(remaining.isEmpty)
+
+        #expect(UserDefaults.standard.string(forKey: "stressChatSessionId") == nil)
+        _ = container
+    }
+
     @Test("a 401 from the sessions endpoint also skips the wipe (stale token, no identity)")
     func unauthorizedSkipsServerWipeAndStillCompletesReset() async throws {
         let (container, ctx) = try makeContextWithOneMeasurement()

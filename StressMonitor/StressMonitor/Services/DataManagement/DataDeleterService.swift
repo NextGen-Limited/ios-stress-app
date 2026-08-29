@@ -458,15 +458,20 @@ final class DataDeleterService: DataDeleter {
     // MARK: - Server Session Wipe
 
     /// Runs the server-session wipe, classifying failures per the locked Q2
-    /// decision: auth-unavailability (no Firebase user → `LLMServiceError.unavailable`
-    /// from `getIDToken()`, or a 401 → `SessionsAPIError.unauthorized`) means
-    /// there is no authenticated identity to wipe — log and skip so an
-    /// offline-of-auth factory reset stays possible. Every other failure
-    /// fails the whole reset loudly (the CloudKit precedent) — never a
-    /// silent partial success.
+    /// decision: auth-unavailability (no Firebase user → `AuthServiceError`
+    /// from `getIDToken()`, an invalid server response →
+    /// `LLMServiceError.unavailable`, or a 401 →
+    /// `SessionsAPIError.unauthorized`) means there is no authenticated
+    /// identity to wipe — log and skip so an offline-of-auth factory reset
+    /// stays possible. Every other failure fails the whole reset loudly (the
+    /// CloudKit precedent) — never a silent partial success.
     private func wipeServerSessionsOrSkip() async throws {
         do {
             try await wipeServerSessions()
+        } catch AuthServiceError.notSignedIn {
+            logger.log("Server session wipe skipped — no authenticated identity: not signed in")
+        } catch AuthServiceError.notConfigured {
+            logger.log("Server session wipe skipped — no authenticated identity: auth not configured")
         } catch LLMServiceError.unavailable(let reason) {
             logger.log("Server session wipe skipped — no authenticated identity: \(reason)")
         } catch SessionsAPIError.unauthorized {

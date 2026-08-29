@@ -48,7 +48,7 @@ final class FirebaseAuthService: AuthServiceProtocol, @unchecked Sendable {
 
     func signInAnonymously() async throws {
         guard isFirebaseConfigured else {
-            throw LLMServiceError.unavailable(reason: "Firebase is not configured.")
+            throw AuthServiceError.notConfigured
         }
         if Auth.auth().currentUser != nil { return }
         let result = try await Auth.auth().signInAnonymously()
@@ -59,7 +59,7 @@ final class FirebaseAuthService: AuthServiceProtocol, @unchecked Sendable {
     /// token is within `tokenRefreshMargin` of expiry.
     func getIDToken() async throws -> String {
         guard isFirebaseConfigured, let user = Auth.auth().currentUser else {
-            throw LLMServiceError.unavailable(reason: "Please sign in to use AI Chat.")
+            throw AuthServiceError.notSignedIn
         }
 
         let result = try await user.getIDTokenResult(forcingRefresh: false)
@@ -82,7 +82,7 @@ final class FirebaseAuthService: AuthServiceProtocol, @unchecked Sendable {
     /// discarding the existing anonymous data.
     func signInWithGoogle(presenting viewController: UIViewController) async throws {
         guard let clientID = FirebaseApp.app()?.options.clientID else {
-            throw LLMServiceError.unavailable(reason: "Firebase client ID is not configured.")
+            throw AuthServiceError.notConfigured
         }
         GIDSignIn.sharedInstance.configuration = GIDConfiguration(clientID: clientID)
 
@@ -93,13 +93,13 @@ final class FirebaseAuthService: AuthServiceProtocol, @unchecked Sendable {
                 } else if let result {
                     continuation.resume(returning: result)
                 } else {
-                    continuation.resume(throwing: LLMServiceError.unavailable(reason: "Google Sign-In returned no result."))
+                    continuation.resume(throwing: AuthServiceError.googleSignInFailed(underlying: nil))
                 }
             }
         }
 
         guard let idToken = result.user.idToken?.tokenString else {
-            throw LLMServiceError.unavailable(reason: "Google Sign-In did not return an ID token.")
+            throw AuthServiceError.googleSignInFailed(underlying: nil)
         }
         let accessToken = result.user.accessToken.tokenString
         let credential = OAuthProvider.credential(

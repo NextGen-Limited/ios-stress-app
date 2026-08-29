@@ -37,7 +37,7 @@ struct AccountViewModelTests {
     @Test("failed Google sign-in surfaces an error and resets progress")
     func failedGoogleSignInSurfacesErrorAndResetsProgress() async throws {
         let mock = MockAuthService(
-            googleSignInError: LLMServiceError.unavailable(reason: "Google Sign-In failed.")
+            googleSignInError: AuthServiceError.googleSignInFailed(underlying: nil)
         )
         let viewModel = AccountViewModel(authService: mock)
 
@@ -45,7 +45,7 @@ struct AccountViewModelTests {
             try await viewModel.signInWithGoogle(presenting: UIViewController())
             Issue.record("Expected sign-in to throw")
         } catch {
-            #expect(error is LLMServiceError)
+            #expect(error is AuthServiceError)
         }
 
         #expect(viewModel.linkedEmail == nil)
