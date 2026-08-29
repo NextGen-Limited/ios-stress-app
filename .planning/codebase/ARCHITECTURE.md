@@ -1,231 +1,256 @@
-<!-- refreshed: 2026-08-08 -->
+<!-- refreshed: 2026-08-29 -->
 # Architecture
 
-**Analysis Date:** 2026-08-08
+**Analysis Date:** 2026-08-29
 
 ## System Overview
 
 ```text
-┌─────────────────────────────────────────────────────────────┐
-│                    Presentation (SwiftUI)                    │
-├──────────────────┬──────────────────┬───────────────────────┤
-│   iPhone app     │   watchOS app    │   Widget extension    │
-│ `StressMonitor/  │ `StressMonitor-  │ `StressMonitorWidget/`│
-│  Views/`         │  Watch Watch App/│                       │
-│                  │  Views/`         │                       │
-└────────┬─────────┴────────┬─────────┴──────────┬────────────┘
-         │                  │                     │
-         ▼                  ▼                     ▼
-┌─────────────────────────────────────────────────────────────┐
-│              ViewModels (@Observable, @MainActor)            │
-│  `StressMonitor/ViewModels/`, per-feature VMs under Views/   │
-│  `StressMonitorWatch Watch App/ViewModels/`                  │
-└────────┬────────────────────────────────────────────────────┘
-         │  protocol-typed dependencies (constructor injection)
-         ▼
-┌─────────────────────────────────────────────────────────────┐
-│                        Service layer                         │
-│ Algorithm │ HealthKit │ Repository │ CloudKit │ Sync │ LLM   │
-│ StoreKit  │ Background│ DataManagement │ Connectivity        │
-│ `StressMonitor/Services/`                                    │
-└────────┬───────────────────────┬──────────────┬─────────────┘
-         │                       │              │
-         ▼                       ▼              ▼
-┌──────────────────┐  ┌────────────────┐  ┌──────────────────┐
-│ SwiftData store  │  │ CloudKit       │  │ Supabase Edge    │
-│ (StressMeasure-  │  │ private DB     │  │ Functions /chat  │
-│  ment, Habit,    │  │ `Services/     │  │ (SSE streaming)  │
-│  CharacterUnlock)│  │  CloudKit/`    │  │ `Services/LLM/`  │
-└──────────────────┘  └────────────────┘  └──────────────────┘
-         │
-         ▼  App Group `group.com.stressmonitor.app`
-┌─────────────────────────────────────────────────────────────┐
-│ Widget / complication snapshot store                         │
-│ `StressMonitorWidget/Models/WidgetDataProvider.swift`        │
-│ `StressMonitorWatch Watch App/Services/WatchSharedDataStore.swift` │
-└─────────────────────────────────────────────────────────────┘
+┌──────────────────────────────────────────────────────────────────────────────┐
+│                            iOS App (stress.ai.com)                           │
+│  Entry: StressMonitor/StressMonitor/StressMonitorApp.swift (@main)           │
+├─────────────────────────────────┬────────────────────────────────────────────┤
+│  OnboardingContainerView       │  MainTabView (4 tabs: home/action/trend/    │
+│  → MainTabView                 │  settings, NavigationStack per tab)         │
+│  Views/* + Views/Components/*  │  Navigation: AppRouter + Route enum         │
+├─────────────────────────────────┴────────────────────────────────────────────┤
+│  ViewModels (@Observable, @MainActor)                                        │
+│  StressViewModel · ChatViewModel · CreditsViewModel · HistoryViewModel ·     │
+│  Onboarding*ViewModel · SettingsViewModel · TrendsViewModel                  │
+├──────────────────────────────────────────────────────────────────────────────┤
+│  Services (protocol-based DI, Services/Protocols/*Protocol.swift)            │
+│  ┌────────────┬──────────────┬───────────────┬──────────────┬─────────────┐  │
+│  │ HealthKit  │ Algorithm    │ Repository    │ API/LLM      │ StoreKit/   │  │
+│  │ Manager    │ MultiFactor  │ StressRepo    │ StressAPI    │ Credits/    │  │
+│  │ (read-only)│ StressCalc   │ (SwiftData)   │ Client (SSE) │ Paywall     │  │
+│  └────────────┴──────────────┴───────────────┴──────────────┴─────────────┘  │
+├──────────────────────────────────────────────────────────────────────────────┤
+│  Persistence & Sync                                                          │
+│  SwiftData ModelContainer (schema V2, CloudKit .automatic) · CloudKitManager │
+│  + CloudKitSyncEngine (offline-first manual sync w/ ConflictResolver)        │
+└───────────────┬──────────────────────────────┬───────────────────────────────┘
+                │                              │
+                ▼                              ▼
+┌──────────────────────────────┐  ┌───────────────────────────────────────────┐
+│ watchOS App (stress.ai.com.  │  │ Widget Extension (stress.ai.com.widget)   │
+│ watchkitapp) — duplicates    │  │ App Group "group.stress.ai.com":          │
+│ algorithm sources; talks via │  │ WidgetPublisher (app writes) →            │
+│ WCSession ↔ PhoneConnector   │  │ WidgetDataProvider (widget reads)         │
+└──────────────────────────────┘  └───────────────────────────────────────────┘
+                │
+                ▼
+┌──────────────────────────────────────────────────────────────────────────────┐
+│  Backend (https://stress-api.dropitx.site) via StressAPIClient — Firebase    │
+│  Auth Bearer token; chat SSE streaming, credits, preferences, sessions       │
+└──────────────────────────────────────────────────────────────────────────────┘
 ```
 
 ## Component Responsibilities
 
 | Component | Responsibility | File |
 |-----------|----------------|------|
-| `StressMonitorApp` | App entry, versioned SwiftData schema + migration plan, ModelContainer, seeds `CharacterUnlock`, injects `AppRouter`/`PaywallController` | `StressMonitor/StressMonitorApp.swift` |
-| `AppRouter` | Central navigation state: selected tab + one `NavigationPath` per tab, deep links, path encode/decode for restoration | `StressMonitor/Navigation/AppRouter.swift` |
-| `Route` | Codable/Hashable enum of every pushable screen | `StressMonitor/Navigation/Route.swift` |
-| `MainTabView` | Four `NavigationStack`s inside a `TabView`, `@SceneStorage` navigation restoration, root paywall cover | `StressMonitor/Views/MainTabView.swift` |
-| `StressViewModel` | Primary dashboard state: fetch → build `StressContext` → calculate → persist | `StressMonitor/ViewModels/StressViewModel.swift` |
-| `HealthKitManager` (+ extensions) | All HealthKit reads (HRV, HR, sleep, activity, recovery, respiratory) | `StressMonitor/Services/HealthKit/HealthKitManager.swift`, `…+SleepFetch.swift`, `…+ActivityFetch.swift`, `…+RecoveryFetch.swift` |
-| `SimulatorHealthKitService` | Demo-mode data generator behind the same protocol | `StressMonitor/Services/HealthKit/SimulatorHealthKitService.swift` |
-| `MultiFactorStressCalculator` | Runs the five `StressFactor`s, redistributes weights, emits composite `StressResult` | `StressMonitor/Services/Algorithm/MultiFactorStressCalculator.swift` |
-| `StressCalculator` | Legacy HRV+HR fallback, also supplies confidence scoring | `StressMonitor/Services/Algorithm/StressCalculator.swift` |
-| `StressRepository` | SwiftData CRUD, baseline persistence/caching, optional CloudKit passthrough | `StressMonitor/Services/Repository/StressRepository.swift` |
-| `SyncManager` / `CloudKitSyncEngine` / `ConflictResolver` | Orchestrated CloudKit sync with conflict merge and background-task guard | `StressMonitor/Services/Sync/SyncManager.swift`, `StressMonitor/Services/CloudKit/CloudKitSyncEngine.swift`, `StressMonitor/Services/Sync/ConflictResolver.swift` |
-| `SupabaseLLMService` / `SSEParser` / `ChatContextBuilder` | Chat streaming over Supabase Edge Functions, token + terminal-metadata parsing, stress-context payload | `StressMonitor/Services/LLM/` |
-| `PhoneConnectivityManager` / `WatchConnectivityManager` | `WCSession` bridge; watch transfers measurement dictionaries, phone inserts them into SwiftData | `StressMonitor/Services/Connectivity/PhoneConnectivityManager.swift`, `StressMonitorWatch Watch App/Services/WatchConnectivityManager.swift` |
-| `WidgetDataProvider` | App-Group `UserDefaults` snapshot read/written for widgets | `StressMonitorWidget/Models/WidgetDataProvider.swift` |
-| `StoreKitService` / `PremiumState` / `PaywallController` | Subscriptions, premium gating, paywall presentation | `StressMonitor/Services/StoreKit/`, `StressMonitor/Services/Premium/PaywallController.swift` |
+| App entry / DI root | Owns app-scope singletons (AppRouter, PaywallController, StoreKitService, CreditService, PreferencesService), SwiftData container with versioned schema + recovery, scenePhase entitlement refresh | `StressMonitor/StressMonitor/StressMonitorApp.swift` |
+| Router | Central navigation state: selected tab + per-tab `NavigationPath`, deep links, state restoration | `StressMonitor/StressMonitor/Navigation/AppRouter.swift` |
+| Route table | Codable, Hashable value-type destinations resolved by one `.navigationDestination` block | `StressMonitor/StressMonitor/Navigation/Route.swift` |
+| Stress VM | Orchestrates HealthKit fetch → algorithm → persistence → dashboard state | `StressMonitor/StressMonitor/ViewModels/StressViewModel.swift` |
+| Multi-factor calculator | Weighted composite of 5 `StressFactor`s, weight redistribution for missing factors, confidence = 0.4·dataCompleteness + 0.6·avgConfidence | `StressMonitor/StressMonitor/Services/Algorithm/MultiFactorStressCalculator.swift` |
+| Legacy calculator | HRV+HR 2-factor fallback (`calculateStress(hrv:heartRate:)`) | `StressMonitor/StressMonitor/Services/Algorithm/StressCalculator.swift` |
+| HealthKit service | Read-only HRV/HR/sleep/activity/recovery/respiratory queries | `StressMonitor/StressMonitor/Services/HealthKit/HealthKitManager.swift` |
+| Repository | Offline-first SwiftData CRUD, baseline storage, CloudKit sync triggers, widget publish | `StressMonitor/StressMonitor/Services/Repository/StressRepository.swift` |
+| API client | Authenticated HTTP for backend (auth token injection, endpoint-group extensions) | `StressMonitor/StressMonitor/Services/API/StressAPIClient.swift` |
+| LLM service | SSE consumption loop for `/chat`, session/credits state, 402→insufficientCredits mapping | `StressMonitor/StressMonitor/Services/LLM/StressLLMService.swift` |
+| Credit service | App-scope credit balance cache; converged from purchases, server grants, chat metadata | `StressMonitor/StressMonitor/Services/Credits/CreditService.swift` |
+| Paywall controller | App-wide paywall presentation singleton (`present(reason:)` from anywhere) | `StressMonitor/StressMonitor/Services/Premium/PaywallController.swift` |
+| CloudKit sync | Batched, retrying CloudKit sync with conflict resolution | `StressMonitor/StressMonitor/Services/CloudKit/CloudKitSyncEngine.swift`, `Services/Sync/SyncManager.swift` |
+| Watch connectivity | WCSession bridge: watch measurements → phone inserts | `StressMonitor/StressMonitor/Services/Connectivity/PhoneConnectivityManager.swift` |
+| Widget publishing | Writes latest measurement to App Group + reloads widget timeline | `StressMonitor/StressMonitor/Models/WidgetSharedData.swift` (`WidgetPublisher`) |
+| Watch app | Standalone stress measurement, complications, cycle/mood/habit/workout logging | `StressMonitor/StressMonitorWatch Watch App/StressMonitorWatchApp.swift` |
+| Widget | Home-screen/lock-screen stress widgets reading App Group data | `StressMonitor/StressMonitorWidget/StressMonitorWidget.swift` |
 
 ## Pattern Overview
 
-**Overall:** MVVM with protocol-based dependency injection, one Swift module per platform target (no shared framework — cross-target types are duplicated by file).
+**Overall:** MVVM with SwiftUI, `@Observable` ViewModels, protocol-oriented DI
 
 **Key Characteristics:**
-- ViewModels are `@Observable @MainActor final class`, constructed with protocol-typed dependencies (`HealthKitServiceProtocol`, `StressAlgorithmServiceProtocol`, `StressRepositoryProtocol`).
-- Algorithm is a strategy/composite: `StressFactor` implementations plugged into `MultiFactorStressCalculator`, with a legacy calculator as fallback.
-- Value-based navigation: a single `Route` enum plus `View.stressNavigationDestinations()` shared by all tabs.
-- Cross-process data hand-off is snapshot-based (App Group `UserDefaults`), never shared SwiftData stores.
+- ViewModels are `@Observable @MainActor final class`; views hold them via `@State` and construct them in `init` with concrete services (constructor injection at the view boundary — see `Views/DashboardView.swift:12-28`)
+- Every cross-cutting dependency has a protocol seam: `Services/Protocols/` (iOS) and duplicated in the watch target (`StressMonitorWatch Watch App/Services/*Protocol.swift`)
+- App-scope state uses SwiftUI `@Environment` injection from `StressMonitorApp` (AppRouter, PaywallController, CreditService, PreferencesService) plus a custom `\.storeKitService` environment value
+- Singletons exist deliberately for process-lifetime concerns: `PhoneConnectivityManager.shared`, `PremiumState.shared`, `AppearanceManager.shared`, watch `WatchConnectivityManager.shared`
+- Offline-first writes: SwiftData local save always happens before CloudKit sync
 
 ## Layers
 
-**Presentation (Views):**
-- Purpose: SwiftUI screens and reusable components.
-- Location: `StressMonitor/Views/`, `StressMonitor/Components/`, `StressMonitorWatch Watch App/Views/`, `StressMonitorWidget/Views/`.
-- Depends on: ViewModels, `Theme/`, `Views/DesignSystem/`.
-- Used by: `MainTabView`, `OnboardingContainerView`.
+**Views (UI):**
+- Purpose: SwiftUI screens and reusable components; no business logic
+- Location: `StressMonitor/StressMonitor/Views/` (feature folders with `Components/` subfolders), shared character art in `StressMonitor/StressMonitor/Components/Character/`
+- Contains: `*View.swift`, feature-local `*ViewModel.swift` (e.g. `Views/Onboarding/OnboardingWelcomeViewModel.swift`), design tokens in `Views/DesignSystem/`
+- Depends on: ViewModels, Theme (`Theme/DesignTokens.swift`), environment objects
+- Used by: `MainTabView` / `OnboardingContainerView` compose them
 
 **ViewModels:**
-- Purpose: screen state + orchestration.
-- Location: `StressMonitor/ViewModels/` (app-wide) and feature-local VMs such as `StressMonitor/Views/Trends/TrendsViewModel.swift`, `StressMonitor/Views/Dashboard/DashboardViewModel.swift`, `StressMonitor/Views/Onboarding/*ViewModel.swift`.
-- Depends on: service protocols only.
-- Used by: Views.
+- Purpose: Presentation state + orchestration of services
+- Location: `StressMonitor/StressMonitor/ViewModels/` (cross-tab VMs) or co-located with feature (`Views/Dashboard/DashboardViewModel.swift`, `Views/Onboarding/*ViewModel.swift`)
+- Depends on: `HealthKitServiceProtocol`, `StressAlgorithmServiceProtocol`, `StressRepositoryProtocol`, `StressAPIClient`
+- Used by: views via `@State private var viewModel`
 
 **Services:**
-- Purpose: all IO, algorithms, and platform integration.
-- Location: `StressMonitor/Services/` with subfolders `Algorithm/`, `HealthKit/`, `Repository/`, `CloudKit/`, `Sync/`, `LLM/`, `StoreKit/`, `Background/`, `DataManagement/`, `Connectivity/`, `Premium/`, `Protocols/`.
-- Depends on: Models, Apple frameworks.
-- Used by: ViewModels, app entry.
+- Purpose: All I/O and domain logic, grouped by domain subdirectory (`Algorithm/`, `API/`, `Auth/`, `Background/`, `Chat/`, `CloudKit/`, `Connectivity/`, `Credits/`, `DataManagement/`, `Firebase/`, `HealthKit/`, `LLM/`, `Preferences/`, `Premium/`, `Repository/`, `StoreKit/`, `Sync/`)
+- Location: `StressMonitor/StressMonitor/Services/`
+- Depends on: system frameworks (HealthKit, CloudKit, WatchConnectivity, StoreKit, WidgetKit), Firebase/GoogleSignIn SPM packages
+- Used by: ViewModels, other services (e.g. Repository → CloudKitManager)
 
 **Models:**
-- Purpose: SwiftData `@Model` entities, value types, DTOs.
-- Location: `StressMonitor/Models/` (plus `Models/Character/`, `Models/Base/`).
-- Used by: every layer.
+- Purpose: SwiftData `@Model` entities, value-type DTOs, shared schemas
+- Location: `StressMonitor/StressMonitor/Models/` (`Base/` for `ObservableModel.swift`, `Character/` for character domain)
+- Note: `Models/WidgetSharedData.swift` also contains behavior (`WidgetPublisher`, `WidgetDataState`) because it is shared shape with the widget target
+
+**Navigation:**
+- Purpose: Type-safe routing and state restoration
+- Location: `StressMonitor/StressMonitor/Navigation/` (`AppRouter.swift`, `Route.swift`, `View+NavigationDestinations.swift`)
+
+**Persistence:**
+- SwiftData `ModelContainer` created in `StressMonitorApp.makeContainer()`; schema V2 = `[StressMeasurement, CharacterUnlock, Habit]`; lightweight migration V1→V2; on failure the store is deleted and rebuilt local-only, then in-memory as last resort
+- CloudKit via `ModelConfiguration(cloudKitDatabase: .automatic)` plus a manual sync path (`CloudKitSyncEngine`, `SyncManager`, `ConflictResolver`)
 
 ## Data Flow
 
-### Primary stress measurement path
+### Primary Request Path: Stress Score
 
-1. View calls `StressViewModel.loadCurrentStress()` / `calculateAndSaveStress()` (`StressMonitor/ViewModels/StressViewModel.swift:110`, `:276`).
-2. Five HealthKit reads issued in parallel with `async let` — HRV and HR are required, sleep/activity/recovery are `try?` best-effort (`StressViewModel.swift:280-295`).
-3. Inputs are packed into `StressContext` (all optional fields) (`StressMonitor/Models/StressContext.swift`).
-4. `MultiFactorStressCalculator.calculateMultiFactorStress(context:)` runs each `StressFactor`; factors returning `nil` are dropped and their weight redistributed (`StressMonitor/Services/Algorithm/MultiFactorStressCalculator.swift:37`).
-5. Composite `StressResult` (+ `FactorBreakdown`) is mapped onto a `StressMeasurement` and saved through `StressRepository.save(_:)` (`StressMonitor/Services/Repository/StressRepository.swift`).
-6. `currentStress` publishes to SwiftUI via `@Observable`.
+1. App launch — `StressMonitorApp.init` bootstraps Firebase + anonymous auth; `OnboardingContainerView` → `MainTabView` builds `StressRepository(modelContext:)` (`StressMonitor/StressMonitor/Views/Onboarding/OnboardingContainerView.swift`)
+2. `DashboardView` constructs `StressViewModel(healthKit:algorithm:repository:)` (`Views/DashboardView.swift:16-27`); `.task` → `loadCurrentStress()` (`ViewModels/StressViewModel.swift:110`)
+3. Five parallel HealthKit queries: HRV, HR (critical, throwing) + sleep/activity/recovery (graceful `try?`) (`ViewModels/StressViewModel.swift:130-150`)
+4. `StressContext` assembled → `algorithm.calculateMultiFactorStress(context:)` (`ViewModels/StressViewModel.swift:152-162`)
+5. `MultiFactorStressCalculator.calculateMultiFactorStress` runs each `StressFactor`, redistributes weights over available factors, produces `StressResult` (0–100 → Relaxed/Mild/Moderate/High) + `FactorBreakdown` (`Services/Algorithm/MultiFactorStressCalculator.swift:40-90`)
+6. VM persists via `repository.save(measurement)` — SwiftData insert/save → `WidgetPublisher.publish` (App Group + timeline reload) → optional CloudKit sync (`Services/Repository/StressRepository.swift:50-73`)
+7. Dashboard renders; `DataQualityInfo(from:breakdown:baseline:)` derives data-quality badge state
 
-### CloudKit sync flow
+### Chat Flow (AI Coach)
 
-1. `SyncManager.sync(localMeasurements:)` guards against a concurrent `syncTask` and checks account status (`StressMonitor/Services/Sync/SyncManager.swift:45`).
-2. `CloudKitSyncEngine` pushes/pulls records against the private database (`StressMonitor/Services/CloudKit/CloudKitSyncEngine.swift`, schema in `CloudKitSchema.swift`).
-3. `ConflictResolver` merges divergent records (`StressMonitor/Services/Sync/ConflictResolver.swift`).
-4. Status surfaces through `SyncStatus` (`StressMonitor/Services/Protocols/CloudKitServiceProtocol.swift`) and the repository's `onSyncStatusChange` callback.
+1. `ChatBottomSheetView` presents `ChatViewModel`; view injects `apiClient` + `preferencesService` on appear (`ViewModels/ChatViewModel.swift:46-60`)
+2. Send → `StressLLMService` (via `LLMServiceProtocol`) builds stress-context payload (`Services/LLM/ChatContextBuilder.swift`, `StressContextPayload.swift`)
+3. `StressAPIClient.authorizedRequest` attaches Firebase Bearer token (`Services/API/StressAPIClient.swift:47-70`); `/chat` streams SSE parsed by `Services/LLM/SSEParser.swift`
+4. Terminal SSE event metadata (`credits_remaining`, session id) converges into `CreditService` via `onCreditsRemainingChange` callback
+5. HTTP 402 → `LLMServiceError.insufficientCredits` → `presentPaywall` closure → `PaywallController.present(reason:)` full-screen cover above all tabs (`Views/MainTabView.swift:105-107`)
 
-### Watch → phone flow
+### Watch → Phone Flow
 
-1. Watch computes stress with its own copy of the factor pipeline (`StressMonitorWatch Watch App/Services/MultiFactorStressCalculator.swift`).
-2. `WatchConnectivityManager.syncData(_:)` calls `WCSession.transferUserInfo` (`StressMonitorWatch Watch App/Services/WatchConnectivityManager.swift:18`).
-3. `PhoneConnectivityManager.handleWatchMeasurement(_:)` decodes the dictionary and inserts a `StressMeasurement` into the injected `ModelContext` (`StressMonitor/Services/Connectivity/PhoneConnectivityManager.swift:27`).
+1. Watch `WatchStressViewModel` computes stress with duplicated algorithm (`StressMonitorWatch Watch App/Services/MultiFactorStressCalculator.swift`)
+2. `WatchConnectivityManager.syncData` → `WCSession.transferUserInfo` (`StressMonitorWatch Watch App/Services/WatchConnectivityManager.swift`)
+3. Phone `PhoneConnectivityManager.handleWatchMeasurement` decodes userInfo → constructs `StressMeasurement` → inserts into SwiftData (`Services/Connectivity/PhoneConnectivityManager.swift:31-55`)
 
-### Chat streaming flow
+### Widget Flow
 
-1. `ChatViewModel` builds messages and stress context (`StressMonitor/ViewModels/ChatViewModel.swift`, `StressMonitor/Services/LLM/ChatContextBuilder.swift`, `StressContextPayload.swift`).
-2. `SupabaseLLMService.send(messages:systemPrompt:)` returns an `AsyncThrowingStream<String, Error>` fed by the Edge Function response (`StressMonitor/Services/LLM/SupabaseLLMService.swift:137`).
-3. Each line is decoded by `SSEParser.parse(line:)` into `.content`, `.metadata`, `.done`, `.error` (`StressMonitor/Services/LLM/SSEParser.swift:31`).
-4. Terminal `metadata` updates `sessionId`, `creditsRemaining`, `modelUsed`; JWT is read from `KeychainService`.
+1. `StressRepository.save` → `WidgetPublisher.publish(measurement)` writes snapshot to App Group `group.stress.ai.com` and calls `WidgetCenter.shared.reloadAllTimelines` (`Models/WidgetSharedData.swift:122+`)
+2. `StressWidgetProvider.timeline` reads via `WidgetDataProvider` (App Group UserDefaults) (`StressMonitorWidget/Providers/StressWidgetProvider.swift`, `StressMonitorWidget/Models/WidgetDataProvider.swift`)
+3. Freshness resolved by `WidgetDataState` (duplicated byte-identical in both targets — no shared module exists)
 
 **State Management:**
-- `@Observable` ViewModels; `AppRouter` and `PaywallController` injected via `.environment(...)` at the root scene.
-- SwiftData `ModelContainer` attached with `.modelContainer(sharedModelContainer)`.
-- Navigation restoration through `@SceneStorage` `Data` blobs per tab.
+- UI state: `@Observable` ViewModels owned by views (`@State`)
+- App-scope state: `@Environment` injection from the App struct (single source for paywall, credits, preferences, navigation)
+- IAP entitlements: `PremiumState.shared` singleton, self-corrected on every foreground (`StressMonitorApp.swift:219-240`)
+- Persistence: SwiftData `@Environment(\.modelContext)` flows down from `.modelContainer(sharedModelContainer)`
 
 ## Key Abstractions
 
-**Service protocol (DI seam):**
-- Purpose: swap live/mock/simulator implementations.
-- Examples: `StressMonitor/Services/Protocols/HealthKitServiceProtocol.swift`, `StressAlgorithmServiceProtocol.swift`, `StressRepositoryProtocol.swift`, `CloudKitServiceProtocol.swift`, `StressMonitor/Services/LLM/LLMServiceProtocol.swift`, `StressMonitor/Services/StoreKit/StoreKitServiceProtocol.swift`.
-- Pattern: `Sendable` protocol + default implementations in a protocol extension so mocks only override what they need.
+**StressFactor (strategy pattern):**
+- Purpose: One stress contributor scoring 0–1 with its own weight
+- Examples: `Services/Algorithm/HRVStressFactor.swift`, `HeartRateStressFactor.swift`, `SleepStressFactor.swift`, `ActivityStressFactor.swift`, `RecoveryStressFactor.swift`
+- Pattern: `protocol StressFactor: Sendable { var id: String; var weight: Double; func calculate(context:) async throws -> FactorResult? }` (`Services/Algorithm/StressFactor.swift`) — returning nil excludes the factor and triggers weight redistribution
 
-**StressFactor:**
-- Purpose: one scoring contributor returning `FactorResult?` (nil = unavailable).
-- Examples: `HRVStressFactor.swift`, `HeartRateStressFactor.swift`, `SleepStressFactor.swift`, `ActivityStressFactor.swift`, `RecoveryStressFactor.swift` in `StressMonitor/Services/Algorithm/`.
-- Pattern: strategy objects composed by `MultiFactorStressCalculator`.
+**Service protocols (DI seams):**
+- Purpose: Decouple ViewModels from concrete services; enable `MockServices.swift` and `SimulatorHealthKitService`
+- Examples: `Services/Protocols/StressAlgorithmServiceProtocol.swift`, `HealthKitServiceProtocol.swift`, `StressRepositoryProtocol.swift`, `CloudKitServiceProtocol.swift`; plus `Services/Credits/CreditServiceProtocol.swift`, `Services/StoreKit/StoreKitServiceProtocol.swift`, `Services/LLM/LLMServiceProtocol.swift`
+- Pattern: protocol with default-implemented backward-compatible overloads; ViewModels accept protocols in `init`
 
-**Route:**
-- Purpose: value-typed destination for all `NavigationStack`s.
-- Examples: `StressMonitor/Navigation/Route.swift`, resolved in `StressMonitor/Navigation/View+NavigationDestinations.swift`.
+**Endpoint-group extensions:**
+- Purpose: Keep `StressAPIClient` small while grouping endpoints by domain
+- Examples: `Services/API/StressAPIClient+Credits.swift`, `+Preferences.swift`, `+QuickActions.swift`, `+Sessions.swift`
+- Pattern: `extension StressAPIClient` per API domain around shared `authorizedRequest` builder
 
-**Snapshot store:**
-- Purpose: cross-process data for widgets/complications.
-- Examples: `StressMonitorWidget/Models/WidgetDataProvider.swift`, `StressMonitor/Models/WidgetSharedData.swift`, `StressMonitorWatch Watch App/Services/WatchSharedDataStore.swift`.
+**Versioned SwiftData schema:**
+- Purpose: Safe migration instead of silent store wipe
+- Examples: `AppSchemaV1`/`AppSchemaV2`/`AppMigrationPlan` nested in `StressMonitorApp.swift:40-74`
+- Pattern: nested `VersionedSchema` enums + `SchemaMigrationPlan` with lightweight stages; adding a model = new V(n) enum + stage
+
+**Character unlock domain:**
+- Purpose: Gamified companion characters tied to stress data and premium entitlement
+- Examples: `Models/Character/CharacterCreature.swift`, `CharacterUnlock.swift` (SwiftData), `Components/Character/*` views, seeding in `StressMonitorApp.seedDefaultCharacterUnlocks`
 
 ## Entry Points
 
-**iPhone app:**
-- Location: `StressMonitor/StressMonitorApp.swift`
-- Triggers: app launch.
-- Responsibilities: build versioned `ModelContainer` (`AppSchemaV1` → `AppSchemaV2` lightweight stage), seed default `CharacterUnlock` rows, inject `AppRouter` + `PaywallController`, present `OnboardingContainerView`.
+**iOS app:**
+- Location: `StressMonitor/StressMonitor/StressMonitorApp.swift`
+- Triggers: `@main`; normal launch and `-demo-mode` launch argument (DEBUG) which swaps `SimulatorHealthKitService` into the real pipeline
+- Responsibilities: DI root, ModelContainer + recovery, Firebase bootstrap, anonymous auth, scenePhase refresh, schema migration
 
 **watchOS app:**
-- Location: `StressMonitorWatch Watch App/StressMonitorWatchApp.swift`
-- Triggers: watch app launch; activates `WatchConnectivityManager.shared` in `init`.
-- Root view: `StressMonitorWatch Watch App/ContentView.swift` → `WatchHomeView`/`WatchMenuView`.
+- Location: `StressMonitor/StressMonitorWatch Watch App/StressMonitorWatchApp.swift`
+- Triggers: `@main`; activates `WatchConnectivityManager.shared` in `init`, root `ContentView`
 
 **Widget extension:**
-- Location: `StressMonitorWidget/StressMonitorWidgetBundle.swift`
-- Contains: `StressMonitorWidget`, `LockScreenStressWidget`, `StressMonitorWidgetControl`, `StressMonitorWidgetLiveActivity`; timeline in `StressMonitorWidget/Providers/StressWidgetProvider.swift`.
+- Location: `StressMonitor/StressMonitorWidget/StressMonitorWidgetBundle.swift`
+- Triggers: WidgetKit timeline from `StressWidgetProvider`; `AppIntent.swift` / `Intents/UpdateWidgetIntent.swift` for interactive updates; `StressMonitorWidgetLiveActivity.swift` for Live Activity
 
-**Watch complications:**
-- Location: `StressMonitorWatch Watch App/Complications/ComplicationBundle.swift` with WidgetKit providers under `Complications/Providers/`.
+**Unit tests:**
+- Location: `StressMonitor/StressMonitorTests/` (36 test files + `StressMonitorProducts.storekit`)
+- Host: `StressMonitor` scheme with `-parallel-testing-enabled NO`
 
-**Tests:**
-- Location: `StressMonitorTests/` (XCTest, run via the `StressMonitor` scheme).
+**Background work:**
+- `Services/Background/HealthBackgroundScheduler.swift` — HealthKit background delivery
+- `Services/Background/NotificationManager.swift` — local notifications
+- `StoreKitServiceEnvironment.swift` — process-lifetime `Transaction.updates` listener (`Services/StoreKit/StoreKitServiceEnvironment.swift`)
 
 ## Architectural Constraints
 
-- **Concurrency:** Swift strict-concurrency oriented. ViewModels, `StressRepository`, `SyncManager`, and `SupabaseLLMService` are `@MainActor`; service protocols are `Sendable`; HealthKit and SwiftData are imported `@preconcurrency` in `Services/Protocols/HealthKitServiceProtocol.swift` and `StressRepositoryProtocol.swift`.
-- **Global state:** several shared singletons — `PhoneConnectivityManager.shared`, `WatchConnectivityManager.shared`, `WidgetDataProvider.shared`, `AppearanceManager.shared`, `HapticManager.shared`, `CharacterSelectionSync.shared`, `PaywallController` (owned once at the root scene).
-- **No shared module:** the watch target re-declares models and the algorithm (`StressMonitorWatch Watch App/Models/`, `…/Services/`). Any change to `StressContext`, `StressResult`, `FactorWeights`, or a factor must be mirrored in both targets.
-- **Cross-process boundary:** widgets and complications never touch SwiftData; they only read the App Group suite `group.com.stressmonitor.app`.
-- **Schema migration:** adding a `@Model` type requires a new `VersionedSchema` + `MigrationStage` in `StressMonitorApp.swift`; skipping it can wipe the on-disk store.
-- **Health data locality:** HealthKit-derived values stay on device; only chat context, auth, and preferences leave the device (`Services/LLM/`).
+- **Target duplication (CRITICAL):** The watch target duplicates algorithm and protocol sources — `MultiFactorStressCalculator`, all `*StressFactor.swift`, `StressFactor.swift`, `StressCalculator`, `BaselineCalculator`, `BioAgeCalculator`, model types, and the `*Protocol.swift` files exist in BOTH `StressMonitor/StressMonitor/Services/Algorithm/` and `StressMonitor/StressMonitorWatch Watch App/Services/`. There is no shared framework/module. Any algorithm change must be mirrored into the watch target or the two platforms silently diverge.
+- **Widget shared-shape duplication:** `WidgetDataState` and the App Group keys are duplicated by convention between `Models/WidgetSharedData.swift` (app) and `StressMonitorWidget/Providers/StressWidgetProvider.swift` / `Models/WidgetDataProvider.swift` (widget) — they must stay byte-identical.
+- **Orphaned code (never edit):** `StressMonitor/Models/`, `StressMonitor/Services/`, `StressMonitor/Views/`, and repo-root `StressMonitorTests/` are committed to git but NOT members of any target in `StressMonitor.xcodeproj` — edits there never build or run. Real targets live at `StressMonitor/StressMonitor/`, `StressMonitor/StressMonitorTests/`, `StressMonitor/StressMonitorWatch Watch App/`, `StressMonitor/StressMonitorWidget/`.
+- **Threading:** ViewModels and most services are `@MainActor`; `StressRepository` holds a `nonisolated` `BaselineCalculator` to avoid isolation violations; HealthKit/background work hops off main via `async let` and `Task(priority:)`.
+- **Global state:** `PremiumState.shared`, `PhoneConnectivityManager.shared`, `AppearanceManager.shared`, `CharacterSelectionSync.shared` (app); `WatchConnectivityManager.shared`, `WatchSharedDataStore` (watch). `StressLLMService` is `@unchecked Sendable`.
+- **Xcode paths:** Watch target path contains spaces — quote `"StressMonitorWatch Watch App"` in every xcodebuild/fastlane invocation.
+- **Test-host constraints:** CloudKit is disabled when `XCTestConfigurationFilePath` is set (`StressMonitorApp.isRunningUnitTests`) to keep CI test hosts alive; `DataDeletionConsolidationTests` skip under `GSD_CI`.
+- **Deployment targets:** iOS 18.6 (some configurations 26.1), watchOS 11.6, Swift 5 language mode. Bundle IDs `stress.ai.com` / `.watchkitapp` / `.widget`, team `K2TYLYAWMK`.
 
 ## Anti-Patterns
 
-### Duplicated algorithm/model source across targets
+### Editing orphaned directories
 
-**What happens:** `MultiFactorStressCalculator`, `StressFactor`, `StressContext`, `PersonalBaseline`, and friends exist twice — under `StressMonitor/Services/Algorithm/` and `StressMonitorWatch Watch App/Services/`.
-**Why it's wrong:** edits applied to one copy silently diverge, so phone and watch can report different stress levels from the same inputs.
-**Do this instead:** when touching algorithm or shared model files, apply the identical change to the watch copy in the same commit, and prefer moving genuinely shared logic into a shared package before adding new duplicated types.
+**What happens:** `StressMonitor/Models/`, `StressMonitor/Services/`, `StressMonitor/Views/` look like the app's source tree but are not in the pbxproj file lists.
+**Why it's wrong:** Changes there compile nowhere; tests and app behavior never reflect them, producing phantom "fixed" work.
+**Do this instead:** All edits go under `StressMonitor/StressMonitor/` (app), `StressMonitor/StressMonitorWatch Watch App/`, `StressMonitor/StressMonitorWidget/`, `StressMonitor/StressMonitorTests/`. Verify with a build: `xcodebuild build -project StressMonitor/StressMonitor.xcodeproj -scheme StressMonitor ...`.
 
-### Force-unwrapped process boundaries
+### Duplicating a shared type instead of updating both copies
 
-**What happens:** `WidgetDataProvider.init` calls `fatalError` when the App Group suite is missing (`StressMonitorWidget/Models/WidgetDataProvider.swift:45`), and `StressMonitorApp` calls `fatalError` when the `ModelContainer` fails (`StressMonitor/StressMonitorApp.swift:76`).
-**Why it's wrong:** a provisioning or migration problem becomes a launch crash rather than a degraded but usable app.
-**Do this instead:** for new cross-process stores, return an optional/failable initializer and render an explicit empty state, as `WidgetEntry` already supports.
+**What happens:** New fields/types added to one target's copy of algorithm sources or widget shared-shape types (e.g. adding a factor metadata key only on iOS).
+**Why it's wrong:** Watch and widget targets drift; `Codable` App Group payloads and WCSession dictionaries stop decoding.
+**Do this instead:** Mirror the change into the watch copy (`StressMonitorWatch Watch App/Services/`) or both widget copies, keeping them byte-identical where the comment says so (`Models/WidgetSharedData.swift:150-152`).
 
-### Print-based error handling in the connectivity bridge
+### Business logic in views
 
-**What happens:** `PhoneConnectivityManager.handleWatchMeasurement` swallows save failures with `print` (`StressMonitor/Services/Connectivity/PhoneConnectivityManager.swift:55`).
-**Why it's wrong:** dropped watch measurements are invisible in release builds.
-**Do this instead:** surface failures through an observable status property the way `SyncManager` exposes `syncError`/`SyncStatus`.
+**What happens:** Views constructing throwaway persistence in `init` (e.g. `DashboardView` fallback creating an in-memory container, `Views/DashboardView.swift:22-27`).
+**Why it's wrong:** Silent data loss path; hard to test.
+**Do this instead:** Follow the primary path — build `StressRepository` once in `OnboardingContainerView`/`MainTabView` and pass it down; use the fallback only for previews.
 
 ## Error Handling
 
-**Strategy:** typed throwing errors at service boundaries, optional/graceful degradation for secondary data, user-facing message string on the ViewModel.
+**Strategy:** Typed errors at service boundaries; user-facing message strings on ViewModels; graceful degradation for non-critical data.
 
 **Patterns:**
-- Domain error enums conforming to `LocalizedError`: `LLMServiceError` (`Services/LLM/LLMServiceProtocol.swift`), `SyncError` (`Services/Sync/SyncManager.swift`), `StressError` (used by `StressViewModel`).
-- Required inputs `throw`; optional factors use `try?` so a missing sensor degrades weights instead of failing the calculation.
-- ViewModels set `errorMessage` and clear it via `clearError()`; permission denial is tracked separately with `isPermissionRequired`.
-- Sync/CloudKit surfaces state through `SyncStatus` / `NetworkReason` / `CloudKitAccountStatus` rather than throwing to the UI.
+- `LLMServiceError` with `LocalizedError` descriptions incl. `insufficientCredits` mapped from HTTP 402 (`Services/LLM/LLMServiceProtocol.swift`)
+- `AuthServiceError` (`Services/Auth/AuthServiceError.swift`), `RepositoryError.saveFailed` (`Services/Repository/StressRepository.swift`)
+- Non-critical HealthKit factors degrade via `try?` while HRV absence aborts (`ViewModels/StressViewModel.swift:139-150`)
+- CloudKit errors surfaced through `onSyncError` callbacks rather than thrown to callers
+- ViewModels expose `errorMessage: String?` rendered by view `.alert`
 
 ## Cross-Cutting Concerns
 
-**Logging:** `os_signpost` / `OSLog` under `#if DEBUG` for launch and load instrumentation (`StressMonitorApp.swift`, `StressViewModel.swift`); no release-time logging framework.
-**Validation:** input validity is encoded in the factor layer (each factor returns `nil` for unusable data) and in `DataQualityInfo` / `FactorResult.confidence`.
-**Authentication:** Supabase JWT stored via `KeychainService` (`StressMonitor/Services/KeychainService.swift`), read by `SupabaseLLMService`; a guest JWT fallback lives in `Services/LLM/SupabaseConfig.swift`.
-**Theming/accessibility:** `StressMonitor/Theme/` (design tokens, wellness colors, typography) plus `StressMonitor/Utilities/AccessibilityModifiers.swift`, `DynamicTypeScaling.swift`, `HighContrastModifier.swift`.
-**Premium gating:** `PremiumState` + `PaywallController` consulted by feature views before showing gated content.
+**Logging:** `os.Logger` with subsystem `com.stressmonitor.app` and per-category loggers; DEBUG-only `os_signpost` for launch/stress-calc timing (`StressMonitorApp.swift:82-90`, `ViewModels/StressViewModel.swift:111-114`).
+**Validation:** Manual Codable decoding with defensive fallbacks (navigation path decode drops corrupt data, `Navigation/AppRouter.swift:70-78`); URL building via `URLComponents` for query strings (documented pitfall in `Services/API/StressAPIClient.swift:52-58`).
+**Authentication:** Firebase Auth (anonymous on launch, GoogleSignIn available) → ID token injected as Bearer header by `StressAPIClient`; session cache in `FirebaseAuthService` (`Services/Auth/FirebaseAuthService.swift`); bootstrap guard in `Services/Firebase/FirebaseBootstrap.swift` (committed `GoogleService-Info.plist`).
+**Accessibility:** `.accessibleDynamicType()` modifier, 44pt targets, dual-coded stress levels — see `Utilities/AccessibilityModifiers.swift`, `Utilities/DynamicTypeScaling.swift`.
+**Haptics:** Centralized `Views/Components/HapticManager.swift`.
+**Theming:** `Theme/DesignTokens.swift`, `Color.stressColor(for:)` in `Theme/Color+Extensions.swift`, shared spacing/typography in `Views/DesignSystem/`.
 
 ---
 
-*Architecture analysis: 2026-08-08*
+*Architecture analysis: 2026-08-29*

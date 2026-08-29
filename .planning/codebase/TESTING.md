@@ -1,240 +1,213 @@
 # Testing Patterns
 
-**Analysis Date:** 2026-08-08
-
-> **BLOCKING FACT — no test target exists.** `StressMonitor/StressMonitor.xcodeproj/project.pbxproj`
-> declares 2 × `com.apple.product-type.application` (iPhone, Watch) and 1 ×
-> `com.apple.product-type.app-extension` (Widget). It declares **zero**
-> `com.apple.product-type.bundle.unit-test` targets. Both test directories —
-> `StressMonitor/StressMonitorTests/` and the repo-root `StressMonitorTests/` — are orphaned.
-> **No test in this repo can currently run.** Every run command, coverage claim, and
-> "wired-up target" reference below describes the intended state, not the actual one.
-> Creating a unit-test bundle target is the prerequisite for all of it.
+**Analysis Date:** 2026-08-29
 
 ## Test Framework
 
-**Runners — both are in use, deliberately mixed:**
-- **Swift Testing** (`import Testing`, `@Test`, `#expect`) — the newer convention. Used by `StressMonitor/StressMonitorTests/PremiumViewModelTests.swift`, `StoreKitProductCatalogTests.swift`, `CharacterAssetResolverTests.swift`, `CharacterCollectionViewModelTests.swift`.
-- **XCTest** (`import XCTest`, `XCTestCase`) — used by `StressMonitor/StressMonitorTests/BioAgeCalculatorTests.swift` and by the entire orphaned root `StressMonitorTests/` directory.
+**Runner:**
+- **Swift Testing** (`import Testing`) — primary framework, 33 of 35 test files
+- **XCTest** — legacy, 2 files: `BioAgeCalculatorTests.swift`, `StressContextPayloadTests.swift` (both `StressMonitor/StressMonitorTests/`)
+- Config: Xcode project `StressMonitor/StressMonitor.xcodeproj`, scheme `StressMonitor` (shared, at `StressMonitor/StressMonitor.xcodeproj/xcshareddata/xcschemes/StressMonitor.xcscheme`). No `.xctestplan` files.
 
-**Use Swift Testing for new tests.** XCTest remains only where `setUp`/`tearDown` lifecycle is already established.
-
-**Assertions:** `#expect(...)` (Swift Testing) or `XCTAssert*` (XCTest). Floating point comparisons use `XCTAssertLessThan`/`XCTAssertGreaterThan` against a documented threshold rather than `accuracy:` in current code — `CLAUDE.md` prescribes `XCTAssertEqual(..., accuracy:)`; either is acceptable, but always state the tolerance.
+**Assertion Library:**
+- Swift Testing: `#expect(...)`, `Issue.record("...")`
+- XCTest: `XCTAssert*` family
+- Floating-point comparisons use `accuracy:` (XCTest) per `AGENTS.md` — prescriptive rule; current suites mostly assert exact values/Sets
 
 **Run Commands:**
 ```bash
-# Canonical entry point — resolves/boots a simulator, then runs the suite
-python3 scripts/run-tests.py
-
-# CI mode (name-based destination, code coverage on)
-CI=1 python3 scripts/run-tests.py
-
-# Raw equivalent
-xcodebuild test \
-  -project StressMonitor/StressMonitor.xcodeproj \
-  -scheme StressMonitor \
+# All tests (CI parity — mirrors .github/workflows/_test.yml)
+xcodebuild test -project StressMonitor/StressMonitor.xcodeproj -scheme StressMonitor \
   -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest' \
-  -only-testing:StressMonitorTests \
-  -resultBundlePath StressMonitor/build/TestResults.xcresult
+  -parallel-testing-enabled NO CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
+
+# Single class / single method
+xcodebuild test ... -only-testing:StressMonitorTests/SSEParserTests
+xcodebuild test ... -only-testing:StressMonitorTests/SSEParserTests/testMethod
+
+# Local helper: finds/boots a simulator, passes its UUID, results in StressMonitor/build/
+python3 scripts/run-tests.py
 ```
+- Always run from the **repo root** with `-project StressMonitor/StressMonitor.xcodeproj`
+- Keep `-parallel-testing-enabled NO` when reproducing CI failures — CI disables parallelism deliberately (`.github/workflows/_test.yml` also sets `-maximum-concurrent-test-simulator-destinations 1`)
+- CI environment: Xcode 26.3, macos-15 runner, iPhone 16 / OS=latest
 
-`scripts/run-tests.py` prefers an already-booted iPhone locally, otherwise picks from an ordered preference list (iPhone 16 → 17 → 15 → …), boots it via `simctl bootstatus`, and passes a UDID destination. In CI it switches to a name-based destination because UUID resolution between `simctl` and `xcodebuild` is unreliable. Result bundle lands at `StressMonitor/build/TestResults.xcresult`.
-
-Xcode-MCP equivalents (`mcp__plugin_xclaude-plugin_xc-all__xcode_test` with `only_testing:`) are documented in `CLAUDE.md` for single-class/method runs.
+**CI behavior (`.github/workflows/_test.yml`, called by `ci.yml`):**
+- `TEST_RUNNER_GSD_CI: "1"` env — forwarded (prefix stripped) into the test host to gate flaky suites (see Common Patterns)
+- On failure uploads `raw-test-output.log` and `TestResults.xcresult` as artifacts (5-day retention)
+- DerivedData and SPM checkouts cached, keyed on `project.pbxproj` / `Package.resolved`
 
 ## Test File Organization
 
-**Location:** separate test target directory, not co-located with sources.
+**Location:**
+- Single test target: `StressMonitor/StressMonitorTests/` (35 Swift files, ~5,600 LOC). Tests are co-located in one flat directory (no mirrors of app structure).
+- **`StressMonitorTests/` at the repo root is orphaned (not in the Xcode project) — never add tests there; they will not run.**
 
+**Naming:**
+- Files: `XxxTests.swift` named after the SUT (`SSEParserTests.swift`, `StressAPIClientTests.swift`, `AccountViewModelTests.swift`)
+- Feature-per-contract split instead of one mega-file: `StressAPIClientCreditsTests.swift`, `StressAPIClientPreferencesTests.swift`, `StressAPIClientSessionsTests.swift`, `StressAPIClientQuickActionsTests.swift`
+- Test doubles live in the file that owns them and are reused across files (module-internal): `MockAuthService` defined in `StressAPIClientTests.swift` is used by 11 test files
+- Support files: `StoreKitTestSessionProvider.swift` (shared SKTestSession), `StressMonitorProducts.storekit` (StoreKit config)
+
+**Structure:**
 ```
-StressMonitor/
-├── StressMonitor/            # app sources
-└── StressMonitorTests/       # NOT wired into any target — see blocking note at top
-    ├── BioAgeCalculatorTests.swift          (350 lines, XCTest)
-    ├── PremiumViewModelTests.swift          (276 lines, Swift Testing)
-    ├── StoreKitProductCatalogTests.swift    (173 lines, Swift Testing)
-    ├── CharacterAssetResolverTests.swift    (59 lines,  Swift Testing)
-    └── CharacterCollectionViewModelTests.swift (54 lines, Swift Testing)
+StressMonitor/StressMonitorTests/
+├── <SUT>Tests.swift           # one suite per SUT/contract
+├── StoreKitTestSessionProvider.swift   # shared IAP test session helper
+├── StressMonitorProducts.storekit      # StoreKit test catalog
+└── ... (35 files, flat)
 ```
-
-**Naming:** `<TypeUnderTest>Tests.swift`; suite type is `struct <Type>Tests` (Swift Testing) or `final class <Type>Tests: XCTestCase`. Test methods are `lowerCamelCase` behaviour names (`loadInitialDataLoadsPlans`, `testCalculateWithGoodHRVReturnsYoungerAge`).
-
-**Orphaned directory — important:** the repo-root `StressMonitorTests/` (`HRVAnalyzerTests.swift`, `StressPredictorTests.swift`, `MorningReadinessServiceTests.swift`, `StressReadingTests.swift`, `StressHistoryTests.swift`, ~28KB, last touched 2025-05-31) is **not referenced by `StressMonitor.xcodeproj`** and is excluded from SwiftLint. It targets the legacy source set at `StressMonitor/Services/HRVAnalyzer.swift` etc. These tests never run. Do not add to them; either wire them into the target or delete them.
 
 ## Test Structure
 
-**Swift Testing suite (preferred):**
+**Suite Organization (canonical Swift Testing pattern):**
 ```swift
-import Foundation
 import Testing
+import UIKit
 @testable import StressMonitor
 
+@Suite("Delete All Credential Clearance")
 @MainActor
-struct PremiumViewModelTests {
+struct DataDeleterConsolidationTests {
 
-    /// Helper to create an isolated PremiumState that doesn't pollute real UserDefaults.
-    private func makeIsolatedState(isPremium: Bool = false) -> PremiumState {
-        let defaults = UserDefaults(suiteName: "PremiumViewModelTests_\(UUID().uuidString)")!
-        let state = PremiumState(defaults: defaults, key: "isPremiumUser")
-        state.isPremiumUser = isPremium
-        return state
-    }
-
-    @Test("loadInitialData loads plans")
-    func loadInitialDataLoadsPlans() async {
-        let service = FakeStoreKitService()
-        let vm = PremiumViewModel(storeKit: service, premiumState: makeIsolatedState())
-        await vm.loadInitialData()
-        #expect(vm.plans.count == service.stubbedPlans.count)
+    @Test("clearCredentialsAndSharedCaches removes the stored chat session id")
+    func clearsStressChatSessionId() throws {
+        UserDefaults.standard.set("seed-session-id", forKey: "stressChatSessionId")
+        DataDeleterService.clearCredentialsAndSharedCaches()
+        #expect(UserDefaults.standard.string(forKey: "stressChatSessionId") == nil)
     }
 }
 ```
+- Suites: `struct` named `XxxTests`, annotated `@MainActor` when touching UI/UserDefaults/SwiftData
+- Every test gets a human-readable `@Test("...")` title; the method name restates it in camelCase
+- XCTest legacy naming follows `test[Method]_[Condition]` (e.g. `testCalculateWithGoodHRVReturnsYoungerAge` in `BioAgeCalculatorTests.swift`) — use this style **only** when extending the two XCTest files
+- Helper factories inside suites: `makeClient()`, `makeService()`, `makeSession()` (private, `private static let` constants for product IDs)
 
-**XCTest suite:**
-```swift
-final class BioAgeCalculatorTests: XCTestCase {
-    private var calculator: BioAgeCalculator!
-    override func setUp() { super.setUp(); calculator = BioAgeCalculator() }
-    override func tearDown() { calculator = nil; super.tearDown() }
-}
-```
-
-Patterns to follow:
-- `@MainActor` on the suite whenever it touches an `@Observable @MainActor` ViewModel or `ModelContext`.
-- No shared setup in Swift Testing suites — build fresh state per `@Test` via a `private func make...()` helper. Suites are structs, so each test gets a new instance.
-- `@Test("human readable description")` on every test; the string is the spec.
-- Assertions carry an explanatory message where the threshold is a judgement call: `XCTAssertLessThan(result!.estimatedAge, 35, "High HRV with low RHR should estimate younger bio age")`.
-
-## Mocking
-
-**Approach: hand-written protocol doubles. No mocking framework, no code generation.**
-
-Two distinct families:
-
-**1. Test-local fakes** — declared `private final class Fake<X>: <X>Protocol` inside the test file, with stub properties and closure hooks:
-```swift
-private final class FakeStoreKitService: StoreKitServiceProtocol {
-    var stubbedPlans: [SubscriptionPlan] = SubscriptionPlan.defaultPlans
-    var stubbedIsPremiumUser: Bool = false
-    var purchaseStub: (() async throws -> Void)?
-    var didCallRefresh = false
-
-    var availablePlans: [SubscriptionPlan] { get async { stubbedPlans } }
-    func purchase(_ plan: SubscriptionPlan) async throws { try await purchaseStub?() }
-    func refreshEntitlements() async { didCallRefresh = true }
-}
-```
-Convention: `stubbed*` for canned returns, `*Stub` closures for behaviour/error injection, `didCall*` booleans for interaction assertions.
-
-**2. Shipping mocks in the app target** — `StressMonitor/StressMonitor/Services/MockServices.swift` (`MockHealthKitService`, `MockStressAlgorithmService`, `MockStressRepository`) and `Services/StoreKit/MockStoreKitService.swift`. These exist primarily to feed the 119 `#Preview` blocks and are also available to tests. They expose `mockHRV`, `mockHeartRate`, `mockSleepData`, … plus `shouldThrowError: Bool` to drive the failure path. They are `@unchecked Sendable`.
-
-**What to mock:** anything behind a `...ServiceProtocol` — HealthKit, StoreKit, CloudKit, the LLM service, the repository. Inject via the initializer default-parameter seam.
-
-**What NOT to mock:** the stress algorithm itself (`MultiFactorStressCalculator` and the five `StressFactor` implementations are pure and fast — test them directly), `DesignTokens`/pure value types, and SwiftData — use a real in-memory container instead.
-
-**SwiftData in tests** — use an in-memory `ModelContainer`, never the app store:
-```swift
-let config = ModelConfiguration(isStoredInMemoryOnly: true)
-let container = try ModelContainer(for: CharacterUnlock.self, configurations: config)
-let ctx = container.mainContext
-let vm = CharacterCollectionViewModel()
-vm.configure(modelContext: ctx)
-```
-
-**UserDefaults in tests** — always a per-test suite name seeded with a UUID (`makeIsolatedState()` above). Never touch `UserDefaults.standard`.
-
-## Simulator / Demo-Mode Harness
-
-Not a test target, but the primary manual-verification path for anything HealthKit-driven (the simulator has no health data):
-
-- Launch argument `-demo-mode`, checked by `enum DemoMode` in `StressMonitor/StressMonitorApp.swift`; consumed by `ViewModels/StressViewModel.swift:477` and `Views/MainTabView.swift`.
-- `Services/HealthKit/SimulatorHealthKitService.swift` (whole file wrapped in `#if DEBUG`) generates time-varying 5-factor data, cycling `relaxed → mild → moderate → high → edgeLowHRV` every 30s and emitting live HR through `AsyncStream`. The `edgeLowHRV` scenario deliberately omits sleep/activity/recovery to exercise weight redistribution.
-- `Views/Components/DemoModeBannerView.swift` renders the on-screen "DEMO MODE" pill.
-- It runs the real `MultiFactorStressCalculator` + SwiftData pipeline, so it validates integration, not just rendering.
-
-Use demo mode to verify UI states that unit tests cannot reach; do not use it as a substitute for a unit test of the calculator.
-
-## Coverage
-
-**No coverage threshold is enforced anywhere.** `-enableCodeCoverage YES` is passed only in CI mode of `scripts/run-tests.py`, and nothing gates on the number.
-
-```bash
-CI=1 python3 scripts/run-tests.py
-xcrun xccov view --report StressMonitor/build/TestResults.xcresult
-```
-
-## CI
-
-`.github/workflows/ci.yml` delegates to the reusable `.github/workflows/_test.yml`, which despite the name runs **three build jobs and zero test jobs**:
-
-| Job | What it does |
-|-----|--------------|
-| `lint-and-build` | SwiftLint (`\|\| true` — non-blocking), then `xcodebuild build` for scheme `StressMonitor`, `generic/platform=iOS Simulator` |
-| `build-watchos` | `xcodebuild build` for `"StressMonitorWatch Watch App"` |
-| `build-widget` | `xcodebuild build` for `StressMonitorWidgetExtension` |
-
-Xcode 26.3 on `macos-15`, with DerivedData and SPM caches. `xcodebuild test` is never invoked, and SwiftLint failures do not fail the build. Distribution runs through `fastlane` (`fastlane/Fastfile`: `build_widget`, `upload_beta`, `distribute_beta`, `release`) and `ci_scripts/ci_post_clone.sh` / `ci_post_xcodebuild.sh` for Xcode Cloud.
-
-## Test Types
-
-**Unit tests:** the only kind present. Pure calculators (`BioAgeCalculatorTests`), catalog/resolver logic (`StoreKitProductCatalogTests`, `CharacterAssetResolverTests`), and ViewModels with injected fakes (`PremiumViewModelTests`, `CharacterCollectionViewModelTests`).
-
-**Integration tests:** none. `CharacterCollectionViewModelTests` is the closest — ViewModel over a real in-memory SwiftData container.
-
-**UI / E2E tests:** none. No XCUITest target exists (`.swiftlint.yml` excludes a `StressMonitorWatch Watch AppUITests` path that has no sources). UI verification is manual via simulator + demo mode, or via the `idb_*` MCP tools documented in `CLAUDE.md`.
-
-**Watch / Widget tests:** none. Neither target has a test bundle.
-
-## Common Patterns
+**Patterns:**
+- Setup: constructor injection of test doubles; isolated persistence (`UserDefaults(suiteName: "StoreKitServiceTests-\(UUID().uuidString)")`, in-memory `ModelContainer`)
+- Teardown: `defer { Self.cleanupDirectory(for: storeURL) }` for filesystem stores (see `StressMeasurementMigrationTests.swift`); XCTest files use `setUp`/`tearDown`
+- Assertion: `#expect(value == expected, "explanation")` — trailing message explains the intent, not the failure
 
 **Async testing:**
 ```swift
-@Test("loadInitialData loads plans")
-func loadInitialDataLoadsPlans() async {
-    await vm.loadInitialData()
-    #expect(vm.plans.isEmpty == false)
+@Test("signInWithGoogle presents progress and calls the auth service once")
+func signInWithGooglePresentsProgressAndCallsAuthService() async throws {
+    let mock = MockAuthService(googleSignInError: nil, email: "linked@ripple.app")
+    let viewModel = AccountViewModel(authService: mock)
+
+    let signInTask = Task { try await viewModel.signInWithGoogle(presenting: UIViewController()) }
+    await Task.yield()
+    #expect(viewModel.isSigningIn)          // mid-flight state
+    try await signInTask.value
+
+    #expect(!viewModel.isSigningIn)
+    #expect(mock.googleSignInCallCount == 1)
 }
 ```
-Swift Testing tests are plain `async`; no expectations/waiters. For throwing paths mark the test `async throws` and `try`.
 
-**Error testing:** inject via the fake's closure hook rather than a separate mock type —
+**Error testing:**
 ```swift
-service.purchaseStub = { throw StoreKitError.purchaseFailed }
-await vm.purchase(plan)
-#expect(vm.errorMessage != nil)
+do {
+    try await viewModel.signInWithGoogle(presenting: UIViewController())
+    Issue.record("Expected sign-in to throw")
+} catch {
+    #expect(error is AuthServiceError)
+}
 ```
-For the shipping mocks, flip `mockService.shouldThrowError = true`.
+- Pattern-decoding: `guard case .metadata(let metadata) = event else { Issue.record(...); return }` (Swift Testing has no `XCTThrowsError`)
 
-**Interaction assertions:** `#expect(service.didCallRefresh)`.
+## Mocking
 
-## Coverage Gaps
+**Framework:** None — all doubles are **hand-written** conformances to app protocols (`Services/Protocols/`, `Services/Auth/`, `Services/LLM/`, `Services/StoreKit/`)
 
-Ranked by risk.
+**Patterns:**
+```swift
+// Mock = verification double with call counters (StressAPIClientTests.swift)
+final class MockAuthService: AuthServiceProtocol, @unchecked Sendable {
+    let token: String
+    var email: String?
+    private(set) var googleSignInCallCount = 0
+    private(set) var lastPresentingViewController: UIViewController?
+    init(token: String = "fake-token", ...) { ... }
+    func getIDToken() async throws -> String { tokenCallCount += 1; return token }
+}
 
-**Core stress algorithm — untested. HIGH.**
-`Services/Algorithm/MultiFactorStressCalculator.swift`, `StressCalculator.swift`, `BaselineCalculator.swift`, and all five `StressFactor` implementations (HRV, HeartRate, Sleep, Activity, Recovery) have no tests in the wired-up target. Weight redistribution when factors are missing, the `guard !results.isEmpty else { throw StressError.noData }` path, and the 0–100 clamping are all unverified. This is the product's central logic.
+// Fake = working stub (ChatLifecycleTests.swift, PremiumViewModelTests.swift)
+final class FakeLLMService: LLMServiceProtocol { ... }
+private final class FakeStoreKitService: StoreKitServiceProtocol { ... }
+```
+- Network stubbing via `URLProtocol` subclass: `RequestCaptureURLProtocol` (in `StressAPIClientTests.swift`) — `nonisolated(unsafe) static var` for `statusCode`, `responseBody`, `statusCodeSequence`, `responseByPath`, `capturedRequests`; installed on an `URLSessionConfiguration.protocolClasses`. **Reset all statics before each test that inspects them** (documented in the class doc comment)
 
-**`StressViewModel` — untested. HIGH.**
-The largest ViewModel: HealthKit observer wiring, the 60s refresh debounce, `isPermissionRequired` set only on `HKError.errorAuthorizationDenied`, and the `isRequestingAccess` re-entry guard. `MockHealthKitService` already exists, so this is cheap to cover.
+**What to Mock:**
+- Network (`URLSession` via `RequestCaptureURLProtocol`), auth (`MockAuthService` — fixed token, no live Firebase), LLM (`FakeLLMService`), StoreKit (`FakeStoreKitService` or `StoreKitTestSessionProvider`), CloudKit reset (`FakeCloudKitResetService`), server wipes (`FakeServerSessionWiper`)
+- Reuse existing doubles before writing new ones — check `grep -rn "class Mock\|class Fake" StressMonitor/StressMonitorTests/`; duplicate sessions/doubles are explicitly called out as bugs in doc comments ("Reused by FirebaseAuthServiceTests — do not duplicate")
 
-**Persistence & sync — untested. HIGH.**
-`Services/Repository/StressRepository.swift`, `Services/Sync/SyncManager.swift`, `Services/Sync/ConflictResolver.swift`, `Services/CloudKit/CloudKitSyncEngine.swift`. Conflict resolution and the `cloudKitModTime`/`isSynced` bookkeeping on `StressMeasurement` are silent-data-loss territory.
+**What NOT to Mock:**
+- SwiftData persistence — use real containers against in-memory stores or isolated on-disk URLs (`StressMeasurementMigrationTests`)
+- The stress pipeline — use `-demo-mode` launch argument (cycles stress levels through the real pipeline; no HealthKit data exists on simulator)
+- Keychain/UserDefaults in data-deletion suites — real `KeychainService` + real suites, asserted via `SecItemCopyMatching` status
 
-**Chat / LLM contract — untested. MEDIUM.**
-`Services/LLM/SSEParser.swift` and `SupabaseLLMService.swift` parse a non-standard terminal `metadata` SSE event before `[DONE]`. `SSEParser` is pure and trivially testable; a backend contract change would currently break silently. `ChatViewModel` and `ChatContextBuilder` are also uncovered.
+## Fixtures and Factories
 
-**Data export / deletion — untested. MEDIUM.**
-`Services/DataManagement/{DataExporter, DataDeleter, LocalDataWipeService, CloudKitResetService}.swift` — destructive and user-facing (GDPR-style delete).
+**Test Data:**
+```swift
+// Isolated defaults suite per test (StoreKitServiceTests.swift)
+let suite = "StoreKitServiceTests-\(UUID().uuidString)"
+let state = PremiumState(defaults: UserDefaults(suiteName: suite)!, key: "isPremiumUser")
 
-**watchOS and Widget targets — zero tests. MEDIUM.**
-Both duplicate model/service code from the iOS target with no verification that they stay in sync.
+// Inline SSE wire fixtures as raw string literals (SSEParserTests.swift)
+let line = #"data: {"type":"metadata","session_id":"00000000-...","credits_remaining":42,"quick_actions":["breathe","reflect"]}"#
 
-**CI does not run tests at all. HIGH (process gap).**
-`scripts/run-tests.py` exists and works but is not invoked by any workflow, so all five suites can regress unnoticed. Adding a `test` job that calls `CI=1 python3 scripts/run-tests.py` is the single highest-leverage fix.
+// Divergent legacy store seeded then migrated (StressMeasurementMigrationTests.swift)
+let storeURL = Self.makeIsolatedStoreURL()
+defer { Self.cleanupDirectory(for: storeURL) }
+try Self.seedDivergentStore(at: storeURL)
+let container = StressMonitorApp.makeContainer(at: storeURL)
+```
 
-**Root `StressMonitorTests/` is dead. LOW (cleanup).**
-Five files / ~28KB of XCTest that are not in the project and cannot compile against the current target.
+**Location:**
+- Fixtures are inline in the test file; shared helpers are `private` static funcs on the suite (`Self.makeIsolatedStoreURL()`, `Self.seedDivergentStore(at:)`)
+- IAP catalog fixture: `StressMonitor/StressMonitorTests/StressMonitorProducts.storekit` (product IDs `com.stressmonitor.app.premium.{weekly,monthly,annual}`)
+
+## Coverage
+
+**Requirements:** None enforced — no coverage flags in CI or the scheme.
+
+**View Coverage:**
+```bash
+# via xcodebuild result bundle produced by the test action
+xcrun xcresulttool get --path StressMonitor/build/TestResults.xcresult ...
+```
+
+## Test Types
+
+**Unit Tests:**
+- All 35 files are unit tests running in the app host (`StressMonitorTests` bundle `stress.ai.com.StressMonitorTests`). Focus: API client contracts, parsers, ViewModels with injected doubles, StoreKit/IAP flows, SwiftData migration, widget data state, data deletion.
+
+**Integration Tests:**
+- Network-stack integration via `URLSession` + `RequestCaptureURLProtocol` (real encode/decode over stubbed HTTP responses)
+- StoreKit integration via `StoreKitTest` shared session (see Common Patterns)
+
+**E2E Tests:**
+- Not used. No XCUITest target; no watch-target tests (`StressMonitor/StressMonitorWatch Watch App` has no test target; its directories are excluded from SwiftLint).
+- Manual/QA on simulator: run the app with `-demo-mode` (Edit Scheme → Run → Arguments) — cycles all stress levels through the real pipeline. The `argent` MCP iOS-simulator skills are wired via `opencode.json` for simulator interaction.
+
+## Common Patterns
+
+**StoreKit test discipline (mandatory for any StoreKit-backed test):**
+- `SKTestSession` connects exactly one session per process to its daemon — never call `SKTestSession(configurationFileNamed:)` directly in a test file. Always use `StoreKitTestSessionProvider.session()` (`StressMonitor/StressMonitorTests/StoreKitTestSessionProvider.swift`), which returns the shared session fully reset (`resetToDefaultState()`, `disableDialogs = true`)
+- The `StressMonitorProducts.storekit` file is also referenced by the shared scheme's LaunchAction
+- `StoreKitServiceTests` is disabled with a documented CI-only session-isolation bug (`@Suite(.serialized, .disabled("StoreKitTest session-isolation bug on CI — see file header"))`); `PremiumViewModelTests` against `FakeStoreKitService` carries the production-path coverage
+
+**CI-only suite gating (do not "fix"):**
+- `DataDeletionConsolidationTests` suites that touch real Keychain/CloudKit use `.enabled(if: ProcessInfo.processInfo.environment["GSD_CI"] == nil)` — they stall the CI test host (exit 65, zero assertion failures). CI sets `GSD_CI` via `TEST_RUNNER_GSD_CI` in `_test.yml`; locally they run normally. This is deliberate gating, not a bug.
+- When adding a suite that manipulates real credentials/persistent state, apply the same `.enabled(if:)` gate.
+
+**Contract-pinning headers:**
+- Suite doc comments state which external contract is pinned and why a rename breaks silently (e.g. `SSEParserTests` pins the backend `quick_actions` field; `WidgetPublisherKeyMatchingTests` pins App Group keys). Follow this style for new wire-format tests.
+
+**Stale docs warning:** `docs/TESTING.md` describes the orphaned repo-root `StressMonitorTests/` and an outdated XCTest-only setup — do not follow it; this file reflects the live target.
 
 ---
 
-*Testing analysis: 2026-08-08*
+*Testing analysis: 2026-08-29*

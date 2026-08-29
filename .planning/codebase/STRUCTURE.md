@@ -1,174 +1,203 @@
 # Codebase Structure
 
-**Analysis Date:** 2026-08-08
+**Analysis Date:** 2026-08-29
 
 ## Directory Layout
 
 ```
-ios-stress-app/
-├── StressMonitor/                     # Xcode project root
-│   ├── StressMonitor.xcodeproj        # Project + shared schemes
-│   ├── StressMonitor/                 # iPhone app target
-│   ├── StressMonitorWatch Watch App/  # watchOS app target
-│   ├── StressMonitorWidget/           # WidgetKit extension target
-│   ├── StressMonitorTests/            # XCTest target
-│   ├── Models/, Services/, Views/     # Legacy loose files (not in modern targets)
-│   ├── build/                         # Build output (generated, not committed)
-│   └── spm-cache/                     # SPM proxy/umbrella cache (generated)
-├── docs/                              # Project documentation (source of truth)
-├── docs-site/                         # Published docs site
-├── design/                            # HTML design system + screen mockups
-├── plans/                             # GSD plans and reports
-├── .planning/                         # GSD planning state incl. codebase/ maps
-├── scripts/                           # generate_app_icons.py, run-tests.py
-├── ci_scripts/                        # Xcode Cloud hooks (ci_post_clone.sh, …)
-├── fastlane/                          # Appfile, Fastfile, Matchfile
-├── assets/, data/                     # Static and scratch data
-├── .swiftlint.yml                     # Lint config
-├── CLAUDE.md / AGENTS.md              # Agent instructions
-└── README.md, CHANGELOG.md
-```
-
-### iPhone target layout
-
-```
-StressMonitor/StressMonitor/
-├── StressMonitorApp.swift        # @main entry
-├── Navigation/                   # AppRouter, Route, View+NavigationDestinations
-├── Models/                       # @Model entities + value types (Base/, Character/)
-├── ViewModels/                   # App-wide VMs (Stress, Chat, Premium, Habit, …)
-├── Views/                        # Feature folders, each with Components/
-│   ├── Dashboard/ History/ Trends/ Chat/ Characters/ Breathing/ MiniWalk/
-│   ├── Onboarding/ Premium/ Settings/ Action/ Journal/ Shared/
-│   ├── Components/               # Cross-feature components (Gauges/, TabBar/)
-│   └── DesignSystem/             # Spacing, Typography, Shadows, Components/
-├── Components/Character/         # Character illustrations + mood glyphs
-├── Services/                     # Algorithm/ HealthKit/ Repository/ CloudKit/
-│                                 # Sync/ LLM/ StoreKit/ Background/ Premium/
-│                                 # DataManagement/ Connectivity/ Protocols/
-├── Theme/                        # DesignTokens, Color+/Font+ extensions, Gradients
-├── Utilities/                    # Accessibility, animation, fonts, misc modifiers
-├── Fonts/ , Assets.xcassets      # Resources
+ios-stress-app/                          # Repo root — run xcodebuild/fastlane/swiftlint here
+├── AGENTS.md / CLAUDE.md                # Agent guidance (build cmds, quirks, conventions)
+├── docs/                                # Product & engineering docs (start at docs/INDEX.md)
+├── .github/workflows/                   # ci.yml → _test.yml, deploy.yml, distribute.yml, release.yml
+├── fastlane/                            # Fastfile, Appfile, Matchfile (upload_beta etc.)
+├── scripts/                             # run-tests.py (local test helper), generate_app_icons.py
+├── ci_scripts/                          # Xcode CI scripts
+├── assets/ · design/ · data/ · docs-site/ · droid-wiki/ · plans/   # Supporting assets/docs
+├── .planning/                           # GSD planning docs (codebase maps live here)
+└── StressMonitor/                       # Xcode project container
+    ├── StressMonitor.xcodeproj/         # THE project (schemes: StressMonitor, watch; widget via CI only)
+    ├── StressMonitor/                   # iOS APP TARGET (real code) — 301 Swift files
+    │   ├── StressMonitorApp.swift       # @main entry, DI root, SwiftData schema/migration
+    │   ├── Components/Character/        # Character companion art views (Ripple, Lumi, Ember…)
+    │   ├── Models/ (+Base, +Character)  # SwiftData @Model entities + DTOs + WidgetSharedData
+    │   ├── Navigation/                  # AppRouter, Route, View+NavigationDestinations
+    │   ├── Services/<Domain>/           # 18 domain subdirectories (see below)
+    │   ├── Theme/                       # DesignTokens, Color+Extensions, Gradients, Fonts
+    │   ├── Utilities/                   # Accessibility, animation presets, FontBlaster
+    │   ├── ViewModels/                  # Cross-tab @Observable VMs
+    │   ├── Views/<Feature>/Components/  # Feature screens + local components + local VMs
+    │   ├── Assets.xcassets · Fonts/     # Resources
+    │   ├── Info.plist · StressMonitor.entitlements · PrivacyInfo.xcprivacy
+    │   └── GoogleService-Info.plist     # Firebase config (committed)
+    ├── StressMonitorTests/              # UNIT TEST TARGET (real) — 36 test files + .storekit
+    ├── StressMonitorWatch Watch App/    # WATCH TARGET (path has spaces) — 74 Swift files
+    ├── StressMonitorWidget/             # WIDGET TARGET — 13 Swift files
+    ├── Models/ · Services/ · Views/     # ⚠️ ORPHANED — committed but in NO target
+    ├── StressMonitorTests (none here — orphan is at repo root, see below)
+    ├── build/ · spm-cache/              # Generated, gitignored
+    └── plans/                           # Old planning notes
+StressMonitorTests/                      # ⚠️ ORPHANED test dir at REPO ROOT — never builds
 ```
 
 ## Directory Purposes
 
-**`StressMonitor/StressMonitor/Services/Protocols/`:**
-- Purpose: the dependency-injection seam for the iPhone target.
-- Key files: `HealthKitServiceProtocol.swift`, `StressAlgorithmServiceProtocol.swift`, `StressRepositoryProtocol.swift`, `CloudKitServiceProtocol.swift`. (`LLMServiceProtocol.swift` and `StoreKitServiceProtocol.swift` live beside their implementations in `Services/LLM/` and `Services/StoreKit/`.)
+**`StressMonitor/StressMonitor/` (iOS app target):**
+- Purpose: All shipping iOS code
+- Key files: `StressMonitorApp.swift` (entry), `Views/MainTabView.swift` (tab shell), `Views/Onboarding/OnboardingContainerView.swift` (root gate)
+- ~301 Swift files across Models / Navigation / Services / Theme / Utilities / ViewModels / Views
 
-**`StressMonitor/StressMonitor/Services/Algorithm/`:**
-- Purpose: stress scoring pipeline.
-- Key files: `StressFactor.swift` (protocol + `FactorResult`), the five factor implementations, `MultiFactorStressCalculator.swift`, `StressCalculator.swift`, `BaselineCalculator.swift`, `FactorCalibrator.swift`, `BioAgeCalculator.swift`.
+**`StressMonitor/StressMonitor/Services/` (domain subdirectories):**
+- `Algorithm/` — stress math: `MultiFactorStressCalculator.swift`, 5 `*StressFactor.swift`, `BaselineCalculator.swift`, `FactorCalibrator.swift`, `BioAgeCalculator.swift`, legacy `StressCalculator.swift`
+- `API/` — `StressAPIClient.swift` + `+Credits/+Preferences/+QuickActions/+Sessions` extensions, `StressAPIConfig.swift`
+- `Auth/` — `FirebaseAuthService.swift`, `AuthServiceError.swift`
+- `Background/` — `HealthBackgroundScheduler.swift`, `NotificationManager.swift`
+- `Chat/` — `ChatAvailability.swift`
+- `CloudKit/` — `CloudKitManager.swift`, `CloudKitSchema.swift`, `CloudKitSyncEngine.swift`
+- `Connectivity/` — `PhoneConnectivityManager.swift` (WCSession phone side)
+- `Credits/` — `CreditService.swift`, `CreditServiceProtocol.swift`
+- `DataManagement/` — `DataDeleter*.swift`, `CloudKitResetService.swift`, `LocalDataWipeService.swift`
+- `Firebase/` — `FirebaseBootstrap.swift`
+- `HealthKit/` — `HealthKitManager.swift` + `+ActivityFetch/+RecoveryFetch/+SleepFetch` extensions, `SimulatorHealthKitService.swift`
+- `LLM/` — `StressLLMService.swift`, `SSEParser.swift`, `ChatContextBuilder.swift`, `ChatQuickActions.swift`, `LLMServiceProtocol.swift`
+- `Preferences/` — `PreferencesService.swift`
+- `Premium/` — `PaywallController.swift`
+- `Protocols/` — the 4 core DI protocols: `StressAlgorithmServiceProtocol`, `HealthKitServiceProtocol`, `StressRepositoryProtocol`, `CloudKitServiceProtocol`
+- `Repository/` — `StressRepository.swift`
+- `StoreKit/` — `StoreKitService.swift`, `MockStoreKitService.swift`, `PremiumState.swift`, `StoreKitProductCatalog.swift`, `CreditPack.swift`, `StoreKitServiceEnvironment.swift`
+- `Sync/` — `SyncManager.swift`, `ConflictResolver.swift`
+- Root-level: `MockServices.swift`, `KeychainService.swift`, `AppearanceManager.swift`, `InsightGeneratorService.swift`, `CharacterAssetResolver.swift`
 
-**`StressMonitor/StressMonitor/Views/<Feature>/`:**
-- Purpose: one folder per screen area; screen file at the folder root, private subviews in `Components/`, feature-local view model beside the screen (e.g. `Trends/TrendsViewModel.swift`).
+**`StressMonitor/StressMonitor/Views/` (feature folders):**
+- Each feature = folder with screens + `Components/` subfolder; some also hold their ViewModel
+- Folders: `Action/`, `Breathing/`, `Characters/`, `Chat/`, `Components/` (shared: `Gauges/`, `TabBar/`, `HapticManager.swift`), `Dashboard/` (+42 components + `DashboardViewModel.swift`), `DesignSystem/`, `History/`, `Journal/`, `MiniWalk/`, `Onboarding/`, `Premium/`, `Settings/` (+`DataManagement/`), `Shared/`, `Trends/`
+- Root files: `DashboardView.swift`, `MainTabView.swift`, `HistoryView.swift`
 
-**`StressMonitor/StressMonitorWatch Watch App/`:**
-- Purpose: independent watchOS target mirroring the phone structure (`Models/`, `Services/`, `ViewModels/`, `Views/`, `Theme/`) plus `Complications/` (Intents/, Providers/, Services/, Views/).
-- Note: algorithm and model files are duplicated here, not shared.
+**`StressMonitor/StressMonitorWatch Watch App/` (watch target — path contains spaces):**
+- Purpose: Standalone watch app with duplicated algorithm sources
+- Layout mirrors the app: `Models/`, `Services/` (incl. duplicated `MultiFactorStressCalculator.swift`, `*StressFactor.swift`, `*Protocol.swift`, plus `WatchHealthKitManager.swift`, `WatchConnectivityManager.swift`, `WatchSharedDataStore.swift`, `CloudKit/`), `ViewModels/`, `Views/`, `Theme/`, `Complications/` (`Providers/`, `Intents/`, `Views/`, `Services/`)
+- Entry: `StressMonitorWatchApp.swift` → `ContentView.swift`
 
-**`StressMonitor/StressMonitorWidget/`:**
-- Purpose: WidgetKit extension — `StressMonitorWidgetBundle.swift`, `Providers/StressWidgetProvider.swift`, `Models/WidgetDataProvider.swift`, `Intents/`, `Views/` (Small/Medium/Large/LockScreen).
+**`StressMonitor/StressMonitorWidget/` (widget target):**
+- Purpose: WidgetKit widgets + Live Activity reading App Group data
+- Key files: `StressMonitorWidgetBundle.swift`, `StressMonitorWidget.swift`, `StressMonitorWidgetControl.swift`, `StressMonitorWidgetLiveActivity.swift`, `Providers/StressWidgetProvider.swift`, `Models/WidgetDataProvider.swift`, `Views/{Small,Medium,Large,LockScreen}WidgetView.swift`, `Intents/UpdateWidgetIntent.swift`, `AppIntent.swift`
+- `README.md` documents the target
 
-**`StressMonitor/Models/`, `StressMonitor/Services/`, `StressMonitor/Views/` (project-root level):**
-- Purpose: older loose Swift files (`HRVAnalyzer.swift`, `StressPredictor.swift`, `MorningReadinessService.swift`, `ActivityManager.swift`, `MergeBenchmark.swift`, `UserSettings.swift`, `StressReading.swift`) sitting outside the four target folders. Do not add new code here.
+**`StressMonitor/StressMonitorTests/` (test target):**
+- Purpose: 36 unit-test files for API, StoreKit/IAP, credits, chat/SSE, persistence, ViewModels
+- Key files: `StressMonitorProducts.storekit` (StoreKit config for IAP tests), `StoreKitTestSessionProvider.swift`, `SSEParserTests.swift`, `StressAPIClientTests.swift`, `DataDeletionConsolidationTests.swift` (skips under `GSD_CI`)
 
-**`StressMonitor/build/`, `StressMonitor/spm-cache/`:**
-- Purpose: generated build artifacts and the SPM proxy/umbrella cache. Generated: yes. Committed: no (git-ignored).
+**`docs/`:**
+- Purpose: Product/engineering documentation
+- Key files: `INDEX.md` (navigation hub), `system-architecture*.md`, `code-standards*.md`, `design-guidelines*.md`, `TESTING.md`, `DEPLOYMENT.md`
+- Committed; treat README package table as stale (trust the pbxproj)
 
 ## Key File Locations
 
 **Entry Points:**
-- `StressMonitor/StressMonitor/StressMonitorApp.swift`: iPhone `@main`, schema/migration, DI roots.
-- `StressMonitor/StressMonitorWatch Watch App/StressMonitorWatchApp.swift`: watchOS `@main`.
-- `StressMonitor/StressMonitorWidget/StressMonitorWidgetBundle.swift`: widget bundle `@main`.
-- `StressMonitor/StressMonitorWatch Watch App/Complications/ComplicationBundle.swift`: complication bundle.
-
-**Navigation:**
-- `StressMonitor/StressMonitor/Navigation/AppRouter.swift`, `Route.swift`, `View+NavigationDestinations.swift`
-- `StressMonitor/StressMonitor/Views/MainTabView.swift`
+- `StressMonitor/StressMonitor/StressMonitorApp.swift`: iOS `@main`, DI root, versioned SwiftData schema V1→V2
+- `StressMonitor/StressMonitorWatch Watch App/StressMonitorWatchApp.swift`: watchOS `@main`
+- `StressMonitor/StressMonitorWidget/StressMonitorWidgetBundle.swift`: widget entry
+- `StressMonitor/StressMonitor/Views/Onboarding/OnboardingContainerView.swift`: first-screen gate (onboarding vs MainTabView)
+- `StressMonitor/StressMonitor/Views/MainTabView.swift`: tab shell, paywall cover, nav restoration
 
 **Configuration:**
-- `StressMonitor/StressMonitor.xcodeproj/project.pbxproj`: targets, capabilities, build settings.
-- `StressMonitor/StressMonitor.xcodeproj/xcshareddata/xcschemes/`: `StressMonitor.xcscheme`, `StressMonitorWatch Watch App.xcscheme`.
-- `.swiftlint.yml`, `fastlane/Fastfile`, `ci_scripts/ci_post_clone.sh`.
+- `StressMonitor/StressMonitor.xcodeproj/project.pbxproj`: target membership (source of truth — 4 targets)
+- `StressMonitor/StressMonitor/Info.plist` + `StressMonitor.entitlements`: app config (base URL via `STRESS_API_BASE_URL`, CloudKit/HealthKit/App Group entitlements)
+- `StressMonitor/StressMonitor/GoogleService-Info.plist`: Firebase (committed)
+- `.swiftlint.yml` (repo root, `included: StressMonitor/`), `.github/workflows/*.yml`, `fastlane/Fastfile`
 
 **Core Logic:**
-- `StressMonitor/StressMonitor/Services/Algorithm/MultiFactorStressCalculator.swift`
-- `StressMonitor/StressMonitor/Services/Repository/StressRepository.swift`
-- `StressMonitor/StressMonitor/Services/Sync/SyncManager.swift`
-- `StressMonitor/StressMonitor/Services/LLM/SupabaseLLMService.swift`
-- `StressMonitor/StressMonitor/ViewModels/StressViewModel.swift`
+- `StressMonitor/StressMonitor/Services/Algorithm/MultiFactorStressCalculator.swift`: composite stress score
+- `StressMonitor/StressMonitor/ViewModels/StressViewModel.swift`: main orchestration VM (571 lines)
+- `StressMonitor/StressMonitor/Services/Repository/StressRepository.swift`: persistence + sync + widget publish
+- `StressMonitor/StressMonitor/Services/API/StressAPIClient.swift`: backend client
 
 **Testing:**
-- `StressMonitor/StressMonitorTests/` — `BioAgeCalculatorTests.swift`, `CharacterAssetResolverTests.swift`, `CharacterCollectionViewModelTests.swift`, `PremiumViewModelTests.swift`, `StoreKitProductCatalogTests.swift`.
-- `scripts/run-tests.py` for CLI runs.
-
-**Docs:**
-- `docs/system-architecture.md`, `docs/codebase-summary.md`, `docs/code-standards.md`, `docs/project-roadmap.md`, `docs/INDEX.md`.
+- `StressMonitor/StressMonitorTests/`: all real tests
+- `StressMonitor/StressMonitor/Services/MockServices.swift`: mock/stub factories for previews and tests
 
 ## Naming Conventions
 
 **Files:**
-- One primary type per file, filename equals the type: `StressViewModel.swift`, `MultiFactorStressCalculator.swift`.
-- PascalCase for all Swift sources.
-- Protocols end in `Protocol`: `HealthKitServiceProtocol.swift`.
-- Extensions use `Type+Feature.swift`: `HealthKitManager+SleepFetch.swift`, `Color+Wellness.swift`, `View+NavigationDestinations.swift`.
-- Views end in `View`, view models in `ViewModel`, services in `Service`/`Manager`, mocks prefixed `Mock`/`Simulator`.
-- Watch-target types are prefixed `Watch`: `WatchStressViewModel.swift`, `WatchHealthKitManager.swift`.
-- Tests: `<TypeUnderTest>Tests.swift`.
+- Views: `*View.swift` (e.g. `DashboardView.swift`, `BreathingSessionView.swift`)
+- ViewModels: `*ViewModel.swift` — cross-tab in `ViewModels/`, feature-local co-located in `Views/<Feature>/` (e.g. `Views/Trends/TrendsViewModel.swift`); watch files prefixed `Watch*` (e.g. `WatchStressViewModel.swift`)
+- Protocols: `*Protocol.swift` (e.g. `HealthKitServiceProtocol.swift`) or `*ServiceProtocol.swift`
+- Service extensions: `Type+Feature.swift` (e.g. `StressAPIClient+Credits.swift`, `HealthKitManager+SleepFetch.swift`)
+- Models: noun `*.swift` matching the type (e.g. `StressMeasurement.swift`, `FactorWeights.swift`)
+- Tests: `*Tests.swift` matching subject (e.g. `SSEParserTests.swift`)
 
 **Directories:**
-- PascalCase feature folders under `Views/`, each optionally containing `Components/`.
-- Service folders named after the integration (`HealthKit/`, `CloudKit/`, `StoreKit/`, `LLM/`).
-- Markdown docs and design assets use kebab-case: `docs/system-architecture-core.md`, `design/design-system.html`.
+- Feature folders in `Views/`: capitalized feature name with `Components/` subfolder for reusable pieces (`Views/Dashboard/Components/`)
+- Service domains: singular noun (`Algorithm/`, `Auth/`, `Credits/`)
+- The watch target directory literally contains spaces: `StressMonitorWatch Watch App/` — always quote it
+
+**Bundles/IDs:**
+- App `stress.ai.com`, watch `stress.ai.com.watchkitapp`, widget `stress.ai.com.widget`; App Group `group.stress.ai.com`; team `K2TYLYAWMK`
 
 ## Where to Add New Code
 
-**New screen:**
-- Screen: `StressMonitor/StressMonitor/Views/<Feature>/<Name>View.swift`
-- Subviews: `StressMonitor/StressMonitor/Views/<Feature>/Components/`
-- View model: `StressMonitor/StressMonitor/Views/<Feature>/<Name>ViewModel.swift` (or `ViewModels/` if reused across features)
-- Register a case in `Navigation/Route.swift` and resolve it in `Navigation/View+NavigationDestinations.swift`.
+**New feature screen (iOS):**
+- Screen: `StressMonitor/StressMonitor/Views/<Feature>/<Feature>View.swift`
+- Components: `StressMonitor/StressMonitor/Views/<Feature>/Components/`
+- ViewModel: `StressMonitor/StressMonitor/ViewModels/<Feature>ViewModel.swift` (cross-tab) or co-locate in the feature folder (feature-local)
+- Route: add a case to `Navigation/Route.swift` and a destination in `Navigation/View+NavigationDestinations.swift`
+- MUST also add the file to the `StressMonitor` target in Xcode (pbxproj)
 
 **New service:**
 - Implementation: `StressMonitor/StressMonitor/Services/<Domain>/<Name>Service.swift`
-- Protocol: `StressMonitor/StressMonitor/Services/Protocols/<Name>ServiceProtocol.swift` (or beside the implementation, matching `LLM/`/`StoreKit/`)
-- Test double: extend `StressMonitor/StressMonitor/Services/MockServices.swift`.
+- Protocol (if consumed by ViewModels): `StressMonitor/StressMonitor/Services/Protocols/` (or domain-local like `Credits/CreditServiceProtocol.swift`)
+- Mock: extend `Services/MockServices.swift`
+- If it is stress-algorithm code: MIRROR the file into `StressMonitor/StressMonitorWatch Watch App/Services/` and add to the watch target
 
-**New stress factor:**
-- `StressMonitor/StressMonitor/Services/Algorithm/<Name>StressFactor.swift`, add to the default array in `MultiFactorStressCalculator.init`, extend `FactorWeights.swift` and `FactorBreakdown.swift`, and mirror all of it in `StressMonitorWatch Watch App/Services/`.
+**New SwiftData model:**
+- Model file: `StressMonitor/StressMonitor/Models/<Name>.swift` (`@Model final class`)
+- Bump the versioned schema: new `AppSchemaV(n)` enum + lightweight `MigrationStage` in `StressMonitorApp.swift:40-74`
+- Mirror into watch `Models/` only if the watch target needs it (watch has its own copies of the model types)
 
-**New persisted model:**
-- `StressMonitor/StressMonitor/Models/<Name>.swift` with `@Model`, then add a new `AppSchemaVN` + `MigrationStage` in `StressMonitor/StressMonitor/StressMonitorApp.swift`.
+**New API endpoint:**
+- Either extend the matching `StressAPIClient+<Domain>.swift` or create `Services/API/StressAPIClient+<Domain>.swift`; build query-carrying URLs with `URLComponents`, never `appendingPathComponent`
+- Test: matching `StressMonitorTests/StressAPIClient<Domain>Tests.swift`
 
-**Shared design tokens / colors / typography:**
-- `StressMonitor/StressMonitor/Theme/` (phone) and `StressMonitorWatch Watch App/Theme/` (watch).
+**New widget surface:**
+- View in `StressMonitor/StressMonitorWidget/Views/`, wire in `StressMonitorWidget.swift`/`StressMonitorWidgetBundle.swift`; shared data shape changes must update `Models/WidgetSharedData.swift` (app side) AND the duplicated widget copies
 
-**Reusable UI primitives:**
-- `StressMonitor/StressMonitor/Views/DesignSystem/Components/`.
+**New test:**
+- `StressMonitor/StressMonitorTests/<Subject>Tests.swift`; IAP tests use `StressMonitorProducts.storekit`
 
-**Tests:**
-- `StressMonitor/StressMonitorTests/<TypeUnderTest>Tests.swift`.
+**Utilities:**
+- Shared helpers: `StressMonitor/StressMonitor/Utilities/`
+- Shared UI components: `StressMonitor/StressMonitor/Views/Components/` (design primitives in `Views/DesignSystem/`)
+
+**Do NOT add code to (orphaned, never compiles):**
+- `StressMonitor/Models/`, `StressMonitor/Services/`, `StressMonitor/Views/`, repo-root `StressMonitorTests/`
 
 ## Special Directories
 
-**`StressMonitor/build/`:**
-- Purpose: xcodebuild output, `.xcresult` bundles, dSYMs. Generated: Yes. Committed: No.
-
-**`StressMonitor/spm-cache/`:**
-- Purpose: SPM proxy and umbrella packages used to cache third-party dependencies. Generated: Yes. Committed: No (artifacts git-ignored).
+**`StressMonitor/build/`, `StressMonitor/spm-cache/`:**
+- Purpose: Build output and SPM package cache (`scripts/run-tests.py` writes results here)
+- Generated: Yes
+- Committed: No (gitignored)
 
 **`.planning/`:**
-- Purpose: GSD workflow state, including these codebase maps under `.planning/codebase/`. Generated: Yes (by GSD commands). Committed: Yes.
+- Purpose: GSD planning artifacts (codebase maps, milestones, phases)
+- Generated: By GSD commands
+- Committed: Yes
 
-**`docs-site/`:**
-- Purpose: rendered documentation site generated from `docs/`. Committed: Yes.
+**`.gsd/`, `.gitnexus/`, `.claude/`, `.agents/`, `.opencode/`, `.kiro/`, `.gemini/`, `.codex/`, `.cursor/`:**
+- Purpose: Agent tooling configs, skills, rules, indexes
+- Generated: Partly (indexes/caches)
+- Committed: Varies — do not delete, do not treat as product code
 
-**`design/`:**
-- Purpose: HTML design-system references and screen mockups used as UI source of truth. Generated: No. Committed: Yes.
+**`docs/`:**
+- Purpose: Human documentation; `INDEX.md` is the entry point
+- Generated: No
+- Committed: Yes
+
+**Orphaned source dirs (`StressMonitor/{Models,Services,Views}`, root `StressMonitorTests/`):**
+- Purpose: Legacy pre-restructure locations; committed but absent from the pbxproj
+- Generated: No
+- Committed: Yes (do not edit — never builds; candidates for deletion in a cleanup phase)
 
 ---
 
-*Structure analysis: 2026-08-08*
+*Structure analysis: 2026-08-29*

@@ -1,170 +1,138 @@
 # External Integrations
 
-**Analysis Date:** 2026-08-08
+**Analysis Date:** 2026-08-29
 
 ## APIs & External Services
 
-**Supabase Edge Functions (AI coaching backend):**
-- Base URL: `SupabaseConfig.url` + `functions/v1`, defined in `StressMonitor/StressMonitor/Services/LLM/SupabaseConfig.swift`
-  - Default project URL fallback: `https://sxlaxpnyadellgyvxofm.supabase.co`
-  - Overridable via Info.plist key `SUPABASE_URL`, env `SUPABASE_URL`, or `UserDefaults["supabaseURL"]`
-- Declared endpoints (`SupabaseConfig`):
-  | Constant | Path | Wired up in code? |
-  |----------|------|-------------------|
-  | `healthURL` | `functions/v1/health` | Declared only |
-  | `chatURL` | `functions/v1/chat` | Yes — `SupabaseLLMService.send` |
-  | `sessionsURL` | `functions/v1/sessions` | Declared only |
-  | `preferencesURL` | `functions/v1/preferences` | Declared only |
-  | `creditsURL` | `functions/v1/credits` | Declared only |
-  | `quickActionsURL` | `functions/v1/quick-actions` | Declared only (quick actions arrive via SSE metadata) |
-- SDK/Client: none — hand-rolled `URLSession.bytes(for:)` streaming in `StressMonitor/StressMonitor/Services/LLM/SupabaseLLMService.swift`
-- Auth headers per request: `apikey: <anon key>`, `Authorization: Bearer <JWT>`, `Accept: text/event-stream`, `Content-Type: application/json`, 90s timeout
+**Backend API (standalone StressMonitor backend):**
+- `https://stress-api.dropitx.site` (fallback) — chat/LLM streaming, credits, sessions, preferences, quick actions
+  - SDK/Client: hand-rolled `URLSession` client, no third-party HTTP lib — `StressMonitor/StressMonitor/Services/API/StressAPIClient.swift` + endpoint-group extensions (`+Credits.swift`, `+Preferences.swift`, `+QuickActions.swift`, `+Sessions.swift`)
+  - Auth: `Authorization: Bearer <Firebase ID token>` on every endpoint except `GET /health` (token fetched per-request via `AuthServiceProtocol.getIDToken()`)
+  - Base URL resolution (`StressMonitor/StressMonitor/Services/API/StressAPIConfig.swift`): Info.plist `STRESS_API_BASE_URL` → env var → `UserDefaults` key `stressAPIBaseURL` → fallback. Testable via `StressAPIConfig.resolveBaseURL(...)` seam (D-03)
 
-**`/chat` request contract** (`SupabaseLLMService.swift:95-120`):
-```json
-{ "messages": [{"role": "...", "content": "..."}],
-  "session_id": "<uuid, optional>",
-  "stress_context": { ...snake_case payload... } }
-```
-`stress_context` is built by `StressMonitor/StressMonitor/Services/LLM/ChatContextBuilder.swift` into `StressContextPayload` (`StressMonitor/StressMonitor/Services/LLM/StressContextPayload.swift`), whose `CodingKeys` already emit snake_case.
+**Endpoints (all relative to base URL):**
 
-**SSE streaming contract** (`StressMonitor/StressMonitor/Services/LLM/SSEParser.swift`):
-- Only lines prefixed `data: ` are parsed
-- `[DONE]` sentinel ends the stream
-- OpenAI-shaped tokens: `choices[0].delta.content`
-- Alternate gateway shape: `{"token": "..."}`
-- Error shape: `{"error": "<message>"}`
-- Non-standard terminal event: `{"type":"metadata","session_id":...,"credits_remaining":...,"model_used":...}` → applied by `SupabaseLLMService.apply(metadata:)`, which persists `session_id` to `UserDefaults` and updates `creditsRemaining` / `modelUsed`
+| Endpoint | Method | Purpose | File |
+|---|---|---|---|
+| `/health` | GET | Liveness probe, no auth | `StressAPIClient.swift:80` |
+| `/chat` | POST | SSE streaming chat (OpenAI-compatible chunks) | `StressAPIClient.swift:94` |
+| `/credits` | GET | Credit balance | `StressAPIClient+Credits.swift:33` |
+| `/credits/redeem` | POST | Redeem credit-pack purchase (JWS body) | `StressAPIClient+Credits.swift:53` |
+| `/credits/premium/verify` | POST | Verify premium subscription (JWS body) | `StressAPIClient+Credits.swift:60` |
+| `/preferences` | GET / PUT | User preferences sync | `StressAPIClient+Preferences.swift:36,57` |
+| `/quick-actions` | GET | Server-defined chat quick actions (query via `URLComponents`) | `StressAPIClient+QuickActions.swift:43` |
+| `/sessions` | GET / POST | List (with `?limit=`) / create chat sessions | `StressAPIClient+Sessions.swift:38,85` |
+| `/sessions/{uuid}` | DELETE | Delete a session | `StressAPIClient+Sessions.swift:108` |
+| `/sessions/{uuid}/messages` | GET | Fetch session message history | `StressAPIClient+Sessions.swift:139` |
 
-**HTTP error mapping** (`SupabaseLLMService.mapHTTPError`):
-| Status | Meaning surfaced to user |
-|--------|--------------------------|
-| 401 | "Please sign in to use AI Chat." |
-| 402 | Out of credits (monthly reset) |
-| 422 | Bad request body |
-| 429 | Rate limited |
-| 502 | Provider failure |
+**SSE streaming pipeline:**
+- `StressAPIClient.sendChat(...)` returns `(URLSession.AsyncBytes, HTTPURLResponse)`; line consumption lives in `StressMonitor/StressMonitor/Services/LLM/StressLLMService.swift`
+- `SSEParser.parse(line:)` (`StressMonitor/StressMonitor/Services/LLM/SSEParser.swift`) decodes OpenAI-compatible `data: {...}` lines into `.content` tokens or `.metadata(SSEMetadata)` (credits/session state) and handles the stream-end sentinel
+- Chat context assembled by `ChatContextBuilder.swift` / `StressContextPayload.swift` before the request
 
-**Third-party service SDKs (via SPM):**
-- Giphy iOS SDK 2.2.16 — GIF picker embedded in the `exyte/Chat` UI; requires a Giphy API key at the Chat layer
-- Kingfisher 8.8.1 — arbitrary remote image fetching in chat/media views
+**Firebase (Auth only):**
+- Firebase project `stress-io`; config committed at `StressMonitor/StressMonitor/GoogleService-Info.plist` (analytics/GCM/ads flags off in plist, sign-in on)
+- SDK: `FirebaseAuth` + `FirebaseCore` (SPM, firebase-ios-sdk >= 11.0.0)
+- Bootstrap: `StressMonitor/StressMonitor/Services/Firebase/FirebaseBootstrap.swift` — single `FirebaseApp.configure()` entry point, guards double-configure trap
+- Client: `StressMonitor/StressMonitor/Services/Auth/FirebaseAuthService.swift` — `signInAnonymously()`, `signInWithGoogle(presenting:)` (links Google credential to anonymous user; falls back to plain `signIn(with:)` on `credentialAlreadyInUse`)
+
+**Google Sign-In:**
+- SDK: `GoogleSignIn` (SPM, GoogleSignIn-iOS >= 9.0.0, transitive `AppAuth-iOS` 2.1.0)
+- `GIDSignIn` requires a UIKit presenter — bridged in `StressMonitor/StressMonitor/Views/Settings/SettingsView.swift:436`; user-cancellation detection in `StressMonitor/StressMonitor/ViewModels/AccountViewModel.swift:39` (`com.google.GIDSignIn` code -5)
+- URL scheme registered in `StressMonitor/StressMonitor/Info.plist` (`com.googleusercontent.apps.595426793312-...`)
 
 ## Data Storage
 
 **Databases:**
-- On-device: SwiftData (`@Model` types such as `StressMeasurement`, `CharacterUnlock`), container configured in `StressMonitor/StressMonitor/StressMonitorApp.swift`
-- Server-side: Supabase Postgres, reached only indirectly through Edge Functions. The app never opens a direct Postgres/PostgREST connection.
+- SwiftData (on-device primary store)
+  - Connection: `ModelContainer` with recovery path (delete incompatible store → local-only container → in-memory last resort) — `StressMonitor/StressMonitor/StressMonitorApp.swift:92-141`
+  - Entities: `@Model` types in `StressMonitor/StressMonitor/Models/` (`StressMeasurement.swift`, `Habit.swift`, `Character/CharacterUnlock.swift`), repository layer at `StressMonitor/StressMonitor/Services/Repository/StressRepository.swift`
+- CloudKit (sync/backup)
+  - Container `iCloud.stress.ai.com`, entitlement `com.apple.developer.icloud-services = CloudKit`
+  - Client: `CKContainer` wrapper `StressMonitor/StressMonitor/Services/CloudKit/CloudKitManager.swift`, sync engine `CloudKitSyncEngine.swift`, schema mirror `CloudKitSchema.swift`, conflict handling `StressMonitor/StressMonitor/Services/Sync/ConflictResolver.swift` + `SyncManager.swift`
 
 **File Storage:**
-- Local filesystem only — exports written by `StressMonitor/StressMonitor/Services/DataManagement/DataExporter.swift`, `CSVGenerator.swift`, `JSONGenerator.swift`
+- Local app container + asset catalogs only; no remote file storage (Firebase Storage bucket exists in config plist but is not used by app code)
 
 **Caching:**
-- `UserDefaults` for chat session id, config overrides, and appearance state
-- SPM dependency mirror under `StressMonitor/spm-cache/`
+- App Group `group.stress.ai.com` — `UserDefaults(suiteName:)` shared app↔widget, `StressMonitor/StressMonitor/Models/WidgetSharedData.swift:100,133`
+- No explicit HTTP cache service
 
 ## Authentication & Identity
 
 **Auth Provider:**
-- Supabase Auth (JWT), consumed as a bearer token. There is **no Apple Sign-In implementation in this repo** — no `AuthenticationServices` / `ASAuthorization` usage was found.
-- Token resolution (`SupabaseLLMService.init`, `SupabaseConfig.guestJWT`):
-  1. Explicitly injected `accessToken`
-  2. Keychain, via `StressMonitor/StressMonitor/Services/KeychainService.swift` (`kSecClassGenericPassword`, `kSecAttrAccessibleWhenUnlockedThisDeviceOnly`)
-  3. Fallback shared **guest JWT** from Info.plist `SUPABASE_GUEST_JWT` → env → `UserDefaults["supabaseGuestJWT"]` → `SupabaseSecrets.guestJWT`
-- `SupabaseConfig.swift` carries an in-source TODO: replace the guest JWT with a real `SupabaseAuthService` (Apple Sign-In) before production.
-- `StressMonitor/StressMonitor/Services/LLM/SupabaseSecrets.swift` is gitignored (`.gitignore:164`) but is present in the working tree and contains an embedded long-lived dev JWT. Treat as a secret; do not commit or quote.
+- Firebase Auth (`stress-io` project)
+  - Implementation: anonymous sign-in on first run; optional Google Sign-In upgrade that links the Google credential to the existing anonymous user so credit balance survives (`StressMonitor/StressMonitor/Services/Auth/FirebaseAuthService.swift:49-121`)
+  - ID tokens injected as Bearer headers by `StressAPIClient.authorizedRequest(...)` (`StressAPIClient.swift:38-65`)
+  - Token/credential storage: Keychain via `StressMonitor/StressMonitor/Services/KeychainService.swift`
 
 ## Monitoring & Observability
 
 **Error Tracking:**
-- None. No Sentry/Crashlytics/analytics SDK is linked.
+- None (no Crashlytics/Sentry). Firebase plist has analytics disabled.
 
 **Logs:**
-- `os.log` / `Logger` (5 files) plus plain `print` in places. No remote log sink.
+- `os.Logger` subsystem-scoped logging (e.g. `persistenceLogger` in `StressMonitor/StressMonitor/StressMonitorApp.swift`); no remote log shipping
 
 ## CI/CD & Deployment
 
 **Hosting:**
-- App Store / TestFlight. Signing teams `EQ8B89SPCX` (default) and `K2TYLYAWMK` (per-SDK for `iphoneos*` / `watchos*`).
-- Docs site: VitePress static build from `docs-site/`
+- App Store / TestFlight (fastlane `upload_beta`); backend hosted externally at `stress-api.dropitx.site` (not in this repo)
 
 **CI Pipeline:**
-- GitHub Actions: `.github/workflows/ci.yml` (lint & build, calls reusable `_test.yml`), plus `deploy.yml`, `distribute.yml`, `release.yml`, `droid-wiki-refresh.yml`
-- Xcode Cloud: `ci_scripts/ci_post_clone.sh` (Homebrew Fastlane install, `fastlane match appstore --readonly`), `ci_scripts/ci_post_xcodebuild.sh`
-- Fastlane Match for certificates — `fastlane/Matchfile`, `fastlane/Appfile`, `fastlane/Fastfile`
-
-## Cloud Sync (CloudKit)
-
-- `CKContainer.default()` is used — no explicit container identifier string and **no CloudKit entitlement** is declared in either `.entitlements` file (they contain only `com.apple.developer.healthkit`).
-  - `StressMonitor/StressMonitor/Services/CloudKit/CloudKitManager.swift:23` — `init(container: CKContainer = .default())`
-  - `StressMonitor/StressMonitor/Services/CloudKit/CloudKitSyncEngine.swift:102` — writes to `privateCloudDatabase`
-  - Schema definitions in `StressMonitor/StressMonitor/Services/CloudKit/CloudKitSchema.swift`
-  - Reset path: `StressMonitor/StressMonitor/Services/DataManagement/CloudKitResetService.swift`
-- Merge/conflict handling: `StressMonitor/StressMonitor/Services/Sync/SyncManager.swift`, `ConflictResolver.swift`
-
-## In-App Purchases (StoreKit 2)
-
-- Product IDs are **not hardcoded** — resolved at runtime by `StressMonitor/StressMonitor/Services/StoreKit/StoreKitProductCatalog.swift`:
-  | Period | Info.plist / env key | UserDefaults key |
-  |--------|----------------------|------------------|
-  | Weekly | `STOREKIT_PREMIUM_WEEKLY_PRODUCT_ID` | `storeKitPremiumWeeklyProductID` |
-  | Monthly | `STOREKIT_PREMIUM_MONTHLY_PRODUCT_ID` | `storeKitPremiumMonthlyProductID` |
-  | Annual | `STOREKIT_PREMIUM_ANNUAL_PRODUCT_ID` | `storeKitPremiumAnnualProductID` |
-  | Group | `STOREKIT_PREMIUM_SUBSCRIPTION_GROUP_ID` | `storeKitPremiumSubscriptionGroupID` |
-  Placeholder values (`$(...)`) and empty strings resolve to nil.
-- Implementations: `StoreKitService.swift` (live), `MockStoreKitService.swift` (tests/previews), gating in `StressMonitor/StressMonitor/Services/Premium/PaywallController.swift`
-- Tests: `StressMonitor/StressMonitorTests/StoreKitProductCatalogTests.swift`, `PremiumViewModelTests.swift`
-
-## HealthKit Data Types Read
-
-Declared in `StressMonitor/StressMonitor/Services/HealthKit/HealthKitManager.swift:9-34` (read-only authorization set):
-- `.heartRateVariabilitySDNN` (HRV — SDNN, not RMSSD)
-- `.heartRate`
-- `.restingHeartRate`
-- `.stepCount`
-- `.activeEnergyBurned`
-- `.appleStandTime`
-- `.respiratoryRate`
-- `.oxygenSaturation`
-- `HKCategoryType(.sleepAnalysis)`
-- `HKObjectType.workoutType()`
-
-Fetch extensions: `HealthKitManager+ActivityFetch.swift`, `HealthKitManager+RecoveryFetch.swift`, `HealthKitManager+SleepFetch.swift`. Simulator substitute: `SimulatorHealthKitService.swift` (`-demo-mode`).
-
-Usage descriptions live in build settings, not Info.plist: `INFOPLIST_KEY_NSHealthShareUsageDescription`, `INFOPLIST_KEY_NSHealthUpdateUsageDescription`, `INFOPLIST_KEY_NSHealthClinicalHealthRecordsShareUsageDescription`, `INFOPLIST_KEY_NSCameraUsageDescription`.
-
-## Device-to-Device Integration
-
-**WatchConnectivity:**
-- `StressMonitor/StressMonitor/Services/Connectivity/PhoneConnectivityManager.swift` — `WCSession.default` delegate, activation, reachability, `didReceiveUserInfo` handling. Mirror service exists in the `StressMonitorWatch Watch App` target.
-
-**Widgets / Live Activities:**
-- `StressMonitor/StressMonitorWidget/` — `StressMonitorWidgetBundle.swift`, `StressMonitorWidget.swift`, `StressMonitorWidgetLiveActivity.swift`, `StressMonitorWidgetControl.swift`, `AppIntent.swift`
-- Extension point `com.apple.widgetkit-extension` (`StressMonitor/StressMonitorWidget/Info.plist`)
-
-**Background execution:**
-- `INFOPLIST_KEY_UIBackgroundModes = "fetch processing"`; scheduling in `StressMonitor/StressMonitor/Services/Background/HealthBackgroundScheduler.swift`, alerts in `NotificationManager.swift`
+- GitHub Actions, repo root `.github/workflows/`
+  - `ci.yml` → calls `_test.yml`: SwiftLint (advisory) + iOS/watchOS/widget builds + unit tests; Xcode 26.3 on macos-15; destination `platform=iOS Simulator,name=iPhone 16,OS=latest`; `-parallel-testing-enabled NO`; sets `TEST_RUNNER_GSD_CI` to skip `DataDeletionConsolidationTests` on CI
+  - `deploy.yml`: on CI success for `main`/`release/*` → fastlane `upload_beta` (TestFlight)
+  - `distribute.yml`, `release.yml`: manual dispatch lanes; `match.yml`: cert management; `droid-wiki-refresh.yml`: docs tooling
+- Xcode Cloud hooks present (`ci_scripts/ci_post_clone.sh`, `ci_post_xcodebuild.sh`) — not the primary CI path
+- Optional Slack notify via `SLACK_WEBHOOK_URL` (`fastlane/Fastfile:301-313`)
 
 ## Environment Configuration
 
-**Required config values:**
-- `SUPABASE_URL`, `SUPABASE_ANON_KEY`, `SUPABASE_GUEST_JWT`
-- `STOREKIT_PREMIUM_WEEKLY_PRODUCT_ID`, `STOREKIT_PREMIUM_MONTHLY_PRODUCT_ID`, `STOREKIT_PREMIUM_ANNUAL_PRODUCT_ID`, `STOREKIT_PREMIUM_SUBSCRIPTION_GROUP_ID`
-- CI only: `MATCH_PASSWORD`, `MATCH_GIT_URL` (Xcode Cloud env vars)
+**Required env vars (CI/deploy, all from GitHub Actions secrets):**
+- `APP_STORE_CONNECT_API_KEY_ID`, `APP_STORE_CONNECT_ISSUER_ID`, `APP_STORE_CONNECT_API_KEY_P8` (or local `~/.appstoreconnect/AuthKey.p8` via `APP_STORE_CONNECT_API_KEY_PATH`)
+- `MATCH_PASSWORD`, `MATCH_GIT_URL`, `MATCH_GIT_BASIC_AUTHORIZATION` — code signing (CI always `readonly`)
+- `SLACK_WEBHOOK_URL` (optional)
+- App identifier overrides: `APP_IDENTIFIER`, `WATCH_APP_IDENTIFIER`, `WIDGET_APP_IDENTIFIER`; `TESTFLIGHT_GROUPS`
+
+**Runtime app config:**
+- `STRESS_API_BASE_URL` (optional; Info.plist build setting / env / `UserDefaults` "stressAPIBaseURL" / fallback)
+- StoreKit product IDs via Info.plist keys: `com.stressmonitor.app.premium.weekly|monthly|annual`, `com.stressmonitor.app.credits.small|large`, group `SMPREMIUM01`
 
 **Secrets location:**
-- Runtime user secrets → Keychain (`KeychainService`)
-- Build-time secrets → Info.plist build settings injected by CI, or Xcode Cloud environment variables
-- Local dev fallback → gitignored `Services/LLM/SupabaseSecrets.swift`
-- No `.env` files exist in the repo
+- GitHub Actions secrets (CI); `~/.appstoreconnect/` (local fastlane); Match git repo (certs). No `.env` files in repo.
+
+## Apple Ecosystem Integrations
+
+**HealthKit (read-only):**
+- Client: `StressMonitor/StressMonitor/Services/HealthKit/HealthKitManager.swift` (+ `+SleepFetch`, `+ActivityFetch`, `+RecoveryFetch`)
+- Read types: HRV SDNN, heart rate, resting heart rate, step count, active energy, apple stand time, respiratory rate, oxygen saturation, sleep, workouts (`HealthKitManager.swift:9-34`)
+- Simulator stand-in: `SimulatorHealthKitService.swift` + `-demo-mode` launch arg
+- Watch-side reader: `StressMonitor/StressMonitorWatch Watch App/Services/WatchHealthKitManager.swift`
+- Usage strings via `INFOPLIST_KEY_NSHealth*UsageDescription` in pbxproj; entitlement `com.apple.developer.healthkit`
+
+**StoreKit 2 (IAP):**
+- Client: `StressMonitor/StressMonitor/Services/StoreKit/StoreKitService.swift`; product IDs resolved from Info.plist via `StoreKitProductCatalog.swift`
+- Purchases verified server-side: JWS transaction posted to `/credits/redeem` and `/credits/premium/verify` — the backend is the source of truth for credit balance
+- Test fixture: `StressMonitor/StressMonitorTests/StressMonitorProducts.storekit` + `StoreKitTestSessionProvider.swift`; `MockStoreKitService.swift` for previews
+
+**WatchConnectivity:**
+- `StressMonitor/StressMonitorWatch Watch App/Services/WatchConnectivityManager.swift` — phone↔watch data transfer; watch duplicates stress-algorithm sources locally (`MultiFactorStressCalculator`, `*StressFactor.swift`)
+
+**WidgetKit / AppIntents / ActivityKit:**
+- `StressMonitor/StressMonitorWidget/` — timeline widgets, controls, Live Activity; data shared through app group `group.stress.ai.com`
+
+**UserNotifications (local only):**
+- `StressMonitor/StressMonitor/Services/Background/NotificationManager.swift`; no push/APNs entitlement detected
 
 ## Webhooks & Callbacks
 
 **Incoming:**
-- None. The app exposes no URL scheme handlers or push-notification server callbacks (notifications are locally scheduled via `UserNotifications`).
+- None (Google Sign-In URL callback scheme only: `com.googleusercontent.apps.595426793312-...`)
 
 **Outgoing:**
-- Only the `POST functions/v1/chat` SSE call described above.
+- None (optional Slack webhook is CI-side, not app-side)
 
 ---
 
-*Integration audit: 2026-08-08*
+*Integration audit: 2026-08-29*

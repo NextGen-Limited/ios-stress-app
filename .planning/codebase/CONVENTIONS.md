@@ -1,161 +1,162 @@
 # Coding Conventions
 
-**Analysis Date:** 2026-08-08
+**Analysis Date:** 2026-08-29
 
-Source of truth for this document is the actual Swift in `StressMonitor/StressMonitor/` (iOS app target), `StressMonitor/StressMonitorWatch Watch App/` (watchOS), and `StressMonitor/StressMonitorWidget/` (WidgetKit). Where the code diverges from `CLAUDE.md`, the drift is flagged inline.
+## Scope Notes
+
+- Live code = files inside the Xcode project at `StressMonitor/StressMonitor.xcodeproj`. Real targets: app `StressMonitor/StressMonitor/`, tests `StressMonitor/StressMonitorTests/`, watch `StressMonitor/StressMonitorWatch Watch App/` (path contains spaces), widget `StressMonitor/StressMonitorWidget/`.
+- `StressMonitorTests/` (repo root) and `StressMonitor/Models/`, `StressMonitor/Services/`, `StressMonitor/Views/` are **orphaned** (not in any target). Never edit or extend them; changes there never build.
+- The watch target **duplicates algorithm sources** (`MultiFactorStressCalculator`, all `*StressFactor.swift`, shared protocols). Algorithm changes must be mirrored into `StressMonitor/StressMonitorWatch Watch App/Services/`.
+- Companion docs (partly stale; trust the code): `docs/code-standards-swift.md`, `docs/code-standards-patterns.md`, `docs/code-standards.md`. `docs/TESTING.md` is stale (describes the orphaned repo-root test dir).
 
 ## Naming Patterns
 
 **Files:**
-- One primary type per file, filename == type name: `Services/Algorithm/MultiFactorStressCalculator.swift`, `ViewModels/StressViewModel.swift`.
-- Extensions use `Type+Feature.swift`: `Services/HealthKit/HealthKitManager+SleepFetch.swift`, `Theme/Color+Extensions.swift`, `Utilities/Animation+Wellness.swift`.
-- Protocols live in `Services/Protocols/` and end in `...ServiceProtocol.swift` (`HealthKitServiceProtocol.swift`, `StressRepositoryProtocol.swift`, `StressAlgorithmServiceProtocol.swift`, `CloudKitServiceProtocol.swift`). Exceptions live beside their implementation: `Services/LLM/LLMServiceProtocol.swift`, `Services/StoreKit/StoreKitServiceProtocol.swift`.
-- Views end in `View`: `Views/Settings/SettingsView.swift`, `Views/Components/DemoModeBannerView.swift`. Sub-components go in a sibling `Components/` folder (`Views/Dashboard/Components/`, `Views/Premium/Components/`).
-- ViewModels end in `ViewModel`. Note: they are split across two places — `ViewModels/` (`StressViewModel`, `ChatViewModel`, `PremiumViewModel`, `CharacterCollectionViewModel`, `DataManagementViewModel`, `HabitViewModel`) and feature-local files (`Views/Dashboard/DashboardViewModel.swift`, `Views/Settings/SettingsViewModel.swift`). Prefer `ViewModels/` for new cross-screen VMs; a screen-only VM next to its screen is accepted.
-- Test files end in `Tests.swift` (`StressMonitorTests/PremiumViewModelTests.swift`).
+- PascalCase matching the primary type: `StressMeasurement.swift`, `HealthKitManager.swift`, `DashboardView.swift`
+- ViewModels: `XxxViewModel.swift` in `StressMonitor/StressMonitor/ViewModels/` (7 files: `StressViewModel.swift`, `ChatViewModel.swift`, `AccountViewModel.swift`, `PremiumViewModel.swift`, `CreditsViewModel.swift`, `HabitViewModel.swift`, `CharacterCollectionViewModel.swift`)
+- Services: `XxxService.swift` / `XxxManager.swift`, organized by domain subdirectory under `StressMonitor/StressMonitor/Services/` (`API/`, `Auth/`, `Algorithm/`, `Chat/`, `CloudKit/`, `Credits/`, `DataManagement/`, `Firebase/`, `HealthKit/`, `LLM/`, `Preferences/`, `Premium/`, `Repository/`, `StoreKit/`, `Sync/`, `Background/`, `Connectivity/`)
+- Protocols: `XxxProtocol.swift` in `StressMonitor/StressMonitor/Services/Protocols/` (`AuthServiceProtocol` lives at `Services/Auth/`, `LLMServiceProtocol` at `Services/LLM/`, `StoreKitServiceProtocol` at `Services/StoreKit/`)
+- Extensions: `Type+Feature.swift` — `Theme/Color+Extensions.swift`, `Theme/Color+Wellness.swift`, `Utilities/Animation+Wellness.swift`, `Services/API/StressAPIClient+Credits.swift` (endpoint groups as extensions: `+Preferences`, `+QuickActions`, `+Sessions`)
+- Views: `XxxView.swift` grouped by feature folder `Views/<Feature>/` with shared subcomponents in `Views/<Feature>/Components/` and cross-feature pieces in `Views/Components/`
 
-**Types:** `UpperCamelCase`. Namespacing is done with caseless `enum` containers, not structs — `enum DesignTokens`, `enum SupabaseConfig`, `enum DemoMode`, `enum SupabaseSecrets`.
+**Types / Functions / Variables:**
+- Types PascalCase; functions/variables camelCase
+- Booleans read as predicates: `isSigningIn`, `isSynced`, `isPremiumUser`, `isLoading`, `appeared`
+- Factory helpers in views/tests: `makeClient()`, `makeService()`, `makeSession()`
+- Test doubles: `MockXxx` (verification doubles with call counters) or `FakeXxx` (working stubs) — see TESTING.md
 
-**Functions / properties:** `lowerCamelCase`, verb-first for actions (`calculateMultiFactorStress(context:)`, `fetchLatestHRV()`, `refreshEntitlements()`), noun for state (`currentStress`, `isPermissionRequired`).
-
-**Errors:** one `enum <Domain>Error` per subsystem, conforming to `Error` and usually `LocalizedError` or `Sendable`: `StoreKitError`, `RepositoryError`, `CloudKitSyncError`, `SyncError`, `LLMServiceError`, `ExportError`, `BaselineCalculatorError`.
+**Errors:**
+- One `enum XxxError: Error, LocalizedError` per domain, colocated with the protocol/service it guards: `Services/Auth/AuthServiceError.swift` (`AuthServiceError`), `Services/LLM/LLMServiceProtocol.swift` (`LLMServiceError`), `Services/StoreKit/StoreKitServiceProtocol.swift` (`StoreKitError`), `Services/Repository/StressRepository.swift` (`RepositoryError`), `Services/CloudKit/CloudKitManager.swift` (`CloudKitError`), `Services/Algorithm/BaselineCalculator.swift` (`BaselineCalculatorError`)
+- Cases are `camelCase`, often with payloads: `googleSignInFailed(underlying: Error?)`, `unknown(Error)`
 
 ## Code Style
 
 **Formatting:**
-- No SwiftFormat config exists. Formatting is enforced only by SwiftLint (`.swiftlint.yml` at repo root) plus convention.
-- Indentation: 4 spaces in 288 of 292 iOS-target files. A handful of older `@Model` files use 2 spaces (`StressMonitor/StressMonitor/Models/StressMeasurement.swift`). **Use 4 spaces.**
-- `// MARK: - Section` dividers are used heavily to segment types and files. This is the one comment form the codebase does use consistently; keep it.
-- Doc comments (`///`) are used on public/shared types and on non-obvious stored properties (see `StressViewModel` property block). Prose explains *why* a value exists, not what the line does.
+- Tool: SwiftLint, config `.swiftlint.yml` (repo root). Lint scope `included: StressMonitor/`
+- `disabled_rules`: `trailing_whitespace`
+- Opt-in rules enabled: `empty_count`, `closure_spacing`, `force_unwrapping`, `implicitly_unwrapped_optional`, `overridden_super_call`, `private_outlet`, `vertical_whitespace_closing_braces`
+- **Avoid `!` (force unwrap/try) and `var x: T!` in all new code** — `force_unwrapping` and `implicitly_unwrapped_optional` are enforced
+- Escape hatch when unavoidable: `// swiftlint:disable:next force_try` with a reason (see `StressMonitor/StressMonitorTests/StoreKitTestSessionProvider.swift`)
+- Thresholds: `line_length` 150 warn / 250 error; `type_body_length` 400 warn / 600 error; `large_tuple` 5 warn / 6 error; short identifiers (`i`, `x`, `hr`, `hrv`, `id`, `dx`, ...) allowed via `identifier_name.excluded`
+- CI lint is advisory (`swiftlint lint ... || true` in `.github/workflows/_test.yml`) — do not regress anyway
+- Run locally from repo root: `swiftlint lint`
 
-**Linting (`.swiftlint.yml`):**
-- Disabled: `trailing_whitespace`.
-- Opt-in enabled: `empty_count`, `closure_spacing`, `force_unwrapping`, `implicitly_unwrapped_optional`, `overridden_super_call`, `private_outlet`, `vertical_whitespace_closing_braces`.
-- `line_length`: warn 150 / error 250. `type_body_length`: warn 400 / error 600. `large_tuple`: warn 5 / error 6.
-- `identifier_name` allows short domain identifiers: `hr`, `hrv`, `dt`, `dx`, `dy`, `id`, `db`, `ui`, plus single letters.
-- `included: StressMonitor` only; watch tests/UI-test dirs are excluded. **Lint does not cover the root-level `StressMonitorTests/` directory.**
+**Section organization:**
+- `// MARK: - Section Name` used pervasively (~800 occurrences) to segment files: `// MARK: - Stress API Client`, `// MARK: - Request Builder`, `// MARK: - Auth Service Errors`
+
+**Concurrency:**
+- `@MainActor` on ViewModels and UI-facing services (`StressAPIClient`, test suites)
+- ViewModels: `@MainActor @Observable final class` (34 `@Observable` types in app target)
+- `async throws` throwing APIs; `defer` for state reset (`AccountViewModel.signInWithGoogle` resets `isSigningIn` in `defer`)
+- Cross-thread test doubles use `@unchecked Sendable` with a comment justifying it
+
+**Access control:**
+- Default internal; `public` only where a framework boundary demands it (e.g. `RepositoryError`, `CloudKitSyncError` in `Services/Repository/StressRepository.swift`, `Utilities/DynamicTypeScaling.swift` helpers)
+- Mutable verification state in doubles is `private(set) var`
+
+## Architecture Conventions
+
+**MVVM + protocol DI (prescriptive — follow for all new features):**
+1. Define the seam as a protocol (`Services/<Domain>/XxxProtocol.swift` or `Services/Protocols/`)
+2. Implement a production service (`final class XxxService: XxxProtocol`)
+3. ViewModel takes the protocol with a production default so views need no wiring:
+   ```swift
+   // StressMonitor/StressMonitor/ViewModels/AccountViewModel.swift
+   @MainActor
+   @Observable
+   final class AccountViewModel {
+       private let authService: AuthServiceProtocol
+       init(authService: AuthServiceProtocol = FirebaseAuthService()) {
+           self.authService = authService
+       }
+   }
+   ```
+4. Tests inject a hand-written `MockXxx`/`FakeXxx` through the same initializer
+5. Views own ViewModels via `@State private var viewModel:` and `State(initialValue:)` in `init` (see `Views/DashboardView.swift`)
+
+**HTTP client pattern** (`Services/API/StressAPIClient*.swift`):
+- One `@MainActor final class StressAPIClient` with injected `authService`, `baseURL`, `session`
+- Endpoint groups in sibling extension files (`StressAPIClient+Credits.swift` etc.) sharing `authorizedRequest(path:method:body:accept:)`
+- Query-string endpoints must build URLs with `URLComponents` and call `authorizedRequest(url:)` — `appendingPathComponent` percent-encodes `?` (documented in the method's doc comment; follow it)
+
+**Base URL resolution:** `STRESS_API_BASE_URL` from Info.plist → env → UserDefaults → fallback `https://stress-api.dropitx.site` (`Services/API/StressAPIConfig.swift`)
+
+**UI conventions (from `AGENTS.md` + `docs/design-guidelines*.md`):**
+- Dual-code stress levels: color **plus** icon/text — never color alone
+- Colors via `Color.stressColor(for:)` (`Theme/Color+Extensions.swift`); gradients via `Theme/Gradients.swift`
+- 44pt touch targets: `.minimumTouchTarget()` (`Utilities/AccessibilityModifiers.swift`, default 44)
+- Dynamic Type: `.accessibleDynamicType(minimumScale:maxDynamicTypeSize:)` (`Utilities/DynamicTypeScaling.swift`) applied at screen root
+- Haptics via `HapticManager` (`Views/Components/HapticManager.swift`) — never raw `UIImpactFeedbackGenerator` calls in views
+- Design tokens in `Theme/DesignTokens.swift`, `Theme/HomeCharacterDesignTokens.swift`; characters via `Theme/CharacterAssetCatalog.swift`
+
+**Launch arguments:**
+- `-demo-mode` — simulator demo pipeline (no HealthKit data on simulator); checked in `StressMonitorApp.swift` (`DemoMode.isEnabled`) and backed by `Services/HealthKit/SimulatorHealthKitService.swift`
 
 ## Import Organization
 
-Observed pattern — a single alphabetically sorted block, no blank-line grouping, no third-party section (the app has no non-Apple imports outside the SPM UI packages):
-
-```swift
-import Foundation
-import HealthKit
-import Observation
-import SwiftData
-import SwiftUI
-```
-
-Rules in practice:
-- `Foundation` first (alphabetical anyway), then remaining frameworks alphabetically.
-- Import only what the file uses — service/model files typically import just `Foundation`, sometimes `+ SwiftData`.
-- Conditional imports are wrapped: `#if DEBUG import os #endif` (`ViewModels/StressViewModel.swift`), and whole DEBUG-only files open with `#if DEBUG` at line 1 (`Services/HealthKit/SimulatorHealthKitService.swift`).
-- No path aliases / module aliases; everything is one app module accessed via `@testable import StressMonitor` from tests.
-
-## State Management
-
-**`@Observable` is the only ViewModel pattern.** 32 files use `@Observable`; **zero** files use `ObservableObject`/`@Published`. Do not introduce Combine-era observation.
-
-Canonical shape (`ViewModels/StressViewModel.swift`):
-
-```swift
-@Observable
-@MainActor
-final class StressViewModel {
-    var currentStress: StressResult?
-    var isLoading = false
-    var errorMessage: String?
-    private(set) var isRequestingAccess: Bool = false
-}
-```
-
-- `@Observable` + `@MainActor` on the class, `final` preferred (`DashboardViewModel` omits `final` — prefer `final` on new code).
-- Mutable UI state is `var` and internal; state the view must not set is `private(set)`.
-- 37 files carry `@MainActor`. There are **no `actor` declarations anywhere** — concurrency isolation is main-actor-plus-`Sendable`, not custom actors.
-
-## Concurrency & Sendable
-
-- `Sendable` appears ~100 times across the iOS target. Protocols that cross task boundaries declare it: `StressAlgorithmServiceProtocol: Sendable`, `LLMServiceProtocol: Sendable`. Error enums that escape are `Error, Sendable` (`RepositoryError`, `CloudKitSyncError`, `SyncError`, `CloudKitError`).
-- Mocks and framework-backed services use `@unchecked Sendable` with mutable stored state: `final class MockHealthKitService: HealthKitServiceProtocol, @unchecked Sendable`, `final class SimulatorHealthKitService: HealthKitServiceProtocol, @unchecked Sendable`. **Drift:** `@unchecked` opts out of the checking that `CLAUDE.md`'s "strict concurrency, `Sendable` throughout" implies. Acceptable for test/demo doubles; avoid it in production services — prefer making stored state immutable or main-actor-isolated.
-- `async`/`await` everywhere; callbacks only at HealthKit/CloudKit framework boundaries. Streaming uses `AsyncStream` / `AsyncThrowingStream` (`observeHeartRateUpdates()`, `LLMServiceProtocol.send`).
-- Concurrent fetches use `async let` then a tuple `try await`.
-
-## Dependency Injection
-
-Protocol-based constructor injection with defaulted parameters, so call sites stay terse and tests can substitute doubles:
-
-```swift
-final class MultiFactorStressCalculator: StressAlgorithmServiceProtocol {
-    init(factors: [any StressFactor]? = nil,
-         baseline: PersonalBaseline = PersonalBaseline(),
-         calibratedWeights: FactorWeights? = nil) { ... }
-}
-```
-
-- Heterogeneous protocol collections use `[any Protocol]` (`[any StressFactor]`), not generics.
-- Non-optional collaborators are `private let` and assigned once in `init`.
-- Test-time substitution passes a fake into the initializer (`PremiumViewModel(storeKit:premiumState:)` in `StressMonitorTests/PremiumViewModelTests.swift`).
-- `UserDefaults`-backed state accepts an injected suite so tests avoid polluting the real domain (`PremiumState(defaults:key:)`).
-
-## SwiftData Models
-
-`@Model public final class` with plain stored properties and an explicit memberwise `init` — see `StressMonitor/StressMonitor/Models/StressMeasurement.swift`.
-
-- New fields added post-release are **optional** (`var hrvComponent: Double?`) so SwiftData performs a lightweight migration; the file marks these with a `// MARK: - Multi-Factor Component Fields (optional — lightweight migration)` banner. Follow this: never add a non-optional field without a default to an existing `@Model`.
-- Enums are persisted as `...RawValue: String` companions (`categoryRawValue`) rather than as enum-typed properties.
-- CloudKit sync bookkeeping travels on the model itself: `isSynced`, `cloudKitRecordName`, `deviceID`, `cloudKitModTime`.
-- Schema registration lives in `StressMonitor/StressMonitorSchema.swift`; container setup in `StressMonitor/StressMonitorApp.swift`.
+**Order** (per `docs/code-standards-swift.md`, observed in source):
+1. System/framework imports, alphabetized (`import Foundation`, `import SwiftUI`, `import SwiftData`, `import UIKit`)
+2. Third-party (`import StoreKit`, `import StoreKitTest`, `import FirebaseCore`, ...)
+3. No project-module imports (single app module); tests add `@testable import StressMonitor` last
 
 ## Error Handling
 
-**`throws` is the default mechanism.** `Result` is not used as a return type anywhere — the only `Result<...>` occurrences are StoreKit's own `VerificationResult` (`Services/StoreKit/StoreKitService.swift`).
-
-Patterns:
-- Each subsystem defines its own `enum ...Error: LocalizedError` and throws it; `guard ... else { throw StressError.noData }` (`MultiFactorStressCalculator.calculateMultiFactorStress`).
-- Optionals signal "absent, not exceptional": `fetchLatestHRV() async throws -> HRVMeasurement?`, and a factor returning `nil` from `calculate(context:)` means "this factor has no data" and triggers weight redistribution rather than an error.
-- ViewModels catch at the boundary and surface `errorMessage: String?` for the UI; permission failures get their own flag (`isPermissionRequired` is set *only* on `HKError.errorAuthorizationDenied`, deliberately not inferred from nil data).
-- `try!` count is **0**. `try?` appears in ~33 files — acceptable only where failure is genuinely ignorable; prefer `do/catch` with a logged reason.
-- `force_unwrapping` and `implicitly_unwrapped_optional` are SwiftLint opt-ins, so both are flagged in app code (test code is outside `included:` and does use `!`).
+**Patterns (prescriptive):**
+- Throw typed domain errors from services; never `NSError` or bare `String`
+- Provide `var errorDescription: String?` with **user-facing copy** in the error enum itself:
+  ```swift
+  // StressMonitor/StressMonitor/Services/Auth/AuthServiceError.swift
+  enum AuthServiceError: Error, LocalizedError {
+      case googleSignInFailed(underlying: Error?)
+      var errorDescription: String? {
+          switch self {
+          case .googleSignInFailed(let underlying):
+              return underlying?.localizedDescription
+                  ?? "Google Sign-In could not be completed. Please try again."
+          }
+      }
+  }
+  ```
+- Keep error enums **distinct per domain** so failures surface as the right UI message (`AuthServiceError` doc comment: kept separate from `LLMServiceError` deliberately)
+- ViewModels catch, set `errorMessage: String?`, rethrow when the caller must know, and expose `clearError()`
+- Known-noise filtering via small helper enums with static predicates: `GoogleSignInCancellation.isUserCancellation(error)` (checks `NSError.domain == "com.google.GIDSignIn"`, `code == -5`) in `ViewModels/AccountViewModel.swift`
+- Comments in tests record why a bug is pinned (`// DISABLED: ...` header in `StressMonitor/StressMonitorTests/StoreKitServiceTests.swift`)
 
 ## Logging
 
-There is **no unified logging layer** — this is real drift worth fixing.
+**Framework:** `os.Logger` (unified logging), subsystem `"com.stressmonitor.app"`
 
-- `os.Logger` is used in only 2 files, and `DataManagementViewModel`/`DataManagementUtilities` define their own `DataManagementLogger` abstraction with a `static let \`default\``.
-- 17 raw `print(` calls remain in the iOS target.
-- `import os` is `#if DEBUG`-gated in `StressViewModel`.
-
-Guidance for new code: use `os.Logger` with a subsystem/category, gate verbose output behind `#if DEBUG`, never `print` in a shipping path, and never log health values or auth tokens.
+**Patterns:**
+- Private static loggers with a category: `Logger(subsystem: "com.stressmonitor.app", category: "FirebaseBootstrap")` (`Services/Firebase/FirebaseBootstrap.swift`, `StressMonitorApp.swift`)
+- Logging is intentionally sparse (~6 files import `os`); a handful of `print(` calls remain (~13) — do not add more; use `Logger`
+- No third-party logging/crash SDK in the app target
 
 ## Comments
 
-- Do not write "what" comments. The prevailing style is `// MARK: - ` structural dividers plus `///` doc comments on shared types and on properties whose semantics are non-obvious.
-- Where a comment exists it explains a constraint or a rationale ("Set exclusively when `HKError.errorAuthorizationDenied` is caught — NOT a proxy for `currentStress == nil`").
-- Match the CLAUDE.md comment policy: prefer better naming; only comment non-obvious rules, framework workarounds, and numeric/algorithmic derivations.
+**When to Comment:**
+- `///` doc comments on types and public-facing methods explain **why** and pin external contracts, e.g. `StressAPIClient.authorizedRequest(path:)` explains the `URLComponents` rule; `SSEParserTests` header pins the backend-defined `quick_actions` field name ("a rename breaks silently")
+- `// MARK: -` for section navigation
+- Block comments on test doubles document reset discipline and sharing rules (`RequestCaptureURLProtocol`, `StoreKitTestSessionProvider` doc comments in `StressMonitor/StressMonitorTests/`)
+- `// swiftlint:disable:next <rule>` with an adjacent justification
 
-## Function & Type Design
+**JSDoc/TSDoc equivalent:** Swift Markup (`///`, `- Parameter`, `- Returns`) — used on services and protocols; keep it current when changing behavior
 
-- Types are `final class` for services/ViewModels, `struct` for value types and views, caseless `enum` for namespaces. `type_body_length` warns at 400 lines — several ViewModels approach this; split with extensions in `Type+Feature.swift` files rather than growing the primary declaration (see the `HealthKitManager+*Fetch.swift` split).
-- Prefer expression-bodied one-line forwarding (`try await fallback.calculateStress(...)` with no `return`).
-- Parameters use full external labels; multi-argument initializers wrap one-per-line.
-- Access control: mostly implicit `internal`; `public` is used on model/repository/sync types that the widget & watch targets share (`StressMeasurement`, `RepositoryError`, `SyncError`). Collaborators and helpers are `private`.
+## Function Design
 
-## Theming & Design Tokens
+**Size:** Keep files/types focused; SwiftLint flags type bodies over 400 lines (warn) / 600 (error). `docs/code-standards-swift.md` targets ~200 LOC per file via extraction into `Components/` subdirectories.
 
-- `Theme/DesignTokens.swift` provides nested caseless enums — `DesignTokens.Spacing.{xs…xxxl}`, `.Layout.{cornerRadius, minTouchTarget: 44, cardPadding, sectionSpacing}`, `.Typography`, `.Animation`. Used in 257 places.
-- Stress colors come from `Color.stressColor(for:)` (`Theme/Color+Extensions.swift`), used 23 times.
-- **Drift:** 424 call sites still construct colors inline via `Color(hex:)` / `Color(red:)`, and additional token sets exist in parallel (`Theme/HomeCharacterDesignTokens.swift`, `Theme/Color+Wellness.swift`, `Theme/Gradients.swift`). New UI should reach for `DesignTokens` / `Color.stressColor` / `Font+WellnessType` first and add a token rather than an inline literal.
-- Accessibility helpers live in `Utilities/` (`AccessibilityModifiers.swift`, `DynamicTypeScaling.swift`, `HighContrastModifier.swift`, `PatternOverlay.swift`, `ColorBlindnessSimulator.swift`). **Drift:** `CLAUDE.md` requires `.accessibleDynamicType()` on views but only 1 file applies it — treat Dynamic Type as an open gap when touching a screen.
-- Haptics are centralized in `HapticManager` (39 call sites); do not call `UIImpactFeedbackGenerator` directly.
-- 119 files ship `#Preview` blocks, generally fed by `Services/MockServices.swift` doubles. Add a preview for every new view.
+**Parameters:** Prefer parameterized initializers with sensible defaults (`StressAPIClient.init(authService:baseURL:session:)`); avoid boolean flag parameters in favor of distinct methods.
 
-## Module & Target Layout Notes
+**Return Values:** `async throws` for fallible I/O; typed results (`[CreditTransaction]`, `ChatSession`); errors typed per domain (see Error Handling).
 
-- Single app module `StressMonitor` — no barrel files, no re-export shims.
-- Shared code is duplicated per target rather than extracted into a framework: `StressMonitorWatch Watch App/` mirrors `Models/`, `Services/`, `Theme/`, `ViewModels/`, `Views/`. Changing a shared model means editing both sides.
-- A legacy source set sits one level up at `StressMonitor/{Models,Services,Views}/` (`Services/HRVAnalyzer.swift`, `Services/StressPredictor.swift`, `Services/MorningReadinessService.swift`, `Models/StressReading.swift`). New work belongs in `StressMonitor/StressMonitor/`.
+## Module Design
+
+**Exports:** One primary type per file (plus tightly-coupled private helpers and its error enum). Extensions on the same type go in `Type+Feature.swift` siblings.
+
+**Barrel Files:** Not used. No umbrella re-exports; consumers import `StressMonitor` (single app module) or `@testable import StressMonitor` in tests.
+
+**Target duplication:** Shared algorithm/protocol sources are compiled into both app and watch targets by membership — there is no shared framework. Mirror changes manually.
 
 ---
 
-*Convention analysis: 2026-08-08*
+*Convention analysis: 2026-08-29*
