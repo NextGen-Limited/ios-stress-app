@@ -190,7 +190,7 @@ Workarounds attempted and why each failed:
 | `-target StressMonitorTests` without `-sdk` | Switches to device signing; fails on Match provisioning profile capability mismatches |
 | Adding `ASSETCATALOG_COMPILER_APPICON_NAME=""` to skip the watch icon | The override applies to SPM package targets too and broke GTMAppAuth module-map generation. Reverted; SPM state recovered on the next clean invocation. |
 | Building the watch target alone against `iphonesimulator` | Genuine compile failure — `WatchConnectivityManager does not conform to WCSessionDelegate` under the iOS SDK. Dead end. |
-| `xcodebuild -downloadPlatform watchOS` (started in background) | Still downloading after ~50 minutes; did not complete within this session. |
+| `xcodebuild -downloadPlatform watchOS` (started in background) | Ran ~60 minutes without completing, then was killed when the session ended. `xcrun simctl list runtimes` still shows no watchOS runtime, so this workaround delivered nothing and must be re-run. |
 
 **What I did verify:**
 
