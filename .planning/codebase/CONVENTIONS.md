@@ -15,7 +15,7 @@
 - PascalCase matching the primary type: `StressMeasurement.swift`, `HealthKitManager.swift`, `DashboardView.swift`
 - ViewModels: `XxxViewModel.swift` in `StressMonitor/StressMonitor/ViewModels/` (7 files: `StressViewModel.swift`, `ChatViewModel.swift`, `AccountViewModel.swift`, `PremiumViewModel.swift`, `CreditsViewModel.swift`, `HabitViewModel.swift`, `CharacterCollectionViewModel.swift`)
 - Services: `XxxService.swift` / `XxxManager.swift`, organized by domain subdirectory under `StressMonitor/StressMonitor/Services/` (`API/`, `Auth/`, `Algorithm/`, `Chat/`, `CloudKit/`, `Credits/`, `DataManagement/`, `Firebase/`, `HealthKit/`, `LLM/`, `Preferences/`, `Premium/`, `Repository/`, `StoreKit/`, `Sync/`, `Background/`, `Connectivity/`)
-- Protocols: `XxxProtocol.swift` in `StressMonitor/StressMonitor/Services/Protocols/` (`AuthServiceProtocol` lives at `Services/Auth/`, `LLMServiceProtocol` at `Services/LLM/`, `StoreKitServiceProtocol` at `Services/StoreKit/`)
+- Protocols: `XxxProtocol.swift` — the cross-domain seams live in `StressMonitor/StressMonitor/Services/Protocols/` (`HealthKitServiceProtocol.swift`, `StressRepositoryProtocol.swift`, `StressAlgorithmServiceProtocol.swift`, `CloudKitServiceProtocol.swift`); domain protocols live beside their implementation: `AuthServiceProtocol` at `Services/Auth/`, `LLMServiceProtocol` at `Services/LLM/`, `StoreKitServiceProtocol` at `Services/StoreKit/`, `CreditServiceProtocol` at `Services/Credits/`
 - Extensions: `Type+Feature.swift` — `Theme/Color+Extensions.swift`, `Theme/Color+Wellness.swift`, `Utilities/Animation+Wellness.swift`, `Services/API/StressAPIClient+Credits.swift` (endpoint groups as extensions: `+Preferences`, `+QuickActions`, `+Sessions`)
 - Views: `XxxView.swift` grouped by feature folder `Views/<Feature>/` with shared subcomponents in `Views/<Feature>/Components/` and cross-feature pieces in `Views/Components/`
 
@@ -42,7 +42,7 @@
 - Run locally from repo root: `swiftlint lint`
 
 **Section organization:**
-- `// MARK: - Section Name` used pervasively (~800 occurrences) to segment files: `// MARK: - Stress API Client`, `// MARK: - Request Builder`, `// MARK: - Auth Service Errors`
+- `// MARK: - Section Name` used pervasively (~810 occurrences) to segment files: `// MARK: - Stress API Client`, `// MARK: - Request Builder`, `// MARK: - Auth Service Errors`, `// MARK: - Test doubles`
 
 **Concurrency:**
 - `@MainActor` on ViewModels and UI-facing services (`StressAPIClient`, test suites)
@@ -72,14 +72,17 @@
    }
    ```
 4. Tests inject a hand-written `MockXxx`/`FakeXxx` through the same initializer
-5. Views own ViewModels via `@State private var viewModel:` and `State(initialValue:)` in `init` (see `Views/DashboardView.swift`)
+5. Views own ViewModels via `@State private var viewModel:` and `_viewModel = State(initialValue:)` in `init` (see `Views/DashboardView.swift`, `Views/Settings/SettingsView.swift`)
+
+**Testability seams beyond protocols:**
+- Where a framework type cannot conform to a protocol (`StoreKit.Purchase` is a struct from the SDK), declare a narrow internal protocol and accept it in the API: `PurchaseTransactionHandle` (`Services/StoreKit/StoreKitService.swift:13`) lets `CreditPurchaseFlowTests` fake a purchase without StoreKitTest. Prefer this over widening method signatures to framework types.
 
 **HTTP client pattern** (`Services/API/StressAPIClient*.swift`):
 - One `@MainActor final class StressAPIClient` with injected `authService`, `baseURL`, `session`
 - Endpoint groups in sibling extension files (`StressAPIClient+Credits.swift` etc.) sharing `authorizedRequest(path:method:body:accept:)`
-- Query-string endpoints must build URLs with `URLComponents` and call `authorizedRequest(url:)` — `appendingPathComponent` percent-encodes `?` (documented in the method's doc comment; follow it)
+- Query-string endpoints must build URLs with `URLComponents` and call `authorizedRequest(url:)` — `appendingPathComponent` percent-encodes `?` (documented in the method's doc comment and pinned by tests asserting `url.absoluteString.contains("%3F") == false`; follow it)
 
-**Base URL resolution:** `STRESS_API_BASE_URL` from Info.plist → env → UserDefaults → fallback `https://stress-api.dropitx.site` (`Services/API/StressAPIConfig.swift`)
+**Base URL resolution:** `STRESS_API_BASE_URL` from Info.plist → env → UserDefaults → fallback `https://stress-api.dropitx.site` (`Services/API/StressAPIConfig.swift`; precedence pinned by `StressMonitor/StressMonitorTests/StressAPIConfigTests.swift`)
 
 **UI conventions (from `AGENTS.md` + `docs/design-guidelines*.md`):**
 - Dual-code stress levels: color **plus** icon/text — never color alone
@@ -90,7 +93,7 @@
 - Design tokens in `Theme/DesignTokens.swift`, `Theme/HomeCharacterDesignTokens.swift`; characters via `Theme/CharacterAssetCatalog.swift`
 
 **Launch arguments:**
-- `-demo-mode` — simulator demo pipeline (no HealthKit data on simulator); checked in `StressMonitorApp.swift` (`DemoMode.isEnabled`) and backed by `Services/HealthKit/SimulatorHealthKitService.swift`
+- `-demo-mode` — simulator demo pipeline (no HealthKit data on simulator); `DemoMode.isEnabled` is defined in `StressMonitorApp.swift` and consumed by `StressViewModel` (`ViewModels/StressViewModel.swift:477`), backed by `Services/HealthKit/SimulatorHealthKitService.swift`
 
 ## Import Organization
 
@@ -117,18 +120,18 @@
       }
   }
   ```
-- Keep error enums **distinct per domain** so failures surface as the right UI message (`AuthServiceError` doc comment: kept separate from `LLMServiceError` deliberately)
+- Keep error enums **distinct per domain** so failures surface as the right UI message (`AuthServiceError` doc comment: kept separate from `LLMServiceError` deliberately). Wording is regression-pinned by `StressMonitor/StressMonitorTests/AuthServiceErrorTests.swift` and `LLMServiceErrorTests.swift`
 - ViewModels catch, set `errorMessage: String?`, rethrow when the caller must know, and expose `clearError()`
 - Known-noise filtering via small helper enums with static predicates: `GoogleSignInCancellation.isUserCancellation(error)` (checks `NSError.domain == "com.google.GIDSignIn"`, `code == -5`) in `ViewModels/AccountViewModel.swift`
-- Comments in tests record why a bug is pinned (`// DISABLED: ...` header in `StressMonitor/StressMonitorTests/StoreKitServiceTests.swift`)
+- Comments in tests record why a suite is quarantined (`// DISABLED: ...` header in `StressMonitor/StressMonitorTests/StoreKitServiceTests.swift`)
 
 ## Logging
 
 **Framework:** `os.Logger` (unified logging), subsystem `"com.stressmonitor.app"`
 
 **Patterns:**
-- Private static loggers with a category: `Logger(subsystem: "com.stressmonitor.app", category: "FirebaseBootstrap")` (`Services/Firebase/FirebaseBootstrap.swift`, `StressMonitorApp.swift`)
-- Logging is intentionally sparse (~6 files import `os`); a handful of `print(` calls remain (~13) — do not add more; use `Logger`
+- Private static loggers with a category: `Logger(subsystem: "com.stressmonitor.app", category: "FirebaseBootstrap")` (`Services/Firebase/FirebaseBootstrap.swift`, `StressMonitorApp.swift`); launch signposts use the same subsystem (`StressMonitorApp.swift:193`)
+- Logging is intentionally sparse (6 files import `os`); 16 `print(` calls remain — do not add more; use `Logger`
 - No third-party logging/crash SDK in the app target
 
 ## Comments
