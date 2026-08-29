@@ -138,6 +138,7 @@ Carried into v1.1 (still open at v1.0 close — see PROJECT.md Active requiremen
 | # | Description | Date | Commit | Directory |
 |---|-------------|------|--------|-----------|
 | 260811-t0l | Fix CI failure in .github/workflows/_test.yml: resolve iPhone Simulator UDID dynamically instead of hardcoding name=iPhone 16 | 2026-08-11 | 7864b95 | [260811-t0l-fix-ci-failure-in-github-workflows-test-](./quick/260811-t0l-fix-ci-failure-in-github-workflows-test-/) |
+| 260829-kby | Firebase bootstrap state + AuthServiceError taxonomy (CI provisioning deferred) | 2026-08-29 | 6227803 | [260829-kby-provision-googleservice-info-plist-in-ci](./quick/260829-kby-provision-googleservice-info-plist-in-ci/) |
 
 ## Deferred Items
 

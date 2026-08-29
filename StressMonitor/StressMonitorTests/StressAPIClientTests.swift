@@ -20,7 +20,7 @@ final class MockAuthService: AuthServiceProtocol, @unchecked Sendable {
 
     init(
         token: String = "fake-token",
-        googleSignInError: Error? = LLMServiceError.unavailable(reason: "Google Sign-In not supported in mock."),
+        googleSignInError: Error? = AuthServiceError.googleSignInFailed(underlying: nil),
         email: String? = nil
     ) {
         self.token = token

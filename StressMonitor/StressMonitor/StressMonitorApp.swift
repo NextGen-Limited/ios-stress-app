@@ -1,7 +1,6 @@
 import FirebaseAuth
 import os
 import SwiftData
-import FirebaseCore
 import SwiftUI
 
 #if DEBUG
@@ -184,13 +183,10 @@ struct StressMonitorApp: App {
         let creditService = CreditService()
         _creditService = State(initialValue: creditService)
         _storeKitService = State(initialValue: Self.makeStoreKitService(creditService: creditService))
-        // Firebase requires GoogleService-Info.plist at configure time and the
-        // file is gitignored — fresh checkouts (CI runners) launch without it.
-        // Configure only when it is present; `Auth.auth()` would equally trap
-        // without a configured FIRApp, so the anonymous sign-in rides the same
-        // guard. Auth-dependent surfaces degrade via typed errors instead.
-        if Bundle.main.path(forResource: "GoogleService-Info", ofType: "plist") != nil {
-            FirebaseApp.configure()
+        // `Auth.auth()` traps without a configured FIRApp, so the anonymous
+        // sign-in rides the same guard as configuration. Auth-dependent
+        // surfaces degrade via typed errors instead.
+        if FirebaseBootstrap.bootstrap() == .configured {
             Task { try? await Auth.auth().signInAnonymously() }
         }
         #if DEBUG
