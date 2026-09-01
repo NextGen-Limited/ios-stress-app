@@ -31,7 +31,7 @@ See: .planning/PROJECT.md (updated 2026-08-23 after v1.1 Phase 03 close — mile
 Phase: Post-milestone — Phase 03 drift re-test
 Plan: —
 Status: v1.1 closed & tagged (PR #48 squash-merged, CI 6/6); drift re-test awaiting user scenarios
-Last activity: 2026-09-01
+Last activity: 2026-09-01 - Completed quick task 260901-vfd: Fix Color.stressColor(for: Double) threshold bug
 
 ## Performance Metrics
 
@@ -139,6 +139,7 @@ Carried into v1.1 (still open at v1.0 close — see PROJECT.md Active requiremen
 |---|-------------|------|--------|-----------|
 | 260811-t0l | Fix CI failure in .github/workflows/_test.yml: resolve iPhone Simulator UDID dynamically instead of hardcoding name=iPhone 16 | 2026-08-11 | 7864b95 | [260811-t0l-fix-ci-failure-in-github-workflows-test-](./quick/260811-t0l-fix-ci-failure-in-github-workflows-test-/) |
 | 260829-kby | Firebase bootstrap state + AuthServiceError taxonomy (CI provisioning deferred) | 2026-08-29 | 6227803 | [260829-kby-provision-googleservice-info-plist-in-ci](./quick/260829-kby-provision-googleservice-info-plist-in-ci/) |
+| 260901-vfd | Fix Color.stressColor(for: Double) threshold bug - delegate to StressResult.category(for:).color so fractional scores stop rendering gray and 90+ resolves severe | 2026-09-01 | cf2dc8c | [260901-vfd-fix-color-stresscolor-for-double-thresho](./quick/260901-vfd-fix-color-stresscolor-for-double-thresho/) |
 
 ## Deferred Items
 
