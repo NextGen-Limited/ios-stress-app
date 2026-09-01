@@ -122,6 +122,8 @@ StressMonitor/
 
 MVVM with protocol-based dependency injection:
 
+[![StressMonitor stress calculation architecture](docs/diagrams/stress-calculation-architecture.png)](docs/diagrams/stress-calculation-architecture.html)
+
 ```
 Views (SwiftUI)
     ↓
