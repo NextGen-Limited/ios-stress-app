@@ -38,12 +38,7 @@ class DetailViewModel {
     }
 
     var category: StressCategory {
-        switch measurement.stressLevel {
-        case 0...25: return .relaxed
-        case 26...50: return .mild
-        case 51...75: return .moderate
-        default: return .high
-        }
+        StressResult.category(for: measurement.stressLevel)
     }
 
     func shareMeasurement() {
