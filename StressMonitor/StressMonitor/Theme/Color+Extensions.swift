@@ -189,14 +189,11 @@ extension Color {
 
     // MARK: - Color Helpers
 
+    /// Resolves a raw 0-100 stress level to its category color.
+    /// Delegates to `StressResult.category(for:)` so tier thresholds stay consistent
+    /// with the algorithm's own boundaries and fractional levels never fall through.
     static func stressColor(for level: Double) -> Color {
-        switch level {
-        case 0...25: return .stressRelaxed
-        case 26...50: return .stressMild
-        case 51...75: return .stressModerate
-        case 76...100: return .stressHigh
-        default: return .secondary
-        }
+        return StressResult.category(for: level).color
     }
 
     static func stressColor(for category: StressCategory) -> Color {
