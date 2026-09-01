@@ -2,10 +2,10 @@
 gsd_state_version: 1.0
 milestone: v1.1
 milestone_name: Backend API Migration
-status: "Milestone v1.1 shipped — PR #48 squash-merged (CI green: 6/6 checks, 2026-08-24)"
-stopped_at: Milestone v1.1 complete — all 3 phases passed verification; lifecycle (audit → complete → cleanup) pending
-last_updated: "2026-08-24T02:47:52.891Z"
-last_activity: 2026-08-24
+status: "No active milestone — v1.1 closed 2026-08-24 (verified_closeout, tag v1.1); Phase 03 post-merge drift re-test in flight (started 2026-08-30)"
+stopped_at: Awaiting user execution of Phase 03 post-merge drift re-test scenarios (.planning/phases/03-*/03-UAT.md); then /gsd-new-milestone (v1.2 submission readiness recommended)
+last_updated: "2026-09-01T15:10:00Z"
+last_activity: 2026-09-01
 progress:
   total_phases: 3
   completed_phases: 3
@@ -24,14 +24,14 @@ last_activity_desc: Milestone v1.1 completed and archived
 See: .planning/PROJECT.md (updated 2026-08-23 after v1.1 Phase 03 close — milestone complete)
 
 **Core value:** Every feature that ships in the binary must actually work end-to-end for a real user — not just compile.
-**Current focus:** Milestone v1.1 complete — lifecycle (audit → complete → cleanup) pending
+**Current focus:** Post-merge drift re-test of Phase 03 UAT (5 scenarios pending), then /gsd-new-milestone — v1.2 submission readiness recommended per v1.1 audit
 
 ## Current Position
 
-Phase: Milestone v1.1 complete
+Phase: Post-milestone — Phase 03 drift re-test
 Plan: —
-Status: Milestone v1.1 shipped — PR #48 (squash-merge pending CI)
-Last activity: 2026-08-24
+Status: v1.1 closed & tagged (PR #48 squash-merged, CI 6/6); drift re-test awaiting user scenarios
+Last activity: 2026-09-01
 
 ## Performance Metrics
 
@@ -156,10 +156,11 @@ Items acknowledged and deferred at v1.1 milestone close on 2026-08-23: none — 
 
 ## Session Continuity
 
-Last session: 2026-08-23T15:15:00Z
-Stopped at: Milestone v1.1 complete — all 3 phases passed verification; lifecycle (audit → complete → cleanup) pending
+Last session: 2026-09-01T15:10:00Z
+Stopped at: v1.1 lifecycle complete (audit → archive → tag). Open: Phase 03 post-merge drift re-test (.planning/phases/03-*/03-UAT.md) awaiting user execution
 Resume file: None
 
 ## Operator Next Steps
 
-- Start the next milestone with /gsd-new-milestone
+- Finish the Phase 03 post-merge drift re-test (.planning/phases/03-*/03-UAT.md — 5 scenarios, health precheck confirmed green 2026-08-30)
+- Start the next milestone with /gsd-new-milestone (v1.2 submission readiness recommended)
