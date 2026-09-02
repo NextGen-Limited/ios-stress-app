@@ -27,8 +27,8 @@ struct StoreKitProductCatalogLiveTests {
     func liveCatalogResolvesGroupID() {
         let catalog = StoreKitProductCatalog.live
         #expect(
-            catalog.subscriptionGroupID == "SMPREMIUM01",
-            "Subscription group ID missing or mismatched. Add INFOPLIST_KEY_STOREKIT_PREMIUM_SUBSCRIPTION_GROUP_ID = SMPREMIUM01 to the app target build settings."
+            catalog.subscriptionGroupID == "22353146",
+            "Subscription group ID missing or mismatched. Add INFOPLIST_KEY_STOREKIT_PREMIUM_SUBSCRIPTION_GROUP_ID = 22353146 to the app target build settings."
         )
     }
 
