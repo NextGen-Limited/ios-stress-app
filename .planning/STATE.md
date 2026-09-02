@@ -1,20 +1,21 @@
 ---
 gsd_state_version: 1.0
 milestone: v1.1
-milestone_name: Backend API Migration
-status: "No active milestone — v1.1 closed 2026-08-24 (verified_closeout, tag v1.1); Phase 03 post-merge drift re-test in flight (started 2026-08-30)"
+current_phase_name: Sessions, Preferences, Quick Actions + Cleanup
+status: No active milestone — v1.1 closed 2026-08-24 (verified_closeout, tag v1.1); Phase 03 post-merge drift re-test in flight (started 2026-08-30)
 stopped_at: Awaiting user execution of Phase 03 post-merge drift re-test scenarios (.planning/phases/03-*/03-UAT.md); then /gsd-new-milestone (v1.2 submission readiness recommended)
-last_updated: "2026-09-01T15:10:00Z"
+last_updated: "2026-09-02T06:14:05.441Z"
 last_activity: 2026-09-01
+last_activity_desc: Milestone v1.1 completed and archived
+state_head: 2b8486251e4443e697e551daa6ef968e26c11a9b
 progress:
   total_phases: 3
   completed_phases: 3
   total_plans: 17
   completed_plans: 17
   percent: 100
+milestone_name: Backend API Migration
 current_phase: 3
-current_phase_name: Sessions, Preferences, Quick Actions + Cleanup
-last_activity_desc: Milestone v1.1 completed and archived
 ---
 
 # Project State
@@ -140,6 +141,7 @@ Carried into v1.1 (still open at v1.0 close — see PROJECT.md Active requiremen
 | 260811-t0l | Fix CI failure in .github/workflows/_test.yml: resolve iPhone Simulator UDID dynamically instead of hardcoding name=iPhone 16 | 2026-08-11 | 7864b95 | [260811-t0l-fix-ci-failure-in-github-workflows-test-](./quick/260811-t0l-fix-ci-failure-in-github-workflows-test-/) |
 | 260829-kby | Firebase bootstrap state + AuthServiceError taxonomy (CI provisioning deferred) | 2026-08-29 | 6227803 | [260829-kby-provision-googleservice-info-plist-in-ci](./quick/260829-kby-provision-googleservice-info-plist-in-ci/) |
 | 260901-vfd | Fix Color.stressColor(for: Double) threshold bug - delegate to StressResult.category(for:).color so fractional scores stop rendering gray and 90+ resolves severe | 2026-09-01 | cf2dc8c | [260901-vfd-fix-color-stresscolor-for-double-thresho](./quick/260901-vfd-fix-color-stresscolor-for-double-thresho/) |
+| 4 | Update Settings UI to approved redesign direction (cream canvas, plain surface cards) | 2026-09-02 | 2b84862 | — |
 
 ## Deferred Items
 
