@@ -28,7 +28,6 @@ struct SettingsCard<Content: View>: View {
     private var cardShape: RoundedRectangle {
         RoundedRectangle(cornerRadius: Spacing.settingsCardRadius, style: .continuous)
     }
-
 }
 
 struct SettingsCard_Previews: PreviewProvider {

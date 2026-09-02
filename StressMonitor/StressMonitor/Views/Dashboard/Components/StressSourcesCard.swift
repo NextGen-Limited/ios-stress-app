@@ -49,7 +49,7 @@ struct StressSourcesCard: View {
             legendGrid
         }
         .padding(Spacing.settingsCardPadding)
-        .background(Color.adaptiveCardBackground)
+        .background(Color.Wellness.adaptiveCardBackground)
         .clipShape(RoundedRectangle(cornerRadius: Spacing.settingsCardRadius))
         .shadow(AppShadow.settingsCard)
     }
