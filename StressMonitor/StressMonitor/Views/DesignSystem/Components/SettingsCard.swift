@@ -15,12 +15,8 @@ struct SettingsCard<Content: View>: View {
     var body: some View {
         content
             .padding(padding)
-            .background(cardBackground)
+            .background(Color.Wellness.adaptiveCardBackground)
             .clipShape(cardShape)
-            .overlay(
-                cardShape
-                    .stroke(Color.settingsCardBorder, lineWidth: 1)
-            )
             .shadow(
                 color: colorScheme == .dark ? Color.clear : Color.settingsCardShadowColor.opacity(0.07),
                 radius: colorScheme == .dark ? 0 : 10,
@@ -33,16 +29,6 @@ struct SettingsCard<Content: View>: View {
         RoundedRectangle(cornerRadius: Spacing.settingsCardRadius, style: .continuous)
     }
 
-    @ViewBuilder
-    private var cardBackground: some View {
-        if colorScheme == .dark {
-            cardShape
-                .fill(Color.settingsCardBackground.opacity(0.92))
-                .background(.ultraThinMaterial, in: cardShape)
-        } else {
-            cardShape.fill(Color.settingsCardBackground)
-        }
-    }
 }
 
 struct SettingsCard_Previews: PreviewProvider {

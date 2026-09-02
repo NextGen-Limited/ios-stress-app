@@ -109,10 +109,6 @@ extension Color {
     static let settingsRippleBlue = Color(hex: "4FC3F7")
     /// Accent teal compatibility alias now aligned to Ripple blue.
     static let accentTeal = Color(hex: "4FC3F7")
-    /// Settings glass card background (light: white, dark: #1A1A2E)
-    static let settingsCardBackground = Color(light: .white, dark: Color(hex: "1A1A2E"))
-    /// Settings card border for refined glass cards.
-    static let settingsCardBorder = Color(light: Color(hex: "E9E4D8"), dark: Color.white.opacity(0.10))
     /// Settings icon accents.
     static let settingsIconYellow = Color(hex: "FFD166")
     static let settingsIconPurple = Color(hex: "A78BFA")
@@ -138,11 +134,6 @@ extension Color {
     /// Adaptive background for settings screen
     static var adaptiveSettingsBackground: Color {
         settingsBackground
-    }
-
-    /// Adaptive card background (white in light, elevated in dark)
-    static var adaptiveCardBackground: Color {
-        settingsCardBackground
     }
 
         // MARK: - Paywall Redesign Colors

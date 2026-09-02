@@ -52,7 +52,7 @@ struct SettingsView: View {
             .padding(.top, 8)
             .padding(.bottom, 24)
         }
-        .background(Color.appBackground)
+        .background(Color.Wellness.adaptiveBackground)
         .accessibleDynamicType()
         .navigationTitle("Settings")
         .navigationBarTitleDisplayMode(.inline)
