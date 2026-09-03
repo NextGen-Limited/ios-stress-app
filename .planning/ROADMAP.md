@@ -103,7 +103,7 @@ Plans:
   4. The full suite reports zero unexplained failures and no silently disabled suite: the WINDOWS.md #8 CoreSimulator crash lineage and the `CharacterEntitlementSyncTests` quarantine are each fixed, or each carries a written, dated disposition naming the root cause and the accepted coverage loss.
   5. The money-path advisories are dispositioned: WR-03 (DEBUG builds routing purchases through `MockStoreKitService`) and WR-04 (`.unverified` consumables being finished) are fixed or documented as an explicit accept with rationale.
 
-**Plans**: 2/6 plans executed
+**Plans**: 3/6 plans executed
 Plans:
 **Wave 1**
 
@@ -112,7 +112,7 @@ Plans:
 
 **Wave 2** *(pbxproj serialized after 02-01)*
 
-- [ ] 02-03-PLAN.md — ENV-03/WR-03 (TDD): DEBUG defaults to real StoreKit at both wiring sites; mock becomes launch-arg opt-in — red-first wiring pin
+- [x] 02-03-PLAN.md — ENV-03/WR-03 (TDD): DEBUG defaults to real StoreKit at both wiring sites; mock becomes launch-arg opt-in — red-first wiring pin
 
 **Wave 3** *(blocked on Waves 1-2)*
 
@@ -163,6 +163,6 @@ Plans:
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 1. Binary & Manifest Truth | v1.2 | 6/6 | Complete    | 2026-09-03 |
-| 2. Delete Correctness & Test-Suite Trust | v1.2 | 2/6 | In Progress|  |
+| 2. Delete Correctness & Test-Suite Trust | v1.2 | 3/6 | In Progress|  |
 | 3. Accessibility Compliance | v1.2 | 0/TBD | Not started | - |
 | 4. Store Submission Package | v1.2 | 0/TBD | Not started | - |

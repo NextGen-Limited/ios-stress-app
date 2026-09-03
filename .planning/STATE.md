@@ -5,16 +5,16 @@ milestone_name: Submission Readiness
 current_phase: 2
 current_phase_name: Delete Correctness & Test-Suite Trust
 status: executing
-stopped_at: "Completed 02-02-PLAN.md (WR-04: unverified transactions never finish, red-first pins + reachability audit)"
-last_updated: "2026-09-03T16:17:58.103Z"
+stopped_at: "Completed 02-03-PLAN.md (WR-03: DEBUG real-default StoreKit wiring, -mock-iap opt-in, red-first wiring pin)"
+last_updated: "2026-09-03T16:33:45.266Z"
 last_activity: 2026-09-03
 last_activity_desc: Phase 1 complete, transitioned to Phase 2
-state_head: 9598de6c616f6019c80348a35da070f3abc50245
+state_head: 43a3a13d9d7125c1f17af52c4344121611bebbb9
 progress:
   total_phases: 4
   completed_phases: 1
   total_plans: 12
-  completed_plans: 8
+  completed_plans: 9
   percent: 25
 ---
 
@@ -30,7 +30,7 @@ See: .planning/PROJECT.md (updated 2026-09-03 at v1.2 start)
 ## Current Position
 
 Phase: 2 (Delete Correctness & Test-Suite Trust) — IN EXECUTION
-Plan: 3 of 6
+Plan: 4 of 6
 Status: Ready to execute
 Last activity: 2026-09-03 — 02-01 DATA-04 truthiness suite complete
 
@@ -73,6 +73,7 @@ Per-plan history for v1.0/v1.1 archived under `.planning/milestones/v1.0-phases/
 | Phase 1 P06 | 17 min | 2 tasks | 5 files |
 | Phase 02 P01 | 10 min | 2 tasks | 2 files |
 | Phase 02 P02 | 9 min | 2 tasks | 2 files |
+| Phase 02 P03 | 6 min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -103,6 +104,8 @@ Full log in PROJECT.md Key Decisions. v1.1 per-phase decisions archived with the
 - [Phase 2]: [Phase 2 P01]: Mutation run is the TDD red gate for regression suites guarding already-fixed bugs — suite green on HEAD, red under reintroduced CR-01 swallow (exit 65, prong-1 double detection: no-throw + local split-brain), green after revert (exit 0)
 - [Phase 02]: [Phase 2 P02, WR-04]: Unverified transactions never finished — .unverified branch extracted to internal protocol-typed handleUnverifiedTransaction(_:) (VerificationResult<Transaction> is not test-constructible), finish deleted, redelivery-as-retry pinned red-first (finishCallCount == 0 single + redelivered)
 - [Phase 02]: [Phase 2 P02]: The four completePurchase finish sites are verified-only by construction (checkVerified throws on .unverified before reach; handle(transaction:) entered only from .verified) — reachability note delivered, sites byte-unchanged; no runtime checks added inside the grant choke point
+- [Phase 02]: [Phase 2 P03, WR-03]: DEBUG defaults to the real StoreKit service at BOTH wiring sites (app factory + StoreKitServiceKey.defaultValue) behind one shared MockIAPMode condition — mock resolves only via the -mock-iap launch arg (DemoMode shape, injectable arguments); pinned by StoreKitServiceWiringTests (RED 2 absent-flag failures, GREEN 16/16 with CreditPurchaseFlowTests); Release #else branches byte-unchanged
+- [Phase 02]: [Phase 2 P03]: Minimal testability seam for a private factory — widen makeStoreKitService to internal static + an arguments parameter instead of extracting a resolver type; the pin asserts through the real factory, never by constructing services directly (Pitfall 4)
 
 ### Pending Todos
 
@@ -147,8 +150,8 @@ Earlier v1.0 deferrals (Phase 01/02 verification gaps, `MockStoreKitService` Rel
 
 ## Session Continuity
 
-Last session: 2026-09-03T16:17:49.342Z
-Stopped at: Completed 02-02-PLAN.md (WR-04: unverified transactions never finish, red-first pins + reachability audit)
+Last session: 2026-09-03T16:33:37.642Z
+Stopped at: Completed 02-03-PLAN.md (WR-03: DEBUG real-default StoreKit wiring, -mock-iap opt-in, red-first wiring pin)
 Resume file: None
 
 ## Operator Next Steps
