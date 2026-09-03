@@ -63,7 +63,13 @@ Full phase detail archived at `.planning/milestones/v1.1-ROADMAP.md` and `.plann
   4. `strings` over the Release binary returns no usable credential — no JWT, API key, or secret is extractable from the shipped artifact.
   5. Per D4: the widget on a real device shows the same stress score the app shows after a refresh, or the widget target is absent from the archive's bundle list and no dead widget code ships.
   6. A Release archive is producible from the unmodified working tree — the SPM-cache proxy migration is complete (Firebase proxy products exist, GoogleSignIn proxy product naming does not collide with upstream) — and CI's `fastlane match` readonly run accepts the dual-cert App Store profiles without regenerating them.
-**Plans**: TBD
+**Plans**: 5 plans
+Plans:
+- [ ] 01-01-PLAN.md — Tracer: scripts/verify-archive.sh artifact gate + ENV-04 SPM proxy completion (Firebase shims, GoogleSignIn_proxied rename, archive-from-tree)
+- [ ] 01-02-PLAN.md — BUILD-01: watch privacy-manifest CA92.1 + D3 doc corrections (CLAUDE.md, EN/VI privacy policies)
+- [ ] 01-03-PLAN.md — BUILD-03: Info.plist consolidation (CFBundleURLTypes-only app plist, widget delete-or-verify) + dead Giphy build-phase removal
+- [ ] 01-04-PLAN.md — BUILD-02/AUTH-01/WIRE-01: phase-final archive audits (App Group suite, credential strings gate) + widget simulator evidence
+- [ ] 01-05-PLAN.md — ENV-05: draft-PR CI run + user-approved deploy.yml dispatch (match readonly + ASC upload validation)
 
 #### Phase 2: Delete Correctness & Test-Suite Trust
 
@@ -110,7 +116,7 @@ Full phase detail archived at `.planning/milestones/v1.1-ROADMAP.md` and `.plann
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 1. Binary & Manifest Truth | v1.2 | 0/TBD | Not started | - |
+| 1. Binary & Manifest Truth | v1.2 | 0/5 | Not started | - |
 | 2. Delete Correctness & Test-Suite Trust | v1.2 | 0/TBD | Not started | - |
 | 3. Accessibility Compliance | v1.2 | 0/TBD | Not started | - |
 | 4. Store Submission Package | v1.2 | 0/TBD | Not started | - |
