@@ -27,6 +27,7 @@
   ],
   "async_jobs": [],
   "human_actions_pending": [
+    {"action": "Execute Phase 03 post-merge drift re-test — 5 UAT scenarios in .planning/phases/03-sessions-preferences-quick-actions-cleanup/03-UAT.md — then /gsd-new-milestone (v1.2 submission readiness recommended)", "context": "STATE.md stopped_at pre-existing pending item; NOW actionable — build 1.0.0 (13) on TestFlight (both groups) is the artifact those scenarios test against", "blocking": false},
     {"action": "Watch next CI run for fastlane match readonly failure against dual-cert profiles; if it fails run `bundle exec fastlane setup_match` once (regenerates single-cert profiles; local archive swap recipe stored in agent memory)", "context": "Recreated portal profiles embed XPT2DHR688 which is not in the match git repo", "blocking": false}
   ],
   "decisions": [
