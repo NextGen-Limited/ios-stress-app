@@ -2,20 +2,20 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Submission Readiness
-current_phase: 1
-current_phase_name: Binary & Manifest Truth
-status: verifying
-stopped_at: "Completed 01-06-PLAN.md (WIRE-01 gap closure: live widget write path wired, evidence §8, D4 wire-branch decision recorded)"
-last_updated: "2026-09-03T14:01:19.237Z"
+current_phase: 2
+current_phase_name: Delete Correctness & Test-Suite Trust
+status: planning
+stopped_at: Phase 1 complete, ready to plan Phase 2
+last_updated: "2026-09-03T14:59:35.677Z"
 last_activity: 2026-09-03
-last_activity_desc: Phase 1 execution started
-state_head: 83aef3cf0f96d1b62b92870bb7703d3a1b7a94f2
+last_activity_desc: Phase 1 complete, transitioned to Phase 2
+state_head: 7353bf3558baf2644ae45ae4f71b5e16cf808ae4
 progress:
   total_phases: 4
-  completed_phases: 0
+  completed_phases: 1
   total_plans: 6
   completed_plans: 6
-  percent: 0
+  percent: 25
 ---
 
 # Project State
@@ -29,10 +29,10 @@ See: .planning/PROJECT.md (updated 2026-09-03 at v1.2 start)
 
 ## Current Position
 
-Phase: 1 (Binary & Manifest Truth) — EXECUTING
-Plan: 5 of 5
-Status: Phase complete — ready for verification
-Last activity: 2026-09-03 — Phase 1 execution started
+Phase: 2 — Delete Correctness & Test-Suite Trust
+Plan: Not started
+Status: Ready to plan
+Last activity: 2026-09-03 — Phase 1 complete, transitioned to Phase 2
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -40,7 +40,7 @@ Progress: [░░░░░░░░░░] 0%
 
 **Velocity:**
 
-- Total plans completed: 18 (v1.0 + v1.1, both closed)
+- Total plans completed: 6 (v1.0 + v1.1, both closed)
 - Average duration: ~22 min/plan (v1.1 sample)
 - Total execution time: not tracked cumulatively
 
@@ -48,7 +48,7 @@ Progress: [░░░░░░░░░░] 0%
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 1 | 1 | 40 min | 40 min |
+| 1 | 6 | - | - |
 | 2 | 0 | - | - |
 | 3 | 0 | - | - |
 | 4 | 0 | - | - |
@@ -103,16 +103,16 @@ None yet.
 
 ### Blockers/Concerns
 
-- **D3 (Privacy contract authority)** — root `CLAUDE.md`'s "HealthKit never sent" claim vs. `StressContextPayload.swift`'s actual derived-score payload. **Gates BUILD-01 (Phase 1) and SHIP-03 (Phase 4). Must be resolved at Phase 1 discuss, before any Phase 1 implementation task.**
-- **D4 (Widget in v1)** — ship the widget target or exclude it. **Gates WIRE-01 and scopes BUILD-01/02/03 to two bundles or three. Must be resolved at Phase 1 discuss.**
+- ~~**D3 (Privacy contract authority)**~~ **RESOLVED (v1.2 P1)**: code is the contract — docs moved toward StressContextPayload, zero payload churn; gates BUILD-01 (validated) and SHIP-03 (Phase 4, unblocked).
+- ~~**D4 (Widget in v1)**~~ **RESOLVED (v1.2 P1)**: keep the widget and make it true — write path wired (01-06), device-verified; WIRE-01 validated.
 - D2 (CloudKit encryption) resolved in practice (encryptedValues shipped v1.0 Phase 2) but never recorded as a formal decision — close opportunistically.
 - `CharacterEntitlementSyncTests` quarantined (`@Suite(.disabled)`), root cause undiagnosed after 5 ruled-out hypotheses — ENV-02 (Phase 2).
-- WINDOWS.md #8 host CoreSimulator cold-launch crash on DataDeletion/DataExport suites (exit 65, 0 assertion failures) — accepted lineage, ENV-01 (Phase 2).
+- WINDOWS.md #8 host CoreSimulator cold-launch crash on DataDeletion/DataExport suites (exit 65, 0 assertion failures) — accepted lineage, ENV-01 (Phase 2). Locally gated via TEST_RUNNER_GSD_CI env (CI parity).
 - v1.1 Phase 2 advisory residue: WR-03 (DEBUG money path uses `MockStoreKitService`) and WR-04 (`.unverified` consumables finished) — ENV-03 (Phase 2).
-- [Branch] `git.base_branch` is `main`, strategy `milestone`; v1.2 work rides `gsd/v1.2-submission-readiness` (cut 2026-09-03). ~~Working tree carries an uncommitted SPM-proxy migration that cannot archive~~ **ENV-04 RESOLVED (01-01)**: migration completed in place and committed (feb3bf1, 1afb401) — Firebase_proxy shims + `_proxied` renames, Package.resolved regains firebase-ios-sdk 11.15.0, Release archive producible from the working tree (`.asc/backup/spm-migration/` snapshot now historical, never restored).
-- [Release] TestFlight 1.0.0 build 13 is BETA_APPROVED; build 12 shipped with no entitlements blob — dump entitlements per bundle before every publish (affects Phase 1 BUILD-02 verification and Phase 4). AUTH-01's empirical `strings` check can run against the shipped Release IPA/archive in `.asc/artifacts/` immediately — no rebuild needed (build 13 also re-proves the v1.0 Release-compile blocker stays dead).
-- Pending from v1.1: Phase 03 drift re-test (5 UAT scenarios, `.planning/milestones/v1.1-phases/03-sessions-preferences-quick-actions-cleanup.1/03-UAT.md`) against build 13 — not a v1.2 requirement, but the last open v1.1 item.
-- WIRE-01 write-path gap — RESOLVED (plan 01-06, D4 wire branch): the user decision from plan 01-04 (wire a save trigger vs descope the widget) is recorded as WIRE — the widget is kept and made truthful by the guarded save in StressViewModel.loadCurrentStress (one measurement per new underlying HRV reading; see 01-WIRE-01-EVIDENCE.md §8). Simulator evidence closed (widget renders the live tier, not No Data); the physical-device same-value confirmation is the standing end-of-phase human item, now with an expected-match outcome.
+- [Phase 2 input] `INFOPLIST_KEY_UIBackgroundModes` never merges into product plists (absent from build-13 too — pre-existing) — folds into BUILD-04 doc-truth work.
+- [Phase 1 code review] 7 Info findings carried as documented debt (01-REVIEW.md): scan-pattern gaps (AKIA/ghp_/xox-), allowlist masking removed supabase literals, stale STOREKIT comment, widget-README/CLAUDE.md staleness, pbxproj churn, transitive-pin drift (GoogleUtilities 8.1.2→8.1.3).
+- [Release] TestFlight 1.0.0 build 13 is BETA_APPROVED; build 14 (v1.2 P1, VALID) predates the WIRE-01 fix — its widget shows "No Data"; the next build carries the wiring. Build 12 shipped with no entitlements blob — dump entitlements per bundle before every publish (Phase 4).
+- Pending from v1.1: Phase 03 drift re-test (5 UAT scenarios, `.planning/milestones/v1.1-phases/03-sessions-preferences-quick-actions-cleanup.1/03-UAT.md`) — candidate target now build 15+ (post-wiring) — not a v1.2 requirement, but the last open v1.1 item.
 
 ### Quick Tasks Completed
 
@@ -136,14 +136,12 @@ Earlier v1.0 deferrals (Phase 01/02 verification gaps, `MockStoreKitService` Rel
 
 | Phase | State | Resume |
 |-------|-------|--------|
-| 1 | verification_deferred_human | /gsd-verify-work 1 |
-
-Deferred 2026-09-03 by user choice after 6/6 automated verification (01-VERIFICATION.md): the two standing human items are the physical-device widget parity check (expected MATCH post-01-06) and the EN↔VI privacy-policy parity read. Autonomous run stopped here per protocol; phases 2–4 not started.
+| 1 | ~~verification_deferred_human~~ **RESOLVED 2026-09-03** — /gsd-verify-work 1 passed 19/19 (both human items validated); phase marked complete | — |
 
 ## Session Continuity
 
 Last session: 2026-09-03T14:01:19.225Z
-Stopped at: Completed 01-06-PLAN.md (WIRE-01 gap closure: live widget write path wired, evidence §8, D4 wire-branch decision recorded)
+Stopped at: Phase 1 complete, ready to plan Phase 2
 Resume file: None
 
 ## Operator Next Steps

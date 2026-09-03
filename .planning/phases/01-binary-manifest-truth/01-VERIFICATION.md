@@ -1,7 +1,7 @@
 ---
 phase: 01-binary-manifest-truth
 verified: 2026-09-03T21:12:00+07:00
-status: human_needed
+status: passed
 score: 6/6 must-haves verified
 behavior_unverified: 0
 overrides_applied: 0
@@ -13,10 +13,12 @@ re_verification:
   gaps_remaining: []
   regressions: []
 deferred:  # Items addressed in later phases — not actionable gaps
+
   - truth: "INFOPLIST_KEY_UIBackgroundModes = 'fetch processing' never merges into product plists — background fetch/processing silently absent from every shipped binary"
     addressed_in: "Phase 2 (BUILD-04)"
     evidence: "REQUIREMENTS.md traceability maps BUILD-04 to Phase 2 (Pending); pre-existing condition, unchanged by Phase 1 and provably untouched by 01-06 (no plist/pbxproj file changed over 9c2001af..HEAD)"
 human_verification:
+
   - test: "Physical-device widget parity (WIRE-01 device half, evidence §6): on hardware with real HealthKit data, install the wired build, open the app (foreground refresh saves + publishes + reloadAllTimelines), add/refresh the home-screen widget."
     expected: "MATCH — the widget shows the same stress state the dashboard shows, immediately after the reload (within the 15-minute timeline budget at worst). With the write path now live, the prior expected outcome ('No Data' on a stock install) is superseded; this check closes WIRE-01 end-to-end."
     why_human: "Requires real hardware and real HealthKit data; the agent-executable path (CONTEXT-sanctioned simulator fallback + machine-read suite values) is complete. CONTEXT.md:25 sanctions 'simulator gallery + documented human UAT as fallback evidence' — this is that documented human UAT component."

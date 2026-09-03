@@ -6,7 +6,7 @@ StressMonitor is an iOS/watchOS app that scores stress 0–100 from HealthKit bi
 
 As of v1.1 close (2026-08-23) the app runs end-to-end against its own deployed backend (`stress-api.dropitx.site`): Firebase Auth (anonymous + Google linking with account preservation), credit-metered chat streaming with server-side session history, preferences that shape the coach's system prompt, Apple-verified purchases with idempotent grants and refund demotion, and a factory reset that wipes server history. The money path and all 4 E2E flows are live-verified against deployed infrastructure.
 
-What blocks submission now is the v1.0-carryover list — privacy manifest validation (BUILD-01, gated on D3), ship readiness (SHIP-01..03), accessibility (A11Y-01..05), and the widget decision (WIRE-01/D4) — plus environment debt (WINDOWS.md #8 host crash lineage, quarantined CharacterEntitlementSyncTests). The v1.1 milestone audit recommends a v1.2 "submission readiness" milestone to close exactly that list.
+What blocks submission now is the v1.0-carryover list — as of v1.2 Phase 1 close (2026-09-03), the binary-truth half is closed: privacy manifest validated on a real ASC upload (BUILD-01, build 14 VALID), one App Group suite across all targets (BUILD-02), plist single-sourced (BUILD-03), no extractable credential (AUTH-01), widget renders live data on device (WIRE-01), and both CI surfaces proven (ENV-04/05). Remaining: accessibility (A11Y-01..05), ship readiness (SHIP-01..03), delete correctness + test-suite trust (Phase 2), plus environment debt (WINDOWS.md #8 lineage, quarantined CharacterEntitlementSyncTests).
 
 ## Core Value
 
@@ -75,31 +75,35 @@ Every feature that ships in the binary must actually work end-to-end for a real 
 - ✓ v1.0 AUTH-02: Chat entry point reflects real auth state — closed via v1.1 Phase 2 verification (`passed`); live kill-check (typed 401 / stale-session) rode the human-validated live smoke of 2026-08-23
 - ✓ v1.0 AUTH-03: Chat dismiss-mid-stream cancels SSE within one runloop, no credit charged — closed via v1.1 Phase 3: ChatLifecycleTests green in every Phase-3 fence run
 - ✓ v1.0 TEST-01: Host CoreSimulator test execution — resolved 2026-08-16: full suite runs green with `-parallel-testing-enabled NO` (215 tests at v1.1 close); only parallel-testing clones fail
+- ✓ v1.2 P1 BUILD-01: Privacy manifest passes ASC upload validation — watch `CA92.1` declared, unused media deps + dead Giphy phase removed, TestFlight build 14 processed VALID with 0×ITMS-91053 (deploy run 33749862925); EN/VI policies reconciled with the manifest (5 collection types both locales)
+- ✓ v1.2 P1 BUILD-02: One canonical App Group suite `group.stress.ai.com` across all 3 targets — audit-only (CONTEXT's `group.com.stressmonitor.app` was a documented typo, never a repo value); entitlements gate PASS ×3 on the signed golden
+- ✓ v1.2 P1 BUILD-03: Plist single-source — empirical inversion: Xcode merges only the documented `INFOPLIST_KEY_*` closed set, so custom `INFOPLIST_KEY_STOREKIT_*` settings never reached the product plist; the plist FILE is the sole live source (six keys byte-equal in the merged product; 12 dead settings deleted; build-13 key-set diff clean)
+- ✓ v1.2 P1 AUTH-01: No extractable credential — hardened `verify-archive.sh` gate (CFBundleURLSchemes check fixed vacuous-true, red/green harness 5/5) green on the phase-final Release archive; benign allowlist documented (Google eyJ error constant, Keychain-cleanup literals)
+- ✓ v1.2 P1 WIRE-01: Widget renders live data on device — write path was dead (`WidgetPublisher.publish` zero call sites since bba996a); gap-closure plan 01-06 wired a dedupe-guarded save into `StressViewModel.loadCurrentStress` (TDD RED→GREEN, frozen contracts 0-diff); same-tick machine-verified simulator evidence + physical-device parity UAT pass 2026-09-03
+- ✓ v1.2 P1 ENV-04: SPM proxy migration complete in place — Release archive producible from the working tree; proxy sources committed behind a scoped `.gitignore` exception; clean-CI resolve green (runs 33745603902/33746936991)
+- ✓ v1.2 P1 ENV-05: CI `fastlane match` readonly accepts the dual-cert world — 3 App Store profiles + K2TYLYAWMK Distribution cert installed with zero regeneration (run 33749862925); the documented `setup_match` fallback was never needed
 
 ### Active
 
 <!-- v1.2 "Submission Readiness" scope (this milestone). Status reflects honest per-requirement verification state, not self-reported marks. -->
 
 **BUILD — carried from v1.0 Phase 1**
-- [ ] BUILD-01: `PrivacyInfo.xcprivacy` passes ASC upload validation — unchecked, still blocked on D3
-- [ ] BUILD-02: One canonical App Group suite ID across all 3 targets — unchecked
-- [ ] BUILD-03: Info.plist consolidated onto `INFOPLIST_KEY_*` — unchecked
-- [ ] BUILD-04 residual: pin `-parallel-testing-enabled NO` in dev docs/CI — suite itself green (see Validated TEST-01)
+- [ ] BUILD-04 residual: pin `-parallel-testing-enabled NO` in dev docs/CI — suite itself green (see Validated TEST-01); NEW input from P1: `INFOPLIST_KEY_UIBackgroundModes` also never merges (absent from build-13 too — pre-existing; folds into this doc-truth item, Phase 2)
 
 **DATA — carried from v1.0 Phase 2**
 - [ ] DATA-01 residual: two-device CloudKit-propagation delete test never run (local + Keychain + App-Group + server-session halves all verified; server wipe live-verified in v1.1 Phase 3 UAT scenario 5)
 - [ ] DATA-04: Add a regression test for v1.0 CR-01 (CloudKit batch-delete failure propagation) — fix correct by inspection, zero automated coverage; needs a test seam below `CloudKitResetServiceProtocol`
 
 **AUTH — carried from v1.0 Phase 3**
-- [ ] AUTH-01: Empirical `strings` check of the Release binary for extractable credentials — `#if DEBUG` fix applied and Release build compiles since v1.1 Phase 2 (BUILD-05); the empirical confirmation itself never run
+(closed — AUTH-01 validated in v1.2 P1; see Validated)
 
 **WIRE — carried from v1.0 Phase 4**
-- [ ] WIRE-01: Widget renders live data on a real device, not placeholder — depends on decision D4 (still open)
+(closed — WIRE-01 validated in v1.2 P1; see Validated)
 
 **SHIP — carried from v1.0 Phase 5**
 - [ ] SHIP-01: App Store screenshot set captured with demo mode disabled
 - [ ] SHIP-02: Fastlane `release` lane matches actual readiness (metadata-only upload)
-- [ ] SHIP-03: ASC privacy questionnaire answered per D3 — blocked on D3
+- [ ] SHIP-03: ASC privacy questionnaire answered per D3 (D3 resolved v1.2 P1: code is the contract — StressContextPayload derived scores, no raw HealthKit)
 
 **A11Y — carried from v1.0 Phase 5**
 - [ ] A11Y-01: Sub-44pt touch targets fixed
@@ -167,6 +171,12 @@ Every feature that ships in the binary must actually work end-to-end for a real 
 | v1.1 Phase 3 review CR-01: wipe loop re-queries page 1 instead of advancing offset | Backend paginates over live rows — advancing offset after deletion skips every page past the first (>20 sessions → residue while reset reports success) | ✓ Good — deletion-aware fake + 42-session regression pin it; caught only because review used a deletion-aware fake |
 | v1.1 closed `verified_closeout` — audit full scores, zero gaps; v1.2 "submission readiness" recommended for the v1.0-carryover list | The v1.0 override debt (unverified phases, unchecked requirements) was fully answered: 3/3 v1.1 phases passed verification with human-validated UAT (live money-path smoke, 5 backend scenarios), milestone audit cross-checked 21/21 requirements | ✓ Good — carryover list is now purely submission-blocking items, not verification debt |
 | Debug session `google-signin-ui-entry-missing` closed as stale-resolved at v1.1 close | audit-open flagged it open (status `diagnosed`, updated 2026-08-15), but gap-closure plan 01-04 had shipped the exact diagnosed fix on 2026-08-16 — the session was never re-checked. Lesson: re-run audit-open after gap-closure lands, not just at milestone close | ✓ Good — caught by cross-referencing PROJECT.md Validated entries before archiving |
+| v1.2 P1 D3 resolved: code is the contract | `StressContextPayload`'s actual derived-score payload is the normative privacy statement; docs (root CLAUDE.md, EN/VI policies) move toward code, never the reverse; zero payload churn (byte-identical proof) | ✓ Good — build 14 ASC-valid, policies reconciled, UAT parity pass |
+| v1.2 P1 D4 resolved: keep the widget and make it true | Removing a shipped TestFlight surface right after external beta is a user-visible regression; the gap was a dead call site (dropped at bba996a), not a design flaw | ✓ Good — wired via 01-06 (TDD), device-verified |
+| v1.2 P1 ENV-05: CI surface made concrete — draft PR (ci.yml) + user-approved workflow_dispatch (deploy.yml) | A bare branch push triggers NO workflow (ci.yml=PRs, deploy.yml=main/release/dispatch); only deploy.yml runs fastlane match; the TestFlight dispatch is a one-way-ish external action, gated by a blocking checkpoint with the empty-widget caveat disclosed | ✓ Good — both surfaces green; approval recorded pre-timestamp |
+| v1.2 P1 BUILD-03 inversion: plist FILE is the single source, not `INFOPLIST_KEY_*` | Empirically discovered mid-execution: Xcode merges only the documented closed set of `INFOPLIST_KEY_*` — custom `INFOPLIST_KEY_STOREKIT_*` settings were dead duplicates that never reached any product plist; deleting the file-side keys would have silently starved StoreKit config (T-03-01). Fixed from the opposite direction: file restored as source, 12 dead settings deleted | ✓ Good — verifier confirmed criterion substance (no duplicate contributions, every key resolves) |
+| v1.2 P1: spm-cache proxy sources committed behind a scoped `.gitignore` exception | Clean CI checkout could not resolve the local proxy package (whole tree gitignored) — surfaced empirically by the draft-PR CI run; committing the 9 package files (caches still ignored) makes checkouts self-sufficient | ✓ Good — clean-CI resolve green |
+| v1.2 P1: code review forced 3-pass iteration and found a vacuous gate (CR-01) | The AUTH-01 gate's CFBundleURLSchemes check passed on empty arrays (its own quotes satisfied the grep); plan-checker iterations 2–3 caught the `-A3` grep-window blocker empirically. Lesson: verify commands must be tested red, not just green — the harness now does both | ✓ Good — gate hardened with anti-vacuous red/green tests |
 
 ## Evolution
 
@@ -186,4 +196,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-09-03 at v1.2 "Submission Readiness" start (v1.1 closed verified_closeout 2026-08-23; TestFlight 1.0.0 build 13 BETA_APPROVED 2026-09-03 — see MILESTONES.md release record)*
+*Last updated: 2026-09-03 after v1.2 Phase 1 (binary & manifest truth closed: BUILD-01/02/03, AUTH-01, WIRE-01, ENV-04/05 validated; D3/D4 resolved; TestFlight build 14 VALID — carries the pre-fix empty widget; next build includes the 01-06 wiring)*

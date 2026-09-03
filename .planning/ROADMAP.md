@@ -41,7 +41,7 @@ Full phase detail archived at `.planning/milestones/v1.1-ROADMAP.md` and `.plann
 
 **Milestone Goal:** TestFlight build 1.0.0 (13) is live and BETA_APPROVED. This milestone closes the v1.0-carryover blocker list — privacy-manifest validation, build-config truth, delete correctness, test-suite trust, accessibility, and the store submission package — plus the two decisions (D3, D4) that gate them, so the shipped binary is submittable to App Review rather than merely installable.
 
-- [ ] **Phase 1: Binary & Manifest Truth** — Resolve D3/D4, then make everything the archive declares about itself true: privacy manifest validates at ASC, one App Group across targets, consolidated Info.plist, no credentials in the Release binary, widget either live or gone.
+- [x] **Phase 1: Binary & Manifest Truth** — Resolve D3/D4, then make everything the archive declares about itself true: privacy manifest validates at ASC, one App Group across targets, consolidated Info.plist, no credentials in the Release binary, widget either live or gone. (completed 2026-09-03)
 - [ ] **Phase 2: Delete Correctness & Test-Suite Trust** — Prove "delete all data" propagates across devices, pin the CloudKit batch-delete failure path with a regression test, and make the test suite a trustworthy gate with no silent skips or unexplained failures.
 - [ ] **Phase 3: Accessibility Compliance** — Touch targets, contrast, Reduce Motion, Dynamic Type, and removal of orphaned redesign views on the primary screens.
 - [ ] **Phase 4: Store Submission Package** — Screenshots from a real-data build, an honest Fastlane `release` lane, and ASC privacy answers that match the actual `/chat` payload.
@@ -141,7 +141,7 @@ Plans:
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 1. Binary & Manifest Truth | v1.2 | 6/6 | In Progress|  |
+| 1. Binary & Manifest Truth | v1.2 | 6/6 | Complete    | 2026-09-03 |
 | 2. Delete Correctness & Test-Suite Trust | v1.2 | 0/TBD | Not started | - |
 | 3. Accessibility Compliance | v1.2 | 0/TBD | Not started | - |
 | 4. Store Submission Package | v1.2 | 0/TBD | Not started | - |
