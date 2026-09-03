@@ -212,7 +212,7 @@ To test with simulated HealthKit data on simulator:
 - **Persistence**: SwiftData (`StressMeasurement`, `CharacterUnlock`)
 - **Health Data**: HealthKit (HRV, HR, Sleep, Activity, Recovery)
 - **Cloud Sync**: CloudKit + custom `SyncManager`/`ConflictResolver`
-- **AI Chat**: `SupabaseLLMService` (via Supabase Edge Functions, SSE streaming), via `LLMServiceProtocol`
+- **AI Chat**: `StressLLMService` (via `StressAPIClient` → chat endpoint on `https://stress-api.dropitx.site`, SSE streaming, Firebase Auth), via `LLMServiceProtocol`
 - **IAP**: StoreKit 2 — monthly/annual subscriptions via `StoreKitService` / `MockStoreKitService`
 - **Watch**: Separate watchOS target with `WatchConnectivity` sync
 
@@ -318,7 +318,7 @@ StressMonitor/
 │   ├── Services/
 │   │   ├── Algorithm/      (MultiFactorStressCalculator, StressCalculator, 5 StressFactor impls)
 │   │   ├── HealthKit/      (HealthKitManager + extensions for Activity/Recovery/Sleep fetch)
-│   │   ├── LLM/            (SupabaseLLMService, ChatContextBuilder)
+│   │   ├── LLM/            (StressLLMService, ChatContextBuilder)
 │   │   ├── StoreKit/       (StoreKitService, MockStoreKitService, StoreKitProductCatalog)
 │   │   ├── CloudKit/       (CloudKitManager, CloudKitSyncEngine, CloudKitSchema)
 │   │   ├── Sync/           (SyncManager, ConflictResolver)
@@ -478,7 +478,7 @@ Follow `documentation/references/README.md` for phased implementation:
 | watchOS Complications | WidgetKit (NOT ClockKit) | Required for watchOS 10+ |
 | Background Tasks | BGAppRefreshTask | System-managed, battery-efficient |
 | Dependencies | None (system only) | Privacy-first, no bloat |
-| AI Chat | SupabaseLLMService (via Supabase Edge Functions, SSE streaming) | On-device privacy when available |
+| AI Chat | StressLLMService (via StressAPIClient → https://stress-api.dropitx.site, SSE streaming, Firebase Auth) | On-device privacy when available |
 | IAP | StoreKit 2 — monthly + annual plans | StoreKitProductCatalog resolves IDs from Info.plist/env |
 | Gamification | 5 character creatures with evolution (SwiftData CharacterUnlock) | Engagement via stress-driven character evolution |
 | Algorithm | MultiFactorStressCalculator (5 factors) with StressCalculator fallback (HRV+HR) | Graceful degradation when sensors missing |
@@ -490,8 +490,8 @@ Follow `documentation/references/README.md` for phased implementation:
 - All health data stored locally via SwiftData (encrypted at rest)
 - CloudKit sync is end-to-end encrypted
 - HealthKit is read-only access (no writes)
-- No third-party analytics or tracking
-- AI Coaching Chat sends derived stress-context (stress score/category, confidence, trend, and per-factor HRV/heart-rate/sleep/activity/recovery scores — never raw HealthKit readings) to the `/chat` Supabase Edge Function under a Bearer-JWT-authenticated session, not anonymously
+- No third-party analytics or tracking (privacy manifest declares `NSPrivacyTracking` false; the DeviceID/ProductInteraction collected-data entries exist solely because of the Google/Firebase auth SDKs)
+- AI Coaching Chat sends derived stress-context (stress score/category, confidence, trend, and per-factor HRV/heart-rate/sleep/activity/recovery scores — never raw HealthKit readings) to the `chat` endpoint on `https://stress-api.dropitx.site` (via `StressAPIClient`) under a Bearer-authenticated Firebase session (anonymous sign-in or Google Sign-In)
 
 ---
 

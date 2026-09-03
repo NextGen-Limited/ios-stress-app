@@ -27,7 +27,7 @@ If you enable iCloud sync, your stress history syncs across your own Apple devic
 
 When you open AI Coaching Chat, the app sends derived values to StressMonitor's backend to generate a coaching response: your stress score, stress category, confidence, trend, and a per-factor breakdown of normalized HRV, heart rate, sleep, activity, and recovery scores. Raw HealthKit sample values (e.g. exact HRV readings in milliseconds, exact heart rate in bpm) are never included.
 
-This request carries an authenticated session (a Bearer JWT, established via Supabase Auth — anonymous or signed-in), not an anonymous one. Chat messages and this derived context are retained according to the backend's own chat-history retention policy, separate from the on-device health store described above.
+This request carries an authenticated session (a Bearer JWT, established via Firebase Auth — anonymous sign-in or Google Sign-In). Chat messages and this derived context are retained according to the backend's own chat-history retention policy, separate from the on-device health store described above.
 
 ## HealthKit
 

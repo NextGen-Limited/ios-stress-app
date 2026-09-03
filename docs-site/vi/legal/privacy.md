@@ -27,7 +27,7 @@ Nếu bạn bật đồng bộ iCloud, lịch sử căng thẳng đồng bộ qu
 
 Khi bạn mở Trò Chuyện Cùng AI, ứng dụng gửi các giá trị đã xử lý đến máy chủ của StressMonitor để tạo phản hồi tư vấn: điểm căng thẳng, phân loại căng thẳng, độ tin cậy, xu hướng, và điểm số đã chuẩn hóa theo từng yếu tố cho HRV, nhịp tim, giấc ngủ, hoạt động và hồi phục. Dữ liệu HealthKit thô (ví dụ: giá trị HRV chính xác theo milisecond, nhịp tim chính xác theo bpm) không bao giờ được gửi kèm.
 
-Yêu cầu này được thực hiện qua một phiên đăng nhập xác thực (Bearer JWT, được thiết lập qua Supabase Auth — ẩn danh hoặc đã đăng nhập), không phải một yêu cầu ẩn danh. Tin nhắn trò chuyện và dữ liệu đã xử lý này được lưu giữ theo chính sách lưu trữ lịch sử trò chuyện của máy chủ, tách biệt với dữ liệu sức khỏe lưu trên thiết bị đã nêu trên.
+Yêu cầu này được thực hiện qua một phiên đăng nhập xác thực (Bearer JWT, được thiết lập qua Firebase Auth — đăng nhập ẩn danh hoặc Google Sign-In). Tin nhắn trò chuyện và dữ liệu đã xử lý này được lưu giữ theo chính sách lưu trữ lịch sử trò chuyện của máy chủ, tách biệt với dữ liệu sức khỏe lưu trên thiết bị đã nêu trên.
 
 ## HealthKit
 
