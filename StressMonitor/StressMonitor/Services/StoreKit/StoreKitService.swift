@@ -312,10 +312,18 @@ final class StoreKitService: StoreKitServiceProtocol {
             await handle(transaction: transaction, jwsRepresentation: result.jwsRepresentation)
 
         case .unverified(let transaction, _):
-            // No grant occurs for an unverified payload, so finishing is
-            // safe and clears the queue.
-            await transaction.finish()
+            await handleUnverifiedTransaction(transaction)
         }
+    }
+
+    /// `.unverified` branch of the updates-listener entry, extracted
+    /// protocol-typed so unit tests can drive it with a fake transaction —
+    /// `VerificationResult<Transaction>` itself cannot be constructed in
+    /// tests (no public `Transaction` initializer).
+    func handleUnverifiedTransaction(_ transaction: any PurchaseTransactionHandle) async {
+        // No grant occurs for an unverified payload, so finishing is
+        // safe and clears the queue.
+        await transaction.finish()
     }
 
     // MARK: - Grant orchestration

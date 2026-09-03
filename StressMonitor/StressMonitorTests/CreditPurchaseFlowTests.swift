@@ -252,6 +252,29 @@ struct CreditPurchaseFlowTests {
         #expect(fake.finishCallCount == 1)
     }
 
+    // MARK: WR-04 — unverified transactions are never finished
+
+    @Test("An unverified transaction delivered through the listener entry is never finished")
+    func unverifiedDeliveryNeverFinishesTransaction() async throws {
+        let fake = FakePurchaseTransaction(productID: Self.smallPackID)
+        let service = makeService(state: makeState())
+
+        await service.handleUnverifiedTransaction(fake)
+
+        #expect(fake.finishCallCount == 0)
+    }
+
+    @Test("A redelivered unverified transaction is still finished zero times")
+    func redeliveredUnverifiedStillFinishedZeroTimes() async throws {
+        let fake = FakePurchaseTransaction(productID: Self.smallPackID)
+        let service = makeService(state: makeState())
+
+        await service.handleUnverifiedTransaction(fake)
+        await service.handleUnverifiedTransaction(fake)
+
+        #expect(fake.finishCallCount == 0)
+    }
+
     // MARK: Subscription path — legacy grant, no regression
 
     @Test("Subscription transaction takes the legacy grant path — immediate finish, no redemption, server verify")
