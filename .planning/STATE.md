@@ -5,16 +5,16 @@ milestone_name: Submission Readiness
 current_phase: 1
 current_phase_name: Binary & Manifest Truth
 status: executing
-stopped_at: ROADMAP.md written (4 phases), REQUIREMENTS.md traceability filled (19/19 mapped)
-last_updated: "2026-09-03T07:03:46.878Z"
+stopped_at: Completed 01-01-PLAN.md (verify-archive gate + ENV-04 migration + archive-from-tree)
+last_updated: "2026-09-03T07:51:56.078Z"
 last_activity: 2026-09-03
-last_activity_desc: v1.2 roadmap created (4 phases, 19/19 requirements mapped)
-state_head: 775cdfb382e10443951d74aa43d8914e55556cb4
+last_activity_desc: Phase 1 execution started
+state_head: 1afb4019f2761e4fce4f8bd0d5a5cd0609c62014
 progress:
   total_phases: 4
   completed_phases: 0
   total_plans: 5
-  completed_plans: 0
+  completed_plans: 1
   percent: 0
 ---
 
@@ -25,14 +25,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-09-03 at v1.2 start)
 
 **Core value:** Every feature that ships in the binary must actually work end-to-end for a real user — not just compile.
-**Current focus:** Phase 1 — Binary & Manifest Truth (opens with the D3/D4 decision gate)
+**Current focus:** Phase 1 — Binary & Manifest Truth
 
 ## Current Position
 
-Phase: 1 (Binary & Manifest Truth) — READY TO EXECUTE
-Plan: — (none yet)
+Phase: 1 (Binary & Manifest Truth) — EXECUTING
+Plan: 2 of 5
 Status: Ready to execute
-Last activity: 2026-09-03 — v1.2 roadmap created (4 phases, 19/19 requirements mapped)
+Last activity: 2026-09-03 — Phase 1 execution started
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -48,7 +48,7 @@ Progress: [░░░░░░░░░░] 0%
 
 | Phase | Plans | Total | Avg/Plan |
 |-------|-------|-------|----------|
-| 1 | 0 | - | - |
+| 1 | 1 | 40 min | 40 min |
 | 2 | 0 | - | - |
 | 3 | 0 | - | - |
 | 4 | 0 | - | - |
@@ -61,6 +61,11 @@ Per-plan history for v1.0/v1.1 archived under `.planning/milestones/v1.0-phases/
 - Trend: Stable
 
 *Updated after each plan completion*
+**Per-Plan Metrics:**
+
+| Plan | Duration | Tasks | Files |
+|------|----------|-------|-------|
+| Phase 1 P01 | 40 min | 3 tasks | 11 files |
 
 ## Accumulated Context
 
@@ -74,6 +79,8 @@ Full log in PROJECT.md Key Decisions. v1.1 per-phase decisions archived with the
 - [v1.1 P03-04]: in-memory `ModelContainer` must outlive its `mainContext` in tests; return-context-only fixtures are the WINDOWS.md #8 crash lineage (ENV-01 input)
 - [v1.1 P03-05, ledger #12]: `RequestCaptureURLProtocol` statics leak across suites (order-dependent pollution) — relevant when ENV-01/ENV-02 make suite ordering deterministic
 - [v1.2 roadmap, 2026-09-03]: phase numbering restarts at 1 for this milestone (project convention, matching v1.0 and v1.1)
+- [Phase 1]: Proxy shim products MUST use _proxied-style names distinct from upstream (Xcode PIF registers both shim and upstream products — Firebase collided exactly like GoogleSignIn; A4 remedy applied in 1afb401)
+- [Phase 1]: spm-cache/ package sources stay uncommitted by repo gitignore convention ('regenerated locally'); tracked migration artifacts = pbxproj + Package.resolved; ENV-04 bar = archive-from-working-tree (proven 01-01)
 
 ### Pending Todos
 
@@ -87,7 +94,7 @@ None yet.
 - `CharacterEntitlementSyncTests` quarantined (`@Suite(.disabled)`), root cause undiagnosed after 5 ruled-out hypotheses — ENV-02 (Phase 2).
 - WINDOWS.md #8 host CoreSimulator cold-launch crash on DataDeletion/DataExport suites (exit 65, 0 assertion failures) — accepted lineage, ENV-01 (Phase 2).
 - v1.1 Phase 2 advisory residue: WR-03 (DEBUG money path uses `MockStoreKitService`) and WR-04 (`.unverified` consumables finished) — ENV-03 (Phase 2).
-- [Branch] `git.base_branch` is `main`, strategy `milestone`; v1.2 work rides `gsd/v1.2-submission-readiness` (cut 2026-09-03, carries the milestone-start + roadmap commits; main additionally holds unpushed release-session wip commits). Working tree also carries an uncommitted SPM-proxy migration that cannot archive (snapshot at `.asc/backup/spm-migration/`) — tracked as **ENV-04** (Phase 1); resolve before Phase 1's archive-producing tasks (BUILD-01, AUTH-01).
+- [Branch] `git.base_branch` is `main`, strategy `milestone`; v1.2 work rides `gsd/v1.2-submission-readiness` (cut 2026-09-03). ~~Working tree carries an uncommitted SPM-proxy migration that cannot archive~~ **ENV-04 RESOLVED (01-01)**: migration completed in place and committed (feb3bf1, 1afb401) — Firebase_proxy shims + `_proxied` renames, Package.resolved regains firebase-ios-sdk 11.15.0, Release archive producible from the working tree (`.asc/backup/spm-migration/` snapshot now historical, never restored).
 - [Release] TestFlight 1.0.0 build 13 is BETA_APPROVED; build 12 shipped with no entitlements blob — dump entitlements per bundle before every publish (affects Phase 1 BUILD-02 verification and Phase 4). AUTH-01's empirical `strings` check can run against the shipped Release IPA/archive in `.asc/artifacts/` immediately — no rebuild needed (build 13 also re-proves the v1.0 Release-compile blocker stays dead).
 - Pending from v1.1: Phase 03 drift re-test (5 UAT scenarios, `.planning/milestones/v1.1-phases/03-sessions-preferences-quick-actions-cleanup.1/03-UAT.md`) against build 13 — not a v1.2 requirement, but the last open v1.1 item.
 
@@ -111,9 +118,9 @@ Earlier v1.0 deferrals (Phase 01/02 verification gaps, `MockStoreKitService` Rel
 
 ## Session Continuity
 
-Last session: 2026-09-03 — v1.2 roadmap created
-Stopped at: ROADMAP.md written (4 phases), REQUIREMENTS.md traceability filled (19/19 mapped)
-Resume file: .planning/HANDOFF.json (release-session handoff, still valid for build-13 context)
+Last session: 2026-09-03T07:51:56.055Z
+Stopped at: Completed 01-01-PLAN.md (verify-archive gate + ENV-04 migration + archive-from-tree)
+Resume file: None
 
 ## Operator Next Steps
 
