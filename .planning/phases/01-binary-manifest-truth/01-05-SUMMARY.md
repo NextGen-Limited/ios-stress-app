@@ -48,6 +48,7 @@ coverage:
   - id: D1
     description: "Draft PR #49 on gsd/v1.2-submission-readiness with ci.yml green on clean CI hardware (ENV-04 CI half)"
     requirement: ENV-04
+    human_judgment: false
     verification:
       - kind: other
         ref: "gh run list --workflow=CI --branch gsd/v1.2-submission-readiness — run 33745603902 success at fcd4c87; docs-only re-run 33746936991 success at 1d29c51"
@@ -55,6 +56,7 @@ coverage:
   - id: D2
     description: "User-approved deploy.yml dispatch: match readonly installed all three App Store profiles with no regeneration (ENV-05)"
     requirement: ENV-05
+    human_judgment: false
     verification:
       - kind: other
         ref: "run 33749862925 success; match log excerpt in 01-ENV-05-CI-RECORD.md (cert + 3 profile UUIDs, force:false, zero regeneration)"
@@ -62,6 +64,7 @@ coverage:
   - id: D3
     description: "Pilot upload cleared ASC processing — build 1.0.0 (14) VALID, no ITMS-91053, no missing-SDK-manifest error (BUILD-01 SC-1)"
     requirement: BUILD-01
+    human_judgment: false
     verification:
       - kind: other
         ref: "run 33749862925 pilot output + asc builds list: build 14 state=VALID uploaded 2026-09-03T04:37:01-07:00"
