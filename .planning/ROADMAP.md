@@ -54,21 +54,36 @@ Full phase detail archived at `.planning/milestones/v1.1-ROADMAP.md` and `.plann
 **Depends on**: Nothing (first phase)
 **Requirements**: BUILD-01, BUILD-02, BUILD-03, AUTH-01, WIRE-01, ENV-04, ENV-05
 **Decisions to resolve first** (before any implementation task in this phase):
+
   - **D3 — privacy contract authority**: which document is authoritative about what leaves the device (root `CLAUDE.md`'s "HealthKit never sent" claim vs. `StressContextPayload.swift`'s actual derived-score payload). Gates BUILD-01 here and SHIP-03 in Phase 4.
   - **D4 — widget in v1**: ship the widget target or exclude it from the submitted build. Gates WIRE-01 here, and determines whether BUILD-01/BUILD-02/BUILD-03 must cover two bundles or three.
+
 **Success Criteria** (what must be TRUE):
+
   1. A Release archive uploads to App Store Connect and clears privacy-manifest validation — no missing required-reason API declaration and no missing third-party SDK manifest (including any SPM dependency that survives the unused-media evaluation).
   2. App, widget, and watch targets read and write one canonical App Group suite ID; no target falls back to a placeholder suite or fails to open the shared container.
   3. Every Info.plist key the app depends on resolves from `INFOPLIST_KEY_*` build settings in the merged plist of the built product — no orphaned or duplicate plist file contributes keys.
   4. `strings` over the Release binary returns no usable credential — no JWT, API key, or secret is extractable from the shipped artifact.
   5. Per D4: the widget on a real device shows the same stress score the app shows after a refresh, or the widget target is absent from the archive's bundle list and no dead widget code ships.
   6. A Release archive is producible from the unmodified working tree — the SPM-cache proxy migration is complete (Firebase proxy products exist, GoogleSignIn proxy product naming does not collide with upstream) — and CI's `fastlane match` readonly run accepts the dual-cert App Store profiles without regenerating them.
+
 **Plans**: 5 plans
 Plans:
+**Wave 1**
+
 - [ ] 01-01-PLAN.md — Tracer: scripts/verify-archive.sh artifact gate + ENV-04 SPM proxy completion (Firebase shims, GoogleSignIn_proxied rename, archive-from-tree)
+
+**Wave 2** *(blocked on Wave 1 completion)*
+
 - [ ] 01-02-PLAN.md — BUILD-01: watch privacy-manifest CA92.1 + D3 doc corrections (CLAUDE.md, EN/VI privacy policies)
 - [ ] 01-03-PLAN.md — BUILD-03: Info.plist consolidation (CFBundleURLTypes-only app plist, widget delete-or-verify) + dead Giphy build-phase removal
+
+**Wave 3** *(blocked on Wave 2 completion)*
+
 - [ ] 01-04-PLAN.md — BUILD-02/AUTH-01/WIRE-01: phase-final archive audits (App Group suite, credential strings gate) + widget simulator evidence
+
+**Wave 4** *(blocked on Wave 3 completion)*
+
 - [ ] 01-05-PLAN.md — ENV-05: draft-PR CI run + user-approved deploy.yml dispatch (match readonly + ASC upload validation)
 
 #### Phase 2: Delete Correctness & Test-Suite Trust
@@ -77,11 +92,13 @@ Plans:
 **Depends on**: Phase 1 (the canonical App Group suite from BUILD-02 is one of the stores DATA-01's propagation check must observe as cleared)
 **Requirements**: DATA-01, DATA-04, BUILD-04, ENV-01, ENV-02, ENV-03
 **Success Criteria** (what must be TRUE):
+
   1. Deleting all data on one device signed into an iCloud account removes those records on a second device signed into the same account — verified end to end, not per-half.
   2. A regression test fails if CloudKit batch delete reports success while records survive; the v1.0 CR-01 bug cannot return unnoticed, and the seam under `CloudKitResetServiceProtocol` makes that failure injectable.
   3. One documented `xcodebuild test` invocation with `-parallel-testing-enabled NO` is what CI runs and what the dev docs tell a human to run — the two do not diverge.
   4. The full suite reports zero unexplained failures and no silently disabled suite: the WINDOWS.md #8 CoreSimulator crash lineage and the `CharacterEntitlementSyncTests` quarantine are each fixed, or each carries a written, dated disposition naming the root cause and the accepted coverage loss.
   5. The money-path advisories are dispositioned: WR-03 (DEBUG builds routing purchases through `MockStoreKitService`) and WR-04 (`.unverified` consumables being finished) are fixed or documented as an explicit accept with rationale.
+
 **Plans**: TBD
 
 #### Phase 3: Accessibility Compliance
@@ -90,11 +107,13 @@ Plans:
 **Depends on**: Phase 1 (D4 determines whether widget surfaces are inside the contrast/Dynamic Type sweep)
 **Requirements**: A11Y-01, A11Y-02, A11Y-03, A11Y-04, A11Y-05
 **Success Criteria** (what must be TRUE):
+
   1. Every interactive control on the primary screens has a hit target of at least 44×44pt.
   2. Text and essential UI on the primary surfaces pass WCAG AA contrast in both light and dark appearance.
   3. With Reduce Motion enabled, animated views present their content without motion — no looping, scaling, or parallax animation plays.
   4. At the largest accessibility Dynamic Type size, the primary screens stay readable — no label truncates, clips, or overlaps another element.
   5. The orphaned redesign views are deleted from the source tree; no unreachable duplicate screen compiles into the binary.
+
 **Plans**: TBD
 **UI hint**: yes
 
@@ -104,10 +123,12 @@ Plans:
 **Depends on**: Phase 1 (D3 sets the privacy contract SHIP-03 must answer to), Phase 3 (screenshots must capture the post-accessibility UI, not a version that gets re-cut)
 **Requirements**: SHIP-01, SHIP-02, SHIP-03
 **Success Criteria** (what must be TRUE):
+
   1. A complete App Store screenshot set exists for the required device sizes, captured from a build with demo mode disabled — every screenshot shows real app state, not generated demo data.
   2. Running the Fastlane `release` lane performs exactly the metadata-only upload the first submission needs, and no step in it claims work it does not perform.
   3. The ASC privacy questionnaire answers match the actual `/chat` payload field for field, consistent with the D3 privacy contract and with the shipped privacy policy text.
   4. The App Store Connect record reports no missing required item — metadata, screenshots, and privacy answers are all present and the version can be submitted for review.
+
 **Plans**: TBD
 
 ## Progress
