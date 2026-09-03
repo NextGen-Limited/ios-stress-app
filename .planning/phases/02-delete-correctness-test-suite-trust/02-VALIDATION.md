@@ -39,7 +39,20 @@ created: 2026-09-03
 
 | Task ID | Plan | Wave | Requirement | Threat Ref | Secure Behavior | Test Type | Automated Command | File Exists | Status |
 |---------|------|------|-------------|------------|-----------------|-----------|-------------------|-------------|--------|
-| TBD at plan time | — | — | DATA-01, DATA-04, BUILD-04, ENV-01, ENV-02, ENV-03 | — | see RESEARCH ## Validation Architecture | mixed | TBD | TBD | ⬜ pending |
+| 02-01-T1 | 02-01 | 1 | DATA-04 | T-02-01/02 | Lying CloudKit double detectable; query-based emptiness | unit (DI spy, CI-green) | `-only-testing:StressMonitorTests/DataDeleterCloudKitTruthinessTests` | ⬜ new this phase | ⬜ pending |
+| 02-01-T2 | 02-01 | 1 | DATA-04 | T-02-01 | Mutation proof: suite red when orchestrator swallows failures | unit (mutation run) | same -only-testing run (red) + revert + green | ⬜ recorded in SUMMARY | ⬜ pending |
+| 02-02-T1 | 02-02 | 1 | ENV-03 | T-02-03 | Unverified transaction finished zero times (RED first) | unit (fake handle) | `-only-testing:StressMonitorTests/CreditPurchaseFlowTests` | ⬜ new test | ⬜ pending |
+| 02-02-T2 | 02-02 | 1 | ENV-03 | T-02-03/04 | Finish removed from unverified branch; reachability note | unit + doc | same suite green + swiftlint | ✅ suite exists | ⬜ pending |
+| 02-03-T1 | 02-03 | 2 | ENV-03 | T-02-05 | Wiring pin: DEBUG resolves real service absent override (RED first) | unit (#if DEBUG) | `-only-testing:StressMonitorTests/StoreKitServiceWiringTests` | ⬜ new this phase | ⬜ pending |
+| 02-03-T2 | 02-03 | 2 | ENV-03 | T-02-05/06 | Both wiring sites flip behind one named opt-in | unit | wiring + CreditPurchaseFlowTests green | ✅ suites exist | ⬜ pending |
+| 02-04-T1 | 02-04 | 3 | ENV-01, ENV-02 | T-02-07 | Container-lifetime hypothesis tested (.ips + fixture conversion + targeted runs) | diagnostic | targeted `-only-testing` runs w/o GSD_CI env | ✅ suites exist | ⬜ pending |
+| 02-04-T2 | 02-04 | 3 | ENV-01, ENV-02 | T-02-07/08 | Fix-or-disposition applied; no silently disabled suite | checkpoint + suite state | trust grep + full CI-parity run | ✅ (disposition ❌ until written) | ⬜ pending |
+| 02-04-T3 | 02-04 | 3 | ENV-01, ENV-02 | T-02-08 | StoreKitServiceTests + EntitlementForegroundCorrection dispositioned | diagnostic | isolation-matrix runs + trust grep | ✅ suites exist | ⬜ pending |
+| 02-05-T1 | 02-05 | 4 | BUILD-04 | T-02-09/10 | Canonical CI-parity invocation + INFOPLIST_KEY note | doc verification | grep over AGENTS.md/_test.yml | ✅ files exist | ⬜ pending |
+| 02-05-T2 | 02-05 | 4 | BUILD-04 | T-02-09 | docs/TESTING.md pointer-only; no divergence | doc verification | grep + git diff --stat | ✅ file exists | ⬜ pending |
+| 02-06-T1 | 02-06 | 5 | DATA-01 | T-02-11 | Factory reset deletes Habit (full store set) | unit (RED→GREEN) | deletion suites -only-testing green | ✅ suites exist | ⬜ pending |
+| 02-06-T2 | 02-06 | 5 | DATA-01 | T-02-12 | Evidence note execution-ready with disclosures | doc (manual-apparatus) | file + section greps | ⬜ new this phase | ⬜ pending |
+| 02-06-T3 | 02-06 | 5 | DATA-01, DATA-04, BUILD-04, ENV-01, ENV-02, ENV-03 | T-02-13 | Trust gate: full suite green, enumeration, grep mapping | full-suite + xcresulttool | CI-parity full run + `xcresulttool get test-results tests` | ⬜ new this phase | ⬜ pending |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 

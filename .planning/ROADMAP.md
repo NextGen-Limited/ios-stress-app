@@ -103,7 +103,28 @@ Plans:
   4. The full suite reports zero unexplained failures and no silently disabled suite: the WINDOWS.md #8 CoreSimulator crash lineage and the `CharacterEntitlementSyncTests` quarantine are each fixed, or each carries a written, dated disposition naming the root cause and the accepted coverage loss.
   5. The money-path advisories are dispositioned: WR-03 (DEBUG builds routing purchases through `MockStoreKitService`) and WR-04 (`.unverified` consumables being finished) are fixed or documented as an explicit accept with rationale.
 
-**Plans**: TBD
+**Plans**: 6 plans
+Plans:
+**Wave 1**
+
+- [ ] 02-01-PLAN.md — Tracer (TDD): DATA-04 CloudKit delete-truthiness spy suite — ungated, mutation-proven red/green (the suite catches a lying delete)
+- [ ] 02-02-PLAN.md — ENV-03/WR-04 (TDD): never finish unverified transactions — red-first pin + five-site reachability note
+
+**Wave 2** *(pbxproj serialized after 02-01)*
+
+- [ ] 02-03-PLAN.md — ENV-03/WR-03 (TDD): DEBUG defaults to real StoreKit at both wiring sites; mock becomes launch-arg opt-in — red-first wiring pin
+
+**Wave 3** *(blocked on Waves 1-2)*
+
+- [ ] 02-04-PLAN.md — ENV-01/ENV-02: bounded re-diagnosis (container-lifetime hypothesis + live .ips) → fix-or-disposition for #8 lineage, CharacterEntitlementSyncTests, StoreKitServiceTests, EntitlementForegroundCorrectionTests (checkpoint-gated un-quarantine)
+
+**Wave 4** *(blocked on 02-04 — docs follow the final gate state)*
+
+- [ ] 02-05-PLAN.md — BUILD-04: AGENTS.md canonical CI-parity invocation (env-var form), docs/TESTING.md pointer, INFOPLIST_KEY doc-truth note
+
+**Wave 5** *(phase closer — blocked on all)*
+
+- [ ] 02-06-PLAN.md — DATA-01: Habit store-sweep fix + two-surface evidence note (device + CloudKit Console, human item) + phase trust gate record
 
 #### Phase 3: Accessibility Compliance
 
@@ -142,6 +163,6 @@ Plans:
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 1. Binary & Manifest Truth | v1.2 | 6/6 | Complete    | 2026-09-03 |
-| 2. Delete Correctness & Test-Suite Trust | v1.2 | 0/TBD | Not started | - |
+| 2. Delete Correctness & Test-Suite Trust | v1.2 | 0/6 | Not started | - |
 | 3. Accessibility Compliance | v1.2 | 0/TBD | Not started | - |
 | 4. Store Submission Package | v1.2 | 0/TBD | Not started | - |
