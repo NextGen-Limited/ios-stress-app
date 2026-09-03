@@ -10,7 +10,16 @@ import SwiftUI
 /// delayed Ask-to-Buy) that arrive the rest of the time were never observed.
 private struct StoreKitServiceKey: EnvironmentKey {
     #if DEBUG
-    static let defaultValue: StoreKitServiceProtocol = MockStoreKitService(premiumState: .shared)
+    // WR-03 site B: same decision logic as
+    // StressMonitorApp.makeStoreKitService — the real service by default,
+    // MockStoreKitService only behind the explicit `-mock-iap` launch-arg
+    // opt-in. This default backs views outside the app's `.environment`
+    // injection (PaywallView); it must not leave a no-op money path.
+    static let defaultValue: StoreKitServiceProtocol = if MockIAPMode.isEnabled() {
+        MockStoreKitService(premiumState: .shared)
+    } else {
+        StoreKitService(premiumState: .shared)
+    }
     #else
     static let defaultValue: StoreKitServiceProtocol = StoreKitService(premiumState: .shared)
     #endif

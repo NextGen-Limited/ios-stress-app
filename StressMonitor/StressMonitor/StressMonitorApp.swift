@@ -267,7 +267,10 @@ struct StressMonitorApp: App {
         creditService: CreditService,
         arguments: [String] = ProcessInfo.processInfo.arguments
     ) -> StoreKitServiceProtocol {
-        MockStoreKitService(premiumState: .shared)
+        if MockIAPMode.isEnabled(arguments: arguments) {
+            return MockStoreKitService(premiumState: .shared)
+        }
+        return StoreKitService(premiumState: .shared, creditService: creditService)
     }
     #else
     private static func makeStoreKitService(creditService: CreditService) -> StoreKitServiceProtocol {
