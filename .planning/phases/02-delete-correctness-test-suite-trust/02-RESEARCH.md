@@ -370,24 +370,28 @@ TEST_RUNNER_GSD_CI=1 xcodebuild test \
 
 **All other claims are [VERIFIED: path:lines] (in-repo, read this session) or [CITED: url] (external).**
 
-## Open Questions
+## Open Questions (RESOLVED at planning)
 
 1. **Which UI surface does DATA-01 certify — factory reset or scoped Delete-All?**
    - What we know: three claims exist with different sweep breadth (Pitfall 2); UI copy promises "all data … from both this device and iCloud".
    - What's unclear: whether the user wants the narrower scoped path also certified or fixed to match its copy.
    - Recommendation: run the evidence against the factory-reset surface (broadest actual sweep, matches the strongest claim) and record the scoped path's narrower semantics as a disclosed fact in the note; escalate the Habit gap as a planner decision (1-line fix vs. documented accept).
+   - **RESOLVED (at planning):** factory-reset surface adopted; scoped-path semantics disclosed as a fact in the evidence note (plan 02-06).
 
 2. **Does the container-lifetime fix actually clear #8, or is it a sixth falsified hypothesis?**
    - What we know: strongest un-tested hypothesis (STATE decision + matching live .ips faulting in SwiftData); consistent with every prior bisection observation.
    - What's unclear: whether it fully explains the CI-side (macos-15 runner) crashes or only the local dev-host lineage.
    - Recommendation: bounded session tests it FIRST (cheap, reversible); either way the disposition names the outcome with the .ips evidence attached.
+   - **RESOLVED (at planning):** inherently empirical — resolved BY the 02-04 bounded session + its blocking decision checkpoint, not before it.
 
 3. **Is `StoreKitServiceTests`' session-isolation disable fixable by the same ENV-01 fix?**
    - What we know: its disabled reason cites CI StoreKitTest session state, not host crashes; `StoreKitTestSessionProvider` centralizes sessions already.
    - What's unclear: whether un-quarantining after the ENV-01 fix makes it green or it's an independent bug.
    - Recommendation: include it in the bounded session's isolation matrix; disposition either way (Pitfall 6 requires it).
+   - **RESOLVED (at planning):** StoreKitServiceTests is included in 02-04's Task 3 isolation matrix (disposition either way).
 
 4. **ENV-03 pinning test placement for WR-03** — the factory is `private static`; options: widen to `internal` + `#if DEBUG` test asserting resolved type (real absent `-mock-iap`-style arg, mock with it), or extract a testable `StoreKitServiceFactory.resolve()` helper. Executor's discretion per CONTEXT; flagging the access-change need so the plan doesn't discover it mid-task.
+   - **RESOLVED (at planning):** seam-widening mechanism left to executor discretion, flagged in 02-03.
 
 ## Environment Availability
 
