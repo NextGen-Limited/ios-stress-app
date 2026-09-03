@@ -106,7 +106,7 @@ struct WidgetPublisherKeyMatchingTests {
     @Test("the live dashboard path writes all six widget suite keys")
     @MainActor
     func liveDashboardPathWritesAllSixSuiteKeys() async throws {
-        let defaults = UserDefaults(suiteName: Self.suiteName)!
+        let defaults = try #require(UserDefaults(suiteName: Self.suiteName))
         cleanUp(defaults)
         defer { cleanUp(defaults) }
 
@@ -144,8 +144,8 @@ struct WidgetPublisherKeyMatchingTests {
     @MainActor
     func repeatedLoadsOfSameReadingPersistOnce() async {
         let healthKit = MockHealthKitService()
-        let t0 = Date(timeIntervalSince1970: 1_750_000_000)
-        healthKit.mockHRVTimestamp = t0
+        let firstReadingDate = Date(timeIntervalSince1970: 1_750_000_000)
+        healthKit.mockHRVTimestamp = firstReadingDate
         let repository = MockStressRepository()
 
         let viewModel = StressViewModel(
@@ -157,8 +157,7 @@ struct WidgetPublisherKeyMatchingTests {
         await viewModel.loadCurrentStress()
         #expect(repository.mockMeasurements.count == 1)
 
-        let t1 = t0.addingTimeInterval(600)
-        healthKit.mockHRVTimestamp = t1
+        healthKit.mockHRVTimestamp = firstReadingDate.addingTimeInterval(600)
         await viewModel.loadCurrentStress()
         #expect(repository.mockMeasurements.count == 2)
     }

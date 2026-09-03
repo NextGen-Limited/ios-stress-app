@@ -10,7 +10,7 @@ final class MockHealthKitService: HealthKitServiceProtocol, @unchecked Sendable 
     var mockHRVHistory: [HRVMeasurement] = []
     /// When set, fetchLatestHRV stamps this fixed date instead of Date() —
     /// pins the underlying reading for same-reading dedupe tests.
-    var mockHRVTimestamp: Date? = nil
+    var mockHRVTimestamp: Date?
     var shouldThrowError: Bool = false
     var mockSleepData: SleepData? = nil
     var mockActivityData: ActivityData? = nil
