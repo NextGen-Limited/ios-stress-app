@@ -48,16 +48,16 @@
 		F211BBDA2FD9112000A6E25D /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F211BBD92FD9111F00A6E25D /* WidgetKit.framework */; };
 		F211BBDC2FD9112000A6E25D /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F211BBDB2FD9112000A6E25D /* SwiftUI.framework */; };
 		F211BBED2FD9112200A6E25D /* StressMonitorWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = F211BBD72FD9111F00A6E25D /* StressMonitorWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		F227C3DF3027787A0083F74C /* (null) in Frameworks */ = {isa = PBXBuildFile; };
-		F227C3E03027787A0083F74C /* (null) in Frameworks */ = {isa = PBXBuildFile; };
-		F227C739302781F80083F74C /* (null) in Frameworks */ = {isa = PBXBuildFile; };
-		F227C73A302781F80083F74C /* (null) in Frameworks */ = {isa = PBXBuildFile; };
-		F26968812F5DAE2400B40F0F /* (null) in Frameworks */ = {isa = PBXBuildFile; };
+		F227C3DF3027787A0083F74C /* BuildFile in Frameworks */ = {isa = PBXBuildFile; };
+		F227C3E03027787A0083F74C /* BuildFile in Frameworks */ = {isa = PBXBuildFile; };
+		F227C739302781F80083F74C /* BuildFile in Frameworks */ = {isa = PBXBuildFile; };
+		F227C73A302781F80083F74C /* BuildFile in Frameworks */ = {isa = PBXBuildFile; };
+		F26968812F5DAE2400B40F0F /* BuildFile in Frameworks */ = {isa = PBXBuildFile; };
 		F2E2EC392F1CC605000C2B53 /* StressMonitorWatch Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = F2E2EC192F1CC602000C2B53 /* StressMonitorWatch Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		F2FCD7AF2F8FFBFF000DE6E8 /* (null) in Frameworks */ = {isa = PBXBuildFile; };
-		FB1A00010000000000000004 /* FirebaseAuth in Frameworks */ = {isa = PBXBuildFile; productRef = FB1A00010000000000000002 /* FirebaseAuth */; };
-		FB1A00010000000000000005 /* FirebaseCore in Frameworks */ = {isa = PBXBuildFile; productRef = FB1A00010000000000000003 /* FirebaseCore */; };
-		FB1A00010000000000000007 /* GoogleSignIn in Frameworks */ = {isa = PBXBuildFile; productRef = FB1A00010000000000000006 /* GoogleSignIn */; };
+		F2FCD7AF2F8FFBFF000DE6E8 /* BuildFile in Frameworks */ = {isa = PBXBuildFile; };
+		FB1A00010000000000000004 /* BuildFile in Frameworks */ = {isa = PBXBuildFile; };
+		FB1A00010000000000000005 /* BuildFile in Frameworks */ = {isa = PBXBuildFile; };
+		FB1A00010000000000000007 /* BuildFile in Frameworks */ = {isa = PBXBuildFile; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -206,11 +206,15 @@
 		};
 		F2E2EBFB2F1CC556000C2B53 /* StressMonitorTests */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
 			path = StressMonitorTests;
 			sourceTree = "<group>";
 		};
 		F2E2EC1A2F1CC602000C2B53 /* StressMonitorWatch Watch App */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
+			exceptions = (
+			);
 			path = "StressMonitorWatch Watch App";
 			sourceTree = "<group>";
 		};
@@ -238,15 +242,15 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F227C73A302781F80083F74C /* (null) in Frameworks */,
-				F227C739302781F80083F74C /* (null) in Frameworks */,
-				F227C3E03027787A0083F74C /* (null) in Frameworks */,
-				F227C3DF3027787A0083F74C /* (null) in Frameworks */,
-				F26968812F5DAE2400B40F0F /* (null) in Frameworks */,
-				F2FCD7AF2F8FFBFF000DE6E8 /* (null) in Frameworks */,
-				FB1A00010000000000000004 /* FirebaseAuth in Frameworks */,
-				FB1A00010000000000000005 /* FirebaseCore in Frameworks */,
-				FB1A00010000000000000007 /* GoogleSignIn in Frameworks */,
+				F227C73A302781F80083F74C /* BuildFile in Frameworks */,
+				F227C739302781F80083F74C /* BuildFile in Frameworks */,
+				F227C3E03027787A0083F74C /* BuildFile in Frameworks */,
+				F227C3DF3027787A0083F74C /* BuildFile in Frameworks */,
+				F26968812F5DAE2400B40F0F /* BuildFile in Frameworks */,
+				F2FCD7AF2F8FFBFF000DE6E8 /* BuildFile in Frameworks */,
+				FB1A00010000000000000004 /* BuildFile in Frameworks */,
+				FB1A00010000000000000005 /* BuildFile in Frameworks */,
+				FB1A00010000000000000007 /* BuildFile in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -412,9 +416,9 @@
 			);
 			name = StressMonitor;
 			packageProductDependencies = (
-				FB1A00010000000000000002 /* FirebaseAuth */,
-				FB1A00010000000000000003 /* FirebaseCore */,
-				FB1A00010000000000000006 /* GoogleSignIn */,
+				C24A1D1C962200A0ADB75737 /* FirebaseAuth */,
+				F125E68A1518EF9B500DADDA /* FirebaseCore */,
+				7B5DBEA14CEB67077FD66BBE /* GoogleSignIn */,
 			);
 			productName = StressMonitor;
 			productReference = F2E2EBE92F1CC553000C2B53 /* StressMonitor.app */;
@@ -471,8 +475,7 @@
 			mainGroup = F2E2EBE02F1CC553000C2B53;
 			minimizedProjectReferenceProxies = 1;
 			packageReferences = (
-				FB1A00010000000000000001 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */,
-				FB2A00010000000000000001 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */,
+				C3ECFE78514FF7DFB2DBDB1E /* XCLocalSwiftPackageReference "proxy" */,
 			);
 			preferredProjectObjectVersion = 77;
 			productRefGroup = F2E2EBEA2F1CC553000C2B53 /* Products */;
@@ -672,77 +675,77 @@
 			name = Release;
 		};
 		F211BBEF2FD9112200A6E25D /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
-				CODE_SIGN_ENTITLEMENTS = StressMonitorWidget/StressMonitorWidget.entitlements;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = K2TYLYAWMK;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = StressMonitorWidget/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = StressMonitorWidget;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@executable_path/../../Frameworks",
-				);
-				MARKETING_VERSION = 1.0.0;
-				PRODUCT_BUNDLE_IDENTIFIER = stress.ai.com.widget;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "match Development stress.ai.com.widget";
-				SKIP_INSTALL = YES;
-				STRING_CATALOG_GENERATE_SYMBOLS = YES;
-				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Debug;
-		};
+	buildSettings = {
+		"ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME" = AccentColor;
+		"ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME" = WidgetBackground;
+		"CODE_SIGN_ENTITLEMENTS" = "StressMonitorWidget/StressMonitorWidget.entitlements";
+		"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+		"CODE_SIGN_STYLE" = Manual;
+		"CURRENT_PROJECT_VERSION" = 12;
+		"DEVELOPMENT_TEAM" = "";
+		"DEVELOPMENT_TEAM[sdk=iphoneos*]" = K2TYLYAWMK;
+		"GENERATE_INFOPLIST_FILE" = YES;
+		"INFOPLIST_FILE" = "StressMonitorWidget/Info.plist";
+		"INFOPLIST_KEY_CFBundleDisplayName" = StressMonitorWidget;
+		"INFOPLIST_KEY_NSHumanReadableCopyright" = "";
+		"IPHONEOS_DEPLOYMENT_TARGET" = "18.6";
+		"LD_RUNPATH_SEARCH_PATHS" = (
+			"$(inherited)",
+			"@executable_path/Frameworks",
+			"@executable_path/../../Frameworks",
+		);
+		"MARKETING_VERSION" = "1.0.0";
+		"PRODUCT_BUNDLE_IDENTIFIER" = "stress.ai.com.widget";
+		"PRODUCT_NAME" = "$(TARGET_NAME)";
+		"PROVISIONING_PROFILE_SPECIFIER" = "";
+		"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "match Development stress.ai.com.widget";
+		"SKIP_INSTALL" = YES;
+		"STRING_CATALOG_GENERATE_SYMBOLS" = YES;
+		"SWIFT_APPROACHABLE_CONCURRENCY" = YES;
+		"SWIFT_EMIT_LOC_STRINGS" = YES;
+		"SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY" = YES;
+		"SWIFT_VERSION" = "5.0";
+		"TARGETED_DEVICE_FAMILY" = "1,2";
+	};
+	isa = XCBuildConfiguration;
+	name = Debug;
+};
 		F211BBF02FD9112200A6E25D /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME = WidgetBackground;
-				CODE_SIGN_ENTITLEMENTS = StressMonitorWidget/StressMonitorWidget.entitlements;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
-				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = K2TYLYAWMK;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = StressMonitorWidget/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = StressMonitorWidget;
-				INFOPLIST_KEY_NSHumanReadableCopyright = "";
-				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-					"@executable_path/../../Frameworks",
-				);
-				MARKETING_VERSION = 1.0.0;
-				PRODUCT_BUNDLE_IDENTIFIER = stress.ai.com.widget;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "match AppStore stress.ai.com.widget";
-				SKIP_INSTALL = YES;
-				STRING_CATALOG_GENERATE_SYMBOLS = YES;
-				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = "1,2";
-			};
-			name = Release;
-		};
+	buildSettings = {
+		"ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME" = AccentColor;
+		"ASSETCATALOG_COMPILER_WIDGET_BACKGROUND_COLOR_NAME" = WidgetBackground;
+		"CODE_SIGN_ENTITLEMENTS" = "StressMonitorWidget/StressMonitorWidget.entitlements";
+		"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+		"CODE_SIGN_STYLE" = Manual;
+		"CURRENT_PROJECT_VERSION" = 12;
+		"DEVELOPMENT_TEAM" = "";
+		"DEVELOPMENT_TEAM[sdk=iphoneos*]" = K2TYLYAWMK;
+		"GENERATE_INFOPLIST_FILE" = YES;
+		"INFOPLIST_FILE" = "StressMonitorWidget/Info.plist";
+		"INFOPLIST_KEY_CFBundleDisplayName" = StressMonitorWidget;
+		"INFOPLIST_KEY_NSHumanReadableCopyright" = "";
+		"IPHONEOS_DEPLOYMENT_TARGET" = "18.6";
+		"LD_RUNPATH_SEARCH_PATHS" = (
+			"$(inherited)",
+			"@executable_path/Frameworks",
+			"@executable_path/../../Frameworks",
+		);
+		"MARKETING_VERSION" = "1.0.0";
+		"PRODUCT_BUNDLE_IDENTIFIER" = "stress.ai.com.widget";
+		"PRODUCT_NAME" = "$(TARGET_NAME)";
+		"PROVISIONING_PROFILE_SPECIFIER" = "";
+		"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "match AppStore stress.ai.com.widget";
+		"SKIP_INSTALL" = YES;
+		"STRING_CATALOG_GENERATE_SYMBOLS" = YES;
+		"SWIFT_APPROACHABLE_CONCURRENCY" = YES;
+		"SWIFT_EMIT_LOC_STRINGS" = YES;
+		"SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY" = YES;
+		"SWIFT_VERSION" = "5.0";
+		"TARGETED_DEVICE_FAMILY" = "1,2";
+	};
+	isa = XCBuildConfiguration;
+	name = Release;
+};
 		F2E2EC0A2F1CC556000C2B53 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -867,203 +870,203 @@
 			name = Release;
 		};
 		F2E2EC0D2F1CC556000C2B53 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = StressMonitor/StressMonitor.entitlements;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
-				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = K2TYLYAWMK;
-				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = StressMonitor/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Stress AI Coach";
-				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
-				INFOPLIST_KEY_NSCameraUsageDescription = "Camera access allows you to capture photos and videos to share in chat conversations.";
-				INFOPLIST_KEY_NSHealthClinicalHealthRecordsShareUsageDescription = "We need access to your health data to monitor stress levels.";
-				INFOPLIST_KEY_NSHealthShareUsageDescription = "We need access to your health data to monitor stress levels.";
-				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "We need to update your health data with stress measurements.";
-				INFOPLIST_KEY_STOREKIT_CREDITS_LARGE_PRODUCT_ID = com.stressmonitor.app.credits.large;
-				INFOPLIST_KEY_STOREKIT_CREDITS_SMALL_PRODUCT_ID = com.stressmonitor.app.credits.small;
-				INFOPLIST_KEY_STOREKIT_PREMIUM_ANNUAL_PRODUCT_ID = com.stressmonitor.app.premium.annual;
-				INFOPLIST_KEY_STOREKIT_PREMIUM_MONTHLY_PRODUCT_ID = com.stressmonitor.app.premium.monthly;
-				INFOPLIST_KEY_STOREKIT_PREMIUM_SUBSCRIPTION_GROUP_ID = 22353146;
-				INFOPLIST_KEY_STOREKIT_PREMIUM_WEEKLY_PRODUCT_ID = com.stressmonitor.app.premium.weekly;
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
-				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UIBackgroundModes = "fetch processing";
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = UIInterfaceOrientationLandscapeRight;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
-				MARKETING_VERSION = 1.0.0;
-				PRODUCT_BUNDLE_IDENTIFIER = stress.ai.com;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "match Development stress.ai.com";
-				STRING_CATALOG_GENERATE_SYMBOLS = YES;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 1;
-			};
-			name = Debug;
-		};
+	buildSettings = {
+		"ASSETCATALOG_COMPILER_APPICON_NAME" = AppIcon;
+		"ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME" = AccentColor;
+		"CODE_SIGN_ENTITLEMENTS" = "StressMonitor/StressMonitor.entitlements";
+		"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
+		"CODE_SIGN_STYLE" = Manual;
+		"CURRENT_PROJECT_VERSION" = 12;
+		"DEVELOPMENT_TEAM" = "";
+		"DEVELOPMENT_TEAM[sdk=iphoneos*]" = K2TYLYAWMK;
+		"ENABLE_PREVIEWS" = YES;
+		"GENERATE_INFOPLIST_FILE" = YES;
+		"INFOPLIST_FILE" = "StressMonitor/Info.plist";
+		"INFOPLIST_KEY_CFBundleDisplayName" = "Stress AI Coach";
+		"INFOPLIST_KEY_ITSAppUsesNonExemptEncryption" = NO;
+		"INFOPLIST_KEY_LSApplicationCategoryType" = "public.app-category.healthcare-fitness";
+		"INFOPLIST_KEY_NSCameraUsageDescription" = "Camera access allows you to capture photos and videos to share in chat conversations.";
+		"INFOPLIST_KEY_NSHealthClinicalHealthRecordsShareUsageDescription" = "We need access to your health data to monitor stress levels.";
+		"INFOPLIST_KEY_NSHealthShareUsageDescription" = "We need access to your health data to monitor stress levels.";
+		"INFOPLIST_KEY_NSHealthUpdateUsageDescription" = "We need to update your health data with stress measurements.";
+		"INFOPLIST_KEY_STOREKIT_CREDITS_LARGE_PRODUCT_ID" = "com.stressmonitor.app.credits.large";
+		"INFOPLIST_KEY_STOREKIT_CREDITS_SMALL_PRODUCT_ID" = "com.stressmonitor.app.credits.small";
+		"INFOPLIST_KEY_STOREKIT_PREMIUM_ANNUAL_PRODUCT_ID" = "com.stressmonitor.app.premium.annual";
+		"INFOPLIST_KEY_STOREKIT_PREMIUM_MONTHLY_PRODUCT_ID" = "com.stressmonitor.app.premium.monthly";
+		"INFOPLIST_KEY_STOREKIT_PREMIUM_SUBSCRIPTION_GROUP_ID" = 22353146;
+		"INFOPLIST_KEY_STOREKIT_PREMIUM_WEEKLY_PRODUCT_ID" = "com.stressmonitor.app.premium.weekly";
+		"INFOPLIST_KEY_UIApplicationSceneManifest_Generation" = YES;
+		"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents" = YES;
+		"INFOPLIST_KEY_UIBackgroundModes" = "fetch processing";
+		"INFOPLIST_KEY_UILaunchScreen_Generation" = YES;
+		"INFOPLIST_KEY_UISupportedInterfaceOrientations" = UIInterfaceOrientationPortrait;
+		"INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad" = UIInterfaceOrientationLandscapeRight;
+		"IPHONEOS_DEPLOYMENT_TARGET" = "18.6";
+		"LD_RUNPATH_SEARCH_PATHS" = (
+			"$(inherited)",
+			"@executable_path/Frameworks",
+		);
+		"MARKETING_VERSION" = "1.0.0";
+		"PRODUCT_BUNDLE_IDENTIFIER" = "stress.ai.com";
+		"PRODUCT_NAME" = "$(TARGET_NAME)";
+		"PROVISIONING_PROFILE_SPECIFIER" = "";
+		"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "match Development stress.ai.com";
+		"STRING_CATALOG_GENERATE_SYMBOLS" = YES;
+		"SUPPORTED_PLATFORMS" = "iphoneos iphonesimulator";
+		"SUPPORTS_MACCATALYST" = NO;
+		"SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD" = NO;
+		"SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD" = NO;
+		"SWIFT_APPROACHABLE_CONCURRENCY" = YES;
+		"SWIFT_DEFAULT_ACTOR_ISOLATION" = MainActor;
+		"SWIFT_EMIT_LOC_STRINGS" = YES;
+		"SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY" = YES;
+		"SWIFT_VERSION" = "5.0";
+		"TARGETED_DEVICE_FAMILY" = 1;
+	};
+	isa = XCBuildConfiguration;
+	name = Debug;
+};
 		F2E2EC0E2F1CC556000C2B53 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = StressMonitor/StressMonitor.entitlements;
-				"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
-				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=iphoneos*]" = K2TYLYAWMK;
-				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_FILE = StressMonitor/Info.plist;
-				INFOPLIST_KEY_CFBundleDisplayName = "Stress AI Coach";
-				INFOPLIST_KEY_ITSAppUsesNonExemptEncryption = NO;
-				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.healthcare-fitness";
-				INFOPLIST_KEY_NSCameraUsageDescription = "Camera access allows you to capture photos and videos to share in chat conversations.";
-				INFOPLIST_KEY_NSHealthClinicalHealthRecordsShareUsageDescription = "We need access to your health data to monitor stress levels.";
-				INFOPLIST_KEY_NSHealthShareUsageDescription = "We need access to your health data to monitor stress levels.";
-				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "We need to update your health data with stress measurements.";
-				INFOPLIST_KEY_STOREKIT_CREDITS_LARGE_PRODUCT_ID = com.stressmonitor.app.credits.large;
-				INFOPLIST_KEY_STOREKIT_CREDITS_SMALL_PRODUCT_ID = com.stressmonitor.app.credits.small;
-				INFOPLIST_KEY_STOREKIT_PREMIUM_ANNUAL_PRODUCT_ID = com.stressmonitor.app.premium.annual;
-				INFOPLIST_KEY_STOREKIT_PREMIUM_MONTHLY_PRODUCT_ID = com.stressmonitor.app.premium.monthly;
-				INFOPLIST_KEY_STOREKIT_PREMIUM_SUBSCRIPTION_GROUP_ID = 22353146;
-				INFOPLIST_KEY_STOREKIT_PREMIUM_WEEKLY_PRODUCT_ID = com.stressmonitor.app.premium.weekly;
-				INFOPLIST_KEY_UIApplicationSceneManifest_Generation = YES;
-				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
-				INFOPLIST_KEY_UIBackgroundModes = "fetch processing";
-				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations = UIInterfaceOrientationPortrait;
-				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = UIInterfaceOrientationLandscapeRight;
-				IPHONEOS_DEPLOYMENT_TARGET = 18.6;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
-				MARKETING_VERSION = 1.0.0;
-				PRODUCT_BUNDLE_IDENTIFIER = stress.ai.com;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "match AppStore stress.ai.com";
-				STRING_CATALOG_GENERATE_SYMBOLS = YES;
-				SUPPORTED_PLATFORMS = "iphoneos iphonesimulator";
-				SUPPORTS_MACCATALYST = NO;
-				SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD = NO;
-				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 1;
-			};
-			name = Release;
-		};
+	buildSettings = {
+		"ASSETCATALOG_COMPILER_APPICON_NAME" = AppIcon;
+		"ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME" = AccentColor;
+		"CODE_SIGN_ENTITLEMENTS" = "StressMonitor/StressMonitor.entitlements";
+		"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
+		"CODE_SIGN_STYLE" = Manual;
+		"CURRENT_PROJECT_VERSION" = 12;
+		"DEVELOPMENT_TEAM" = "";
+		"DEVELOPMENT_TEAM[sdk=iphoneos*]" = K2TYLYAWMK;
+		"ENABLE_PREVIEWS" = YES;
+		"GENERATE_INFOPLIST_FILE" = YES;
+		"INFOPLIST_FILE" = "StressMonitor/Info.plist";
+		"INFOPLIST_KEY_CFBundleDisplayName" = "Stress AI Coach";
+		"INFOPLIST_KEY_ITSAppUsesNonExemptEncryption" = NO;
+		"INFOPLIST_KEY_LSApplicationCategoryType" = "public.app-category.healthcare-fitness";
+		"INFOPLIST_KEY_NSCameraUsageDescription" = "Camera access allows you to capture photos and videos to share in chat conversations.";
+		"INFOPLIST_KEY_NSHealthClinicalHealthRecordsShareUsageDescription" = "We need access to your health data to monitor stress levels.";
+		"INFOPLIST_KEY_NSHealthShareUsageDescription" = "We need access to your health data to monitor stress levels.";
+		"INFOPLIST_KEY_NSHealthUpdateUsageDescription" = "We need to update your health data with stress measurements.";
+		"INFOPLIST_KEY_STOREKIT_CREDITS_LARGE_PRODUCT_ID" = "com.stressmonitor.app.credits.large";
+		"INFOPLIST_KEY_STOREKIT_CREDITS_SMALL_PRODUCT_ID" = "com.stressmonitor.app.credits.small";
+		"INFOPLIST_KEY_STOREKIT_PREMIUM_ANNUAL_PRODUCT_ID" = "com.stressmonitor.app.premium.annual";
+		"INFOPLIST_KEY_STOREKIT_PREMIUM_MONTHLY_PRODUCT_ID" = "com.stressmonitor.app.premium.monthly";
+		"INFOPLIST_KEY_STOREKIT_PREMIUM_SUBSCRIPTION_GROUP_ID" = 22353146;
+		"INFOPLIST_KEY_STOREKIT_PREMIUM_WEEKLY_PRODUCT_ID" = "com.stressmonitor.app.premium.weekly";
+		"INFOPLIST_KEY_UIApplicationSceneManifest_Generation" = YES;
+		"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents" = YES;
+		"INFOPLIST_KEY_UIBackgroundModes" = "fetch processing";
+		"INFOPLIST_KEY_UILaunchScreen_Generation" = YES;
+		"INFOPLIST_KEY_UISupportedInterfaceOrientations" = UIInterfaceOrientationPortrait;
+		"INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad" = UIInterfaceOrientationLandscapeRight;
+		"IPHONEOS_DEPLOYMENT_TARGET" = "18.6";
+		"LD_RUNPATH_SEARCH_PATHS" = (
+			"$(inherited)",
+			"@executable_path/Frameworks",
+		);
+		"MARKETING_VERSION" = "1.0.0";
+		"PRODUCT_BUNDLE_IDENTIFIER" = "stress.ai.com";
+		"PRODUCT_NAME" = "$(TARGET_NAME)";
+		"PROVISIONING_PROFILE_SPECIFIER" = "";
+		"PROVISIONING_PROFILE_SPECIFIER[sdk=iphoneos*]" = "match AppStore stress.ai.com";
+		"STRING_CATALOG_GENERATE_SYMBOLS" = YES;
+		"SUPPORTED_PLATFORMS" = "iphoneos iphonesimulator";
+		"SUPPORTS_MACCATALYST" = NO;
+		"SUPPORTS_MAC_DESIGNED_FOR_IPHONE_IPAD" = NO;
+		"SUPPORTS_XR_DESIGNED_FOR_IPHONE_IPAD" = NO;
+		"SWIFT_APPROACHABLE_CONCURRENCY" = YES;
+		"SWIFT_DEFAULT_ACTOR_ISOLATION" = MainActor;
+		"SWIFT_EMIT_LOC_STRINGS" = YES;
+		"SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY" = YES;
+		"SWIFT_VERSION" = "5.0";
+		"TARGETED_DEVICE_FAMILY" = 1;
+	};
+	isa = XCBuildConfiguration;
+	name = Release;
+};
 		F2E2EC3B2F1CC605000C2B53 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = "StressMonitorWatch Watch App/StressMonitorWatch Watch App.entitlements";
-				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "iPhone Developer";
-				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=watchos*]" = K2TYLYAWMK;
-				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "Stress AI Coach";
-				INFOPLIST_KEY_NSHealthShareUsageDescription = "We need access to your health data to monitor stress levels.";
-				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "We need to update your health data with stress measurements.";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				INFOPLIST_KEY_WKBackgroundModes = fetch;
-				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = stress.ai.com;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
-				MARKETING_VERSION = 1.0.0;
-				PRODUCT_BUNDLE_IDENTIFIER = stress.ai.com.watchkitapp;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=watchos*]" = "match Development stress.ai.com.watchkitapp";
-				SDKROOT = watchos;
-				SKIP_INSTALL = YES;
-				STRING_CATALOG_GENERATE_SYMBOLS = YES;
-				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 4;
-				WATCHOS_DEPLOYMENT_TARGET = 11.6;
-			};
-			name = Debug;
-		};
+	buildSettings = {
+		"ASSETCATALOG_COMPILER_APPICON_NAME" = AppIcon;
+		"ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME" = AccentColor;
+		"CODE_SIGN_ENTITLEMENTS" = "StressMonitorWatch Watch App/StressMonitorWatch Watch App.entitlements";
+		"CODE_SIGN_IDENTITY" = "Apple Development";
+		"CODE_SIGN_IDENTITY[sdk=watchos*]" = "iPhone Developer";
+		"CODE_SIGN_STYLE" = Manual;
+		"CURRENT_PROJECT_VERSION" = 12;
+		"DEVELOPMENT_TEAM" = "";
+		"DEVELOPMENT_TEAM[sdk=watchos*]" = K2TYLYAWMK;
+		"ENABLE_PREVIEWS" = YES;
+		"GENERATE_INFOPLIST_FILE" = YES;
+		"INFOPLIST_KEY_CFBundleDisplayName" = "Stress AI Coach";
+		"INFOPLIST_KEY_NSHealthShareUsageDescription" = "We need access to your health data to monitor stress levels.";
+		"INFOPLIST_KEY_NSHealthUpdateUsageDescription" = "We need to update your health data with stress measurements.";
+		"INFOPLIST_KEY_UISupportedInterfaceOrientations" = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+		"INFOPLIST_KEY_WKBackgroundModes" = fetch;
+		"INFOPLIST_KEY_WKCompanionAppBundleIdentifier" = "stress.ai.com";
+		"LD_RUNPATH_SEARCH_PATHS" = (
+			"$(inherited)",
+			"@executable_path/Frameworks",
+		);
+		"MARKETING_VERSION" = "1.0.0";
+		"PRODUCT_BUNDLE_IDENTIFIER" = "stress.ai.com.watchkitapp";
+		"PRODUCT_NAME" = "$(TARGET_NAME)";
+		"PROVISIONING_PROFILE_SPECIFIER" = "";
+		"PROVISIONING_PROFILE_SPECIFIER[sdk=watchos*]" = "match Development stress.ai.com.watchkitapp";
+		SDKROOT = watchos;
+		"SKIP_INSTALL" = YES;
+		"STRING_CATALOG_GENERATE_SYMBOLS" = YES;
+		"SWIFT_APPROACHABLE_CONCURRENCY" = YES;
+		"SWIFT_DEFAULT_ACTOR_ISOLATION" = MainActor;
+		"SWIFT_EMIT_LOC_STRINGS" = YES;
+		"SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY" = YES;
+		"SWIFT_VERSION" = "5.0";
+		"TARGETED_DEVICE_FAMILY" = 4;
+		"WATCHOS_DEPLOYMENT_TARGET" = "11.6";
+	};
+	isa = XCBuildConfiguration;
+	name = Debug;
+};
 		F2E2EC3C2F1CC605000C2B53 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
-				CODE_SIGN_ENTITLEMENTS = "StressMonitorWatch Watch App/StressMonitorWatch Watch App.entitlements";
-				CODE_SIGN_IDENTITY = "Apple Development";
-				"CODE_SIGN_IDENTITY[sdk=watchos*]" = "iPhone Distribution";
-				CODE_SIGN_STYLE = Manual;
-				CURRENT_PROJECT_VERSION = 1;
-				DEVELOPMENT_TEAM = "";
-				"DEVELOPMENT_TEAM[sdk=watchos*]" = K2TYLYAWMK;
-				ENABLE_PREVIEWS = YES;
-				GENERATE_INFOPLIST_FILE = YES;
-				INFOPLIST_KEY_CFBundleDisplayName = "Stress AI Coach";
-				INFOPLIST_KEY_NSHealthShareUsageDescription = "We need access to your health data to monitor stress levels.";
-				INFOPLIST_KEY_NSHealthUpdateUsageDescription = "We need to update your health data with stress measurements.";
-				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
-				INFOPLIST_KEY_WKBackgroundModes = fetch;
-				INFOPLIST_KEY_WKCompanionAppBundleIdentifier = stress.ai.com;
-				LD_RUNPATH_SEARCH_PATHS = (
-					"$(inherited)",
-					"@executable_path/Frameworks",
-				);
-				MARKETING_VERSION = 1.0.0;
-				PRODUCT_BUNDLE_IDENTIFIER = stress.ai.com.watchkitapp;
-				PRODUCT_NAME = "$(TARGET_NAME)";
-				PROVISIONING_PROFILE_SPECIFIER = "";
-				"PROVISIONING_PROFILE_SPECIFIER[sdk=watchos*]" = "match AppStore stress.ai.com.watchkitapp";
-				SDKROOT = watchos;
-				SKIP_INSTALL = YES;
-				STRING_CATALOG_GENERATE_SYMBOLS = YES;
-				SWIFT_APPROACHABLE_CONCURRENCY = YES;
-				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
-				SWIFT_EMIT_LOC_STRINGS = YES;
-				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
-				TARGETED_DEVICE_FAMILY = 4;
-				WATCHOS_DEPLOYMENT_TARGET = 11.6;
-			};
-			name = Release;
-		};
+	buildSettings = {
+		"ASSETCATALOG_COMPILER_APPICON_NAME" = AppIcon;
+		"ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME" = AccentColor;
+		"CODE_SIGN_ENTITLEMENTS" = "StressMonitorWatch Watch App/StressMonitorWatch Watch App.entitlements";
+		"CODE_SIGN_IDENTITY" = "Apple Development";
+		"CODE_SIGN_IDENTITY[sdk=watchos*]" = "iPhone Distribution";
+		"CODE_SIGN_STYLE" = Manual;
+		"CURRENT_PROJECT_VERSION" = 12;
+		"DEVELOPMENT_TEAM" = "";
+		"DEVELOPMENT_TEAM[sdk=watchos*]" = K2TYLYAWMK;
+		"ENABLE_PREVIEWS" = YES;
+		"GENERATE_INFOPLIST_FILE" = YES;
+		"INFOPLIST_KEY_CFBundleDisplayName" = "Stress AI Coach";
+		"INFOPLIST_KEY_NSHealthShareUsageDescription" = "We need access to your health data to monitor stress levels.";
+		"INFOPLIST_KEY_NSHealthUpdateUsageDescription" = "We need to update your health data with stress measurements.";
+		"INFOPLIST_KEY_UISupportedInterfaceOrientations" = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown";
+		"INFOPLIST_KEY_WKBackgroundModes" = fetch;
+		"INFOPLIST_KEY_WKCompanionAppBundleIdentifier" = "stress.ai.com";
+		"LD_RUNPATH_SEARCH_PATHS" = (
+			"$(inherited)",
+			"@executable_path/Frameworks",
+		);
+		"MARKETING_VERSION" = "1.0.0";
+		"PRODUCT_BUNDLE_IDENTIFIER" = "stress.ai.com.watchkitapp";
+		"PRODUCT_NAME" = "$(TARGET_NAME)";
+		"PROVISIONING_PROFILE_SPECIFIER" = "";
+		"PROVISIONING_PROFILE_SPECIFIER[sdk=watchos*]" = "match AppStore stress.ai.com.watchkitapp";
+		SDKROOT = watchos;
+		"SKIP_INSTALL" = YES;
+		"STRING_CATALOG_GENERATE_SYMBOLS" = YES;
+		"SWIFT_APPROACHABLE_CONCURRENCY" = YES;
+		"SWIFT_DEFAULT_ACTOR_ISOLATION" = MainActor;
+		"SWIFT_EMIT_LOC_STRINGS" = YES;
+		"SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY" = YES;
+		"SWIFT_VERSION" = "5.0";
+		"TARGETED_DEVICE_FAMILY" = 4;
+		"WATCHOS_DEPLOYMENT_TARGET" = "11.6";
+	};
+	isa = XCBuildConfiguration;
+	name = Release;
+};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -1114,40 +1117,28 @@
 		};
 /* End XCConfigurationList section */
 
-/* Begin XCRemoteSwiftPackageReference section */
-		FB1A00010000000000000001 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/firebase/firebase-ios-sdk.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 11.0.0;
-			};
+/* Begin XCLocalSwiftPackageReference section */
+		C3ECFE78514FF7DFB2DBDB1E /* XCLocalSwiftPackageReference "proxy" */ = {
+			isa = XCLocalSwiftPackageReference;
+			relativePath = "spm-cache/packages/proxy";
 		};
-		FB2A00010000000000000001 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */ = {
-			isa = XCRemoteSwiftPackageReference;
-			repositoryURL = "https://github.com/google/GoogleSignIn-iOS.git";
-			requirement = {
-				kind = upToNextMajorVersion;
-				minimumVersion = 9.0.0;
-			};
-		};
-/* End XCRemoteSwiftPackageReference section */
+/* End XCLocalSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
-		FB1A00010000000000000002 /* FirebaseAuth */ = {
+		7B5DBEA14CEB67077FD66BBE /* GoogleSignIn_proxied */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = FB1A00010000000000000001 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			package = C3ECFE78514FF7DFB2DBDB1E /* XCLocalSwiftPackageReference "proxy" */;
+			productName = GoogleSignIn_proxied;
+		};
+		C24A1D1C962200A0ADB75737 /* FirebaseAuth */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = C3ECFE78514FF7DFB2DBDB1E /* XCLocalSwiftPackageReference "proxy" */;
 			productName = FirebaseAuth;
 		};
-		FB1A00010000000000000003 /* FirebaseCore */ = {
+		F125E68A1518EF9B500DADDA /* FirebaseCore */ = {
 			isa = XCSwiftPackageProductDependency;
-			package = FB1A00010000000000000001 /* XCRemoteSwiftPackageReference "firebase-ios-sdk" */;
+			package = C3ECFE78514FF7DFB2DBDB1E /* XCLocalSwiftPackageReference "proxy" */;
 			productName = FirebaseCore;
-		};
-		FB1A00010000000000000006 /* GoogleSignIn */ = {
-			isa = XCSwiftPackageProductDependency;
-			package = FB2A00010000000000000001 /* XCRemoteSwiftPackageReference "GoogleSignIn-iOS" */;
-			productName = GoogleSignIn;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
