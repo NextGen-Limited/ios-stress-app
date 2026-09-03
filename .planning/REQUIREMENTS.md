@@ -74,31 +74,42 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| BUILD-01 | — | Pending |
-| BUILD-02 | — | Pending |
-| BUILD-03 | — | Pending |
-| BUILD-04 | — | Pending |
-| DATA-01 | — | Pending |
-| DATA-04 | — | Pending |
-| AUTH-01 | — | Pending |
-| WIRE-01 | — | Pending |
-| SHIP-01 | — | Pending |
-| SHIP-02 | — | Pending |
-| SHIP-03 | — | Pending |
-| A11Y-01 | — | Pending |
-| A11Y-02 | — | Pending |
-| A11Y-03 | — | Pending |
-| A11Y-04 | — | Pending |
-| A11Y-05 | — | Pending |
-| ENV-01 | — | Pending |
-| ENV-02 | — | Pending |
-| ENV-03 | — | Pending |
+| BUILD-01 | Phase 1 | Pending |
+| BUILD-02 | Phase 1 | Pending |
+| BUILD-03 | Phase 1 | Pending |
+| BUILD-04 | Phase 2 | Pending |
+| DATA-01 | Phase 2 | Pending |
+| DATA-04 | Phase 2 | Pending |
+| AUTH-01 | Phase 1 | Pending |
+| WIRE-01 | Phase 1 | Pending |
+| SHIP-01 | Phase 4 | Pending |
+| SHIP-02 | Phase 4 | Pending |
+| SHIP-03 | Phase 4 | Pending |
+| A11Y-01 | Phase 3 | Pending |
+| A11Y-02 | Phase 3 | Pending |
+| A11Y-03 | Phase 3 | Pending |
+| A11Y-04 | Phase 3 | Pending |
+| A11Y-05 | Phase 3 | Pending |
+| ENV-01 | Phase 2 | Pending |
+| ENV-02 | Phase 2 | Pending |
+| ENV-03 | Phase 2 | Pending |
 
 **Coverage:**
 - v1 requirements: 19 total
-- Mapped to phases: 0
-- Unmapped: 19 ⚠️ (roadmapper assigns)
+- Mapped to phases: 19 ✓
+- Unmapped: 0
+
+**Per-phase distribution:**
+
+| Phase | Requirements | Count |
+|-------|--------------|-------|
+| Phase 1 — Binary & Manifest Truth | BUILD-01, BUILD-02, BUILD-03, AUTH-01, WIRE-01 | 5 |
+| Phase 2 — Delete Correctness & Test-Suite Trust | DATA-01, DATA-04, BUILD-04, ENV-01, ENV-02, ENV-03 | 6 |
+| Phase 3 — Accessibility Compliance | A11Y-01, A11Y-02, A11Y-03, A11Y-04, A11Y-05 | 5 |
+| Phase 4 — Store Submission Package | SHIP-01, SHIP-02, SHIP-03 | 3 |
+
+**Decision gates:** D3 (privacy contract authority) gates BUILD-01 and SHIP-03; D4 (widget in v1) gates WIRE-01 and scopes BUILD-01/02/03. Both are resolved at the Phase 1 discuss gate, before any Phase 1 implementation task.
 
 ---
 *Requirements defined: 2026-09-03*
-*Last updated: 2026-09-03 after initial definition*
+*Last updated: 2026-09-03 — roadmap traceability filled (19/19 mapped across 4 phases)*
