@@ -13,7 +13,7 @@ set -uo pipefail
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 VERIFY="$SCRIPT_DIR/verify-archive.sh"
-GOLDEN_APP=".asc/artifacts/StressMonitor.xcarchive/Products/Applications/StressMonitor.app"
+GOLDEN_APP="$REPO_ROOT/.asc/artifacts/StressMonitor.xcarchive/Products/Applications/StressMonitor.app"
 GOLDEN="$REPO_ROOT/.asc/artifacts/StressMonitor.xcarchive"
 PLANTED="eyJhbGciOiJIUzI1NiJ9.PLANTEDSECRETVALUE.forTestingPurposes"
 
@@ -36,15 +36,19 @@ expect_pass $? "test_green_on_golden_archive (exit=$rc)"
 rm -f /tmp/verify-archive-tests-green.$$
 
 # Test 2 (red direction): planted JWT-shaped string in a binary copy must trip the scan.
+# NOTE: macOS strings parses Mach-O and stops at the object's last section, so bytes appended
+# past EOF are invisible to it. The secret is planted by overwriting bytes at the file
+# midpoint: the copy remains a Mach-O and the unmodified `strings -a` pipeline detects it —
+# the same visibility a credential embedded in a shipped binary would have.
 TMPD=$(mktemp -d)
 cp "$GOLDEN_APP/StressMonitor" "$TMPD/tampered"
-printf '%s' "$PLANTED" >> "$TMPD/tampered"
-strings -a "$TMPD/tampered" | grep -q "PLANTEDSECRETVALUE"
-planted_visible=$?
+TSIZE=$(stat -f%z "$TMPD/tampered")
+printf '%s' "$PLANTED" | dd of="$TMPD/tampered" bs=1 seek=$((TSIZE / 2)) conv=notrunc status=none
+planted_count=$(strings -a "$TMPD/tampered" | grep -c "PLANTEDSECRETVALUE" || true)
 bash "$VERIFY" --scan-binary "$TMPD/tampered" > /dev/null 2>&1
 rc=$?
-[ "$rc" -ne 0 ] && [ "$planted_visible" -eq 0 ]
-expect_pass $? "test_red_on_planted_secret (scan exit=$rc, planted string visible=$planted_visible)"
+[ "$rc" -ne 0 ] && [ "$planted_count" -ge 1 ]
+expect_pass $? "test_red_on_planted_secret (scan exit=$rc, planted string visible via strings: $planted_count hit(s))"
 rm -rf "$TMPD"
 
 # Test 3 (entitlements direction): all three bundles report the app group.
