@@ -5,16 +5,16 @@ milestone_name: Submission Readiness
 current_phase: 2
 current_phase_name: Delete Correctness & Test-Suite Trust
 status: executing
-stopped_at: Completed 02-01-PLAN.md (DATA-04 truthiness suite green + mutation red-proof)
-last_updated: "2026-09-03T16:03:50.933Z"
+stopped_at: "Completed 02-02-PLAN.md (WR-04: unverified transactions never finish, red-first pins + reachability audit)"
+last_updated: "2026-09-03T16:17:58.103Z"
 last_activity: 2026-09-03
 last_activity_desc: Phase 1 complete, transitioned to Phase 2
-state_head: 77698de034a1f7e66252298d1bdad5e3bc69798e
+state_head: 9598de6c616f6019c80348a35da070f3abc50245
 progress:
   total_phases: 4
   completed_phases: 1
   total_plans: 12
-  completed_plans: 7
+  completed_plans: 8
   percent: 25
 ---
 
@@ -30,7 +30,7 @@ See: .planning/PROJECT.md (updated 2026-09-03 at v1.2 start)
 ## Current Position
 
 Phase: 2 (Delete Correctness & Test-Suite Trust) — IN EXECUTION
-Plan: 2 of 6
+Plan: 3 of 6
 Status: Ready to execute
 Last activity: 2026-09-03 — 02-01 DATA-04 truthiness suite complete
 
@@ -72,6 +72,7 @@ Per-plan history for v1.0/v1.1 archived under `.planning/milestones/v1.0-phases/
 | Phase 1 P05 | 87 min | 2 tasks | 13 files |
 | Phase 1 P06 | 17 min | 2 tasks | 5 files |
 | Phase 02 P01 | 10 min | 2 tasks | 2 files |
+| Phase 02 P02 | 9 min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -100,6 +101,8 @@ Full log in PROJECT.md Key Decisions. v1.1 per-phase decisions archived with the
 - [Phase 2]: [Phase 2 P01, DATA-04]: Ungated truthiness suite lands as a NEW sibling file (DataDeleterCloudKitTruthinessTests.swift), not inside the GSD_CI-gated DataDeletionConsolidationTests.swift — CI must see the CR-01 regression; registered in pbxproj (A026/B026)
 - [Phase 2]: [Phase 2 P01]: One SeededCloudKitResetService double (.lying/.throwing/.draining) with exact-Int remainingRecords covers all three prongs — constructor-injected only, no statics (WINDOWS #12); emptiness asserted only by querying the store, never by the success return
 - [Phase 2]: [Phase 2 P01]: Mutation run is the TDD red gate for regression suites guarding already-fixed bugs — suite green on HEAD, red under reintroduced CR-01 swallow (exit 65, prong-1 double detection: no-throw + local split-brain), green after revert (exit 0)
+- [Phase 02]: [Phase 2 P02, WR-04]: Unverified transactions never finished — .unverified branch extracted to internal protocol-typed handleUnverifiedTransaction(_:) (VerificationResult<Transaction> is not test-constructible), finish deleted, redelivery-as-retry pinned red-first (finishCallCount == 0 single + redelivered)
+- [Phase 02]: [Phase 2 P02]: The four completePurchase finish sites are verified-only by construction (checkVerified throws on .unverified before reach; handle(transaction:) entered only from .verified) — reachability note delivered, sites byte-unchanged; no runtime checks added inside the grant choke point
 
 ### Pending Todos
 
@@ -144,8 +147,8 @@ Earlier v1.0 deferrals (Phase 01/02 verification gaps, `MockStoreKitService` Rel
 
 ## Session Continuity
 
-Last session: 2026-09-03T16:03:27.655Z
-Stopped at: Completed 02-01-PLAN.md (DATA-04 truthiness suite green + mutation red-proof)
+Last session: 2026-09-03T16:17:49.342Z
+Stopped at: Completed 02-02-PLAN.md (WR-04: unverified transactions never finish, red-first pins + reachability audit)
 Resume file: None
 
 ## Operator Next Steps
