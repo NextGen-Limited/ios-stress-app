@@ -27,7 +27,7 @@ Complete iOS 17+ widget extension for the Stress Monitor app using WidgetKit and
 ## Features Implemented
 
 ### Data Sharing
-- App Groups: `group.com.stressmonitor.app`
+- App Groups: `group.stress.ai.com`
 - UserDefaults-based data sharing between main app and widget
 - Support for latest stress data, history (20 entries), and personal baseline
 
@@ -85,11 +85,11 @@ Complete iOS 17+ widget extension for the Stress Monitor app using WidgetKit and
 ### 2. Enable App Groups
 In main app target:
 - Signing & Capabilities → + Capability → App Groups
-- Add: `group.com.stressmonitor.app`
+- Add: `group.stress.ai.com`
 
 In widget extension target:
 - Signing & Capabilities → + Capability → App Groups
-- Add: `group.com.stressmonitor.app`
+- Add: `group.stress.ai.com`
 
 ### 3. Update Main App
 After saving a new stress measurement:
