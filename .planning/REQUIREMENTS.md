@@ -46,6 +46,8 @@ Requirements for v1.2. Each maps to roadmap phases.
 - [ ] **ENV-01**: WINDOWS.md #8 CoreSimulator cold-launch crash lineage documented and accepted (or fixed)
 - [ ] **ENV-02**: `CharacterEntitlementSyncTests` quarantine resolved — root cause diagnosed and tests restored, or permanent skip documented with rationale
 - [ ] **ENV-03**: WR-03 (DEBUG money path uses MockStoreKitService) and WR-04 (`.unverified` consumables finished) advisories dispositioned — fixed or documented accept
+- [ ] **ENV-04**: SPM-cache proxy migration completed — a Release archive is producible from the unmodified working tree (Firebase proxy products exist; GoogleSignIn proxy product naming does not collide with upstream GoogleSignIn-iOS), not only from HEAD
+- [ ] **ENV-05**: CI `fastlane match` readonly run accepts the dual-cert App Store profiles (XPT2DHR688 present in the match repo or profiles regenerated single-cert per the documented fallback)
 
 ## v2 Requirements
 
@@ -93,17 +95,19 @@ Which phases cover which requirements. Updated during roadmap creation.
 | ENV-01 | Phase 2 | Pending |
 | ENV-02 | Phase 2 | Pending |
 | ENV-03 | Phase 2 | Pending |
+| ENV-04 | Phase 1 | Pending |
+| ENV-05 | Phase 1 | Pending |
 
 **Coverage:**
-- v1 requirements: 19 total
-- Mapped to phases: 19 ✓
+- v1 requirements: 21 total
+- Mapped to phases: 21 ✓
 - Unmapped: 0
 
 **Per-phase distribution:**
 
 | Phase | Requirements | Count |
 |-------|--------------|-------|
-| Phase 1 — Binary & Manifest Truth | BUILD-01, BUILD-02, BUILD-03, AUTH-01, WIRE-01 | 5 |
+| Phase 1 — Binary & Manifest Truth | BUILD-01, BUILD-02, BUILD-03, AUTH-01, WIRE-01, ENV-04, ENV-05 | 7 |
 | Phase 2 — Delete Correctness & Test-Suite Trust | DATA-01, DATA-04, BUILD-04, ENV-01, ENV-02, ENV-03 | 6 |
 | Phase 3 — Accessibility Compliance | A11Y-01, A11Y-02, A11Y-03, A11Y-04, A11Y-05 | 5 |
 | Phase 4 — Store Submission Package | SHIP-01, SHIP-02, SHIP-03 | 3 |
@@ -112,4 +116,4 @@ Which phases cover which requirements. Updated during roadmap creation.
 
 ---
 *Requirements defined: 2026-09-03*
-*Last updated: 2026-09-03 — roadmap traceability filled (19/19 mapped across 4 phases)*
+*Last updated: 2026-09-03 — ENV-04/ENV-05 folded in from release-session handoff (21/21 mapped across 4 phases)*

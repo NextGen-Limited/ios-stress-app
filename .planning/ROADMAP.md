@@ -52,7 +52,7 @@ Full phase detail archived at `.planning/milestones/v1.1-ROADMAP.md` and `.plann
 
 **Goal**: Everything the shipped archive declares about itself is true — Apple's automated validation accepts the privacy manifest, all three targets agree on one App Group suite, Info.plist keys resolve from a single source, the Release binary leaks no credential, and the widget either renders real data or is not in the build at all.
 **Depends on**: Nothing (first phase)
-**Requirements**: BUILD-01, BUILD-02, BUILD-03, AUTH-01, WIRE-01
+**Requirements**: BUILD-01, BUILD-02, BUILD-03, AUTH-01, WIRE-01, ENV-04, ENV-05
 **Decisions to resolve first** (before any implementation task in this phase):
   - **D3 — privacy contract authority**: which document is authoritative about what leaves the device (root `CLAUDE.md`'s "HealthKit never sent" claim vs. `StressContextPayload.swift`'s actual derived-score payload). Gates BUILD-01 here and SHIP-03 in Phase 4.
   - **D4 — widget in v1**: ship the widget target or exclude it from the submitted build. Gates WIRE-01 here, and determines whether BUILD-01/BUILD-02/BUILD-03 must cover two bundles or three.
@@ -62,6 +62,7 @@ Full phase detail archived at `.planning/milestones/v1.1-ROADMAP.md` and `.plann
   3. Every Info.plist key the app depends on resolves from `INFOPLIST_KEY_*` build settings in the merged plist of the built product — no orphaned or duplicate plist file contributes keys.
   4. `strings` over the Release binary returns no usable credential — no JWT, API key, or secret is extractable from the shipped artifact.
   5. Per D4: the widget on a real device shows the same stress score the app shows after a refresh, or the widget target is absent from the archive's bundle list and no dead widget code ships.
+  6. A Release archive is producible from the unmodified working tree — the SPM-cache proxy migration is complete (Firebase proxy products exist, GoogleSignIn proxy product naming does not collide with upstream) — and CI's `fastlane match` readonly run accepts the dual-cert App Store profiles without regenerating them.
 **Plans**: TBD
 
 #### Phase 2: Delete Correctness & Test-Suite Trust
