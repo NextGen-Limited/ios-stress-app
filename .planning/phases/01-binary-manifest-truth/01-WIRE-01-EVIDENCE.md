@@ -58,3 +58,30 @@ The watch app writes **different** keys (`watch.latestStress` / `watch.stressHis
 **Executor deviation trail for this task** (auto-fixes that were attempted and legitimately ruled out): re-signing the simulator build with embedded entitlements (fixes nothing — the gap is call-graph, not entitlements; also the manual ad-hoc re-sign broke SpringBoard launch trust and was reverted to the stock xcodebuild product); the argent simulator-server touch pipeline wedged mid-session and was restored via `stop-simulator-server` (skill-documented remedy).
 
 **Evidence artifacts:** screenshots §2; describe-tree readings quoted per section; tests §3; archive check §4.
+
+---
+
+## 8. Gap closure — live write path wired (plan 01-06)
+
+**Date:** 2026-09-03 · **Plan:** 01-06 (WIRE-01 / SC-5, D4 wire branch) · **Closes the finding recorded in §7.**
+
+**What changed:** `StressViewModel.loadCurrentStress` — the funnel every live foreground dashboard path passes through (DashboardView `.task` → `loadDashboardData`, `requestHealthKitAccess`, NoDataCard retry, scenePhase-active retry, HKObserverQuery `handleHealthKitUpdate`, DEBUG demo 15s timer) — now persists the calculated result: a `lastPersistedReadingDate` guard saves **one `StressMeasurement` per new underlying HRV reading** via `repository.save` → `WidgetPublisher.publish` (writes the six `latest_*` keys verbatim, then `WidgetCenter.reloadAllTimelines()`). The guard marks the reading persisted synchronously *before* the save await, so interleaved loads sharing one sample cannot double-save; a swallowed save failure (`try?`) never degrades the dashboard read path. The StressResult→StressMeasurement mapping was extracted into a shared `makeMeasurement(from:)` used by both the legacy `calculateAndSaveStress` and the new live save.
+
+**RED→GREEN proof:** three `@MainActor` tests added to `WidgetPublisherKeyMatchingTests` (originals untouched): *loadCurrentStress saves the calculated measurement through the repository* (mock repo: 1 save, level 61 / HRV 55 / HR 72 match), *the live dashboard path writes all six widget suite keys* (real `StressRepository` over an in-memory container: all six keys non-nil, `latest_stress_level` 42 == `currentStress?.level`), *repeated loads of the same underlying reading persist exactly once* (same timestamp → 1 save; fresh timestamp → 2). Observed RED (3 failing, 14 issues, zero saves / nil suite keys) before the wiring, then GREEN 5/5. Full-suite regression after touching the core viewmodel: **217 tests / 40 suites, TEST SUCCEEDED** (TEST_RUNNER_GSD_CI=1, `-parallel-testing-enabled NO`, iPhone 17 / iOS 26.3).
+
+**New same-value pair (supersedes the §2 empty-state pair):**
+
+| File | Captured | Shows |
+|------|----------|-------|
+| `StressMonitor/build/wire-01/dashboard-live-value.png` | 2026-09-03 20:55:48 | In-app dashboard (demo mode): hero **"Current stress, Elevated. Tense · busy."**, `measured 20:55`, vitals from the same tick (suite: HRV 11.0 ms / HR 104.2 bpm) |
+| `StressMonitor/build/wire-01/widget-live-value.png` | 2026-09-03 20:56:51 | Home screen with the StressMonitor widget (top-left, added via the real gallery flow in the 01-04 session) rendering **"Tense"** — a live value, **not** the "💧 No Data" empty state |
+
+**Value-match statement (machine-verified):** after the dashboard capture the app was terminated (20:55:49), freezing the demo cycle, so **both screenshots show the same underlying reading**: suite `latest_stress_level = 73.19`, `latest_stress_category = "moderate"`, `latest_timestamp = 2026-09-03 20:55:45.4` (read directly from the App Group plist on the simulator). Both visible labels are the correct derivations of that one value: the dashboard hero label **"Elevated"** is the `.moderate` badge (`StressResult.category(for: 73.19)` → `.moderate`; the two surfaces use different label vocabularies by design), and the widget label **"Tense"** is `WidgetStressTier.from(level: 73.19)` (61..<81). The widget's displayed value is read verbatim from the same suite keys the test integration wrote — no re-derivation between publish and render (§5). Reading jitter disclosure: the describe tree quoted above was taken 1–2 s before the final demo tick landed (confidence read "74%", frozen tick is 0.71); the compared labels (moderate-band hero, Tense tier) are band-stable across those adjacent ticks — both were `.moderate`.
+
+**§2 superseded:** the §2 pair (17:05:08/17:05:17, 01-04) showed the widget rendering its contract empty state — kept for the record as the pre-wiring baseline; it is **historical**. This §8 pair is the current truth.
+
+**§6 status update — still PENDING, expected outcome changed:** the physical-device confirmation remains the standing end-of-phase human item. With the write path wired, the expected outcome on hardware is now a **match**: open the app (foreground refresh saves + publishes + reloads), and the widget should show the same stress state the dashboard shows within its 15-minute timeline budget (immediately after `reloadAllTimelines`). Confirm there once this build reaches a device — that check closes WIRE-01 end-to-end; the simulator half is closed here.
+
+**Demo-mode disclosure (unchanged):** the data in this pair is demo-mode synthetic (`SimulatorHealthKitService` → the real 5-factor pipeline → the real save/publish path). No HealthKit provenance is claimed. The suite-key writes and the level equality are machine-verified by the unit tests above, not narrated from pixels.
+
+**Environment:** iPhone 17 simulator (iOS 26.3, UDID 5DD825B4-…), Debug build of the `StressMonitor` scheme launched via `-demo-mode`; discovery via argent `describe` (labels quoted from the accessibility tree — this session's runtime cannot render images); screenshots via `xcrun simctl io screenshot`; frozen-window protocol as described above.
