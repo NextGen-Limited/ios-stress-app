@@ -25,7 +25,7 @@ Requirements for v1.2. Each maps to roadmap phases.
 
 ### Widget Wiring
 
-- [ ] **WIRE-01**: Widget renders live stress data on a real device, not placeholder (requires decision D4: widget in v1)
+- [x] **WIRE-01**: Widget renders live stress data on a real device, not placeholder (requires decision D4: widget in v1)
 
 ### Ship Readiness
 
@@ -83,7 +83,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | DATA-01 | Phase 2 | Pending |
 | DATA-04 | Phase 2 | Pending |
 | AUTH-01 | Phase 1 | Complete |
-| WIRE-01 | Phase 1 | Pending |
+| WIRE-01 | Phase 1 | Complete |
 | SHIP-01 | Phase 4 | Pending |
 | SHIP-02 | Phase 4 | Pending |
 | SHIP-03 | Phase 4 | Pending |
