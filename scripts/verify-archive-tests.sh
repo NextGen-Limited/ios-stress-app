@@ -8,6 +8,12 @@
 #               appended makes the credential scan (scan mode) exit non-zero.
 #   3. ENTITLEMENTS — the per-bundle entitlements check reports PASS for all three
 #               bundles (app, widget appex, watch app) of the golden archive.
+#   4. RED    — a planted app Info.plist with an empty CFBundleURLSchemes array
+#               makes the merged-plists URL-schemes check report FAIL, and the
+#               PASS line must NOT appear (guards against the check passing on
+#               the key line's own quotes).
+#   5. GREEN  — the same planted plist with one scheme entry reports PASS.
+#               Tests 4-5 run on a planted temp archive and need no golden.
 set -uo pipefail
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -63,6 +69,50 @@ c=$?
 [ "$rc" -eq 0 ] && [ "$a" -eq 0 ] && [ "$b" -eq 0 ] && [ "$c" -eq 0 ]
 expect_pass $? "test_entitlements_all_three_bundles (app=$a widget=$b watch=$c)"
 rm -f /tmp/verify-archive-tests-ent.$$
+
+# Tests 4 & 5 (URL-schemes direction): the CFBundleURLSchemes check must FAIL on
+# an empty array and PASS on a populated one. These run against a planted minimal
+# archive, so they exercise the check without needing the golden.
+TMPD2=$(mktemp -d)
+PLANTED_APP="$TMPD2/planted/Products/Applications/StressMonitor.app"
+mkdir -p "$PLANTED_APP"
+PPLIST="$PLANTED_APP/Info.plist"
+plutil -create xml1 "$PPLIST" >/dev/null
+/usr/libexec/PlistBuddy \
+    -c 'Add :STOREKIT_CREDITS_LARGE_PRODUCT_ID string credits.large' \
+    -c 'Add :STOREKIT_CREDITS_SMALL_PRODUCT_ID string credits.small' \
+    -c 'Add :STOREKIT_PREMIUM_ANNUAL_PRODUCT_ID string premium.annual' \
+    -c 'Add :STOREKIT_PREMIUM_MONTHLY_PRODUCT_ID string premium.monthly' \
+    -c 'Add :STOREKIT_PREMIUM_WEEKLY_PRODUCT_ID string premium.weekly' \
+    -c 'Add :STOREKIT_PREMIUM_SUBSCRIPTION_GROUP_ID string group.premium' \
+    -c 'Add :CFBundleURLTypes array' \
+    -c 'Add :CFBundleURLTypes:0 dict' \
+    -c 'Add :CFBundleURLTypes:0:CFBundleURLSchemes array' \
+    "$PPLIST" >/dev/null 2>&1
+
+# Test 4 (red direction): empty CFBundleURLSchemes must FAIL — and must not emit
+# the PASS line (the vacuous form that matched the key line's own quotes).
+bash "$VERIFY" --skip-entitlements "$TMPD2/planted" > "$TMPD2/red-urlschemes.log" 2>&1
+grep -q "CFBundleURLSchemes missing or empty" "$TMPD2/red-urlschemes.log"
+a=$?
+grep -q "CFBundleURLSchemes has at least one entry" "$TMPD2/red-urlschemes.log"
+b=$?
+[ "$a" -eq 0 ] && [ "$b" -ne 0 ]
+expect_pass $? "test_red_on_empty_cfbundleurlschemes (fail line present=$a, vacuous pass absent=$b)"
+
+# Test 5 (green direction): one scheme entry must PASS — and must not emit the
+# FAIL line.
+/usr/libexec/PlistBuddy \
+    -c 'Add :CFBundleURLTypes:0:CFBundleURLSchemes:0 string com.googleusercontent.apps.planted' \
+    "$PPLIST" >/dev/null 2>&1
+bash "$VERIFY" --skip-entitlements "$TMPD2/planted" > "$TMPD2/green-urlschemes.log" 2>&1
+grep -q "CFBundleURLSchemes has at least one entry" "$TMPD2/green-urlschemes.log"
+a=$?
+grep -q "CFBundleURLSchemes missing or empty" "$TMPD2/green-urlschemes.log"
+b=$?
+[ "$a" -eq 0 ] && [ "$b" -ne 0 ]
+expect_pass $? "test_green_on_populated_cfbundleurlschemes (pass line present=$a, fail line absent=$b)"
+rm -rf "$TMPD2"
 
 echo "verify-archive tests: $failures failure(s)"
 exit "$failures"

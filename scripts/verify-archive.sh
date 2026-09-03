@@ -197,7 +197,18 @@ if [ -n "$APP_PLIST_DUMP" ]; then
         note_pass "MERGED PLISTS" "all six STOREKIT_* keys present in app Info.plist"
     fi
 
-    if grep -A2 '"CFBundleURLSchemes"' <<<"$APP_PLIST_DUMP" | grep -q '"'; then
+    # The URL-schemes check parses the canonical XML serialization instead of
+    # grepping the human-readable dump: the dump's key line itself always
+    # contains quotes, so an empty CFBundleURLSchemes array passed vacuously.
+    # The check passes only when at least one <string> entry appears inside
+    # the array that follows the key.
+    app_plist_xml=$(plutil -convert xml1 -o - -- "$APP_PLIST" 2>/dev/null || true)
+    if [ -n "$app_plist_xml" ] && awk '
+        /<key>CFBundleURLSchemes<\/key>/ { in_schemes = 1; next }
+        in_schemes && /<string>/ { found = 1; exit }
+        in_schemes && /<\/array>|<array\/>/ { in_schemes = 0 }
+        END { exit found ? 0 : 1 }
+    ' <<<"$app_plist_xml"; then
         note_pass "MERGED PLISTS" "CFBundleURLSchemes has at least one entry (GoogleSignIn callback)"
     else
         note_fail "MERGED PLISTS" "CFBundleURLSchemes missing or empty in app Info.plist"
