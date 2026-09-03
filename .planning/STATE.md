@@ -2,11 +2,11 @@
 gsd_state_version: 1.0
 milestone: v1.1
 current_phase_name: Sessions, Preferences, Quick Actions + Cleanup
-status: No active milestone — v1.1 closed 2026-08-24 (verified_closeout, tag v1.1); Phase 03 post-merge drift re-test in flight (started 2026-08-30)
-stopped_at: Awaiting user execution of Phase 03 post-merge drift re-test scenarios (.planning/phases/03-*/03-UAT.md); then /gsd-new-milestone (v1.2 submission readiness recommended)
-last_updated: "2026-09-02T06:14:05.441Z"
-last_activity: 2026-09-01
-last_activity_desc: Milestone v1.1 completed and archived
+status: No active milestone — v1.1 closed 2026-08-24 (verified_closeout, tag v1.1); TestFlight 1.0.0 (13) BETA_APPROVED 2026-09-03 (recorded in MILESTONES.md); Phase 03 drift re-test pending user execution
+stopped_at: Phase 03 drift re-test awaiting user scenarios (.planning/phases/03-*/03-UAT.md — runnable against TestFlight build 13); v1.2 new-milestone kickoff next (/gsd-new-milestone)
+last_updated: "2026-09-03T03:45:00.000Z"
+last_activity: 2026-09-03
+last_activity_desc: Recorded TestFlight 1.0.0 (13) release in MILESTONES.md
 state_head: 2b8486251e4443e697e551daa6ef968e26c11a9b
 progress:
   total_phases: 3
@@ -25,14 +25,14 @@ current_phase: 3
 See: .planning/PROJECT.md (updated 2026-08-23 after v1.1 Phase 03 close — milestone complete)
 
 **Core value:** Every feature that ships in the binary must actually work end-to-end for a real user — not just compile.
-**Current focus:** Post-merge drift re-test of Phase 03 UAT (5 scenarios pending), then /gsd-new-milestone — v1.2 submission readiness recommended per v1.1 audit
+**Current focus:** Phase 03 drift re-test (5 scenarios, vs TestFlight build 13), then v1.2 "submission readiness" milestone kickoff
 
 ## Current Position
 
 Phase: Post-milestone — Phase 03 drift re-test
 Plan: —
-Status: v1.1 closed & tagged (PR #48 squash-merged, CI 6/6); drift re-test awaiting user scenarios
-Last activity: 2026-09-01 - Completed quick task 260901-vfd: Fix Color.stressColor(for: Double) threshold bug
+Status: TestFlight 1.0.0 (13) live + BETA_APPROVED (groups Qa, Release-1.0.0); drift re-test pending; v1.2 kickoff next
+Last activity: 2026-09-03 - Recorded TestFlight 1.0.0 (13) release in MILESTONES.md; refreshed STATE/next steps
 
 ## Performance Metrics
 
@@ -159,11 +159,11 @@ Items acknowledged and deferred at v1.1 milestone close on 2026-08-23: none — 
 
 ## Session Continuity
 
-Last session: 2026-09-01T15:10:00Z
-Stopped at: v1.1 lifecycle complete (audit → archive → tag). Open: Phase 03 post-merge drift re-test (.planning/phases/03-*/03-UAT.md) awaiting user execution
-Resume file: None
+Last session: 2026-09-03T03:28:00Z (release session — build 13 shipped, approved, distributed; handoff written)
+Stopped at: v1.2 kickoff. Open: Phase 03 drift re-test (.planning/phases/03-*/03-UAT.md — 5 scenarios, vs TestFlight build 13)
+Resume file: .planning/HANDOFF.json
 
 ## Operator Next Steps
 
-- Finish the Phase 03 post-merge drift re-test (.planning/phases/03-*/03-UAT.md — 5 scenarios, health precheck confirmed green 2026-08-30)
-- Start the next milestone with /gsd-new-milestone (v1.2 submission readiness recommended)
+- Run the Phase 03 drift re-test against TestFlight build 13 (.planning/phases/03-*/03-UAT.md — 5 scenarios)
+- Start v1.2 with /gsd-new-milestone (submission readiness — v1.0-carryover list per v1.1 audit)

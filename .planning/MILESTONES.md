@@ -1,5 +1,16 @@
 # Milestones
 
+## TestFlight Release 1.0.0 build 13 (2026-09-03) — post-v1.1 release record, not a GSD milestone
+
+**Shipped:** app `stress.ai.com` (ASC 6778478266), version **1.0.0 build 13** (buildId `7e58956b-0f13-4dcb-beaf-f00dec3ce512`) — built from HEAD `fed4b6b`, processingState VALID, external **BETA_APPROVED**, attached to groups **Qa** (internal, all-builds) and **Release-1.0.0** (external). What-to-Test notes attached (en-US). Executed outside GSD phases (archive → export → entitlements verify → upload → groups → notes → beta review); full detail in `.planning/HANDOFF.json` and `.planning/.continue-here.md`.
+
+- Build 12 (unsigned-archive + manual export path) shipped with **no entitlements blob** on app/watch/widget despite passing strict codesign verify and ASC processing — pulled from Release-1.0.0 and expired. Mitigation now codified: entitlements dump per bundle before every publish; signed archives from dual-cert profiles only.
+- Signing state changed: the 3 match AppStore profiles recreated dual-cert (WTV47CUC2N + XPT2DHR688). CI `fastlane match` readonly validation against them still pending (run `setup_match` once if rejected).
+- Working tree carries an uncommitted SPM-proxy migration that cannot archive (no Firebase proxy products; GoogleSignIn product-name collision) — build 13 was cut from HEAD around it; snapshot at `.asc/backup/spm-migration/`.
+- Unblocks the pending Phase 03 post-merge drift re-test: its 5 UAT scenarios (`03-UAT.md`) now run against a live, approved TestFlight build.
+
+---
+
 ## v1.1 Backend API Migration (Shipped: 2026-08-24)
 
 **Phases completed:** 3 phases, 17 plans, 25 tasks · **Closeout:** `verified_closeout` (audit: 21/21 requirements, 3/3 phases, 7/7 integration, 4/4 E2E flows, 0 gaps; UAT 9/9 human-validated; SECURITY.md all phases, threats_open 0) · **Stats:** 164 commits, 197 files, +20,611/−1,160, 12 days (2026-08-12 → 2026-08-23)
