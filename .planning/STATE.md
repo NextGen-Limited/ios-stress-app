@@ -5,16 +5,16 @@ milestone_name: Submission Readiness
 current_phase: 1
 current_phase_name: Binary & Manifest Truth
 status: executing
-stopped_at: Completed 01-01-PLAN.md (verify-archive gate + ENV-04 migration + archive-from-tree)
-last_updated: "2026-09-03T07:51:56.078Z"
+stopped_at: Completed 01-02-PLAN.md (watch CA92.1 manifest fix + D3 doc corrections)
+last_updated: "2026-09-03T08:28:26.983Z"
 last_activity: 2026-09-03
 last_activity_desc: Phase 1 execution started
-state_head: 1afb4019f2761e4fce4f8bd0d5a5cd0609c62014
+state_head: 4b9e4ae1d1105a2099af7fb77fa7e6eaa402b1de
 progress:
   total_phases: 4
   completed_phases: 0
   total_plans: 5
-  completed_plans: 1
+  completed_plans: 2
   percent: 0
 ---
 
@@ -30,7 +30,7 @@ See: .planning/PROJECT.md (updated 2026-09-03 at v1.2 start)
 ## Current Position
 
 Phase: 1 (Binary & Manifest Truth) — EXECUTING
-Plan: 2 of 5
+Plan: 3 of 5
 Status: Ready to execute
 Last activity: 2026-09-03 — Phase 1 execution started
 
@@ -66,6 +66,7 @@ Per-plan history for v1.0/v1.1 archived under `.planning/milestones/v1.0-phases/
 | Plan | Duration | Tasks | Files |
 |------|----------|-------|-------|
 | Phase 1 P01 | 40 min | 3 tasks | 11 files |
+| Phase 1 P2 | 8 min | 2 tasks | 4 files |
 
 ## Accumulated Context
 
@@ -81,6 +82,8 @@ Full log in PROJECT.md Key Decisions. v1.1 per-phase decisions archived with the
 - [v1.2 roadmap, 2026-09-03]: phase numbering restarts at 1 for this milestone (project convention, matching v1.0 and v1.1)
 - [Phase 1]: Proxy shim products MUST use _proxied-style names distinct from upstream (Xcode PIF registers both shim and upstream products — Firebase collided exactly like GoogleSignIn; A4 remedy applied in 1afb401)
 - [Phase 1]: spm-cache/ package sources stay uncommitted by repo gitignore convention ('regenerated locally'); tracked migration artifacts = pbxproj + Package.resolved; ENV-04 bar = archive-from-working-tree (proven 01-01)
+- [Phase 1]: Phase 1 P02: Watch UserDefaults reason set = CA92.1 + 1C8F.1, scan-verified at execution time (4 .standard files + 3 suite files; zero delta vs research §5.3) — scan-then-declare is the standing pattern for required-reason declarations
+- [Phase 1]: Phase 1 P02 (D3 applied): CLAUDE.md + EN/VI privacy policies corrected to the real contract (StressLLMService/StressAPIClient → https://stress-api.dropitx.site chat endpoint, Firebase Auth anonymous-or-Google) with zero Swift churn — docs move toward code, never the reverse
 
 ### Pending Todos
 
@@ -118,8 +121,8 @@ Earlier v1.0 deferrals (Phase 01/02 verification gaps, `MockStoreKitService` Rel
 
 ## Session Continuity
 
-Last session: 2026-09-03T07:51:56.055Z
-Stopped at: Completed 01-01-PLAN.md (verify-archive gate + ENV-04 migration + archive-from-tree)
+Last session: 2026-09-03T08:28:26.945Z
+Stopped at: Completed 01-02-PLAN.md (watch CA92.1 manifest fix + D3 doc corrections)
 Resume file: None
 
 ## Operator Next Steps
