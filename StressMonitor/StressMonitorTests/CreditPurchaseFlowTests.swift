@@ -252,7 +252,7 @@ struct CreditPurchaseFlowTests {
         #expect(fake.finishCallCount == 1)
     }
 
-    // MARK: WR-04 — unverified transactions are never finished
+    // MARK: Unverified deliveries are never finished (listener entry)
 
     @Test("An unverified transaction delivered through the listener entry is never finished")
     func unverifiedDeliveryNeverFinishesTransaction() async throws {
