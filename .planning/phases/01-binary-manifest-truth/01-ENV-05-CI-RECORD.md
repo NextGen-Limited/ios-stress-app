@@ -2,7 +2,7 @@
 
 Evidence record for the two CI surfaces of Phase 1:
 1. **Draft PR → ci.yml** (clean-machine proof of the SPM proxy migration, ENV-04's CI half) — complete, green.
-2. **User-approved deploy.yml dispatch** (match readonly verdict for ENV-05 + ASC processing verdict for BUILD-01 SC-1) — **pending the blocking human checkpoint** (Task 2).
+2. **User-approved deploy.yml dispatch** (match readonly verdict for ENV-05 + ASC processing verdict for BUILD-01 SC-1) — **complete, both verdicts GREEN** (Task 2).
 
 ---
 
@@ -72,24 +72,60 @@ Fix: gated the two `.configured` assertions with `.disabled(if: plist absent)` �
 
 ## Task 2 — deploy.yml dispatch (ENV-05 match readonly + BUILD-01 SC-1 ASC processing)
 
-**STATUS: BLOCKING HUMAN CHECKPOINT — NOT DISPATCHED. Awaiting explicit user approval.**
+**STATUS: APPROVED BY USER — dispatching.** (Earlier state: blocking-human checkpoint presented; resolved below.)
 
-Per plan 01-05 Task 2 (gate="blocking-human"): the dispatch command (`gh workflow run deploy.yml --ref gsd/v1.2-submission-readiness`) runs **only** after the user explicitly approves. Silence is not approval. No deploy.yml run has been dispatched by this plan.
-
-Sections below will be populated after the user decision:
+Per plan 01-05 Task 2 (gate="blocking-human"): the dispatch command (`gh workflow run deploy.yml --ref gsd/v1.2-submission-readiness`) runs **only** after the user explicitly approves. Silence is not approval.
 
 ### Dispatch approval
-- _pending user decision (approve / defer)_
+
+- **User decision (explicit, before any dispatch command was run):** **"approved — dispatch it"** — approving the `gh workflow run deploy.yml --ref gsd/v1.2-submission-readiness` dispatch (pilot upload to TestFlight, new build number, visible to external beta testers), with the disclosed caveat that the widget in this build has the known write-path gap (plan 01-04 WIRE-01: gallery flow proven, write path not yet wired — widget timeline may render empty/placeholder content).
+- **Approval received:** 2026-09-03 (session continuation, prior to the dispatch timestamp below).
+- **Fallback pre-authorization:** NONE — the setup_match fallback (if match readonly rejects) requires a **second explicit user approval** and is NOT pre-authorized by this message. If match readonly fails, execution stops and returns to the user.
+- **Dispatch executed:** 2026-09-03T11:28Z (immediately after this note was written to the record — approval note precedes dispatch by construction).
 
 ### Deploy run
-- _pending_
+
+| Item | Value |
+|------|-------|
+| Run | [33749862925](https://github.com/NextGen-Limited/ios-stress-app/actions/runs/33749862925) — event `workflow_dispatch`, head `acea984` |
+| Job | Build & Deploy to TestFlight — started 2026-09-03T11:28:28Z, completed 11:39:38Z (**11m10s**) |
+| Conclusion | **success** (verified via `gh run view` and an independent `gh run watch --exit-status`, exit 0) |
+| Disposition | `upload_beta` end-to-end: setup_ci → WWDR import → match(readonly) → 3× update_code_signing_settings → increment_build → gym → pilot → slack. Fastlane summary reports every step green (`match` 1s, `gym` 362s, `pilot` incl. processing wait). |
 
 ### ENV-05 match readonly verdict
-- _pending_ — expected evidence: the three profiles (`match AppStore stress.ai.com`, `match AppStore stress.ai.com.watchkitapp`, `match AppStore stress.ai.com.widget`) installed with readonly semantics and NO regeneration, from the run logs.
-- Known expected-failure mode (research §9 / HANDOFF.json): portal profiles were recreated dual-cert (WTV47CUC2N + XPT2DHR688) and XPT2DHR688 may not be mirrored in the match git repo → match readonly may reject. Documented fallback: one `setup_match` regeneration via match.yml's manual job, then re-swap dual-cert locally per the stored release recipe — **requires a second explicit user approval before dispatch**; never routine.
 
-### BUILD-01 SC-1 ASC processing verdict
-- _pending_ — expected evidence: pilot upload clears processing with no ITMS-91053 and no missing-SDK-manifest error. Build 13 is the standing prior if the user defers.
+**GREEN — profiles installed read-only, NO regeneration, NO fallback needed.**
 
-### Final PR/main state confirmation
-- _pending at Task 2 close (Task 1 state recorded above: PR #49 draft, main at fed4b6b)_
+Evidence from the run logs (step "Build & Deploy via Fastlane"):
+
+- `[11:29:27]: Enabling match readonly mode.` + match summary table: `readonly | true`, `force | false`, `type | appstore`, `app_identifier | ["stress.ai.com", "stress.ai.com.watchkitapp", "stress.ai.com.widget"]`, `team_id | K2TYLYAWMK`, `storage_mode | git`.
+- `[11:29:28]: Cloning remote git repo...` → `[11:29:29]: 🔓 Successfully decrypted certificates repo` → `Installing certificate...` → **Installed Certificate**: `Apple Distribution: Doan Duy Phuong (K2TYLYAWMK)`, valid 2026-06-11 → 2027-06-11.
+- Three `Installing provisioning profile...` lines, then three **Installed Provisioning Profile** tables:
+
+| App Identifier | Profile Name | Profile UUID |
+|----------------|--------------|--------------|
+| `stress.ai.com` | `match AppStore stress.ai.com` | `b45e811f-a286-4cea-99ac-02aacb702afb` |
+| `stress.ai.com.watchkitapp` | `match AppStore stress.ai.com.watchkitapp` | `4c637481-aae6-4bc0-89e4-cbbc5e66ca59` |
+| `stress.ai.com.widget` | `match AppStore stress.ai.com.widget` | `e25888e9-864d-4e76-8fab-09cb42a740b6` |
+
+- **No regeneration**: zero `Creating…/Renewing…/Would you like to…` messages in the run log (the only "renew" hit is a fastlane-changelog line); `force: false` throughout. `match.yml` / `setup_match` was **never touched** — the §9 expected-failure mode (portal dual-cert profiles not mirrored in the match repo causing readonly rejection) did **not** materialize on CI. Note for the release recipe: the cert CI installed from the match repo is the single K2TYLYAWMK Distribution identity in the repo — readonly never consults the portal's recreated dual-cert profiles, which is exactly why this path is repeatable (idempotency edge satisfied: every readonly re-run performs the same read-only install; the setup_match fallback stays one-shot and user-gated, unused here).
+
+### gym archive outcome
+
+**Signed Release archive + app-store export succeeded.** `Successfully stored the archive` (11:35:28Z) → `-exportArchive` → `Compressing 3 dSYM(s)` (app + watch + widget) → `Successfully exported and signed the ipa file: build/StressMonitor.ipa` (11:35:34Z). Manual signing via the three match profiles confirmed by export mapping `{"stress.ai.com"=>"match AppStore stress.ai.com", "stress.ai.com.watchkitapp"=>…, "stress.ai.com.widget"=>…}` and Xcode log lines `Signing StressMonitorWidgetExtension.appex` / `Signing StressMonitorWatch Watch App.app` / `Signing StressMonitor.app` with `"signingStyle": "manual"`.
+
+### pilot upload result & BUILD-01 SC-1 ASC processing verdict
+
+**GREEN — build 1.0.0 (14) uploaded, cleared ASC processing, state VALID, no ITMS-91053, no missing-SDK-manifest error.**
+
+- Build number: `Setting build number to 14 (TF: 13, Store: 0)` (prior standing build was 13, as expected).
+- `Ready to upload new build to TestFlight (App: 6778478266)...` → `Successfully uploaded package to App Store Connect` (11:36:14Z) → `Waiting for processing on... build_version: 14` → **`Successfully finished processing the build 1.0.0 - 14 for IOS`** (11:38:16Z).
+- **Authoritative ASC check (asc CLI, App 6778478266):** `build 14: state=VALID uploaded=2026-09-03T04:37:01-07:00 expired=False audience=APP_STORE_ELIGIBLE` — processing completed VALID. ITMS-91053 (missing required-reason declaration) and missing-SDK-manifest errors both abort ASC processing; a VALID state with zero occurrences of either error string anywhere in the run log or the uploaded `build-logs` artifact means the phase's privacy-manifest work (plan 02 declarations, plan 01/04 SDK-bundle flow) cleared the upload-validation gate. No phase-gap finding — plan 02's manifest scan missed nothing.
+- Artifact spot-check (threat T-05-02): downloaded the run's `build-logs` artifact (gym log + fastlane/report.xml) — no private keys, tokens, or secret env material present.
+
+### Final PR/main state confirmation (Task 2 close)
+
+- PR #49: `state=OPEN`, `isDraft=true` — never merged.
+- `git log origin/main -1` → `fed4b6b` — main untouched by the entire plan.
+- `git diff origin/main...HEAD --name-only -- .github/workflows/` → 0 files — no workflow edited; deploy.yml used as-is via its existing `workflow_dispatch` trigger.
+- Concurrency note: single dispatch, no race; the `deploy-<ref>` cancel-in-progress group was not exercised beyond design intent.

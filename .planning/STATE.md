@@ -4,17 +4,17 @@ milestone: v1.2
 milestone_name: Submission Readiness
 current_phase: 1
 current_phase_name: Binary & Manifest Truth
-status: executing
-stopped_at: Completed 01-04-PLAN.md (BUILD-02/AUTH-01 evidence + WIRE-01 finding)
-last_updated: "2026-09-03T10:07:54.521Z"
+status: verifying
+stopped_at: Completed 01-05-PLAN.md (ENV-05 match-readonly GREEN + BUILD-01 SC-1 ASC-processing GREEN; TestFlight build 14)
+last_updated: "2026-09-03T11:43:25.438Z"
 last_activity: 2026-09-03
 last_activity_desc: Phase 1 execution started
-state_head: a272f04831bbbd6e955996a7aefc82d90ef84c0d
+state_head: acea9841cb4f3e5f0c3583ad39ce4c72a456e509
 progress:
   total_phases: 4
   completed_phases: 0
   total_plans: 5
-  completed_plans: 4
+  completed_plans: 5
   percent: 0
 ---
 
@@ -31,7 +31,7 @@ See: .planning/PROJECT.md (updated 2026-09-03 at v1.2 start)
 
 Phase: 1 (Binary & Manifest Truth) — EXECUTING
 Plan: 5 of 5
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-09-03 — Phase 1 execution started
 
 Progress: [░░░░░░░░░░] 0%
@@ -69,6 +69,7 @@ Per-plan history for v1.0/v1.1 archived under `.planning/milestones/v1.0-phases/
 | Phase 1 P2 | 8 min | 2 tasks | 4 files |
 | Phase 01 P03 | 22 min | 2 tasks | 1 files |
 | Phase 01 P04 | 58 min | 3 tasks | 3 files |
+| Phase 1 P05 | 87 min | 2 tasks | 13 files |
 
 ## Accumulated Context
 
@@ -91,6 +92,9 @@ Full log in PROJECT.md Key Decisions. v1.1 per-phase decisions archived with the
 - [Phase 1]: Phase 1 P03: Giphy dSYM stub script phase removed (definition + reference + section markers, 4098d8b); zero live Giphy/Kingfisher/exyte/MediaPicker references remain — unused-media removal fully landed
 - [Phase 01]: BUILD-02/AUTH-01 evidence-complete (plan 01-04): one suite group.stress.ai.com proven across entitlements+constants+tests+golden codesign dump; phase-final archive passes the credential gate with every strings hit dispositioned benign
 - [Phase 01]: WIRE-01 finding (plan 01-04): WidgetPublisher.publish has zero live call sites (calculateAndSaveStress uncalled, DashboardViewModel preview-only, HealthBackgroundScheduler never instantiated, watch writes watch.* keys) — widget renders No Data on any device until a save trigger is wired; surfaced for user decision, not auto-fixed
+- [Phase 1]: Phase 1 P05: deploy.yml dispatched only after explicit user approval recorded in 01-ENV-05-CI-RECORD.md before the dispatch timestamp — the standing gate for any TestFlight-visible action
+- [Phase 1]: Phase 1 P05: ENV-05 GREEN — CI match(readonly) installs all three App Store profiles + K2TYLYAWMK Distribution cert with zero regeneration; readonly reads the match repo, never the portal dual-cert profiles, so the setup_match fallback stays unused and the path is idempotently repeatable
+- [Phase 1]: Phase 1 P05: BUILD-01 SC-1 GREEN — TestFlight build 1.0.0 (14) from phase-final tree cleared ASC processing (state=VALID), no ITMS-91053 and no missing-SDK-manifest error; plan 02 manifest scan missed nothing
 
 ### Pending Todos
 
@@ -129,8 +133,8 @@ Earlier v1.0 deferrals (Phase 01/02 verification gaps, `MockStoreKitService` Rel
 
 ## Session Continuity
 
-Last session: 2026-09-03T10:07:54.508Z
-Stopped at: Completed 01-04-PLAN.md (BUILD-02/AUTH-01 evidence + WIRE-01 finding)
+Last session: 2026-09-03T11:43:25.425Z
+Stopped at: Completed 01-05-PLAN.md (ENV-05 match-readonly GREEN + BUILD-01 SC-1 ASC-processing GREEN; TestFlight build 14)
 Resume file: None
 
 ## Operator Next Steps
