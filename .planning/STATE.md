@@ -132,6 +132,14 @@ None yet.
 
 Earlier v1.0 deferrals (Phase 01/02 verification gaps, `MockStoreKitService` Release blocker) are all closed — see PROJECT.md Validated.
 
+## Deferred Verification
+
+| Phase | State | Resume |
+|-------|-------|--------|
+| 1 | verification_deferred_human | /gsd-verify-work 1 |
+
+Deferred 2026-09-03 by user choice after 6/6 automated verification (01-VERIFICATION.md): the two standing human items are the physical-device widget parity check (expected MATCH post-01-06) and the EN↔VI privacy-policy parity read. Autonomous run stopped here per protocol; phases 2–4 not started.
+
 ## Session Continuity
 
 Last session: 2026-09-03T14:01:19.225Z
