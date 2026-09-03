@@ -403,7 +403,6 @@
 				F2E2EBE72F1CC553000C2B53 /* Resources */,
 				F2E2EC3D2F1CC605000C2B53 /* Embed Watch Content */,
 				F211BBEE2FD9112200A6E25D /* Embed Foundation Extensions */,
-				F2A1B0012AAA000100DE6E8F /* Generate Giphy dSYM Stub */,
 			);
 			buildRules = (
 			);
@@ -521,28 +520,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
-
-/* Begin PBXShellScriptBuildPhase section */
-		F2A1B0012AAA000100DE6E8F /* Generate Giphy dSYM Stub */ = {
-			isa = PBXShellScriptBuildPhase;
-			alwaysOutOfDate = 1;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputFileListPaths = (
-			);
-			inputPaths = (
-			);
-			name = "Generate Giphy dSYM Stub";
-			outputFileListPaths = (
-			);
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "# Generate stub dSYM for GiphyUISDK to suppress App Store Connect warning\nif [ \"$CONFIGURATION\" != \"Release\" ]; then\n    exit 0\nfi\n\nGIPHY_FRAMEWORK=\"${BUILT_PRODUCTS_DIR}/Frameworks/GiphyUISDK.framework\"\nif [ ! -d \"$GIPHY_FRAMEWORK\" ]; then\n    # Also check the direct location\n    GIPHY_FRAMEWORK=\"${BUILT_PRODUCTS_DIR}/GiphyUISDK.framework\"\nfi\nif [ ! -d \"$GIPHY_FRAMEWORK\" ]; then\n    echo \"Warning: GiphyUISDK.framework not found, skipping dSYM stub generation\"\n    exit 0\nfi\n\nFRAMEWORK_BINARY=\"${GIPHY_FRAMEWORK}/GiphyUISDK\"\nif [ ! -f \"$FRAMEWORK_BINARY\" ]; then\n    echo \"Warning: GiphyUISDK binary not found\"\n    exit 0\nfi\n\nUUID=$(xcrun dwarfdump --uuid \"$FRAMEWORK_BINARY\" 2>/dev/null | head -1 | awk '{print $2}')\nif [ -z \"$UUID\" ]; then\n    echo \"Warning: Could not extract UUID from GiphyUISDK\"\n    exit 0\nfi\n\necho \"Generating stub dSYM for GiphyUISDK (UUID: $UUID)\"\n\nDSYM_DIR=\"${DWARF_DSYM_FOLDER_PATH}/GiphyUISDK.framework.dSYM\"\nmkdir -p \"${DSYM_DIR}/Contents/Resources/DWARF\"\nmkdir -p \"${DSYM_DIR}/Contents\"\n\ncat > \"${DSYM_DIR}/Contents/Info.plist\" << 'PLISTEOF'\n<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<!DOCTYPE plist PUBLIC \"-//Apple//DTD PLIST 1.0//EN\" \"http://www.apple.com/DTDs/PropertyList-1.0.dtd\">\n<plist version=\"1.0\">\n<dict>\n    <key>CFBundleIdentifier</key>\n    <string>com.giphy.GiphyUISDK</string>\n    <key>CFBundleName</key>\n    <string>GiphyUISDK</string>\n</dict>\n</plist>\nPLISTEOF\n\n# Copy the binary as the DWARF file (contains the UUID Apple expects)\ncp \"$FRAMEWORK_BINARY\" \"${DSYM_DIR}/Contents/Resources/DWARF/GiphyUISDK\"\n\necho \"Stub dSYM created at ${DSYM_DIR}\"\n";
-		};
-/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		3828578ADDAD4AC5925394DB /* Sources */ = {
