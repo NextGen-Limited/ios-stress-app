@@ -2,7 +2,20 @@ import SwiftData
 import Testing
 @testable import StressMonitor
 
-// DISABLED: every @Test in this suite reliably hangs the xcodebuild/XCTest host
+// QUARANTINE LIFTED 2026-09-03 (02-04 bounded re-diagnosis): the container-
+// lifetime hypothesis — never among the five ruled out below — is under test.
+// makeSeededContext previously returned only mainContext while the owning
+// ModelContainer went out of scope at fixture return (the WINDOWS.md #8 crash
+// lineage per the v1.1 P03-04 rule: containers must outlive their contexts);
+// it now returns (ModelContainer, ModelContext) and every test keeps the
+// container alive. Six 2026-09-03 .ips crash reports (coalition
+// com.apple.CoreSimulator.SimDevice.5DD825B4-…, EXC_BREAKPOINT, faulting
+// frame #0 in SwiftData, direct callers in the sibling #8 suites' test
+// bodies) match the dead-container prediction. Final enable/disable state
+// follows the ENV-02 decision checkpoint (02-04 Task 2).
+//
+// ORIGINAL QUARANTINE RECORD (historical, predates the container-lifetime
+// test): every @Test in this suite reliably hangs the xcodebuild/XCTest host
 // process on this toolchain (Xcode 26.3 / iOS 26.2-26.3 simulator), producing
 // "Restarting after unexpected exit, crash, or test timeout" with zero console
 // diagnostics — this was the actual source of the CI test-run crash originally
@@ -24,11 +37,15 @@ import Testing
 // itself has no other test coverage — a known gap until this is diagnosed with
 // a working local simulator (this dev host's CoreSimulator/XCTestDevices layer
 // has documented pre-existing instability, see WINDOWS.md item #1).
-@Suite(.disabled("Reliable test-host hang on this toolchain — see file header"))
 @MainActor
 struct CharacterEntitlementSyncTests {
 
-    private func makeSeededContext() throws -> ModelContext {
+    /// In-memory context seeded with every creature's unlock row. The
+    /// container is returned alongside its context and must stay alive for
+    /// the whole test — returning the context alone lets the container (the
+    /// only owner of the in-memory store) deallocate, and the next SwiftData
+    /// operation on the orphaned context traps (WINDOWS.md #8 lineage).
+    private func makeSeededContext() throws -> (ModelContainer, ModelContext) {
         let config = ModelConfiguration(isStoredInMemoryOnly: true, cloudKitDatabase: .none)
         let container = try ModelContainer(for: CharacterUnlock.self, configurations: config)
         let ctx = container.mainContext
@@ -41,7 +58,7 @@ struct CharacterEntitlementSyncTests {
             ))
         }
         save(ctx)
-        return ctx
+        return (container, ctx)
     }
 
     private func unlock(in ctx: ModelContext, for id: String) -> CharacterUnlock {
@@ -64,7 +81,7 @@ struct CharacterEntitlementSyncTests {
 
     @Test("Subscribing unlocks premium characters, leaves others untouched")
     func subscribingUnlocksPremiumOnly() throws {
-        let ctx = try makeSeededContext()
+        let (container, ctx) = try makeSeededContext()
         CharacterCollectionViewModel.syncPremiumCharacterEntitlement(isPremium: true, in: ctx)
 
         #expect(unlock(in: ctx, for: "ember").isUnlocked)
@@ -72,11 +89,12 @@ struct CharacterEntitlementSyncTests {
         #expect(unlock(in: ctx, for: "lumi").isUnlocked == false)
         #expect(unlock(in: ctx, for: "ripple").isUnlocked)
         #expect(unlock(in: ctx, for: "blossom").isUnlocked)
+        _ = container // keep the in-memory store alive until the assertions are done
     }
 
     @Test("Lapsing keeps premium characters unlocked (one-time-permanent) and falls back active selection to Ripple")
     func lapsingKeepsPremiumUnlockedAndResetsActive() throws {
-        let ctx = try makeSeededContext()
+        let (container, ctx) = try makeSeededContext()
         CharacterCollectionViewModel.syncPremiumCharacterEntitlement(isPremium: true, in: ctx)
 
         let ember = unlock(in: ctx, for: "ember")
@@ -91,24 +109,27 @@ struct CharacterEntitlementSyncTests {
         #expect(unlock(in: ctx, for: "ember").isActive == false)
         #expect(unlock(in: ctx, for: "ripple").isActive)
         #expect(unlock(in: ctx, for: "ripple").isUnlocked)
+        _ = container // keep the in-memory store alive until the assertions are done
     }
 
     @Test("Streak-gated Lumi survives a subscription lapse")
     func lumiStreakUnlockSurvivesLapse() throws {
-        let ctx = try makeSeededContext()
+        let (container, ctx) = try makeSeededContext()
         unlock(in: ctx, for: "lumi").isUnlocked = true
         save(ctx)
 
         CharacterCollectionViewModel.syncPremiumCharacterEntitlement(isPremium: false, in: ctx)
 
         #expect(unlock(in: ctx, for: "lumi").isUnlocked)
+        _ = container // keep the in-memory store alive until the assertions are done
     }
 
     @Test("In-memory test container disables CloudKit sync")
     func inMemoryContainerDisablesCloudKit() throws {
-        let ctx = try makeSeededContext()
+        let (container, ctx) = try makeSeededContext()
         let cloudKitDatabases = ctx.container.configurations.map { String(describing: $0.cloudKitDatabase) }
 
         #expect(cloudKitDatabases.allSatisfy { $0 == String(describing: ModelConfiguration.CloudKitDatabase.none) })
+        _ = container // keep the in-memory store alive until the assertions are done
     }
 }
