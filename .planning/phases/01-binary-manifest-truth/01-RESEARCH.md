@@ -473,17 +473,21 @@ plutil -p ".asc/artifacts/StressMonitor.xcarchive/Products/Applications/StressMo
 | A4 | Proxy product-name collision is the GoogleSignIn case only (upstream enters graph via the shim, two same-named products one hop apart); Firebase product names exposed solely by the shim package won't collide | §8 ENV-04 | Medium — if SwiftPM still complains, also rename Firebase shim products; same recipe applies |
 | A5 | `docs-site/.vitepress/dist/*` build outputs regenerate from `docs-site/**.md` — D3 edits target the `.md` sources only | §5.6 | None — dist is generated |
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **App Group suite string in CONTEXT.md vs repo (BLOCKER for BUILD-02 task wording)**
    - What we know: repo is 100% consistent on `group.stress.ai.com` (3 entitlements, 6+ Swift constants, 2 tests). CONTEXT.md decision text says `group.com.stressmonitor.app`. Zero occurrences of that string in-repo.
    - What's unclear: whether the discuss-session string was a typo (most likely) or the user believes a different suite exists.
    - Recommendation: planner writes BUILD-02 as "audit all targets against `group.stress.ai.com` (repo truth); CONTEXT.md's `group.com.stressmonitor.app` is a typo to note in the phase wrap-up." Ask the user only if they object. Do NOT plan any rename.
+   - **Resolution:** suite string → repo truth `group.stress.ai.com` (CONTEXT string is a typo; audit-only, no rename).
 2. **ASC upload as BUILD-01 gate — which upload?**
    - What we know: SC-1 requires "a Release archive uploads to ASC and clears privacy-manifest validation." Full `upload_beta` increments the build number and pushes a TestFlight build; `release` lane is metadata-only; `build_only` doesn't upload.
    - Recommendation: validate via the ENV-05 CI run if it reaches gym+pilot, or a deliberate `upload_beta` the user opts into at phase end; treat build 13 as the standing prior that the manifest set passes. Confirm with user before creating TestFlight builds from Phase-1 code (it's user-visible to external testers).
+   - **Resolution:** ASC upload surface → plan 05 Task 2 blocking human checkpoint (user-approved dispatch; no silent TestFlight build).
 3. **ENV-05 CI surface** (see Pitfall 6): PR vs manual dispatch vs temporarily widening a workflow trigger. User said "branch push only; main untouched" — a PR is not a merge, but check the user accepts opening one.
+   - **Resolution:** CI trigger matrix verified (ci.yml = PRs, deploy.yml = main/release/dispatch; only deploy.yml runs match) → plan 05 uses draft PR + user-approved dispatch.
 4. **Widget gallery verification device availability**: is a physical device connected/available for WIRE-01, or is the simulator+human-UAT fallback the plan of record from the start?
+   - **Resolution:** plan 04 flags the physical-device check as a human item; simulator fallback is CONTEXT-sanctioned.
 
 ## Environment Availability
 
