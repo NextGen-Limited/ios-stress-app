@@ -82,7 +82,7 @@ None yet.
 - `CharacterEntitlementSyncTests` quarantined (`@Suite(.disabled)`), root cause undiagnosed after 5 ruled-out hypotheses — ENV-02 (Phase 2).
 - WINDOWS.md #8 host CoreSimulator cold-launch crash on DataDeletion/DataExport suites (exit 65, 0 assertion failures) — accepted lineage, ENV-01 (Phase 2).
 - v1.1 Phase 2 advisory residue: WR-03 (DEBUG money path uses `MockStoreKitService`) and WR-04 (`.unverified` consumables finished) — ENV-03 (Phase 2).
-- [Branch] `git.base_branch` is `main`, strategy `milestone`; the v1.2 milestone branch (`gsd/v1.2-submission-readiness`) is not yet cut. Working tree also carries an uncommitted SPM-proxy migration that cannot archive (snapshot at `.asc/backup/spm-migration/`) — resolve before Phase 1's archive-producing tasks (BUILD-01, AUTH-01).
+- [Branch] `git.base_branch` is `main`, strategy `milestone`; v1.2 work rides `gsd/v1.2-submission-readiness` (cut 2026-09-03, carries the milestone-start + roadmap commits; main additionally holds unpushed release-session wip commits). Working tree also carries an uncommitted SPM-proxy migration that cannot archive (snapshot at `.asc/backup/spm-migration/`) — resolve before Phase 1's archive-producing tasks (BUILD-01, AUTH-01).
 - [Release] TestFlight 1.0.0 build 13 is BETA_APPROVED; build 12 shipped with no entitlements blob — dump entitlements per bundle before every publish (affects Phase 1 BUILD-02 verification and Phase 4).
 - Pending from v1.1: Phase 03 drift re-test (5 UAT scenarios, `.planning/milestones/v1.1-phases/03-sessions-preferences-quick-actions-cleanup.1/03-UAT.md`) against build 13 — not a v1.2 requirement, but the last open v1.1 item.
 
@@ -112,5 +112,5 @@ Resume file: .planning/HANDOFF.json (release-session handoff, still valid for bu
 
 ## Operator Next Steps
 
-- Cut the v1.2 milestone branch and resolve the uncommitted SPM-proxy migration in the working tree
+- Resolve the uncommitted SPM-proxy migration in the working tree (Firebase proxy products + non-colliding GoogleSignIn naming) before Phase 1 archive work
 - `/gsd-discuss-phase 1` — resolve D3 (privacy contract authority) and D4 (widget in v1) before planning Phase 1
