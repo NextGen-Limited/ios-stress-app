@@ -1,21 +1,16 @@
 ---
 gsd_state_version: 1.0
-milestone: v1.1
-current_phase_name: Sessions, Preferences, Quick Actions + Cleanup
-status: No active milestone — v1.1 closed 2026-08-24 (verified_closeout, tag v1.1); TestFlight 1.0.0 (13) BETA_APPROVED 2026-09-03 (recorded in MILESTONES.md); Phase 03 drift re-test pending user execution
-stopped_at: Phase 03 drift re-test awaiting user scenarios (.planning/phases/03-*/03-UAT.md — runnable against TestFlight build 13); v1.2 new-milestone kickoff next (/gsd-new-milestone)
-last_updated: "2026-09-03T03:45:00.000Z"
+milestone: v1.2
+milestone_name: Submission Readiness
+status: planning
+last_updated: "2026-09-03T04:17:10.054Z"
 last_activity: 2026-09-03
-last_activity_desc: Recorded TestFlight 1.0.0 (13) release in MILESTONES.md
-state_head: 2b8486251e4443e697e551daa6ef968e26c11a9b
 progress:
-  total_phases: 3
-  completed_phases: 3
-  total_plans: 17
-  completed_plans: 17
-  percent: 100
-milestone_name: Backend API Migration
-current_phase: 3
+  total_phases: 0
+  completed_phases: 0
+  total_plans: 0
+  completed_plans: 0
+  percent: 0
 ---
 
 # Project State
@@ -29,10 +24,10 @@ See: .planning/PROJECT.md (updated 2026-08-23 after v1.1 Phase 03 close — mile
 
 ## Current Position
 
-Phase: Post-milestone — Phase 03 drift re-test
+Phase: Not started (defining requirements)
 Plan: —
-Status: TestFlight 1.0.0 (13) live + BETA_APPROVED (groups Qa, Release-1.0.0); drift re-test pending; v1.2 kickoff next
-Last activity: 2026-09-03 - Recorded TestFlight 1.0.0 (13) release in MILESTONES.md; refreshed STATE/next steps
+Status: Defining requirements
+Last activity: 2026-09-03 — Milestone v1.2 started
 
 ## Performance Metrics
 

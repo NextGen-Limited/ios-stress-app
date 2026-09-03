@@ -19,6 +19,19 @@ Every feature that ships in the binary must actually work end-to-end for a real 
 - **Success metric**: A release archive uploads to App Store Connect without manifest validation failure; a real purchase/restore/cancel/expiry cycle verifies against a local `.storekit` file; Chat reflects real auth state instead of a dead, expired credential.
 - **Strategy notes**: `plans/0808-2042-appstore-submission-remediation/plan.md` (the authoritative scope for this milestone), `plans/reports/appstore-audit-0808-*.md` (6 source audits), `.planning/codebase/{ARCHITECTURE,STACK,TESTING,CONCERNS}.md` (codebase map, corroborates several findings), `docs/project-roadmap.md`, `docs/KANBAN-SHIP-READINESS.md` (both partially stale relative to the fresher audit).
 
+## Current Milestone: v1.2 Submission Readiness
+
+**Goal:** Close the v1.0-carryover submission-blocker list and environment debt so the shipped binary is actually submittable — privacy manifest validation, ship readiness, accessibility, and the two blocking decisions (D3, D4).
+
+**Target features:**
+- BUILD: privacy manifest ASC validation (BUILD-01), canonical App Group suite ID (BUILD-02), Info.plist consolidation (BUILD-03), CI parallel-testing pin (BUILD-04 residual)
+- DATA: two-device CloudKit delete test (DATA-01 residual), CR-01 regression test seam (DATA-04)
+- AUTH: empirical Release-binary strings check (AUTH-01)
+- WIRE: widget live data on device (WIRE-01, gated on D4)
+- SHIP: screenshots (SHIP-01), release lane truth (SHIP-02), privacy questionnaire (SHIP-03, gated on D3)
+- A11Y: touch targets, contrast, Reduce Motion, Dynamic Type, orphaned view deletion (A11Y-01..05)
+- ENV: WINDOWS.md #8 lineage, CharacterEntitlementSyncTests quarantine, WR-03/WR-04 advisories
+
 ## Requirements
 
 ### Validated
@@ -65,7 +78,7 @@ Every feature that ships in the binary must actually work end-to-end for a real 
 
 ### Active
 
-<!-- Carried into v1.2 "submission readiness" (per v1.1 milestone audit recommendation). Status reflects honest per-requirement verification state, not self-reported marks. -->
+<!-- v1.2 "Submission Readiness" scope (this milestone). Status reflects honest per-requirement verification state, not self-reported marks. -->
 
 **BUILD — carried from v1.0 Phase 1**
 - [ ] BUILD-01: `PrivacyInfo.xcprivacy` passes ASC upload validation — unchecked, still blocked on D3
@@ -173,4 +186,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-08-23 after v1.1 milestone close (Backend API Migration — verified_closeout, audit 21/21 requirements · 3/3 phases · 7/7 integration · 4/4 flows; UAT 9/9 human-validated; SECURITY.md 3/3 phases, threats_open 0)*
+*Last updated: 2026-09-03 at v1.2 "Submission Readiness" start (v1.1 closed verified_closeout 2026-08-23; TestFlight 1.0.0 build 13 BETA_APPROVED 2026-09-03 — see MILESTONES.md release record)*
