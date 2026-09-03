@@ -13,8 +13,9 @@ import Testing
 /// CI does not provision the file (its provisioning was deliberately deferred
 /// when this suite landed), so on a clean CI checkout they are disabled with
 /// an explicit reason — the gate re-arms automatically wherever the file
-/// exists (local dev machines, or a future CI that runs the provisioning
-/// script).
+/// exists (local dev machines, or a future CI that provisions the file;
+/// the deferred plan lives in
+/// .planning/quick/260829-kby-provision-googleservice-info-plist-in-ci).
 @Suite("Firebase Bootstrap")
 struct FirebaseBootstrapTests {
 
@@ -32,7 +33,7 @@ struct FirebaseBootstrapTests {
     func testHostIsConfigured() {
         #expect(
             FirebaseBootstrap.state == .configured,
-            "GoogleService-Info.plist is missing from the test host bundle. Restore it locally or run ci_scripts/provision_firebase_config.sh."
+            "GoogleService-Info.plist is missing from the test host bundle. Copy the per-app GoogleService-Info.plist into StressMonitor/StressMonitor/ (gitignored by design; CI provisioning is deferred — see .planning/quick/260829-kby-provision-googleservice-info-plist-in-ci)."
         )
     }
 
@@ -46,7 +47,7 @@ struct FirebaseBootstrapTests {
     func bootstrapReturnsConfigured() {
         #expect(
             FirebaseBootstrap.bootstrap() == .configured,
-            "GoogleService-Info.plist is missing from the test host bundle. Restore it locally or run ci_scripts/provision_firebase_config.sh."
+            "GoogleService-Info.plist is missing from the test host bundle. Copy the per-app GoogleService-Info.plist into StressMonitor/StressMonitor/ (gitignored by design; CI provisioning is deferred — see .planning/quick/260829-kby-provision-googleservice-info-plist-in-ci)."
         )
     }
 
