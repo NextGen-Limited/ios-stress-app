@@ -5,16 +5,16 @@ milestone_name: Submission Readiness
 current_phase: 2
 current_phase_name: Delete Correctness & Test-Suite Trust
 status: executing
-stopped_at: Phase 1 complete, ready to plan Phase 2
-last_updated: "2026-09-03T15:50:31.158Z"
+stopped_at: Completed 02-01-PLAN.md (DATA-04 truthiness suite green + mutation red-proof)
+last_updated: "2026-09-03T16:03:50.933Z"
 last_activity: 2026-09-03
 last_activity_desc: Phase 1 complete, transitioned to Phase 2
-state_head: 8909954ecb7597352600307121caf5e77c697a60
+state_head: 77698de034a1f7e66252298d1bdad5e3bc69798e
 progress:
   total_phases: 4
   completed_phases: 1
   total_plans: 12
-  completed_plans: 6
+  completed_plans: 7
   percent: 25
 ---
 
@@ -29,12 +29,12 @@ See: .planning/PROJECT.md (updated 2026-09-03 at v1.2 start)
 
 ## Current Position
 
-Phase: 2 (Delete Correctness & Test-Suite Trust) — READY TO EXECUTE
-Plan: Not started
+Phase: 2 (Delete Correctness & Test-Suite Trust) — IN EXECUTION
+Plan: 2 of 6
 Status: Ready to execute
-Last activity: 2026-09-03 — Phase 1 complete, transitioned to Phase 2
+Last activity: 2026-09-03 — 02-01 DATA-04 truthiness suite complete
 
-Progress: [██░░░░░░░░] 25% (1/4 phases)
+Progress: [███░░░░░░░] 25% (1/4 phases)
 
 ## Performance Metrics
 
@@ -71,6 +71,7 @@ Per-plan history for v1.0/v1.1 archived under `.planning/milestones/v1.0-phases/
 | Phase 01 P04 | 58 min | 3 tasks | 3 files |
 | Phase 1 P05 | 87 min | 2 tasks | 13 files |
 | Phase 1 P06 | 17 min | 2 tasks | 5 files |
+| Phase 02 P01 | 10 min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -96,6 +97,9 @@ Full log in PROJECT.md Key Decisions. v1.1 per-phase decisions archived with the
 - [Phase 1]: Phase 1 P05: deploy.yml dispatched only after explicit user approval recorded in 01-ENV-05-CI-RECORD.md before the dispatch timestamp — the standing gate for any TestFlight-visible action
 - [Phase 1]: Phase 1 P05: ENV-05 GREEN — CI match(readonly) installs all three App Store profiles + K2TYLYAWMK Distribution cert with zero regeneration; readonly reads the match repo, never the portal dual-cert profiles, so the setup_match fallback stays unused and the path is idempotently repeatable
 - [Phase 1]: Phase 1 P05: BUILD-01 SC-1 GREEN — TestFlight build 1.0.0 (14) from phase-final tree cleared ASC processing (state=VALID), no ITMS-91053 and no missing-SDK-manifest error; plan 02 manifest scan missed nothing
+- [Phase 2]: [Phase 2 P01, DATA-04]: Ungated truthiness suite lands as a NEW sibling file (DataDeleterCloudKitTruthinessTests.swift), not inside the GSD_CI-gated DataDeletionConsolidationTests.swift — CI must see the CR-01 regression; registered in pbxproj (A026/B026)
+- [Phase 2]: [Phase 2 P01]: One SeededCloudKitResetService double (.lying/.throwing/.draining) with exact-Int remainingRecords covers all three prongs — constructor-injected only, no statics (WINDOWS #12); emptiness asserted only by querying the store, never by the success return
+- [Phase 2]: [Phase 2 P01]: Mutation run is the TDD red gate for regression suites guarding already-fixed bugs — suite green on HEAD, red under reintroduced CR-01 swallow (exit 65, prong-1 double detection: no-throw + local split-brain), green after revert (exit 0)
 
 ### Pending Todos
 
@@ -140,8 +144,8 @@ Earlier v1.0 deferrals (Phase 01/02 verification gaps, `MockStoreKitService` Rel
 
 ## Session Continuity
 
-Last session: 2026-09-03T14:01:19.225Z
-Stopped at: Phase 1 complete, ready to plan Phase 2
+Last session: 2026-09-03T16:03:27.655Z
+Stopped at: Completed 02-01-PLAN.md (DATA-04 truthiness suite green + mutation red-proof)
 Resume file: None
 
 ## Operator Next Steps

@@ -103,11 +103,11 @@ Plans:
   4. The full suite reports zero unexplained failures and no silently disabled suite: the WINDOWS.md #8 CoreSimulator crash lineage and the `CharacterEntitlementSyncTests` quarantine are each fixed, or each carries a written, dated disposition naming the root cause and the accepted coverage loss.
   5. The money-path advisories are dispositioned: WR-03 (DEBUG builds routing purchases through `MockStoreKitService`) and WR-04 (`.unverified` consumables being finished) are fixed or documented as an explicit accept with rationale.
 
-**Plans**: 6 plans
+**Plans**: 1/6 plans executed
 Plans:
 **Wave 1**
 
-- [ ] 02-01-PLAN.md — Tracer (TDD): DATA-04 CloudKit delete-truthiness spy suite — ungated, mutation-proven red/green (the suite catches a lying delete)
+- [x] 02-01-PLAN.md — Tracer (TDD): DATA-04 CloudKit delete-truthiness spy suite — ungated, mutation-proven red/green (the suite catches a lying delete)
 - [ ] 02-02-PLAN.md — ENV-03/WR-04 (TDD): never finish unverified transactions — red-first pin + five-site reachability note
 
 **Wave 2** *(pbxproj serialized after 02-01)*
@@ -163,6 +163,6 @@ Plans:
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 1. Binary & Manifest Truth | v1.2 | 6/6 | Complete    | 2026-09-03 |
-| 2. Delete Correctness & Test-Suite Trust | v1.2 | 0/6 | Not started | - |
+| 2. Delete Correctness & Test-Suite Trust | v1.2 | 1/6 | In Progress|  |
 | 3. Accessibility Compliance | v1.2 | 0/TBD | Not started | - |
 | 4. Store Submission Package | v1.2 | 0/TBD | Not started | - |

@@ -17,7 +17,7 @@ Requirements for v1.2. Each maps to roadmap phases.
 ### Data Integrity
 
 - [ ] **DATA-01**: Two-device CloudKit-propagation delete verified end-to-end (residual — local, Keychain, App-Group, and server-session halves verified separately)
-- [ ] **DATA-04**: Regression test pins the v1.0 CR-01 CloudKit batch-delete failure propagation (needs a test seam below `CloudKitResetServiceProtocol`)
+- [x] **DATA-04**: Regression test pins the v1.0 CR-01 CloudKit batch-delete failure propagation (needs a test seam below `CloudKitResetServiceProtocol`)
 
 ### Auth
 
@@ -81,7 +81,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | BUILD-03 | Phase 1 | Complete |
 | BUILD-04 | Phase 2 | Pending |
 | DATA-01 | Phase 2 | Pending |
-| DATA-04 | Phase 2 | Pending |
+| DATA-04 | Phase 2 | Complete |
 | AUTH-01 | Phase 1 | Complete |
 | WIRE-01 | Phase 1 | Complete |
 | SHIP-01 | Phase 4 | Pending |
