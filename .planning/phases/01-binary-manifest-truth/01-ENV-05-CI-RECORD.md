@@ -33,6 +33,7 @@ Evidence record for the two CI surfaces of Phase 1:
 |-----|----------|------------|-------|
 | [33743495896](https://github.com/NextGen-Limited/ios-stress-app/actions/runs/33743495896) | `483f270` | **failure** | First run. All 3 build jobs green (iOS, watchOS, widget) — proxy migration already resolved on clean hardware. Test job failed: 2 issues. |
 | [33745603902](https://github.com/NextGen-Limited/ios-stress-app/actions/runs/33745603902) | `fcd4c87` | **success** | All 4 jobs green: Lint & Build (iOS), Build watchOS, Build Widget, Test. **This is the ENV-04 clean-machine proof run.** |
+| [33746936991](https://github.com/NextGen-Limited/ios-stress-app/actions/runs/33746936991) | `1d29c51` | **success** | Docs-only re-run (this record file's first commit); all 4 jobs green. Latest run at the Task-1 final pushed head. |
 
 **Job matrix of the green run (33745603902):**
 
