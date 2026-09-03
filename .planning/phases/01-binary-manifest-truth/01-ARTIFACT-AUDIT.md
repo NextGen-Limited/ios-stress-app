@@ -83,4 +83,53 @@ The entitlements source files are unchanged by this phase, so golden signed dump
 
 ## AUTH-01 — Credential scan over the phase-final archive
 
-*(appended by plan 01-04 Task 2 — see below)*
+**Verdict: PASS — no usable credential is extractable from any of the three binaries or bundled resources of `StressMonitor/build/Phase1-Final.xcarchive`.**
+
+### 1. The phase-final archive
+
+Built fresh this session (includes every change from plans 01-02 and 01-03 — manifest reasons, plist consolidation, pbxproj cleanup, README typo fix):
+
+```
+xcodebuild archive -project StressMonitor/StressMonitor.xcodeproj -scheme StressMonitor \
+  -configuration Release -destination 'generic/platform=iOS Simulator' \
+  -archivePath StressMonitor/build/Phase1-Final.xcarchive \
+  CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO        → ** ARCHIVE SUCCEEDED **
+```
+
+Binaries (universal simulator slices): app `StressMonitor` 12,115,776 B · widget `StressMonitorWidgetExtension` 535,792 B · watch `StressMonitorWatch Watch App` 1,727,040 B.
+
+Gate result: `bash scripts/verify-archive.sh StressMonitor/build/Phase1-Final.xcarchive --skip-entitlements` → **exit 0** — credential scan ×3, AIza resource grep, merged plists, SDK manifests all PASS. The signing-disabled archive is a faithful proxy: credential strings are a property of the compiled Mach-O, not of the signature.
+
+### 2. Manual triage pass (raw §7 strings pipeline, pre-allowlist — every hit dispositioned)
+
+The script allowlists known-benign hits; this pass re-ran the raw pipeline by hand so every actual hit is on record. (Each app-binary constant appears twice — the universal binary carries one slice per architecture.)
+
+| Binary | Hit (literal) | Disposition |
+|--------|---------------|-------------|
+| app ×2 | `eyJlcnJvciI6IlVOS05PV05fRVJST1IifQ==` | **Benign** — base64 `{"error":"UNKNOWN_ERROR"}`, Google App Check SDK error constant (adjacent strings: `com.google.app_check_core.token_storage`). Identical to the build-13 baseline hit. Not a credential. |
+| app ×2 | `supabaseAccessToken` | **Benign** — legacy Keychain account-name literal REMOVED by `FirebaseAuthService.swift:133` deletion path. Key name, not a token. |
+| app ×2 | `supabaseRefreshToken` | **Benign** — same Keychain-cleanup literal class. |
+| app ×2 | `supabaseSessionExpiresAt` | **Benign** — same class. |
+| app ×2 | `supabaseChatSessionId` | **Benign** — same class. |
+| widget | — | zero hits across all patterns (`eyJ`, PRIVATE KEY, supabase, sk-, anon key, api secret, BEGIN RSA/EC, Bearer token) |
+| watch | — | zero hits across all patterns |
+
+Raw commands (re-runnable, read-only): `strings -a <mach-o> | grep -n "eyJ"` and `strings -a <mach-o> | grep -inE "PRIVATE KEY|supabase|sk-[A-Za-z0-9]|anon[_-]?key|api[_-]?secret|BEGIN RSA|BEGIN EC|Bearer [A-Za-z0-9._-]{20,}"`. Re-running yields the identical verdict (AUTH-01 concurrency edge: the scan is read-only against the completed artifact).
+
+### 3. AIza containment
+
+`strings -a <mach-o> | grep -c "AIza"` → app **0**, widget **0**, watch **0**. `grep -rl "AIza" <StressMonitor.app>` → **only** `GoogleService-Info.plist` (bundled resource). The Firebase `API_KEY`/client ID are public identifiers by Google's documented model (restrictable by bundle ID), committed to the repo by convention and shipped in build 13 — expected, not a finding.
+
+### 4. Additional greps (new-archive checks the research flagged)
+
+- `STRESS_API` env-style key forms over the three binaries: app = 2 × literal string `STRESS_API_BASE_URL`, widget = 0, watch = 0. The 2 app hits are the env-var/config **name** read by `StressAPIConfig.swift:10-11` for the optional non-secret base-URL override (Info.plist → env → UserDefaults → fallback `https://stress-api.dropitx.site`) — a configuration key name, not a value; no secret material. Disposition: benign.
+- `sb_publishable` / `sb_secret` forms over the three binaries: **0 / 0 / 0**.
+
+### 5. fastlane/report.xml spot-check
+
+`fastlane/report.xml` (383 B, committed, uploaded as a CI artifact by deploy.yml) contains only two lane stubs (`default_platform`, `update_fastlane`) — grep for token-value patterns (`AIza…`, `eyJ…` 20+ chars, `sb_secret`, `sk-…`, `MATCH_PASSWORD`, `APP_STORE_CONNECT_API_KEY` values) → nothing. **Clean.**
+
+### 6. Baseline preservation
+
+`.asc/artifacts/` (build-13 IPA + archive, the AUTH-01/BUILD-01 golden reference) untouched — mtimes still Sep 3 00:24 (pre-session); `verify-archive.sh` is read-only by design and no other command wrote there.
+
