@@ -67,7 +67,7 @@ Full phase detail archived at `.planning/milestones/v1.1-ROADMAP.md` and `.plann
   5. Per D4: the widget on a real device shows the same stress score the app shows after a refresh, or the widget target is absent from the archive's bundle list and no dead widget code ships.
   6. A Release archive is producible from the unmodified working tree — the SPM-cache proxy migration is complete (Firebase proxy products exist, GoogleSignIn proxy product naming does not collide with upstream) — and CI's `fastlane match` readonly run accepts the dual-cert App Store profiles without regenerating them.
 
-**Plans**: 5/5 plans executed
+**Plans**: 5/6 plans executed (01-06 is the WIRE-01 gap-closure plan from verification)
 Plans:
 **Wave 1**
 
@@ -85,6 +85,10 @@ Plans:
 **Wave 4** *(blocked on Wave 3 completion)*
 
 - [x] 01-05-PLAN.md — ENV-05: draft-PR CI run + user-approved deploy.yml dispatch (match readonly + ASC upload validation)
+
+**Wave 5** *(gap closure — blocked on Wave 4; addresses the sole SC-5/WIRE-01 verification gap per D4)*
+
+- [ ] 01-06-PLAN.md — WIRE-01 gap closure: TDD wire the live widget write trigger (guarded save inside StressViewModel.loadCurrentStress → WidgetPublisher.publish) + re-captured widget/app same-value evidence
 
 #### Phase 2: Delete Correctness & Test-Suite Trust
 
