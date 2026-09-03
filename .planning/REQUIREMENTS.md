@@ -10,7 +10,7 @@ Requirements for v1.2. Each maps to roadmap phases.
 ### Build Configuration
 
 - [ ] **BUILD-01**: Privacy manifest (`PrivacyInfo.xcprivacy`) passes ASC upload validation (requires decision D3: privacy contract authority)
-- [ ] **BUILD-02**: One canonical App Group suite ID across app, widget, and watch targets
+- [x] **BUILD-02**: One canonical App Group suite ID across app, widget, and watch targets
 - [x] **BUILD-03**: Info.plist consolidated onto `INFOPLIST_KEY_*` build settings
 - [ ] **BUILD-04**: CI and dev docs pin `-parallel-testing-enabled NO` (residual — suite itself green since v1.1 TEST-01)
 
@@ -21,7 +21,7 @@ Requirements for v1.2. Each maps to roadmap phases.
 
 ### Auth
 
-- [ ] **AUTH-01**: Empirical `strings` check of the Release binary finds no extractable credentials (`#if DEBUG` fix shipped; the empirical confirmation remains)
+- [x] **AUTH-01**: Empirical `strings` check of the Release binary finds no extractable credentials (`#if DEBUG` fix shipped; the empirical confirmation remains)
 
 ### Widget Wiring
 
@@ -77,12 +77,12 @@ Which phases cover which requirements. Updated during roadmap creation.
 | Requirement | Phase | Status |
 |-------------|-------|--------|
 | BUILD-01 | Phase 1 | Pending |
-| BUILD-02 | Phase 1 | Pending |
+| BUILD-02 | Phase 1 | Complete |
 | BUILD-03 | Phase 1 | Complete |
 | BUILD-04 | Phase 2 | Pending |
 | DATA-01 | Phase 2 | Pending |
 | DATA-04 | Phase 2 | Pending |
-| AUTH-01 | Phase 1 | Pending |
+| AUTH-01 | Phase 1 | Complete |
 | WIRE-01 | Phase 1 | Pending |
 | SHIP-01 | Phase 4 | Pending |
 | SHIP-02 | Phase 4 | Pending |

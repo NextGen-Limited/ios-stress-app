@@ -5,16 +5,16 @@ milestone_name: Submission Readiness
 current_phase: 1
 current_phase_name: Binary & Manifest Truth
 status: executing
-stopped_at: Completed 01-03-PLAN.md (plist single-source + media-residue removal)
-last_updated: "2026-09-03T08:53:44.391Z"
+stopped_at: Completed 01-04-PLAN.md (BUILD-02/AUTH-01 evidence + WIRE-01 finding)
+last_updated: "2026-09-03T10:07:54.521Z"
 last_activity: 2026-09-03
 last_activity_desc: Phase 1 execution started
-state_head: 8557ba37de9402f47f2bfc9021212bcb96b23485
+state_head: a272f04831bbbd6e955996a7aefc82d90ef84c0d
 progress:
   total_phases: 4
   completed_phases: 0
   total_plans: 5
-  completed_plans: 3
+  completed_plans: 4
   percent: 0
 ---
 
@@ -30,7 +30,7 @@ See: .planning/PROJECT.md (updated 2026-09-03 at v1.2 start)
 ## Current Position
 
 Phase: 1 (Binary & Manifest Truth) — EXECUTING
-Plan: 4 of 5
+Plan: 5 of 5
 Status: Ready to execute
 Last activity: 2026-09-03 — Phase 1 execution started
 
@@ -68,6 +68,7 @@ Per-plan history for v1.0/v1.1 archived under `.planning/milestones/v1.0-phases/
 | Phase 1 P01 | 40 min | 3 tasks | 11 files |
 | Phase 1 P2 | 8 min | 2 tasks | 4 files |
 | Phase 01 P03 | 22 min | 2 tasks | 1 files |
+| Phase 01 P04 | 58 min | 3 tasks | 3 files |
 
 ## Accumulated Context
 
@@ -88,6 +89,8 @@ Full log in PROJECT.md Key Decisions. v1.1 per-phase decisions archived with the
 - [Phase 1]: Phase 1 P03: Xcode merges only the documented closed set of INFOPLIST_KEY_* settings — custom INFOPLIST_KEY_STOREKIT_* never contributed to any merged plist; the app Info.plist file was the sole live source, so BUILD-03 landed inverted: file kept, 12 dead build settings deleted (388efe5)
 - [Phase 1]: Phase 1 P03: widget Info.plist retained as one-key NSExtension file — delete branch disproven empirically (fresh .appex product lacks NSExtensionPointIdentifier without the file; auto-injection does not happen)
 - [Phase 1]: Phase 1 P03: Giphy dSYM stub script phase removed (definition + reference + section markers, 4098d8b); zero live Giphy/Kingfisher/exyte/MediaPicker references remain — unused-media removal fully landed
+- [Phase 01]: BUILD-02/AUTH-01 evidence-complete (plan 01-04): one suite group.stress.ai.com proven across entitlements+constants+tests+golden codesign dump; phase-final archive passes the credential gate with every strings hit dispositioned benign
+- [Phase 01]: WIRE-01 finding (plan 01-04): WidgetPublisher.publish has zero live call sites (calculateAndSaveStress uncalled, DashboardViewModel preview-only, HealthBackgroundScheduler never instantiated, watch writes watch.* keys) — widget renders No Data on any device until a save trigger is wired; surfaced for user decision, not auto-fixed
 
 ### Pending Todos
 
@@ -104,6 +107,7 @@ None yet.
 - [Branch] `git.base_branch` is `main`, strategy `milestone`; v1.2 work rides `gsd/v1.2-submission-readiness` (cut 2026-09-03). ~~Working tree carries an uncommitted SPM-proxy migration that cannot archive~~ **ENV-04 RESOLVED (01-01)**: migration completed in place and committed (feb3bf1, 1afb401) — Firebase_proxy shims + `_proxied` renames, Package.resolved regains firebase-ios-sdk 11.15.0, Release archive producible from the working tree (`.asc/backup/spm-migration/` snapshot now historical, never restored).
 - [Release] TestFlight 1.0.0 build 13 is BETA_APPROVED; build 12 shipped with no entitlements blob — dump entitlements per bundle before every publish (affects Phase 1 BUILD-02 verification and Phase 4). AUTH-01's empirical `strings` check can run against the shipped Release IPA/archive in `.asc/artifacts/` immediately — no rebuild needed (build 13 also re-proves the v1.0 Release-compile blocker stays dead).
 - Pending from v1.1: Phase 03 drift re-test (5 UAT scenarios, `.planning/milestones/v1.1-phases/03-sessions-preferences-quick-actions-cleanup.1/03-UAT.md`) against build 13 — not a v1.2 requirement, but the last open v1.1 item.
+- WIRE-01 write-path gap (from plan 01-04, Rule 4 surfaced): no live code path writes the widget's latest_* suite keys — widget renders No Data on ANY device. User decision required: wire a save trigger (foreground calculateAndSaveStress call, HealthBackgroundScheduler registration, or loadCurrentStress save) or descope the widget for v1.2. Gates the phase's 'widget true' claim; physical-device human check expected to confirm.
 
 ### Quick Tasks Completed
 
@@ -125,8 +129,8 @@ Earlier v1.0 deferrals (Phase 01/02 verification gaps, `MockStoreKitService` Rel
 
 ## Session Continuity
 
-Last session: 2026-09-03T08:53:36.489Z
-Stopped at: Completed 01-03-PLAN.md (plist single-source + media-residue removal)
+Last session: 2026-09-03T10:07:54.508Z
+Stopped at: Completed 01-04-PLAN.md (BUILD-02/AUTH-01 evidence + WIRE-01 finding)
 Resume file: None
 
 ## Operator Next Steps
