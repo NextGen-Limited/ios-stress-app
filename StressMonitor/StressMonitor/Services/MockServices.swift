@@ -8,6 +8,9 @@ final class MockHealthKitService: HealthKitServiceProtocol, @unchecked Sendable 
     var mockHRV: Double = 50.0
     var mockHeartRate: Double = 72.0
     var mockHRVHistory: [HRVMeasurement] = []
+    /// When set, fetchLatestHRV stamps this fixed date instead of Date() —
+    /// pins the underlying reading for same-reading dedupe tests.
+    var mockHRVTimestamp: Date? = nil
     var shouldThrowError: Bool = false
     var mockSleepData: SleepData? = nil
     var mockActivityData: ActivityData? = nil
@@ -19,6 +22,9 @@ final class MockHealthKitService: HealthKitServiceProtocol, @unchecked Sendable 
 
     func fetchLatestHRV() async throws -> HRVMeasurement? {
         if shouldThrowError { throw NSError(domain: "Mock", code: -1) }
+        if let stamp = mockHRVTimestamp {
+            return HRVMeasurement(value: mockHRV, timestamp: stamp)
+        }
         return HRVMeasurement(value: mockHRV, timestamp: Date())
     }
 
