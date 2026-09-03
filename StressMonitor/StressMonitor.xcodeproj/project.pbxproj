@@ -416,9 +416,9 @@
 			);
 			name = StressMonitor;
 			packageProductDependencies = (
-				C24A1D1C962200A0ADB75737 /* FirebaseAuth */,
-				F125E68A1518EF9B500DADDA /* FirebaseCore */,
-				7B5DBEA14CEB67077FD66BBE /* GoogleSignIn */,
+				C24A1D1C962200A0ADB75737 /* FirebaseAuth_proxied */,
+				F125E68A1518EF9B500DADDA /* FirebaseCore_proxied */,
+				7B5DBEA14CEB67077FD66BBE /* GoogleSignIn_proxied */,
 			);
 			productName = StressMonitor;
 			productReference = F2E2EBE92F1CC553000C2B53 /* StressMonitor.app */;
@@ -1130,15 +1130,15 @@
 			package = C3ECFE78514FF7DFB2DBDB1E /* XCLocalSwiftPackageReference "proxy" */;
 			productName = GoogleSignIn_proxied;
 		};
-		C24A1D1C962200A0ADB75737 /* FirebaseAuth */ = {
+		C24A1D1C962200A0ADB75737 /* FirebaseAuth_proxied */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = C3ECFE78514FF7DFB2DBDB1E /* XCLocalSwiftPackageReference "proxy" */;
-			productName = FirebaseAuth;
+			productName = FirebaseAuth_proxied;
 		};
-		F125E68A1518EF9B500DADDA /* FirebaseCore */ = {
+		F125E68A1518EF9B500DADDA /* FirebaseCore_proxied */ = {
 			isa = XCSwiftPackageProductDependency;
 			package = C3ECFE78514FF7DFB2DBDB1E /* XCLocalSwiftPackageReference "proxy" */;
-			productName = FirebaseCore;
+			productName = FirebaseCore_proxied;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};
