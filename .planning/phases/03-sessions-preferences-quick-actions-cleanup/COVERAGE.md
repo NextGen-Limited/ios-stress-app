@@ -6,26 +6,26 @@
 
 ## Stress API backend (`https://stress-api.dropitx.site`)
 
-| # | capability | decision | reason |
-|---|---|---|---|
-| 1 | `GET /health` | INTEGRATE | Phase 1 — `StressAPIClient.getHealth()` (config/diagnostics; verified 200 this session) |
-| 2 | `POST /chat` (SSE stream + terminal metadata) | INTEGRATE | Phase 1 — streaming chat, session-persisted, credit-metered; unchanged this phase (regression-fenced only) |
-| 3 | `POST /chat` SSE terminal `metadata.session_id` | INTEGRATE | Phase 1 — `StressLLMService.apply(metadata:)` persists the rolling session id (session continuity backbone for Phase 3 restore) |
-| 4 | `POST /chat` SSE terminal `metadata.credits_remaining` | INTEGRATE | Phase 2 — balance convergence sink |
-| 5 | `POST /chat` SSE terminal `metadata.quick_actions` | OPT-OUT (driving UI) | Parsed and stored (`SSEParser`/`apply(metadata:)`, pinned by `SSEParserTests`) but does NOT drive chip refresh — chips refresh on chat open only this phase (CONTEXT deferred idea) |
-| 6 | `GET /credits` (balance) | INTEGRATE | Phase 2 — `CreditService.refreshBalance()` |
-| 7 | `GET /credits?history&limit&offset` (transaction ledger) | OPT-OUT | Carried from Phase 2 COVERAGE — no transaction-list UI; natural follow-up |
-| 8 | `POST /credits/redeem` | INTEGRATE | Phase 2 — server-authoritative pack grants |
-| 9 | `POST /credits/premium/verify` | INTEGRATE | Phase 2 (02-07/02-08) — JWS verification + premium demotion signal |
-| 10 | `GET /sessions?limit&offset` | INTEGRATE | Phase 3 — factory-reset wipe loop pages the user's sessions (`derived-SES-03`) |
-| 11 | `POST /sessions` | INTEGRATE | Phase 3 — titled session creation before first chat of a new session (`derived-SES-02`) |
-| 12 | `DELETE /sessions?id=` | INTEGRATE | Phase 3 — per-session delete in the factory-reset wipe; messages cascade server-side (`derived-SES-03`) |
-| 13 | `GET /sessions/:id/messages` | INTEGRATE | Phase 3 — history restore on chat open for the persisted rolling session (`derived-SES-01`) |
-| 14 | `GET /preferences` | INTEGRATE | Phase 3 — one-time seed at first surface (chat open / Settings onAppear); chat-relevant pair only (`derived-PREF-01`) |
-| 15 | `PUT /preferences` | INTEGRATE | Phase 3 — single-field local-writer-wins updates (`language` / `coaching_style` only) (`derived-PREF-01`) |
-| 16 | `GET /quick-actions` | INTEGRATE | Phase 3 — server-suggested chips at chat open with live stress context; local static set renders instantly as fallback (`derived-QA-01`) |
-| 17 | `POST /quick-actions` | OPT-OUT | **Deliberately unwired per CONTEXT lock** — returns a full 512-token completion with **no `deductCredit` anywhere in the route** (verified: `quick-actions.ts:44-61`); wiring it would open an unmetered chat path bypassing the Phase 2 revenue model. Chip taps ride the existing credit-metered `/chat` path instead. Metering/gating note filed on `phuongddx/stress-app-be` (plan 03-04) — tracked as https://github.com/phuongddx/stress-app-be/issues/2; iOS grep-gate pins that no POST to this route ever appears in app sources |
-| 18 | `GET /` (OpenAPI docs HTML page) | OPT-OUT | Browser-facing documentation surface, not an app capability |
+| capability | decision | reason |
+|---|---|---|
+| `GET /health` | INTEGRATE | Phase 1 — `StressAPIClient.getHealth()` (config/diagnostics; verified 200) |
+| `POST /chat` (SSE stream + terminal metadata) | INTEGRATE | Phase 1 — streaming chat, session-persisted, credit-metered; regression-fenced only |
+| `POST /chat` SSE terminal `metadata.session_id` | INTEGRATE | Phase 1 — `StressLLMService.apply(metadata:)` persists rolling session id (restore backbone) |
+| `POST /chat` SSE terminal `metadata.credits_remaining` | INTEGRATE | Phase 2 — balance convergence sink |
+| `POST /chat` SSE terminal `metadata.quick_actions` | OPT-OUT | Parsed+stored (`SSEParserTests`-pinned) but does NOT drive chip refresh — chips refresh on chat open only (CONTEXT deferral) |
+| `GET /credits` (balance) | INTEGRATE | Phase 2 — `CreditService.refreshBalance()` |
+| `GET /credits?history&limit&offset` (ledger) | OPT-OUT | Carried from Phase 2 — no transaction-list UI; natural follow-up |
+| `POST /credits/redeem` | INTEGRATE | Phase 2 — server-authoritative pack grants |
+| `POST /credits/premium/verify` | INTEGRATE | Phase 2 (02-07/02-08) — JWS verification + premium demotion signal |
+| `GET /sessions?limit&offset` | INTEGRATE | Phase 3 — factory-reset wipe loop pages sessions (`derived-SES-03`) |
+| `POST /sessions` | INTEGRATE | Phase 3 — titled session creation before first chat of a new session (`derived-SES-02`) |
+| `DELETE /sessions?id=` | INTEGRATE | Phase 3 — per-session delete in factory-reset wipe; messages cascade server-side (`derived-SES-03`) |
+| `GET /sessions/:id/messages` | INTEGRATE | Phase 3 — history restore on chat open for persisted rolling session (`derived-SES-01`) |
+| `GET /preferences` | INTEGRATE | Phase 3 — one-time seed at first surface; chat-relevant pair only (`derived-PREF-01`) |
+| `PUT /preferences` | INTEGRATE | Phase 3 — local-writer-wins updates (`language` / `coaching_style` only) (`derived-PREF-01`) |
+| `GET /quick-actions` | INTEGRATE | Phase 3 — server chips at chat open with live stress context; static fallback renders instantly (`derived-QA-01`) |
+| `POST /quick-actions` | OPT-OUT | Deliberately unwired (CONTEXT lock): route has no `deductCredit` — wiring opens unmetered chat bypassing Phase 2 revenue. Chips ride metered `/chat`. BE issue #2 tracks |
+| `GET /` (OpenAPI docs HTML) | OPT-OUT | Browser-facing documentation surface, not an app capability |
 
 ## Field-level scope note (preferences)
 
