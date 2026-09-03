@@ -48,16 +48,7 @@
 		F211BBDA2FD9112000A6E25D /* WidgetKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F211BBD92FD9111F00A6E25D /* WidgetKit.framework */; };
 		F211BBDC2FD9112000A6E25D /* SwiftUI.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = F211BBDB2FD9112000A6E25D /* SwiftUI.framework */; };
 		F211BBED2FD9112200A6E25D /* StressMonitorWidgetExtension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = F211BBD72FD9111F00A6E25D /* StressMonitorWidgetExtension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		F227C3DF3027787A0083F74C /* BuildFile in Frameworks */ = {isa = PBXBuildFile; };
-		F227C3E03027787A0083F74C /* BuildFile in Frameworks */ = {isa = PBXBuildFile; };
-		F227C739302781F80083F74C /* BuildFile in Frameworks */ = {isa = PBXBuildFile; };
-		F227C73A302781F80083F74C /* BuildFile in Frameworks */ = {isa = PBXBuildFile; };
-		F26968812F5DAE2400B40F0F /* BuildFile in Frameworks */ = {isa = PBXBuildFile; };
 		F2E2EC392F1CC605000C2B53 /* StressMonitorWatch Watch App.app in Embed Watch Content */ = {isa = PBXBuildFile; fileRef = F2E2EC192F1CC602000C2B53 /* StressMonitorWatch Watch App.app */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
-		F2FCD7AF2F8FFBFF000DE6E8 /* BuildFile in Frameworks */ = {isa = PBXBuildFile; };
-		FB1A00010000000000000004 /* BuildFile in Frameworks */ = {isa = PBXBuildFile; };
-		FB1A00010000000000000005 /* BuildFile in Frameworks */ = {isa = PBXBuildFile; };
-		FB1A00010000000000000007 /* BuildFile in Frameworks */ = {isa = PBXBuildFile; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -242,15 +233,6 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				F227C73A302781F80083F74C /* BuildFile in Frameworks */,
-				F227C739302781F80083F74C /* BuildFile in Frameworks */,
-				F227C3E03027787A0083F74C /* BuildFile in Frameworks */,
-				F227C3DF3027787A0083F74C /* BuildFile in Frameworks */,
-				F26968812F5DAE2400B40F0F /* BuildFile in Frameworks */,
-				F2FCD7AF2F8FFBFF000DE6E8 /* BuildFile in Frameworks */,
-				FB1A00010000000000000004 /* BuildFile in Frameworks */,
-				FB1A00010000000000000005 /* BuildFile in Frameworks */,
-				FB1A00010000000000000007 /* BuildFile in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
