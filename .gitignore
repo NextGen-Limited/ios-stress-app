@@ -161,10 +161,31 @@ vendor/bundle
 build/
 .worktrees/
 
-# spm-cache (sandbox, lockfile, build artifacts - regenerated locally)
-StressMonitor/spm-cache/
+# spm-cache (sandbox, lockfile, build artifacts - regenerated locally).
+# Exception: the local proxy package under packages/proxy is source-tracked — the
+# Xcode project references it via XCLocalSwiftPackageReference "spm-cache/packages/proxy",
+# so clean checkouts (CI) need its manifests + shim sources. Everything else
+# (clone cache, .build, .swiftpm state, graph.json) stays ignored/regenerated.
+StressMonitor/spm-cache/*
 StressMonitor/spm-cache.lock
 StressMonitor/spm-cache.yml
+!StressMonitor/spm-cache/packages/
+StressMonitor/spm-cache/packages/*
+!StressMonitor/spm-cache/packages/proxy/
+StressMonitor/spm-cache/packages/proxy/*
+!StressMonitor/spm-cache/packages/proxy/Package.swift
+!StressMonitor/spm-cache/packages/proxy/Package.resolved
+!StressMonitor/spm-cache/packages/proxy/src/
+!StressMonitor/spm-cache/packages/proxy/.proxies/
+StressMonitor/spm-cache/packages/proxy/.proxies/*
+!StressMonitor/spm-cache/packages/proxy/.proxies/Firebase_proxy/
+StressMonitor/spm-cache/packages/proxy/.proxies/Firebase_proxy/*
+!StressMonitor/spm-cache/packages/proxy/.proxies/Firebase_proxy/Package.swift
+!StressMonitor/spm-cache/packages/proxy/.proxies/Firebase_proxy/Sources/
+!StressMonitor/spm-cache/packages/proxy/.proxies/GoogleSignIn-iOS_proxy/
+StressMonitor/spm-cache/packages/proxy/.proxies/GoogleSignIn-iOS_proxy/*
+!StressMonitor/spm-cache/packages/proxy/.proxies/GoogleSignIn-iOS_proxy/Package.swift
+!StressMonitor/spm-cache/packages/proxy/.proxies/GoogleSignIn-iOS_proxy/Sources/
 StressMonitor/build_output.log
 StressMonitor/test_output.log
 .claude/
