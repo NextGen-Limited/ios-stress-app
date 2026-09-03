@@ -67,7 +67,7 @@ Full phase detail archived at `.planning/milestones/v1.1-ROADMAP.md` and `.plann
   5. Per D4: the widget on a real device shows the same stress score the app shows after a refresh, or the widget target is absent from the archive's bundle list and no dead widget code ships.
   6. A Release archive is producible from the unmodified working tree — the SPM-cache proxy migration is complete (Firebase proxy products exist, GoogleSignIn proxy product naming does not collide with upstream) — and CI's `fastlane match` readonly run accepts the dual-cert App Store profiles without regenerating them.
 
-**Plans**: 2/5 plans executed
+**Plans**: 3/5 plans executed
 Plans:
 **Wave 1**
 
@@ -76,7 +76,7 @@ Plans:
 **Wave 2** *(blocked on Wave 1 completion)*
 
 - [x] 01-02-PLAN.md — BUILD-01: watch privacy-manifest CA92.1 + D3 doc corrections (CLAUDE.md, EN/VI privacy policies)
-- [ ] 01-03-PLAN.md — BUILD-03: Info.plist consolidation (CFBundleURLTypes-only app plist, widget delete-or-verify) + dead Giphy build-phase removal
+- [x] 01-03-PLAN.md — BUILD-03: Info.plist consolidation (CFBundleURLTypes-only app plist, widget delete-or-verify) + dead Giphy build-phase removal
 
 **Wave 3** *(blocked on Wave 2 completion)*
 
@@ -137,7 +137,7 @@ Plans:
 
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
-| 1. Binary & Manifest Truth | v1.2 | 2/5 | In Progress|  |
+| 1. Binary & Manifest Truth | v1.2 | 3/5 | In Progress|  |
 | 2. Delete Correctness & Test-Suite Trust | v1.2 | 0/TBD | Not started | - |
 | 3. Accessibility Compliance | v1.2 | 0/TBD | Not started | - |
 | 4. Store Submission Package | v1.2 | 0/TBD | Not started | - |

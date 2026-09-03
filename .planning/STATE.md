@@ -5,16 +5,16 @@ milestone_name: Submission Readiness
 current_phase: 1
 current_phase_name: Binary & Manifest Truth
 status: executing
-stopped_at: Completed 01-02-PLAN.md (watch CA92.1 manifest fix + D3 doc corrections)
-last_updated: "2026-09-03T08:28:26.983Z"
+stopped_at: Completed 01-03-PLAN.md (plist single-source + media-residue removal)
+last_updated: "2026-09-03T08:53:44.391Z"
 last_activity: 2026-09-03
 last_activity_desc: Phase 1 execution started
-state_head: 4b9e4ae1d1105a2099af7fb77fa7e6eaa402b1de
+state_head: 8557ba37de9402f47f2bfc9021212bcb96b23485
 progress:
   total_phases: 4
   completed_phases: 0
   total_plans: 5
-  completed_plans: 2
+  completed_plans: 3
   percent: 0
 ---
 
@@ -30,7 +30,7 @@ See: .planning/PROJECT.md (updated 2026-09-03 at v1.2 start)
 ## Current Position
 
 Phase: 1 (Binary & Manifest Truth) — EXECUTING
-Plan: 3 of 5
+Plan: 4 of 5
 Status: Ready to execute
 Last activity: 2026-09-03 — Phase 1 execution started
 
@@ -67,6 +67,7 @@ Per-plan history for v1.0/v1.1 archived under `.planning/milestones/v1.0-phases/
 |------|----------|-------|-------|
 | Phase 1 P01 | 40 min | 3 tasks | 11 files |
 | Phase 1 P2 | 8 min | 2 tasks | 4 files |
+| Phase 01 P03 | 22 min | 2 tasks | 1 files |
 
 ## Accumulated Context
 
@@ -84,6 +85,9 @@ Full log in PROJECT.md Key Decisions. v1.1 per-phase decisions archived with the
 - [Phase 1]: spm-cache/ package sources stay uncommitted by repo gitignore convention ('regenerated locally'); tracked migration artifacts = pbxproj + Package.resolved; ENV-04 bar = archive-from-working-tree (proven 01-01)
 - [Phase 1]: Phase 1 P02: Watch UserDefaults reason set = CA92.1 + 1C8F.1, scan-verified at execution time (4 .standard files + 3 suite files; zero delta vs research §5.3) — scan-then-declare is the standing pattern for required-reason declarations
 - [Phase 1]: Phase 1 P02 (D3 applied): CLAUDE.md + EN/VI privacy policies corrected to the real contract (StressLLMService/StressAPIClient → https://stress-api.dropitx.site chat endpoint, Firebase Auth anonymous-or-Google) with zero Swift churn — docs move toward code, never the reverse
+- [Phase 1]: Phase 1 P03: Xcode merges only the documented closed set of INFOPLIST_KEY_* settings — custom INFOPLIST_KEY_STOREKIT_* never contributed to any merged plist; the app Info.plist file was the sole live source, so BUILD-03 landed inverted: file kept, 12 dead build settings deleted (388efe5)
+- [Phase 1]: Phase 1 P03: widget Info.plist retained as one-key NSExtension file — delete branch disproven empirically (fresh .appex product lacks NSExtensionPointIdentifier without the file; auto-injection does not happen)
+- [Phase 1]: Phase 1 P03: Giphy dSYM stub script phase removed (definition + reference + section markers, 4098d8b); zero live Giphy/Kingfisher/exyte/MediaPicker references remain — unused-media removal fully landed
 
 ### Pending Todos
 
@@ -121,8 +125,8 @@ Earlier v1.0 deferrals (Phase 01/02 verification gaps, `MockStoreKitService` Rel
 
 ## Session Continuity
 
-Last session: 2026-09-03T08:28:26.945Z
-Stopped at: Completed 01-02-PLAN.md (watch CA92.1 manifest fix + D3 doc corrections)
+Last session: 2026-09-03T08:53:36.489Z
+Stopped at: Completed 01-03-PLAN.md (plist single-source + media-residue removal)
 Resume file: None
 
 ## Operator Next Steps
