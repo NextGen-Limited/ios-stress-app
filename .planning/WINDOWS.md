@@ -1,10 +1,10 @@
 ---
 schema_version: 1
-open_count: 12
+open_count: 13
 waived_count: 0
-fixed_count: 0
-total_count: 12
-last_updated: 2026-08-23T11:21:42.696Z
+fixed_count: 3
+total_count: 16
+last_updated: 2026-09-04T05:44:33.254Z
 ---
 
 # Broken Windows Ledger
@@ -23,10 +23,14 @@ last_updated: 2026-08-23T11:21:42.696Z
 | 6 | 02 | skipped-test | StressMonitor/StressMonitorTests/EntitlementForegroundCorrectionTests.swift |  | Suite disabled: StoreKitTest purchase throws productNotFound (IAP-01 — no product IDs resolve); re-enable in 02-03 | open |  | 2026-08-16T17:28:36.992Z |  |
 | 7 | 02 | skipped-test | StressMonitor/StressMonitorTests/StoreKitProductCatalogLiveTests.swift |  | Suite disabled: custom INFOPLIST_KEY_STOREKIT_* settings never reach the generated Info.plist so live catalog resolves empty (IAP-01); re-enable in 02-03 | open |  | 2026-08-16T17:28:40.914Z |  |
 | 8 | 02 | deviation | StressMonitor/StressMonitorTests/DataDeletionConsolidationTests.swift |  | Full-suite xcodebuild exit 65 despite 84/84 tests passing: 6 cold-launch host restarts clustered on CloudKit Failure & Cancellation and Data Export Field Selection suites (pre-existing TEST-01 host flakiness) | open |  | 2026-08-16T17:28:41.937Z |  |
-| 9 | 02 | deviation | stress-app-be/src/routes/credits.ts |  | Redeem + premium/verify endpoints and 2 migrations committed but NOT deployed; production apply deferred to 02-04 user_setup with user confirmation | closed | resolved 2026-08-23: backend deployed + ASC consumables filed + live money-path smoke human-validated (02-VERIFICATION passed) | 2026-08-17T02:05:07.102Z |  |
-| 10 | 02 | unmet-truth | stress-app-be/src/lib/iap.ts |  | Real-Apple success path of verifyAndDecodeTransaction untestable without an Apple-signed JWS fixture; covered only via route-seam fakes and rejection-path tests until live sandbox UAT in 02-04 | closed | live sandbox refund UAT (CR-05 demotion + WR-10 one-pass clear) human-validated 2026-08-23 | 2026-08-17T02:05:07.194Z |  |
-| 11 | 02 | unrun-verify | .planning/phases/02-credits-system-iap-transition/02-04-PLAN.md |  | 02-04 Task 3 live money-path smoke (provision->402->sandbox purchase->server grant->persisted balance) blocked on backend deploy + ASC consumable filing; see 02-04-SUMMARY Deferred Issues | closed | unblocked by the deployed backend + filed ASC products; 02-VERIFICATION passed 29/29 2026-08-23 | 2026-08-17T04:32:14.498Z |  |
-| 12 | 3 | deviation | StressMonitor/StressMonitorTests/StressAPIClientTests.swift | 80 | Order-dependent test pollution (found at 03-05 gate): ChatHistoryRestoreTests leaves static RequestCaptureURLProtocol.responseByPath['/preferences'] set; PreferencesServiceTests + StressAPIClientPreferencesTests stub via the single-response statics and receive the stale vi/direct 200 because responseByPath takes precedence (StressAPIClientTests.swift:80-81) — 10 assertion failures / exit 65 in a crash-free 10-suite targeted run; masked in full-suite runs by the #8 crash-restart boundary sitting between polluter (launch 1) and victims (later launch). Fix seam: per-test reset/clear of RequestCaptureURLProtocol statics (or teardown in ChatHistoryRestoreTests.makeStubbedClient). | closed | fixed at producer+consumer seams in 03-review WR-04 (commits c2d6922, 4444e85); combined 11-suite single-process run 70/70 green — verified independently by 03-VERIFICATION | 2026-08-23T11:21:42.696Z |  |
+| 9 | 02 | deviation | stress-app-be/src/routes/credits.ts |  | Redeem + premium/verify endpoints and 2 migrations committed but NOT deployed; production apply deferred to 02-04 user_setup with user confirmation | fixed | resolved 2026-08-23: backend deployed + ASC consumables filed + live money-path smoke human-validated (02-VERIFICATION passed); resolution restored 2026-09-04 after accidental stale-mirror reopen | 2026-08-17T02:05:07.102Z | 2026-09-04T05:43:22.407Z |
+| 10 | 02 | unmet-truth | stress-app-be/src/lib/iap.ts |  | Real-Apple success path of verifyAndDecodeTransaction untestable without an Apple-signed JWS fixture; covered only via route-seam fakes and rejection-path tests until live sandbox UAT in 02-04 | fixed | live sandbox refund UAT (CR-05 demotion + WR-10 one-pass clear) human-validated 2026-08-23; resolution restored 2026-09-04 after accidental stale-mirror reopen | 2026-08-17T02:05:07.194Z | 2026-09-04T05:44:33.032Z |
+| 11 | 02 | unrun-verify | .planning/phases/02-credits-system-iap-transition/02-04-PLAN.md |  | 02-04 Task 3 live money-path smoke (provision->402->sandbox purchase->server grant->persisted balance) blocked on backend deploy + ASC consumable filing; see 02-04-SUMMARY Deferred Issues | fixed | unblocked by the deployed backend + filed ASC products; 02-VERIFICATION passed 29/29 2026-08-23; resolution restored 2026-09-04 after accidental stale-mirror reopen | 2026-08-17T04:32:14.498Z | 2026-09-04T05:44:33.254Z |
+| 12 | 3 | deviation | StressMonitor/StressMonitorTests/StressAPIClientTests.swift | 80 | Order-dependent test pollution (found at 03-05 gate): ChatHistoryRestoreTests leaves static RequestCaptureURLProtocol.responseByPath['/preferences'] set; PreferencesServiceTests + StressAPIClientPreferencesTests stub via the single-response statics and receive the stale vi/direct 200 because responseByPath takes precedence (StressAPIClientTests.swift:80-81) — 10 assertion failures / exit 65 in a crash-free 10-suite targeted run; masked in full-suite runs by the #8 crash-restart boundary sitting between polluter (launch 1) and victims (later launch). Fix seam: per-test reset/clear of RequestCaptureURLProtocol statics (or teardown in ChatHistoryRestoreTests.makeStubbedClient). | open |  | 2026-08-23T11:21:42.696Z |  |
+| 13 | 1 | deviation | scripts/verify-archive-tests.sh |  | Plan 01-01 Task 1 automated verify as written (append planted string past Mach-O EOF, then strings) is a no-op on macOS - cctools strings stops at the object's last section; harness plants via midpoint overwrite instead | open |  | 2026-09-03T07:48:47.465Z |  |
+| 14 | 1 | deviation | StressMonitor/StressMonitor.xcodeproj/project.pbxproj |  | Plan 01-01 Task 2 kept Firebase product names un-renamed per plan letter, but Xcode PIF duplicate-registration required the A4 remedy (FirebaseAuth_proxied/FirebaseCore_proxied) - applied in fix commit 1afb401 | open |  | 2026-09-03T07:48:47.765Z |  |
+| 15 | 1 | deviation | docs-site/legal/privacy.md |  | 01-02 Task 2: dropped self-contradictory 'not an anonymous one' clause alongside Supabase→Firebase Auth correction (resolved, verified, committed 4b9e4ae) | open |  | 2026-09-03T08:29:14.277Z |  |
+| 16 | 2 | deviation | StressMonitor/StressMonitor/Services/StoreKit/StoreKitService.swift |  | WR-04 reachability note delivered label-free in Swift (finding code kept out of code comments per user AGENTS.md); labeled audit lives in 02-02-SUMMARY | open |  | 2026-09-03T16:18:10.408Z |  |
 
 ````json
 [
@@ -133,10 +137,10 @@ last_updated: 2026-08-23T11:21:42.696Z
     "file": "stress-app-be/src/routes/credits.ts",
     "line": null,
     "description": "Redeem + premium/verify endpoints and 2 migrations committed but NOT deployed; production apply deferred to 02-04 user_setup with user confirmation",
-    "status": "open",
+    "status": "fixed",
     "reason": "",
     "recorded_at": "2026-08-17T02:05:07.102Z",
-    "resolved_at": null
+    "resolved_at": "2026-09-04T05:43:22.407Z"
   },
   {
     "id": 10,
@@ -145,10 +149,10 @@ last_updated: 2026-08-23T11:21:42.696Z
     "file": "stress-app-be/src/lib/iap.ts",
     "line": null,
     "description": "Real-Apple success path of verifyAndDecodeTransaction untestable without an Apple-signed JWS fixture; covered only via route-seam fakes and rejection-path tests until live sandbox UAT in 02-04",
-    "status": "open",
+    "status": "fixed",
     "reason": "",
     "recorded_at": "2026-08-17T02:05:07.194Z",
-    "resolved_at": null
+    "resolved_at": "2026-09-04T05:44:33.032Z"
   },
   {
     "id": 11,
@@ -157,10 +161,10 @@ last_updated: 2026-08-23T11:21:42.696Z
     "file": ".planning/phases/02-credits-system-iap-transition/02-04-PLAN.md",
     "line": null,
     "description": "02-04 Task 3 live money-path smoke (provision->402->sandbox purchase->server grant->persisted balance) blocked on backend deploy + ASC consumable filing; see 02-04-SUMMARY Deferred Issues",
-    "status": "open",
+    "status": "fixed",
     "reason": "",
     "recorded_at": "2026-08-17T04:32:14.498Z",
-    "resolved_at": null
+    "resolved_at": "2026-09-04T05:44:33.254Z"
   },
   {
     "id": 12,
@@ -172,6 +176,54 @@ last_updated: 2026-08-23T11:21:42.696Z
     "status": "open",
     "reason": "",
     "recorded_at": "2026-08-23T11:21:42.696Z",
+    "resolved_at": null
+  },
+  {
+    "id": 13,
+    "kind": "deviation",
+    "phase": "1",
+    "file": "scripts/verify-archive-tests.sh",
+    "line": null,
+    "description": "Plan 01-01 Task 1 automated verify as written (append planted string past Mach-O EOF, then strings) is a no-op on macOS - cctools strings stops at the object's last section; harness plants via midpoint overwrite instead",
+    "status": "open",
+    "reason": "",
+    "recorded_at": "2026-09-03T07:48:47.465Z",
+    "resolved_at": null
+  },
+  {
+    "id": 14,
+    "kind": "deviation",
+    "phase": "1",
+    "file": "StressMonitor/StressMonitor.xcodeproj/project.pbxproj",
+    "line": null,
+    "description": "Plan 01-01 Task 2 kept Firebase product names un-renamed per plan letter, but Xcode PIF duplicate-registration required the A4 remedy (FirebaseAuth_proxied/FirebaseCore_proxied) - applied in fix commit 1afb401",
+    "status": "open",
+    "reason": "",
+    "recorded_at": "2026-09-03T07:48:47.765Z",
+    "resolved_at": null
+  },
+  {
+    "id": 15,
+    "kind": "deviation",
+    "phase": "1",
+    "file": "docs-site/legal/privacy.md",
+    "line": null,
+    "description": "01-02 Task 2: dropped self-contradictory 'not an anonymous one' clause alongside Supabase→Firebase Auth correction (resolved, verified, committed 4b9e4ae)",
+    "status": "open",
+    "reason": "",
+    "recorded_at": "2026-09-03T08:29:14.277Z",
+    "resolved_at": null
+  },
+  {
+    "id": 16,
+    "kind": "deviation",
+    "phase": "2",
+    "file": "StressMonitor/StressMonitor/Services/StoreKit/StoreKitService.swift",
+    "line": null,
+    "description": "WR-04 reachability note delivered label-free in Swift (finding code kept out of code comments per user AGENTS.md); labeled audit lives in 02-02-SUMMARY",
+    "status": "open",
+    "reason": "",
+    "recorded_at": "2026-09-03T16:18:10.408Z",
     "resolved_at": null
   }
 ]
