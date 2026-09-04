@@ -252,3 +252,102 @@ struct DataDeleterCloudKitTruthinessTests {
         _ = container // keep the in-memory store alive until the assertions are done
     }
 }
+
+// MARK: - Factory Reset Sweep Completeness (Habit)
+
+/// Regression suite for the store-sweep completeness gap the phase research
+/// surfaced: `Habit` is synced (`AppSchemaV2`, `cloudKitDatabase: .automatic`
+/// — StressMonitorApp.swift:69-79) yet was deleted by no code path in
+/// `performFactoryReset`. Pins the fix (mirrors the `CharacterUnlock`
+/// deletion at `DataDeleterService.swift:431`) so a synced model surviving
+/// a claimed-complete factory reset regresses loudly, not silently.
+@Suite("Factory Reset Sweep Completeness")
+@MainActor
+struct FactoryResetSweepCompletenessTests {
+
+    // MARK: - Fixtures
+
+    /// In-memory context seeded with one row each of StressMeasurement,
+    /// CharacterUnlock, and Habit — the full local sweep set
+    /// `performFactoryReset` must empty. The container is returned
+    /// alongside its context and must stay alive for the whole test
+    /// (WINDOWS.md #8 lineage this suite must not add to).
+    private func makeContextWithMeasurementCharacterAndHabit() throws -> (ModelContainer, ModelContext) {
+        let config = ModelConfiguration(isStoredInMemoryOnly: true, cloudKitDatabase: .none)
+        let container = try ModelContainer(
+            for: StressMeasurement.self, CharacterUnlock.self, Habit.self,
+            configurations: config
+        )
+        let ctx = container.mainContext
+        ctx.insert(StressMeasurement(timestamp: Date(), stressLevel: 50, hrv: 40, restingHeartRate: 65))
+        ctx.insert(CharacterUnlock(characterId: "ripple", isUnlocked: true))
+        ctx.insert(Habit(type: .hydration, currentValue: 1.2))
+        try ctx.save()
+        return (container, ctx)
+    }
+
+    /// Empty in-memory context registering the same schema — proves the
+    /// empty-input case never throws.
+    private func makeEmptyContext() throws -> (ModelContainer, ModelContext) {
+        let config = ModelConfiguration(isStoredInMemoryOnly: true, cloudKitDatabase: .none)
+        let container = try ModelContainer(
+            for: StressMeasurement.self, CharacterUnlock.self, Habit.self,
+            configurations: config
+        )
+        return (container, container.mainContext)
+    }
+
+    /// Server-session wipe never needs a real network round trip here — an
+    /// immediate empty first page mirrors "list, see nothing, return"
+    /// (FakeServerSessionWiper precedent, DataDeleterServerWipeTests.swift).
+    private func makeService(
+        _ ctx: ModelContext,
+        cloudKit: SeededCloudKitResetService,
+        wiper: FakeServerSessionWiper
+    ) -> DataDeleterService {
+        DataDeleterService(
+            modelContext: ctx,
+            cloudKitResetService: cloudKit,
+            repository: StressRepository(modelContext: ctx),
+            serverSessionWiper: wiper,
+            logger: .default
+        )
+    }
+
+    // MARK: - Habit-survives pin (planner decision: FIX, mirrors CharacterUnlock)
+
+    @Test("performFactoryReset empties Habit, StressMeasurement, and CharacterUnlock")
+    func performFactoryResetEmptiesEveryLocalSweepModelIncludingHabit() async throws {
+        let (container, ctx) = try makeContextWithMeasurementCharacterAndHabit()
+        let cloudKit = SeededCloudKitResetService(behavior: .draining, seededRows: [.stressMeasurement: 1])
+        let wiper = FakeServerSessionWiper(behavior: .pages([]))
+        let service = makeService(ctx, cloudKit: cloudKit, wiper: wiper)
+
+        try await service.performFactoryReset()
+
+        // The gap this suite pins: no code path deleted Habit until this fix.
+        #expect(try ctx.fetch(FetchDescriptor<Habit>()).isEmpty)
+        // Existing behavior stays pinned — no regression on the models
+        // factory reset already swept.
+        #expect(try ctx.fetch(FetchDescriptor<StressMeasurement>()).isEmpty)
+        #expect(try ctx.fetch(FetchDescriptor<CharacterUnlock>()).isEmpty)
+        _ = container // keep the in-memory store alive until the assertions are done
+    }
+
+    // MARK: - Empty-store idempotency
+
+    @Test("performFactoryReset on an already-empty store completes without throwing")
+    func performFactoryResetOnEmptyStoreCompletesWithoutThrowing() async throws {
+        let (container, ctx) = try makeEmptyContext()
+        let cloudKit = SeededCloudKitResetService(behavior: .draining)
+        let wiper = FakeServerSessionWiper(behavior: .pages([]))
+        let service = makeService(ctx, cloudKit: cloudKit, wiper: wiper)
+
+        try await service.performFactoryReset()
+
+        #expect(try ctx.fetch(FetchDescriptor<Habit>()).isEmpty)
+        #expect(try ctx.fetch(FetchDescriptor<StressMeasurement>()).isEmpty)
+        #expect(try ctx.fetch(FetchDescriptor<CharacterUnlock>()).isEmpty)
+        _ = container // keep the in-memory store alive until the assertions are done
+    }
+}
