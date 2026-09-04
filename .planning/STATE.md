@@ -156,6 +156,7 @@ Earlier v1.0 deferrals (Phase 01/02 verification gaps, `MockStoreKitService` Rel
 | Phase | State | Resume |
 |-------|-------|--------|
 | 1 | ~~verification_deferred_human~~ **RESOLVED 2026-09-03** — /gsd-verify-work 1 passed 19/19 (both human items validated); phase marked complete | — |
+| 2 | verification_deferred_human (deferred 2026-09-04) — DATA-01 live two-surface CloudKit delete test (physical iPhone + CloudKit Console). Automated 5/6 requirements verified (02-VERIFICATION.md), full suite green 0 failed, UAT 0/1 pending (`02-UAT.md`), evidence apparatus execution-ready (`02-DATA-01-EVIDENCE.md`, redaction rule in §3 step 7) | `/gsd-verify-work 2` |
 
 ## Session Continuity
 
