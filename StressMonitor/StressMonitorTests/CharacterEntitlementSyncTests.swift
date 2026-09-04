@@ -2,17 +2,19 @@ import SwiftData
 import Testing
 @testable import StressMonitor
 
-// QUARANTINE LIFTED 2026-09-03 (02-04 bounded re-diagnosis): the container-
-// lifetime hypothesis — never among the five ruled out below — is under test.
-// makeSeededContext previously returned only mainContext while the owning
-// ModelContainer went out of scope at fixture return (the WINDOWS.md #8 crash
-// lineage per the v1.1 P03-04 rule: containers must outlive their contexts);
-// it now returns (ModelContainer, ModelContext) and every test keeps the
-// container alive. Six 2026-09-03 .ips crash reports (coalition
-// com.apple.CoreSimulator.SimDevice.5DD825B4-…, EXC_BREAKPOINT, faulting
-// frame #0 in SwiftData, direct callers in the sibling #8 suites' test
-// bodies) match the dead-container prediction. Final enable/disable state
-// follows the ENV-02 decision checkpoint (02-04 Task 2).
+// QUARANTINE FIXED 2026-09-04 (ENV-02, 02-04 bounded re-diagnosis): the
+// container-lifetime hypothesis — never among the five ruled out below — was
+// confirmed as the root cause. makeSeededContext previously returned only
+// mainContext while the owning ModelContainer went out of scope at fixture
+// return (the WINDOWS.md #8 crash lineage per the v1.1 P03-04 rule:
+// containers must outlive their contexts); it now returns (ModelContainer,
+// ModelContext) and every test keeps the container alive. Six 2026-09-03
+// .ips crash reports (coalition com.apple.CoreSimulator.SimDevice.5DD825B4-…,
+// EXC_BREAKPOINT, faulting frame #0 in SwiftData, direct callers in the
+// sibling #8 suites' test bodies) matched the dead-container prediction.
+// Verdict (02-04 Task 2 checkpoint, evidence in 02-04-SUMMARY.md): fix
+// landed — suite restored to the default run permanently, no quarantine
+// trait remains.
 //
 // ORIGINAL QUARANTINE RECORD (historical, predates the container-lifetime
 // test): every @Test in this suite reliably hangs the xcodebuild/XCTest host

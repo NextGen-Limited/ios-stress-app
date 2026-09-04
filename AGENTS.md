@@ -42,7 +42,7 @@ swiftlint lint
 
 ## Testing quirks
 
-- `DataDeletionConsolidationTests` skips suites when env `GSD_CI` is set: they stall the CI test host (exit 65, zero assertion failures). CI sets it via `TEST_RUNNER_GSD_CI`; locally they run normally — don't "fix" the gating.
+- `DataDeletionConsolidationTests`/`CharacterEntitlementSyncTests` no longer gate on `GSD_CI`/`TEST_RUNNER_GSD_CI` (removed 2026-09-04, 02-04/ENV-01/ENV-02): the exit-65 host stall was a container-lifetime bug (fixture returned a context whose owning `ModelContainer` had already deallocated), not a CI-only defect. All suites run in the default invocation everywhere now.
 - CI disables parallel testing deliberately; keep `-parallel-testing-enabled NO` when reproducing CI failures.
 - IAP tests use the StoreKit config `StressMonitor/StressMonitorTests/StressMonitorProducts.storekit`.
 - No HealthKit data on simulator: run with the `-demo-mode` launch argument (Edit Scheme → Run → Arguments) — cycles all stress levels through the real pipeline, not mocks.

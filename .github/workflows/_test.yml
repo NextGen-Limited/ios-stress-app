@@ -174,12 +174,11 @@ jobs:
           restore-keys: |
             spm-${{ runner.os }}-
 
+      # 2026-09-04 (02-04/ENV-01): TEST_RUNNER_GSD_CI env gate removed here —
+      # WINDOWS.md #8's container-lifetime bug (fixed in
+      # DataDeletionConsolidationTests.swift/CharacterEntitlementSyncTests.swift)
+      # was the actual cause of the CI host stall; no CI-only skip is needed.
       - name: Run Tests
-        env:
-          # Forwarded by xcodebuild (TEST_RUNNER_ prefix stripped) into the
-          # test host; gates WINDOWS.md #8-lineage suites off on CI — they
-          # stall the host and exit 65 with zero assertion failures.
-          TEST_RUNNER_GSD_CI: "1"
         run: |
           set -o pipefail
           xcodebuild test \
