@@ -429,6 +429,7 @@ final class DataDeleterService: DataDeleter {
 
             try await localWipeService.deleteAllMeasurements()
             try modelContext.delete(model: CharacterUnlock.self)
+            try modelContext.delete(model: Habit.self)
             try modelContext.save()
 
             // Phase 3: Reset baseline (90% - 100%)

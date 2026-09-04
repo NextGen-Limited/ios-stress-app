@@ -104,14 +104,16 @@ struct DataDeleterServerWipeTests {
     }
 
     /// In-memory context mirroring the consolidation tests' setup, plus
-    /// CharacterUnlock (performFactoryReset deletes that model too). The
+    /// CharacterUnlock and Habit (performFactoryReset deletes both models
+    /// too — the container's schema must declare every model type the
+    /// reset touches, or `modelContext.delete(model:)` crashes). The
     /// container is returned alongside its context and must stay alive for
     /// the whole test — dropping it first crashes SwiftData (the WINDOWS.md
     /// #8 lineage this suite must not add to).
     private func makeContextWithOneMeasurement() throws -> (ModelContainer, ModelContext) {
         let config = ModelConfiguration(isStoredInMemoryOnly: true, cloudKitDatabase: .none)
         let container = try ModelContainer(
-            for: StressMeasurement.self, CharacterUnlock.self,
+            for: StressMeasurement.self, CharacterUnlock.self, Habit.self,
             configurations: config
         )
         let ctx = container.mainContext
