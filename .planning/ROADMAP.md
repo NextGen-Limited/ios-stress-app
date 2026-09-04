@@ -139,8 +139,27 @@ Plans:
   4. At the largest accessibility Dynamic Type size, the primary screens stay readable — no label truncates, clips, or overlaps another element.
   5. The orphaned redesign views are deleted from the source tree; no unreachable duplicate screen compiles into the binary.
 
-**Plans**: TBD
+**Plans**: 6 plans
 **UI hint**: yes
+
+Plans:
+**Wave 1**
+
+- [ ] 03-01-PLAN.md — Tracer (A11Y-02): contrast token retunes in place (D-04) + the D-06 token-pair unit test (usage-class matrix, both appearances, RED→GREEN + mutation red-proof) + watch mirrors + dual-coding caption fix
+- [ ] 03-02-PLAN.md — A11Y-04 mechanism: rework `.accessibleDynamicType()` (no cap, no shrink; delete superseded zero-adopter variants), anchor Font.WellnessType to the system text-style ramp (byte-identical at Large), adopt on all 14 manifest surfaces (D-10 layer 1)
+
+**Wave 2** *(surface files serialized after 03-02; chart files after 03-01)*
+
+- [ ] 03-03-PLAN.md — A11Y-01: touch-target + icon-only-label sweep across the 14 surfaces (`.minimumTouchTarget` + token), dual-coding adoption where categories show, state-shape triage (error copy, NoDataCard empty states, locked-character dimming)
+- [ ] 03-04-PLAN.md — A11Y-04/D-09: chart accessibility series (trend-summary builder unit-pinned red-first + per-point labels) + gauge/hero-numeral values + chart-file legend targets
+
+**Wave 3** *(blocked on Waves 1-2 — shares files with both)*
+
+- [ ] 03-05-PLAN.md — A11Y-03: one app-wide Reduce Motion helper (D-12/D-13, cross-fade fallbacks, DEBUG `-a11y-reduce-motion` seam), 13-file consolidation with re-baselined grep gate, D-11 breathing haptic+text fallback
+
+**Wave 4** *(phase closer — deletion LAST, then gates against the final tree)*
+
+- [ ] 03-06-PLAN.md — A11Y-05: D-14 reachability audit (BFS + extension-member screen + Periphery cross-check), blocking decision checkpoint, batched delete-compile of ~80 orphan files across 3 targets, both trust-gate records (D-10/D-13) + full suite + 03-A11Y-UAT.md apparatus
 
 #### Phase 4: Store Submission Package
 
