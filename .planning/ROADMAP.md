@@ -103,7 +103,7 @@ Plans:
   4. The full suite reports zero unexplained failures and no silently disabled suite: the WINDOWS.md #8 CoreSimulator crash lineage and the `CharacterEntitlementSyncTests` quarantine are each fixed, or each carries a written, dated disposition naming the root cause and the accepted coverage loss.
   5. The money-path advisories are dispositioned: WR-03 (DEBUG builds routing purchases through `MockStoreKitService`) and WR-04 (`.unverified` consumables being finished) are fixed or documented as an explicit accept with rationale.
 
-**Plans**: 5/6 plans executed
+**Plans**: 6/6 plans executed
 Plans:
 **Wave 1**
 
@@ -124,7 +124,7 @@ Plans:
 
 **Wave 5** *(phase closer — blocked on all)*
 
-- [ ] 02-06-PLAN.md — DATA-01: Habit store-sweep fix + two-surface evidence note (device + CloudKit Console, human item) + phase trust gate record
+- [x] 02-06-PLAN.md — DATA-01: Habit store-sweep fix + two-surface evidence note (device + CloudKit Console, human item) + phase trust gate record
 
 #### Phase 3: Accessibility Compliance
 
@@ -163,6 +163,6 @@ Plans:
 | Phase | Milestone | Plans Complete | Status | Completed |
 |-------|-----------|----------------|--------|-----------|
 | 1. Binary & Manifest Truth | v1.2 | 6/6 | Complete    | 2026-09-03 |
-| 2. Delete Correctness & Test-Suite Trust | v1.2 | 5/6 | In Progress|  |
+| 2. Delete Correctness & Test-Suite Trust | v1.2 | 6/6 | In Progress|  |
 | 3. Accessibility Compliance | v1.2 | 0/TBD | Not started | - |
 | 4. Store Submission Package | v1.2 | 0/TBD | Not started | - |

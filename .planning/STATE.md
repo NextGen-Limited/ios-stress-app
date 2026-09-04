@@ -4,17 +4,17 @@ milestone: v1.2
 milestone_name: Submission Readiness
 current_phase: 2
 current_phase_name: Delete Correctness & Test-Suite Trust
-status: executing
-stopped_at: "Completed 02-05-PLAN.md (BUILD-04: AGENTS.md canonical CI-parity invocation + INFOPLIST_KEY doc-truth note; docs/TESTING.md replace-by-reference)"
-last_updated: "2026-09-04T06:22:59.671Z"
+status: verifying
+stopped_at: "Completed 02-06-PLAN.md (DATA-01: Habit store-sweep fix + evidence note skeleton + phase trust gate record; live two-surface verification remains the end-of-phase human item)"
+last_updated: "2026-09-04T06:54:18.440Z"
 last_activity: 2026-09-03
 last_activity_desc: Phase 1 complete, transitioned to Phase 2
-state_head: e3a4b873f86c09c987ab1646909709585168cbf3
+state_head: 65e9f9f855cd32f16f7c1906c05aef2f22d30eae
 progress:
   total_phases: 4
   completed_phases: 1
   total_plans: 12
-  completed_plans: 11
+  completed_plans: 12
   percent: 25
 ---
 
@@ -31,7 +31,7 @@ See: .planning/PROJECT.md (updated 2026-09-03 at v1.2 start)
 
 Phase: 2 (Delete Correctness & Test-Suite Trust) — IN EXECUTION
 Plan: 6 of 6
-Status: Ready to execute
+Status: Phase complete — ready for verification
 Last activity: 2026-09-03 — 02-01 DATA-04 truthiness suite complete
 
 Progress: [███░░░░░░░] 25% (1/4 phases)
@@ -76,6 +76,7 @@ Per-plan history for v1.0/v1.1 archived under `.planning/milestones/v1.0-phases/
 | Phase 02 P03 | 6 min | 2 tasks | 4 files |
 | Phase 02 P04 | 40min | 3 tasks | 7 files |
 | Phase 02 P05 | 25min | 2 tasks | 2 files |
+| Phase 02 P06 | 40min | 3 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -112,6 +113,9 @@ Full log in PROJECT.md Key Decisions. v1.1 per-phase decisions archived with the
 - [Phase 02]: [Phase 2 P04] StoreKitServiceTests/EntitlementForegroundCorrectionTests productNotFound reproduces on TWO local simulators (not CI-runner-specific) — StoreKitTest daemon/session-isolation bug independent of IAP-01 product-ID registration (StoreKitProductCatalogLiveTests confirmed enabled+green, WINDOWS #7 closed); both suites stay dated-dispositioned (WINDOWS #6 open unchanged, #18 new entry), not re-enabled
 - [Phase 2]: [Phase 02] [Phase 2 P05, BUILD-04] AGENTS.md is now the canonical CI-parity xcodebuild test invocation (flag-for-flag mirror of _test.yml's Run Tests step); docs/TESTING.md reduced to a pointer-only cross-reference (locked replace-not-extend decision) — zero divergence risk between what CI runs and what dev docs tell a human to run
 - [Phase 2]: [Phase 02] [Phase 2 P05] INFOPLIST_KEY_* doc-truth note added to AGENTS.md folding in the Phase-1 UIBackgroundModes finding: custom INFOPLIST_KEY_* settings never merge into product plists on this toolchain — the Info.plist file is the source of truth
+- [Phase 2]: [Phase 2 P06, DATA-01] performFactoryReset now deletes Habit (planner FIX decision, mirrors CharacterUnlock precedent) — closes the store-sweep completeness gap; TDD red-first pin in FactoryResetSweepCompletenessTests; deleteAllMeasurements stays byte-unchanged
+- [Phase 2]: [Phase 2 P06] Assumption-delta: no-change (2026-09-03, orchestrator-resolved) — CloudKit's account-scoped CKRecord identity already generalizes to the second DATA-01 surface (console or second iPhone); no new identity axis
+- [Phase 2]: [Phase 2 P06] DATA-01 stays Pending in REQUIREMENTS.md — only the automatable portion (sweep fix, evidence-note apparatus, trust gate) is done; the live two-surface verification is the explicit outstanding end-of-phase human item (no physical hardware/CloudKit Console reachable from this session; simulator evidence rejected per Pitfall 7)
 
 ### Pending Todos
 
@@ -155,8 +159,8 @@ Earlier v1.0 deferrals (Phase 01/02 verification gaps, `MockStoreKitService` Rel
 
 ## Session Continuity
 
-Last session: 2026-09-04T06:22:59.490Z
-Stopped at: Completed 02-05-PLAN.md (BUILD-04: AGENTS.md canonical CI-parity invocation + INFOPLIST_KEY doc-truth note; docs/TESTING.md replace-by-reference)
+Last session: 2026-09-04T06:54:18.058Z
+Stopped at: Completed 02-06-PLAN.md (DATA-01: Habit store-sweep fix + evidence note skeleton + phase trust gate record; live two-surface verification remains the end-of-phase human item)
 Resume file: None
 
 ## Operator Next Steps
