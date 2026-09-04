@@ -7,84 +7,19 @@ How to run, write, and organize tests for StressMonitor.
 
 ## Overview
 
-The project uses **XCTest** for unit testing. Test files live in `StressMonitorTests/` (bundle ID: `stress.ai.com.StressMonitorTests`).
+The project uses **Swift Testing** and **XCTest** together. Test files live in `StressMonitor/StressMonitorTests/` (bundle ID: `stress.ai.com.StressMonitorTests`) — not the orphaned root-level `StressMonitorTests/`, which is outside the Xcode project and never builds (see `AGENTS.md` → "Orphaned code").
 
-Current test coverage focuses on:
-- Stress algorithm components (HRV analysis, category ranges)
-- Morning readiness scoring
-- Stress history time ranges
-- Stress prediction
-- Stress reading model initialization
-
-> **Note**: A comprehensive test suite rewrite is in progress (tracked as blocker B3). The current 5 test files cover core logic but many services lack dedicated tests yet.
+Coverage spans dozens of suites across the algorithm, repository, sync, LLM, StoreKit, and ViewModel layers — see `AGENTS.md` for the current build/test setup rather than a fixed file list here.
 
 ---
 
 ## Running Tests
 
-### From Xcode
+**Canonical invocation:** the full `xcodebuild test` command — project, scheme, destination, and every flag CI runs — is documented once, in `AGENTS.md` under "Build & test". That block mirrors `.github/workflows/_test.yml` flag-for-flag; this doc does not duplicate it.
 
-1. Select the **StressMonitor** scheme.
-2. Press `⌘U` to run all tests.
-3. Or use the Test Navigator (`⌘6`) to run individual tests.
-
-### From the Command Line
-
-```bash
-xcodebuild test \
-  -project StressMonitor/StressMonitor.xcodeproj \
-  -scheme StressMonitor \
-  -destination 'platform=iOS Simulator,name=iPhone 16' \
-  -skipPackagePluginValidation
-```
-
-### Via the Python Runner
-
-The project includes a test runner script that auto-detects a booted iPhone simulator:
-
-```bash
-python3 scripts/run-tests.py
-```
-
-This script finds a booted iPhone simulator (or boots one), runs the `StressMonitorTests` target, and reports results.
-
----
-
-## Running Specific Tests
-
-### Single Test Class
-
-```bash
-xcodebuild test \
-  -project StressMonitor/StressMonitor.xcodeproj \
-  -scheme StressMonitor \
-  -destination 'platform=iOS Simulator,name=iPhone 16' \
-  -only-testing:StressMonitorTests/HRVAnalyzerTests \
-  -skipPackagePluginValidation
-```
-
-### Single Test Method
-
-```bash
-xcodebuild test \
-  -project StressMonitor/StressMonitor.xcodeproj \
-  -scheme StressMonitor \
-  -destination 'platform=iOS Simulator,name=iPhone 16' \
-  -only-testing:StressMonitorTests/MorningReadinessServiceTests/testComputeScoreAtBaseline \
-  -skipPackagePluginValidation
-```
-
----
-
-## Test Files
-
-| File | Tests |
-|------|-------|
-| `HRVAnalyzerTests.swift` | Stress category ranges, HRV analysis logic |
-| `MorningReadinessServiceTests.swift` | Score computation at/above/below baseline |
-| `StressHistoryTests.swift` | History time ranges (day/week/month), raw values |
-| `StressPredictorTests.swift` | Stress prediction logic |
-| `StressReadingTests.swift` | `StressReading` model initialization |
+- **From Xcode:** select the **StressMonitor** scheme, press `⌘U` to run all tests, or use the Test Navigator (`⌘6`) for individual tests.
+- **Single class / single method:** append `-only-testing:StressMonitorTests/<Suite>` (or `/<Suite>/<method>`) to the AGENTS.md command — examples are listed there.
+- **Local helper:** `python3 scripts/run-tests.py` auto-detects (or boots) a simulator and runs the suite.
 
 ---
 
@@ -149,13 +84,7 @@ The project includes `MockServices.swift` and `MockStoreKitService.swift` for th
 
 ## CI Testing
 
-GitHub Actions runs build validation (not full test execution yet) on every PR via `.github/workflows/ci.yml` → `_test.yml`:
-
-- **Lint & Build** (iOS Simulator) — SwiftLint + xcodebuild build
-- **Build watchOS** — watchOS Simulator build
-- **Build Widget** — Widget extension build
-
-To run the full test suite in CI, trigger the `_test.yml` workflow with a test step or use the `scripts/run-tests.py` runner.
+`.github/workflows/ci.yml` → `_test.yml` runs, on every PR: SwiftLint (advisory) + iOS/watchOS/widget builds, plus the full `StressMonitorTests` suite in the `test` job — the same invocation documented in `AGENTS.md`. CI does not skip test execution.
 
 ---
 
