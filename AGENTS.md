@@ -24,10 +24,18 @@ xcodebuild build -project StressMonitor/StressMonitor.xcodeproj \
   -scheme "StressMonitorWatch Watch App" -destination 'generic/platform=watchOS Simulator' \
   CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
 
-# All tests (CI destination: iPhone 16 / OS=latest, Xcode 26.3 on macos-15)
-xcodebuild test -project StressMonitor/StressMonitor.xcodeproj -scheme StressMonitor \
+# All tests (CI parity — mirrors .github/workflows/_test.yml:181-195 flag-for-flag; env-var gating removed 2026-09-04, see Testing quirks below)
+xcodebuild test \
+  -project StressMonitor/StressMonitor.xcodeproj \
+  -scheme StressMonitor \
   -destination 'platform=iOS Simulator,name=iPhone 16,OS=latest' \
-  -parallel-testing-enabled NO CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO
+  -derivedDataPath build \
+  -resultBundlePath TestResults.xcresult \
+  -skipPackagePluginValidation \
+  -parallel-testing-enabled NO \
+  -maximum-concurrent-test-simulator-destinations 1 \
+  CODE_SIGN_IDENTITY="" \
+  CODE_SIGNING_REQUIRED=NO
 
 # Single class / single method: append
 #   -only-testing:StressMonitorTests/SSEParserTests
@@ -39,6 +47,8 @@ python3 scripts/run-tests.py
 # Lint — run from repo root (.swiftlint.yml `included:` is StressMonitor/)
 swiftlint lint
 ```
+
+**Doc truth:** custom `INFOPLIST_KEY_*` build settings do not merge into product plists on this project's toolchain — the `Info.plist` file is the source of truth for any key that must actually ship. Phase-1 finding: `INFOPLIST_KEY_UIBackgroundModes = "fetch processing"` was set in the pbxproj (app Debug+Release) but absent from both the shipped build-13 Release archive plist and every fresh build's merged plist — background fetch/processing has silently never shipped. Same closed-key-set mechanism as the STOREKIT keys (moved file-side to fix). Before trusting an `INFOPLIST_KEY_*` setting, confirm the key in a merged/built plist, not just the pbxproj.
 
 ## Testing quirks
 
