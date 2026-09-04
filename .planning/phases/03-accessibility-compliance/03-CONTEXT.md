@@ -16,7 +16,8 @@ Scope anchor: ROADMAP v1.2 Phase 3. Widget surfaces are in scope for contrast/Dy
 ## Implementation Decisions
 
 ### Primary-Screen Scope (the sweep manifest)
-- **D-01:** The primary-screen set = the 4 tab roots (Dashboard, Trends, History, Settings) **plus every `Route`-pushed child**, resolved from `StressMonitor/StressMonitor/Navigation/Route.swift`: `dataExport, dataManage, dataDelete, characters, appearance, about, watchFace, measurement(id), boxBreathing, miniWalk`. Session views `breathingSession` and `breathingSummary` are exempt (session UI; their accessibility is governed by the Reduce Motion fallback decision D-10). Onboarding and Paywall are exempt this phase.
+- **D-01:** The primary-screen set = the 4 tab roots — **Home (`homeView`), Action (`ActionView`), Trends (`TrendsView`), Settings (`SettingsView`)** per `MainTabView.swift` — **plus every `Route`-pushed child**, resolved from `StressMonitor/StressMonitor/Navigation/Route.swift`: `dataExport, dataManage, dataDelete, characters, appearance, about, watchFace, measurement(id), boxBreathing, miniWalk`. Measurement history is a Home child, not a tab root. Session views `breathingSession` and `breathingSummary` are exempt (session UI; their accessibility is governed by the Reduce Motion fallback decision D-11). Onboarding and Paywall are exempt this phase.
+  — **Reversibility:** reversible — manifest is a doc artifact; adding/removing surfaces is a list edit, not a migration.
 - **D-02:** Widget (gallery + lock-screen) and watch surfaces join the contrast/Dynamic Type sweep per D4/ROADMAP; the 44pt touch-target rule does not apply to them (not touch UI).
 - **D-03:** The sweep list above is LOCKED as the audit manifest — verification (and the grep sweeps) run against exactly these surfaces, phase-2 trust-gate style (enumeration, not counts). If a surface is added later, the manifest changes with it.
   — **Reversibility:** reversible — manifest is a doc artifact; adding/removing surfaces is a list edit, not a migration.
@@ -30,7 +31,7 @@ Scope anchor: ROADMAP v1.2 Phase 3. Widget surfaces are in scope for contrast/Dy
 ### Dynamic Type (A11Y-04)
 - **D-08:** Acceptance bar at accessibility sizes is the ROADMAP SC, strict: **zero truncation** — no ellipsis-truncation, no clipping, no overlap at AX sizes; layouts adapt (stack, wrap, `ViewThatFits`, scroll). Long text wraps or scrolls rather than fitting one line.
 - **D-09:** Charts (Swift Charts / SwiftUICharts) render **fixed-size** (geometry exempt) but expose an **accessibility series** — per-point labels/values plus a one-line trend summary — so VoiceOver conveys what sight shows. The gamified character UI is likewise **exempt from scaling but labeled** (accessibilityLabel + state value).
-- **D-10:** Gate = two layers: (1) machine-checked adoption sweep — every manifest surface's root view applies `.accessibleDynamicType()` (grep over the D-03 manifest, 1:1 mapping, zero unaccounted); (2) human AX5 walkthrough per surface recorded in phase UAT (screenshots, light+dark).
+- **D-10:** Gate = two layers: (1) machine-checked adoption sweep — every manifest surface's root view applies the **reworked** `.accessibleDynamicType()` (grep over the D-03 manifest, 1:1 mapping, zero unaccounted). REWORK REQUIRED: the helper's current defaults (`DynamicTypeScaling.swift` — `minScale 0.75`, `maxDynamicTypeSize .accessibility3`) contractually contradict D-08: the AX3 cap prevents AX4/AX5 from rendering at all, and the 0.75 shrink fights scaling toward ellipsis. Reworked primary-surface adoption must scale through AX5 with no cap and no shrink (layout adapts instead); (2) human AX5 walkthrough per surface recorded in phase UAT (screenshots, light+dark).
 
 ### Reduce Motion (A11Y-03) + Orphans (A11Y-05)
 - **D-11:** Breathing exercise is motion-essential and user-initiated → **exempt with a fallback mode**: under Reduce Motion it defaults to haptic pulses + text countdown (switchable in-session). The active session/summary views are covered by this decision, not the contrast/DT sweep.
@@ -47,6 +48,7 @@ Scope anchor: ROADMAP v1.2 Phase 3. Widget surfaces are in scope for contrast/Dy
 
 ### Scope & Navigation
 - `StressMonitor/StressMonitor/Navigation/Route.swift` — the D-03 sweep manifest source: every Route case = one auditable surface; `View.stressNavigationDestinations()` resolves them
+- `StressMonitor/StressMonitor/Views/MainTabView.swift` — the four tab roots (Home/Action/Trends/Settings) and their NavigationStacks
 - `.planning/ROADMAP.md` §Phase 3 — phase goal, success criteria (zero-truncation bar), dependency note binding widget surfaces via D4
 
 ### Tokens & Theme
@@ -55,7 +57,7 @@ Scope anchor: ROADMAP v1.2 Phase 3. Widget surfaces are in scope for contrast/Dy
 - Settings redesign decision (2026-09-02, commit `2b84862`): cream canvas `#FFFDF6`, plain surface cards, dark set `#121212`/`#1E1E1E` — the approved design contrast fixes must preserve
 
 ### Existing Accessibility Assets
-- `StressMonitor/StressMonitor/Utilities/DynamicTypeScaling.swift` — defines `.accessibleDynamicType()` (5 adopters today); the D-10 sweep target modifier
+- `StressMonitor/StressMonitor/Utilities/DynamicTypeScaling.swift` — defines `.accessibleDynamicType()` (5 adopters today; needs rework per D-10 before manifest-wide adoption) and `limitedDynamicType()` (AX3 cap — usable only with an explicit dated exception if the planner finds an unfixable surface)
 - `StressMonitor/StressMonitor/Utilities/HighContrastModifier.swift` — to be deleted per D-05
 - `StressMonitor/StressMonitor/Utilities/AccessibilityModifiers.swift` — existing a11y helper inventory
 - `StressMonitor/StressMonitor/Views/Breathing/BreathingExerciseView.swift` — the D-11 motion-essential surface; 65 existing reduceMotion references across the target are the D-13 consolidation input
@@ -69,7 +71,7 @@ Scope anchor: ROADMAP v1.2 Phase 3. Widget surfaces are in scope for contrast/Dy
 ## Existing Code Insights
 
 ### Reusable Assets
-- `.accessibleDynamicType()` (DynamicTypeScaling.swift): already defined and adopted on 5 views — extend to the manifest, don't invent a second mechanism
+- `.accessibleDynamicType()` (DynamicTypeScaling.swift): defined and adopted on 5 views, but must be REWORKED before manifest-wide adoption — its defaults (AX3 cap + 0.75 minimumScaleFactor) contradict the zero-truncation bar (see D-10)
 - `DesignTokens.Spacing.Layout.minTouchTarget` (44): exists as the constant hit-target audits should assert against
 - 92 view files already carry `accessibilityLabel` — labeling baseline is broad; audit depth (values/traits/series) is the gap, not presence
 - `Utilities/PatternOverlay.swift`, `ColorBlindnessSimulator.swift` — audit whether they duplicate HighContrastModifier's fate (dead) during orphan work
