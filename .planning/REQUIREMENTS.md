@@ -12,7 +12,7 @@ Requirements for v1.2. Each maps to roadmap phases.
 - [x] **BUILD-01**: Privacy manifest (`PrivacyInfo.xcprivacy`) passes ASC upload validation (requires decision D3: privacy contract authority)
 - [x] **BUILD-02**: One canonical App Group suite ID across app, widget, and watch targets
 - [x] **BUILD-03**: Info.plist consolidated onto `INFOPLIST_KEY_*` build settings
-- [ ] **BUILD-04**: CI and dev docs pin `-parallel-testing-enabled NO` (residual — suite itself green since v1.1 TEST-01)
+- [x] **BUILD-04**: CI and dev docs pin `-parallel-testing-enabled NO` (residual — suite itself green since v1.1 TEST-01)
 
 ### Data Integrity
 
@@ -79,7 +79,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | BUILD-01 | Phase 1 | Complete |
 | BUILD-02 | Phase 1 | Complete |
 | BUILD-03 | Phase 1 | Complete |
-| BUILD-04 | Phase 2 | Pending |
+| BUILD-04 | Phase 2 | Complete |
 | DATA-01 | Phase 2 | Pending |
 | DATA-04 | Phase 2 | Complete |
 | AUTH-01 | Phase 1 | Complete |

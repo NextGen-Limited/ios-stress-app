@@ -5,16 +5,16 @@ milestone_name: Submission Readiness
 current_phase: 2
 current_phase_name: Delete Correctness & Test-Suite Trust
 status: executing
-stopped_at: "Completed 02-04-PLAN.md (ENV-01/ENV-02: WINDOWS #8 + CharacterEntitlementSyncTests fixed via container-lifetime fix; StoreKitServiceTests/EntitlementForegroundCorrectionTests re-dispositioned)"
-last_updated: "2026-09-04T06:11:57.194Z"
+stopped_at: "Completed 02-05-PLAN.md (BUILD-04: AGENTS.md canonical CI-parity invocation + INFOPLIST_KEY doc-truth note; docs/TESTING.md replace-by-reference)"
+last_updated: "2026-09-04T06:22:59.671Z"
 last_activity: 2026-09-03
 last_activity_desc: Phase 1 complete, transitioned to Phase 2
-state_head: 5a45f7f35ff55bd57dc3ffb3aee2c1399526fc56
+state_head: e3a4b873f86c09c987ab1646909709585168cbf3
 progress:
   total_phases: 4
   completed_phases: 1
   total_plans: 12
-  completed_plans: 9
+  completed_plans: 11
   percent: 25
 ---
 
@@ -30,7 +30,7 @@ See: .planning/PROJECT.md (updated 2026-09-03 at v1.2 start)
 ## Current Position
 
 Phase: 2 (Delete Correctness & Test-Suite Trust) — IN EXECUTION
-Plan: 5 of 6
+Plan: 6 of 6
 Status: Ready to execute
 Last activity: 2026-09-03 — 02-01 DATA-04 truthiness suite complete
 
@@ -75,6 +75,7 @@ Per-plan history for v1.0/v1.1 archived under `.planning/milestones/v1.0-phases/
 | Phase 02 P02 | 9 min | 2 tasks | 2 files |
 | Phase 02 P03 | 6 min | 2 tasks | 4 files |
 | Phase 02 P04 | 40min | 3 tasks | 7 files |
+| Phase 02 P05 | 25min | 2 tasks | 2 files |
 
 ## Accumulated Context
 
@@ -109,6 +110,8 @@ Full log in PROJECT.md Key Decisions. v1.1 per-phase decisions archived with the
 - [Phase 02]: [Phase 2 P03]: Minimal testability seam for a private factory — widen makeStoreKitService to internal static + an arguments parameter instead of extracting a resolver type; the pin asserts through the real factory, never by constructing services directly (Pitfall 4)
 - [Phase 02]: [Phase 2 P04, ENV-01/ENV-02] WINDOWS #8 root cause found: fixture container-lifetime bug (return-context-only fixtures let the owning ModelContainer deallocate before the next SwiftData op), not a CI-host defect — fixed by converting to (ModelContainer, ModelContext) tuple fixtures; both #8-gated suites and CharacterEntitlementSyncTests permanently restored to the default run, GSD_CI/TEST_RUNNER_GSD_CI plumbing removed
 - [Phase 02]: [Phase 2 P04] StoreKitServiceTests/EntitlementForegroundCorrectionTests productNotFound reproduces on TWO local simulators (not CI-runner-specific) — StoreKitTest daemon/session-isolation bug independent of IAP-01 product-ID registration (StoreKitProductCatalogLiveTests confirmed enabled+green, WINDOWS #7 closed); both suites stay dated-dispositioned (WINDOWS #6 open unchanged, #18 new entry), not re-enabled
+- [Phase 2]: [Phase 02] [Phase 2 P05, BUILD-04] AGENTS.md is now the canonical CI-parity xcodebuild test invocation (flag-for-flag mirror of _test.yml's Run Tests step); docs/TESTING.md reduced to a pointer-only cross-reference (locked replace-not-extend decision) — zero divergence risk between what CI runs and what dev docs tell a human to run
+- [Phase 2]: [Phase 02] [Phase 2 P05] INFOPLIST_KEY_* doc-truth note added to AGENTS.md folding in the Phase-1 UIBackgroundModes finding: custom INFOPLIST_KEY_* settings never merge into product plists on this toolchain — the Info.plist file is the source of truth
 
 ### Pending Todos
 
@@ -152,8 +155,8 @@ Earlier v1.0 deferrals (Phase 01/02 verification gaps, `MockStoreKitService` Rel
 
 ## Session Continuity
 
-Last session: 2026-09-04T06:11:30.778Z
-Stopped at: Completed 02-04-PLAN.md (ENV-01/ENV-02: WINDOWS #8 + CharacterEntitlementSyncTests fixed via container-lifetime fix; StoreKitServiceTests/EntitlementForegroundCorrectionTests re-dispositioned)
+Last session: 2026-09-04T06:22:59.490Z
+Stopped at: Completed 02-05-PLAN.md (BUILD-04: AGENTS.md canonical CI-parity invocation + INFOPLIST_KEY doc-truth note; docs/TESTING.md replace-by-reference)
 Resume file: None
 
 ## Operator Next Steps
