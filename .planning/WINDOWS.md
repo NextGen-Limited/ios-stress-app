@@ -1,10 +1,10 @@
 ---
 schema_version: 1
-open_count: 12
-waived_count: 0
+open_count: 11
+waived_count: 1
 fixed_count: 6
 total_count: 18
-last_updated: 2026-09-04T06:07:36.770Z
+last_updated: 2026-09-04T07:12:09.996Z
 ---
 
 # Broken Windows Ledger
@@ -20,7 +20,7 @@ last_updated: 2026-09-04T06:07:36.770Z
 | 3 | 02 | unrun-verify | .planning/phases/02-data-integrity-deletion-consolidation/02-01-PLAN.md |  | Task 4 two-device CloudKit sync verification deferred — needs real devices | open |  | 2026-08-11T05:34:27.039Z |  |
 | 4 | 01 | stub | StressMonitor/StressMonitor/Services/Auth/FirebaseAuthService.swift | 57 | signInWithGoogle() throws not-yet-available; Google Sign-In deferred to Plan 02 (D-02) | open |  | 2026-08-13T09:37:49.691Z |  |
 | 5 | 01 | unrun-verify | StressMonitor/StressMonitor/Services/LLM/StressLLMService.swift |  | End-to-end /chat round-trip unverified: backend deployment down (404 on all endpoints) | open |  | 2026-08-13T09:37:49.786Z |  |
-| 6 | 02 | skipped-test | StressMonitor/StressMonitorTests/EntitlementForegroundCorrectionTests.swift |  | Suite disabled: StoreKitTest purchase throws productNotFound (IAP-01 — no product IDs resolve); re-enable in 02-03 | open |  | 2026-08-16T17:28:36.992Z |  |
+| 6 | 02 | skipped-test | StressMonitor/StressMonitorTests/EntitlementForegroundCorrectionTests.swift |  | Suite disabled: StoreKitTest purchase throws productNotFound (IAP-01 — no product IDs resolve); re-enable in 02-03 | waived | Dated disposition 2026-09-04 (02-04 Task 3): StoreKitTest session-isolation bug — productNotFound reproduces locally on current AND disposable fresh simulator (exit 65 both rounds, isolation-matrix evidence in 02-04-SUMMARY), ruling out CI-runner-specificity; ruled-out causes in file header EntitlementForegroundCorrectionTests.swift:6-27; residual risk: foreground entitlement-correction coverage CI-invisible; authoritative disposition lives in the file header | 2026-08-16T17:28:36.992Z | 2026-09-04T07:12:09.996Z |
 | 7 | 02 | skipped-test | StressMonitor/StressMonitorTests/StoreKitProductCatalogLiveTests.swift |  | Suite disabled: custom INFOPLIST_KEY_STOREKIT_* settings never reach the generated Info.plist so live catalog resolves empty (IAP-01); re-enable in 02-03 | fixed |  | 2026-08-16T17:28:40.914Z | 2026-09-04T06:07:19.983Z |
 | 8 | 02 | deviation | StressMonitor/StressMonitorTests/DataDeletionConsolidationTests.swift |  | Full-suite xcodebuild exit 65 despite 84/84 tests passing: 6 cold-launch host restarts clustered on CloudKit Failure & Cancellation and Data Export Field Selection suites (pre-existing TEST-01 host flakiness) | fixed |  | 2026-08-16T17:28:41.937Z | 2026-09-04T06:07:14.237Z |
 | 9 | 02 | deviation | stress-app-be/src/routes/credits.ts |  | Redeem + premium/verify endpoints and 2 migrations committed but NOT deployed; production apply deferred to 02-04 user_setup with user confirmation | fixed | resolved 2026-08-23: backend deployed + ASC consumables filed + live money-path smoke human-validated (02-VERIFICATION passed); resolution restored 2026-09-04 after accidental stale-mirror reopen | 2026-08-17T02:05:07.102Z | 2026-09-04T05:43:22.407Z |
@@ -103,10 +103,10 @@ last_updated: 2026-09-04T06:07:36.770Z
     "file": "StressMonitor/StressMonitorTests/EntitlementForegroundCorrectionTests.swift",
     "line": null,
     "description": "Suite disabled: StoreKitTest purchase throws productNotFound (IAP-01 — no product IDs resolve); re-enable in 02-03",
-    "status": "open",
-    "reason": "",
+    "status": "waived",
+    "reason": "Dated disposition 2026-09-04 (02-04 Task 3): StoreKitTest session-isolation bug — productNotFound reproduces locally on current AND disposable fresh simulator (exit 65 both rounds, isolation-matrix evidence in 02-04-SUMMARY), ruling out CI-runner-specificity; ruled-out causes in file header EntitlementForegroundCorrectionTests.swift:6-27; residual risk: foreground entitlement-correction coverage CI-invisible; authoritative disposition lives in the file header",
     "recorded_at": "2026-08-16T17:28:36.992Z",
-    "resolved_at": null
+    "resolved_at": "2026-09-04T07:12:09.996Z"
   },
   {
     "id": 7,
