@@ -1,8 +1,8 @@
 # Codebase Concerns
 
-**Analysis Date:** 2026-08-29
+**Analysis Date:** 2026-09-01
 
-<!-- refreshed: 2026-08-29 -->
+<!-- refreshed: 2026-09-01 -->
 
 ## Tech Debt
 
@@ -36,8 +36,8 @@
 - Impact: Any animation/bugfix must be replicated 5 times; each copy is a lint violation.
 - Fix approach: Parameterize one `CharacterView` with a per-character configuration (shapes, palette, animation curves) and delete the clones.
 
-**SwiftLint signal buried under 1.6 GB of vendored SPM checkouts:**
-- Issue: `.swiftlint.yml` sets `included: [StressMonitor]` but the `excluded` list omits `StressMonitor/spm-cache/` — a gitignored 1.6 GB directory (measured on disk) holding full checkouts of firebase-ios-sdk and transitive packages. A raw `swiftlint lint` run last measured ~8,081 total violations, of which ~7,398 came from vendored code; ~683 were first-party. CI runs `swiftlint lint ... || true` (`.github/workflows/_test.yml:55,58`), so nothing blocks regardless.
+**SwiftLint signal buried under 1.3 GB of vendored SPM checkouts:**
+- Issue: `.swiftlint.yml` sets `included: [StressMonitor]` but the `excluded` list omits `StressMonitor/spm-cache/` — a gitignored 1.3 GB directory (measured on disk) holding full checkouts of firebase-ios-sdk and transitive packages. A raw `swiftlint lint` run last measured ~8,081 total violations, of which ~7,398 came from vendored code; ~683 were first-party. CI runs `swiftlint lint ... || true` (`.github/workflows/_test.yml:55,58`), so nothing blocks regardless.
 - Files: `.swiftlint.yml`, `StressMonitor/spm-cache/` (gitignored)
 - Impact: Lint output is effectively unusable without manual filtering; the advisory CI gate hides even error-severity findings; real first-party violations (force_unwrapping, identifier_name, vertical_whitespace_closing_braces, line_length) never get triaged.
 - Fix approach: Add `StressMonitor/spm-cache` to `excluded` in `.swiftlint.yml`, then burn down the real first-party violations (starting with `force_unwrapping`). Only after that, consider removing `|| true` from CI.
@@ -126,7 +126,7 @@
 ## Performance Bottlenecks
 
 **spm-cache inside the working tree:**
-- Problem: `StressMonitor/spm-cache/` holds 1.6 GB (measured) of resolved SPM package checkouts inside the repo directory (gitignored).
+- Problem: `StressMonitor/spm-cache/` holds 1.3 GB (measured) of resolved SPM package checkouts inside the repo directory (gitignored).
 - Files: `StressMonitor/spm-cache/`
 - Cause: Local package cache location choice; slows any naive recursive tooling (grep/find/lint) and inflates local disk usage.
 - Improvement path: Keep it (it is ignored), but exclude it from `.swiftlint.yml` and from any glob-based tooling; skip it during exploration.
@@ -184,7 +184,7 @@
 ## Dependencies at Risk
 
 **SPM dependency set is minimal and current (firebase-ios-sdk for Auth, GoogleSignIn-iOS):**
-- Risk: Low. The umbrella firebase package pulls a large transitive graph (1.6 GB spm-cache) but only Auth-adjacent pieces are linked per pbxproj.
+- Risk: Low. The umbrella firebase package pulls a large transitive graph (1.3 GB spm-cache) but only Auth-adjacent pieces are linked per pbxproj.
 - Impact: Build times; spm-cache disk usage.
 - Migration plan: None required. If slimming is desired, switch to granular `FirebaseAuth` product-only dependency.
 
@@ -228,11 +228,11 @@
 - Risk: Release-only integration breakage in the money path.
 - Priority: Medium.
 
-**Auth error taxonomy + Firebase bootstrap (compiled and passing as of 2026-08-29):**
+**Auth error taxonomy + Firebase bootstrap:**
 - What's covered: `FirebaseBootstrapTests.swift`, `AuthServiceErrorTests.swift` (passing after the `6227803` target-membership fix).
 - Risk: Adding future test files without pbxproj entries repeats the silent-inert-test failure mode (see Tech Debt) — the synchronized-group decoy in the navigator makes this easier to miss, not harder.
 - Priority: Low.
 
 ---
 
-*Concerns audit: 2026-08-29*
+*Concerns audit: 2026-09-01*

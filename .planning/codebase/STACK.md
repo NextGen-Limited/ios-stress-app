@@ -1,129 +1,103 @@
 # Technology Stack
 
-**Analysis Date:** 2026-08-29
+**Analysis Date:** 2026-09-01
 
 ## Languages
 
 **Primary:**
-- Swift 5 (`SWIFT_VERSION = 5.0` in `StressMonitor/StressMonitor.xcodeproj/project.pbxproj`) — all app/watch/widget/test targets. UI is pure SwiftUI; concurrency is modern async/await. No third-party UI libraries remain (exyte/Chat, Kingfisher, Giphy, SwiftUICharts, MediaPicker were all removed with the v1.1 backend migration).
+- Swift 5 language mode - iOS app code in `StressMonitor/StressMonitor/`, watchOS code in `StressMonitor/StressMonitorWatch Watch App/`, widget code in `StressMonitor/StressMonitorWidget/`, and XCTest suites in `StressMonitor/StressMonitorTests/`; the project setting is `SWIFT_VERSION = 5.0` in `StressMonitor/StressMonitor.xcodeproj/project.pbxproj`.
 
 **Secondary:**
-- Ruby — fastlane lanes (`fastlane/Fastfile`, `Gemfile`: `fastlane ~> 2.236`, `xcpretty ~> 0.4`, `Gemfile.lock` committed)
-- Python 3 — dev tooling: `scripts/run-tests.py` (simulator discovery + xcodebuild test runner, writes `StressMonitor/build/`), `scripts/generate_app_icons.py`
-- Bash — Xcode Cloud hooks `ci_scripts/ci_post_clone.sh`, `ci_scripts/ci_post_xcodebuild.sh`
-- YAML — GitHub Actions workflows (`.github/workflows/*.yml`), SwiftLint config (`.swiftlint.yml`), SPM cache config (`StressMonitor/spm-cache.yml`)
-- JavaScript/Markdown — VitePress docs site (`docs-site/package.json`, name `stressmonitor-docs`)
+- Ruby - Fastlane delivery automation in `fastlane/Fastfile`, `fastlane/Appfile`, and `fastlane/Matchfile`; dependencies are declared in `Gemfile`.
+- Python 3 - local simulator discovery and test orchestration in `scripts/run-tests.py`.
+- JavaScript/JSON/Markdown - VitePress documentation site configuration and content under `docs-site/`; `docs-site/package.json` declares an ES module package.
+- YAML - GitHub Actions CI/CD under `.github/workflows/`.
 
 ## Runtime
 
 **Environment:**
-- iOS 18.6 deployment target for app/test targets; project-level configs carry `IPHONEOS_DEPLOYMENT_TARGET = 26.1` (per-target overrides land at 18.6)
-- watchOS 11.6 for the watch target
-- CI: Xcode 26.3 on `macos-15` runner (`.github/workflows/_test.yml` `XCODE_VERSION` env); test destination `platform=iOS Simulator,name=iPhone 16,OS=latest`
-- Local testing note: the `StressMonitor` scheme embeds the watch app, so `xcodebuild test` requires the watchOS simulator runtime to be installed (`xcodebuild -downloadPlatform watchOS`) — a fresh Xcode install refuses the scheme without it
-- `TARGETED_DEVICE_FAMILY = "1,2"` — iPhone + iPad; watch target device family 4
+- Xcode 26.3 on macOS 15 is the CI toolchain declared in `.github/workflows/_test.yml` and `.github/workflows/deploy.yml`.
+- iOS Simulator/device for `StressMonitor/StressMonitor/`; the principal app and test targets use iOS 18.6, while project-level settings include iOS 26.1 entries in `StressMonitor/StressMonitor.xcodeproj/project.pbxproj`.
+- watchOS Simulator/device for `StressMonitor/StressMonitorWatch Watch App/`; deployment target is watchOS 11.6 in `StressMonitor/StressMonitor.xcodeproj/project.pbxproj`.
+- WidgetKit extension runtime for `StressMonitor/StressMonitorWidget/`, embedded in the iOS app.
+- Node.js runtime for the documentation-only VitePress site under `docs-site/`; no Node version is pinned in the repository.
+- Ruby 3.3 in CI for Fastlane/Bundler, configured in `.github/workflows/_test.yml`.
 
 **Package Manager:**
-- Swift Package Manager (Xcode-native, 2 package references in the pbxproj)
-  - Lockfile: `StressMonitor/StressMonitor.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved` (present, `version: 3`)
-  - Local revision-pinned mirror: `StressMonitor/spm-cache/` — `spm-cache.yml` (config; `default_sdk: iphonesimulator`), `spm-cache.lock` (mirror of resolved pins), `packages/umbrella/Package.swift` (`// swift-tools-version: 6.0`, pins every dep by exact revision), `packages/proxy/`, `packages/clones/`
-- Bundler for Ruby gems — `Gemfile.lock` committed at repo root
-- No CocoaPods (`excluded: - Pods` in `.swiftlint.yml` is vestigial), no Carthage
-
-## Targets
-
-Defined in `StressMonitor/StressMonitor.xcodeproj/project.pbxproj` (4 native targets):
-
-| Target | Bundle ID | Source root |
-|---|---|---|
-| `StressMonitor` (iOS app) | `stress.ai.com` | `StressMonitor/StressMonitor/` |
-| `StressMonitorTests` | `stress.ai.com.StressMonitorTests` | `StressMonitor/StressMonitorTests/` |
-| `StressMonitorWatch Watch App` | `stress.ai.com.watchkitapp` | `StressMonitor/StressMonitorWatch Watch App/` (path contains spaces) |
-| `StressMonitorWidgetExtension` | `stress.ai.com.widget` | `StressMonitor/StressMonitorWidget/` |
-
-- SPM products `FirebaseAuth`, `FirebaseCore`, `GoogleSignIn` are linked to the **iOS app target only** (`packageProductDependencies` on `StressMonitor`); watch/widget targets carry no external packages
-- Shared Xcode schemes: `StressMonitor`, `"StressMonitorWatch Watch App"` (`StressMonitor/StressMonitor.xcodeproj/xcshareddata/xcschemes/`). The widget has no shared scheme file — CI builds it via its auto-created scheme (`-scheme StressMonitorWidgetExtension` in `_test.yml`)
-- Signing: team `K2TYLYAWMK` at project level for `iphoneos*`/`watchos*` SDKs; project Debug config carries `DEVELOPMENT_TEAM = EQ8B89SPCX`; `CODE_SIGN_IDENTITY` "Apple Development" with per-SDK Distribution overrides. CI builds with `CODE_SIGN_IDENTITY="" CODE_SIGNING_REQUIRED=NO`; releases sign via Match
-- Privacy manifests present in all three app targets: `StressMonitor/StressMonitor/PrivacyInfo.xcprivacy`, `StressMonitor/StressMonitorWatch Watch App/PrivacyInfo.xcprivacy`, `StressMonitor/StressMonitorWidget/PrivacyInfo.xcprivacy`
-
-**Orphaned code — NOT in the Xcode project, edits never build:** repo-root `StressMonitorTests/` (5 legacy suites), `StressMonitor/Models/`, `StressMonitor/Services/`, `StressMonitor/Views/`, plus `StressMonitor/AGENTS.md`. Real code lives under `StressMonitor/StressMonitor/` etc.
+- Swift Package Manager via Xcode - direct application dependencies are Firebase iOS SDK 11.15.0 and GoogleSignIn-iOS 9.2.0; resolved transitive versions are locked in `StressMonitor/StressMonitor.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved`.
+- Bundler - Fastlane `~> 2.236` and xcpretty `~> 0.4` are declared in `Gemfile`; `Gemfile.lock` is present.
+- npm - VitePress `^1.6.3` is declared in `docs-site/package.json`; lockfile is `docs-site/package-lock.json`.
 
 ## Frameworks
 
-**Core (Apple, first-party — no import cost):**
-- SwiftUI + `@Observable` MVVM — `StressMonitor/StressMonitor/StressMonitorApp.swift`, `ViewModels/`, `Views/`
-- SwiftData — persistence via `ModelContainer` with 3-stage crash recovery (delete incompatible store → local-only container → in-memory last resort) (`StressMonitorApp.swift:92-141`), `@Model` entities in `StressMonitor/StressMonitor/Models/`
-- HealthKit — read-only stress inputs, `StressMonitor/StressMonitor/Services/HealthKit/HealthKitManager.swift` (+`ActivityFetch`/`RecoveryFetch`/`SleepFetch` extensions)
-- CloudKit — sync, `StressMonitor/StressMonitor/Services/CloudKit/` (`CloudKitManager.swift`, `CloudKitSyncEngine.swift`, `CloudKitSchema.swift`)
-- WidgetKit + AppIntents + ActivityKit — `StressMonitor/StressMonitorWidget/` (timeline widgets, control, Live Activity)
-- StoreKit 2 — subscriptions/credit packs with server-side JWS verification, `StressMonitor/StressMonitor/Services/StoreKit/`
-- WatchConnectivity — phone↔watch, `StressMonitor/StressMonitor/Services/Connectivity/PhoneConnectivityManager.swift`, `StressMonitor/StressMonitorWatch Watch App/Services/WatchConnectivityManager.swift`
-- UserNotifications — local notifications only, `StressMonitor/StressMonitor/Services/Background/NotificationManager.swift`
-- URLSession — plain `URLSession`/`URLSession.AsyncBytes` for REST + SSE streaming (no Alamofire); `os.Logger` for logging
-
-**External (SPM):**
-- `firebase-ios-sdk` (constraint >= 11.0.0, **resolved 11.15.0**) — products `FirebaseAuth`, `FirebaseCore`. Auth only; no Firestore/Analytics/Crashlytics products linked
-- `GoogleSignIn-iOS` (constraint >= 9.0.0, **resolved 9.2.0**) — product `GoogleSignIn`
-- Transitive resolved deps (from `Package.resolved`): `app-check` 11.3.1, `appauth-ios` 2.1.0, `gtmappauth` 5.0.0, `gtm-session-fetcher` 3.5.0, `google-utilities` 8.1.2, `googleappmeasurement` 11.15.0, `googledatatransport` 10.1.1, `google-ads-on-device-conversion-ios-sdk` 2.3.0, `interop-ios-for-google-sdks` 101.0.0, `grpc-binary` 1.69.1, `abseil-cpp-binary`, `leveldb` 1.22.5, `nanopb`, `promises` 2.4.1, `swift-protobuf` 1.38.1
+**Core:**
+- SwiftUI - declarative UI and application entry points, including `StressMonitor/StressMonitor/StressMonitorApp.swift`, `StressMonitor/StressMonitorWatch Watch App/StressMonitorWatchApp.swift`, and widget views under `StressMonitor/StressMonitorWidget/Views/`.
+- Observation - `@Observable` state models and view models, for example `StressMonitor/StressMonitor/ViewModels/StressViewModel.swift` and `StressMonitor/StressMonitor/Services/CloudKit/CloudKitManager.swift`.
+- SwiftData - local persistence and model queries; the production `ModelContainer` is assembled in `StressMonitor/StressMonitor/StressMonitorApp.swift` and accessed through `StressMonitor/StressMonitor/Services/Repository/StressRepository.swift`.
+- HealthKit - read-side health inputs for HRV, heart rate, sleep, activity, and recovery under `StressMonitor/StressMonitor/Services/HealthKit/`; the watch target has its own integration in `StressMonitor/StressMonitorWatch Watch App/Services/WatchHealthKitManager.swift`.
+- CloudKit - private iCloud record synchronization in `StressMonitor/StressMonitor/Services/CloudKit/` and duplicated watch persistence in `StressMonitor/StressMonitorWatch Watch App/Services/CloudKit/`.
+- StoreKit 2 - subscriptions and consumable credit packs in `StressMonitor/StressMonitor/Services/StoreKit/`.
+- WidgetKit/AppIntents - home/lock-screen widgets and watch complications under `StressMonitor/StressMonitorWidget/` and `StressMonitor/StressMonitorWatch Watch App/Complications/`.
+- WatchConnectivity - phone/watch transfer in `StressMonitor/StressMonitor/Services/Connectivity/PhoneConnectivityManager.swift` and `StressMonitor/StressMonitorWatch Watch App/Services/WatchConnectivityManager.swift`.
 
 **Testing:**
-- XCTest — `StressMonitor/StressMonitorTests/` (35 `*Tests.swift` suites + `StoreKitTestSessionProvider.swift` helper + `StressMonitorProducts.storekit` fixture)
-- URLProtocol-mocked HTTP tests — `StressAPIClientTests`, `StressAPIClient+{Credits,Preferences,QuickActions,Sessions}Tests`, `StressAPIConfigTests`
-- StoreKit testing — `StressMonitor/StressMonitorTests/StressMonitorProducts.storekit` via `StoreKitTestSessionProvider.swift` (one shared `SKTestSession` per process; constructing a second session detaches the daemon)
-- Mock services — `StressMonitor/StressMonitor/Services/MockServices.swift`, `Services/StoreKit/MockStoreKitService.swift`
-- CI gating: `TEST_RUNNER_GSD_CI=1` in `_test.yml` disables the 2 host-restart-sensitive tests in `DataDeletionConsolidationTests.swift:238,375` (`.enabled(if: ProcessInfo...["GSD_CI"] == nil)`)
-- Known run state (orchestrator verification 2026-08-29): 244 tests → 223 pass, 6 pre-existing failures (WINDOWS.md #8 lineage), 15 skips (`CharacterEntitlementSyncTests` + StoreKit-config-dependent suites)
-- Demo mode launch arg `-demo-mode` cycles stress levels through the real pipeline (HealthKit has no simulator data)
+- XCTest - unit and integration-style tests under the real test target `StressMonitor/StressMonitorTests/`; StoreKit tests use `StressMonitor/StressMonitorTests/StressMonitorProducts.storekit`.
+- URLProtocol-based networking doubles and protocol-based service injection are used to test `StressMonitor/StressMonitor/Services/API/` and auth/store services.
+- The repo-root `StressMonitorTests/` directory is orphaned and is not part of `StressMonitor/StressMonitor.xcodeproj`; do not add tests there.
 
 **Build/Dev:**
-- `xcodebuild` (all commands run from repo root with `-project StressMonitor/StressMonitor.xcodeproj`)
-- fastlane — lanes `build_only`, `build_widget`, `dump_capabilities`, `setup_match`, `upload_beta`, `distribute_beta`, `release`, `increment_build` (`fastlane/Fastfile`)
-- SwiftLint — `.swiftlint.yml` at repo root; `included: StressMonitor/`; opt-in `force_unwrapping` + `implicitly_unwrapped_optional`; line_length warn 150 / error 250. CI runs it advisory (`|| true`)
-- `scripts/run-tests.py` — finds/boots simulator, writes results to `StressMonitor/build/`
+- Xcode/xcodebuild - builds the `StressMonitor`, `StressMonitorWatch Watch App`, and `StressMonitorWidgetExtension` targets from `StressMonitor/StressMonitor.xcodeproj`.
+- SwiftLint - style and safety checking configured in `.swiftlint.yml`; CI invokes it advisory-only in `.github/workflows/_test.yml`.
+- Fastlane 2.236.x - signing, archiving, TestFlight upload/distribution, and App Store metadata in `fastlane/Fastfile`.
+- xcpretty 0.4.x - xcodebuild output formatting in `Gemfile` and `.github/workflows/_test.yml`.
+- VitePress 1.6.3 - product documentation site in `docs-site/`, deployed with configuration in `docs-site/vercel.json`.
 
 ## Key Dependencies
 
 **Critical:**
-- `FirebaseAuth` — sole auth provider; ID tokens are the Bearer credential for every backend call (`StressMonitor/StressMonitor/Services/Auth/FirebaseAuthService.swift`, protocol `AuthServiceProtocol` in the same file)
-- `GoogleSignIn` — Google sign-in credential source, linked to anonymous Firebase accounts (`FirebaseAuthService.swift`); UIKit presenter bridged from `StressMonitor/StressMonitor/Views/Settings/SettingsView.swift:436-450`
-- Standalone StressMonitor backend (`https://stress-api.dropitx.site`) — chat/LLM streaming, credits, sessions, preferences, quick actions; see INTEGRATIONS.md
+- FirebaseCore 11.15.0 - application Firebase bootstrap in `StressMonitor/StressMonitor/Services/Firebase/FirebaseBootstrap.swift`.
+- FirebaseAuth 11.15.0 - anonymous identity, Google credential exchange, and backend ID tokens in `StressMonitor/StressMonitor/Services/Auth/FirebaseAuthService.swift`.
+- GoogleSignIn 9.2.0 - interactive Google authentication bridged into Firebase Auth in `StressMonitor/StressMonitor/Services/Auth/FirebaseAuthService.swift`.
+- Foundation URLSession - JSON REST and server-sent event transport in `StressMonitor/StressMonitor/Services/API/StressAPIClient.swift` and parsing in `StressMonitor/StressMonitor/Services/LLM/SSEParser.swift`.
 
 **Infrastructure:**
-- CloudKit (private DB, container `iCloud.stress.ai.com`) — cross-device sync
-- App Group `group.stress.ai.com` — widget↔app data sharing via `UserDefaults(suiteName:)` (`StressMonitor/StressMonitor/Models/WidgetSharedData.swift`)
-- fastlane + Match + App Store Connect API — CI/CD
+- Apple Security framework - legacy/local Keychain operations in `StressMonitor/StressMonitor/Services/KeychainService.swift`.
+- BackgroundTasks and UserNotifications - background refresh scheduling and notifications in `StressMonitor/StressMonitor/Services/Background/`.
+- CoreMotion - walking activity measurement in `StressMonitor/StressMonitor/Views/MiniWalk/MiniWalkViewModel.swift`.
+- os/OSLog - structured logs and launch/calculation signposts in `StressMonitor/StressMonitor/StressMonitorApp.swift`, `StressMonitor/StressMonitor/ViewModels/StressViewModel.swift`, and `StressMonitor/StressMonitor/Services/Firebase/FirebaseBootstrap.swift`.
 
 ## Configuration
 
 **Environment:**
-- Backend base URL resolves 3-tier: Info.plist `STRESS_API_BASE_URL` → process env → `UserDefaults` key `stressAPIBaseURL` → fallback `https://stress-api.dropitx.site` (`StressMonitor/StressMonitor/Services/API/StressAPIConfig.swift`). Note: no `STRESS_API_BASE_URL` key is currently set in `StressMonitor/StressMonitor/Info.plist` or the pbxproj — the shipped binary always uses the fallback unless the env/UserDefaults tier is set (testable via `StressAPIConfig.resolveBaseURL(...)`)
-- App `Info.plist` (`StressMonitor/StressMonitor/Info.plist`) carries: Google URL scheme (`com.googleusercontent.apps.595426793312-...`) and 6 StoreKit keys (`STOREKIT_PREMIUM_{WEEKLY,MONTHLY,ANNUAL}_PRODUCT_ID`, `STOREKIT_PREMIUM_SUBSCRIPTION_GROUP_ID = SMPREMIUM01`, `STOREKIT_CREDITS_{SMALL,LARGE}_PRODUCT_ID`) — consumed by `StressMonitor/StressMonitor/Services/StoreKit/StoreKitProductCatalog.swift`
-- `GoogleService-Info.plist` (Firebase project `stress-io`) is **gitignored** (`.gitignore:174`), expected at `StressMonitor/StressMonitor/GoogleService-Info.plist`. `StressMonitor/StressMonitor/Services/Firebase/FirebaseBootstrap.swift` degrades to `.missingConfiguration` (os.Logger `.fault`, never a trap) when absent — a fresh checkout builds and launches, but auth/chat/credits/IAP-grant are inert. CI provisioning (`GOOGLE_SERVICE_INFO_PLIST_BASE64` secret + `ci_scripts/provision_firebase_config.sh`) is planned but **not yet implemented** — CI-produced builds ship without it (`.planning/quick/260829-kby-*`)
-- Most Info.plist entries are generated via `INFOPLIST_KEY_*` in the pbxproj (`GENERATE_INFOPLIST_FILE = YES`), incl. HealthKit/camera usage strings, `UIBackgroundModes = "fetch processing"`, watch companion bundle ID
-- Entitlements (`StressMonitor/StressMonitor/StressMonitor.entitlements`, watch + widget equivalents): HealthKit, CloudKit (`iCloud.stress.ai.com`), App Group (`group.stress.ai.com`) — widget entitlements file carries only the app group
-- No `.env` files; secrets live in GitHub Actions secrets and locally in `~/.appstoreconnect/`
+- Backend URL precedence is Info.plist `STRESS_API_BASE_URL`, process environment `STRESS_API_BASE_URL`, UserDefaults `stressAPIBaseURL`, then `https://stress-api.dropitx.site`; preserve this resolution order in `StressMonitor/StressMonitor/Services/API/StressAPIConfig.swift`.
+- Firebase client configuration is supplied by the committed `StressMonitor/StressMonitor/GoogleService-Info.plist`; note its presence but do not copy credential-like values into documentation or source.
+- StoreKit product identifiers and subscription group are generated Info.plist keys in `StressMonitor/StressMonitor.xcodeproj/project.pbxproj` and consumed through `StressMonitor/StressMonitor/Services/StoreKit/StoreKitProductCatalog.swift`.
+- App Store Connect, Match, Slack, and identifier overrides are provided as CI environment variables to lanes in `fastlane/Fastfile` and `.github/workflows/deploy.yml`.
+- App, watch, and widget share App Group `group.stress.ai.com`; app and watch use CloudKit container `iCloud.stress.ai.com`, declared in their `.entitlements` files.
 
 **Build:**
-- `StressMonitor/StressMonitor.xcodeproj/project.pbxproj` — single project, 4 targets, SPM packages attached per-target; `ENABLE_USER_SCRIPT_SANDBOXING = YES`; `MARKETING_VERSION = 1.0.0`, `CURRENT_PROJECT_VERSION = 1`
-- `.swiftlint.yml` — lint rules (repo root)
-- `fastlane/Fastfile`, `fastlane/Matchfile`, `Gemfile` — release automation
-- `.github/workflows/` — `ci.yml` (pull_request → main/develop + manual; calls `_test.yml`), `deploy.yml` (`workflow_run` on CI completion for main/release/*), `distribute.yml`, `release.yml`, `match.yml`, `droid-wiki-refresh.yml`
-- SPM caching: `StressMonitor/spm-cache.yml` + `spm-cache.lock` + `StressMonitor/spm-cache/packages/` local mirror; GitHub Actions caches DerivedData + SPM checkouts keyed on pbxproj/`Package.resolved` hashes
+- Xcode project: `StressMonitor/StressMonitor.xcodeproj/project.pbxproj`.
+- Swift package lock: `StressMonitor/StressMonitor.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/Package.resolved`.
+- Lint: `.swiftlint.yml`.
+- StoreKit test catalog: `StressMonitor/StressMonitorTests/StressMonitorProducts.storekit`.
+- CI/release: `.github/workflows/_test.yml`, `.github/workflows/ci.yml`, `.github/workflows/deploy.yml`, `.github/workflows/distribute.yml`, and `.github/workflows/release.yml`.
+- Delivery: `Gemfile` and `fastlane/Fastfile`.
+- Documentation build: `docs-site/package.json` and `docs-site/vercel.json`.
 
 ## Platform Requirements
 
 **Development:**
-- macOS with Xcode 26.x (CI pins 26.3), iOS 26.3 + watchOS 26.2 simulator runtimes (watchOS runtime required to run the app scheme's tests)
-- Ruby 3.3 + Bundler for fastlane
-- SwiftLint installed (`brew install swiftlint` if missing)
-- `StressMonitor/StressMonitor/GoogleService-Info.plist` restored locally (gitignored) for Firebase-backed features and `FirebaseBootstrapTests`
-- No HealthKit data on simulator — use `-demo-mode` launch argument
+- Use Xcode 26.3 for CI parity and run commands from the repository root with `-project StressMonitor/StressMonitor.xcodeproj`.
+- Use an iOS simulator compatible with deployment target 18.6; CI tests an iPhone 16 with latest installed iOS and disables parallel testing in `.github/workflows/_test.yml`.
+- Use a watchOS 11.6-or-newer runtime to build the shared `StressMonitorWatch Watch App` scheme.
+- HealthKit supplies no real simulator data; use the `-demo-mode` launch argument to exercise the actual stress pipeline.
+- Use Ruby 3.3 and Bundler for release lanes, Node/npm for `docs-site/`, and Python 3 for `scripts/run-tests.py`.
 
 **Production:**
-- App Store / TestFlight distribution via fastlane `upload_beta`
-- Apple signing team `K2TYLYAWMK`, certs via Match (`MATCH_GIT_URL` + `MATCH_PASSWORD`); CI syncs Match readonly
-- Firebase project `stress-io` (Auth enabled); backend at `stress-api.dropitx.site`
+- App Store bundles are `stress.ai.com`, `stress.ai.com.watchkitapp`, and `stress.ai.com.widget`, configured in `StressMonitor/StressMonitor.xcodeproj/project.pbxproj`.
+- Release archives include the iOS app, watch app, and widget extension and are signed through Match/App Store profiles in `fastlane/Fastfile`.
+- TestFlight and App Store Connect are the mobile distribution targets; Vercel hosts the static documentation site configured by `docs-site/vercel.json`.
 
 ---
 
-*Stack analysis: 2026-08-29*
+*Stack analysis: 2026-09-01*

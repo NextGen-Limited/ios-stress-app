@@ -138,7 +138,7 @@ last_updated: 2026-09-04T05:44:33.254Z
     "line": null,
     "description": "Redeem + premium/verify endpoints and 2 migrations committed but NOT deployed; production apply deferred to 02-04 user_setup with user confirmation",
     "status": "fixed",
-    "reason": "",
+    "reason": "resolved 2026-08-23: backend deployed + ASC consumables filed + live money-path smoke human-validated (02-VERIFICATION passed); resolution restored 2026-09-04 after accidental stale-mirror reopen",
     "recorded_at": "2026-08-17T02:05:07.102Z",
     "resolved_at": "2026-09-04T05:43:22.407Z"
   },
@@ -150,7 +150,7 @@ last_updated: 2026-09-04T05:44:33.254Z
     "line": null,
     "description": "Real-Apple success path of verifyAndDecodeTransaction untestable without an Apple-signed JWS fixture; covered only via route-seam fakes and rejection-path tests until live sandbox UAT in 02-04",
     "status": "fixed",
-    "reason": "",
+    "reason": "live sandbox refund UAT (CR-05 demotion + WR-10 one-pass clear) human-validated 2026-08-23; resolution restored 2026-09-04 after accidental stale-mirror reopen",
     "recorded_at": "2026-08-17T02:05:07.194Z",
     "resolved_at": "2026-09-04T05:44:33.032Z"
   },
@@ -162,7 +162,7 @@ last_updated: 2026-09-04T05:44:33.254Z
     "line": null,
     "description": "02-04 Task 3 live money-path smoke (provision->402->sandbox purchase->server grant->persisted balance) blocked on backend deploy + ASC consumable filing; see 02-04-SUMMARY Deferred Issues",
     "status": "fixed",
-    "reason": "",
+    "reason": "unblocked by the deployed backend + filed ASC products; 02-VERIFICATION passed 29/29 2026-08-23; resolution restored 2026-09-04 after accidental stale-mirror reopen",
     "recorded_at": "2026-08-17T04:32:14.498Z",
     "resolved_at": "2026-09-04T05:44:33.254Z"
   },
