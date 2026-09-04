@@ -39,7 +39,7 @@ The console (or second-device) check must query **every** record type the schema
 | Device model (Surface A, initiator) | PENDING |
 | iOS build (Surface A) | PENDING |
 | App build / commit hash installed | PENDING — record the commit this evidence run was taken against |
-| iCloud account context | PENDING — team account, container `iCloud.stress.ai.com` (do not record the account email/username — see §5 privacy note) |
+| iCloud account context | PENDING — team account, container `iCloud.stress.ai.com` (do NOT record the account email/username — redaction rule in §3 step 7) |
 | Surface B used | PENDING — "CloudKit Console" or "second physical iPhone" (state which; console is the locked fallback if no second device is available) |
 | How Surface B was reached | PENDING — e.g. `https://icloud.developer.apple.com` → CloudKit Database → container `iCloud.stress.ai.com` → Data → Private Database |
 
@@ -53,12 +53,12 @@ Eventual consistency means a single immediate check after the on-device delete i
 4. **Poll round 1 — immediate:** within ~30 seconds of the trigger, query every enumerated record type on Surface B. Record each type's row count and the query timestamp. Expect **non-empty** here — this round exists to prove propagation lag is real, not to pass.
 5. **Poll round 2..N — until stable-empty:** repeat the per-type query at a fixed interval (recommend every 60 seconds) until **two consecutive rounds both show zero rows for every type**. Record every round's timestamp + per-type count in the table (§4). "Stable-empty" means two-in-a-row, not one lucky zero.
 6. **Compute and record the observed propagation delay:** (timestamp of the first all-zero round) − (trigger timestamp from step 3). This is the honest, measured number — not an assumed SLA.
-7. **Screenshot each poll round** on Surface B (or narrate the CLI/console query result if screenshots aren't practical for every round — at minimum, screenshot the trigger-adjacent round and the first stable-empty round).
+7. **Screenshot each poll round** on Surface B (or narrate the CLI/console query result if screenshots aren't practical for every round — at minimum, screenshot the trigger-adjacent round and the first stable-empty round). **Redaction rule (mandatory):** crop/redact the signed-in account email, personal name, and account-page chrome from every screenshot before it enters this note — capture the record-type query result area only. Screenshots are committed to the repo and cannot be retroactively redacted in place (audit finding T-02-12).
 8. **Second-round confirmation:** the round immediately after first-stable-empty must also read zero for every type (idempotent observation) — this is round N above, already covered by the "two consecutive" rule in step 5.
 
 ## 4. Screenshots / query-round table (to be filled in by the human executor)
 
-| Round | Timestamp | Query target | Row count per type | Screenshot / evidence file |
+| Round | Timestamp | Query target | Row count per type | Screenshot / evidence file (redacted per §3 step 7) |
 |-------|-----------|---------------|---------------------|------------------------------|
 | Pre-delete baseline | PENDING | all enumerated types | PENDING (expect > 0) | PENDING |
 | Trigger | PENDING | — (delete initiated on Surface A) | — | PENDING |
