@@ -3,18 +3,27 @@ import StoreKitTest
 import Testing
 @testable import StressMonitor
 
-// DISABLED: hasIntroductoryOffer reads false and purchase/restore/cancel/
-// expiry all throw productNotFound after the first test in this suite,
-// on the macos-15 CI runner (Xcode 26.3 / iOS 26.2 simulator), regardless
-// of StoreKitTest session-reset strategy. Tried: clearTransactions(),
-// resetToDefaultState(), a settle delay, and routing through a single
-// process-wide shared session — none resolved it. Needs a working local
-// simulator to diagnose further (this dev host's CoreSimulator/
-// XCTestDevices layer is broken — see WINDOWS.md item #3). Tracked
-// as a known gap; StoreKitService's production code path is exercised
-// by PremiumViewModelTests (against FakeStoreKitService) and manual
-// .storekit verification in the app's own LaunchAction scheme config.
-@Suite(.serialized, .disabled("StoreKitTest session-isolation bug on CI — see file header"))
+// DISPOSITION 2026-09-04 (02-04 Task 3, isolation-matrix confirmation):
+// hasIntroductoryOffer reads false and purchase/restore/cancel/expiry all
+// throw productNotFound after the first test in this suite. Failure
+// signature: exit 65, 9-10 issues, every failure is `Caught error:
+// productNotFound` at the purchase/restore call site (not a #expect
+// mismatch). Ruled out this session: CI-runner specificity — the suite was
+// re-enabled and run targeted with GSD_CI unset on TWO local simulators
+// (current iPhone 17 5DD825B4-…, and a disposable fresh iPhone 16) and
+// failed identically both times (exit 65, same 9 productNotFound issues),
+// so this is not a macos-15-CI-only defect. Previously ruled out (original
+// bisection): clearTransactions(), resetToDefaultState(), a settle delay,
+// and routing through a single process-wide shared session (Store
+// KitTestSessionProvider) — none resolved it. Residual risk: StoreKitService's
+// real purchase/restore/cancel/expiry paths have no automated coverage;
+// production path is exercised only indirectly via PremiumViewModelTests
+// (FakeStoreKitService mock) and manual .storekit verification in the app's
+// own LaunchAction scheme config. Needs a working local CoreSimulator/
+// XCTestDevices layer to diagnose the StoreKitTest daemon interaction
+// further (this dev host's instability is tracked at WINDOWS.md item #3).
+// Tracked as WINDOWS.md ledger entry (created this session — see 02-04-SUMMARY.md).
+@Suite(.serialized, .disabled("StoreKitTest session-isolation bug — reproduces locally, see file header (2026-09-04 disposition)"))
 @MainActor
 struct StoreKitServiceTests {
 

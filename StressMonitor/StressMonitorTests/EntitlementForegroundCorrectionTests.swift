@@ -3,13 +3,28 @@ import StoreKitTest
 import Testing
 @testable import StressMonitor
 
-// DISABLED: purchase(annual) throws productNotFound — the same StoreKitTest
-// session-isolation failure documented in StoreKitServiceTests.swift's header
-// (product IDs resolve in no build configuration today; see IAP-01). The
-// refund → refreshEntitlements → stale-premium-correction path this suite
-// pins is re-enabled alongside the StoreKit configuration work in phase 02
-// plan 02-03, which makes product IDs resolvable.
-@Suite(.serialized, .disabled("StoreKitTest cannot resolve subscription products — see file header and IAP-01"))
+// DISPOSITION 2026-09-04 (ENV-lineage / WINDOWS #6, 02-04 Task 3 isolation-
+// matrix confirmation): purchase(annual) throws productNotFound — the same
+// StoreKitTest session-isolation failure documented in
+// StoreKitServiceTests.swift's header. Failure signature: exit 65, 1 issue,
+// `Caught error: productNotFound` at the purchase(annual) call site (not a
+// #expect mismatch). Ruled out this session: CI-runner specificity — the
+// suite was re-enabled and run targeted with GSD_CI unset on TWO local
+// simulators (current iPhone 17 5DD825B4-…, and a disposable fresh iPhone
+// 16) and failed identically both times, so this reproduces locally, not
+// only on the macos-15 CI runner. Previously ruled out (per the IAP-01
+// investigation this suite's original comment cited): product-ID
+// registration was fixed in phase 02 plan 02-03 (StoreKitProductCatalogLiveTests
+// now resolves live catalog IDs, verified green this session — see
+// 02-04-SUMMARY.md), so the residual cause is the same StoreKitTest
+// daemon/session-isolation issue as StoreKitServiceTests, not unresolved
+// product IDs. Residual risk: the refund → refreshEntitlements →
+// stale-premium-correction path this suite pins has no automated coverage;
+// needs a working local CoreSimulator/XCTestDevices layer to diagnose
+// further (WINDOWS.md item #3). WINDOWS.md #6 stays open with this updated
+// disposition (ledger CLI has no update-description verb — the file header
+// is the authoritative bar-meeting record; see 02-04-SUMMARY.md).
+@Suite(.serialized, .disabled("StoreKitTest session-isolation bug — reproduces locally, see file header (2026-09-04 disposition)"))
 @MainActor
 struct EntitlementForegroundCorrectionTests {
 
