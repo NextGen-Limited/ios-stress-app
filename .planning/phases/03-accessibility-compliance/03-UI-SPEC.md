@@ -282,9 +282,11 @@ shapes below are the complete set of new strings:
 
 ## UI Considerations
 
-Applicable state considerations resolved: 6 covered, 2 backstop, 2 unresolved — the phase's
-five requirements are themselves state guarantees (zero-truncation at AX5, motion-free under
-Reduce Motion), so several rows below fold into the interaction contracts.
+Applicable state considerations resolved: 6 covered, 4 backstop, 2 unresolved, 2 dismissed —
+the phase's five requirements are themselves state guarantees (zero-truncation at AX5,
+motion-free under Reduce Motion), so several rows below fold into the interaction contracts.
+Rows marked 🧪 probe were added by the ui-consideration probe (2026-09-05) as a recall
+check over the 14-surface sweep manifest.
 
 | Category | Element(s) | Status | Resolution / Reason |
 |----------|------------|--------|---------------------|
@@ -298,6 +300,10 @@ Reduce Motion), so several rows below fold into the interaction contracts.
 | zero-one-many | Chart data (1 point vs many) | 🧪 backstop | Trend summary string must degrade to "steady" for single-point series; verify in UAT |
 | populated (dimmed) | Locked character cards (opacity 0.65) | ⚠ unresolved | 0.65 opacity over card text may drop below 4.5:1 — audit during the contrast sweep; if failing, dim the illustration only, not the text |
 | populated | Widget tiers (accent + labels on material) | ✅ covered | D-07 platform-bounded rule: accent never carries meaning alone |
+| loading / error | Trends tab root (repository-backed charts) | 🧪 probe → backstop | Planner verifies whether TrendsView has an async load path; any failure UI follows the phase-wide error shape (operation title + next step). Verified in the per-surface UAT sweep |
+| empty | Data manage measurements list (`DataManageView`) | 🧪 probe → backstop | If the list can render zero rows, apply the NoDataCard pattern — same unresolved family as the Trends/Action empty row; triage during execution |
+| loading / error | Action tab root | 🧪 probe → dismissed | ActionView is static quick-action tiles + mood check-in writes — no async read path (planner confirms during the sweep) |
+| empty / loading / error | Character collection | 🧪 probe → dismissed | `CharacterUnlock` rows are seeded at app launch (`StressMonitorApp` seeds defaults) over a fixed 5-character set — no zero/many variance (planner confirms during the sweep) |
 
 ---
 
