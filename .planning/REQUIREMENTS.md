@@ -43,8 +43,8 @@ Requirements for v1.2. Each maps to roadmap phases.
 
 ### Environment Debt
 
-- [ ] **ENV-01**: WINDOWS.md #8 CoreSimulator cold-launch crash lineage documented and accepted (or fixed)
-- [ ] **ENV-02**: `CharacterEntitlementSyncTests` quarantine resolved — root cause diagnosed and tests restored, or permanent skip documented with rationale
+- [x] **ENV-01**: WINDOWS.md #8 CoreSimulator cold-launch crash lineage documented and accepted (or fixed)
+- [x] **ENV-02**: `CharacterEntitlementSyncTests` quarantine resolved — root cause diagnosed and tests restored, or permanent skip documented with rationale
 - [x] **ENV-03**: WR-03 (DEBUG money path uses MockStoreKitService) and WR-04 (`.unverified` consumables finished) advisories dispositioned — fixed or documented accept
 - [x] **ENV-04**: SPM-cache proxy migration completed — a Release archive is producible from the unmodified working tree (Firebase proxy products exist; GoogleSignIn proxy product naming does not collide with upstream GoogleSignIn-iOS), not only from HEAD
 - [x] **ENV-05**: CI `fastlane match` readonly run accepts the dual-cert App Store profiles (XPT2DHR688 present in the match repo or profiles regenerated single-cert per the documented fallback)
@@ -92,8 +92,8 @@ Which phases cover which requirements. Updated during roadmap creation.
 | A11Y-03 | Phase 3 | Pending |
 | A11Y-04 | Phase 3 | Pending |
 | A11Y-05 | Phase 3 | Pending |
-| ENV-01 | Phase 2 | Pending |
-| ENV-02 | Phase 2 | Pending |
+| ENV-01 | Phase 2 | Complete |
+| ENV-02 | Phase 2 | Complete |
 | ENV-03 | Phase 2 | Complete |
 | ENV-04 | Phase 1 | Complete |
 | ENV-05 | Phase 1 | Complete |

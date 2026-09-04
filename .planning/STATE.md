@@ -5,11 +5,11 @@ milestone_name: Submission Readiness
 current_phase: 2
 current_phase_name: Delete Correctness & Test-Suite Trust
 status: executing
-stopped_at: "Completed 02-03-PLAN.md (WR-03: DEBUG real-default StoreKit wiring, -mock-iap opt-in, red-first wiring pin)"
-last_updated: "2026-09-03T16:33:45.266Z"
+stopped_at: "Completed 02-04-PLAN.md (ENV-01/ENV-02: WINDOWS #8 + CharacterEntitlementSyncTests fixed via container-lifetime fix; StoreKitServiceTests/EntitlementForegroundCorrectionTests re-dispositioned)"
+last_updated: "2026-09-04T06:11:57.194Z"
 last_activity: 2026-09-03
 last_activity_desc: Phase 1 complete, transitioned to Phase 2
-state_head: 43a3a13d9d7125c1f17af52c4344121611bebbb9
+state_head: 5a45f7f35ff55bd57dc3ffb3aee2c1399526fc56
 progress:
   total_phases: 4
   completed_phases: 1
@@ -30,7 +30,7 @@ See: .planning/PROJECT.md (updated 2026-09-03 at v1.2 start)
 ## Current Position
 
 Phase: 2 (Delete Correctness & Test-Suite Trust) — IN EXECUTION
-Plan: 4 of 6
+Plan: 5 of 6
 Status: Ready to execute
 Last activity: 2026-09-03 — 02-01 DATA-04 truthiness suite complete
 
@@ -74,6 +74,7 @@ Per-plan history for v1.0/v1.1 archived under `.planning/milestones/v1.0-phases/
 | Phase 02 P01 | 10 min | 2 tasks | 2 files |
 | Phase 02 P02 | 9 min | 2 tasks | 2 files |
 | Phase 02 P03 | 6 min | 2 tasks | 4 files |
+| Phase 02 P04 | 40min | 3 tasks | 7 files |
 
 ## Accumulated Context
 
@@ -106,6 +107,8 @@ Full log in PROJECT.md Key Decisions. v1.1 per-phase decisions archived with the
 - [Phase 02]: [Phase 2 P02]: The four completePurchase finish sites are verified-only by construction (checkVerified throws on .unverified before reach; handle(transaction:) entered only from .verified) — reachability note delivered, sites byte-unchanged; no runtime checks added inside the grant choke point
 - [Phase 02]: [Phase 2 P03, WR-03]: DEBUG defaults to the real StoreKit service at BOTH wiring sites (app factory + StoreKitServiceKey.defaultValue) behind one shared MockIAPMode condition — mock resolves only via the -mock-iap launch arg (DemoMode shape, injectable arguments); pinned by StoreKitServiceWiringTests (RED 2 absent-flag failures, GREEN 16/16 with CreditPurchaseFlowTests); Release #else branches byte-unchanged
 - [Phase 02]: [Phase 2 P03]: Minimal testability seam for a private factory — widen makeStoreKitService to internal static + an arguments parameter instead of extracting a resolver type; the pin asserts through the real factory, never by constructing services directly (Pitfall 4)
+- [Phase 02]: [Phase 2 P04, ENV-01/ENV-02] WINDOWS #8 root cause found: fixture container-lifetime bug (return-context-only fixtures let the owning ModelContainer deallocate before the next SwiftData op), not a CI-host defect — fixed by converting to (ModelContainer, ModelContext) tuple fixtures; both #8-gated suites and CharacterEntitlementSyncTests permanently restored to the default run, GSD_CI/TEST_RUNNER_GSD_CI plumbing removed
+- [Phase 02]: [Phase 2 P04] StoreKitServiceTests/EntitlementForegroundCorrectionTests productNotFound reproduces on TWO local simulators (not CI-runner-specific) — StoreKitTest daemon/session-isolation bug independent of IAP-01 product-ID registration (StoreKitProductCatalogLiveTests confirmed enabled+green, WINDOWS #7 closed); both suites stay dated-dispositioned (WINDOWS #6 open unchanged, #18 new entry), not re-enabled
 
 ### Pending Todos
 
@@ -116,13 +119,12 @@ None yet.
 - ~~**D3 (Privacy contract authority)**~~ **RESOLVED (v1.2 P1)**: code is the contract — docs moved toward StressContextPayload, zero payload churn; gates BUILD-01 (validated) and SHIP-03 (Phase 4, unblocked).
 - ~~**D4 (Widget in v1)**~~ **RESOLVED (v1.2 P1)**: keep the widget and make it true — write path wired (01-06), device-verified; WIRE-01 validated.
 - D2 (CloudKit encryption) resolved in practice (encryptedValues shipped v1.0 Phase 2) but never recorded as a formal decision — close opportunistically.
-- `CharacterEntitlementSyncTests` quarantined (`@Suite(.disabled)`), root cause undiagnosed after 5 ruled-out hypotheses — ENV-02 (Phase 2).
-- WINDOWS.md #8 host CoreSimulator cold-launch crash on DataDeletion/DataExport suites (exit 65, 0 assertion failures) — accepted lineage, ENV-01 (Phase 2). Locally gated via TEST_RUNNER_GSD_CI env (CI parity).
 - v1.1 Phase 2 advisory residue: WR-03 (DEBUG money path uses `MockStoreKitService`) and WR-04 (`.unverified` consumables finished) — ENV-03 (Phase 2).
 - [Phase 2 input] `INFOPLIST_KEY_UIBackgroundModes` never merges into product plists (absent from build-13 too — pre-existing) — folds into BUILD-04 doc-truth work.
 - [Phase 1 code review] 7 Info findings carried as documented debt (01-REVIEW.md): scan-pattern gaps (AKIA/ghp_/xox-), allowlist masking removed supabase literals, stale STOREKIT comment, widget-README/CLAUDE.md staleness, pbxproj churn, transitive-pin drift (GoogleUtilities 8.1.2→8.1.3).
 - [Release] TestFlight 1.0.0 build 13 is BETA_APPROVED; build 14 (v1.2 P1, VALID) predates the WIRE-01 fix — its widget shows "No Data"; the next build carries the wiring. Build 12 shipped with no entitlements blob — dump entitlements per bundle before every publish (Phase 4).
 - Pending from v1.1: Phase 03 drift re-test (5 UAT scenarios, `.planning/milestones/v1.1-phases/03-sessions-preferences-quick-actions-cleanup.1/03-UAT.md`) — candidate target now build 15+ (post-wiring) — not a v1.2 requirement, but the last open v1.1 item.
+- StoreKitServiceTests + EntitlementForegroundCorrectionTests remain disabled (StoreKitTest session-isolation/productNotFound bug, dated disposition 2026-09-04 in file headers, WINDOWS #6/#18) — needs a working local CoreSimulator/XCTestDevices layer to diagnose the StoreKitTest daemon interaction further
 
 ### Quick Tasks Completed
 
@@ -150,8 +152,8 @@ Earlier v1.0 deferrals (Phase 01/02 verification gaps, `MockStoreKitService` Rel
 
 ## Session Continuity
 
-Last session: 2026-09-03T16:33:37.642Z
-Stopped at: Completed 02-03-PLAN.md (WR-03: DEBUG real-default StoreKit wiring, -mock-iap opt-in, red-first wiring pin)
+Last session: 2026-09-04T06:11:30.778Z
+Stopped at: Completed 02-04-PLAN.md (ENV-01/ENV-02: WINDOWS #8 + CharacterEntitlementSyncTests fixed via container-lifetime fix; StoreKitServiceTests/EntitlementForegroundCorrectionTests re-dispositioned)
 Resume file: None
 
 ## Operator Next Steps
