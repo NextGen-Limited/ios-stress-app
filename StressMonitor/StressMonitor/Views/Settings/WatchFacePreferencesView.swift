@@ -26,6 +26,7 @@ struct WatchFacePreferencesView: View {
         }
         .navigationTitle("Watch Face")
         .navigationBarTitleDisplayMode(.inline)
+        .accessibleDynamicType()
         .onAppear {
             // Refresh the persisted selection when the screen appears.
             activeCompanionId = UserDefaults.standard.string(forKey: "watchface.activeCompanionId") ?? "ripple"

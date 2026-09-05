@@ -25,6 +25,7 @@ struct DataManageView: View {
         }
         .navigationTitle("Manage Data")
         .navigationBarTitleDisplayMode(.inline)
+        .accessibleDynamicType()
         .task {
             await refreshSnapshotCount()
         }

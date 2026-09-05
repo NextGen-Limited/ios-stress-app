@@ -171,6 +171,7 @@ struct DataDeleteView: View {
         }
         .navigationTitle("Delete Data")
         .navigationBarTitleDisplayMode(.inline)
+        .accessibleDynamicType()
         .toolbar {
             ToolbarItem(placement: .cancellationAction) {
                 Button("Cancel") {

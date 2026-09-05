@@ -46,6 +46,7 @@ struct TrendsView: View {
             .padding(.bottom, 24)
         }
         .background(HomeCharacterDesignTokens.homeBackground.ignoresSafeArea())
+        .accessibleDynamicType()
         .navigationTitle("Trends")
         .navigationBarTitleDisplayMode(.inline)
         .task {

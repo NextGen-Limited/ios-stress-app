@@ -49,6 +49,7 @@ struct CharacterCollectionView: View {
             .padding(.bottom, 40)
         }
         .background(Color.Wellness.adaptiveBackground.ignoresSafeArea())
+        .accessibleDynamicType()
         .navigationTitle("Characters")
         .navigationBarTitleDisplayMode(.inline)
         .sheet(item: $selectedCharacter) { creature in

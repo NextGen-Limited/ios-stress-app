@@ -43,6 +43,7 @@ struct MeasurementDetailView: View {
             .padding(.vertical, 16)
         }
         .background(Color.appBackground)
+        .accessibleDynamicType()
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .principal) {

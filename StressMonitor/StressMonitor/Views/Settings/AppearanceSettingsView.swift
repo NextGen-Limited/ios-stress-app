@@ -16,6 +16,7 @@ struct AppearanceSettingsView: View {
         }
         .navigationTitle("Appearance")
         .navigationBarTitleDisplayMode(.inline)
+        .accessibleDynamicType()
     }
 
     // MARK: - Color scheme
