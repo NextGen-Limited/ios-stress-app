@@ -139,13 +139,13 @@ Plans:
   4. At the largest accessibility Dynamic Type size, the primary screens stay readable — no label truncates, clips, or overlaps another element.
   5. The orphaned redesign views are deleted from the source tree; no unreachable duplicate screen compiles into the binary.
 
-**Plans**: 6 plans
+**Plans**: 1/6 plans executed
 **UI hint**: yes
 
 Plans:
 **Wave 1**
 
-- [ ] 03-01-PLAN.md — Tracer (A11Y-02): contrast token retunes in place (D-04) + the D-06 token-pair unit test (usage-class matrix, both appearances, RED→GREEN + mutation red-proof) + watch mirrors + dual-coding caption fix
+- [x] 03-01-PLAN.md — Tracer (A11Y-02): contrast token retunes in place (D-04) + the D-06 token-pair unit test (usage-class matrix, both appearances, RED→GREEN + mutation red-proof) + watch mirrors + dual-coding caption fix
 - [ ] 03-02-PLAN.md — A11Y-04 mechanism: rework `.accessibleDynamicType()` (no cap, no shrink; delete superseded zero-adopter variants), anchor Font.WellnessType to the system text-style ramp (byte-identical at Large), adopt on all 14 manifest surfaces (D-10 layer 1), and deliver the D-02 widget + watch half: anchor ~140 fixed-size font sites (widget Views/Live Activity/watch Views/complications) to the Dynamic Type ramp, remove the 9 text shrinks (dated exceptions only)
 
 **Wave 2** *(surface files serialized after 03-02; chart files after 03-01)*
@@ -183,5 +183,5 @@ Plans:
 |-------|-----------|----------------|--------|-----------|
 | 1. Binary & Manifest Truth | v1.2 | 6/6 | Complete    | 2026-09-03 |
 | 2. Delete Correctness & Test-Suite Trust | v1.2 | 6/6 | In Progress|  |
-| 3. Accessibility Compliance | v1.2 | 0/TBD | Not started | - |
+| 3. Accessibility Compliance | v1.2 | 1/6 | In Progress|  |
 | 4. Store Submission Package | v1.2 | 0/TBD | Not started | - |

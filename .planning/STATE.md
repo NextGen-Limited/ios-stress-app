@@ -5,16 +5,16 @@ milestone_name: Submission Readiness
 current_phase: 3
 current_phase_name: Accessibility Compliance
 status: executing
-stopped_at: Phase 3 UI-SPEC approved (probe reconciled)
-last_updated: "2026-09-05T00:37:15.430Z"
-last_activity: 2026-09-03
-last_activity_desc: Phase 1 complete, transitioned to Phase 2
-state_head: e7ff8a2dd3b07e0b3dd4387418deb548dc383a8e
+stopped_at: Completed 03-01-PLAN.md (contrast suite + D-04 retunes green)
+last_updated: "2026-09-05T01:13:18.496Z"
+last_activity: 2026-09-05
+last_activity_desc: Phase 3 execution started
+state_head: 9e5f8efb3ec924cfb29ac0c39298402cef07c2c9
 progress:
   total_phases: 4
   completed_phases: 1
   total_plans: 18
-  completed_plans: 12
+  completed_plans: 13
   percent: 25
 ---
 
@@ -25,14 +25,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-09-03 at v1.2 start)
 
 **Core value:** Every feature that ships in the binary must actually work end-to-end for a real user — not just compile.
-**Current focus:** Phase 1 — Binary & Manifest Truth
+**Current focus:** Phase 3 — Accessibility Compliance
 
 ## Current Position
 
-Phase: 3 (Accessibility Compliance) — READY TO EXECUTE
-Plan: 6 of 6
+Phase: 3 (Accessibility Compliance) — EXECUTING
+Plan: 2 of 6
 Status: Ready to execute
-Last activity: 2026-09-03 — 02-01 DATA-04 truthiness suite complete
+Last activity: 2026-09-05 — Phase 3 execution started
 
 Progress: [███░░░░░░░] 25% (1/4 phases)
 
@@ -77,6 +77,7 @@ Per-plan history for v1.0/v1.1 archived under `.planning/milestones/v1.0-phases/
 | Phase 02 P04 | 40min | 3 tasks | 7 files |
 | Phase 02 P05 | 25min | 2 tasks | 2 files |
 | Phase 02 P06 | 40min | 3 tasks | 5 files |
+| Phase 3 P01 | 32 min | 3 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -116,6 +117,8 @@ Full log in PROJECT.md Key Decisions. v1.1 per-phase decisions archived with the
 - [Phase 2]: [Phase 2 P06, DATA-01] performFactoryReset now deletes Habit (planner FIX decision, mirrors CharacterUnlock precedent) — closes the store-sweep completeness gap; TDD red-first pin in FactoryResetSweepCompletenessTests; deleteAllMeasurements stays byte-unchanged
 - [Phase 2]: [Phase 2 P06] Assumption-delta: no-change (2026-09-03, orchestrator-resolved) — CloudKit's account-scoped CKRecord identity already generalizes to the second DATA-01 surface (console or second iPhone); no new identity axis
 - [Phase 2]: [Phase 2 P06] DATA-01 stays Pending in REQUIREMENTS.md — only the automatable portion (sweep fix, evidence-note apparatus, trust gate) is done; the live two-surface verification is the explicit outstanding end-of-phase human item (no physical hardware/CloudKit Console reachable from this session; simulator evidence rejected per Pitfall 7)
+- [Phase 3]: [Phase 3 P01, A11Y-02]: Contrast truth is machine-checked — ContrastComplianceTests (14 tests/36 cases) computes WCAG ratios from Theme tokens via UIColor.resolvedColor(with:) in both appearances; RED 4.242/4.318 at the old secondary hex, mutation red-proof, green at 6B6E7B
+- [Phase 3]: [Phase 3 P01]: settingsRippleBlue/accentTeal = fixed 0891B2 (fill-safe both appearances) — accentTeal is a live white-text fill (AIChatCard/SelfNoteCard/WeekCalendarStrip) and white-on-4FC3F7 is 2.00:1, so the plan's recommended dark 4FC3F7 was overridden by the binding-judge clause; textTertiary/textDescriptive are now computed aliases of adaptiveSecondaryText; StressCategory.color pinned as the stress-hue source via Color.stressColor(for:)
 
 ### Pending Todos
 
@@ -160,9 +163,9 @@ Earlier v1.0 deferrals (Phase 01/02 verification gaps, `MockStoreKitService` Rel
 
 ## Session Continuity
 
-Last session: 2026-09-04T17:25:19.898Z
-Stopped at: Phase 3 UI-SPEC approved (probe reconciled)
-Resume file: .planning/phases/03-accessibility-compliance/03-UI-SPEC.md
+Last session: 2026-09-05T01:13:18.158Z
+Stopped at: Completed 03-01-PLAN.md (contrast suite + D-04 retunes green)
+Resume file: None
 
 ## Operator Next Steps
 
