@@ -47,6 +47,9 @@ extension View {
 
             case .breathingSummary(let result):
                 BreathingSummaryView(result: result)
+
+            case .agentChat:
+                AgentChatView()
             }
         }
     }

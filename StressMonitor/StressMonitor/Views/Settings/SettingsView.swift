@@ -211,6 +211,17 @@ struct SettingsView: View {
                     title: "Health Data Sync",
                     isOn: healthSyncToggleBinding
                 )
+                if FeatureFlags.agentChatEnabled {
+                    hairlineDivider
+                    navRow(
+                        icon: AppIconSystem.Setting.rippleCoach.sfSymbol,
+                        setting: .rippleCoach,
+                        tint: .settingsIconPurple,
+                        title: "Health Coach",
+                        value: "New",
+                        destination: .agentChat
+                    )
+                }
                 hairlineDivider
                 navRow(
                     icon: "g.circle",

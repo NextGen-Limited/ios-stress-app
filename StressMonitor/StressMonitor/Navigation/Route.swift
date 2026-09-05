@@ -39,4 +39,9 @@ enum Route: Hashable, Codable {
     case breathingSession
     /// Post-session summary. Requires `BreathingSessionResult: Hashable`.
     case breathingSummary(BreathingSessionResult)
+
+    // Health
+    /// Health Coach chat over `POST /agent/chat`. Entry hidden behind
+    /// `FeatureFlags.agentChatEnabled` until the endpoint is deployed.
+    case agentChat
 }
