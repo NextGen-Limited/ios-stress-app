@@ -206,6 +206,18 @@ struct ContrastComplianceTests {
         #expect(ratio >= 3.0)
     }
 
+    @Test(
+        "White CTA text on the IAP paywall button fill passes 3:1 in both appearances",
+        arguments: [UIUserInterfaceStyle.light, .dark]
+    )
+    func whiteOnIAPCTAFill(style: UIUserInterfaceStyle) {
+        let ratio = contrastRatio(
+            UIColor.white,
+            on: resolved(Color.iapCTATeal, style)
+        )
+        #expect(ratio >= 3.0)
+    }
+
     // MARK: - Stress Indicator Pairs (>= 3:1)
 
     @Test(

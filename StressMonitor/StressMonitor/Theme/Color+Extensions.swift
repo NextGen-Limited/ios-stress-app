@@ -156,8 +156,10 @@ extension Color {
 
     /// IAP section header teal - #158B8B
     static let iapHeaderTeal = Color(hex: "158B8B")
-    /// IAP CTA button - Ripple blue #4FC3F7 (matches accentTeal)
-    static let iapCTATeal = Color(hex: "4FC3F7")
+    /// IAP CTA button - Ripple blue #0891B2. Retuned from the legacy
+    /// #4FC3F7 (2.00:1 with white text, failing the 3:1 fill-safe bar);
+    /// matches `settingsRippleBlue` (3.68:1 with white text).
+    static let iapCTATeal = Color(hex: "0891B2")
     /// IAP plan selected border amber - #FFAE3B
     static let iapAmber = Color(hex: "FFAE3B")
     /// IAP savings green - #4FC01B
