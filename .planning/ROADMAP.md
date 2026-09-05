@@ -139,7 +139,7 @@ Plans:
   4. At the largest accessibility Dynamic Type size, the primary screens stay readable — no label truncates, clips, or overlaps another element.
   5. The orphaned redesign views are deleted from the source tree; no unreachable duplicate screen compiles into the binary.
 
-**Plans**: 5/6 plans executed
+**Plans**: 6/6 plans executed
 **UI hint**: yes
 
 Plans:
@@ -159,7 +159,7 @@ Plans:
 
 **Wave 4** *(phase closer — deletion LAST, then gates against the final tree)*
 
-- [ ] 03-06-PLAN.md — A11Y-05: D-14 reachability audit (BFS + extension-member screen + Periphery cross-check), blocking decision checkpoint, batched delete-compile of ~80 orphan files across 3 targets, both trust-gate records (D-10/D-13) + full suite + 03-A11Y-UAT.md apparatus
+- [x] 03-06-PLAN.md — A11Y-05: D-14 reachability audit (BFS + extension-member screen + Periphery cross-check), blocking decision checkpoint, batched delete-compile of ~80 orphan files across 3 targets, both trust-gate records (D-10/D-13) + full suite + 03-A11Y-UAT.md apparatus
 
 #### Phase 4: Store Submission Package
 
@@ -183,5 +183,5 @@ Plans:
 |-------|-----------|----------------|--------|-----------|
 | 1. Binary & Manifest Truth | v1.2 | 6/6 | Complete    | 2026-09-03 |
 | 2. Delete Correctness & Test-Suite Trust | v1.2 | 6/6 | In Progress|  |
-| 3. Accessibility Compliance | v1.2 | 5/6 | In Progress|  |
+| 3. Accessibility Compliance | v1.2 | 6/6 | In Progress|  |
 | 4. Store Submission Package | v1.2 | 0/TBD | Not started | - |

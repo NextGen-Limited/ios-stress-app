@@ -39,7 +39,7 @@ Requirements for v1.2. Each maps to roadmap phases.
 - [x] **A11Y-02**: Color contrast passes WCAG AA on primary surfaces
 - [x] **A11Y-03**: Reduce Motion respected for animated views
 - [x] **A11Y-04**: Dynamic Type adopted on primary screens
-- [ ] **A11Y-05**: Orphaned redesign views deleted
+- [x] **A11Y-05**: Orphaned redesign views deleted
 
 ### Environment Debt
 
@@ -91,7 +91,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | A11Y-02 | Phase 3 | Complete |
 | A11Y-03 | Phase 3 | Complete |
 | A11Y-04 | Phase 3 | Complete |
-| A11Y-05 | Phase 3 | Pending |
+| A11Y-05 | Phase 3 | Complete |
 | ENV-01 | Phase 2 | Complete |
 | ENV-02 | Phase 2 | Complete |
 | ENV-03 | Phase 2 | Complete |
