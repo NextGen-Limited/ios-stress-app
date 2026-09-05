@@ -131,7 +131,7 @@ struct StressBarChartView: View {
         }
         .accessibilityLabel(
             "\(item.dayLabel) \(item.dateNumber.map { "\($0)" } ?? ""), " +
-            (hasData ? "stress level \(Int(item.averageStress)), \(tier.rawValue)" : "no data")
+            (hasData ? "stress level \(Int(item.averageStress)), \(tier.displayName)" : "no data")
         )
     }
 

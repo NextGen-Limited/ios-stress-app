@@ -127,7 +127,7 @@ struct DistributionBar: View {
         ) {
             legendItem(tier: .relaxed, label: "Relaxed", days: relaxedDays)
             legendItem(tier: .mild, label: "Mild", days: mildDays)
-            legendItem(tier: .moderate, label: "Moderate", days: moderateDays)
+            legendItem(tier: .moderate, label: StressCategory.moderate.displayName, days: moderateDays)
             legendItem(
                 tier: .high,
                 label: "High",

@@ -111,7 +111,7 @@ struct MeHeroCard: View {
 
     private var stressLabel: String {
         guard let level = stressLevel else { return "Stress" }
-        return StressCategory.from(score: level).rawValue.capitalized
+        return StressCategory.from(score: level).displayName
     }
 }
 

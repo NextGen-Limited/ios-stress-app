@@ -55,8 +55,7 @@ public enum StressCategory: String, CaseIterable, Codable, Sendable {
 
     /// VoiceOver description combining all dual coding elements
     public var accessibilityDescription: String {
-        let name = rawValue.capitalized
-        return "\(name) stress level, represented by \(icon) icon with \(pattern)"
+        "\(displayName) stress level, represented by \(icon) icon with \(pattern)"
     }
 
     /// Accessibility hint for interactive stress indicators
@@ -67,8 +66,7 @@ public enum StressCategory: String, CaseIterable, Codable, Sendable {
     /// Accessibility value for stress level indicators
     /// - Parameter level: Stress level from 0-100
     public func accessibilityValue(level: Double) -> String {
-        let name = rawValue.capitalized
-        return "\(Int(level)) out of 100, \(name) stress"
+        "\(Int(level)) out of 100, \(displayName) stress"
     }
 }
 
