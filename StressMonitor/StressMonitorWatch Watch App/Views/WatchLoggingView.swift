@@ -16,7 +16,6 @@ struct WatchLoggingView: View {
     @State private var habitViewModel = WatchHabitViewModel()
     @State private var moodViewModel = WatchMoodViewModel()
     @State private var selectedMood: WatchMood?
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     @ScaledMetric(relativeTo: .body) private var bodyScale: CGFloat = 1
     @ScaledMetric(relativeTo: .caption2) private var caption2Scale: CGFloat = 1

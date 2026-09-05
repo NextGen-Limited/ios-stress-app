@@ -10,7 +10,6 @@ import SwiftUI
 ///  - An empty state featuring the Ripple otter + a "Measure Now" pill
 struct WatchHistoryView: View {
     @Bindable var viewModel: WatchStressViewModel
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     private let readings: [SharedReading]
 
