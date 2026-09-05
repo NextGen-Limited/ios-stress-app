@@ -8,8 +8,6 @@ struct LearningPhaseCard: View {
     let minimumSamples: Int
     let onLearnMore: () -> Void
 
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
-
     private var progress: Double {
         min(Double(sampleCount) / Double(minimumSamples), 1.0)
     }
@@ -74,10 +72,7 @@ struct LearningPhaseCard: View {
                             style: StrokeStyle(lineWidth: 3, lineCap: .round)
                         )
                         .rotationEffect(.degrees(-90))
-                        .animation(
-                            reduceMotion ? .none : .easeOut(duration: 0.5),
-                            value: progress
-                        )
+                        .animateIfMotionAllowed(.easeOut(duration: 0.5), value: progress)
 
                     Text("\(Int(progress * 100))%")
                         .font(.system(size: 10, weight: .bold))
@@ -102,10 +97,7 @@ struct LearningPhaseCard: View {
                             )
                         )
                         .frame(width: geometry.size.width * progress, height: 8)
-                        .animation(
-                            reduceMotion ? .none : .easeOut(duration: 0.5),
-                            value: progress
-                        )
+                        .animateIfMotionAllowed(.easeOut(duration: 0.5), value: progress)
                 }
             }
             .frame(height: 8)

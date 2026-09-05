@@ -2,10 +2,11 @@ import SwiftUI
 
 /// Decorative placeholder with pulsing opacity animation.
 /// Used in permission-required state to hint at content behind the access gate.
+/// The pulse loop starts only through the motion helper — static under
+/// Reduce Motion.
 struct SkeletonBlock: View {
     var height: CGFloat = 60
 
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var isAnimating = false
 
     var body: some View {
@@ -13,14 +14,12 @@ struct SkeletonBlock: View {
             .fill(Color.oledCardSecondary)
             .frame(height: height)
             .frame(maxWidth: .infinity)
-            .opacity(opacity)
-            .animation(reduceMotion ? nil : .easeInOut(duration: 1).repeatForever(autoreverses: true), value: isAnimating)
-            .onAppear { guard !reduceMotion else { return }; isAnimating = true }
+            .opacity(isAnimating ? 0.4 : 0.8)
+            .animateIfMotionAllowed(
+                .easeInOut(duration: 1).repeatForever(autoreverses: true),
+                value: isAnimating
+            )
+            .startMotionIfAllowed { isAnimating = true }
             .accessibilityHidden(true)
-    }
-
-    /// Static mid-opacity when Reduce Motion is on; otherwise the pulse target.
-    private var opacity: Double {
-        reduceMotion ? 0.6 : (isAnimating ? 0.4 : 0.8)
     }
 }

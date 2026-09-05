@@ -290,30 +290,3 @@ extension View {
         modifier(ShimmerLoadingModifier())
     }
 }
-
-// MARK: - Legacy Explicit-Bool Factories (pending deletion — callers migrate in the consolidation sweep)
-
-extension Animation {
-    static func wellness(
-        duration: Double = 1.0,
-        reduceMotion: Bool = false
-    ) -> Animation? {
-        reduceMotion ? nil : .easeInOut(duration: duration)
-    }
-
-    static func breathing(reduceMotion: Bool = false) -> Animation? {
-        reduceMotion ? nil : .easeInOut(duration: 4.0).repeatForever(autoreverses: true)
-    }
-
-    static func fidget(reduceMotion: Bool = false) -> Animation? {
-        reduceMotion ? nil : .easeInOut(duration: 0.5)
-    }
-
-    static func shake(reduceMotion: Bool = false) -> Animation? {
-        reduceMotion ? nil : .easeInOut(duration: 0.5).repeatCount(3, autoreverses: true)
-    }
-
-    static func dizzy(reduceMotion: Bool = false) -> Animation? {
-        reduceMotion ? nil : .linear(duration: 1.5).repeatForever(autoreverses: false)
-    }
-}

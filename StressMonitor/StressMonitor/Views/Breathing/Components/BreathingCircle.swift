@@ -8,13 +8,14 @@ import SwiftUI
 /// - r3: solid core (42% width, linear gradient #4FC3F7 → #0288D1, scale 0.85 ↔ 1.15)
 ///
 /// All rings scale over a 4-second easeInOut per phase, synced to the
-/// 4-4-4-4 box-breathing cycle. When `accessibilityReduceMotion` is enabled,
-/// the rings hold static mid-scale positions and no animation runs.
+/// 4-4-4-4 box-breathing cycle. When the caller disables animation (the
+/// D-11 Reduce Motion fallback), the rings hold static mid-scale positions
+/// and no animation runs.
 struct BreathingCircle: View {
     let phase: BoxBreathingPhase
     var size: CGFloat = 280
+    var isAnimated: Bool = true
 
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var animate = false
 
     // Design tokens from HTML
@@ -24,7 +25,7 @@ struct BreathingCircle: View {
 
     /// Target scale for the core (r3) per phase — 0.85 (contracted) ↔ 1.15 (expanded)
     private var coreScale: CGFloat {
-        guard !reduceMotion else { return 0.95 }
+        guard isAnimated else { return 0.95 }
         switch phase {
         case .inhale:  return animate ? 1.15 : 0.85
         case .holdIn:  return 1.15
@@ -35,7 +36,7 @@ struct BreathingCircle: View {
 
     /// Target scale for mid aura (r2)
     private var midScale: CGFloat {
-        guard !reduceMotion else { return 0.95 }
+        guard isAnimated else { return 0.95 }
         switch phase {
         case .inhale:  return animate ? 1.10 : 0.85
         case .holdIn:  return 1.10
@@ -46,7 +47,7 @@ struct BreathingCircle: View {
 
     /// Target scale for outer aura (r1)
     private var outerScale: CGFloat {
-        guard !reduceMotion else { return 0.95 }
+        guard isAnimated else { return 0.95 }
         switch phase {
         case .inhale:  return animate ? 1.05 : 0.85
         case .holdIn:  return 1.05
@@ -104,7 +105,7 @@ struct BreathingCircle: View {
     }
 
     private func beginCycle() {
-        guard !reduceMotion else { return }
+        guard isAnimated else { return }
         animate = false
         withAnimation(.easeInOut(duration: 4)) {
             animate = true

@@ -9,7 +9,6 @@ struct MiniWalkInstructionCard: View {
     let progress: Double
 
     @State private var bobOffset: CGFloat = 0
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     var body: some View {
         HStack(alignment: .center, spacing: 12) {
@@ -43,7 +42,7 @@ struct MiniWalkInstructionCard: View {
                 .clipShape(BubbleTailShape(cornerRadius: 14, tailPosition: .bottomLeft))
         }
         .padding(.horizontal, 16)
-        .onAppear { if !reduceMotion { startBobAnimation() } }
+        .startMotionIfAllowed { startBobAnimation() }
         .onDisappear { bobOffset = 0 }
         .accessibilityElement(children: .combine)
         .accessibilityLabel("Ripple says: \(message)")

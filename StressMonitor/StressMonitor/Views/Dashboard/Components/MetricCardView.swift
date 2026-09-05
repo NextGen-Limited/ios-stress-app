@@ -10,7 +10,7 @@ struct MetricCardView: View {
     let trend: Trend?
     let chartData: [Double]?
 
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @State private var motionReduced = false
 
     // MARK: - Trend Types
 
@@ -70,10 +70,10 @@ struct MetricCardView: View {
                     .font(.system(size: 32, weight: .bold, design: .rounded))
                     .foregroundColor(.white)
                     .contentTransition(
-                        reduceMotion ? .identity : .numericText()
+                        motionReduced ? .identity : .numericText()
                     )
                     .animation(
-                        reduceMotion ? .none : .spring(response: 0.3, dampingFraction: 0.7),
+                        motionReduced ? .none : .spring(response: 0.3, dampingFraction: 0.7),
                         value: value
                     )
 
@@ -111,6 +111,7 @@ struct MetricCardView: View {
         .accessibilityElement(children: .combine)
         .accessibilityLabel(accessibilityLabel)
         .accessibilityValue("\(value) \(unit)")
+        .onMotionDecision { motionReduced = $0 }
     }
 
     // MARK: - Accessibility
