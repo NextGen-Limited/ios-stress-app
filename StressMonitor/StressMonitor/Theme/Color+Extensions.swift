@@ -42,9 +42,14 @@ extension Color {
     // MARK: - Chart Accents
 
     /// HRV trend chart accent (green per HTML `--hrv-color: #34D399`). The
-    /// light variant is retuned to `#0F9D6E` — the base `#34D399` measures
-    /// 1.92:1 on the white light-mode card, failing the 3:1 UI-component bar.
-    static let hrvTrendAccent = Color(light: Color(hex: "#0F9D6E"), dark: Color(hex: "#34D399"))
+    /// color is also used as `.foregroundStyle` for the average numeral and
+    /// "today · NNms" annotation text in `HRVTrendChart`, so the light
+    /// variant must clear the 4.5:1 text bar, not just the 3:1 UI bar the
+    /// line/fill/halo need. The base `#34D399` measures 1.92:1 on the white
+    /// light-mode card; an earlier `#0F9D6E` retune only reached 3.46:1
+    /// (clears 3:1, fails 4.5:1). Retuned to `#0C7A55`, which measures
+    /// 5.34:1 on the white card.
+    static let hrvTrendAccent = Color(light: Color(hex: "#0C7A55"), dark: Color(hex: "#34D399"))
 
     // MARK: - Semantic Colors
 

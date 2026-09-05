@@ -138,6 +138,18 @@ struct ContrastComplianceTests {
         #expect(ratio >= 4.5)
     }
 
+    @Test(
+        "HRV trend chart accent passes AA (4.5:1) for its numeral/annotation text usage on the card in both appearances",
+        arguments: [UIUserInterfaceStyle.light, .dark]
+    )
+    func hrvAccentTextOnCard(style: UIUserInterfaceStyle) {
+        let ratio = contrastRatio(
+            resolved(Color.hrvTrendAccent, style),
+            on: resolved(Color.Wellness.adaptiveCardBackground, style)
+        )
+        #expect(ratio >= 4.5)
+    }
+
     // MARK: - Distribution Segment Label Text Pairs (>= 4.5:1)
     //
     // Each `DistributionBar` segment renders an 11pt semibold "NN%" label —
@@ -279,7 +291,7 @@ struct ContrastComplianceTests {
     }
 
     @Test(
-        "HRV trend chart accent passes 3:1 on the card background in both appearances",
+        "HRV trend chart accent passes 3:1 for its line/fill/halo graphical usage on the card in both appearances",
         arguments: [UIUserInterfaceStyle.light, .dark]
     )
     func hrvAccentOnCard(style: UIUserInterfaceStyle) {
