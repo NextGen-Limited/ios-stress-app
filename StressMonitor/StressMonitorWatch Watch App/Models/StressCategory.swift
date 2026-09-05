@@ -36,14 +36,11 @@ public enum StressCategory: String, CaseIterable, Codable, Sendable, Identifiabl
         }
     }
 
-    /// Text colour that passes WCAG AA against light surfaces.  Moderate
-    /// yellow needs a darker ink; the other tiers reuse their own colour.
-    public var inkColor: Color {
-        switch self {
-        case .moderate: return Color(hex: "#B59400")
-        default:        return color
-        }
-    }
+    /// Text colour that passes WCAG AA against light surfaces. All tiers
+    /// reuse their own colour — the former `.moderate` override
+    /// (`#B59400`, 2.61:1) measured worse than the tier's own colour
+    /// (`#8A5A00`, 5.3:1) after the moderate retune.
+    public var inkColor: Color { color }
 
     // MARK: - Dual Coding: Glyph + Icon
 

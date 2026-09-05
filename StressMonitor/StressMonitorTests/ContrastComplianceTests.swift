@@ -243,4 +243,20 @@ struct ContrastComplianceTests {
         )
         #expect(ratio >= 3.0)
     }
+
+    // MARK: - Watch Token Pins
+    //
+    // `StressMonitorWatch Watch App` is a separate module and cannot be
+    // imported from this iOS test target, so the retuned watch values are
+    // pinned here by literal hex against their fixed watch-canvas
+    // background (`#F2F2F7`, non-adaptive on the watch).
+
+    @Test("Watch moderate ink (mirrors StressCategory.color, #8A5A00) passes 3:1 on the watch canvas")
+    func watchModerateInkOnCanvas() {
+        let ratio = contrastRatio(
+            UIColor(Color(hex: "#8A5A00")),
+            on: UIColor(Color(hex: "#F2F2F7"))
+        )
+        #expect(ratio >= 3.0)
+    }
 }
