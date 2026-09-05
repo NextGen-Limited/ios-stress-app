@@ -146,7 +146,7 @@ Plans:
 **Wave 1**
 
 - [ ] 03-01-PLAN.md — Tracer (A11Y-02): contrast token retunes in place (D-04) + the D-06 token-pair unit test (usage-class matrix, both appearances, RED→GREEN + mutation red-proof) + watch mirrors + dual-coding caption fix
-- [ ] 03-02-PLAN.md — A11Y-04 mechanism: rework `.accessibleDynamicType()` (no cap, no shrink; delete superseded zero-adopter variants), anchor Font.WellnessType to the system text-style ramp (byte-identical at Large), adopt on all 14 manifest surfaces (D-10 layer 1)
+- [ ] 03-02-PLAN.md — A11Y-04 mechanism: rework `.accessibleDynamicType()` (no cap, no shrink; delete superseded zero-adopter variants), anchor Font.WellnessType to the system text-style ramp (byte-identical at Large), adopt on all 14 manifest surfaces (D-10 layer 1), and deliver the D-02 widget + watch half: anchor ~140 fixed-size font sites (widget Views/Live Activity/watch Views/complications) to the Dynamic Type ramp, remove the 9 text shrinks (dated exceptions only)
 
 **Wave 2** *(surface files serialized after 03-02; chart files after 03-01)*
 

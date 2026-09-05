@@ -79,6 +79,7 @@ The riskiest requirement is A11Y-05's deletion audit. Three mechanics are now gr
 | Orphan reachability truth | Compiler build (delete-compile) | Periphery scan (cross-check) | D-14: delete-compile is ground truth; grep BFS is the input list |
 | Watch token parity | Watch target's duplicated `Theme/` | App `Theme/` (source of retunes) | No shared framework — watch has its own `StressCategory.swift`, `Color+Extensions.swift`, `WatchDesignTokens.swift` (verified on disk) |
 | Widget contrast | Widget views (system `.primary`/`.secondary` on materials) | — | D-07: Apple-guaranteed pairs; `tier.accent` dual-coded, never meaning-alone |
+| Widget + watch Dynamic Type anchoring | Widget views + watch `Views/` (per-site `Font.system(size:relativeTo:)` anchors) | Inline dated exceptions (accessory-template / gauge-class sites) | D-02: widget (gallery + lock-screen + Live Activity) and watch surfaces join the Dynamic Type sweep; the targets share no Theme tokens or helper with the app, so the anchor is per-site at each target's existing point sizes; 140 fixed-size sites + 9 `minimumScaleFactor` shrinks measured (30 widget Views / 8 Live Activity / 76 watch Views+Components / 26 complications incl. providers and bundle; shrinks: 5 watch Views, 4 complications) |
 
 ## Standard Stack
 
@@ -482,18 +483,21 @@ xcrun simctl ui <device> appearance dark
 
 **Claims NOT assumed (verified this session):** all token hex values and helper defaults (Read from source with line refs); WCAG ratios (local computation, formula validated); RM ref baseline 66/13 (grep); pbxproj sync-group/exception mechanics (Read); `chartAccessibility` absence (SDK interface grep); `simctl ui` subcommand inventory (local probe); Periphery availability and flags (local binary + `--help` + gh api); test-target manual registration requirement (pbxproj Read); watch-side file duplication (ls + grep); orphan-audit false positives (`displayName` in `Badge.swift`, `IAPPremiumView` ← `PaywallView`, `ShimmerEffectView` via `.shimmerLoading()` — grep).
 
-## Open Questions
+## Open Questions (RESOLVED)
 
 1. **Trends/Action/DataManage empty states and locked-character 0.65-opacity text** (UI-SPEC unresolved rows)
    - What we know: flagged as planner assumptions in the UI-SPEC; locked-character dimming may drop card text below 4.5:1.
    - What's unclear: whether those surfaces can render zero rows in practice.
    - Recommendation: triage during the per-surface sweep with the documented NoDataCard shape; for locked characters, dim the illustration only, never the text (UI-SPEC's stated remedy).
+   - **RESOLVED by 03-03 Task 3** (state-shape triage: NoDataCard branch or a recorded cannot-render-empty disposition per surface; locked-character dimming scoped to the illustration only, character a11y labels per D-09).
 2. **Where does `Motion.swift` (the D-12 helper) live — new file vs reworked `Animation+Wellness.swift`?**
    - What we know: consolidation inputs span 3 utility files; repo convention is one-type-per-file with `Type+Feature` extensions.
    - Recommendation: planner's discretion; reworking `Animation+Wellness.swift` in place avoids a new file and preserves the `animateIfMotionAllowed` call sites already correct.
+   - **RESOLVED by 03-05 Task 1** (rework `Animation+Wellness.swift` in place — no new `Motion.swift` file; the existing env-reading modifier shape is kept and becomes the single owner).
 3. **Should `StressDualCodingModifier`'s caption text move to `adaptiveSecondaryText` before or after the token retune lands?**
    - What we know: both are contrast-sweep items; order doesn't affect correctness, only test sequencing.
    - Recommendation: land the retune + D-06 test first (green baseline), then the modifier change keeps the test honest.
+   - **RESOLVED by 03-01 sequencing** (Tasks 1-2 land the retune + D-06 suite green first; Task 3 moves the caption onto the adaptive secondary token after the green baseline — the recommended order is the plan's task order).
 
 ## Environment Availability
 

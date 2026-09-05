@@ -46,6 +46,7 @@ created: "2026-09-05"
 | 3-02-01 | 02 | 1 | A11Y-04 | T-03-03 | N/A | build + grep | app build + deleted-symbol + cap greps | ✅ | ⬜ pending |
 | 3-02-02 | 02 | 1 | A11Y-04 | T-03-03 | N/A | build + grep + measured parity | app build + fixed-size/modifier greps | ✅ | ⬜ pending |
 | 3-02-03 | 02 | 1 | A11Y-04 | — | N/A | grep gate (trust-gate shape) + build | 14-file adoption loop (`grep -q … \|\| echo MISSING`) | ✅ | ⬜ pending |
+| 3-02-04 | 02 | 1 | A11Y-04 (D-02) | T-03-11 | N/A (view-layer font anchors; no data surface) | grep gates + 2-scheme build | anchor + shrink gate greps (zero undocumented sites across widget Views/Live Activity/watch Views/complications) + widget-extension & watch scheme builds | ✅ | ⬜ pending |
 | 3-03-01 | 03 | 2 | A11Y-01 | T-03-04 | N/A | build + adoption enumeration | app build + `minimumTouchTarget(` count + lint | ✅ | ⬜ pending |
 | 3-03-02 | 03 | 2 | A11Y-01/A11Y-02 | — | N/A | build + grep | app build + `stressDualCoding` count | ✅ | ⬜ pending |
 | 3-03-03 | 03 | 2 | A11Y-01/A11Y-02 | — | N/A | build + triage greps | app build + error-copy/NoDataCard/character-label greps | ✅ | ⬜ pending |
@@ -76,6 +77,7 @@ created: "2026-09-05"
 |----------|-------------|------------|-------------------|
 | Hit areas ≥44pt rendered truth per surface | A11Y-01 | hit-area geometry is a rendered-tree property; no unit seam | Accessibility Inspector scan per the 14 surface rows in 03-A11Y-UAT.md, checked against 03-03-SUMMARY's enumeration |
 | Zero truncation/overlap at AX5, light+dark | A11Y-04 (D-08/D-10 layer 2) | layout-at-AX5 is a rendered property; `simctl ui content_size` sets it but only eyes/screenshots judge | Per-surface rows in 03-A11Y-UAT.md: set AX5, screenshot both appearances, verify wrap/stack/scroll, reset to large |
+| Widget + watch AX5 legibility (D-02) | A11Y-04 (D-02 half) | widget snapshots cache at the rendered size (need a forced re-render) and the watch is a separate process/simulator; no unit seam | Widget rows (gallery Small/Medium/Large, Lock Screen, Live Activity) + watch rows (main surfaces + one complication) in 03-A11Y-UAT.md: set AX5, force widget re-render / relaunch watch app, screenshot light+dark, check the 03-02-SUMMARY exception enumeration renders legibly |
 | Reduce Motion behavior on device | A11Y-03 | no `simctl` toggle exists on Xcode 26.3; env value is read-only | Settings → Accessibility → Motion → Reduce Motion ON (or the `-a11y-reduce-motion` DEBUG launch arg), walk manifest surfaces; breathing fallback walkthrough row |
 | Dual-coding legibility judgment (hue+symbol+name) | A11Y-02 | final visual judgment per surface | Per-surface rows in 03-A11Y-UAT.md |
 
