@@ -1,229 +1,121 @@
 ---
 phase: 03-accessibility-compliance
-reviewed: 2026-09-05T05:13:08Z
+reviewed: 2026-09-05T14:55:00Z
 depth: standard
-files_reviewed: 75
+files_reviewed: 9
 files_reviewed_list:
-  - StressMonitor/StressMonitor.xcodeproj/project.pbxproj
-  - StressMonitor/StressMonitor/Components/Character/CharacterAnimationModifier.swift
-  - StressMonitor/StressMonitor/Models/StressCategory.swift
-  - StressMonitor/StressMonitor/Theme/Color+Extensions.swift
-  - StressMonitor/StressMonitor/Theme/Color+Wellness.swift
-  - StressMonitor/StressMonitor/Theme/Font+WellnessType.swift
-  - StressMonitor/StressMonitor/Utilities/AccessibilityModifiers.swift
-  - StressMonitor/StressMonitor/Utilities/Animation+Wellness.swift
-  - StressMonitor/StressMonitor/Utilities/AnimationPresets.swift
-  - StressMonitor/StressMonitor/Utilities/DynamicTypeScaling.swift
-  - StressMonitor/StressMonitor/Views/Action/ActionView.swift
-  - StressMonitor/StressMonitor/Views/Action/Components/RippleRecommendationCard.swift
-  - StressMonitor/StressMonitor/Views/Breathing/BreathingExerciseView.swift
-  - StressMonitor/StressMonitor/Views/Breathing/BreathingSessionView.swift
-  - StressMonitor/StressMonitor/Views/Breathing/BreathingSummaryView.swift
-  - StressMonitor/StressMonitor/Views/Breathing/BreathingViewModel.swift
-  - StressMonitor/StressMonitor/Views/Breathing/Components/BreathingCircle.swift
-  - StressMonitor/StressMonitor/Views/Characters/CharacterCollectionView.swift
-  - StressMonitor/StressMonitor/Views/Characters/Components/CharacterGridCard.swift
-  - StressMonitor/StressMonitor/Views/Characters/Components/EvolutionStageRow.swift
-  - StressMonitor/StressMonitor/Views/Chat/ChatBottomSheetView.swift
-  - StressMonitor/StressMonitor/Views/Dashboard/Components/MoodCheckInView.swift
-  - StressMonitor/StressMonitor/Views/Dashboard/Components/NoDataCard.swift
-  - StressMonitor/StressMonitor/Views/Dashboard/Components/PremiumBanner.swift
-  - StressMonitor/StressMonitor/Views/Dashboard/Components/SkeletonBlock.swift
-  - StressMonitor/StressMonitor/Views/Dashboard/Components/StressHeroCard.swift
-  - StressMonitor/StressMonitor/Views/DashboardView.swift
-  - StressMonitor/StressMonitor/Views/DesignSystem/Components/Buttons.swift
-  - StressMonitor/StressMonitor/Views/History/MeasurementDetailView.swift
-  - StressMonitor/StressMonitor/Views/MiniWalk/MiniWalkView.swift
-  - StressMonitor/StressMonitor/Views/Settings/AboutView.swift
-  - StressMonitor/StressMonitor/Views/Settings/AppearanceSettingsView.swift
-  - StressMonitor/StressMonitor/Views/Settings/Components/CompanionBanner.swift
-  - StressMonitor/StressMonitor/Views/Settings/Components/PlusPill.swift
-  - StressMonitor/StressMonitor/Views/Settings/DataManagement/Components/ExportProgressView.swift
-  - StressMonitor/StressMonitor/Views/Settings/DataManagement/DataDeleteView.swift
-  - StressMonitor/StressMonitor/Views/Settings/DataManagement/DataExportView.swift
-  - StressMonitor/StressMonitor/Views/Settings/DataManagement/DataManageView.swift
-  - StressMonitor/StressMonitor/Views/Settings/SettingsView.swift
-  - StressMonitor/StressMonitor/Views/Settings/WatchFacePreferencesView.swift
   - StressMonitor/StressMonitor/Views/Trends/Components/DistributionBar.swift
-  - StressMonitor/StressMonitor/Views/Trends/Components/HRVTrendChart.swift
-  - StressMonitor/StressMonitor/Views/Trends/Components/StressBarChartView.swift
-  - StressMonitor/StressMonitor/Views/Trends/TrendsView.swift
-  - StressMonitor/StressMonitorTests/ChartAccessibilityTests.swift
   - StressMonitor/StressMonitorTests/ContrastComplianceTests.swift
-  - StressMonitor/StressMonitorTests/FontWellnessTypeParityTests.swift
-  - StressMonitor/StressMonitorWatch Watch App/Complications/ComplicationBundle.swift
-  - StressMonitor/StressMonitorWatch Watch App/Complications/Providers/CircularComplicationProvider.swift
-  - StressMonitor/StressMonitorWatch Watch App/Complications/Providers/InlineComplicationProvider.swift
-  - StressMonitor/StressMonitorWatch Watch App/Complications/Providers/RectangularComplicationProvider.swift
-  - StressMonitor/StressMonitorWatch Watch App/Complications/Views/CircularStressView.swift
-  - StressMonitor/StressMonitorWatch Watch App/Complications/Views/InlineStressView.swift
-  - StressMonitor/StressMonitorWatch Watch App/Complications/Views/RectangularStressView.swift
+  - StressMonitor/StressMonitor/Models/StressCategory.swift
+  - StressMonitor/StressMonitor/Views/Trends/Components/StressBarChartView.swift
+  - StressMonitor/StressMonitor/Views/Settings/Components/MeHeroCard.swift
   - StressMonitor/StressMonitorWatch Watch App/Models/StressCategory.swift
-  - StressMonitor/StressMonitorWatch Watch App/Theme/Color+Extensions.swift
-  - StressMonitor/StressMonitorWatch Watch App/Views/Components/CalendarHeatmapView.swift
-  - StressMonitor/StressMonitorWatch Watch App/Views/Components/CompactStressView.swift
-  - StressMonitor/StressMonitorWatch Watch App/Views/Components/HabitRingView.swift
-  - StressMonitor/StressMonitorWatch Watch App/Views/Components/MoodPickerRow.swift
-  - StressMonitor/StressMonitorWatch Watch App/Views/Components/RangePickerRow.swift
-  - StressMonitor/StressMonitorWatch Watch App/Views/Components/StressBarChart.swift
-  - StressMonitor/StressMonitorWatch Watch App/Views/WatchBioAgeCardView.swift
-  - StressMonitor/StressMonitorWatch Watch App/Views/WatchBreatheView.swift
-  - StressMonitor/StressMonitorWatch Watch App/Views/WatchCycleView.swift
-  - StressMonitor/StressMonitorWatch Watch App/Views/WatchHistoryView.swift
-  - StressMonitor/StressMonitorWatch Watch App/Views/WatchHomeView.swift
-  - StressMonitor/StressMonitorWatch Watch App/Views/WatchLoggingView.swift
-  - StressMonitor/StressMonitorWatch Watch App/Views/WatchMenuView.swift
-  - StressMonitor/StressMonitorWatch Watch App/Views/WatchWorkoutView.swift
-  - StressMonitor/StressMonitorWidget/StressMonitorWidgetLiveActivity.swift
-  - StressMonitor/StressMonitorWidget/Views/LargeWidgetView.swift
-  - StressMonitor/StressMonitorWidget/Views/LockScreenWidgetView.swift
-  - StressMonitor/StressMonitorWidget/Views/MediumWidgetView.swift
-  - StressMonitor/StressMonitorWidget/Views/SmallWidgetView.swift
+  - StressMonitor/StressMonitor/Theme/Color+Extensions.swift
+  - StressMonitor/StressMonitor/Views/Trends/Components/HRVTrendChart.swift
+  - StressMonitor/StressMonitorWatch Watch App/Theme/WatchDesignTokens.swift
 findings:
-  critical: 1
-  warning: 7
-  info: 6
-  total: 14
+  critical: 2
+  warning: 3
+  info: 2
+  total: 7
 status: findings
 ---
 
-# Phase 3: Code Review Report
+# Phase 3: Code Review Report (Re-Review After Fix Pass)
 
-**Reviewed:** 2026-09-05T05:13:08Z
+**Reviewed:** 2026-09-05T14:55:00Z
 **Depth:** standard
-**Files Reviewed:** 75
+**Files Reviewed:** 9
 **Status:** findings
 
 ## Summary
 
-Reviewed all 75 scoped files (iOS app, watch app, widget target, 3 test suites, pbxproj) at standard depth, cross-referencing the phase diff (`a8fe2ef^..HEAD`) to separate phase-introduced defects from pre-existing ones. Contrast ratios below were independently recomputed from the WCAG relative-luminance formula used by `ContrastComplianceTests`.
+Re-reviewed the 9 files touched by the fix pass (commits dd9fd6f, b52855d, 6e173aa, 0837136, 3af8973, a585b67, 57258bc, 250f990) against the original `03-REVIEW.md` findings (CR-01, WR-01..WR-07). Every contrast-ratio claim was independently recomputed from the WCAG relative-luminance formula (0.03928 threshold, lighter-luminance-first, matching `ContrastComplianceTests`'s own implementation).
 
-**What is sound:** the DEBUG-only `-a11y-reduce-motion` seam is correctly compiled out of Release (`#if DEBUG` on both the enum and the check — T-03-06 verified); the iOS Reduce Motion consolidation is genuinely complete (Animation+Wellness.swift is the sole `accessibilityReduceMotion` reader in the iOS + widget targets); the 84-file orphan deletion left zero dead references (all 84 deleted type names grepped clean); the pbxproj change is additions-only with unique IDs wired into the StressMonitorTests target (folder-synced groups explain the absence of view registrations); the contrast test matrix math is correct (0.03928 threshold, lighter-first ordering per G18/G145) and the plan-authorized `#6B6E7B` secondary text passes 4.5:1 at 5.0:1; `trendSummary` percent math matches its pinned tests and callers pass oldest-first data.
+**Verification verdict — 6 of 8 original findings fully close; 2 have residual gaps:**
 
-**Key concerns:** one phase-introduced WCAG regression in `DistributionBar` (moderate retune changed the fill but not the in-segment text color rule), a moderate-tier naming contradiction ("Elevated" vs "Moderate") that makes VoiceOver announcements disagree across and within surfaces, and a set of contrast failures the new test matrix does not cover (IAP CTA fill, chart accents, watch tier ink).
+| ID | Verdict | Note |
+|----|---------|------|
+| CR-01 | **CLOSED** | `DistributionBar` moderate segment now resolves text color via `@Environment(\.colorScheme)`. Recomputed: white on `#8A5A00` (light) = 5.93:1, black on `#FFD60A` (dark) = 14.9:1. Both pass. |
+| WR-01 | **CLOSED (iOS scope)** | `accessibilityDescription`, `accessibilityValue`, `DistributionBar` legend, `StressBarChartView` label, `MeHeroCard.stressLabel` all now route through `displayName` ("Elevated"). Watch-side scope dispute — see new WR-08 below; the stated justification for leaving it does not hold up. |
+| WR-02 | **CLOSED** | Watch `StressCategory.category(for:)` now matches iOS exactly (`..<25/..<50/..<75/..<90`/default), doc table and `scoreRange` updated to `75...90`/`90...150`. |
+| WR-03 | **CLOSED** | Watch `inkColor` now `{ color }`, dropping the `#B59400` special case. Recomputed `#8A5A00` vs watch canvas `#F2F2F7` = 5.31:1. |
+| WR-04 | **CLOSED** | `iapCTATeal` retuned `#4FC3F7` → `#0891B2`. Recomputed white-on-fill = 3.68:1, clears the 3:1 fill-safe bar (button text is bold ≥14pt via `Typography.iapCTA`, qualifying as large text). |
+| WR-05 | **NOT FULLY CLOSED** | See new CR-03 below — the trend line/fill now pass 3:1, but the chart's own text elements still fail 4.5:1 and the new test doesn't catch it. |
+| WR-06 | **CLOSED** | Residual now assigned via `days.lastIndex(where: { $0 > 0 })` — keyed off raw day counts, not rounded percentages, so a tier can only receive nonzero % if it actually has nonzero days. Verified against several rounding-overshoot/undershoot cases (e.g. days `[1,1,1,0]` → `34/33/33/0`, not `33/33/33/1`). |
+| WR-07 | **CLOSED (marginal)** | `WatchDesignTokens.muted` retuned `#777986` → `#6B6E7B`. Recomputed = 4.541:1 against watch canvas `#F2F2F7` — passes 4.5:1 but by a hair; see IN-02. No call site applies extra `.opacity()` on top of it. |
+
+**New issues found during this re-review** (not part of the original 8, discovered by reading the same files at standard depth):
 
 ## Critical Issues
 
-### CR-01: Moderate retune made DistributionBar's in-segment label fail contrast in light mode (~2.7:1)
+### CR-01 (new): `DistributionBar`'s default white segment-label text fails contrast for relaxed/mild/high — the CR-01 fix only covered moderate
 
-**File:** `StressMonitor/StressMonitor/Views/Trends/Components/DistributionBar.swift:87-90, 104-114`
-**Issue:** The phase changed `StressCategory.moderate.color` light variant from `#FFD60A` (bright yellow) to `#8A5A00` (dark amber). `DistributionBar.barSegment` still hardcodes `darkText: true` for the moderate segment (`Color.black.opacity(0.65)`), which was correct only against the old yellow. In light mode the visible "NN%" label now renders black-on-`#8A5A00` at ~2.67:1 — failing 4.5:1 (11pt semibold is not large text) and even 3:1. Dark mode is unaffected (`#FFD60A` + black). White text on `#8A5A00` measures 5.9:1 and passes. This is a regression introduced by this phase's own token retune; the segment-label pair is not covered by `ContrastComplianceTests`.
-**Fix:** Make the label color tier/appearance-aware instead of hardcoded — e.g. use white for the light variant:
+**File:** `StressMonitor/StressMonitor/Views/Trends/Components/DistributionBar.swift:94-102, 110`
+**Issue:** `barSegment(color:width:label:textColor:)` defaults `textColor` to `.white` for every tier except moderate (which now resolves via `colorScheme`, per the closed CR-01). Recomputing WCAG contrast for the "NN%" label (11pt semibold — not large text, needs 4.5:1) against each tier's actual fill:
+
+| Tier | Light fill | White-on-fill | Dark fill | White-on-fill |
+|------|-----------|----------------|-----------|----------------|
+| Relaxed | `#00A000` | **3.48:1 — fails** | `#30D158` | **2.02:1 — fails badly** |
+| Mild | `#007AFF` | **4.02:1 — fails** | `#0A84FF` | **3.65:1 — fails** |
+| High | `#B25400` | 5.05:1 — passes | `#FF9F0A` | **2.06:1 — fails badly** |
+
+Only moderate (fixed by CR-01) and light-mode high pass. In dark mode, 3 of 4 segment labels render at ~2–3.7:1 — the relaxed and high dark-mode cases are especially severe (~2:1, the same class of failure the original CR-01 called out for moderate). None of these pairs are covered by `ContrastComplianceTests` (only the moderate pair was added). This is not a regression from the fix pass — it pre-dates the phase — but it sits in the exact function CR-01 touched and was not caught by either the original audit or the fix.
+**Fix:** Extend the same `@Environment(\.colorScheme)`-driven approach (or per-tier fixed dark text where the fill is light enough) to all four segments, e.g.:
 ```swift
-if width > 32 {
-    Text(label)
-        .font(.system(size: 11, weight: .semibold, design: .rounded))
-        .foregroundStyle(Color.white)
-}
-```
-(or resolve `darkText` from `@Environment(\.colorScheme)`: dark scheme + moderate → black, otherwise white.) Add the segment-label pair to `ContrastComplianceTests`.
-
-## Warnings
-
-### WR-01: Moderate tier is announced as two different names ("Elevated" vs "Moderate") — VoiceOver label contradicts hint on the same surface
-
-**File:** `StressMonitor/StressMonitor/Models/StressCategory.swift:57-60, 84-86`; `StressMonitor/StressMonitor/Views/Trends/Components/DistributionBar.swift:128`
-**Issue:** This phase relocated `displayName` into `StressCategory` with `.moderate` → "Elevated", while `accessibilityDescription` in the same type derives from `rawValue.capitalized` → "Moderate". A VoiceOver user on the dashboard hears the label "Elevated stress level" (`stressDualCoding`) and, where `accessibilityStressLevel` is applied (`AccessibilityModifiers.swift:127`), the hint "Moderate stress level, represented by triangle.fill…". The Trends screens hardcode "Moderate" (DistributionBar legend, StressBarChartView rawValue labels), and the watch `displayName` is "Moderate". The same score therefore changes name between screens and even between the label and hint of one element — an accessibility label that contradicts the visible text elsewhere.
-**Fix:** Pick one canonical name. Either rename `.moderate` display to "Moderate" everywhere (change `displayName` and keep rawValue-derived copy), or update `accessibilityDescription` to use `displayName`, the DistributionBar legend, StressBarChartView labels, and the watch `displayName` to "Elevated". Minimum fix: `accessibilityDescription` should use `displayName` so label and hint agree.
-
-### WR-02: iOS and watch tier boundaries disagree — a score of 90-100 is "Severe" on iPhone but "High" on Watch
-
-**File:** `StressMonitor/StressMonitorWatch Watch App/Models/StressCategory.swift:126-133`; `StressMonitor/StressMonitor/Models/StressResult.swift:33-41`
-**Issue:** iOS `StressResult.category(for:)` resolves `.high` at `75..<90` and `.severe` at `90+`; the watch resolves `.high` at `76...100` and `.severe` only above 100 (its `category(for:)` pre-dates this phase, but the phase aligned only the colors and left the header claiming "Aligned exactly with the iOS app's StressCategory"). Boundary values also differ (25/50/75 vs 26/51/76). The same synced measurement therefore shows a different tier name, color, and glyph on watch vs phone in the 25.0-25.99, 50.x, 75.x, and 90-100 bands — 95 reads Severe (red) on the phone and High (orange) on the watch.
-**Fix:** Mirror the iOS boundaries in the watch resolver:
-```swift
-public static func category(for level: Double) -> StressCategory {
-    switch level {
-    case ..<25:  return .relaxed
-    case ..<50:  return .mild
-    case ..<75:  return .moderate
-    case ..<90:  return .high
-    default:     return .severe
+private func labelTextColor(for tier: StressCategory) -> Color {
+    switch tier {
+    case .high:     return colorScheme == .dark ? .black : .white   // light passes now; verify dark fill first
+    case .relaxed, .mild: return .black  // both light/dark fills are too bright for white text
+    case .moderate: return colorScheme == .dark ? .black : .white   // already correct
+    default: return .white
     }
 }
 ```
-and update the doc table/scoreRange accordingly.
+Recompute each pairing before shipping and add all four to `ContrastComplianceTests` (not just moderate).
 
-### WR-03: Watch `inkColor` (#B59400) is obsolete and failing (2.6:1) after the moderate retune
+### CR-02 (new, continuation of WR-05): `HRVTrendChart`'s numeral and annotation text still fail 4.5:1 after the accent retune — the new test only pins the loosened 3:1 bar
 
-**File:** `StressMonitor/StressMonitorWatch Watch App/Models/StressCategory.swift:39-46`; used at `WatchHomeView.swift:67`, `WatchHistoryView.swift:117,182`, `CompactStressView.swift:33`, `WatchMenuView.swift:60`
-**Issue:** `inkColor` special-cases `.moderate` to `#B59400` ("yellow needs a darker ink") — measured 2.61:1 on the watch canvas `#F2F2F7`, failing even the 3:1 large-text bar for the 42pt home score. This phase's retune made the tier's own light color `#8A5A00`, which passes at 5.3:1 — the special case now produces strictly worse contrast than the default. (The value pre-dates the phase, but the phase retuned exactly this tier's color and swept these files, making the fix trivial.)
-**Fix:** Delete the moderate special case so ink falls back to `color` (`#8A5A00`), or retune `stressModerateInk` to the `#8A5A00` family.
+**File:** `StressMonitor/StressMonitor/Views/Trends/Components/HRVTrendChart.swift:16, 91, 127-129`; `StressMonitor/StressMonitor/Theme/Color+Extensions.swift:44-47`; `StressMonitor/StressMonitorTests/ContrastComplianceTests.swift:221-231`
+**Issue:** `hrvTrendAccent`'s light variant was retuned `#34D399` → `#0F9D6E`. Recomputed against the white `adaptiveCardBackground`: **3.46:1** (not the ~4.10:1 implied by the fix's own framing) — this only clears the 3:1 UI-component bar appropriate for the 2.4pt trend line/area-fill/halo. But `hrvColor` (== `hrvTrendAccent`) is still the literal `.foregroundStyle` for two text elements in the same file: the 22pt semibold average numeral (line 91) and the 10pt monospaced "today · NNms" annotation (line 129). Both are text, and the 10pt annotation is unambiguously "normal text" requiring 4.5:1 — it still fails at 3.46:1. The newly added `hrvAccentOnCard` test (`ContrastComplianceTests.swift:225-230`) asserts only `ratio >= 3.0`, so it passes today's value and would keep passing even if the accent regressed further toward the pre-fix 1.92:1 as long as it stayed above 3.0 — the gate does not protect the text usages at all.
+**Fix:** Either (a) route the numeral/annotation through `Color.Wellness.adaptivePrimaryText`/`adaptiveSecondaryText` instead of the accent color (matching how `StressBarChartView`'s header text is handled), or (b) retune `hrvTrendAccent`'s light variant further until white/text-on-card clears 4.5:1, and add a dedicated `hrvAccentTextOnCard` test asserting `>= 4.5`, separate from the 3:1 line/fill test.
 
-### WR-04: `iapCTATeal` (#4FC3F7) still carries white CTA text at 2.0:1, violating the new invariant stated in the same file
+## Warnings
 
-**File:** `StressMonitor/StressMonitor/Theme/Color+Extensions.swift:159-160` (token), consumed at `Views/Premium/Components/IAPCTAButton.swift:34`
-**Issue:** This phase's doc comment on `settingsRippleBlue` states "The legacy fixed #4FC3F7 must never carry white text as a fill in either appearance (2.00:1)" (verified: 2.003:1), and `whiteOnRippleFill` now guards the ripple token. But `iapCTATeal` remains `#4FC3F7` and is the leading gradient stop of the paywall's primary "Unlock Premium" button with `.foregroundStyle(.white)` — the app's main conversion button renders at 2.0:1. The token was not retuned and the pair is not in the test matrix. (Value pre-dates the phase; flagged because the phase established the invariant and its contrast gate in this file.)
-**Fix:** Retune `iapCTATeal` to `#0891B2` (matching the ripple token; white passes 3.67:1) or another fill-safe value, and add `whiteOnIAPCTAFill` to `ContrastComplianceTests`.
+### WR-08 (new): WR-01's disputed watch-side justification doesn't hold — `TierNamePreferences` has zero call sites
 
-### WR-05: HRVTrendChart accent (#34D399) measures 1.92:1 on the white light-mode card
+**File:** `StressMonitor/StressMonitorWatch Watch App/Models/StressCategory.swift:76` (watch `displayName` still "Moderate"); `StressMonitor/StressMonitorWatch Watch App/Models/TierNamePreferences.swift` (cited justification)
+**Issue:** The fix pass's stated reason for leaving the watch's `StressCategory.moderate.displayName` at "Moderate" (rather than aligning to iOS's "Elevated") was that renaming it "would newly contradict `TierNamePreferences` defaults" (`moderate: String = "Moderate"`). Verified: `TierNamePreferences` — its `load()`, `save()`, and `displayName(for:)` — has **no call sites anywhere** in the watch target outside its own declaration file (confirmed via repo-wide grep). It is also keyed to a different, unrelated type (`WatchStressCategory`, an `Int`-raw-value enum in `StressMeasurement.swift`), not the `StressCategory` whose `displayName` was actually the subject of WR-01. Since `TierNamePreferences` is not wired into any live UI, it cannot "contradict" anything a user currently sees — the justification is based on dead scaffolding, not a live product constraint. The original WR-01 defect (a stress score of e.g. 60 is announced/labeled "Elevated" on iPhone and "Moderate" on Watch, for the same synced measurement) remains live.
+**Fix:** Either wire `TierNamePreferences` into the watch UI (in which case the naming-consistency tradeoff becomes real and worth relitigating with the user), delete it if it's unused scaffolding, or — absent either — align the watch `displayName` to iOS's "Elevated" per the original WR-01 minimum-fix guidance, since the cited blocker doesn't currently exist.
 
-**File:** `StressMonitor/StressMonitor/Views/Trends/Components/HRVTrendChart.swift:16, 89-99, 127-129, 187`
-**Issue:** The chart card background is `Color.Wellness.adaptiveCardBackground` (white in light mode), and `hrvColor` is the fixed `#34D399`. In light mode the 2.4pt trend line (UI component, needs 3:1), the 22pt semibold average numeral, and the 10pt "today · NNms" annotation all render at 1.92:1. Dark mode passes (8.7:1). The phase added the D-09 accessibility series to this chart but the accent pair was not added to the contrast matrix, so the failure is unguarded. (Accent pre-dates the phase; the file and its contrast posture are in scope.)
-**Fix:** Make the accent adaptive (`light: #0F9D6E`-family dark green, `dark: #34D399`) or move it to `Color.Wellness.healthGreen` with a light variant that passes 3:1, and pin the pair in `ContrastComplianceTests`.
+### WR-09 (new): Two Settings/Trends views define local 4-tier category mappers that never resolve `.severe`, diverging from the canonical `StressResult.category(for:)`
 
-### WR-06: DistributionBar assigns the rounding residual to "high" even when highDays == 0
+**File:** `StressMonitor/StressMonitor/Views/Settings/Components/MeHeroCard.swift:118-127`; `StressMonitor/StressMonitor/Views/Trends/Components/StressBarChartView.swift:141-148`
+**Issue:** Both files define a private/local score→tier mapper (`StressCategory.from(score:)` in `MeHeroCard`, `stressCategory(for:)` in `StressBarChartView`) with only 4 cases — `..<25/25..<50/50..<75/default→.high` — and never produce `.severe`. The canonical resolver used everywhere else (`StressResult.category(for:) `in `StressResult.swift:33-41`, mirrored by the just-fixed watch resolver in WR-02) treats `75..<90` as `.high` and `90+` as `.severe`. A measurement of 95 therefore renders "Severe" (red, `exclamationmark.octagon.fill`) on the Dashboard but "High" (orange, `square.fill`) in the Settings Me-hero-card metric row and the Trends daily bar chart — the same class of cross-surface tier-naming disagreement WR-02 fixed for iOS-vs-watch, but occurring iOS-internally between components. Not touched by this fix pass; flagged because it's the same defect family the phase set out to close and both files are in this re-review's scope.
+**Fix:** Replace both local mappers with `StressResult.category(for:)` (or `StressCategory(from:)`, the existing convenience init in `StressCategory.swift:76-78`) so all three surfaces agree above 90.
 
-**File:** `StressMonitor/StressMonitor/Views/Trends/Components/DistributionBar.swift:21-31`
-**Issue:** The comment says "Last non-zero segment absorbs the rounding residual", but the implementation computes `hPct = max(0, 100 - rPct - mPct - moPct)` unconditionally. With e.g. 1/1/1/0 days, the rounded percentages sum to 99 and `high` receives 1% — an orange sliver renders while the legend directly below shows "High, 0 days" (dimmed), and the VoiceOver label announces "High 1 percent". Contradictory visible/spoken data.
-**Fix:** Assign the residual to the last non-zero tier:
-```swift
-let raw = [rPct, mPct, moPct]
-var pcts = raw
-if let lastNonZero = pcts.lastIndex(where: { $0 > 0 }) {
-    pcts[lastNonZero] += 100 - pcts.reduce(0, +)
-} else {
-    return (0, 0, 0, 0)
-}
-```
-(then map to the four-tuple with `high` receiving only its true rounded share).
+### WR-10 (new): New contrast tests use the 3:1 "large-text" bar for pairs that include genuinely normal-size text
 
-### WR-07: Watch micro-label ramp (`muted` #777986) measures 3.86:1 on the watch canvas — systemic AA failure under the dated-exception sweep
-
-**File:** `StressMonitor/StressMonitorWatch Watch App/Theme/WatchDesignTokens.swift:36` (token); e.g. `WatchHistoryView.swift:286`, `WatchLoggingView.swift:416`, `WatchCycleView.swift:174`, `WatchBreatheView.swift:146`
-**Issue:** `muted` measures 3.86:1 against `canvas` `#F2F2F7` — below the 4.5:1 required for the 7-9pt micro-labels that use it throughout the watch screens this phase swept with dated Dynamic Type exceptions. The iOS-side equivalents were retuned (adaptive secondary text now passes at 5.0:1), but the watch canvas was left out of the contrast gate — `ContrastComplianceTests` covers only iOS tokens, so nothing pins or catches this.
-**Fix:** Retune `WatchDesignTokens.muted` to the `#6B6E7B` family (5.0:1, the same authorized override used on iOS), and add a watch-token contrast test if the watch target can host one (otherwise pin the pair from the iOS test target via shared constants).
+**File:** `StressMonitor/StressMonitorTests/ContrastComplianceTests.swift:191-231`
+**Issue:** `whiteOnModerateDistributionSegmentLight`/`Dark` (11pt semibold "NN%" label — the original CR-01 finding itself said "11pt semibold is not large text" and required 4.5:1) and `hrvAccentOnCard` (10pt monospaced annotation text, see CR-02 above) are both placed under the file's `// MARK: - UI / Large-Text Accent Pairs (>= 3:1)` section and asserted at `>= 3.0`. For the moderate-segment pair the actual values (5.93:1 light / 14.9:1 dark) are high enough that this doesn't currently mask a failure, but the gate itself no longer enforces the 4.5:1 bar the original finding established for that exact text, and for the HRV pair the loose threshold does mask a real failure (CR-02). The `whiteOnIAPCTAFill` test correctly uses 3:1 for genuinely bold/large CTA text — the moderate and HRV cases are text, not "large text."
+**Fix:** Split these two tests to their own text-pair section asserting `>= 4.5`, matching the original findings' own stated requirement.
 
 ## Info
 
-### IN-01: High-contrast stress variants are only tested on the light canvas and are non-adaptive
+### IN-01 (new): `Color.hrvAccent` (`#34D399`, non-adaptive) is now dead code alongside the new `Color.hrvTrendAccent`
 
-**File:** `StressMonitor/StressMonitorTests/ContrastComplianceTests.swift:217-227`; `StressMonitor/StressMonitor/Theme/Color+Wellness.swift:137-153`
-**Issue:** `highContrastStressVariantsOnLightCanvas` resolves only `.light`; the variant hexes are fixed (non-adaptive) and are applied regardless of appearance by `AccessibilityContrastModifier`, so the dark + increased-contrast path is unverified (spot-check shows it passes ~3.2:1, but nothing pins it).
-**Fix:** Add a parameterized dark-appearance variant of the test.
+**File:** `StressMonitor/StressMonitor/Theme/Color+Extensions.swift:94`
+**Issue:** `hrvAccent` has zero call sites anywhere in the app (confirmed via repo-wide grep) now that `HRVTrendChart` was switched to `Color.hrvTrendAccent`. The two similarly-named tokens (`hrvAccent` vs `hrvTrendAccent`) sitting side by side is a maintenance trap for the next person who reaches for "the HRV color" and picks the failing, unmaintained one.
+**Fix:** Delete `hrvAccent`, or if some other consumer is planned, note it explicitly.
 
-### IN-02: Dead motion API surface added this phase
+### IN-02 (new): `WatchDesignTokens.muted` passes AA by 0.041 — no margin for rounding/measurement drift
 
-**File:** `StressMonitor/StressMonitor/Utilities/Animation+Wellness.swift:227-242, 283-291`
-**Issue:** `AnyTransition.accessibleOpacity/accessibleScale/accessibleSlide`, `staggeredAppear(index:total:delay:)`, `shimmerLoading()`, and `pressEffect()` have zero call sites in the app (`ScaleButtonStyle` typealias is live; `animateIfMotionAllowed`, `startMotionIfAllowed`, `onMotionDecision`, `motionAwareTransition`, `accessibleAnimation` all have callers). `accessibleOpacity(motionReduced:)` also ignores its parameter entirely. `StaggeredAppearModifier.totalItems` is stored but unused.
-**Fix:** Remove the uncalled helpers (or note them as intentional forward API); if `accessibleOpacity` stays, drop the unused parameter.
-
-### IN-03: Unused reduce-motion environment declarations left behind after consolidation
-
-**File:** `StressMonitor/StressMonitorWatch Watch App/Views/WatchLoggingView.swift:19`; `StressMonitor/StressMonitorWatch Watch App/Views/WatchHistoryView.swift:13`
-**Issue:** Both files declare `@Environment(\.accessibilityReduceMotion) private var reduceMotion` with no remaining readers (1 mention each = declaration only). Harmless but dead, and contradicts the single-owner rule the iOS side now enforces.
-**Fix:** Delete the declarations (or route them through a watch-side helper if watch consolidation is planned).
-
-### IN-04: Watch `stressModerateInk` token is unused with a stale doc comment
-
-**File:** `StressMonitor/StressMonitorWatch Watch App/Theme/Color+Extensions.swift:50-51`
-**Issue:** Zero usages; the comment still says "WCAG-safe against the pale yellow" although the base token is no longer pale yellow (and the value itself fails, see WR-03).
-**Fix:** Delete the token.
-
-### IN-05: Fidget timer no longer re-checks the motion decision per tick
-
-**File:** `StressMonitor/StressMonitor/Components/Character/CharacterAnimationModifier.swift:58-74`
-**Issue:** The consolidation replaced the per-tick `guard !self.reduceMotion` inside the fidget `Timer` with start-gating only. If Reduce Motion is enabled while a `.focused`-mood character is on screen, the fidget animation continues until the view disappears (the offset gate is by mood, not by motion). Minor: affects only the decorative fidget and only mid-session setting changes.
-**Fix:** Re-add a per-tick check via `onMotionDecision` state, or invalidate the timer when the decision flips.
-
-### IN-06: Watch `scoreRange` contradicts the resolver at exactly 100
-
-**File:** `StressMonitor/StressMonitorWatch Watch App/Models/StressCategory.swift:99-108`
-**Issue:** `.high` is `76...100` and `.severe` is `100...150` (overlapping at 100), while `category(for:)` matches `76...100` first, so 100.0 resolves `.high`. No callers currently use `scoreRange` (dead metadata), but it will mislead the next consumer.
-**Fix:** Correct to `101...150` (or remove `scoreRange` with the WR-02 boundary fix).
+**File:** `StressMonitor/StressMonitorWatch Watch App/Theme/WatchDesignTokens.swift:36-38`
+**Issue:** Recomputed contrast is 4.541:1 against a 4.5:1 requirement — a 0.9% margin. Different rounding in a stricter checker, a future canvas-color tweak, or `.opacity()` added at a new call site would silently drop this below AA with no test failure until the specific pair is re-measured (the `watchMutedTokenOnCanvas` test does pin this exact pair at `>= 4.5`, so a regression would be caught — but the value itself has essentially no headroom).
+**Fix:** Consider retuning slightly darker (e.g. `#666A78` or similar) for headroom, or accept as-is since the pinning test exists.
 
 ---
 
-_Reviewed: 2026-09-05T05:13:08Z_
+_Reviewed: 2026-09-05T14:55:00Z_
 _Reviewer: Claude (gsd-code-reviewer)_
 _Depth: standard_
