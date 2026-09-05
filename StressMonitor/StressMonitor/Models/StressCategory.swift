@@ -38,17 +38,6 @@ public enum StressCategory: String, CaseIterable, Codable, Sendable {
         }
     }
 
-    // MARK: - Accessible Text Variants
-
-    /// Foreground color for text drawn ON TOP of this category's color as a fill.
-    /// Yellow gets dark text; other categories get white.
-    public var overlayTextColor: Color {
-        switch self {
-        case .moderate: return Color(hex: "#1A1A2E")
-        default: return .white
-        }
-    }
-
     // MARK: - Dual Coding: Pattern Description
 
     /// Accessibility pattern description for color-blind users
