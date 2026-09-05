@@ -142,7 +142,8 @@ extension View {
         modifier(ReduceMotionAwareModifier(animation: animation, value: value))
     }
 
-    /// Receive the helper's motion decision (`true` = motion reduced) at appear time.
+    /// Receive the helper's motion decision (`true` = motion reduced) at appear
+    /// time and on every mid-session Reduce Motion change.
     func onMotionDecision(_ handler: @escaping (_ motionReduced: Bool) -> Void) -> some View {
         modifier(MotionDecisionModifier(handler: handler))
     }
@@ -164,5 +165,4 @@ extension View {
     ) -> some View {
         modifier(AccessibleAnimationModifier(animation: animation, value: value))
     }
-
 }
