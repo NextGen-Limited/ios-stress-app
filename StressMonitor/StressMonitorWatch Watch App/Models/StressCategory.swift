@@ -69,11 +69,18 @@ public enum StressCategory: String, CaseIterable, Codable, Sendable, Identifiabl
     // MARK: - Display
 
     /// Capitalised display name ("Relaxed", "Mild", …) for tier labels.
+    ///
+    /// `.moderate` reads "Elevated" to match the iOS app's
+    /// `StressCategory.displayName` — `TierNamePreferences` (which still
+    /// defaults `.moderate` to "Moderate") has no call sites anywhere in the
+    /// watch target and is keyed to the unrelated `WatchStressCategory`
+    /// type, so it cannot justify a cross-platform naming mismatch for a
+    /// synced measurement.
     public var displayName: String {
         switch self {
         case .relaxed:  return "Relaxed"
         case .mild:     return "Mild"
-        case .moderate: return "Moderate"
+        case .moderate: return "Elevated"
         case .high:     return "High"
         case .severe:   return "Severe"
         }
