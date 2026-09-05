@@ -8,10 +8,10 @@ import SwiftUI
 ///
 /// | Tier      | Score range | Hex       | Glyph |
 /// |-----------|-------------|-----------|-------|
-/// | Relaxed   | 0–25        | `#34C759` | ◌     |
+/// | Relaxed   | 0–25        | `#00A000` | ◌     |
 /// | Mild      | 26–50       | `#007AFF` | ◎     |
-/// | Moderate  | 51–75       | `#FFD60A` | ◐     |
-/// | High      | 76–100      | `#FF9500` | ◑     |
+/// | Moderate  | 51–75       | `#8A5A00` | ◐     |
+/// | High      | 76–100      | `#B25400` | ◑     |
 /// | Severe    | 100+        | `#FF3B30` | ●     |
 public enum StressCategory: String, CaseIterable, Codable, Sendable, Identifiable {
     case relaxed
@@ -24,13 +24,14 @@ public enum StressCategory: String, CaseIterable, Codable, Sendable, Identifiabl
 
     // MARK: - Dual Coding: Colour
 
-    /// Primary colour for this stress category.
+    /// Primary colour for this stress category (light set, mirrored from
+    /// the iOS app's `StressCategory.color`).
     public var color: Color {
         switch self {
-        case .relaxed:  return Color(hex: "#34C759")
+        case .relaxed:  return Color(hex: "#00A000")
         case .mild:     return Color(hex: "#007AFF")
-        case .moderate: return Color(hex: "#FFD60A")
-        case .high:     return Color(hex: "#FF9500")
+        case .moderate: return Color(hex: "#8A5A00")
+        case .high:     return Color(hex: "#B25400")
         case .severe:   return Color(hex: "#FF3B30")
         }
     }

@@ -39,11 +39,12 @@ extension Color {
 
     // MARK: - Stress-scale convenience accessors (iOS-aligned)
 
-    /// 5-tier stress scale, exact hex values from app.css `--stress-*`.
-    static let stressRelaxed  = Color(hex: "#34C759")
+    /// 5-tier stress scale, light-set hexes mirrored from the iOS app's
+    /// `StressCategory.color` (no shared framework — mirror convention).
+    static let stressRelaxed  = Color(hex: "#00A000")
     static let stressMild     = Color(hex: "#007AFF")
-    static let stressModerate = Color(hex: "#FFD60A")
-    static let stressHigh     = Color(hex: "#FF9500")
+    static let stressModerate = Color(hex: "#8A5A00")
+    static let stressHigh     = Color(hex: "#B25400")
     static let stressSevere   = Color(hex: "#FF3B30")
 
     /// Moderate-tier on-light text colour (WCAG-safe against the pale yellow).

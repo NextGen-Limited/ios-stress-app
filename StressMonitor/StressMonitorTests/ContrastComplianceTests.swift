@@ -9,7 +9,17 @@ import UIKit
 /// `UIColor.resolvedColor(with:)` in BOTH appearances — never sampled from
 /// screenshots. Thresholds follow the usage class of the pair: >= 4.5:1 for
 /// body-text pairs, >= 3:1 for large-text / UI-component pairs (W3C
-/// techniques G18 and G145).
+/// techniques G18 and G145). Stress hues are asserted through
+/// `Color.stressColor(for:)` delegating to `StressCategory.color`, pinning
+/// the single source of truth for the stress palette.
+///
+/// Widget contrast scope (decision D-07, platform-bounded): widget gallery
+/// and lock-screen surfaces join the contrast/Dynamic Type sweep per D-02 —
+/// the Dynamic Type half executes in plan 03-02 Task 4. Widget foregrounds
+/// are system `.primary` / `.secondary` on system materials (Apple-guaranteed
+/// pairs, verified as token pairs only); the tier accent is always dual-coded
+/// next to a text label and never carries meaning alone; wallpaper-dependent
+/// contrast is out of scope by construction.
 @Suite("Contrast Compliance")
 struct ContrastComplianceTests {
 
@@ -57,6 +67,30 @@ struct ContrastComplianceTests {
     // MARK: - Text Pairs (>= 4.5:1)
 
     @Test(
+        "Adaptive primary text passes AA (4.5:1) on the canvas in both appearances",
+        arguments: [UIUserInterfaceStyle.light, .dark]
+    )
+    func adaptivePrimaryTextOnCanvas(style: UIUserInterfaceStyle) {
+        let ratio = contrastRatio(
+            resolved(Color.Wellness.adaptivePrimaryText, style),
+            on: resolved(Color.Wellness.adaptiveBackground, style)
+        )
+        #expect(ratio >= 4.5)
+    }
+
+    @Test(
+        "Adaptive primary text passes AA (4.5:1) on cards in both appearances",
+        arguments: [UIUserInterfaceStyle.light, .dark]
+    )
+    func adaptivePrimaryTextOnCard(style: UIUserInterfaceStyle) {
+        let ratio = contrastRatio(
+            resolved(Color.Wellness.adaptivePrimaryText, style),
+            on: resolved(Color.Wellness.adaptiveCardBackground, style)
+        )
+        #expect(ratio >= 4.5)
+    }
+
+    @Test(
         "Adaptive secondary text passes AA (4.5:1) on the canvas in both appearances",
         arguments: [UIUserInterfaceStyle.light, .dark]
     )
@@ -78,5 +112,117 @@ struct ContrastComplianceTests {
             on: resolved(Color.Wellness.adaptiveCardBackground, style)
         )
         #expect(ratio >= 4.5)
+    }
+
+    @Test(
+        "Tertiary text (aliased to the adaptive secondary token) passes AA on the canvas in both appearances",
+        arguments: [UIUserInterfaceStyle.light, .dark]
+    )
+    func textTertiaryOnCanvas(style: UIUserInterfaceStyle) {
+        let ratio = contrastRatio(
+            resolved(Color.textTertiary, style),
+            on: resolved(Color.Wellness.adaptiveBackground, style)
+        )
+        #expect(ratio >= 4.5)
+    }
+
+    @Test(
+        "Descriptive text (aliased to the adaptive secondary token) passes AA on the canvas in both appearances",
+        arguments: [UIUserInterfaceStyle.light, .dark]
+    )
+    func textDescriptiveOnCanvas(style: UIUserInterfaceStyle) {
+        let ratio = contrastRatio(
+            resolved(Color.textDescriptive, style),
+            on: resolved(Color.Wellness.adaptiveBackground, style)
+        )
+        #expect(ratio >= 4.5)
+    }
+
+    // MARK: - UI / Large-Text Accent Pairs (>= 3:1)
+
+    @Test(
+        "Primary blue passes AA-UI (3:1) on the canvas in both appearances",
+        arguments: [UIUserInterfaceStyle.light, .dark]
+    )
+    func primaryBlueOnCanvas(style: UIUserInterfaceStyle) {
+        let ratio = contrastRatio(
+            resolved(Color.primaryBlue, style),
+            on: resolved(Color.Wellness.adaptiveBackground, style)
+        )
+        #expect(ratio >= 3.0)
+    }
+
+    @Test(
+        "White text on the primary blue fill passes 3:1 in both appearances",
+        arguments: [UIUserInterfaceStyle.light, .dark]
+    )
+    func whiteOnPrimaryBlueFill(style: UIUserInterfaceStyle) {
+        let ratio = contrastRatio(
+            UIColor.white,
+            on: resolved(Color.primaryBlue, style)
+        )
+        #expect(ratio >= 3.0)
+    }
+
+    @Test(
+        "Ripple accent passes AA-UI (3:1) on the canvas in both appearances",
+        arguments: [UIUserInterfaceStyle.light, .dark]
+    )
+    func rippleAccentOnCanvas(style: UIUserInterfaceStyle) {
+        let ratio = contrastRatio(
+            resolved(Color.settingsRippleBlue, style),
+            on: resolved(Color.Wellness.adaptiveBackground, style)
+        )
+        #expect(ratio >= 3.0)
+    }
+
+    @Test(
+        "White text on the ripple fill passes 3:1 in both appearances",
+        arguments: [UIUserInterfaceStyle.light, .dark]
+    )
+    func whiteOnRippleFill(style: UIUserInterfaceStyle) {
+        let ratio = contrastRatio(
+            UIColor.white,
+            on: resolved(Color.settingsRippleBlue, style)
+        )
+        #expect(ratio >= 3.0)
+    }
+
+    // MARK: - Stress Indicator Pairs (>= 3:1)
+
+    @Test(
+        "Every stress category hue passes 3:1 on the light canvas via Color.stressColor(for:)",
+        arguments: StressCategory.allCases
+    )
+    func stressHuesOnLightCanvas(category: StressCategory) {
+        let ratio = contrastRatio(
+            resolved(Color.stressColor(for: category), .light),
+            on: resolved(Color.Wellness.adaptiveBackground, .light)
+        )
+        #expect(ratio >= 3.0)
+    }
+
+    @Test(
+        "Every stress category hue passes 3:1 on the dark canvas via Color.stressColor(for:)",
+        arguments: StressCategory.allCases
+    )
+    func stressHuesOnDarkCanvas(category: StressCategory) {
+        let ratio = contrastRatio(
+            resolved(Color.stressColor(for: category), .dark),
+            on: resolved(Color.Wellness.adaptiveBackground, .dark)
+        )
+        #expect(ratio >= 3.0)
+    }
+
+    @Test(
+        "High-contrast stress variants pass 3:1 on the light canvas for every category",
+        arguments: StressCategory.allCases
+    )
+    func highContrastStressVariantsOnLightCanvas(category: StressCategory) {
+        let ratio = contrastRatio(
+            resolved(Color.accessibleStressColor(for: category, highContrast: true), .light),
+            on: resolved(Color.Wellness.adaptiveBackground, .light)
+        )
+        #expect(ratio >= 3.0)
     }
 }

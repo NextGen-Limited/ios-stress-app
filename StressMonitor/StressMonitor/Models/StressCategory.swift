@@ -13,13 +13,13 @@ public enum StressCategory: String, CaseIterable, Codable, Sendable {
     public var color: Color {
         switch self {
         case .relaxed:
-            return Color(light: Color(hex: "#34C759"), dark: Color(hex: "#30D158"))
+            return Color(light: Color(hex: "#00A000"), dark: Color(hex: "#30D158"))
         case .mild:
             return Color(light: Color(hex: "#007AFF"), dark: Color(hex: "#0A84FF"))
         case .moderate:
-            return Color(hex: "#FFD60A")
+            return Color(light: Color(hex: "#8A5A00"), dark: Color(hex: "#FFD60A"))
         case .high:
-            return Color(light: Color(hex: "#FF9500"), dark: Color(hex: "#FF9F0A"))
+            return Color(light: Color(hex: "#B25400"), dark: Color(hex: "#FF9F0A"))
         case .severe:
             return Color(light: Color(hex: "#FF3B30"), dark: Color(hex: "#FF453A"))
         }

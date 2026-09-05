@@ -136,14 +136,15 @@ extension Color {
     /// - Returns: Color for the stress level
     static func accessibleStressColor(for category: StressCategory, highContrast: Bool = false) -> Color {
         if highContrast {
-            // WCAG AAA compliant high contrast colors (7:1 ratio)
+            // Increased-contrast indicator variants — each passes WCAG AA
+            // (>= 3:1) on the light cream canvas
             switch category {
             case .relaxed:
                 return Color(hex: "#00A000") // Darker green
             case .mild:
                 return Color(hex: "#0050FF") // Darker blue
             case .moderate:
-                return Color(hex: "#FFA500") // Orange (not yellow for better contrast)
+                return Color(hex: "#8A5A00") // Dark amber (matches the standard light variant)
             case .high:
                 return Color(hex: "#CC0000") // Dark red
             case .severe:
