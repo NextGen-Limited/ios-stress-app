@@ -6,6 +6,12 @@ struct MainTabView: View {
     @Environment(AppRouter.self) private var router
     @Environment(PaywallController.self) private var paywall
     @State private var stressRepository: StressRepository?
+    // Health-sync consent prompt state. The service is the signal source:
+    // a 403 CONSENT_REQUIRED during the foreground upload flips
+    // `needsConsent`, and the explanation sheet presents from here — above
+    // the whole tab hierarchy, like the paywall.
+    @StateObject private var healthSync = HealthSyncService.shared
+    @State private var showConsentSheet = false
 
     // Per-tab navigation restoration (Axiom nav.md Pattern 6). `Route` is
     // Codable, so each path round-trips through `NavigationPath.CodableRepresentation`.
@@ -79,6 +85,10 @@ struct MainTabView: View {
             selectedTabData = router.selectedTab.rawValue
         }
         .onAppear {
+            // Mirror the current prompt state on mount: the foreground sync
+            // may have flipped `needsConsent` before this view existed
+            // (e.g. while onboarding was still up).
+            showConsentSheet = healthSync.needsConsent
             if stressRepository == nil {
                 stressRepository = StressRepository(modelContext: modelContext)
             }
@@ -98,6 +108,16 @@ struct MainTabView: View {
                     .padding(.top, 8)
             }
             #endif
+        }
+        // Consent prompt: presents when the upload path discovers missing
+        // server-side consent. Transition-driven — "Not Now" leaves
+        // `needsConsent` true, so the sheet stays quiet until consent state
+        // actually changes again (grant, revoke, or a later 403 episode).
+        .sheet(isPresented: $showConsentSheet) {
+            HealthConsentView()
+        }
+        .onChange(of: healthSync.needsConsent) { _, needsConsent in
+            showConsentSheet = needsConsent
         }
         // Paywall sits ABOVE the entire TabView (all tabs + their navigation
         // stacks). The controller is owned at the app root and injected via

@@ -75,6 +75,24 @@ struct SettingsView: View {
         .sheet(isPresented: $showChatSheet) {
             ChatBottomSheetView(stressResult: nil, baseline: nil)
         }
+        // Explanation + grant sheet for the first "Health Data Sync" enable.
+        // Allow performs the PUT inside the sheet; Not Now reverts the
+        // optimistic toggle without touching the server.
+        .sheet(isPresented: $showHealthConsentSheet) {
+            HealthConsentView { granted in
+                if granted {
+                    // Allow persisted the grant inside the sheet; align the
+                    // toggle's session state so it doesn't read stale-OFF
+                    // after a revoke-then-re-enable round trip.
+                    hasGrantedHealthConsent = true
+                    healthSyncOptedIn = true
+                } else {
+                    // Not Now: no server call, no side effects — revert the
+                    // optimistic flip.
+                    healthSyncOptedIn = false
+                }
+            }
+        }
         .alert("Health Access Needed", isPresented: $showPermissionDeniedAlert) {
             Button("Open Settings") {
                 if let url = URL(string: UIApplication.openSettingsURLString) {
@@ -161,6 +179,20 @@ struct SettingsView: View {
     // MARK: - 4. Sync & devices
 
     private var syncDevicesSection: some View {
+        // Card split out so the wrapper can add the consent-failure
+        // footnote — same optimistic-then-revert shape as aiCoachSection.
+        VStack(spacing: 6) {
+            syncDevicesCard
+            if let healthSyncError {
+                Text(healthSyncError)
+                    .font(.system(size: 12, weight: .regular, design: .rounded))
+                    .foregroundStyle(Color.error)
+                    .frame(maxWidth: .infinity, alignment: .leading)
+            }
+        }
+    }
+
+    private var syncDevicesCard: some View {
         SettingsCard {
             VStack(spacing: 0) {
                 navRow(
@@ -170,6 +202,14 @@ struct SettingsView: View {
                     title: "Apple Health",
                     value: healthStatusText,
                     action: healthAuthStatus == .sharingAuthorized ? nil : { requestHealthPermission() }
+                )
+                hairlineDivider
+                toggleRow(
+                    icon: AppIconSystem.Setting.dailySummary.sfSymbol,
+                    setting: .dailySummary,
+                    tint: .primaryGreen,
+                    title: "Health Data Sync",
+                    isOn: healthSyncToggleBinding
                 )
                 hairlineDivider
                 navRow(
@@ -457,6 +497,53 @@ struct SettingsView: View {
         }
     }
 
+    // MARK: - Health data sync actions
+
+    /// Reads ON unless the server explicitly refused (the 403
+    /// CONSENT_REQUIRED path flipped `needsConsent`); writes route through
+    /// `handleHealthSyncToggle` — a service-side change just re-renders.
+    private var healthSyncToggleBinding: Binding<Bool> {
+        Binding(
+            get: { healthSyncOptedIn && !healthSync.needsConsent },
+            set: { handleHealthSyncToggle($0) }
+        )
+    }
+
+    /// Enable: the first enable this session opens the explanation sheet
+    /// (its Allow performs the grant); later enables PUT consent directly.
+    /// Disable always revokes (`granted: false`). A failed PUT reverts the
+    /// optimistic flip and surfaces the footnote — the AI Coach pattern.
+    private func handleHealthSyncToggle(_ enabled: Bool) {
+        if enabled {
+            if hasGrantedHealthConsent {
+                setHealthSyncConsent(true)
+            } else {
+                showHealthConsentSheet = true
+            }
+        } else {
+            setHealthSyncConsent(false)
+        }
+    }
+
+    private func setHealthSyncConsent(_ granted: Bool) {
+        Task { @MainActor in
+            do {
+                try await StressAPIClient().setHealthConsent(granted)
+                // Success: the toggle lands on the server-confirmed value —
+                // including revoke (granted=false → OFF), which previously
+                // sprang back ON.
+                healthSyncOptedIn = granted
+                healthSyncError = nil
+                if granted { healthSync.markConsentGranted() }
+            } catch {
+                // Failure: revert the optimistic flip and surface the
+                // footnote — the AI Coach error pattern.
+                healthSyncOptedIn = granted ? false : true
+                healthSyncError = "Couldn't reach the server. Try again later."
+            }
+        }
+    }
+
     // MARK: - Row builders
 
     private func navRow(
@@ -593,6 +680,18 @@ struct SettingsView: View {
     @State private var isRequestingHealthPermission = false
     @State private var showPermissionDeniedAlert = false
     @State private var hapticsEnabled: Bool = !UserDefaults.standard.bool(forKey: "appearance.hapticsDisabled")
+
+    // MARK: - Health data sync (server-side consent)
+
+    /// Session-local UI state only — the `user_consents` server row is the
+    /// consent authority (see StressAPIClient+Health.swift), so nothing here
+    /// persists. Defaults optimistic: the toggle reads ON until the server
+    /// explicitly refuses (a 403 CONSENT_REQUIRED flips `needsConsent`).
+    @StateObject private var healthSync = HealthSyncService.shared
+    @State private var healthSyncOptedIn = true
+    @State private var hasGrantedHealthConsent = false
+    @State private var showHealthConsentSheet = false
+    @State private var healthSyncError: String?
 
     private var healthStatusText: String {
         switch healthAuthStatus {
