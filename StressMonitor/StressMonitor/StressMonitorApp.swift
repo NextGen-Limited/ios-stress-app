@@ -253,6 +253,10 @@ struct StressMonitorApp: App {
                     isPremium: PremiumState.shared.isPremiumUser,
                     in: sharedModelContainer.mainContext
                 )
+                // Daily HealthKit upload rides the same foreground tick:
+                // once per local day, consent-gated server-side (a 403
+                // CONSENT_REQUIRED flips `needsConsent` for the prompt UI).
+                await HealthSyncService.shared.syncYesterdayIfNeeded()
             }
         }
     }
