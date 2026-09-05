@@ -137,14 +137,11 @@ struct StressBarChartView: View {
 
     // MARK: - Helpers
 
-    /// Maps 0–100 stress level to the 4-tier StressCategory system.
+    /// Maps 0–100 stress level to the 5-tier StressCategory system, matching
+    /// the canonical `StressResult.category(for:)` boundaries (the local
+    /// 4-tier mapper this replaced never resolved `.severe`).
     private func stressCategory(for level: Double) -> StressCategory {
-        switch level {
-        case ..<25:   return .relaxed
-        case ..<50:   return .mild
-        case ..<75:   return .moderate
-        default:      return .high
-        }
+        StressCategory(from: level)
     }
 
     // MARK: - Empty State
