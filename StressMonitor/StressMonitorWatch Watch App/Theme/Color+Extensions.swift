@@ -47,9 +47,6 @@ extension Color {
     static let stressHigh     = Color(hex: "#B25400")
     static let stressSevere   = Color(hex: "#FF3B30")
 
-    /// Moderate-tier on-light text colour (WCAG-safe against the pale yellow).
-    static let stressModerateInk = Color(hex: "#B59400")
-
     /// Resolve the stress colour for a raw 0–100+ level.
     static func stressColor(for level: Double) -> Color {
         StressCategory.category(for: level).color
