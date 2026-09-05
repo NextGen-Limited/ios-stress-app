@@ -76,14 +76,16 @@ struct DistributionBar: View {
                     barSegment(
                         color: StressCategory.relaxed.color,
                         width: total * CGFloat(s.relaxed) / 100,
-                        label: "\(s.relaxed)%"
+                        label: "\(s.relaxed)%",
+                        textColor: labelTextColor(for: .relaxed)
                     )
                 }
                 if s.mild > 0 {
                     barSegment(
                         color: StressCategory.mild.color,
                         width: total * CGFloat(s.mild) / 100,
-                        label: "\(s.mild)%"
+                        label: "\(s.mild)%",
+                        textColor: labelTextColor(for: .mild)
                     )
                 }
                 if s.moderate > 0 {
@@ -91,20 +93,38 @@ struct DistributionBar: View {
                         color: StressCategory.moderate.color,
                         width: total * CGFloat(s.moderate) / 100,
                         label: "\(s.moderate)%",
-                        textColor: colorScheme == .dark ? Color.black : Color.white
+                        textColor: labelTextColor(for: .moderate)
                     )
                 }
                 if s.high > 0 {
                     barSegment(
                         color: StressCategory.high.color,
                         width: total * CGFloat(s.high) / 100,
-                        label: "\(s.high)%"
+                        label: "\(s.high)%",
+                        textColor: labelTextColor(for: .high)
                     )
                 }
             }
         }
         .frame(height: 28)
         .clipShape(RoundedRectangle(cornerRadius: 6, style: .continuous))
+    }
+
+    /// Per-tier segment-label text color, resolved against the tier's actual
+    /// fill in the current color scheme so 11pt semibold text clears the
+    /// 4.5:1 WCAG AA bar (this is normal-size text, not large text). Relaxed
+    /// and mild fills are never bright enough for white text in either
+    /// appearance; moderate and high flip between white (light fill) and
+    /// black (bright dark-mode fill).
+    private func labelTextColor(for tier: StressCategory) -> Color {
+        switch tier {
+        case .relaxed, .mild:
+            return .black
+        case .moderate, .high:
+            return colorScheme == .dark ? .black : .white
+        case .severe:
+            return colorScheme == .dark ? .black : .white
+        }
     }
 
     private func barSegment(color: Color, width: CGFloat, label: String, textColor: Color = .white) -> some View {

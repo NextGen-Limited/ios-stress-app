@@ -138,6 +138,84 @@ struct ContrastComplianceTests {
         #expect(ratio >= 4.5)
     }
 
+    // MARK: - Distribution Segment Label Text Pairs (>= 4.5:1)
+    //
+    // Each `DistributionBar` segment renders an 11pt semibold "NN%" label —
+    // normal-size text, not large text — so every fill/text pairing must
+    // clear 4.5:1, matching `DistributionBar.labelTextColor(for:)`.
+
+    @Test("Black label text on the relaxed distribution-bar segment passes 4.5:1 in light mode")
+    func blackOnRelaxedDistributionSegmentLight() {
+        let ratio = contrastRatio(
+            UIColor.black,
+            on: resolved(StressCategory.relaxed.color, .light)
+        )
+        #expect(ratio >= 4.5)
+    }
+
+    @Test("Black label text on the relaxed distribution-bar segment passes 4.5:1 in dark mode")
+    func blackOnRelaxedDistributionSegmentDark() {
+        let ratio = contrastRatio(
+            UIColor.black,
+            on: resolved(StressCategory.relaxed.color, .dark)
+        )
+        #expect(ratio >= 4.5)
+    }
+
+    @Test("Black label text on the mild distribution-bar segment passes 4.5:1 in light mode")
+    func blackOnMildDistributionSegmentLight() {
+        let ratio = contrastRatio(
+            UIColor.black,
+            on: resolved(StressCategory.mild.color, .light)
+        )
+        #expect(ratio >= 4.5)
+    }
+
+    @Test("Black label text on the mild distribution-bar segment passes 4.5:1 in dark mode")
+    func blackOnMildDistributionSegmentDark() {
+        let ratio = contrastRatio(
+            UIColor.black,
+            on: resolved(StressCategory.mild.color, .dark)
+        )
+        #expect(ratio >= 4.5)
+    }
+
+    @Test("White label text on the moderate distribution-bar segment passes 4.5:1 in light mode")
+    func whiteOnModerateDistributionSegmentLight() {
+        let ratio = contrastRatio(
+            UIColor.white,
+            on: resolved(StressCategory.moderate.color, .light)
+        )
+        #expect(ratio >= 4.5)
+    }
+
+    @Test("Black label text on the moderate distribution-bar segment passes 4.5:1 in dark mode")
+    func blackOnModerateDistributionSegmentDark() {
+        let ratio = contrastRatio(
+            UIColor.black,
+            on: resolved(StressCategory.moderate.color, .dark)
+        )
+        #expect(ratio >= 4.5)
+    }
+
+    @Test("White label text on the high distribution-bar segment passes 4.5:1 in light mode")
+    func whiteOnHighDistributionSegmentLight() {
+        let ratio = contrastRatio(
+            UIColor.white,
+            on: resolved(StressCategory.high.color, .light)
+        )
+        #expect(ratio >= 4.5)
+    }
+
+    @Test("Black label text on the high distribution-bar segment passes 4.5:1 in dark mode")
+    func blackOnHighDistributionSegmentDark() {
+        let ratio = contrastRatio(
+            UIColor.black,
+            on: resolved(StressCategory.high.color, .dark)
+        )
+        #expect(ratio >= 4.5)
+    }
+
     // MARK: - UI / Large-Text Accent Pairs (>= 3:1)
 
     @Test(
@@ -184,24 +262,6 @@ struct ContrastComplianceTests {
         let ratio = contrastRatio(
             UIColor.white,
             on: resolved(Color.settingsRippleBlue, style)
-        )
-        #expect(ratio >= 3.0)
-    }
-
-    @Test("White label text on the moderate distribution-bar segment passes 3:1 in light mode")
-    func whiteOnModerateDistributionSegmentLight() {
-        let ratio = contrastRatio(
-            UIColor.white,
-            on: resolved(StressCategory.moderate.color, .light)
-        )
-        #expect(ratio >= 3.0)
-    }
-
-    @Test("Black label text on the moderate distribution-bar segment passes 3:1 in dark mode")
-    func blackOnModerateDistributionSegmentDark() {
-        let ratio = contrastRatio(
-            UIColor.black,
-            on: resolved(StressCategory.moderate.color, .dark)
         )
         #expect(ratio >= 3.0)
     }
