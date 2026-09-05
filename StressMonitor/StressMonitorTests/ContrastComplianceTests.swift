@@ -340,6 +340,18 @@ struct ContrastComplianceTests {
         #expect(ratio >= 3.0)
     }
 
+    @Test(
+        "High-contrast stress variants pass 3:1 on the dark canvas for every category",
+        arguments: StressCategory.allCases
+    )
+    func highContrastStressVariantsOnDarkCanvas(category: StressCategory) {
+        let ratio = contrastRatio(
+            resolved(Color.accessibleStressColor(for: category, highContrast: true), .dark),
+            on: resolved(Color.Wellness.adaptiveBackground, .dark)
+        )
+        #expect(ratio >= 3.0)
+    }
+
     // MARK: - Watch Token Pins
     //
     // `StressMonitorWatch Watch App` is a separate module and cannot be
