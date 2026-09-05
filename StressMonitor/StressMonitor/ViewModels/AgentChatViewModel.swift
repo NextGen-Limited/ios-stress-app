@@ -26,6 +26,10 @@ final class AgentChatViewModel: ObservableObject {
 
     private(set) var creditsRemaining: Int?
     private(set) var sessionID: UUID?
+    /// Bumped by `startNewConversation`. Events (and session-id adoption)
+    /// from an in-flight turn carry the generation they started under; a
+    /// mismatch means the conversation was reset and the event is dropped.
+    private var generation = 0
 
     private let client: StressAPIClient
     /// Nil-coalesced inside the body — a default-argument expression would
@@ -34,64 +38,88 @@ final class AgentChatViewModel: ObservableObject {
         self.client = client ?? StressAPIClient()
     }
 
-    func send(_ text: String) async {
-        await run(text: text)
+    /// Signature of `StressAPIClient.streamAgentChat`, injectable so tests
+    /// can park a stream mid-turn and drive the reset race deterministically.
+    typealias AgentChatStream = @Sendable (
+        _ sessionID: UUID?,
+        _ message: String,
+        _ onEvent: @escaping @Sendable (AgentChatEvent) -> Void
+    ) async throws -> UUID?
+
+    func send(_ text: String, stream: AgentChatStream? = nil) async {
+        await run(text: text, stream: stream ?? { sessionID, message, onEvent in
+            try await self.client.streamAgentChat(
+                sessionID: sessionID, message: message, onEvent: onEvent)
+        })
     }
 
-    /// Test seam: same flow shape as `send`, with the stream call elided.
+    /// Test seam: same flow as `send`, with the stream call elided.
     func sendForTesting(
         _ text: String,
         stream: @escaping @Sendable (AgentChatEvent) -> Void
     ) async {
-        messages.append(AgentMessage(role: "user", text: text))
-        isStreaming = true
-        stream(.content("ok"))
-        stream(.done)
-        isStreaming = false
+        await run(text: text) { _, _, onEvent in
+            stream(.content("ok"))
+            stream(.done)
+            return nil
+        }
     }
 
-    private func run(text: String) async {
+    private func run(text: String, stream: AgentChatStream) async {
         errorText = nil
         messages.append(AgentMessage(role: "user", text: text))
         let assistant = AgentMessage(role: "assistant", text: "")
-        // The row index must be captured BEFORE appending the placeholder —
-        // the streaming closure and the failure path below must agree on
-        // which bubble accumulates text / gets removed.
-        let index = messages.count
+        // Identity over position: `New` mid-stream or the failure path can
+        // remove rows while events are still in flight, so the streaming
+        // closure and the failure path resolve the SAME bubble by id — a
+        // captured index would trap on a reset list.
+        let assistantID = assistant.id
         messages.append(assistant)
+        let generation = self.generation
         isStreaming = true
         do {
-            let returned = try await client.streamAgentChat(
-                sessionID: sessionID,
-                message: text,
-                onEvent: { [weak self] event in
-                    Task { @MainActor in self?.handle(event, assistantIndex: index) }
+            let returned = try await stream(sessionID, text) { [weak self] event in
+                Task { @MainActor [weak self] in
+                    guard let self, generation == self.generation else { return }
+                    self.handle(event, assistantID: assistantID)
                 }
-            )
-            sessionID = sessionID ?? returned
+            }
+            // The returned id belongs to the conversation this turn started
+            // in — after a mid-stream reset it must not be adopted.
+            if generation == self.generation {
+                sessionID = sessionID ?? returned
+            }
         } catch let error as AgentChatAPIError {
             errorText = error.errorDescription
-            if messages.indices.contains(index), messages[index].text.isEmpty {
-                messages.remove(at: index) // empty assistant bubble on failure
-            }
+            removeEmptyAssistantBubble(id: assistantID)
         } catch {
             errorText = "Coach chat failed. Try again."
+            removeEmptyAssistantBubble(id: assistantID)
         }
         isStreaming = false
     }
 
-    /// Reduces one stream event into state. `assistantIndex` pins the bubble
+    private func removeEmptyAssistantBubble(id: UUID) {
+        if let i = messages.firstIndex(where: { $0.id == id }), messages[i].text.isEmpty {
+            messages.remove(at: i) // empty assistant bubble on failure
+        }
+    }
+
+    /// Reduces one stream event into state. `assistantID` pins the bubble
     /// for the in-flight turn; nil targets the last assistant bubble,
     /// creating it on first content if the turn hasn't materialized one yet
-    /// (direct `handle` calls, e.g. tests).
-    func handle(_ event: AgentChatEvent, assistantIndex: Int? = nil) {
+    /// (direct `handle` calls, e.g. tests). An id that no longer resolves
+    /// (reset or failed turn) silently drops the event instead of trapping.
+    func handle(_ event: AgentChatEvent, assistantID: UUID? = nil) {
         switch event {
         case .content(let text):
-            if assistantIndex == nil,
-               messages.lastIndex(where: { $0.role == "assistant" }) == nil {
-                messages.append(AgentMessage(role: "assistant", text: ""))
+            var target = assistantID ?? messages.last(where: { $0.role == "assistant" })?.id
+            if target == nil {
+                let bubble = AgentMessage(role: "assistant", text: "")
+                messages.append(bubble)
+                target = bubble.id
             }
-            if let i = assistantIndex ?? messages.lastIndex(where: { $0.role == "assistant" }) {
+            if let i = messages.firstIndex(where: { $0.id == target }) {
                 messages[i].text += text
             }
         case .metadata(let session, let credits, _):
@@ -103,6 +131,10 @@ final class AgentChatViewModel: ObservableObject {
     }
 
     func startNewConversation() {
+        // Bump first: in-flight events and session-id adoption from the old
+        // conversation compare generations and drop instead of mutating the
+        // fresh state.
+        generation += 1
         sessionID = nil
         messages.removeAll()
         errorText = nil

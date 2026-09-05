@@ -9,6 +9,9 @@ import Testing
 /// - a failing stream (402 from the URLProtocol stub) surfaces the typed
 ///   error text and removes the empty assistant placeholder bubble
 /// - `startNewConversation` resets the conversation, credits, and error
+/// - a mid-stream `New` (reset) drops in-flight events, never adopts the
+///   stale session id, and never traps on the reset list
+/// - a generic (non-API) stream failure behaves like the typed failure path
 /// - `streamAgentChat` maps HTTP status to `AgentChatAPIError` (401/402/other)
 ///   and replays the SSE line contract (`/chat`-identical) into events,
 ///   returning the first-seen session id
@@ -80,6 +83,62 @@ struct AgentChatViewModelTests {
         // a new conversation must not pretend the balance vanished.
         #expect(vm.creditsRemaining == 12)
         #expect(vm.errorText == nil)
+    }
+
+    // MARK: - Mid-stream reset & generic failure (hardening)
+
+    @Test("mid-stream New drops stale events and skips the stale session id")
+    func midStreamNewDropsStaleEventsAndSessionAdoption() async {
+        let vm = AgentChatViewModel() // real client unused — stream is injected
+        let onEventBox = LockedBox<@Sendable (AgentChatEvent) -> Void>()
+        let gate = Gate()
+        let staleID = UUID()
+        let turn = Task { await vm.send("hi", stream: { _, _, onEvent in
+            onEventBox.append(onEvent)
+            await gate.wait()
+            return staleID
+        }) }
+        while onEventBox.items.isEmpty { await Task.yield() }
+
+        vm.startNewConversation() // New mid-stream: reset while the stream is open
+        onEventBox.items[0](.content("ghost")) // stale event from the old turn
+        await Task.yield()
+        await Task.yield()
+        #expect(vm.messages.isEmpty) // dropped — no crash, no stray bubble
+
+        gate.open() // let the old turn finish and return its session id
+        await turn.value
+        #expect(vm.sessionID == nil) // old conversation's id not adopted
+        #expect(vm.isStreaming == false)
+    }
+
+    @Test("generic stream error surfaces fallback text and drops the empty bubble")
+    func genericErrorRemovesEmptyAssistantBubble() async {
+        let config = URLSessionConfiguration.ephemeral
+        config.protocolClasses = [FailingURLProtocol.self]
+        let vm = AgentChatViewModel(client: StressAPIClient(
+            authService: MockAuthService(token: "fake-token"),
+            baseURL: URL(string: "https://api.test")!,
+            session: URLSession(configuration: config)))
+        await vm.send("hello")
+
+        // A transport URLError is not an AgentChatAPIError — the generic
+        // catch must behave like the typed one: fallback text, placeholder
+        // removed, only the user message left.
+        #expect(vm.errorText == "Coach chat failed. Try again.")
+        #expect(vm.messages.map(\.role) == ["user"])
+        #expect(vm.messages.first?.text == "hello")
+        #expect(vm.isStreaming == false)
+    }
+
+    @Test("stale assistant id drops content instead of crashing")
+    func staleAssistantIDDropsContent() {
+        let vm = AgentChatViewModel()
+        vm.handle(.content("live"))
+        vm.handle(.content("ghost"), assistantID: UUID()) // id from a removed turn
+
+        #expect(vm.messages.count == 1)
+        #expect(vm.messages[0].text == "live")
     }
 
     // MARK: - streamAgentChat (POST /agent/chat)
@@ -163,4 +222,54 @@ private final class EventCollector: @unchecked Sendable {
         defer { lock.unlock() }
         return events
     }
+}
+
+/// Thread-safe box for values captured across `@Sendable` boundaries.
+private final class LockedBox<T>: @unchecked Sendable {
+    private let lock = NSLock()
+    private var _items: [T] = []
+
+    var items: [T] {
+        lock.lock(); defer { lock.unlock() }
+        return _items
+    }
+
+    func append(_ item: T) {
+        lock.lock(); defer { lock.unlock() }
+        _items.append(item)
+    }
+}
+
+/// One-shot gate: parks a fake stream mid-turn while the test mutates
+/// conversation state on the main actor.
+private final class Gate: @unchecked Sendable {
+    private let lock = NSLock()
+    private var continuation: CheckedContinuation<Void, Never>?
+
+    func wait() async {
+        await withCheckedContinuation { (c: CheckedContinuation<Void, Never>) in
+            lock.lock(); continuation = c; lock.unlock()
+        }
+    }
+
+    func open() {
+        lock.lock()
+        let c = continuation
+        continuation = nil
+        lock.unlock()
+        c?.resume()
+    }
+}
+
+/// Fails every request with a transport error — drives the view model's
+/// generic (non-`AgentChatAPIError`) catch path.
+private final class FailingURLProtocol: URLProtocol {
+    override class func canInit(with request: URLRequest) -> Bool { true }
+    override class func canonicalRequest(for request: URLRequest) -> URLRequest { request }
+
+    override func startLoading() {
+        client?.urlProtocol(self, didFailWithError: URLError(.badServerResponse))
+    }
+
+    override func stopLoading() {}
 }
