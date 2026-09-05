@@ -283,4 +283,13 @@ struct ContrastComplianceTests {
         )
         #expect(ratio >= 3.0)
     }
+
+    @Test("Watch muted micro-label token (#6B6E7B) passes 4.5:1 on the watch canvas")
+    func watchMutedTokenOnCanvas() {
+        let ratio = contrastRatio(
+            UIColor(Color(hex: "#6B6E7B")),
+            on: UIColor(Color(hex: "#F2F2F7"))
+        )
+        #expect(ratio >= 4.5)
+    }
 }
