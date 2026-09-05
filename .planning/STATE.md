@@ -5,16 +5,15 @@ milestone_name: Submission Readiness
 current_phase: 3
 current_phase_name: Accessibility Compliance
 status: executing
-stopped_at: Completed 03-04-PLAN.md (chart a11y series + gauge value green)
-last_updated: "2026-09-05T02:35:17.621Z"
+stopped_at: Completed 03-05-PLAN.md
+last_updated: "2026-09-05T03:46:33.872Z"
 last_activity: 2026-09-05
 last_activity_desc: Phase 3 execution started
-state_head: 2f63443a414609eb56cec4797694ea80523a2d60
 progress:
   total_phases: 4
   completed_phases: 1
   total_plans: 18
-  completed_plans: 16
+  completed_plans: 17
   percent: 25
 ---
 
@@ -30,7 +29,7 @@ See: .planning/PROJECT.md (updated 2026-09-03 at v1.2 start)
 ## Current Position
 
 Phase: 3 (Accessibility Compliance) — EXECUTING
-Plan: 5 of 6
+Plan: 6 of 6
 Status: Ready to execute
 Last activity: 2026-09-05 — Phase 3 execution started
 
@@ -81,6 +80,7 @@ Per-plan history for v1.0/v1.1 archived under `.planning/milestones/v1.0-phases/
 | Phase 03 P02 | 34 min | 4 tasks | 41 files |
 | Phase 03 P03 | 20 min | 3 tasks | 23 files |
 | Phase 03 P04 | 10 min | 2 tasks | 8 files |
+| Phase 03 P05 | 31 min | 3 tasks | 18 files |
 
 ## Accumulated Context
 
@@ -128,6 +128,10 @@ Full log in PROJECT.md Key Decisions. v1.1 per-phase decisions archived with the
 - [Phase 03]: [Phase 3 P02, D-02]: widget+watch sweep = 82 ScaledMetric anchors + 58 inline dated exceptions (9 classes: accessory templates 26, lock-screen slots 5, LA system slots 6, LA banner SDK-gap 2, watch fixed hero 3, ring geometry 4, icon wells 2, chart geometry 3, N-across labels 4, breathing-ring 3); 1 shrink deleted, 8 kept behind markers
 - [Phase 03]: Touch-target adoption wraps buttons from the outside (after buttonStyle) so visual glyphs stay small while contentShape covers 44pt; stressDualCoding gains showsCaption:false for name-bearing category sites — bare adoption duplicated the visible name
 - [Phase 03]: D-09 value copy is 'Evolution stage n of 3' per EvolutionStage code truth (3 cases; in-app banner agrees) — UI-SPEC's 'of 5' contradicts the enum; StressHeroCard left readableTextColor #B8860B for category.color #8A5A00 (passes 4.5:1 at body size), making readableTextColor zero-adopter (03-06 deletion candidate)
+- [Phase 3]: [Phase 3 P05, A11Y-03]: Motion optionality lives in one helper — Animation+Wellness.swift owns every accessibilityReduceMotion read (gate grep zero by construction); views needing the boolean capture it via onMotionDecision instead of reading the env
+- [Phase 3]: [Phase 3 P05, D-11]: Breathing fallback = mode not stub — session defaults to HapticManager phase pulses + 'Inhale — 3' countdown under Reduce Motion via pure resolvedAnimationEnabled(motionReduced:userChoice:); 'Breathing animation' switch is in-session opt-in, nothing persists; scripted via the -a11y-reduce-motion DEBUG seam (simctl has no RM toggle on Xcode 26.3)
+- [Phase 3]: [Phase 3 P05, D-11]: Breathing fallback = mode not stub — session defaults to HapticManager phase pulses + 'Inhale — 3' countdown under Reduce Motion via pure resolvedAnimationEnabled(motionReduced:userChoice:); 'Breathing animation' switch is in-session opt-in, nothing persists; scripted via the -a11y-reduce-motion DEBUG seam (simctl has no RM toggle on Xcode 26.3)
+- [Phase 3]: [Phase 3 P05, D-13]: Re-baseline drift confirmed — research 66/13 and UI-SPEC 65/13 were stale; execution-time truth was 18 ref lines/13 files (17 env reads + 1 doc comment); gate must always enumerate by file+construct, never by count; 4 additional unguarded repeatForever loops found outside the plan set (deferred-items.md, several are 03-06 orphan candidates)
 
 ### Pending Todos
 
@@ -172,8 +176,8 @@ Earlier v1.0 deferrals (Phase 01/02 verification gaps, `MockStoreKitService` Rel
 
 ## Session Continuity
 
-Last session: 2026-09-05T02:35:17.167Z
-Stopped at: Completed 03-04-PLAN.md (chart a11y series + gauge value green)
+Last session: 2026-09-05T03:44:27.761Z
+Stopped at: Completed 03-05-PLAN.md
 Resume file: None
 
 ## Operator Next Steps

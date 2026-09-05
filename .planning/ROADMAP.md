@@ -139,7 +139,7 @@ Plans:
   4. At the largest accessibility Dynamic Type size, the primary screens stay readable — no label truncates, clips, or overlaps another element.
   5. The orphaned redesign views are deleted from the source tree; no unreachable duplicate screen compiles into the binary.
 
-**Plans**: 4/6 plans executed
+**Plans**: 5/6 plans executed
 **UI hint**: yes
 
 Plans:
@@ -155,7 +155,7 @@ Plans:
 
 **Wave 3** *(blocked on Waves 1-2 — shares files with both)*
 
-- [ ] 03-05-PLAN.md — A11Y-03: one app-wide Reduce Motion helper (D-12/D-13, cross-fade fallbacks, DEBUG `-a11y-reduce-motion` seam), 13-file consolidation with re-baselined grep gate, D-11 breathing haptic+text fallback
+- [x] 03-05-PLAN.md — A11Y-03: one app-wide Reduce Motion helper (D-12/D-13, cross-fade fallbacks, DEBUG `-a11y-reduce-motion` seam), 13-file consolidation with re-baselined grep gate, D-11 breathing haptic+text fallback
 
 **Wave 4** *(phase closer — deletion LAST, then gates against the final tree)*
 
@@ -183,5 +183,5 @@ Plans:
 |-------|-----------|----------------|--------|-----------|
 | 1. Binary & Manifest Truth | v1.2 | 6/6 | Complete    | 2026-09-03 |
 | 2. Delete Correctness & Test-Suite Trust | v1.2 | 6/6 | In Progress|  |
-| 3. Accessibility Compliance | v1.2 | 4/6 | In Progress|  |
+| 3. Accessibility Compliance | v1.2 | 5/6 | In Progress|  |
 | 4. Store Submission Package | v1.2 | 0/TBD | Not started | - |
