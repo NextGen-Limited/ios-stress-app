@@ -119,6 +119,13 @@ enum VoiceOverLabels {
         "At \(hour) hours, stress level was \(Int(stress)) percent"
     }
 
+    /// One-line trend summary for a chart series (D-09 contract):
+    /// "{Metric} {up|down|steady} {percent}% in the last {period}" —
+    /// steady omits the percent token.
+    static func trendSummary(metric: String, values: [Double], period: String) -> String {
+        ""
+    }
+
     // Learning Phase
     static func learningProgress(samples: Int, total: Int, days: Int) -> String {
         "Learning phase: \(samples) of \(total) samples collected, \(days) days remaining"
