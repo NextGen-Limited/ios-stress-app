@@ -1,7 +1,11 @@
 import SwiftUI
 
-/// Animation presets for consistent timing across the app
-/// All durations follow 150-300ms guidelines for micro-interactions
+/// Animation presets for consistent timing across the app.
+/// All durations follow 150-300ms guidelines for micro-interactions.
+/// The values are inert on their own — apply them through
+/// `animateIfMotionAllowed(_:value:)` (Animation+Wellness.swift) so preset
+/// users inherit the app-wide Reduce Motion decision without reading
+/// anything themselves.
 extension Animation {
     /// Quick micro-interaction (100ms)
     static let micro = Animation.easeOut(duration: 0.1)
@@ -26,97 +30,6 @@ extension Animation {
 
     /// Smooth ease for state transitions
     static let smooth = Animation.easeInOut(duration: 0.3)
-}
-
-// MARK: - Staggered Animation Modifier
-
-struct StaggeredAppearModifier: ViewModifier {
-    let index: Int
-    let totalItems: Int
-    let baseDelay: Double
-
-    @State private var appeared = false
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
-
-    private var delay: Double {
-        baseDelay * Double(index)
-    }
-
-    func body(content: Content) -> some View {
-        content
-            .opacity(appeared ? 1 : 0)
-            .offset(y: appeared ? 0 : 20)
-            .onAppear {
-                if reduceMotion {
-                    appeared = true
-                } else {
-                    withAnimation(.easeOut(duration: 0.3).delay(delay)) {
-                        appeared = true
-                    }
-                }
-            }
-    }
-}
-
-extension View {
-    /// Applies staggered appear animation for list items
-    func staggeredAppear(index: Int, total: Int, delay: Double = 0.05) -> some View {
-        modifier(StaggeredAppearModifier(index: index, totalItems: total, baseDelay: delay))
-    }
-}
-
-// MARK: - Shimmer Loading Effect
-
-struct ShimmerLoadingModifier: ViewModifier {
-    @State private var phase: CGFloat = 0
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
-
-    func body(content: Content) -> some View {
-        if reduceMotion {
-            content.redacted(reason: .placeholder)
-        } else {
-            content
-                .overlay(
-                    ShimmerEffectView(phase: $phase)
-                )
-                .redacted(reason: .placeholder)
-                .onAppear {
-                    withAnimation(.linear(duration: 1.5).repeatForever(autoreverses: false)) {
-                        phase = 1
-                    }
-                }
-        }
-    }
-}
-
-struct ShimmerEffectView: View {
-    @Binding var phase: CGFloat
-
-    var body: some View {
-        GeometryReader { geometry in
-            Rectangle()
-                .fill(
-                    LinearGradient(
-                        stops: [
-                            .init(color: .clear, location: 0),
-                            .init(color: Color.white.opacity(0.3), location: 0.5),
-                            .init(color: .clear, location: 1)
-                        ],
-                        startPoint: .leading,
-                        endPoint: .trailing
-                    )
-                )
-                .offset(x: phase * geometry.size.width * 2 - geometry.size.width)
-        }
-        .mask(Rectangle())
-    }
-}
-
-extension View {
-    /// Applies shimmer loading effect
-    func shimmerLoading() -> some View {
-        modifier(ShimmerLoadingModifier())
-    }
 }
 
 // MARK: - Preview

@@ -1,6 +1,8 @@
 import SwiftUI
 
-/// Accessibility modifiers and helpers for WCAG compliance
+/// Accessibility modifiers and helpers for WCAG compliance.
+/// Motion-gated helpers (accessibleAnimation, pressEffect) live in
+/// Animation+Wellness.swift — the single owner of the Reduce Motion decision.
 extension View {
     /// Applies dual coding for stress levels (color + icon + text)
     /// Required for WCAG AA compliance
@@ -14,16 +16,6 @@ extension View {
     /// Ensures minimum touch target size (44x44pt)
     func minimumTouchTarget(_ size: CGFloat = 44) -> some View {
         modifier(MinimumTouchTargetModifier(minSize: size))
-    }
-
-    /// Animation that respects accessibility reduce motion preference
-    func accessibleAnimation(_ animation: Animation = .easeOut(duration: 0.2)) -> some View {
-        modifier(AccessibleAnimationModifier(animation: animation))
-    }
-
-    /// Press effect that respects reduce motion
-    func pressEffect() -> some View {
-        modifier(PressEffectModifier())
     }
 }
 
@@ -60,39 +52,6 @@ struct MinimumTouchTargetModifier: ViewModifier {
         content
             .frame(minWidth: minSize, minHeight: minSize)
             .contentShape(Rectangle())
-    }
-}
-
-// MARK: - Accessible Animation Modifier
-
-struct AccessibleAnimationModifier: ViewModifier {
-    let animation: Animation
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
-
-    func body(content: Content) -> some View {
-        if reduceMotion {
-            content
-        } else {
-            content.animation(animation, value: UUID())
-        }
-    }
-}
-
-// MARK: - Press Effect Modifier
-
-struct PressEffectModifier: ViewModifier {
-    @State private var isPressed = false
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
-
-    func body(content: Content) -> some View {
-        content
-            .scaleEffect(isPressed ? 0.96 : 1.0)
-            .animation(reduceMotion ? .none : .easeOut(duration: 0.1), value: isPressed)
-            .simultaneousGesture(
-                DragGesture(minimumDistance: 0)
-                    .onChanged { _ in isPressed = true }
-                    .onEnded { _ in isPressed = false }
-            )
     }
 }
 
