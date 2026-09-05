@@ -39,8 +39,12 @@ struct DashboardView: View {
         }
         .background(HomeCharacterDesignTokens.homeBackground.ignoresSafeArea())
         .accessibleDynamicType()
-        .alert("Error", isPresented: .constant(viewModel.errorMessage != nil)) {
-            Button("OK") {
+        .alert("Couldn't load health data", isPresented: .constant(viewModel.errorMessage != nil)) {
+            Button("Try Again") {
+                viewModel.clearError()
+                Task { await viewModel.loadCurrentStress() }
+            }
+            Button("Cancel", role: .cancel) {
                 viewModel.clearError()
             }
         } message: {

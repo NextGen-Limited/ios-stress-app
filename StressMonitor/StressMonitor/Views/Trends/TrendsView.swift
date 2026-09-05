@@ -34,12 +34,18 @@ struct TrendsView: View {
             VStack(alignment: .leading, spacing: 14) {
                 // Chip row — Week / Month / 3 Months / Year
                 chipRow
-                editorialSummary
-                dailyBars
-                distributionCard
-                calendarCard
-                hrvCard
-                editorialInsight
+                if viewModel.weeklyMeasurements.isEmpty && !viewModel.isLoading {
+                    NoDataCard(dataType: .trends) {
+                        Task { await viewModel.loadTrendData() }
+                    }
+                } else {
+                    editorialSummary
+                    dailyBars
+                    distributionCard
+                    calendarCard
+                    hrvCard
+                    editorialInsight
+                }
             }
             .padding(.horizontal, 16)
             .padding(.top, 8)

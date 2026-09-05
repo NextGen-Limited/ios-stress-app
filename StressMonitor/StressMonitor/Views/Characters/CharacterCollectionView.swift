@@ -193,6 +193,10 @@ struct CharacterCollectionView: View {
                 selectedCharacter = lumi
                 HapticManager.shared.buttonPress()
             }
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel(lumiAccessibilityLabel(lumi: lumi, isUnlocked: isUnlocked))
+            .accessibilityValue("Evolution stage \((unlock?.evolutionStage ?? .droplet).sortOrder + 1) of \(EvolutionStage.allCases.count)")
+            .accessibilityHint("Double tap for character details")
         }
     }
 
@@ -301,6 +305,14 @@ struct CharacterCollectionView: View {
 
     private func isUnlocked(_ characterId: String) -> Bool {
         viewModel.unlockStatus(for: characterId)?.isUnlocked ?? false
+    }
+
+    private func lumiAccessibilityLabel(lumi: CharacterCreature, isUnlocked: Bool) -> String {
+        let stage = viewModel.unlockStatus(for: lumi.id)?.evolutionStage ?? .droplet
+        if isUnlocked {
+            return "\(lumi.displayName), \(stage.displayName.lowercased()) stage"
+        }
+        return "\(lumi.displayName), locked"
     }
 }
 

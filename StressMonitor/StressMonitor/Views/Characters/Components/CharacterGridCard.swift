@@ -20,7 +20,9 @@ struct CharacterGridCard: View {
 
     var body: some View {
         VStack(spacing: 6) {
-            // Character art with glow background
+            // Character art with glow background. Locked dimming is scoped to
+            // the illustration block only — card text always renders at full
+            // token contrast.
             ZStack {
                 Circle()
                     .fill(creature.element.primaryColor.opacity(0.55))
@@ -52,6 +54,8 @@ struct CharacterGridCard: View {
                 }
             }
             .frame(height: 92)
+            .opacity(isUnlocked ? 1.0 : 0.65)
+            .saturation(isUnlocked ? 1.0 : 0.5)
 
             // Name
             Text(creature.displayName)
@@ -83,10 +87,9 @@ struct CharacterGridCard: View {
             RoundedRectangle(cornerRadius: 18, style: .continuous)
                 .stroke(isActive ? creature.element.primaryColor : Color.clear, lineWidth: 2)
         }
-        .opacity(isUnlocked ? 1.0 : 0.65)
-        .saturation(isUnlocked ? 1.0 : 0.5)
         .accessibilityElement(children: .combine)
         .accessibilityLabel(accessibilityLabel)
+        .accessibilityValue(accessibilityValue)
         .accessibilityHint("Double tap for character details")
     }
 
@@ -143,8 +146,14 @@ struct CharacterGridCard: View {
     }
 
     private var accessibilityLabel: String {
-        let status = isUnlocked ? "unlocked" : "locked"
         let active = isActive ? ", active" : ""
-        return "\(creature.displayName), \(creature.subtitle), \(status)\(active)"
+        if isUnlocked {
+            return "\(creature.displayName), \(currentStage.displayName.lowercased()) stage\(active)"
+        }
+        return "\(creature.displayName), locked\(active)"
+    }
+
+    private var accessibilityValue: String {
+        "Evolution stage \(currentStage.sortOrder + 1) of \(EvolutionStage.allCases.count)"
     }
 }
