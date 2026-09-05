@@ -17,6 +17,7 @@ struct SparklineChart: View {
     let dataPoints: [DataPoint]
     var color: Color = .accentColor
     var lineWidth: CGFloat = 2
+    var metricName: String = "Metric"
 
     // MARK: - Computed
 
@@ -28,11 +29,6 @@ struct SparklineChart: View {
         let range = max - min
         let padding = range * 0.2
         return (min - padding)...(max + padding)
-    }
-
-    private var trendChange: Double {
-        guard let first = dataPoints.first?.value, let last = dataPoints.last?.value else { return 0 }
-        return last - first
     }
 
     // MARK: - Body
@@ -62,20 +58,46 @@ struct SparklineChart: View {
         .chartXAxis(.hidden)
         .chartYAxis(.hidden)
         .frame(width: 120, height: 60)
-        .accessibilityLabel(accessibilityLabel)
+        .accessibilityChart(
+            description: "\(metricName) trend",
+            summary: accessibilityTrendSummary,
+            points: accessibilityPoints
+        )
         .accessibilityHint("Shows \(dataPoints.count) recent measurements")
     }
 
-    // MARK: - Accessibility
+    // MARK: - Accessibility Series (D-09)
 
-    private var accessibilityLabel: String {
-        let change = abs(trendChange)
-        if trendChange > 5 {
-            return "Trending up by \(Int(change)) points"
-        } else if trendChange < -5 {
-            return "Trending down by \(Int(change)) points"
-        } else {
-            return "Stable trend"
+    private static let pointDateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMM d"
+        return formatter
+    }()
+
+    /// Whole days the series spans, floor 1 — restates the span the
+    /// timestamps actually cover.
+    private var periodText: String {
+        guard let first = dataPoints.first?.timestamp,
+              let last = dataPoints.last?.timestamp else { return "recent period" }
+        let days = max(1, Int(last.timeIntervalSince(first) / 86_400))
+        return days == 1 ? "1 day" : "\(days) days"
+    }
+
+    private var accessibilityTrendSummary: String {
+        guard !dataPoints.isEmpty else { return "No data yet" }
+        return VoiceOverLabels.trendSummary(
+            metric: metricName,
+            values: dataPoints.map(\.value),
+            period: periodText
+        )
+    }
+
+    private var accessibilityPoints: [String] {
+        dataPoints.map { point in
+            VoiceOverLabels.chartPoint(
+                dateText: Self.pointDateFormatter.string(from: point.timestamp),
+                valueText: "\(Int(point.value))"
+            )
         }
     }
 }

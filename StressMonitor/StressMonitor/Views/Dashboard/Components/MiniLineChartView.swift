@@ -6,6 +6,7 @@ struct MiniLineChartView: View {
     let dataPoints: [Double]
     let color: Color
     var showGradient: Bool = true
+    var metricName: String = "Metric"
 
     var body: some View {
         Chart {
@@ -37,6 +38,30 @@ struct MiniLineChartView: View {
         .chartPlotStyle { plotArea in
             plotArea
                 .frame(height: 40)
+        }
+        .accessibilityChart(
+            description: "\(metricName) trend",
+            summary: accessibilityTrendSummary,
+            points: accessibilityPoints
+        )
+    }
+
+    // MARK: - Accessibility Series (D-09)
+
+    /// Index-only series carries no dates — the period restates the point
+    /// count and each point its position.
+    private var accessibilityTrendSummary: String {
+        guard !dataPoints.isEmpty else { return "No data yet" }
+        return VoiceOverLabels.trendSummary(
+            metric: metricName,
+            values: dataPoints,
+            period: "\(dataPoints.count) points"
+        )
+    }
+
+    private var accessibilityPoints: [String] {
+        dataPoints.enumerated().map { index, value in
+            VoiceOverLabels.chartPoint(dateText: "Point \(index + 1)", valueText: "\(Int(value))")
         }
     }
 }

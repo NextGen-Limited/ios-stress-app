@@ -121,9 +121,31 @@ enum VoiceOverLabels {
 
     /// One-line trend summary for a chart series (D-09 contract):
     /// "{Metric} {up|down|steady} {percent}% in the last {period}" —
-    /// steady omits the percent token.
+    /// steady omits the percent token. A single-point series and an
+    /// exactly-zero relative change both classify as steady; the percent is
+    /// the relative change between the first and last values, rounded to a
+    /// whole number. A zero baseline makes the percent uncomputable, so the
+    /// direction word is kept and the percent token omitted.
     static func trendSummary(metric: String, values: [Double], period: String) -> String {
-        ""
+        let steady = "\(metric) steady in the last \(period)"
+        guard let first = values.first, let last = values.last, first != last else {
+            return steady
+        }
+        let direction = last > first ? "up" : "down"
+        guard first != 0 else {
+            return "\(metric) \(direction) in the last \(period)"
+        }
+        let percent = Int((abs(last - first) / abs(first) * 100).rounded())
+        guard percent > 0 else {
+            return steady
+        }
+        return "\(metric) \(direction) \(percent)% in the last \(period)"
+    }
+
+    /// Per-point chart series label (D-09 contract): "{date}: {value}{unit}"
+    /// — e.g. "Sep 3: 48 ms". Inputs restate exactly what the chart renders.
+    static func chartPoint(dateText: String, valueText: String, unit: String = "") -> String {
+        unit.isEmpty ? "\(dateText): \(valueText)" : "\(dateText): \(valueText) \(unit)"
     }
 
     // Learning Phase
@@ -152,6 +174,19 @@ extension View {
             .accessibilityElement(children: .combine)
             .accessibilityLabel(description)
             .accessibilityValue(value)
+            .accessibilityAddTraits(.updatesFrequently)
+    }
+
+    /// Chart accessibility series (D-09): the chart keeps fixed-size geometry
+    /// while the container carries its descriptive label, the one-line trend
+    /// summary as the VoiceOver value (the entry point), and the per-point
+    /// series after it. Child containment keeps per-element labels navigable
+    /// inside the container.
+    func accessibilityChart(description: String, summary: String, points: [String]) -> some View {
+        self
+            .accessibilityElement(children: .contain)
+            .accessibilityLabel(description)
+            .accessibilityValue(([summary] + points).joined(separator: ", "))
             .accessibilityAddTraits(.updatesFrequently)
     }
 }

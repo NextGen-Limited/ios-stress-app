@@ -28,8 +28,32 @@ struct StressBarChartView: View {
             RoundedRectangle(cornerRadius: 16, style: .continuous)
                 .stroke(Color.Wellness.adaptiveSecondaryText.opacity(0.08), lineWidth: 1)
         )
-        .accessibilityElement(children: .contain)
-        .accessibilityLabel("Daily stress bar chart. Average \(averageValue) on a 0 to 100 scale.")
+        .accessibilityChart(
+            description: "Daily stress bar chart. Average \(averageValue) on a 0 to 100 scale.",
+            summary: accessibilityTrendSummary,
+            points: accessibilityPoints
+        )
+    }
+
+    // MARK: - Accessibility Series (D-09)
+
+    /// Bars with a zero average render as "no data" tracks — the trend
+    /// series covers only days with data.
+    private var daysWithData: [DailyStressData] {
+        dailyStress.filter { $0.averageStress > 0 }
+    }
+
+    private var accessibilityTrendSummary: String {
+        let values = daysWithData.map(\.averageStress)
+        guard !values.isEmpty else { return "No data yet" }
+        return VoiceOverLabels.trendSummary(metric: "Daily stress", values: values, period: "7 days")
+    }
+
+    private var accessibilityPoints: [String] {
+        daysWithData.map { item in
+            let day = item.dateNumber.map { "\(item.dayLabel) \($0)" } ?? item.dayLabel
+            return VoiceOverLabels.chartPoint(dateText: day, valueText: "\(Int(item.averageStress))%")
+        }
     }
 
     // MARK: - Header

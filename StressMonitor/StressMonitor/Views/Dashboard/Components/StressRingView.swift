@@ -54,7 +54,7 @@ struct StressRingView: View {
         }
         .accessibilityElement(children: .combine)
         .accessibilityLabel("Stress level")
-        .accessibilityValue("\(Int(stressLevel)) out of 100")
+        .accessibilityStressLevel(stressLevel, category: category)
         .onAppear {
             withAnimation(.spring(response: 0.8, dampingFraction: 0.7)) {
                 animateRing = true
