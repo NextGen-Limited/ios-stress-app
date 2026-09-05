@@ -57,7 +57,7 @@ created: "2026-09-05"
 | 3-05-03 | 05 | 3 | A11Y-03 | T-03-07 | fallback keeps session feedback (haptic+text) | build + copy/haptic greps | app build + fallback-string greps | ✅ | ⬜ pending |
 | 3-06-01 | 06 | 4 | A11Y-05 | T-03-09 | extension-member screen prevents breaking live code | record greps | `test -f` + disposition greps on 03-ORPHAN-AUDIT-RECORD.md | created by this task | ⬜ pending |
 | 3-06-02 | 06 | 4 | A11Y-05 | T-03-10 | decision recorded before any deletion | record grep | decision-entry grep on the audit record | ✅ (after 3-06-01) | ⬜ pending |
-| 3-06-03 | 06 | 4 | A11Y-05 + all | T-03-08 | dead code out of all three binaries | 3-scheme clean builds + both gate greps + full suite | build x3 + adoption/RM gate loops + canonical full suite | ✅ | ⬜ pending |
+| 3-06-03 | 06 | 4 | A11Y-05 + all | T-03-08 | dead code out of all three binaries | 3-scheme clean builds + all gate greps (adoption, RM, D-02 anchor+shrink, app-side shrink) + full suite | build x3 + adoption/RM/D-02-anchor/shrink/app-shrink gate loops + canonical full suite | ✅ | ⬜ pending |
 
 *Status: ⬜ pending · ✅ green · ❌ red · ⚠️ flaky*
 
