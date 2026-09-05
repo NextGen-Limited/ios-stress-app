@@ -9,10 +9,10 @@ import SwiftUI
 /// | Tier      | Score range | Hex       | Glyph |
 /// |-----------|-------------|-----------|-------|
 /// | Relaxed   | 0–25        | `#00A000` | ◌     |
-/// | Mild      | 26–50       | `#007AFF` | ◎     |
-/// | Moderate  | 51–75       | `#8A5A00` | ◐     |
-/// | High      | 76–100      | `#B25400` | ◑     |
-/// | Severe    | 100+        | `#FF3B30` | ●     |
+/// | Mild      | 25–50       | `#007AFF` | ◎     |
+/// | Moderate  | 50–75       | `#8A5A00` | ◐     |
+/// | High      | 75–90       | `#B25400` | ◑     |
+/// | Severe    | 90+         | `#FF3B30` | ●     |
 public enum StressCategory: String, CaseIterable, Codable, Sendable, Identifiable {
     case relaxed
     case mild
@@ -89,10 +89,10 @@ public enum StressCategory: String, CaseIterable, Codable, Sendable, Identifiabl
     public var scoreRange: ClosedRange<Double> {
         switch self {
         case .relaxed:  return 0...25
-        case .mild:     return 26...50
-        case .moderate: return 51...75
-        case .high:     return 76...100
-        case .severe:   return 100...150
+        case .mild:     return 25...50
+        case .moderate: return 50...75
+        case .high:     return 75...90
+        case .severe:   return 90...150
         }
     }
 
@@ -118,14 +118,15 @@ public enum StressCategory: String, CaseIterable, Codable, Sendable, Identifiabl
 
     // MARK: - Resolution
 
-    /// Resolve the tier from a raw 0–100+ stress level.
+    /// Resolve the tier from a raw 0–100+ stress level. Boundaries mirror
+    /// the iOS app's `StressResult.category(for:)`.
     public static func category(for level: Double) -> StressCategory {
         switch level {
-        case ..<26:    return .relaxed
-        case ..<51:    return .mild
-        case ..<76:    return .moderate
-        case 76...100: return .high
-        default:       return .severe   // 100+ overflow → Severe
+        case ..<25: return .relaxed
+        case ..<50: return .mild
+        case ..<75: return .moderate
+        case ..<90: return .high
+        default:    return .severe
         }
     }
 }
