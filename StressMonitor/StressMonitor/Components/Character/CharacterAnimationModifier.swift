@@ -13,6 +13,7 @@ struct CharacterAnimationModifier: ViewModifier {
     @State private var shakeRotation: Double = 0
     @State private var dizzyRotation: Double = 0
     @State private var fidgetTimer: Timer?
+    @State private var motionReduced: Bool = false
 
     func body(content: Content) -> some View {
         content
@@ -24,6 +25,7 @@ struct CharacterAnimationModifier: ViewModifier {
                 fidgetTimer?.invalidate()
                 fidgetTimer = nil
             }
+            .onMotionDecision { reduced in motionReduced = reduced }
             .startMotionIfAllowed { applyAnimation() }
     }
 
@@ -57,6 +59,7 @@ struct CharacterAnimationModifier: ViewModifier {
     /// Fidget animation: Random offset ±3pt every 2-3s
     private func startFidget() {
         fidgetTimer = Timer.scheduledTimer(withTimeInterval: 2.5, repeats: true) { _ in
+            guard !self.motionReduced else { return }
             let randomX = CGFloat.random(in: -3...3)
             let randomY = CGFloat.random(in: -3...3)
 
