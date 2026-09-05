@@ -7,6 +7,7 @@ behavior_unverified: 3 # present + wired, behavior not exercised by an executed 
 overrides_applied: 0
 gaps: []
 behavior_unverified_items:
+
   - truth: "On two signed-in devices, tapping 'Delete All' removes the user's records from local storage, CloudKit, and the App Group cache — verified from the second device (Roadmap SC1 / DATA-01)"
     test: "Task 4 in 02-01-PLAN.md (checkpoint:human-verify, gate=blocking): take a measurement on device A, confirm sync to device B, Delete All on device A, confirm the record disappears from device B and the widget clears, confirm device A is signed out."
     expected: "Device B's history and widget no longer show the deleted measurement after a sync window; device A shows no live chat session (Keychain JWT actually cleared on a real keychain, not just the simulator's)."
@@ -19,12 +20,17 @@ behavior_unverified_items:
     expected: "Both tests pass, proving local deletion always completes once the CloudKit phase has begun."
     why_human: "The tests exist, target the correct methods, and use a proper FakeCloudKitResetService double with no real CloudKit dependency — but `xcodebuild test` could not execute on this host (see Verification Notes: reproducible CoreSimulator device-pairing failure). `xcodebuild build-for-testing` compiled this exact test file successfully, confirming the test is well-formed, but pass/fail could not be observed."
 human_verification:
+
   - test: "Two-device CloudKit sync + Keychain sign-out check (Task 4 of 02-01-PLAN.md)"
     expected: "Deleted measurement disappears from device B and its widget; device A's chat entry point shows no live session after Delete All."
     why_human: "Requires two real iCloud-signed devices; simulator does not exercise the same CloudKit sync engine."
   - test: "Run StressMonitorTests/DataDeletionConsolidationTests.swift on a host where the simulator can actually launch (or on a real device), particularly DataDeleterFailureAndCancellationTests and the CR-01 CloudKit-batch-failure path"
     expected: "All 12 tests in the file pass, including the two cancellation-ordering tests and (once added) a CKDatabase-double test for CR-01."
     why_human: "This host's CoreSimulator install cannot complete a test launch session (`No matching device ... in set at .../XCTestDevices`) — a documented, pre-existing environment issue independent of this phase's code, reproduced again in this verification session. `xcodebuild build-for-testing` for the full scheme succeeded, confirming no compile-level regression."
+audit_acknowledged:
+  milestone: v1.2
+  at: 2026-09-05
+  status: human_needed
 ---
 
 # Phase 2: Data Integrity, Deletion & Consolidation Verification Report

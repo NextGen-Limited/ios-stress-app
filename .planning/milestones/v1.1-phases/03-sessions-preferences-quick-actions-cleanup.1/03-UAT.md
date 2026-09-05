@@ -5,6 +5,10 @@ source: [03-01-SUMMARY.md, 03-02-SUMMARY.md, 03-03-SUMMARY.md, 03-04-SUMMARY.md,
 started: 2026-08-30T21:30:00+07:00
 updated: 2026-08-30T21:30:00+07:00
 round: re-test 1 (post-merge drift check, built from main @ d74d6d7; round 1 = v1.1 close-out 2026-08-23, 5/5 pass, archived in .planning/milestones/v1.1-phases/)
+audit_acknowledged:
+  milestone: v1.2
+  at: 2026-09-05
+  gap_snapshot: "testing::scenarios=5"
 ---
 
 # Phase 3 UAT — Live-Backend Re-Test (post-merge drift check)

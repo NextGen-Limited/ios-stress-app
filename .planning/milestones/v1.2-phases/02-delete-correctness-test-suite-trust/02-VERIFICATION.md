@@ -6,9 +6,14 @@ score: 5/6 must-haves verified (automated); 1/6 requires human execution (plan-s
 behavior_unverified: 0
 overrides_applied: 0
 human_verification:
+
   - test: "DATA-01 live two-surface CloudKit delete verification: on a physical iPhone signed into the team iCloud account (container iCloud.stress.ai.com), seed real data across every swept model (StressMeasurement, an unlocked CharacterUnlock, a logged Habit), trigger Settings → Data Management → Factory Reset, then poll the CloudKit Console private database (or a second physical iPhone if available) per record type — including live enumeration of the NSPersistentCloudKitContainer-mirrored types for CharacterUnlock/Habit — at a fixed interval until two consecutive rounds read zero rows for every type. Fill in 02-DATA-01-EVIDENCE.md §2 (environment) and §4 (timestamped poll-round table + computed propagation delay)."
     expected: "All enumerated record types reach stable-empty (two consecutive zero-count rounds) within a documented, measured propagation delay after the factory-reset trigger. If any type (especially the newly-fixed Habit mirror) remains non-empty after several stable-empty rounds for the others, that is a live finding to record, not a pass."
     why_human: "Requires physical hardware signed into a real iCloud account and the CloudKit Developer Console — Pitfall 7 (locked CONTEXT decision) explicitly rejects simulator-derived evidence, and CloudKit propagation timing cannot be observed by static code analysis or a unit test. This is a plan-sanctioned (02-06 Task 2) end-of-phase human item, not a scope gap: the automated portion (store-sweep completeness fix + regression pins + execution-ready evidence apparatus) is done and independently verified against the codebase in this report."
+audit_acknowledged:
+  milestone: v1.2
+  at: 2026-09-05
+  status: human_needed
 ---
 
 # Phase 2: Delete Correctness & Test-Suite Trust Verification Report

@@ -6,6 +6,7 @@ score: 1/5 truths verified
 behavior_unverified: 2
 overrides_applied: 0
 gaps:
+
   - truth: "`xcodebuild test` executes a real unit-test bundle and reports pass/fail"
     status: failed
     reason: "Independently reproduced in this verification session (separate from the 3 executor attempts in 01-01/01-02): `xcodebuild test -only-testing:StressMonitorTests/WidgetDataStateTests` failed at the CoreSimulator device-pairing layer ('No matching device ... in XCTestDevices') before producing any pass/fail signal. This is the 4th+ consecutive failure of this exact command on this host across two independent sessions (executor + verifier), which raises this from 'one-off flake' to a persistent environment defect that blocks the literal roadmap success criterion. `xcodebuild build-for-testing` succeeds (test bundle compiles, target is real `com.apple.product-type.bundle.unit-test`, 11 test files present and registered) — this is a runtime-execution gap, not a code or wiring defect."
@@ -14,8 +15,10 @@ gaps:
         issue: "Target and 11 test files exist and compile (TEST BUILD SUCCEEDED) but `xcodebuild test` cannot complete a run on this machine — CoreSimulator device-clone registration failure."
     missing:
       - "A `xcodebuild test -only-testing:StressMonitorTests` run that actually reports PASS or FAIL, obtained on a stable CoreSimulator host or CI runner."
+
 deferred: []
 behavior_unverified_items:
+
   - truth: "The widget and complications read/write the same App Group suite as the app on a real device (no fatalError, one canonical suite ID)"
     test: "Install the app on a physical device, take a stress measurement, background the app, and confirm the home-screen widget updates within its next 15-minute timeline refresh without a fatalError crash."
     expected: "Widget reflects the new measurement; `WidgetDataProvider.init`'s `UserDefaults(suiteName:)` guard does not fatalError."
@@ -25,6 +28,7 @@ behavior_unverified_items:
     expected: "Widget's Small/Medium/Large views show the just-saved measurement's real stress level/category, not the hardcoded placeholder/sample data."
     why_human: "Code-level data flow is confirmed end-to-end (see Data-Flow Trace below: `StressRepository.save()` → `WidgetPublisher.publish()` → App Group `UserDefaults` → `WidgetDataProvider.getLatestStress()` → `StressWidgetProvider.getTimeline` → view `dataState` branching), but no real device is available to this agent to observe the actual on-screen refresh, matching 01-VALIDATION.md's own Manual-Only Verifications table."
 human_verification:
+
   - test: "Archive the app (Release configuration) via Xcode Organizer or `xcodebuild -exportArchive`, then run App Store Connect's pre-upload validation."
     expected: "No Privacy Manifest validation error/warning is raised by ASC's own validator."
     why_human: "No local tool wraps ASC's own Privacy Manifest validator (confirmed in 01-RESEARCH.md's Validation Architecture table and unchanged since). This verifier confirmed all 3 `PrivacyInfo.xcprivacy` files are `plutil`-lint clean and use the real, Apple-documented `1C8F.1` (App-Group UserDefaults) reason code, and that the main app's `HealthAndFitness` entry now declares `Linked=true` — but that is necessary, not sufficient, evidence for ASC acceptance."
@@ -34,6 +38,10 @@ human_verification:
   - test: "See widget/real-device items above (behavior_unverified_items)."
     expected: "See above."
     why_human: "See above."
+audit_acknowledged:
+  milestone: v1.2
+  at: 2026-09-05
+  status: gaps_found
 ---
 
 # Phase 1: Build Configuration & Widget Wiring Verification Report

@@ -2,39 +2,37 @@
 gsd_state_version: 1.0
 milestone: v1.2
 milestone_name: Submission Readiness
-current_phase: 3
-current_phase_name: Accessibility Compliance
-status: verifying
+status: Awaiting next milestone
 stopped_at: Completed 03-06-PLAN.md (phase 3 complete — 6/6)
-last_updated: "2026-09-05T04:57:27.847Z"
+last_updated: "2026-09-05T14:04:39.674Z"
 last_activity: 2026-09-05
-last_activity_desc: Phase 3 execution started
-state_head: fce8e8a8398ee5633ff271b76e17192c013ae9af
+last_activity_desc: Milestone v1.2 completed and archived
+state_head: 0aff6a5dd2bde35f130c6c94f8eb7298b185c411
 progress:
   total_phases: 4
   completed_phases: 1
   total_plans: 18
   completed_plans: 18
   percent: 25
+current_phase: 3
+current_phase_name: Accessibility Compliance
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-09-03 at v1.2 start)
+See: .planning/PROJECT.md (updated 2026-09-05 at v1.2 close)
 
 **Core value:** Every feature that ships in the binary must actually work end-to-end for a real user — not just compile.
-**Current focus:** Phase 3 — Accessibility Compliance
+**Current focus:** Planning next milestone (submission cycle: SHIP-01..03 + DATA-01 human verification)
 
 ## Current Position
 
-Phase: 3 (Accessibility Compliance) — EXECUTING
-Plan: 6 of 6
-Status: Phase complete — ready for verification
-Last activity: 2026-09-05 — Phase 3 execution started
-
-Progress: [███░░░░░░░] 25% (1/4 phases)
+Phase: Milestone v1.2 complete
+Plan: —
+Status: Awaiting next milestone
+Last activity: 2026-09-05 — Milestone v1.2 completed and archived
 
 ## Performance Metrics
 
@@ -152,6 +150,7 @@ None yet.
 - [Release] TestFlight 1.0.0 build 13 is BETA_APPROVED; build 14 (v1.2 P1, VALID) predates the WIRE-01 fix — its widget shows "No Data"; the next build carries the wiring. Build 12 shipped with no entitlements blob — dump entitlements per bundle before every publish (Phase 4).
 - Pending from v1.1: Phase 03 drift re-test (5 UAT scenarios, `.planning/milestones/v1.1-phases/03-sessions-preferences-quick-actions-cleanup.1/03-UAT.md`) — candidate target now build 15+ (post-wiring) — not a v1.2 requirement, but the last open v1.1 item.
 - StoreKitServiceTests + EntitlementForegroundCorrectionTests remain disabled (StoreKitTest session-isolation/productNotFound bug, dated disposition 2026-09-04 in file headers, WINDOWS #6/#18) — needs a working local CoreSimulator/XCTestDevices layer to diagnose the StoreKitTest daemon interaction further
+- [Motion-family follow-up, v1.2 close] ChatBottomSheetView:541 decorative repeatForever unguarded under Reduce Motion; fidget timer does not restart when RM is disabled mid-session after being on at appear — motionReduced state is wired in CharacterAnimationModifier, both are ~two-line fixes
 
 ### Quick Tasks Completed
 
@@ -166,8 +165,20 @@ None yet.
 
 | Category | Item | Status | Deferred At | Milestone |
 |----------|------|--------|-------------|-----------|
-| uat_gap | v1.1 Phase 03 drift re-test (5 scenarios vs TestFlight build 13) | pending | 2026-09-03 | v1.1 |
-| doc_gap | DOCS-01 — Nyquist VALIDATION.md reconciliation for v1.1 phases 1-3 | v2 backlog | 2026-09-03 | v1.1 |
+| uat_gaps | 02/02-UAT.md | testing (1 scenario) | 2026-09-05 | v1.2 |
+| uat_gaps | 03/03-A11Y-UAT.md | unknown (walkthrough pending) | 2026-09-05 | v1.2 |
+| uat_gaps | 03/03-UAT.md @ v1.1-phases (drift re-test) | testing (5 scenarios) | 2026-09-05 | v1.2 |
+| uat_gaps | 01.1/01.1-UAT.md @ v1.0-phases | passed (0 pending) | 2026-09-05 | v1.2 |
+| uat_gaps | 02/02-UAT.md @ v1.0-phases | testing (3 scenarios) | 2026-09-05 | v1.2 |
+| verification_gaps | 02/02-VERIFICATION.md | human_needed | 2026-09-05 | v1.2 |
+| verification_gaps | 03/03-VERIFICATION.md | human_needed | 2026-09-05 | v1.2 |
+| verification_gaps | 01/01-VERIFICATION.md @ v1.0-phases | gaps_found | 2026-09-05 | v1.2 |
+| verification_gaps | 02/02-VERIFICATION.md @ v1.0-phases | human_needed | 2026-09-05 | v1.2 |
+| quick_tasks | 260902-wso-repo-hygiene-gitignore-agent-harness-dir | missing | 2026-09-05 | v1.2 |
+| deferred_items | 01/deferred-items.md: INFOPLIST_KEY_UIBackgroundModes never merges into product plists | acknowledged | 2026-09-05 | v1.2 |
+| deferred_items | 03/deferred-items.md @ v1.0-phases: MockStoreKitService Release-build blocker | acknowledged | 2026-09-05 | v1.2 |
+| deferred_items | 03/deferred-items.md: ChatBottomSheetView decorative repeatForever | acknowledged | 2026-09-05 | v1.2 |
+| deferred_items | 03/deferred-items.md: LoadingView/BioAgeCardView/SmartInsightsTeaser repeatForever loops | resolved (files deleted by redesign) | 2026-09-05 | v1.2 |
 
 Earlier v1.0 deferrals (Phase 01/02 verification gaps, `MockStoreKitService` Release blocker) are all closed — see PROJECT.md Validated.
 
@@ -178,6 +189,8 @@ Earlier v1.0 deferrals (Phase 01/02 verification gaps, `MockStoreKitService` Rel
 | 1 | ~~verification_deferred_human~~ **RESOLVED 2026-09-03** — /gsd-verify-work 1 passed 19/19 (both human items validated); phase marked complete | — |
 | 2 | verification_deferred_human (deferred 2026-09-04) — DATA-01 live two-surface CloudKit delete test (physical iPhone + CloudKit Console). Automated 5/6 requirements verified (02-VERIFICATION.md), full suite green 0 failed, UAT 0/1 pending (`02-UAT.md`), evidence apparatus execution-ready (`02-DATA-01-EVIDENCE.md`, redaction rule in §3 step 7) | `/gsd-verify-work 2` |
 
+| 3 | verification_deferred_human (deferred 2026-09-05 at milestone close) — machine gates green (contrast suite 28/28, all four a11y grep gates, code review clean after 3 passes + residual remediation); human A11Y walkthrough (03-A11Y-UAT.md, 14 surfaces) outstanding | `/gsd-verify-work 3` (walkthrough apparatus ready) |
+
 ## Session Continuity
 
 Last session: 2026-09-05T04:57:10.464Z
@@ -186,5 +199,4 @@ Resume file: None
 
 ## Operator Next Steps
 
-- Resolve the uncommitted SPM-proxy migration in the working tree (Firebase proxy products + non-colliding GoogleSignIn naming) before Phase 1 archive work
-- `/gsd-discuss-phase 1` — resolve D3 (privacy contract authority) and D4 (widget in v1) before planning Phase 1
+- Start the next milestone with /gsd-new-milestone

@@ -6,6 +6,7 @@ score: 5/5 must-haves verified (source-level); 3/5 route to human verification f
 behavior_unverified: 3
 overrides_applied: 0
 behavior_unverified_items:
+
   - truth: "SC-1: Every interactive control on the primary screens has a hit target of at least 44x44pt"
     test: "Run the Accessibility Inspector 'Hit Targets' audit on each of the 14 manifest surfaces per 03-A11Y-UAT.md §1, cross-checked against the 03-03 per-surface enumeration; confirm adjacent controls retain separate, non-overlapping hit regions"
     expected: "No control below 44x44pt hit area; no overlapping hit regions between neighboring controls"
@@ -19,6 +20,10 @@ behavior_unverified_items:
     expected: "Zero truncation, zero clipping, zero overlap; stacked/wrapped content preserves default-size reading order; every dated exception (58 widget/watch + 3 app-side) renders legibly"
     why_human: "The D-10/D-02 adoption and anchor gates (all re-verified green in this pass) prove every text site is on the Dynamic Type ramp or carries a documented exception — they cannot observe whether a given layout actually clips or overlaps once rendered at AX5, which requires visual inspection"
 coincidental_reliance_items: []
+audit_acknowledged:
+  milestone: v1.2
+  at: 2026-09-05
+  status: human_needed
 ---
 
 # Phase 3: Accessibility Compliance Verification Report
@@ -106,21 +111,25 @@ All spot-checks re-run in this session against the current tree (post-2-iteratio
 The phase's own 03-06 plan correctly classified 7 backstop-verification truths plus the per-surface Inspector/AX5/RM walkthrough as requiring a human with a running simulator/device — this is by design (`verification: backstop` in the PLAN frontmatter), not a gap. `03-A11Y-UAT.md` is the apparatus; every row is genuinely `_pending_`.
 
 ### 1. Accessibility Inspector hit-target scan (A11Y-01)
+
 **Test:** Run Xcode Accessibility Inspector's Hit Targets audit on each of the 14 manifest surfaces (03-A11Y-UAT.md §1).
 **Expected:** No control below 44x44pt; no overlapping hit regions between adjacent controls.
 **Why human:** Runtime layout property; source-level grep confirms adoption but not rendered geometry or adjacency.
 
 ### 2. AX5 visual walkthrough (A11Y-04)
+
 **Test:** Set AX5 (`accessibility-extra-extra-extra-large`), screenshot all 14 surfaces + widget + watch surfaces, light and dark (03-A11Y-UAT.md §1/§3/§4).
 **Expected:** Zero truncation/clipping/overlap; reading order preserved when content wraps/stacks.
 **Why human:** Visual rendering outcome; source gates prove ramp adoption, not final layout.
 
 ### 3. Reduce Motion behavioral walkthrough (A11Y-03)
+
 **Test:** Enable Reduce Motion (Settings or the DEBUG `-a11y-reduce-motion` seam), walk all surfaces plus the breathing-session fallback (03-A11Y-UAT.md §1(c)/§2).
 **Expected:** No looping/scaling/parallax animation plays; breathing session defaults to haptic + text countdown, animated guide switchable on.
 **Why human:** Runtime OS-setting behavior; source gate proves single-helper ownership, not the actual suppression when the setting is live.
 
 ### 4. Widget/watch AX5 legibility (D-02, folded into A11Y-04)
+
 **Test:** Force widget re-render at AX5 (gallery Small/Medium/Large, Lock Screen, Live Activity) and set AX5 on the watch simulator for main surfaces + one complication family (03-A11Y-UAT.md §3/§4).
 **Expected:** Anchored text scales without overflow; every dated exception renders legibly.
 **Why human:** Widget snapshot caching and watch complication rendering are runtime/visual properties.

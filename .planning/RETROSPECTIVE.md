@@ -78,6 +78,47 @@
 
 ---
 
+## Milestone: v1.2 — Submission Readiness
+
+**Shipped:** 2026-09-05 (`override_closeout`, user-directed — Phase 4 deferred)
+**Phases:** 3 executed of 4 planned | **Plans:** 18 | **Tasks:** 46 | 313 files, +17,871/−14,401 over 3 days (2026-09-03 → 2026-09-05)
+
+### What Was Built
+
+- Binary & manifest truth: privacy manifest ASC-valid on a real upload (TestFlight build 14), one canonical App Group, plist single-sourcing (empirical inversion — the Info.plist FILE is the live source, custom INFOPLIST_KEY_* never merge), zero extractable credentials, SPM proxy migration committed, CI fastlane-match readonly green
+- Widget made true: the dead write path (WidgetPublisher.publish had zero callers since bba996a) discovered by evidence and wired TDD-first
+- Delete correctness & test-suite trust: lying-delete regression pin via the CloudKitResetServiceProtocol seam, WR-03/WR-04 money-path fixes, WINDOWS #8 root-caused as a fixture container-lifetime bug, one canonical CI-parity test invocation
+- Accessibility: machine-checked WCAG contrast suite (resolved-UIColor ratios, both appearances), Dynamic Type ramp across app + widget + watch (82 ScaledMetric anchors), single-owner Reduce Motion helper with DEBUG seam, 84-file orphan deletion proven by three-scheme builds
+- Phase 3 code review fully remediated across three passes plus a final SDD subagent loop for the IN-finding residuals (9 commits, every task spec+quality reviewed, whole-branch review clean)
+
+### What Worked
+
+- TDD pins for every contrast/wiring/boundary claim — regressions are machine-caught now, not review-caught
+- The pre-close artifact audit forced honest disposition of 16 open items instead of silent loss at archive time
+- Plan-vs-repo divergence (parallel GSD fix stream closed 8 of 12 findings under a stalled plan) resolved by explicit user ruling — supersession, not blind re-execution
+
+### What Was Inefficient
+
+- The final remediation plan was drafted against a repo state the parallel GSD stream then changed under it; one stalled dispatch (fork exhaustion) lost a staged diff and cost a full resumption audit
+- Two resource-exhaustion incidents (process/fork limits; an Argent tool-server storm) each stalled execution for tens of minutes
+- Function-level `-only-testing` selects 0 tests on this toolchain — vacuous-pass traps, caught both times only by implementers verifying per-case output
+
+### Patterns Established
+
+- Contrast truth computed from resolved UIColor values, never screenshots
+- Verification gates tested red AND green (anti-vacuous harness)
+- Motion decisions owned by one helper; consumers fed via onMotionDecision — now change-fed (mid-session Reduce Motion toggles propagate)
+
+### Key Lessons
+
+- A plan's verbatim code can be provably unable to fix its own finding (IN-05: appear-time-only notification feeding a per-tick gate) — review the mechanism, not just diff-to-spec
+- Archived milestones resurface their open items at every later close; the CLI acknowledge writer can hit the wrong same-numbered active phase — verify the gap_snapshot you actually suppressed
+
+### Cost Observations
+
+- Model mix: GSD phases on the balanced profile; the SDD loop used low-tier implementers for transcription tasks, standard tier for judgment, reviewer tier for gates
+- Notable: the 42-minute first SDD dispatch was dominated by simulator boot and process storms, not agent work
+
 ## Cross-Milestone Trends
 
 ### Process Evolution

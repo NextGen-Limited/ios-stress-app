@@ -6,7 +6,7 @@ StressMonitor is an iOS/watchOS app that scores stress 0–100 from HealthKit bi
 
 As of v1.1 close (2026-08-23) the app runs end-to-end against its own deployed backend (`stress-api.dropitx.site`): Firebase Auth (anonymous + Google linking with account preservation), credit-metered chat streaming with server-side session history, preferences that shape the coach's system prompt, Apple-verified purchases with idempotent grants and refund demotion, and a factory reset that wipes server history. The money path and all 4 E2E flows are live-verified against deployed infrastructure.
 
-What blocks submission now is the v1.0-carryover list — as of v1.2 Phase 1 close (2026-09-03), the binary-truth half is closed: privacy manifest validated on a real ASC upload (BUILD-01, build 14 VALID), one App Group suite across all targets (BUILD-02), plist single-sourced (BUILD-03), no extractable credential (AUTH-01), widget renders live data on device (WIRE-01), and both CI surfaces proven (ENV-04/05). Remaining: accessibility (A11Y-01..05), ship readiness (SHIP-01..03), delete correctness + test-suite trust (Phase 2), plus environment debt (WINDOWS.md #8 lineage, quarantined CharacterEntitlementSyncTests).
+As of v1.2 close (2026-09-05, `override_closeout`, Phase 4 deferred): the remediation halves are done — binary/manifest truth (privacy manifest ASC-valid on build 14, one App Group, plist single-source, no extractable credentials), the widget's write path wired and device-verified, delete-correctness machinery with a mutation-proven regression pin, a trustworthy CI-parity test suite, and accessibility machine-gated and review-clean (contrast suite, Dynamic Type ramp, single-owner Reduce Motion, 84 orphan files deleted). What remains between the binary and App Review is deliberately small: the Phase-4 submission package (SHIP-01..03, never started), two human verification gates (DATA-01 live two-device CloudKit delete; Phase-3 A11Y walkthrough via `/gsd-verify-work 3`), and the v1.1 drift re-test against a post-wiring TestFlight build.
 
 ## Core Value
 
@@ -19,18 +19,15 @@ Every feature that ships in the binary must actually work end-to-end for a real 
 - **Success metric**: A release archive uploads to App Store Connect without manifest validation failure; a real purchase/restore/cancel/expiry cycle verifies against a local `.storekit` file; Chat reflects real auth state instead of a dead, expired credential.
 - **Strategy notes**: `plans/0808-2042-appstore-submission-remediation/plan.md` (the authoritative scope for this milestone), `plans/reports/appstore-audit-0808-*.md` (6 source audits), `.planning/codebase/{ARCHITECTURE,STACK,TESTING,CONCERNS}.md` (codebase map, corroborates several findings), `docs/project-roadmap.md`, `docs/KANBAN-SHIP-READINESS.md` (both partially stale relative to the fresher audit).
 
-## Current Milestone: v1.2 Submission Readiness
+## Next Milestone (candidate scope, from v1.2 close carryover)
 
-**Goal:** Close the v1.0-carryover submission-blocker list and environment debt so the shipped binary is actually submittable — privacy manifest validation, ship readiness, accessibility, and the two blocking decisions (D3, D4).
+**Goal:** The submission tail — finish what stands between the current binary and App Review.
 
-**Target features:**
-- BUILD: privacy manifest ASC validation (BUILD-01), canonical App Group suite ID (BUILD-02), Info.plist consolidation (BUILD-03), CI parallel-testing pin (BUILD-04 residual)
-- DATA: two-device CloudKit delete test (DATA-01 residual), CR-01 regression test seam (DATA-04)
-- AUTH: empirical Release-binary strings check (AUTH-01)
-- WIRE: widget live data on device (WIRE-01, gated on D4)
-- SHIP: screenshots (SHIP-01), release lane truth (SHIP-02), privacy questionnaire (SHIP-03, gated on D3)
-- A11Y: touch targets, contrast, Reduce Motion, Dynamic Type, orphaned view deletion (A11Y-01..05)
-- ENV: WINDOWS.md #8 lineage, CharacterEntitlementSyncTests quarantine, WR-03/WR-04 advisories
+- SHIP-01: App Store screenshot set captured from a real-data build (demo mode disabled)
+- SHIP-02: Fastlane `release` lane that does exactly the metadata-only upload the first submission needs
+- SHIP-03: ASC privacy questionnaire answered field-for-field per the D3 contract (code-is-the-contract, resolved v1.2 P1)
+- Human gates: DATA-01 two-device CloudKit delete (`/gsd-verify-work 2`); Phase-3 A11Y walkthrough (`/gsd-verify-work 3`); v1.1 drift re-test vs build 15+
+- Quick-task candidates: motion-family micro-fixes (ChatBottomSheetView loop guard; fidget resume on Reduce Motion disable — state already wired)
 
 ## Requirements
 
@@ -83,41 +80,27 @@ Every feature that ships in the binary must actually work end-to-end for a real 
 - ✓ v1.2 P1 ENV-04: SPM proxy migration complete in place — Release archive producible from the working tree; proxy sources committed behind a scoped `.gitignore` exception; clean-CI resolve green (runs 33745603902/33746936991)
 - ✓ v1.2 P1 ENV-05: CI `fastlane match` readonly accepts the dual-cert world — 3 App Store profiles + K2TYLYAWMK Distribution cert installed with zero regeneration (run 33749862925); the documented `setup_match` fallback was never needed
 
+- ✓ v1.2 P2 BUILD-04: one canonical CI-parity `xcodebuild test` invocation (AGENTS.md, `-parallel-testing-enabled NO`) — dev docs and CI cannot diverge; INFOPLIST_KEY doc-truth note folded in (phase automated verification 5/6; DATA-01 is the human half)
+- ✓ v1.2 P2 DATA-04: CloudKit delete-truthiness spy suite via the `CloudKitResetServiceProtocol` seam — ungated, mutation-proven (a lying delete fails CI)
+- ✓ v1.2 P2 ENV-01/ENV-02: WINDOWS #8 root-caused as a fixture container-lifetime bug and fixed (keep-alive `(ModelContainer, ModelContext)` tuples); `CharacterEntitlementSyncTests` restored to the default run
+- ✓ v1.2 P2 ENV-03: WR-03 (DEBUG defaults to real StoreKit; mock via `-mock-iap` launch arg) + WR-04 (unverified transactions never finished) — both red-first pinned
+- ✓ v1.2 P3 A11Y-01..05: 44pt hit areas, machine-checked WCAG AA contrast (resolved-UIColor ratios, both appearances), single-owner Reduce Motion helper, Dynamic Type ramp (14 manifest surfaces + 82 widget/watch anchors), 84 orphan files deleted behind three-scheme builds — machine gates green; human walkthrough pending (override recorded at close)
+
 ### Active
 
-<!-- v1.2 "Submission Readiness" scope (this milestone). Status reflects honest per-requirement verification state, not self-reported marks. -->
+<!-- Next-milestone scope: the v1.2 close carryover (submission tail). Status reflects honest per-requirement verification state, not self-reported marks. -->
 
-**BUILD — carried from v1.0 Phase 1**
-- [ ] BUILD-04 residual: pin `-parallel-testing-enabled NO` in dev docs/CI — suite itself green (see Validated TEST-01); NEW input from P1: `INFOPLIST_KEY_UIBackgroundModes` also never merges (absent from build-13 too — pre-existing; folds into this doc-truth item, Phase 2)
+**Carried to the next milestone — the submission tail**
 
-**DATA — carried from v1.0 Phase 2**
-- [ ] DATA-01 residual: two-device CloudKit-propagation delete test never run (local + Keychain + App-Group + server-session halves all verified; server wipe live-verified in v1.1 Phase 3 UAT scenario 5)
-- [ ] DATA-04: Add a regression test for v1.0 CR-01 (CloudKit batch-delete failure propagation) — fix correct by inspection, zero automated coverage; needs a test seam below `CloudKitResetServiceProtocol`
-
-**AUTH — carried from v1.0 Phase 3**
-(closed — AUTH-01 validated in v1.2 P1; see Validated)
-
-**WIRE — carried from v1.0 Phase 4**
-(closed — WIRE-01 validated in v1.2 P1; see Validated)
-
-**SHIP — carried from v1.0 Phase 5**
 - [ ] SHIP-01: App Store screenshot set captured with demo mode disabled
 - [ ] SHIP-02: Fastlane `release` lane matches actual readiness (metadata-only upload)
-- [ ] SHIP-03: ASC privacy questionnaire answered per D3 (D3 resolved v1.2 P1: code is the contract — StressContextPayload derived scores, no raw HealthKit)
-
-**A11Y — carried from v1.0 Phase 5**
-- [ ] A11Y-01: Sub-44pt touch targets fixed
-- [ ] A11Y-02: Color-contrast fixes
-- [ ] A11Y-03: Reduce Motion guards added
-- [ ] A11Y-04: Dynamic Type adopted app-wide
-- [ ] A11Y-05: Orphaned redesign views deleted
-
-**ENV/ADVISORY — surfaced during v1.1, carried to v1.2**
-- [ ] WINDOWS.md #8: host CoreSimulator cold-launch crash restarts on DataDeletion/DataExport suites (exit 65, 0 assertion failures) — accepted lineage, still open
-- [ ] CharacterEntitlementSyncTests quarantine (`@Suite(.disabled)`) — root cause undiagnosed; no coverage for `syncPremiumCharacterEntitlement` until resolved
-- [ ] Phase 2 advisory residue WR-02..04/06..09, IN-01..08 (02-REVIEW.md) — none must-have; WR-03 (DEBUG money path mocks StoreKit) and WR-04 (`.unverified` consumables finished) are the notable ones
-- [ ] Backend: POST /quick-actions unmetered completion route — meter/gate tracked as phuongddx/stress-app-be#2 (iOS grep-gated against wiring it)
-- [ ] (optional) Nyquist coverage TODO: VALIDATION.md files for phases 1-3 seeded but never reconciled by validate-phase (per #2117, coverage TODO not compliance failure)
+- [ ] SHIP-03: ASC privacy questionnaire answered per the D3 contract
+- [ ] DATA-01 residual: two-device CloudKit-propagation delete test (human-gated; evidence apparatus ready)
+- [ ] Motion-family follow-up: ChatBottomSheetView:541 decorative `repeatForever` guard; fidget resume on Reduce Motion disable (both ~two-line; `motionReduced` state already wired)
+- [ ] StoreKitServiceTests + EntitlementForegroundCorrectionTests re-enablement (StoreKitTest daemon productNotFound — needs a working XCTestDevices layer)
+- [ ] v1.1 drift re-test: 5 UAT scenarios vs build 15+ (acknowledged at v1.2 close)
+- [ ] (optional) Nyquist VALIDATION.md reconciliation for v1.1 phases 1-3 (coverage TODO, not compliance)
+- [ ] Backend: POST /quick-actions unmetered completion route — phuongddx/stress-app-be#2 (iOS grep-gated against wiring it)
 
 ### Out of Scope
 
@@ -135,6 +118,8 @@ Every feature that ships in the binary must actually work end-to-end for a real 
 - `.planning/codebase/CONCERNS.md` (generated independently, same day) corroborates the auth/privacy findings from a different angle (static codebase analysis vs. targeted audit), which is why both agree D1/D3 are real and unresolved.
 - **Decision status at v1.1 close**: D1 RESOLVED (real Firebase auth shipped, v1.1 Phase 01); D2 RESOLVED in practice (encryptedValues shipped, v1.0 Phase 2 — never formally recorded); D3 (privacy contract authority) and D4 (widget in v1) STILL OPEN and gate BUILD-01/SHIP-03 and WIRE-01 respectively — the two decisions v1.2 must make first. The two non-blocking product questions (7-day trial copy, premium character unlock semantics) also remain open.
 - Repo state at v1.1 close: work shipped on milestone branch `gsd/v1.1-backend-api-migration` (branch created retroactively for Phase 02+; Phase 01 landed on `main`), tagged `v1.1` at close; backend lives in the separate `stress-app-be` repo, deployed at `stress-api.dropitx.site`.
+
+- Repo state at v1.2 close: merged to `main` via merge commit `8d98697`, tagged `v1.2`, branch `v1.2-submission-readiness` preserved on origin; full suite 296 tests (285 pass / 0 fail / 11 pre-existing skips); ~763k Swift LOC in tree excluding spm-cache.
 - **v1.0 Verification Reality Check** (kept for history, from 2026-08-12 close): v1.0 was closed with `override_closeout` — 5/6 phases un-verified or partially verified, 9/26 requirements unchecked. **v1.1 answered that debt**: every v1.1 phase closed with `passed` verification + human-validated UAT, and v1.1 itself closed `verified_closeout` (milestone audit 21/21 requirements, 3/3 phases, 7/7 integration seams, 4/4 E2E flows; zero gaps, documented tech debt only).
 
 ## Constraints
@@ -178,6 +163,11 @@ Every feature that ships in the binary must actually work end-to-end for a real 
 | v1.2 P1: spm-cache proxy sources committed behind a scoped `.gitignore` exception | Clean CI checkout could not resolve the local proxy package (whole tree gitignored) — surfaced empirically by the draft-PR CI run; committing the 9 package files (caches still ignored) makes checkouts self-sufficient | ✓ Good — clean-CI resolve green |
 | v1.2 P1: code review forced 3-pass iteration and found a vacuous gate (CR-01) | The AUTH-01 gate's CFBundleURLSchemes check passed on empty arrays (its own quotes satisfied the grep); plan-checker iterations 2–3 caught the `-A3` grep-window blocker empirically. Lesson: verify commands must be tested red, not just green — the harness now does both | ✓ Good — gate hardened with anti-vacuous red/green tests |
 
+| v1.2 P2: WINDOWS #8 diagnosed as fixture container-lifetime, not a CI-host defect | Keep-alive `(ModelContainer, ModelContext)` tuple fixtures — returning a bare context let the owning container deallocate mid-op | ✓ Good — crash family gone, quarantined suite restored |
+| v1.2 P3: contrast and Dynamic Type truth is machine-checked, not review-asserted | Resolved-UIColor ratio suites + `FontWellnessTypeParityTests` pin the tokens; regressions fail CI instead of awaiting a reviewer | ✓ Good |
+| v1.2 close: a parallel GSD fix stream superseded a stalled plan's Tasks 1-8; user ruled accept-supersede + test-only pins | Re-executing the plan text would have downgraded stronger landed fixes (4.5:1 per-tier labels back to unconditional-white 3:1); only the genuinely-open IN residuals were executed (SDD subagent loop, 9 commits, whole-branch review clean) | ✓ Good |
+| v1.2 closed `override_closeout` with Phase 4 deferred | Phase-4 prerequisites are green and its scope needs its own discuss/plan cycle; user directed the close to bank the remediation work | ⚠️ Revisit — SHIP-01..03 + the two human gates are the submission tail |
+
 ## Evolution
 
 This document evolves at phase transitions and milestone boundaries.
@@ -196,4 +186,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-09-03 after v1.2 Phase 1 (binary & manifest truth closed: BUILD-01/02/03, AUTH-01, WIRE-01, ENV-04/05 validated; D3/D4 resolved; TestFlight build 14 VALID — carries the pre-fix empty widget; next build includes the 01-06 wiring)*
+*Last updated: 2026-09-05 after v1.2 milestone (Submission Readiness closed — override_closeout, Phase 4 deferred; merged to main at 8d98697, tagged v1.2)*

@@ -10,3 +10,4 @@ Out-of-scope issues discovered during execution. Not caused by Phase 3 changes; 
 - **Scope:** Out of Phase 3 scope — not caused by any Phase 3 change. Pre-existing.
 - **Impact on Phase 3:** Blocks the local AUTH-01 `strings` gate (Task 4), which requires a Release-config build/archive. The AUTH-01 fix itself (the `#if DEBUG` wrap of `SupabaseSecrets.swift`) is structurally correct by Swift semantics; only the empirical `strings` confirmation is deferred.
 - **Suggested fix (future phase):** Gate the `defaultValue` reference behind `#if DEBUG` (provide a Release fallback) or make `MockStoreKitService` available in all configurations.
+  status: acknowledged

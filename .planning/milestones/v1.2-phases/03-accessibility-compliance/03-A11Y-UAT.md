@@ -1,3 +1,10 @@
+---
+audit_acknowledged:
+  milestone: v1.2
+  at: 2026-09-05
+  gap_snapshot: "unknown::scenarios=0"
+---
+
 # Phase 3 — A11Y UAT Apparatus (per-surface human verification)
 
 **Produced by:** plan 03-06 Task 3 · **Date:** 2026-09-05
@@ -7,12 +14,19 @@
 ## How to run (mechanics)
 
 ```bash
+
 # Boot + launch ( argent MCP or Xcode; app scheme StressMonitor, demo mode allowed )
+
 # Set AX5:
+
 xcrun simctl ui <device> content_size accessibility-extra-extra-extra-large
+
 # Appearance light/dark:
+
 xcrun simctl ui <device> appearance light   # then: dark
+
 # Reset when done:
+
 xcrun simctl ui <device> content_size large
 ```
 

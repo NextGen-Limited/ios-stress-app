@@ -3,6 +3,10 @@ status: complete
 phase: 03-sessions-preferences-quick-actions-cleanup
 source: [03-CONTEXT.md, 03-05-PLAN.md, COVERAGE.md]
 updated: 2026-08-23T23:50:43+07:00
+audit_acknowledged:
+  milestone: v1.2
+  at: 2026-09-05
+  gap_snapshot: "complete::scenarios=0"
 ---
 
 # Phase 3 UAT — Live-Backend Scenario Script (v1.1 close-out)
@@ -35,6 +39,7 @@ If this is not 200, stop — the backend is down/stale and every scenario below 
 **Preconditions:** Fresh-ish anonymous account with credits (a new install provisions 50); backend precheck green; no prior chat this session.
 
 **Steps:**
+
 1. Launch the app, open the AI Coach chat sheet (Settings → AI Coach chat row, or the dashboard coach card).
 2. Send a message longer than ~50 characters, e.g. `Hello coach, this is my first message and it is deliberately long enough to be truncated in a session title`.
 3. Wait for the streamed reply to finish.
@@ -42,6 +47,7 @@ If this is not 200, stop — the backend is down/stale and every scenario below 
 5. Relaunch, reopen the chat sheet.
 
 **Expected observable results:**
+
 - Step 5: the prior conversation (your message + the coach reply) renders immediately — history is restored from the server, not lost on relaunch.
 - Close and reopen the chat sheet a second time: the message list is **not duplicated** (Pitfall 2 warning sign — each open fetches once, no double-render).
 
@@ -54,12 +60,14 @@ result: pass
 **Preconditions:** Scenario 1 completed (account has a session); backend precheck green.
 
 **Steps:**
+
 1. Settings → **AI Coach** section: set Language → **Tiếng Việt**, Coaching Style → **Direct**.
 2. Force-quit and relaunch the app; reopen Settings → AI Coach.
 3. Open the chat sheet and send one message (e.g. `I feel tense right now`).
 4. After Scenario 2 checks pass, switch both pickers back: Language → **English**, Coaching Style → **Supportive**.
 
 **Expected observable results:**
+
 - Step 2: both pickers still show Tiếng Việt / Direct after relaunch (seeded from and persisted to the server).
 - Step 3: the reply arrives **in Vietnamese, in a direct tone** — the backend system prompt now says `Respond in vi.` and follows the direct coaching style.
 - No error footnote appears under the AI Coach card during the switches (a transient footnote during a failed PUT is a bug to record).
@@ -73,11 +81,13 @@ result: pass
 **Preconditions:** Account has credits; backend precheck green. Stress context is whatever the app currently has (default context is fine).
 
 **Steps:**
+
 1. Open the chat sheet and watch the quick-reply chips above the composer.
 2. Wait 1–2 seconds without typing.
 3. Tap any chip.
 
 **Expected observable results:**
+
 - Step 1: chips render **instantly** (local fallback set — no blank/loading state).
 - Step 2: within a second or two the chip titles swap to the server's suggestions for the current stress context (e.g. breathing / grounding when stress is high; titles may match the local set at moderate stress — the swap itself is the signal, and with Vietnamese+direct still set from Scenario 2 the server suggestions follow that context).
 - Step 3: the tap sends a prompt through the normal chat path — a **credit-metered** streamed response plays (spinner → tokens stream); the credit pill/balance decreases by one. **A "free" instant completion with no credit deduction = FAIL** (that would mean the unmetered `POST /quick-actions` got wired — it must never be).
@@ -91,11 +101,13 @@ result: pass
 **Preconditions:** Account at **zero remaining credits** (keep chatting from Scenario 3 until the balance hits 0; a fresh account's 50 free credits minus one per message — or reuse the Phase-2 smoke procedure for draining).
 
 **Steps:**
+
 1. With 0 credits remaining, open the chat sheet and send a message.
 2. Observe the response.
 3. Dismiss the paywall; verify the app is still usable (dashboard, settings).
 
 **Expected observable results:**
+
 - Step 2: the **paywall presents with the out-of-credits reason** ("You're out of credits" lead copy + top-up options) — **no crash, no dead-end raw error**, streaming spinner does not hang.
 - Step 3: the sheet dismisses; the app remains functional.
 
@@ -108,12 +120,14 @@ result: pass
 **Preconditions:** Scenarios 1–3 done (the account has server-side chat history); **extract and save the account's Bearer token FIRST** (Appendix) — after the reset the device identity is gone, so this token is your only handle on the wiped account.
 
 **Steps:**
+
 1. With the saved token, confirm server-side history exists: `GET /sessions` → non-empty list.
 2. In the app: Settings → **Manage data** → **factory reset** (the full wipe), confirm the destructive prompt and let it run to completion while the device has network.
 3. Immediately re-check with the **same saved token**: `GET /sessions` → **empty list** `{"sessions":[],…}`.
 4. Let the app re-sign-in (it provisions a fresh anonymous identity), then open the chat sheet.
 
 **Expected observable results:**
+
 - Step 2: reset completes without an error alert (a network hiccup should surface `DeletionError`, not claim success — but on a healthy connection it completes).
 - Step 3: server-side emptiness for the **wiped account** — this is the DATA-01 bar ("delete actually deletes everywhere"), not just local.
 - Step 4: the chat sheet opens **empty** — no restored history, no error (the dangling local session id was cleared and/or 404-tolerated).
@@ -141,6 +155,7 @@ All server-side checks need the app account's **Firebase ID token** as a Bearer 
 | Quick actions (optional) | `GET https://stress-api.dropitx.site/quick-actions?stress_level=75&language=en&coaching_style=supportive` | none (route is unauthenticated) | `{"quick_actions":[…breathing, grounding…]}` |
 
 Notes for the tester:
+
 - `GET /sessions` rows carry `id`, `title`, `created_at`, `updated_at` (dates are ISO strings with fractional seconds — normal).
 - Scenario 2 mutates preferences; if you bail mid-scenario, leave the account on `en`/`supportive` (step 4) so later runs start from the defaults.
 - Every chat send (including chip taps) costs 1 credit and is logged server-side — Scenario 3's tap is metered by design.

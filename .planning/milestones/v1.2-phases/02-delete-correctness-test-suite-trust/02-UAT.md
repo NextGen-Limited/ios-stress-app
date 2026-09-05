@@ -4,6 +4,10 @@ phase: 02-delete-correctness-test-suite-trust
 source: [02-VERIFICATION.md]
 started: 2026-09-04T07:20:00Z
 updated: 2026-09-04T07:20:00Z
+audit_acknowledged:
+  milestone: v1.2
+  at: 2026-09-05
+  gap_snapshot: "testing::scenarios=1"
 ---
 
 ## Current Test
@@ -20,6 +24,7 @@ awaiting: user response
 ## Tests
 
 ### 1. DATA-01 live two-surface CloudKit delete verification
+
 expected: |
   On a physical iPhone signed into the team iCloud account (container
   iCloud.stress.ai.com), seed real data across every swept model (StressMeasurement,
