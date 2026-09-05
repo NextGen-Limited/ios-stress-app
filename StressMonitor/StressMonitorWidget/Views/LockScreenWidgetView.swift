@@ -13,14 +13,14 @@ struct LockScreenRectangularView: View {
             let tier = WidgetStressTier.from(level: stress.level)
             HStack(spacing: 6) {
                 Text(tier.emoji)
-                    .font(.system(size: 14))
+                    .font(.system(size: 14)) // dated exception 2026-09-05: lock-screen accessory slot — system-fixed template
                 Text(tier.label)
-                    .font(.system(size: 12, weight: .semibold, design: .rounded))
+                    .font(.system(size: 12, weight: .semibold, design: .rounded)) // dated exception 2026-09-05: lock-screen accessory slot — system-fixed template
                     .foregroundColor(tier.accent)
             }
         } else {
             Text("💧")
-                .font(.system(size: 14))
+                .font(.system(size: 14)) // dated exception 2026-09-05: lock-screen accessory slot — system-fixed template
         }
     }
 }
@@ -39,11 +39,11 @@ struct LockScreenCircularView: View {
                 Circle()
                     .stroke(tier.accent.opacity(0.3), lineWidth: 2)
                 Text(tier.emoji)
-                    .font(.system(size: 18))
+                    .font(.system(size: 18)) // dated exception 2026-09-05: lock-screen accessory slot — system-fixed template
             }
         } else {
             Text("💧")
-                .font(.system(size: 18))
+                .font(.system(size: 18)) // dated exception 2026-09-05: lock-screen accessory slot — system-fixed template
         }
     }
 }

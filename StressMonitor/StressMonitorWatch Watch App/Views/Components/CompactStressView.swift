@@ -29,15 +29,15 @@ struct CompactStressView: View {
             VStack(spacing: 2) {
                 if showsScore {
                     Text("\(Int(stressLevel))")
-                        .font(.system(size: size * 0.30, weight: .bold, design: .rounded).monospacedDigit())
+                        .font(.system(size: size * 0.30, weight: .bold, design: .rounded).monospacedDigit()) // dated exception 2026-09-05: ring geometry — font proportional to ring diameter
                         .foregroundStyle(category.inkColor)
                 }
                 if showsLabel {
                     Text(category.displayName)
-                        .font(.system(size: size * 0.11, weight: .semibold, design: .monospaced))
+                        .font(.system(size: size * 0.11, weight: .semibold, design: .monospaced)) // dated exception 2026-09-05: ring geometry — font proportional to ring diameter
                         .foregroundStyle(WatchDesignTokens.muted)
                         .lineLimit(1)
-                        .minimumScaleFactor(0.7)
+                        .minimumScaleFactor(0.7) // dated exception 2026-09-05: ring-interior label; slot geometry is proportional to ring size
                 }
             }
         }

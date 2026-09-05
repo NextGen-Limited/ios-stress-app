@@ -26,7 +26,7 @@ struct InlineStressView: View {
             // Optional category icon
             if showIcon {
                 Image(systemName: category.icon)
-                    .font(.system(size: 12))
+                    .font(.system(size: 12)) // dated exception 2026-09-05: accessory inline template — single-line system slot
                     .foregroundColor(category.color)
             }
 
@@ -34,30 +34,30 @@ struct InlineStressView: View {
             if hasData {
                 if showLabel {
                     Text("Mood: ")
-                        .font(.system(size: 14, weight: .medium))
+                        .font(.system(size: 14, weight: .medium)) // dated exception 2026-09-05: accessory inline template — single-line system slot
                         .foregroundColor(.secondary) +
                     Text(stressLevelText)
-                        .font(.system(size: 14, weight: .semibold, design: .rounded))
+                        .font(.system(size: 14, weight: .semibold, design: .rounded)) // dated exception 2026-09-05: accessory inline template — single-line system slot
                         .foregroundColor(category.color)
                 } else {
                     Text(stressLevelText)
-                        .font(.system(size: 14, weight: .semibold, design: .rounded))
+                        .font(.system(size: 14, weight: .semibold, design: .rounded)) // dated exception 2026-09-05: accessory inline template — single-line system slot
                         .foregroundColor(category.color)
                 }
             } else {
                 if showLabel {
                     Text("Mood: —")
-                        .font(.system(size: 14, weight: .medium))
+                        .font(.system(size: 14, weight: .medium)) // dated exception 2026-09-05: accessory inline template — single-line system slot
                         .foregroundColor(.secondary)
                 } else {
                     Text("--")
-                        .font(.system(size: 14, weight: .semibold, design: .rounded))
+                        .font(.system(size: 14, weight: .semibold, design: .rounded)) // dated exception 2026-09-05: accessory inline template — single-line system slot
                         .foregroundColor(.secondary)
                 }
             }
         }
         .lineLimit(1)
-        .minimumScaleFactor(0.7)
+        .minimumScaleFactor(0.7) // dated exception 2026-09-05: accessory inline slot — single line, cannot accommodate the ramp
     }
 
     // MARK: - Computed Properties
@@ -85,12 +85,12 @@ struct StressLabelInlineView: View {
         HStack(spacing: 4) {
             if showIcon {
                 Image(systemName: category.icon)
-                    .font(.system(size: 12))
+                    .font(.system(size: 12)) // dated exception 2026-09-05: accessory inline template — single-line system slot
                     .foregroundColor(category.color)
             }
 
             Text(category.label)
-                .font(.system(size: 14, weight: .semibold))
+                .font(.system(size: 14, weight: .semibold)) // dated exception 2026-09-05: accessory inline template — single-line system slot
                 .foregroundColor(category.color)
         }
         .lineLimit(1)

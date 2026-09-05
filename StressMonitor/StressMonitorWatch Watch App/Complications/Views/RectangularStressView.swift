@@ -55,7 +55,7 @@ struct RectangularStressView: View {
                 .fill(category.color.opacity(0.15))
 
             Image(systemName: category.icon)
-                .font(.system(size: iconSize))
+                .font(.system(size: iconSize)) // dated exception 2026-09-05: parametric accessory rectangular slot — font proportional to slot size
                 .foregroundColor(category.color)
         }
         .frame(width: indicatorSize, height: indicatorSize)
@@ -65,11 +65,11 @@ struct RectangularStressView: View {
     private var stressLevelDisplay: some View {
         VStack(alignment: .leading, spacing: verticalTextSpacing) {
             Text("Stress")
-                .font(.system(size: labelSize, weight: .medium))
+                .font(.system(size: labelSize, weight: .medium)) // dated exception 2026-09-05: parametric accessory rectangular slot — font proportional to slot size
                 .foregroundColor(.secondary)
 
             Text(stressLevelText)
-                .font(.system(size: valueSize, weight: .bold, design: .rounded))
+                .font(.system(size: valueSize, weight: .bold, design: .rounded)) // dated exception 2026-09-05: parametric accessory rectangular slot — font proportional to slot size
                 .foregroundColor(category.color)
         }
     }
@@ -78,16 +78,16 @@ struct RectangularStressView: View {
     private var healthMetrics: some View {
         VStack(alignment: .trailing, spacing: verticalTextSpacing) {
             Text("HRV")
-                .font(.system(size: metricLabelSize, weight: .medium))
+                .font(.system(size: metricLabelSize, weight: .medium)) // dated exception 2026-09-05: parametric accessory rectangular slot — font proportional to slot size
                 .foregroundColor(.secondary)
 
             HStack(spacing: 2) {
                 Text(hrvText)
-                    .font(.system(size: metricValueSize, weight: .semibold, design: .rounded))
+                    .font(.system(size: metricValueSize, weight: .semibold, design: .rounded)) // dated exception 2026-09-05: parametric accessory rectangular slot — font proportional to slot size
                     .foregroundColor(.primary)
 
                 Text("ms")
-                    .font(.system(size: unitSize, weight: .regular))
+                    .font(.system(size: unitSize, weight: .regular)) // dated exception 2026-09-05: parametric accessory rectangular slot — font proportional to slot size
                     .foregroundColor(.secondary)
             }
 
@@ -95,11 +95,11 @@ struct RectangularStressView: View {
             if height >= 70 {
                 HStack(spacing: 2) {
                     Text(heartRateText)
-                        .font(.system(size: metricValueSize, weight: .semibold, design: .rounded))
+                        .font(.system(size: metricValueSize, weight: .semibold, design: .rounded)) // dated exception 2026-09-05: parametric accessory rectangular slot — font proportional to slot size
                         .foregroundColor(.primary)
 
                     Text("bpm")
-                        .font(.system(size: unitSize, weight: .regular))
+                        .font(.system(size: unitSize, weight: .regular)) // dated exception 2026-09-05: parametric accessory rectangular slot — font proportional to slot size
                         .foregroundColor(.secondary)
                 }
             }

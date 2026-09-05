@@ -62,11 +62,11 @@ struct InlineComplicationView: View {
             CharacterFaceView(creature: .ripple, category: entry.entry.category, size: 14, showsHalo: false)
 
             Text(entry.entry.isPlaceholder ? "—" : "\(Int(entry.entry.stressLevel.rounded()))")
-                .font(.system(size: 13, weight: .semibold, design: .rounded).monospacedDigit())
+                .font(.system(size: 13, weight: .semibold, design: .rounded).monospacedDigit()) // dated exception 2026-09-05: accessory inline template — single-line system slot
                 .foregroundColor(stressColor)
 
             Text("· \(entry.entry.category.displayName)")
-                .font(.system(size: 11, weight: .medium, design: .monospaced))
+                .font(.system(size: 11, weight: .medium, design: .monospaced)) // dated exception 2026-09-05: accessory inline template — single-line system slot
                 .foregroundColor(.white.opacity(0.55))
         }
         .widgetURL(deepLinkURL)

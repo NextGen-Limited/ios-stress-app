@@ -12,6 +12,10 @@ public struct MediumWidgetView: View {
         self.entry = entry
     }
 
+    @ScaledMetric(relativeTo: .caption2) private var caption2Scale: CGFloat = 1
+    @ScaledMetric(relativeTo: .footnote) private var footnoteScale: CGFloat = 1
+    @ScaledMetric(relativeTo: .title) private var titleScale: CGFloat = 1
+    @ScaledMetric(relativeTo: .title3) private var title3Scale: CGFloat = 1
     public var body: some View {
         HStack(spacing: 0) {
             if entry.isPlaceholder {
@@ -38,11 +42,11 @@ public struct MediumWidgetView: View {
 
                 if isStale {
                     Text(stress.timestamp, format: .relative(presentation: .named))
-                        .font(.system(size: 12, weight: .medium))
+                        .font(.system(size: 12 * footnoteScale, weight: .medium))
                         .foregroundColor(.secondary)
                 } else {
                     Text(tier.label)
-                        .font(.system(size: 10, weight: .semibold, design: .rounded))
+                        .font(.system(size: 10 * caption2Scale, weight: .semibold, design: .rounded))
                         .foregroundColor(tier.accent)
                 }
             }
@@ -57,10 +61,10 @@ public struct MediumWidgetView: View {
                 // Not enough data — show character mood descriptor
                 VStack(spacing: 4) {
                     Image(systemName: "waveform.path.ecg")
-                        .font(.system(size: 20))
+                        .font(.system(size: 20 * title3Scale))
                         .foregroundColor(tier.accent.opacity(0.6))
                     Text("Gathering data…")
-                        .font(.system(size: 9))
+                        .font(.system(size: 9 * caption2Scale))
                         .foregroundColor(.secondary)
                 }
                 .frame(maxWidth: .infinity)
@@ -73,7 +77,7 @@ public struct MediumWidgetView: View {
     private func sparklineSection(tier: WidgetStressTier) -> some View {
         VStack(alignment: .leading, spacing: 4) {
             Text("Trend")
-                .font(.system(size: 9, weight: .semibold))
+                .font(.system(size: 9 * caption2Scale, weight: .semibold))
                 .foregroundColor(.secondary)
 
             Chart(entry.history.suffix(12)) { item in
@@ -102,7 +106,7 @@ public struct MediumWidgetView: View {
             WidgetCharacterFace(tier: .balanced, size: 50, showsRing: true)
                 .opacity(0.5)
             Text("StressMonitor")
-                .font(.system(size: 11, weight: .medium))
+                .font(.system(size: 11 * caption2Scale, weight: .medium))
                 .foregroundColor(.secondary)
         }
         .padding(12)
@@ -113,12 +117,12 @@ public struct MediumWidgetView: View {
     private var emptyStateView: some View {
         VStack(spacing: 8) {
             Text("💧")
-                .font(.system(size: 28))
+                .font(.system(size: 28 * titleScale))
             Text("No Data")
-                .font(.system(size: 11, weight: .medium))
+                .font(.system(size: 11 * caption2Scale, weight: .medium))
                 .foregroundColor(.primary)
             Text("Open StressMonitor to measure")
-                .font(.system(size: 9))
+                .font(.system(size: 9 * caption2Scale))
                 .foregroundColor(.secondary)
         }
         .padding(12)

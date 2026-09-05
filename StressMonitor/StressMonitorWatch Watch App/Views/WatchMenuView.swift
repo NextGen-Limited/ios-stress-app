@@ -21,6 +21,9 @@ struct WatchMenuView: View {
     private var creature: CharacterCreature { theme.creature }
     private var category: StressCategory { StressCategory.category(for: viewModel.currentLevel) }
 
+    @ScaledMetric(relativeTo: .caption2) private var caption2Scale: CGFloat = 1
+    @ScaledMetric(relativeTo: .footnote) private var footnoteScale: CGFloat = 1
+    @ScaledMetric(relativeTo: .title2) private var title2Scale: CGFloat = 1
     var body: some View {
         List {
             header
@@ -47,12 +50,12 @@ struct WatchMenuView: View {
 
             VStack(alignment: .leading, spacing: 1) {
                 Text(category.displayName.uppercased())
-                    .font(.system(size: 9, weight: .semibold, design: .monospaced))
+                    .font(.system(size: 9 * caption2Scale, weight: .semibold, design: .monospaced))
                     .tracking(0.08 * 9)
                     .foregroundStyle(category.color)
 
                 Text("\(Int(viewModel.currentLevel.rounded()))")
-                    .font(.system(size: 24, weight: .bold, design: .rounded).monospacedDigit())
+                    .font(.system(size: 24 * title2Scale, weight: .bold, design: .rounded).monospacedDigit())
                     .tracking(-0.02 * 24)
                     .foregroundStyle(category.inkColor)
                     .contentTransition(.numericText(value: viewModel.currentLevel))
@@ -150,24 +153,24 @@ struct WatchMenuView: View {
                     .fill(iconColor.opacity(0.14))
                     .frame(width: 30, height: 30)
                 Image(systemName: icon)
-                    .font(.system(size: 14, weight: .semibold))
+                    .font(.system(size: 14, weight: .semibold)) // dated exception 2026-09-05: icon inside fixed 30pt circular well
                     .foregroundStyle(iconColor)
             }
 
             VStack(alignment: .leading, spacing: 1) {
                 Text(title)
-                    .font(.system(size: 14, weight: .semibold, design: .rounded))
+                    .font(.system(size: 14 * footnoteScale, weight: .semibold, design: .rounded))
                     .foregroundStyle(WatchDesignTokens.ink)
 
                 Text(subtitle)
-                    .font(.system(size: 9.5, weight: .regular, design: .default))
+                    .font(.system(size: 9.5 * caption2Scale, weight: .regular, design: .default))
                     .foregroundStyle(WatchDesignTokens.muted)
             }
 
             Spacer(minLength: 0)
 
             Image(systemName: "chevron.right")
-                .font(.system(size: 10, weight: .semibold))
+                .font(.system(size: 10 * footnoteScale, weight: .semibold))
                 .foregroundStyle(WatchDesignTokens.mutedSystem)
         }
         .padding(.vertical, 3)

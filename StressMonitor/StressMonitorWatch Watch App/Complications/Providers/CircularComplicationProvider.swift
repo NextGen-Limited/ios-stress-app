@@ -78,10 +78,10 @@ struct CircularComplicationView: View {
             // Centre content — score + tier label
             VStack(spacing: 0) {
                 Text(entry.entry.isPlaceholder ? "—" : "\(Int(entry.entry.stressLevel.rounded()))")
-                    .font(.system(size: 14, weight: .bold, design: .rounded).monospacedDigit())
+                    .font(.system(size: 14, weight: .bold, design: .rounded).monospacedDigit()) // dated exception 2026-09-05: accessory circular template — system-fixed slot
                     .foregroundColor(stressColor)
                 Text(entry.entry.category.displayName.uppercased())
-                    .font(.system(size: 6.5, weight: .semibold, design: .monospaced))
+                    .font(.system(size: 6.5, weight: .semibold, design: .monospaced)) // dated exception 2026-09-05: accessory circular template — system-fixed slot
                     .tracking(0.06 * 6.5)
                     .foregroundColor(.white.opacity(0.55))
             }

@@ -62,18 +62,18 @@ struct WatchHomeView: View {
     private var readout: some View {
         VStack(spacing: 3) {
             Text("\(score)")
-                .font(.system(size: 42, weight: .bold, design: .rounded).monospacedDigit())
+                .font(.system(size: 42, weight: .bold, design: .rounded).monospacedDigit()) // dated exception 2026-09-05: fixed full-bleed hero composition, no scroll container; readout accessibility-labeled
                 .tracking(-0.028 * 42)
                 .foregroundStyle(category.inkColor)
                 .contentTransition(.numericText(value: Double(score)))
 
             Text(category.displayName.uppercased())
-                .font(.system(size: 9, weight: .semibold, design: .monospaced))
+                .font(.system(size: 9, weight: .semibold, design: .monospaced)) // dated exception 2026-09-05: fixed full-bleed hero composition, no scroll container; readout accessibility-labeled
                 .tracking(0.08 * 9)
                 .foregroundStyle(category.color)
 
             Text("out of 100")
-                .font(.system(size: 9.5, weight: .regular, design: .default))
+                .font(.system(size: 9.5, weight: .regular, design: .default)) // dated exception 2026-09-05: fixed full-bleed hero composition, no scroll container; readout accessibility-labeled
                 .foregroundStyle(WatchDesignTokens.muted)
         }
         .accessibilityElement()
