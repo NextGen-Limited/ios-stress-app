@@ -56,15 +56,19 @@ struct ReduceMotionAwareModifier<V: Equatable>: ViewModifier {
     }
 }
 
-/// Hands the helper's motion decision to a view at appear time — the
-/// sanctioned way for non-helper code to learn the Reduce Motion state
-/// without reading the environment itself.
+/// Hands the helper's motion decision to a view at appear time and on
+/// every mid-session Reduce Motion change — the sanctioned way for
+/// non-helper code to learn the motion state without reading the
+/// environment itself.
 struct MotionDecisionModifier: ViewModifier {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     let handler: (_ motionReduced: Bool) -> Void
 
     func body(content: Content) -> some View {
         content.onAppear {
+            handler(WellnessMotion.isMotionReduced(reduceMotionEnvironment: reduceMotion))
+        }
+        .onChange(of: reduceMotion) { _, _ in
             handler(WellnessMotion.isMotionReduced(reduceMotionEnvironment: reduceMotion))
         }
     }
