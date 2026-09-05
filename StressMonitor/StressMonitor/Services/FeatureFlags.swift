@@ -7,7 +7,8 @@ import Foundation
 /// Flip to `true` to light the feature up everywhere it is gated; the call
 /// sites never change.
 enum FeatureFlags {
-    /// Health Coach chat (POST /agent/chat). The endpoint is not deployed to
-    /// every backend yet, so the Settings entry stays hidden until it is.
+    /// Health Coach chat (`POST /agent/chat`). Ships visible ahead of the
+    /// backend Phase B deploy — until `/agent/chat` exists, sends surface
+    /// a typed 404 in the chat view instead of hiding the entry.
     static let agentChatEnabled = true
 }

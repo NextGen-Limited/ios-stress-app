@@ -78,7 +78,11 @@ struct SettingsView: View {
         // Explanation + grant sheet for the first "Health Data Sync" enable.
         // Allow performs the PUT inside the sheet; Not Now reverts the
         // optimistic toggle without touching the server.
-        .sheet(isPresented: $showHealthConsentSheet) {
+        .sheet(isPresented: $showHealthConsentSheet, onDismiss: {
+            // Swipe-to-dismiss skips `onDecision` entirely, so the
+            // optimistic flip must revert unless the grant actually landed.
+            if !hasGrantedHealthConsent { healthSyncOptedIn = false }
+        }) {
             HealthConsentView { granted in
                 if granted {
                     // Allow persisted the grant inside the sheet; align the

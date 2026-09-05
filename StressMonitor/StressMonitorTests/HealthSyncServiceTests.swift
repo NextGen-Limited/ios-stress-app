@@ -180,4 +180,54 @@ struct HealthSyncServiceTests {
         #expect(service.needsConsent == false)
         #expect(defaults.string(forKey: dayKey) == nil)
     }
+
+    // MARK: - Client-side consent gate
+
+    @Test("declined consent blocks re-egress: upload closure never runs again, no day key stored")
+    func declinedConsentBlocksUpload() async throws {
+        let (defaults, cleanup) = makeDefaults()
+        defer { cleanup() }
+        var attempts = 0
+        let service = makeService(defaults, upload: { _ in
+            attempts += 1
+            throw HealthAPIError.consentRequired
+        })
+
+        // First run probes once — the 403 flips needsConsent (and surfaces
+        // the prompt) but never stores the day key.
+        await service.syncYesterdayIfNeeded()
+        #expect(service.needsConsent == true)
+
+        // A declined user re-foregrounds: their aggregates must not re-send.
+        await service.syncYesterdayIfNeeded()
+
+        #expect(attempts == 1) // only the initial probe
+        #expect(service.needsConsent == true)
+        #expect(defaults.string(forKey: dayKey) == nil)
+    }
+
+    @Test("markConsentGranted re-opens the upload and stores the day key")
+    func consentGrantResumesUpload() async throws {
+        let (defaults, cleanup) = makeDefaults()
+        defer { cleanup() }
+        var attempts = 0
+        let service = makeService(defaults, upload: { _ in
+            attempts += 1
+            if attempts == 1 { throw HealthAPIError.consentRequired }
+            return Self.score
+        })
+
+        await service.syncYesterdayIfNeeded() // declined → 403 → needsConsent
+        #expect(service.needsConsent == true)
+
+        // Re-enable from Settings calls markConsentGranted; the next
+        // foreground must proceed and dedupe via the stored key.
+        service.markConsentGranted()
+        await service.syncYesterdayIfNeeded()
+
+        #expect(attempts == 2)
+        #expect(defaults.string(forKey: dayKey) == yesterdayKey)
+        #expect(service.needsConsent == false)
+        #expect(service.lastSyncFailed == false)
+    }
 }

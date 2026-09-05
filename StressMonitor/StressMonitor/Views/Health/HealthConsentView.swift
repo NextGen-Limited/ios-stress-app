@@ -37,6 +37,10 @@ struct HealthConsentView: View {
                         do {
                             try await StressAPIClient().setHealthConsent(true)
                             HealthSyncService.shared.markConsentGranted()
+                            // Consent just landed server-side — run the
+                            // pending upload now instead of waiting for the
+                            // next background→foreground transition.
+                            Task { await HealthSyncService.shared.syncYesterdayIfNeeded() }
                             onDecision(true)
                             dismiss()
                         } catch {

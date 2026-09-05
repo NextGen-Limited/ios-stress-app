@@ -51,6 +51,11 @@ final class HealthSyncService: ObservableObject {
         formatter.locale = Locale(identifier: "en_US_POSIX")
         let key = formatter.string(from: yesterday)
         guard lastUploadedDayKey != key else { return }
+        // Client-side consent gate: a user who declined ("Not Now") keeps
+        // `needsConsent` true, so their aggregates must not re-egress on
+        // every foreground. First run still probes once (the 403 path sets
+        // the flag); re-enabling from Settings calls `markConsentGranted`.
+        guard !needsConsent else { return }
 
         do {
             let daily = try await aggregates(yesterday)
