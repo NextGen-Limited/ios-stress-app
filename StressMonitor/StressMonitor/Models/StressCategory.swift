@@ -74,7 +74,6 @@ public enum StressCategory: String, CaseIterable, Codable, Sendable {
     // MARK: - Accessibility
 
     /// VoiceOver description combining all dual coding elements
-    /// Note: displayName is defined in Badge.swift extension
     public var accessibilityDescription: String {
         let name = rawValue.capitalized
         return "\(name) stress level, represented by \(icon) icon with \(pattern)"
@@ -90,6 +89,24 @@ public enum StressCategory: String, CaseIterable, Codable, Sendable {
     public func accessibilityValue(level: Double) -> String {
         let name = rawValue.capitalized
         return "\(Int(level)) out of 100, \(name) stress"
+    }
+}
+
+// MARK: - Level-Derived Init + Display Name
+
+extension StressCategory {
+    init(from level: Double) {
+        self = StressResult.category(for: level)
+    }
+
+    var displayName: String {
+        switch self {
+        case .relaxed: return "Relaxed"
+        case .mild: return "Mild"
+        case .moderate: return "Elevated"
+        case .high: return "High"
+        case .severe: return "Severe"
+        }
     }
 }
 

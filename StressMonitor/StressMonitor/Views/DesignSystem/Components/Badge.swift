@@ -36,19 +36,3 @@ struct StressBadge: View {
         )
     }
 }
-
-extension StressCategory {
-    init(from level: Double) {
-        self = StressResult.category(for: level)
-    }
-
-    var displayName: String {
-        switch self {
-        case .relaxed: return "Relaxed"
-        case .mild: return "Mild"
-        case .moderate: return "Elevated"
-        case .high: return "High"
-        case .severe: return "Severe"
-        }
-    }
-}
