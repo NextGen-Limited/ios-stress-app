@@ -38,7 +38,7 @@ struct StressDualCodingModifier: ViewModifier {
 
             Text(category.displayName)
                 .font(.caption)
-                .foregroundColor(category.color)
+                .foregroundColor(Color.Wellness.adaptiveSecondaryText)
         }
         .accessibilityElement(children: .combine)
         .accessibilityLabel("\(category.displayName) stress level")
