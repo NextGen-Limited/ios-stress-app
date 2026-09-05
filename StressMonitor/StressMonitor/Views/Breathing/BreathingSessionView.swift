@@ -9,6 +9,7 @@ import SwiftUI
 /// - Progress bar + End early / Skip cycle buttons
 struct BreathingSessionView: View {
     @State private var viewModel: BreathingSessionViewModel?
+    @State private var motionReduced = false
     @Environment(\.dismiss) private var dismiss
     @Environment(AppRouter.self) private var router
 
@@ -16,6 +17,7 @@ struct BreathingSessionView: View {
     private let accent = Color(hex: "#4FC3F7")
     private let accentStrong = Color(hex: "#0288D1")
     private let fg = Color(hex: "#101223")
+    private let fgSecondary = Color(hex: "#3C3C43")
     private let muted = Color(hex: "#777986")
     private let separator = Color(red: 60/255, green: 60/255, blue: 67/255).opacity(0.12)
 
@@ -50,12 +52,20 @@ struct BreathingSessionView: View {
 
                     // Breathing arena (circle + phase label inside)
                     ZStack {
-                        BreathingCircle(phase: vm.boxPhase, size: 280)
-                        PhaseLabel(
+                        BreathingCircle(
                             phase: vm.boxPhase,
-                            secondsRemaining: vm.secondsRemaining,
-                            tint: .white
+                            size: 280,
+                            isAnimated: vm.isAnimationEnabled
                         )
+                        if vm.isAnimationEnabled {
+                            PhaseLabel(
+                                phase: vm.boxPhase,
+                                secondsRemaining: vm.secondsRemaining,
+                                tint: .white
+                            )
+                        } else {
+                            fallbackStatusLine(vm: vm)
+                        }
                     }
                     .frame(height: 300)
 
@@ -70,7 +80,10 @@ struct BreathingSessionView: View {
                         progressBar(fraction: vm.sessionProgressFraction)
 
                         HStack(spacing: 10) {
-                            Button(action: { dismiss() }) {
+                            Button(action: {
+                                HapticManager.shared.buttonPress()
+                                dismiss()
+                            }) {
                                 Text("End early")
                                     .font(.system(size: 16, weight: .semibold))
                                     .foregroundStyle(fg)
@@ -82,7 +95,10 @@ struct BreathingSessionView: View {
                                     )
                             }
 
-                            Button(action: { vm.skipCycle() }) {
+                            Button(action: {
+                                HapticManager.shared.buttonPress()
+                                vm.skipCycle()
+                            }) {
                                 Text("Skip cycle")
                                     .font(.system(size: 16, weight: .semibold))
                                     .foregroundStyle(.white)
@@ -95,6 +111,14 @@ struct BreathingSessionView: View {
                             }
                         }
 
+                        Toggle(isOn: animationToggleBinding(vm: vm)) {
+                            Text("Breathing animation")
+                                .font(.system(size: 13, weight: .medium))
+                                .foregroundStyle(fgSecondary)
+                        }
+                        .toggleStyle(.switch)
+                        .tint(accentStrong)
+
                         Text("Haptic + heartbeat on each transition")
                             .font(.system(size: 12))
                             .foregroundStyle(muted)
@@ -105,9 +129,15 @@ struct BreathingSessionView: View {
             }
         }
         .navigationBarHidden(true)
+        .onMotionDecision { decision in
+            motionReduced = decision
+            viewModel?.configureAnimation(motionReduced: decision)
+        }
         .onAppear {
-            viewModel = BreathingSessionViewModel()
-            viewModel?.startSession()
+            let vm = BreathingSessionViewModel()
+            vm.configureAnimation(motionReduced: motionReduced)
+            vm.startSession()
+            viewModel = vm
         }
         .onDisappear {
             viewModel?.endSession()
@@ -117,6 +147,36 @@ struct BreathingSessionView: View {
                 router.actionPath.append(Route.breathingSummary(result))
             }
         }
+    }
+
+    // MARK: - D-11 Fallback (motion-reduced session presentation)
+
+    /// Text countdown status line shown when the animated guide is off —
+    /// haptic pulses carry the phase rhythm from the view model.
+    private func fallbackStatusLine(vm: BreathingSessionViewModel) -> some View {
+        Text(countdownLine(for: vm.boxPhase, seconds: vm.secondsRemaining))
+            .font(.system(size: 22, weight: .bold, design: .rounded))
+            .monospacedDigit()
+            .foregroundStyle(.white)
+            .accessibilityLabel("\(vm.boxPhase.label), \(vm.secondsRemaining) seconds remaining")
+    }
+
+    /// Contract copy: phase word + seconds ("Inhale — 3"), vocabulary matching
+    /// the box-breathing step words.
+    private func countdownLine(for phase: BoxBreathingPhase, seconds: Int) -> String {
+        switch phase {
+        case .inhale:  return "Inhale — \(seconds)"
+        case .holdIn:  return "Hold — \(seconds)"
+        case .exhale:  return "Exhale — \(seconds)"
+        case .holdOut: return "Hold — \(seconds)"
+        }
+    }
+
+    private func animationToggleBinding(vm: BreathingSessionViewModel) -> Binding<Bool> {
+        Binding(
+            get: { vm.isAnimationEnabled },
+            set: { vm.setAnimationEnabled($0) }
+        )
     }
 
     // MARK: - Meta Row
@@ -173,13 +233,13 @@ struct BreathingSessionView: View {
                         .fill(dotColor(isActive: isActive, isDone: isDone))
                         .frame(width: 10, height: 10)
                         .scaleEffect(isActive ? 1.4 : 1.0)
-                        .animation(.easeInOut(duration: 0.3), value: vm.boxPhase)
+                        .animation(vm.isAnimationEnabled ? .easeInOut(duration: 0.3) : .none, value: vm.boxPhase)
                     Text("\(phase.label) 4")
                         .font(.system(size: 10, weight: .medium, design: .monospaced))
                         .tracking(0.4)
                         .textCase(.uppercase)
                         .foregroundStyle(isActive ? accentStrong : muted)
-                        .animation(.easeInOut(duration: 0.3), value: vm.boxPhase)
+                        .animation(vm.isAnimationEnabled ? .easeInOut(duration: 0.3) : .none, value: vm.boxPhase)
                 }
                 .frame(maxWidth: .infinity)
             }
