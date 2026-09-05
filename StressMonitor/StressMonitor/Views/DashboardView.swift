@@ -149,6 +149,10 @@ struct DashboardView: View {
             substate: substate(for: stress)
         )
         .opacity(appearAnimation ? 1 : 0)
+        // 2b. Server coach score — daily score computed on the server from
+        // uploaded health summaries, under the local reading
+        ServerScoreCard()
+            .opacity(appearAnimation ? 1 : 0)
 
         // 3. AI insight — Ripple's voice right under the hero
         if let insight = viewModel.aiInsight {
