@@ -48,6 +48,7 @@ struct CompanionBanner: View {
                         .font(.system(size: 13, weight: .bold, design: .rounded))
                         .foregroundStyle(HomeCharacterDesignTokens.Ripple.deep)
                 }
+                .minimumTouchTarget(DesignTokens.Layout.minTouchTarget)
                 .accessibilityLabel("Switch active companion")
             }
             .accessibilityElement(children: .combine)

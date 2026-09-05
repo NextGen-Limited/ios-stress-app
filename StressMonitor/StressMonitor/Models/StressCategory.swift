@@ -13,13 +13,13 @@ public enum StressCategory: String, CaseIterable, Codable, Sendable {
     public var color: Color {
         switch self {
         case .relaxed:
-            return Color(light: Color(hex: "#34C759"), dark: Color(hex: "#30D158"))
+            return Color(light: Color(hex: "#00A000"), dark: Color(hex: "#30D158"))
         case .mild:
             return Color(light: Color(hex: "#007AFF"), dark: Color(hex: "#0A84FF"))
         case .moderate:
-            return Color(hex: "#FFD60A")
+            return Color(light: Color(hex: "#8A5A00"), dark: Color(hex: "#FFD60A"))
         case .high:
-            return Color(light: Color(hex: "#FF9500"), dark: Color(hex: "#FF9F0A"))
+            return Color(light: Color(hex: "#B25400"), dark: Color(hex: "#FF9F0A"))
         case .severe:
             return Color(light: Color(hex: "#FF3B30"), dark: Color(hex: "#FF453A"))
         }
@@ -35,26 +35,6 @@ public enum StressCategory: String, CaseIterable, Codable, Sendable {
         case .moderate: return "triangle.fill"
         case .high: return "square.fill"
         case .severe: return "exclamationmark.octagon.fill"
-        }
-    }
-
-    // MARK: - Accessible Text Variants
-
-    /// Color suitable for drawing text in this category's color on a light surface.
-    /// Yellow is darkened to meet WCAG AA contrast; other colors pass for large text.
-    public var readableTextColor: Color {
-        switch self {
-        case .moderate: return Color(hex: "#B8860B")
-        default: return color
-        }
-    }
-
-    /// Foreground color for text drawn ON TOP of this category's color as a fill.
-    /// Yellow gets dark text; other categories get white.
-    public var overlayTextColor: Color {
-        switch self {
-        case .moderate: return Color(hex: "#1A1A2E")
-        default: return .white
         }
     }
 
@@ -74,10 +54,8 @@ public enum StressCategory: String, CaseIterable, Codable, Sendable {
     // MARK: - Accessibility
 
     /// VoiceOver description combining all dual coding elements
-    /// Note: displayName is defined in Badge.swift extension
     public var accessibilityDescription: String {
-        let name = rawValue.capitalized
-        return "\(name) stress level, represented by \(icon) icon with \(pattern)"
+        "\(displayName) stress level, represented by \(icon) icon with \(pattern)"
     }
 
     /// Accessibility hint for interactive stress indicators
@@ -88,8 +66,25 @@ public enum StressCategory: String, CaseIterable, Codable, Sendable {
     /// Accessibility value for stress level indicators
     /// - Parameter level: Stress level from 0-100
     public func accessibilityValue(level: Double) -> String {
-        let name = rawValue.capitalized
-        return "\(Int(level)) out of 100, \(name) stress"
+        "\(Int(level)) out of 100, \(displayName) stress"
+    }
+}
+
+// MARK: - Level-Derived Init + Display Name
+
+extension StressCategory {
+    init(from level: Double) {
+        self = StressResult.category(for: level)
+    }
+
+    var displayName: String {
+        switch self {
+        case .relaxed: return "Relaxed"
+        case .mild: return "Mild"
+        case .moderate: return "Elevated"
+        case .high: return "High"
+        case .severe: return "Severe"
+        }
     }
 }
 

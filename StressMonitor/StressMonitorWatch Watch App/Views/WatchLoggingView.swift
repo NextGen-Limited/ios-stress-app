@@ -16,8 +16,9 @@ struct WatchLoggingView: View {
     @State private var habitViewModel = WatchHabitViewModel()
     @State private var moodViewModel = WatchMoodViewModel()
     @State private var selectedMood: WatchMood?
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
+    @ScaledMetric(relativeTo: .body) private var bodyScale: CGFloat = 1
+    @ScaledMetric(relativeTo: .caption2) private var caption2Scale: CGFloat = 1
     var body: some View {
         ScrollView {
             VStack(spacing: WatchDesignTokens.Spacing.sm) {
@@ -40,12 +41,12 @@ struct WatchLoggingView: View {
     private var header: some View {
         HStack(alignment: .firstTextBaseline) {
             Text("Today")
-                .font(.system(size: 17, weight: .bold, design: .rounded))
+                .font(.system(size: 17 * bodyScale, weight: .bold, design: .rounded))
                 .tracking(-0.02 * 17)
                 .foregroundStyle(WatchDesignTokens.ink)
             Spacer(minLength: 0)
             Text(headerDate)
-                .font(.system(size: 8.5, weight: .semibold, design: .monospaced))
+                .font(.system(size: 8.5 * caption2Scale, weight: .semibold, design: .monospaced))
                 .tracking(0.06 * 8.5)
                 .foregroundStyle(WatchDesignTokens.muted)
         }
@@ -63,7 +64,7 @@ struct WatchLoggingView: View {
     private var habitsSection: some View {
         VStack(alignment: .leading, spacing: 5) {
             Text("HABITS")
-                .font(.system(size: 8.5, weight: .semibold, design: .monospaced))
+                .font(.system(size: 8.5 * caption2Scale, weight: .semibold, design: .monospaced))
                 .tracking(0.06 * 8.5)
                 .foregroundStyle(WatchDesignTokens.muted)
 
@@ -86,19 +87,19 @@ struct WatchLoggingView: View {
             VStack(spacing: 4) {
                 HabitRingView(habit: habit, size: 60)
                 Text(habit.type.displayName.uppercased())
-                    .font(.system(size: 7, weight: .semibold, design: .monospaced))
+                    .font(.system(size: 7, weight: .semibold, design: .monospaced)) // dated exception 2026-09-05: 3-across habit-card single-word micro-label — cannot wrap
                     .tracking(0.06 * 7)
                     .foregroundStyle(WatchDesignTokens.muted)
                     .lineLimit(1)
-                    .minimumScaleFactor(0.7)
+                    .minimumScaleFactor(0.7) // dated exception 2026-09-05: 3-across card label cannot wrap; shrink keeps it visible
                 if isManual {
                     Text("+1")
-                        .font(.system(size: 7.5, weight: .semibold, design: .monospaced))
+                        .font(.system(size: 7.5 * caption2Scale, weight: .semibold, design: .monospaced))
                         .tracking(0.04 * 7.5)
                         .foregroundStyle(Color(hex: "#FE9901"))
                 } else {
                     Text("AUTO")
-                        .font(.system(size: 7, weight: .semibold, design: .monospaced))
+                        .font(.system(size: 7 * caption2Scale, weight: .semibold, design: .monospaced))
                         .tracking(0.04 * 7)
                         .foregroundStyle(WatchDesignTokens.mutedSystem)
                 }
@@ -120,7 +121,7 @@ struct WatchLoggingView: View {
     private var moodSection: some View {
         VStack(alignment: .leading, spacing: 5) {
             Text("MOOD")
-                .font(.system(size: 8.5, weight: .semibold, design: .monospaced))
+                .font(.system(size: 8.5 * caption2Scale, weight: .semibold, design: .monospaced))
                 .tracking(0.06 * 8.5)
                 .foregroundStyle(WatchDesignTokens.muted)
 

@@ -12,6 +12,10 @@ public struct LargeWidgetView: View {
         self.entry = entry
     }
 
+    @ScaledMetric(relativeTo: .caption2) private var caption2Scale: CGFloat = 1
+    @ScaledMetric(relativeTo: .footnote) private var footnoteScale: CGFloat = 1
+    @ScaledMetric(relativeTo: .largeTitle) private var largeTitleScale: CGFloat = 1
+    @ScaledMetric(relativeTo: .title3) private var title3Scale: CGFloat = 1
     public var body: some View {
         VStack(spacing: 0) {
             if entry.isPlaceholder {
@@ -58,12 +62,12 @@ public struct LargeWidgetView: View {
 
             VStack(alignment: .leading, spacing: 2) {
                 Text(tier.label)
-                    .font(.system(size: 20, weight: .bold, design: .rounded))
+                    .font(.system(size: 20 * title3Scale, weight: .bold, design: .rounded))
                     .foregroundColor(tier.accent)
                     .contentTransition(.opacity)
 
                 Text((isStale ? "Stale · " : "") + stress.timestamp.formatted(.relative(presentation: .named)))
-                    .font(.system(size: 10))
+                    .font(.system(size: 10 * caption2Scale))
                     .foregroundColor(.secondary)
             }
 
@@ -79,10 +83,10 @@ public struct LargeWidgetView: View {
     private var gatheringDataSection: some View {
         VStack(spacing: 8) {
             Image(systemName: "waveform.path.ecg")
-                .font(.system(size: 20))
+                .font(.system(size: 20 * title3Scale))
                 .foregroundColor(.secondary.opacity(0.6))
             Text("Gathering data…")
-                .font(.system(size: 9))
+                .font(.system(size: 9 * caption2Scale))
                 .foregroundColor(.secondary)
         }
         .frame(maxWidth: .infinity)
@@ -145,10 +149,10 @@ public struct LargeWidgetView: View {
     private func moodPill(icon: String, label: String, color: Color) -> some View {
         HStack(spacing: 4) {
             Image(systemName: icon)
-                .font(.system(size: 9))
+                .font(.system(size: 9 * caption2Scale))
                 .foregroundColor(color)
             Text(label)
-                .font(.system(size: 10, weight: .medium))
+                .font(.system(size: 10 * caption2Scale, weight: .medium))
                 .foregroundColor(.primary)
         }
         .padding(.horizontal, 8)
@@ -184,7 +188,7 @@ public struct LargeWidgetView: View {
             WidgetCharacterFace(tier: .balanced, size: 60, showsRing: true)
                 .opacity(0.5)
             Text("StressMonitor")
-                .font(.system(size: 12, weight: .medium))
+                .font(.system(size: 12 * footnoteScale, weight: .medium))
                 .foregroundColor(.secondary)
         }
         .padding()
@@ -195,12 +199,12 @@ public struct LargeWidgetView: View {
     private var emptyStateView: some View {
         VStack(spacing: 8) {
             Text("💧")
-                .font(.system(size: 36))
+                .font(.system(size: 36 * largeTitleScale))
             Text("No Data Yet")
-                .font(.system(size: 13, weight: .medium))
+                .font(.system(size: 13 * footnoteScale, weight: .medium))
                 .foregroundColor(.primary)
             Text("Open StressMonitor and take a measurement to see your character here.")
-                .font(.system(size: 10))
+                .font(.system(size: 10 * caption2Scale))
                 .foregroundColor(.secondary)
                 .multilineTextAlignment(.center)
         }

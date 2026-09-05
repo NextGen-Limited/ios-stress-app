@@ -36,14 +36,14 @@ struct MoodPickerRow: View {
         } label: {
             VStack(spacing: 2) {
                 Image(systemName: mood.icon)
-                    .font(.system(size: isSelected ? 18 : 15, weight: .semibold))
+                    .font(.system(size: isSelected ? 18 : 15, weight: .semibold)) // dated exception 2026-09-05: icon in 5-across fixed-height circular mood wells
                     .foregroundStyle(isSelected ? WatchDesignTokens.accentStrong : WatchDesignTokens.ink)
                 Text(mood.displayName.prefix(3).uppercased())
-                    .font(.system(size: 7, weight: .semibold, design: .monospaced))
+                    .font(.system(size: 7, weight: .semibold, design: .monospaced)) // dated exception 2026-09-05: 3-char label in 5-across mood wells — cannot fit the ramp
                     .tracking(0.03 * 7)
                     .foregroundStyle(isSelected ? WatchDesignTokens.accentStrong : WatchDesignTokens.muted)
                     .lineLimit(1)
-                    .minimumScaleFactor(0.8)
+                    .minimumScaleFactor(0.8) // dated exception 2026-09-05: 5-across mood-well row cannot wrap; shrink keeps labels visible
             }
             .frame(maxWidth: .infinity)
             .frame(height: 46)

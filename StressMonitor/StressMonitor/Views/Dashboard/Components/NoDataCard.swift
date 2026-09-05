@@ -11,6 +11,7 @@ struct NoDataCard: View {
         case heartRate
         case stress
         case timeline
+        case trends
 
         var icon: String {
             switch self {
@@ -18,6 +19,7 @@ struct NoDataCard: View {
             case .heartRate: return "waveform.path.ecg"
             case .stress: return "brain.head.profile"
             case .timeline: return "clock"
+            case .trends: return "chart.bar"
             }
         }
 
@@ -27,6 +29,7 @@ struct NoDataCard: View {
             case .heartRate: return "No Heart Rate Data"
             case .stress: return "No Stress Data"
             case .timeline: return "No Timeline Data"
+            case .trends: return "No Trends Yet"
             }
         }
 
@@ -36,6 +39,7 @@ struct NoDataCard: View {
             case .heartRate: return "Heart rate data will sync from Apple Watch."
             case .stress: return "Measure stress to see your patterns here."
             case .timeline: return "Timeline will populate as you take measurements."
+            case .trends: return "Measure stress for a few days to see your patterns here."
             }
         }
 
@@ -43,6 +47,7 @@ struct NoDataCard: View {
             switch self {
             case .hrv, .heartRate, .stress: return "Measure Now"
             case .timeline: return "Get Started"
+            case .trends: return "Refresh"
             }
         }
     }
@@ -74,7 +79,7 @@ struct NoDataCard: View {
                     .font(.subheadline.bold())
                     .foregroundColor(.primaryBlue)
             }
-            .frame(minWidth: 44, minHeight: 44)
+            .minimumTouchTarget(DesignTokens.Layout.minTouchTarget)
         }
         .padding(24)
         .frame(maxWidth: .infinity)

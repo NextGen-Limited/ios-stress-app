@@ -8,6 +8,10 @@ import SwiftUI
 struct WatchCycleView: View {
     @State private var viewModel = WatchCycleViewModel()
 
+    @ScaledMetric(relativeTo: .body) private var bodyScale: CGFloat = 1
+    @ScaledMetric(relativeTo: .caption2) private var caption2Scale: CGFloat = 1
+    @ScaledMetric(relativeTo: .footnote) private var footnoteScale: CGFloat = 1
+    @ScaledMetric(relativeTo: .title) private var titleScale: CGFloat = 1
     var body: some View {
         ScrollView {
             VStack(spacing: WatchDesignTokens.Spacing.sm) {
@@ -42,16 +46,16 @@ struct WatchCycleView: View {
                     .fill(WatchDesignTokens.accentSoft)
                     .frame(width: 40, height: 40)
                 Image(systemName: data.currentPhase.icon)
-                    .font(.system(size: 16, weight: .semibold))
+                    .font(.system(size: 16, weight: .semibold)) // dated exception 2026-09-05: icon inside fixed 40pt circular well
                     .foregroundStyle(WatchDesignTokens.accentStrong)
             }
             VStack(alignment: .leading, spacing: 1) {
                 Text("CURRENT PHASE")
-                    .font(.system(size: 7.5, weight: .semibold, design: .monospaced))
+                    .font(.system(size: 7.5 * caption2Scale, weight: .semibold, design: .monospaced))
                     .tracking(0.08 * 7.5)
                     .foregroundStyle(WatchDesignTokens.muted)
                 Text(data.currentPhase.displayName)
-                    .font(.system(size: 14, weight: .semibold, design: .rounded))
+                    .font(.system(size: 14 * footnoteScale, weight: .semibold, design: .rounded))
                     .tracking(-0.01 * 14)
                     .foregroundStyle(WatchDesignTokens.ink)
             }
@@ -71,17 +75,17 @@ struct WatchCycleView: View {
         HStack(spacing: 6) {
             HStack(alignment: .firstTextBaseline, spacing: 5) {
                 Text("DAY \(data.dayOfCycle)")
-                    .font(.system(size: 18, weight: .bold, design: .rounded).monospacedDigit())
+                    .font(.system(size: 18 * bodyScale, weight: .bold, design: .rounded).monospacedDigit())
                     .tracking(-0.02 * 18)
                     .foregroundStyle(WatchDesignTokens.ink)
                 Text("OF \(data.cycleLength)")
-                    .font(.system(size: 8, weight: .semibold, design: .monospaced))
+                    .font(.system(size: 8 * caption2Scale, weight: .semibold, design: .monospaced))
                     .tracking(0.08 * 8)
                     .foregroundStyle(WatchDesignTokens.muted)
             }
             Spacer(minLength: 0)
             Text("Next: \(viewModel.predictNextPhase().displayName)")
-                .font(.system(size: 10, weight: .medium, design: .rounded))
+                .font(.system(size: 10 * caption2Scale, weight: .medium, design: .rounded))
                 .foregroundStyle(WatchDesignTokens.muted)
                 .multilineTextAlignment(.trailing)
         }
@@ -98,15 +102,15 @@ struct WatchCycleView: View {
     private func predictionRow(_ date: Date) -> some View {
         HStack(spacing: 8) {
             Image(systemName: "calendar")
-                .font(.system(size: 11, weight: .semibold))
+                .font(.system(size: 11 * caption2Scale, weight: .semibold))
                 .foregroundStyle(WatchDesignTokens.muted)
             Text(date.formatted(date: .abbreviated, time: .omitted))
-                .font(.system(size: 13, weight: .semibold, design: .rounded))
+                .font(.system(size: 13 * footnoteScale, weight: .semibold, design: .rounded))
                 .tracking(-0.01 * 13)
                 .foregroundStyle(WatchDesignTokens.ink)
             Spacer(minLength: 0)
             Text("NEXT")
-                .font(.system(size: 7, weight: .semibold, design: .monospaced))
+                .font(.system(size: 7 * caption2Scale, weight: .semibold, design: .monospaced))
                 .tracking(0.06 * 7)
                 .foregroundStyle(WatchDesignTokens.muted)
         }
@@ -124,15 +128,15 @@ struct WatchCycleView: View {
         VStack(alignment: .leading, spacing: 3) {
             HStack(spacing: 5) {
                 Image(systemName: "waveform.path.ecg")
-                    .font(.system(size: 9, weight: .semibold))
+                    .font(.system(size: 9 * caption2Scale, weight: .semibold))
                     .foregroundStyle(WatchDesignTokens.accentStrong)
                 Text("STRESS NOTE")
-                    .font(.system(size: 7.5, weight: .semibold, design: .monospaced))
+                    .font(.system(size: 7.5 * caption2Scale, weight: .semibold, design: .monospaced))
                     .tracking(0.08 * 7.5)
                     .foregroundStyle(WatchDesignTokens.accentStrong)
             }
             Text(note)
-                .font(.system(size: 9.5, weight: .regular, design: .default))
+                .font(.system(size: 9.5 * caption2Scale, weight: .regular, design: .default))
                 .foregroundStyle(WatchDesignTokens.inkSecondary)
                 .fixedSize(horizontal: false, vertical: true)
         }
@@ -151,13 +155,13 @@ struct WatchCycleView: View {
         VStack(spacing: 6) {
             Spacer(minLength: 0)
             Image(systemName: "drop")
-                .font(.system(size: 28, weight: .regular))
+                .font(.system(size: 28 * titleScale, weight: .regular))
                 .foregroundStyle(WatchDesignTokens.mutedSystem)
             Text("No cycle logged")
-                .font(.system(size: 12, weight: .semibold, design: .default))
+                .font(.system(size: 12 * footnoteScale, weight: .semibold, design: .default))
                 .foregroundStyle(WatchDesignTokens.ink)
             Text("Log the start of your cycle to see predictions and stress correlations.")
-                .font(.system(size: 9.5, weight: .regular, design: .default))
+                .font(.system(size: 9.5 * caption2Scale, weight: .regular, design: .default))
                 .foregroundStyle(WatchDesignTokens.muted)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 8)
@@ -165,10 +169,10 @@ struct WatchCycleView: View {
                 viewModel.logCycleStart(Date())
             } label: {
                 Text("Log Today")
-                    .font(.system(size: 11, weight: .semibold, design: .rounded))
+                    .font(.system(size: 11 * caption2Scale, weight: .semibold, design: .rounded))
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity)
-                    .frame(height: 32)
+                    .frame(minHeight: 32)
                     .background(
                         Capsule(style: .continuous)
                             .fill(WatchDesignTokens.accentStrong)

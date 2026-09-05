@@ -17,6 +17,7 @@ struct PlusPill: View {
             content
         }
         .buttonStyle(.plain)
+        .minimumTouchTarget(DesignTokens.Layout.minTouchTarget)
         .accessibilityLabel(accessibility)
     }
 

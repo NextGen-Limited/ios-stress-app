@@ -19,6 +19,9 @@ struct WatchBioAgeCardView: View {
 
     private let cardHeight: CGFloat = 88
 
+    @ScaledMetric(relativeTo: .caption2) private var caption2Scale: CGFloat = 1
+    @ScaledMetric(relativeTo: .subheadline) private var subheadlineScale: CGFloat = 1
+    @ScaledMetric(relativeTo: .title) private var titleScale: CGFloat = 1
     var body: some View {
         HStack(spacing: 10) {
             ageBlock
@@ -50,16 +53,16 @@ struct WatchBioAgeCardView: View {
     private var ageBlock: some View {
         VStack(alignment: .leading, spacing: 1) {
             Text("BIO AGE")
-                .font(.system(size: 7.5, weight: .semibold, design: .monospaced))
+                .font(.system(size: 7.5 * caption2Scale, weight: .semibold, design: .monospaced))
                 .tracking(0.05 * 7.5)
                 .foregroundStyle(WatchDesignTokens.muted)
             HStack(alignment: .firstTextBaseline, spacing: 2) {
                 Text("\(result.estimatedAge)")
-                    .font(.system(size: 30, weight: .bold, design: .rounded).monospacedDigit())
+                    .font(.system(size: 30 * titleScale, weight: .bold, design: .rounded).monospacedDigit())
                     .tracking(-0.02 * 30)
                     .foregroundStyle(ageColor)
                 Text("yrs")
-                    .font(.system(size: 10, weight: .medium, design: .rounded))
+                    .font(.system(size: 10 * caption2Scale, weight: .medium, design: .rounded))
                     .foregroundStyle(WatchDesignTokens.muted)
             }
             if showsConfidence {
@@ -86,7 +89,7 @@ struct WatchBioAgeCardView: View {
             }
             .frame(height: 3)
             Text("\(Int(pct * 100))% CONF")
-                .font(.system(size: 7, weight: .regular, design: .monospaced))
+                .font(.system(size: 7 * caption2Scale, weight: .regular, design: .monospaced))
                 .tracking(0.03 * 7)
                 .foregroundStyle(WatchDesignTokens.muted)
         }
@@ -97,15 +100,13 @@ struct WatchBioAgeCardView: View {
     private var trendBlock: some View {
         VStack(spacing: 2) {
             Image(systemName: result.trend.icon)
-                .font(.system(size: 16, weight: .semibold))
+                .font(.system(size: 16 * subheadlineScale, weight: .semibold))
                 .foregroundStyle(trendColor)
             Text(result.differenceLabel)
-                .font(.system(size: 11, weight: .semibold, design: .rounded).monospacedDigit())
+                .font(.system(size: 11 * caption2Scale, weight: .semibold, design: .rounded).monospacedDigit())
                 .foregroundStyle(trendColor)
-                .lineLimit(1)
-                .minimumScaleFactor(0.7)
             Text("VS CHRONO")
-                .font(.system(size: 7, weight: .semibold, design: .monospaced))
+                .font(.system(size: 7 * caption2Scale, weight: .semibold, design: .monospaced))
                 .tracking(0.04 * 7)
                 .foregroundStyle(WatchDesignTokens.muted)
         }

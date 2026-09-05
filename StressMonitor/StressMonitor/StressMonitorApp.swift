@@ -7,6 +7,23 @@ import SwiftUI
 enum DemoMode {
     static let isEnabled = ProcessInfo.processInfo.arguments.contains("-demo-mode")
 }
+
+/// WR-03: DEBUG-only opt-in for the mocked IAP money path. Launch with
+/// `-mock-iap` (Edit Scheme → Run → Arguments) to route purchases through
+/// `MockStoreKitService`; DEBUG builds otherwise exercise the REAL StoreKit
+/// path at both wiring sites. Release builds exclude the mock at compile
+/// time (`#if DEBUG` on MockStoreKitService), so the opt-in is inert there.
+enum MockIAPMode {
+    static let launchArgument = "-mock-iap"
+
+    /// `arguments` is injectable so the wiring pin suite
+    /// (StoreKitServiceWiringTests) can drive both resolution outcomes —
+    /// a test process cannot change its own launch arguments. Production
+    /// callers use the process's own arguments (DemoMode precedent).
+    static func isEnabled(arguments: [String] = ProcessInfo.processInfo.arguments) -> Bool {
+        arguments.contains(launchArgument)
+    }
+}
 #endif
 
 @main
@@ -242,9 +259,18 @@ struct StressMonitorApp: App {
 
     // MARK: - StoreKit factory (DEBUG vs Release)
 
+    // Internal + arguments-injectable so StoreKitServiceWiringTests asserts
+    // through the real factory (WR-03 pin), never by constructing services
+    // directly. See MockIAPMode for the `-mock-iap` opt-in.
     #if DEBUG
-    private static func makeStoreKitService(creditService: CreditService) -> StoreKitServiceProtocol {
-        MockStoreKitService(premiumState: .shared)
+    static func makeStoreKitService(
+        creditService: CreditService,
+        arguments: [String] = ProcessInfo.processInfo.arguments
+    ) -> StoreKitServiceProtocol {
+        if MockIAPMode.isEnabled(arguments: arguments) {
+            return MockStoreKitService(premiumState: .shared)
+        }
+        return StoreKitService(premiumState: .shared, creditService: creditService)
     }
     #else
     private static func makeStoreKitService(creditService: CreditService) -> StoreKitServiceProtocol {

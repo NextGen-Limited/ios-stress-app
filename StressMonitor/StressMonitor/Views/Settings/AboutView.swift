@@ -15,6 +15,7 @@ struct AboutView: View {
         }
         .navigationTitle("About")
         .navigationBarTitleDisplayMode(.inline)
+        .accessibleDynamicType()
         .sheet(item: $docsURL) { url in
             SafariView(url: url).ignoresSafeArea()
         }

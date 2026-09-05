@@ -29,7 +29,7 @@ struct ExportProgressView: View {
                     )
                     .frame(width: 120, height: 120)
                     .rotationEffect(.degrees(-90))
-                    .animation(.easeInOut(duration: 0.3), value: progress)
+                    .animateIfMotionAllowed(.easeInOut(duration: 0.3), value: progress)
 
                 VStack(spacing: 4) {
                     Text("\(Int(progress * 100))%")
@@ -145,7 +145,7 @@ struct ExportProgressBarView: View {
                     RoundedRectangle(cornerRadius: 4)
                         .fill(Color.primaryBlue)
                         .frame(width: geometry.size.width * progress, height: 8)
-                        .animation(.easeInOut(duration: 0.3), value: progress)
+                        .animateIfMotionAllowed(.easeInOut(duration: 0.3), value: progress)
                 }
             }
             .frame(height: 8)

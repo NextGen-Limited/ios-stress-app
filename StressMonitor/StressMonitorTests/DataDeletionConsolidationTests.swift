@@ -227,31 +227,40 @@ final class FakeCloudKitResetService: CloudKitResetServiceProtocol {
     }
 }
 
-// WINDOWS.md #8: this suite stalls the test host after its first test settles
-// and every cold relaunch then wedges inside XCTest's startup symbolication
-// enumeration — accepted lineage locally (exit 65 tolerated), fatal on CI
-// where the job fails. Disabled on CI runners via GSD_CI (set by _test.yml as
-// TEST_RUNNER_GSD_CI so xcodebuild forwards it into the test host). Re-enable
-// everywhere once #8 is root-caused.
-@Suite(
-    "CloudKit Failure & Cancellation Ordering",
-    .enabled(if: ProcessInfo.processInfo.environment["GSD_CI"] == nil)
-)
+// WINDOWS.md #8 — FIXED 2026-09-04: this suite's host stalls (exit 65, zero
+// assertion failures) traced to a container-lifetime bug, not a test-host
+// defect. makeContextWithOneMeasurement() returned only mainContext while
+// the owning ModelContainer (the in-memory store's sole owner) fell out of
+// scope at fixture return; the next SwiftData operation against the
+// orphaned context trapped (EXC_BREAKPOINT, faulting frame #0 in SwiftData —
+// six 2026-09-03 .ips reports on coalition
+// com.apple.CoreSimulator.SimDevice.5DD825B4-…). Fixture now returns
+// (ModelContainer, ModelContext) with the container kept alive for the
+// whole test. Green on two simulator rounds (current iPhone 17 + fresh
+// E004C4FA-20EC-4768-B70F-2815EADE4A04), zero host restarts either round —
+// see 02-04-SUMMARY.md. CI gate and its TEST_RUNNER_GSD_CI plumbing removed;
+// suite runs in the default invocation everywhere.
+@Suite("CloudKit Failure & Cancellation Ordering")
 @MainActor
 struct DataDeleterFailureAndCancellationTests {
 
-    private func makeContextWithOneMeasurement() throws -> ModelContext {
+    /// In-memory context seeded with one measurement. The container is
+    /// returned alongside its context and must stay alive for the whole
+    /// test — returning the context alone lets the container (the only
+    /// owner of the in-memory store) deallocate, and the next SwiftData
+    /// operation on the orphaned context traps (WINDOWS.md #8 lineage).
+    private func makeContextWithOneMeasurement() throws -> (ModelContainer, ModelContext) {
         let config = ModelConfiguration(isStoredInMemoryOnly: true, cloudKitDatabase: .none)
         let container = try ModelContainer(for: StressMeasurement.self, configurations: config)
         let ctx = container.mainContext
         ctx.insert(StressMeasurement(timestamp: Date(), stressLevel: 50, hrv: 40, restingHeartRate: 65))
         try ctx.save()
-        return ctx
+        return (container, ctx)
     }
 
     @Test("deleteAllMeasurements surfaces a CloudKitResetError as DeletionError.cloudKitError with the correct message")
     func deleteAllMeasurementsPropagatesCloudKitFailureMessage() async throws {
-        let ctx = try makeContextWithOneMeasurement()
+        let (container, ctx) = try makeContextWithOneMeasurement()
 
         let fakeCloudKit = FakeCloudKitResetService()
         fakeCloudKit.behavior = .throwError(.accountNotAvailable)
@@ -275,11 +284,12 @@ struct DataDeleterFailureAndCancellationTests {
         // CloudKit failed before local deletion started, so local data must remain intact.
         let remaining = try ctx.fetch(FetchDescriptor<StressMeasurement>())
         #expect(remaining.count == 1)
+        _ = container // keep the in-memory store alive until the assertions are done
     }
 
     @Test("cancelling after CloudKit deletion has started still deletes local data (no split-brain)")
     func cancellationAfterCloudKitStartsStillDeletesLocal() async throws {
-        let ctx = try makeContextWithOneMeasurement()
+        let (container, ctx) = try makeContextWithOneMeasurement()
 
         let fakeCloudKit = FakeCloudKitResetService()
         fakeCloudKit.behavior = .cancelCallingTask
@@ -301,11 +311,12 @@ struct DataDeleterFailureAndCancellationTests {
 
         let remaining = try ctx.fetch(FetchDescriptor<StressMeasurement>())
         #expect(remaining.isEmpty)
+        _ = container // keep the in-memory store alive until the assertions are done
     }
 
     @Test("cancelling before CloudKit deletion starts aborts the whole operation")
     func cancellationBeforeCloudKitStartsAbortsOperation() async throws {
-        let ctx = try makeContextWithOneMeasurement()
+        let (container, ctx) = try makeContextWithOneMeasurement()
 
         let fakeCloudKit = FakeCloudKitResetService()
 
@@ -333,11 +344,12 @@ struct DataDeleterFailureAndCancellationTests {
         // Cancelled before CloudKit deletion started, so nothing should have been touched.
         let remaining = try ctx.fetch(FetchDescriptor<StressMeasurement>())
         #expect(remaining.count == 1)
+        _ = container // keep the in-memory store alive until the assertions are done
     }
 
     @Test("scoped deleteMeasurements(in:includeLocal:includeCloud:) still deletes local data when cancelled mid-flight (no split-brain)")
     func scopedDeleteInRangeCancellationAfterCloudKitStartsStillDeletesLocal() async throws {
-        let ctx = try makeContextWithOneMeasurement()
+        let (container, ctx) = try makeContextWithOneMeasurement()
         let now = Date()
 
         let fakeCloudKit = FakeCloudKitResetService()
@@ -365,27 +377,39 @@ struct DataDeleterFailureAndCancellationTests {
 
         let remaining = try ctx.fetch(FetchDescriptor<StressMeasurement>())
         #expect(remaining.isEmpty)
+        _ = container // keep the in-memory store alive until the assertions are done
     }
 }
 
-// WINDOWS.md #8 lineage — same host-stall/relaunch pattern as the Cancellation
-// suite above; CI-only skip, runs locally.
-@Suite(
-    "Data Export Field Selection",
-    .enabled(if: ProcessInfo.processInfo.environment["GSD_CI"] == nil)
-)
+// WINDOWS.md #8 — FIXED 2026-09-04: same container-lifetime bug as the
+// Cancellation suite above (fixture returned mainContext only; the owning
+// ModelContainer deallocated at fixture return, next SwiftData op trapped).
+// makeContext() now returns (ModelContainer, ModelContext) with the
+// container kept alive for the whole test. Green on two simulator rounds
+// (current iPhone 17 + fresh E004C4FA-20EC-4768-B70F-2815EADE4A04), zero
+// host restarts either round — see 02-04-SUMMARY.md. CI gate and its
+// TEST_RUNNER_GSD_CI plumbing removed; suite runs in the default invocation
+// everywhere.
+@Suite("Data Export Field Selection")
 @MainActor
 struct DataExportFieldSelectionTests {
 
-    private func makeContext() throws -> ModelContext {
+    /// In-memory context for export tests. The container is returned
+    /// alongside its context and must stay alive for the whole test —
+    /// returning the context alone lets the container (the only owner of
+    /// the in-memory store) deallocate, and the next SwiftData operation
+    /// on the orphaned context traps (WINDOWS.md #8 lineage; both
+    /// 2026-09-03 .ips crash reports fault in SwiftData with this suite's
+    /// test bodies as the direct callers).
+    private func makeContext() throws -> (ModelContainer, ModelContext) {
         let config = ModelConfiguration(isStoredInMemoryOnly: true, cloudKitDatabase: .none)
         let container = try ModelContainer(for: StressMeasurement.self, configurations: config)
-        return container.mainContext
+        return (container, container.mainContext)
     }
 
     @Test("CSV export omits fields whose toggle is disabled")
     func csvExportHonorsToggles() async throws {
-        let ctx = try makeContext()
+        let (container, ctx) = try makeContext()
         ctx.insert(StressMeasurement(timestamp: Date(), stressLevel: 62.5, hrv: 48.0, restingHeartRate: 72.0))
         try ctx.save()
 
@@ -404,12 +428,25 @@ struct DataExportFieldSelectionTests {
         #expect(content.contains("Heart Rate"))
         #expect(!content.contains("HRV"))
         #expect(!content.contains("Stress Level"))
+        _ = container // keep the in-memory store alive until the assertions are done
     }
 
     @Test("JSON export includes a baseline section only when the toggle is enabled")
     func jsonExportIncludesBaselineWhenRequested() async throws {
-        let ctx = try makeContext()
-        ctx.insert(StressMeasurement(timestamp: Date(), stressLevel: 62.5, hrv: 48.0, restingHeartRate: 72.0))
+        let (container, ctx) = try makeContext()
+        // The baseline calculator requires 30+ HRV samples inside its 30-day
+        // window (minimumSampleCount = 30; identical values survive IQR
+        // outlier filtering). Seeding a single measurement made
+        // getBaseline() throw insufficientSamples, which fetchBaseline's
+        // try? swallowed, omitting the baseline section asserted below.
+        for offset in 0..<40 {
+            ctx.insert(StressMeasurement(
+                timestamp: Date().addingTimeInterval(Double(offset) * -43_200),
+                stressLevel: 62.5,
+                hrv: 48.0,
+                restingHeartRate: 72.0
+            ))
+        }
         try ctx.save()
 
         let viewModel = DataExportViewModel()
@@ -423,6 +460,7 @@ struct DataExportFieldSelectionTests {
         let content = try String(contentsOf: url, encoding: .utf8)
         #expect(content.contains("\"baseline\""))
         #expect(content.contains("\"restingHeartRate\""))
+        _ = container // keep the in-memory store alive until the assertions are done
     }
 }
 

@@ -71,15 +71,15 @@ struct RectangularComplicationView: View {
             // Score + tier label
             VStack(alignment: .leading, spacing: 2) {
                 Text(entry.entry.isPlaceholder ? "—" : "\(Int(entry.entry.stressLevel.rounded()))")
-                    .font(.system(size: 22, weight: .semibold, design: .rounded).monospacedDigit())
+                    .font(.system(size: 22, weight: .semibold, design: .rounded).monospacedDigit()) // dated exception 2026-09-05: accessory rectangular template — system-fixed slot
                     .tracking(-0.02 * 22)
                     .foregroundColor(stressColor)
                 Text(entry.entry.isPlaceholder ? "No Data" : "\(entry.entry.category.glyph) \(entry.entry.category.displayName) · Ripple")
-                    .font(.system(size: 9, weight: .medium, design: .monospaced))
+                    .font(.system(size: 9, weight: .medium, design: .monospaced)) // dated exception 2026-09-05: accessory rectangular template — system-fixed slot
                     .tracking(0.04 * 9)
                     .foregroundColor(.white.opacity(0.55))
                     .lineLimit(1)
-                    .minimumScaleFactor(0.7)
+                    .minimumScaleFactor(0.7) // dated exception 2026-09-05: accessory rectangular slot — tier label cannot fit the ramp
             }
 
             Spacer(minLength: 0)

@@ -33,11 +33,23 @@ extension Color {
 
     // MARK: - Stress Level Colors
 
-    static let stressRelaxed = Color(light: Color(hex: "#34C759"), dark: Color(hex: "#30D158"))
+    static let stressRelaxed = Color(light: Color(hex: "#00A000"), dark: Color(hex: "#30D158"))
     static let stressMild = Color(light: Color(hex: "#007AFF"), dark: Color(hex: "#0A84FF"))
-    static let stressModerate = Color(hex: "#FFD60A")
-    static let stressHigh = Color(light: Color(hex: "#FF9500"), dark: Color(hex: "#FF9F0A"))
+    static let stressModerate = Color(light: Color(hex: "#8A5A00"), dark: Color(hex: "#FFD60A"))
+    static let stressHigh = Color(light: Color(hex: "#B25400"), dark: Color(hex: "#FF9F0A"))
     static let stressSevere = Color(light: Color(hex: "#FF3B30"), dark: Color(hex: "#FF453A"))
+
+    // MARK: - Chart Accents
+
+    /// HRV trend chart accent (green per HTML `--hrv-color: #34D399`). The
+    /// color is also used as `.foregroundStyle` for the average numeral and
+    /// "today · NNms" annotation text in `HRVTrendChart`, so the light
+    /// variant must clear the 4.5:1 text bar, not just the 3:1 UI bar the
+    /// line/fill/halo need. The base `#34D399` measures 1.92:1 on the white
+    /// light-mode card; an earlier `#0F9D6E` retune only reached 3.46:1
+    /// (clears 3:1, fails 4.5:1). Retuned to `#0C7A55`, which measures
+    /// 5.34:1 on the white card.
+    static let hrvTrendAccent = Color(light: Color(hex: "#0C7A55"), dark: Color(hex: "#34D399"))
 
     // MARK: - Semantic Colors
 
@@ -103,12 +115,15 @@ extension Color {
     /// Matches iOS Settings canvas.
     static let appBackground = Color(light: Color(hex: "F2F2F7"), dark: Color(hex: "000000"))
 
-    /// Settings background (light: warm cream #FFFDF6, dark canvas #0A0A0F)
-    static let settingsBackground = Color(light: Color(hex: "FFFDF6"), dark: Color(hex: "0A0A0F"))
-    /// Ripple blue accent - #4FC3F7
-    static let settingsRippleBlue = Color(hex: "4FC3F7")
+    /// Settings background (light: warm cream #FFFDF6, dark canvas #121212 —
+    /// unified with the adaptive canvas)
+    static let settingsBackground = Color(light: Color(hex: "FFFDF6"), dark: Color(hex: "121212"))
+    /// Ripple blue accent - #0891B2. Fill-safe: white text on this value
+    /// passes 3:1 in both appearances. The legacy fixed #4FC3F7 must never
+    /// carry white text as a fill in either appearance (2.00:1).
+    static let settingsRippleBlue = Color(hex: "0891B2")
     /// Accent teal compatibility alias now aligned to Ripple blue.
-    static let accentTeal = Color(hex: "4FC3F7")
+    static let accentTeal = Color(hex: "0891B2")
     /// Settings icon accents.
     static let settingsIconYellow = Color(hex: "FFD166")
     static let settingsIconPurple = Color(hex: "A78BFA")
@@ -116,10 +131,10 @@ extension Color {
     static let settingsAmberInfo = Color(light: Color(hex: "FFF4D6"), dark: Color(hex: "3A2A05"))
     /// Premium gold - #FE9901
     static let premiumGold = Color(hex: "FE9901")
-    /// Tertiary text - #808080
-    static let textTertiary = Color(hex: "808080")
-    /// Descriptive text - #848484
-    static let textDescriptive = Color(hex: "848484")
+    /// Tertiary text — alias of the adaptive secondary text token
+    static var textTertiary: Color { Color.Wellness.adaptiveSecondaryText }
+    /// Descriptive text — alias of the adaptive secondary text token
+    static var textDescriptive: Color { Color.Wellness.adaptiveSecondaryText }
     /// Light border - #DBDBDB
     static let borderLight = Color(light: Color(hex: "DBDBDB"), dark: Color(hex: "38383A"))
     /// Widget border - #C0C0C0
@@ -153,8 +168,10 @@ extension Color {
 
     /// IAP section header teal - #158B8B
     static let iapHeaderTeal = Color(hex: "158B8B")
-    /// IAP CTA button - Ripple blue #4FC3F7 (matches accentTeal)
-    static let iapCTATeal = Color(hex: "4FC3F7")
+    /// IAP CTA button - Ripple blue #0891B2. Retuned from the legacy
+    /// #4FC3F7 (2.00:1 with white text, failing the 3:1 fill-safe bar);
+    /// matches `settingsRippleBlue` (3.68:1 with white text).
+    static let iapCTATeal = Color(hex: "0891B2")
     /// IAP plan selected border amber - #FFAE3B
     static let iapAmber = Color(hex: "FFAE3B")
     /// IAP savings green - #4FC01B
@@ -163,7 +180,7 @@ extension Color {
     static let iapTextPrimary = Color(hex: "111827")
     /// IAP secondary text - #6B7280
     static let iapTextSecondary = Color(hex: "6B7280")
-    /// IAP muted text (nav title) — alias of textTertiary (#808080)
+    /// IAP muted text (nav title) — alias of textTertiary
     static var iapTextMuted: Color { textTertiary }
     /// IAP chevron/icon gray - #9CA3AF
     static let iapChevronGray = Color(hex: "9CA3AF")

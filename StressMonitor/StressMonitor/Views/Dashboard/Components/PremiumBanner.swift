@@ -117,6 +117,7 @@ struct PremiumBanner: View {
             .clipShape(Capsule())
         }
         .buttonStyle(.plain)
+        .minimumTouchTarget(DesignTokens.Layout.minTouchTarget)
     }
 
     // MARK: - Companion stack

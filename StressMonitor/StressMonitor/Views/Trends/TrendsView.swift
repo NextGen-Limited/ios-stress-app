@@ -34,18 +34,25 @@ struct TrendsView: View {
             VStack(alignment: .leading, spacing: 14) {
                 // Chip row — Week / Month / 3 Months / Year
                 chipRow
-                editorialSummary
-                dailyBars
-                distributionCard
-                calendarCard
-                hrvCard
-                editorialInsight
+                if viewModel.weeklyMeasurements.isEmpty && !viewModel.isLoading {
+                    NoDataCard(dataType: .trends) {
+                        Task { await viewModel.loadTrendData() }
+                    }
+                } else {
+                    editorialSummary
+                    dailyBars
+                    distributionCard
+                    calendarCard
+                    hrvCard
+                    editorialInsight
+                }
             }
             .padding(.horizontal, 16)
             .padding(.top, 8)
             .padding(.bottom, 24)
         }
         .background(HomeCharacterDesignTokens.homeBackground.ignoresSafeArea())
+        .accessibleDynamicType()
         .navigationTitle("Trends")
         .navigationBarTitleDisplayMode(.inline)
         .task {
@@ -90,6 +97,7 @@ struct TrendsView: View {
                 .clipShape(Capsule())
         }
         .buttonStyle(.plain)
+        .minimumTouchTarget(DesignTokens.Layout.minTouchTarget)
     }
 
     // MARK: - 1. Editorial Summary

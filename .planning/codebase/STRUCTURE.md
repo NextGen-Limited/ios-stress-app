@@ -1,7 +1,7 @@
-<!-- refreshed: 2026-08-29 -->
+<!-- refreshed: 2026-09-01 -->
 # Codebase Structure
 
-**Analysis Date:** 2026-08-29
+**Analysis Date:** 2026-09-01
 
 ## Directory Layout
 
@@ -222,4 +222,4 @@ StressMonitorTests/                      # ⚠️ ORPHANED test dir at REPO ROOT
 
 ---
 
-*Structure analysis: 2026-08-29*
+*Structure analysis: 2026-09-01*

@@ -1,7 +1,7 @@
-<!-- refreshed: 2026-08-29 -->
+<!-- refreshed: 2026-09-01 -->
 # Architecture
 
-**Analysis Date:** 2026-08-29
+**Analysis Date:** 2026-09-01
 
 ## System Overview
 
@@ -288,4 +288,4 @@
 
 ---
 
-*Architecture analysis: 2026-08-29*
+*Architecture analysis: 2026-09-01*

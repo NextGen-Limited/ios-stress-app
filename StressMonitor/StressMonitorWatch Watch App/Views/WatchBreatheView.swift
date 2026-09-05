@@ -28,6 +28,8 @@ struct WatchBreatheView: View {
 
     private var isRunning: Bool { phase != .idle }
 
+    @ScaledMetric(relativeTo: .caption2) private var caption2Scale: CGFloat = 1
+    @ScaledMetric(relativeTo: .footnote) private var footnoteScale: CGFloat = 1
     var body: some View {
         VStack(spacing: WatchDesignTokens.Spacing.xs) {
             Spacer(minLength: 0)
@@ -55,7 +57,7 @@ struct WatchBreatheView: View {
 
     private var phaseLabel: some View {
         Text(phaseTitle)
-            .font(.system(size: 13, weight: .semibold, design: .default))
+            .font(.system(size: 13 * footnoteScale, weight: .semibold, design: .default))
             .tracking(-0.01 * 13)
             .foregroundStyle(phaseColor)
             .contentTransition(.opacity)
@@ -89,17 +91,17 @@ struct WatchBreatheView: View {
         VStack(spacing: 1) {
             if isRunning {
                 Text("\(secondsLeft)")
-                    .font(.system(size: 36, weight: .semibold, design: .rounded).monospacedDigit())
+                    .font(.system(size: 36, weight: .semibold, design: .rounded).monospacedDigit()) // dated exception 2026-09-05: countdown numeral inside fixed 110pt breathing ring
                     .tracking(-0.028 * 36)
                     .foregroundStyle(phaseColor)
                     .contentTransition(.numericText(value: Double(secondsLeft)))
             } else {
                 Text("—")
-                    .font(.system(size: 36, weight: .semibold, design: .rounded).monospacedDigit())
+                    .font(.system(size: 36, weight: .semibold, design: .rounded).monospacedDigit()) // dated exception 2026-09-05: countdown numeral inside fixed 110pt breathing ring
                     .foregroundStyle(WatchDesignTokens.muted)
             }
             Text(isRunning ? "sec" : "Ready")
-                .font(.system(size: 9, weight: .semibold, design: .monospaced))
+                .font(.system(size: 9, weight: .semibold, design: .monospaced)) // dated exception 2026-09-05: countdown numeral inside fixed 110pt breathing ring
                 .tracking(0.06 * 9)
                 .foregroundStyle(WatchDesignTokens.muted)
         }
@@ -141,7 +143,7 @@ struct WatchBreatheView: View {
     private var footBlock: some View {
         VStack(spacing: 8) {
             Text(isRunning ? "CYCLE \(cycleCount)" : "4 · 7 · 8 BREATHING")
-                .font(.system(size: 8.5, weight: .semibold, design: .monospaced))
+                .font(.system(size: 8.5 * caption2Scale, weight: .semibold, design: .monospaced))
                 .tracking(0.08 * 8.5)
                 .foregroundStyle(WatchDesignTokens.muted)
             pillButton
@@ -154,11 +156,11 @@ struct WatchBreatheView: View {
             isRunning ? stop() : start()
         } label: {
             Text(isRunning ? "End" : "Begin")
-                .font(.system(size: 12, weight: .semibold, design: .rounded))
+                .font(.system(size: 12 * footnoteScale, weight: .semibold, design: .rounded))
                 .tracking(-0.01 * 12)
                 .foregroundStyle(isRunning ? WatchDesignTokens.accentStrong : .white)
                 .frame(maxWidth: .infinity)
-                .frame(height: 34)
+                .frame(minHeight: 34)
                 .background(
                     Capsule(style: .continuous)
                         .fill(isRunning ? AnyShapeStyle(WatchDesignTokens.surface) : AnyShapeStyle(WatchDesignTokens.accentStrong))

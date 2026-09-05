@@ -8,11 +8,11 @@ import SwiftUI
 ///
 /// | Tier      | Score range | Hex       | Glyph |
 /// |-----------|-------------|-----------|-------|
-/// | Relaxed   | 0–25        | `#34C759` | ◌     |
-/// | Mild      | 26–50       | `#007AFF` | ◎     |
-/// | Moderate  | 51–75       | `#FFD60A` | ◐     |
-/// | High      | 76–100      | `#FF9500` | ◑     |
-/// | Severe    | 100+        | `#FF3B30` | ●     |
+/// | Relaxed   | 0–24        | `#00A000` | ◌     |
+/// | Mild      | 25–49       | `#007AFF` | ◎     |
+/// | Moderate  | 50–74       | `#8A5A00` | ◐     |
+/// | High      | 75–89       | `#B25400` | ◑     |
+/// | Severe    | 90+         | `#FF3B30` | ●     |
 public enum StressCategory: String, CaseIterable, Codable, Sendable, Identifiable {
     case relaxed
     case mild
@@ -24,25 +24,23 @@ public enum StressCategory: String, CaseIterable, Codable, Sendable, Identifiabl
 
     // MARK: - Dual Coding: Colour
 
-    /// Primary colour for this stress category.
+    /// Primary colour for this stress category (light set, mirrored from
+    /// the iOS app's `StressCategory.color`).
     public var color: Color {
         switch self {
-        case .relaxed:  return Color(hex: "#34C759")
+        case .relaxed:  return Color(hex: "#00A000")
         case .mild:     return Color(hex: "#007AFF")
-        case .moderate: return Color(hex: "#FFD60A")
-        case .high:     return Color(hex: "#FF9500")
+        case .moderate: return Color(hex: "#8A5A00")
+        case .high:     return Color(hex: "#B25400")
         case .severe:   return Color(hex: "#FF3B30")
         }
     }
 
-    /// Text colour that passes WCAG AA against light surfaces.  Moderate
-    /// yellow needs a darker ink; the other tiers reuse their own colour.
-    public var inkColor: Color {
-        switch self {
-        case .moderate: return Color(hex: "#B59400")
-        default:        return color
-        }
-    }
+    /// Text colour that passes WCAG AA against light surfaces. All tiers
+    /// reuse their own colour — the former `.moderate` override
+    /// (`#B59400`, 2.61:1) measured worse than the tier's own colour
+    /// (`#8A5A00`, 5.3:1) after the moderate retune.
+    public var inkColor: Color { color }
 
     // MARK: - Dual Coding: Glyph + Icon
 
@@ -71,11 +69,18 @@ public enum StressCategory: String, CaseIterable, Codable, Sendable, Identifiabl
     // MARK: - Display
 
     /// Capitalised display name ("Relaxed", "Mild", …) for tier labels.
+    ///
+    /// `.moderate` reads "Elevated" to match the iOS app's
+    /// `StressCategory.displayName` — `TierNamePreferences` (which still
+    /// defaults `.moderate` to "Moderate") has no call sites anywhere in the
+    /// watch target and is keyed to the unrelated `WatchStressCategory`
+    /// type, so it cannot justify a cross-platform naming mismatch for a
+    /// synced measurement.
     public var displayName: String {
         switch self {
         case .relaxed:  return "Relaxed"
         case .mild:     return "Mild"
-        case .moderate: return "Moderate"
+        case .moderate: return "Elevated"
         case .high:     return "High"
         case .severe:   return "Severe"
         }
@@ -84,14 +89,14 @@ public enum StressCategory: String, CaseIterable, Codable, Sendable, Identifiabl
     /// Short label combining the glyph and name ("◌ Relaxed").
     public var glyphLabel: String { "\(glyph) \(displayName)" }
 
-    /// Score range (inclusive lower, exclusive upper except severe).
+    /// Non-overlapping integer endpoints — a boundary score (25, 50, 75, 90) belongs to exactly one tier, matching `category(for:)`.
     public var scoreRange: ClosedRange<Double> {
         switch self {
-        case .relaxed:  return 0...25
-        case .mild:     return 26...50
-        case .moderate: return 51...75
-        case .high:     return 76...100
-        case .severe:   return 100...150
+        case .relaxed:  return 0...24
+        case .mild:     return 25...49
+        case .moderate: return 50...74
+        case .high:     return 75...89
+        case .severe:   return 90...150
         }
     }
 
@@ -117,14 +122,15 @@ public enum StressCategory: String, CaseIterable, Codable, Sendable, Identifiabl
 
     // MARK: - Resolution
 
-    /// Resolve the tier from a raw 0–100+ stress level.
+    /// Resolve the tier from a raw 0–100+ stress level. Boundaries mirror
+    /// the iOS app's `StressResult.category(for:)`.
     public static func category(for level: Double) -> StressCategory {
         switch level {
-        case ..<26:    return .relaxed
-        case ..<51:    return .mild
-        case ..<76:    return .moderate
-        case 76...100: return .high
-        default:       return .severe   // 100+ overflow → Severe
+        case ..<25: return .relaxed
+        case ..<50: return .mild
+        case ..<75: return .moderate
+        case ..<90: return .high
+        default:    return .severe
         }
     }
 }

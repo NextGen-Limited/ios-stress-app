@@ -1,5 +1,5 @@
 {
-  "model_profile": "adaptive",
+  "model_profile": "balanced",
   "commit_docs": true,
   "parallelization": true,
   "search_gitignored": false,
@@ -14,7 +14,7 @@
     "branching_strategy": "milestone",
     "create_tag": true,
     "phase_branch_template": "gsd/phase-{phase}-{slug}",
-    "milestone_branch_template": "gsd/{milestone}-{slug}",
+    "milestone_branch_template": "{milestone}-{slug}",
     "quick_branch_template": null
   },
   "workflow": {
@@ -32,7 +32,7 @@
     "human_verify_mode": "end-of-phase",
     "context_guard_mode": "warn",
     "text_mode": false,
-    "research_before_questions": false,
+    "research_before_questions": true,
     "discuss_mode": "discuss",
     "skip_discuss": false,
     "code_review": true,
@@ -47,10 +47,10 @@
     "security_enforcement": true,
     "security_asvs_level": 1,
     "security_block_on": "high",
-    "use_worktrees": true,
-    "tdd_mode": true,
+    "use_worktrees": false,
+    "tdd_mode": false,
     "ui_review": true,
-    "_auto_chain_active": false,
+    "_auto_chain_active": true,
     "build_command": "xcodebuild build -scheme StressMonitor -project StressMonitor/StressMonitor.xcodeproj -destination 'platform=iOS Simulator,name=iPhone 17'",
     "test_command": "xcodebuild test -scheme StressMonitor -project StressMonitor/StressMonitor.xcodeproj -destination 'platform=iOS Simulator,name=iPhone 17' -parallel-testing-enabled NO",
     "test_gate_timeout": 3600

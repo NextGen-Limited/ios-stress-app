@@ -77,6 +77,11 @@ final class StressViewModel {
     /// HealthStore instance
     private let healthStore = HKHealthStore()
 
+    /// Timestamp of the last underlying HRV reading persisted from
+    /// loadCurrentStress — repeated UI-driven loads of the same HealthKit
+    /// sample persist exactly one measurement (WIRE-01 dedupe guard).
+    private var lastPersistedReadingDate: Date?
+
     // MARK: - Trend Direction
 
     enum TrendDirection {
@@ -172,6 +177,18 @@ final class StressViewModel {
 
             if let breakdown = result.factorBreakdown {
                 dataQualityInfo = DataQualityInfo(from: breakdown, baseline: currentBaseline)
+            }
+
+            // Widget write path (WIRE-01): one persisted measurement per new
+            // underlying HRV reading — repository.save publishes the six
+            // latest_* App Group keys and reloads the widget timelines. The
+            // reading is marked persisted BEFORE the save await so two
+            // interleaved loads sharing one sample cannot both save; a
+            // swallowed save failure degrades like the secondary factors and
+            // skips that reading's retry (accepted trade-off).
+            if let readingDate = hrvData?.timestamp, readingDate != lastPersistedReadingDate {
+                lastPersistedReadingDate = readingDate
+                try? await repository.save(makeMeasurement(from: result))
             }
 
             #if DEBUG
@@ -273,6 +290,30 @@ final class StressViewModel {
         }
     }
 
+    /// Maps a calculated StressResult to its persisted StressMeasurement shape.
+    /// Single source for both the legacy calculateAndSaveStress path and the
+    /// live loadCurrentStress save, so the two rows stay identical.
+    private func makeMeasurement(from result: StressResult) -> StressMeasurement {
+        let measurement = StressMeasurement(
+            timestamp: result.timestamp,
+            stressLevel: result.level,
+            hrv: result.hrv,
+            restingHeartRate: result.heartRate,
+            confidences: [result.confidence]
+        )
+
+        if let breakdown = result.factorBreakdown {
+            measurement.hrvComponent = breakdown.hrvComponent
+            measurement.hrComponent = breakdown.hrComponent
+            measurement.sleepComponent = breakdown.sleepComponent
+            measurement.activityComponent = breakdown.activityComponent
+            measurement.recoveryComponent = breakdown.recoveryComponent
+            measurement.dataCompleteness = breakdown.dataCompleteness
+        }
+
+        return measurement
+    }
+
     func calculateAndSaveStress() async throws {
         let fetchedBaseline = try? await repository.getBaseline()
         let currentBaseline = baseline ?? fetchedBaseline ?? PersonalBaseline()
@@ -305,22 +346,7 @@ final class StressViewModel {
 
         let result = try await algorithm.calculateMultiFactorStress(context: context)
 
-        let measurement = StressMeasurement(
-            timestamp: result.timestamp,
-            stressLevel: result.level,
-            hrv: result.hrv,
-            restingHeartRate: result.heartRate,
-            confidences: [result.confidence]
-        )
-
-        if let breakdown = result.factorBreakdown {
-            measurement.hrvComponent = breakdown.hrvComponent
-            measurement.hrComponent = breakdown.hrComponent
-            measurement.sleepComponent = breakdown.sleepComponent
-            measurement.activityComponent = breakdown.activityComponent
-            measurement.recoveryComponent = breakdown.recoveryComponent
-            measurement.dataCompleteness = breakdown.dataCompleteness
-        }
+        let measurement = makeMeasurement(from: result)
 
         try await repository.save(measurement)
         currentStress = result

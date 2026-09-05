@@ -11,7 +11,6 @@ import SwiftUI
 /// - Pause / End Session buttons
 struct MiniWalkView: View {
     @Environment(\.dismiss) private var dismiss
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var viewModel = MiniWalkViewModel()
 
     // Design tokens from app.css / 15-walk.html
@@ -90,7 +89,7 @@ struct MiniWalkView: View {
                     viewModel.showComplete = false
                     dismiss()
                 }
-                .transition(.opacity.combined(with: .scale(scale: 0.95)))
+                .motionAwareTransition(.opacity.combined(with: .scale(scale: 0.95)))
             }
         }
         .animation(.easeInOut(duration: 0.3), value: viewModel.showComplete)
@@ -115,7 +114,10 @@ struct MiniWalkView: View {
                     .frame(width: 6, height: 6)
                     .opacity(viewModel.isRunning ? 1 : 0.4)
                     .scaleEffect(viewModel.isRunning ? 1.0 : 0.8)
-                    .animation(reduceMotion ? nil : .easeInOut(duration: 1.5).repeatForever(autoreverses: true), value: viewModel.isRunning)
+                    .animateIfMotionAllowed(
+                        .easeInOut(duration: 1.5).repeatForever(autoreverses: true),
+                        value: viewModel.isRunning
+                    )
                 Text(viewModel.isRunning ? "LIVE" : "PAUSED")
                     .font(.system(size: 12, weight: .semibold))
                     .foregroundStyle(success)

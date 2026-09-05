@@ -13,6 +13,9 @@ public struct SmallWidgetView: View {
         self.entry = entry
     }
 
+    @ScaledMetric(relativeTo: .caption2) private var caption2Scale: CGFloat = 1
+    @ScaledMetric(relativeTo: .footnote) private var footnoteScale: CGFloat = 1
+    @ScaledMetric(relativeTo: .largeTitle) private var largeTitleScale: CGFloat = 1
     public var body: some View {
         VStack(spacing: 0) {
             if entry.isPlaceholder {
@@ -37,12 +40,12 @@ public struct SmallWidgetView: View {
 
             if isStale {
                 Text(stress.timestamp, format: .relative(presentation: .named))
-                    .font(.system(size: 12, weight: .medium))
+                    .font(.system(size: 12 * footnoteScale, weight: .medium))
                     .foregroundColor(.secondary)
                     .contentTransition(.opacity)
             } else {
                 Text(tier.label)
-                    .font(.system(size: 12, weight: .semibold, design: .rounded))
+                    .font(.system(size: 12 * footnoteScale, weight: .semibold, design: .rounded))
                     .foregroundColor(tier.accent)
                     .contentTransition(.opacity)
             }
@@ -59,7 +62,7 @@ public struct SmallWidgetView: View {
             WidgetCharacterFace(tier: .balanced, size: 60, showsRing: true)
                 .opacity(0.5)
             Text("StressMonitor")
-                .font(.system(size: 10, weight: .medium))
+                .font(.system(size: 10 * caption2Scale, weight: .medium))
                 .foregroundColor(.secondary)
         }
         .padding(12)
@@ -70,12 +73,12 @@ public struct SmallWidgetView: View {
     private var emptyStateView: some View {
         VStack(spacing: 8) {
             Text("💧")
-                .font(.system(size: 32))
+                .font(.system(size: 32 * largeTitleScale))
             Text("No Data")
-                .font(.system(size: 12, weight: .medium))
+                .font(.system(size: 12 * footnoteScale, weight: .medium))
                 .foregroundColor(.primary)
             Text("Open app to measure")
-                .font(.system(size: 9))
+                .font(.system(size: 9 * caption2Scale))
                 .foregroundColor(.secondary)
                 .multilineTextAlignment(.center)
         }

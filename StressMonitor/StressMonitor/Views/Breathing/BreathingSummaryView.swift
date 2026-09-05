@@ -60,6 +60,7 @@ struct BreathingSummaryView: View {
             .padding(.vertical, 16)
         }
         .background(Color(hex: "#F2F2F7"))
+        .onAppear { HapticManager.shared.success() }
         .navigationBarBackButtonHidden(true)
         .toolbar {
             ToolbarItem(placement: .topBarLeading) {

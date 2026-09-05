@@ -32,8 +32,10 @@ enum WatchDesignTokens {
     static let ink             = Color(hex: "#101223")
     /// `--fg-secondary` · secondary text.
     static let inkSecondary    = Color(hex: "#3C3C43")
-    /// `--muted` · meta / caption text.
-    static let muted           = Color(hex: "#777986")
+    /// `--muted` · meta / caption text. Retuned from `#777986` (3.86:1 on
+    /// `canvas`, failing 4.5:1) to the `#6B6E7B` family — the same
+    /// authorized override used on iOS (4.54:1 on the watch `canvas`).
+    static let muted           = Color(hex: "#6B6E7B")
     /// `--muted-2` · system gray.
     static let mutedSystem     = Color(hex: "#8E8E93")
 

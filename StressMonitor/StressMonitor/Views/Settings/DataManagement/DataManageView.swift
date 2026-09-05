@@ -25,6 +25,7 @@ struct DataManageView: View {
         }
         .navigationTitle("Manage Data")
         .navigationBarTitleDisplayMode(.inline)
+        .accessibleDynamicType()
         .task {
             await refreshSnapshotCount()
         }
@@ -80,6 +81,8 @@ struct DataManageView: View {
             } label: {
                 rowLabel(icon: "square.and.arrow.up", tint: Color.primaryBlue, title: "Export data", subtitle: "CSV or JSON, with date range")
             }
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel("Export data. CSV or JSON, with date range")
         } header: {
             Text("Export")
         } footer: {
@@ -96,11 +99,15 @@ struct DataManageView: View {
             } label: {
                 rowLabel(icon: "calendar.badge.minus", tint: .orange, title: "Delete by range", subtitle: "Remove snapshots from a window of time")
             }
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel("Delete by range. Remove snapshots from a window of time")
             Button {
                 showingDeleteAll = true
             } label: {
                 rowLabel(icon: "trash", tint: Color.error, title: "Delete all snapshots", subtitle: "Removes every locally stored measurement")
             }
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel("Delete all snapshots. Removes every locally stored measurement")
         } header: {
             Text("Delete")
         } footer: {
@@ -117,6 +124,8 @@ struct DataManageView: View {
             } label: {
                 rowLabel(icon: "arrow.counterclockwise.circle", tint: Color.error, title: "Factory reset", subtitle: "Wipe all data and return the app to first launch")
             }
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel("Factory reset. Wipe all data and return the app to first launch")
         } footer: {
             Text("Factory reset also clears character unlocks and preferences.")
         }

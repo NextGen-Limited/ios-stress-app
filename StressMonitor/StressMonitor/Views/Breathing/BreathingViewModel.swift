@@ -18,6 +18,12 @@ class BreathingSessionViewModel {
     /// Total cycles planned for the session.
     var totalCycles: Int { max(1, Int(sessionDuration / 16)) }
 
+    /// Whether the animated circle guide runs (D-11). Defaults from the
+    /// app-wide motion decision — Reduce Motion on → animated guide off —
+    /// and the user may flip it in-session. Nothing persists past the session.
+    var isAnimationEnabled = true
+    private var userAnimationChoice: Bool?
+
     // Session config
     var audioGuide: String = "Soft tones"
     var hapticFeedback: Bool = true
@@ -41,6 +47,26 @@ class BreathingSessionViewModel {
 
     convenience init() {
         self.init(healthKit: HealthKitManager())
+    }
+
+    /// Pure D-11 default: with Reduce Motion on the animated guide starts
+    /// off unless the user already chose otherwise in-session.
+    static func resolvedAnimationEnabled(motionReduced: Bool, userChoice: Bool? = nil) -> Bool {
+        userChoice ?? !motionReduced
+    }
+
+    /// Captures the app-wide motion decision (delivered by the helper's
+    /// `onMotionDecision`) as this session's animation default.
+    func configureAnimation(motionReduced: Bool) {
+        isAnimationEnabled = Self.resolvedAnimationEnabled(
+            motionReduced: motionReduced,
+            userChoice: userAnimationChoice
+        )
+    }
+
+    func setAnimationEnabled(_ enabled: Bool) {
+        userAnimationChoice = enabled
+        isAnimationEnabled = enabled
     }
 
     func startSession() {
@@ -119,6 +145,14 @@ class BreathingSessionViewModel {
         case .holdOut: boxPhase = .inhale
         }
         secondsRemaining = boxPhase.durationSeconds
+        pulsePhaseTransition()
+    }
+
+    /// D-11 fallback channel: a haptic pulse at every phase transition keeps
+    /// the session operable without the animated guide.
+    private func pulsePhaseTransition() {
+        guard hapticFeedback else { return }
+        HapticManager.shared.breathingCue()
     }
 
     private func startCountdown() {

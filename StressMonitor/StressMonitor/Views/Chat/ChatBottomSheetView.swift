@@ -542,6 +542,6 @@ private struct TypingDotAnimation: ViewModifier {
                     .delay(delay),
                 value: isAnimating
             )
-            .onAppear { isAnimating = true }
+            .startMotionIfAllowed { isAnimating = true }
     }
 }

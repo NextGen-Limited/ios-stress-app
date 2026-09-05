@@ -43,6 +43,7 @@ struct MeasurementDetailView: View {
             .padding(.vertical, 16)
         }
         .background(Color.appBackground)
+        .accessibleDynamicType()
         .navigationBarTitleDisplayMode(.inline)
         .toolbar {
             ToolbarItem(placement: .principal) {
@@ -56,6 +57,8 @@ struct MeasurementDetailView: View {
                         .font(.system(size: 15, weight: .semibold))
                         .foregroundStyle(Color.primaryBlue)
                 }
+                .minimumTouchTarget(DesignTokens.Layout.minTouchTarget)
+                .accessibilityLabel("Share measurement")
             }
         }
         .task {
@@ -76,6 +79,7 @@ struct MeasurementDetailView: View {
             Text(categoryDisplayName)
                 .font(.system(size: 20, weight: .semibold, design: .rounded))
                 .foregroundStyle(category.color)
+                .stressDualCoding(category, showsCaption: false)
 
             Text(formatFullDate(measurement.timestamp))
                 .font(.system(size: 11, weight: .medium, design: .monospaced))

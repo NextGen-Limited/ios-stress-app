@@ -111,18 +111,7 @@ struct MeHeroCard: View {
 
     private var stressLabel: String {
         guard let level = stressLevel else { return "Stress" }
-        return StressCategory.from(score: level).rawValue.capitalized
-    }
-}
-
-private extension StressCategory {
-    static func from(score: Double) -> StressCategory {
-        switch score {
-        case ..<25:        return .relaxed
-        case 25..<50:      return .mild
-        case 50..<75:      return .moderate
-        default:           return .high
-        }
+        return StressCategory(from: level).displayName
     }
 }
 

@@ -69,12 +69,12 @@ struct HabitRingView: View {
     private var centerStack: some View {
         VStack(spacing: 1) {
             Image(systemName: habit.type.icon)
-                .font(.system(size: size * 0.22, weight: .semibold))
+                .font(.system(size: size * 0.22, weight: .semibold)) // dated exception 2026-09-05: ring geometry — font proportional to ring diameter
                 .foregroundStyle(isComplete ? WatchDesignTokens.accentStrong : WatchDesignTokens.ink)
             Text("\(displayCurrent)/\(displayGoal)")
-                .font(.system(size: size * 0.16, weight: .semibold, design: .rounded).monospacedDigit())
+                .font(.system(size: size * 0.16, weight: .semibold, design: .rounded).monospacedDigit()) // dated exception 2026-09-05: ring geometry — font proportional to ring diameter
                 .foregroundStyle(WatchDesignTokens.inkSecondary)
-                .minimumScaleFactor(0.7)
+                .minimumScaleFactor(0.7) // dated exception 2026-09-05: ring-interior count; slot geometry is proportional to ring size
                 .lineLimit(1)
         }
     }

@@ -12,22 +12,28 @@ struct DistributionBar: View {
     let highDays: Int
     var comment: String? = nil
 
+    @Environment(\.colorScheme) private var colorScheme
+
     // MARK: - Derived
 
     private var totalDays: Int {
         relaxedDays + mildDays + moderateDays + highDays
     }
 
-    /// Exact percentages that always sum to 100. Last non-zero segment
-    /// absorbs the rounding residual.
+    /// Exact percentages that always sum to 100. The last tier with
+    /// nonzero days absorbs the rounding residual — a tier with 0 days
+    /// must never receive a nonzero percentage (it would contradict its
+    /// own dimmed "0 days" legend and VoiceOver label).
     private var segments: (relaxed: Int, mild: Int, moderate: Int, high: Int) {
         guard totalDays > 0 else { return (0, 0, 0, 0) }
         let t = Double(totalDays)
-        let rPct = (Double(relaxedDays) / t * 100).rounded()
-        let mPct = (Double(mildDays) / t * 100).rounded()
-        let moPct = (Double(moderateDays) / t * 100).rounded()
-        let hPct = max(0, 100 - rPct - mPct - moPct)
-        return (Int(rPct), Int(mPct), Int(moPct), Int(hPct))
+        let days = [relaxedDays, mildDays, moderateDays, highDays]
+        var pcts = days.map { Int((Double($0) / t * 100).rounded()) }
+        let residual = 100 - pcts.reduce(0, +)
+        if let lastNonZero = days.lastIndex(where: { $0 > 0 }) {
+            pcts[lastNonZero] += residual
+        }
+        return (pcts[0], pcts[1], pcts[2], pcts[3])
     }
 
     // MARK: - Body
@@ -70,14 +76,16 @@ struct DistributionBar: View {
                     barSegment(
                         color: StressCategory.relaxed.color,
                         width: total * CGFloat(s.relaxed) / 100,
-                        label: "\(s.relaxed)%"
+                        label: "\(s.relaxed)%",
+                        textColor: labelTextColor(for: .relaxed)
                     )
                 }
                 if s.mild > 0 {
                     barSegment(
                         color: StressCategory.mild.color,
                         width: total * CGFloat(s.mild) / 100,
-                        label: "\(s.mild)%"
+                        label: "\(s.mild)%",
+                        textColor: labelTextColor(for: .mild)
                     )
                 }
                 if s.moderate > 0 {
@@ -85,14 +93,15 @@ struct DistributionBar: View {
                         color: StressCategory.moderate.color,
                         width: total * CGFloat(s.moderate) / 100,
                         label: "\(s.moderate)%",
-                        darkText: true
+                        textColor: labelTextColor(for: .moderate)
                     )
                 }
                 if s.high > 0 {
                     barSegment(
                         color: StressCategory.high.color,
                         width: total * CGFloat(s.high) / 100,
-                        label: "\(s.high)%"
+                        label: "\(s.high)%",
+                        textColor: labelTextColor(for: .high)
                     )
                 }
             }
@@ -101,13 +110,30 @@ struct DistributionBar: View {
         .clipShape(RoundedRectangle(cornerRadius: 6, style: .continuous))
     }
 
-    private func barSegment(color: Color, width: CGFloat, label: String, darkText: Bool = false) -> some View {
+    /// Per-tier segment-label text color, resolved against the tier's actual
+    /// fill in the current color scheme so 11pt semibold text clears the
+    /// 4.5:1 WCAG AA bar (this is normal-size text, not large text). Relaxed
+    /// and mild fills are never bright enough for white text in either
+    /// appearance; moderate and high flip between white (light fill) and
+    /// black (bright dark-mode fill).
+    private func labelTextColor(for tier: StressCategory) -> Color {
+        switch tier {
+        case .relaxed, .mild:
+            return .black
+        case .moderate, .high:
+            return colorScheme == .dark ? .black : .white
+        case .severe:
+            return colorScheme == .dark ? .black : .white
+        }
+    }
+
+    private func barSegment(color: Color, width: CGFloat, label: String, textColor: Color = .white) -> some View {
         ZStack {
             Rectangle().fill(color)
             if width > 32 {
                 Text(label)
                     .font(.system(size: 11, weight: .semibold, design: .rounded))
-                    .foregroundStyle(darkText ? Color.black.opacity(0.65) : Color.white)
+                    .foregroundStyle(textColor)
             }
         }
         .frame(width: max(0, width))
@@ -123,11 +149,11 @@ struct DistributionBar: View {
             ],
             spacing: 8
         ) {
-            legendItem(color: StressCategory.relaxed.color, label: "Relaxed", days: relaxedDays)
-            legendItem(color: StressCategory.mild.color, label: "Mild", days: mildDays)
-            legendItem(color: StressCategory.moderate.color, label: "Moderate", days: moderateDays)
+            legendItem(tier: .relaxed, label: "Relaxed", days: relaxedDays)
+            legendItem(tier: .mild, label: "Mild", days: mildDays)
+            legendItem(tier: .moderate, label: StressCategory.moderate.displayName, days: moderateDays)
             legendItem(
-                color: StressCategory.high.color,
+                tier: .high,
                 label: "High",
                 days: highDays,
                 dimmed: highDays == 0
@@ -135,11 +161,12 @@ struct DistributionBar: View {
         }
     }
 
-    private func legendItem(color: Color, label: String, days: Int, dimmed: Bool = false) -> some View {
+    private func legendItem(tier: StressCategory, label: String, days: Int, dimmed: Bool = false) -> some View {
         HStack(spacing: 8) {
             RoundedRectangle(cornerRadius: 3)
-                .fill(color)
+                .fill(tier.color)
                 .frame(width: 10, height: 10)
+                .stressDualCoding(tier, showsCaption: false)
             Text(label)
                 .font(.system(size: 12, weight: .medium))
                 .foregroundStyle(Color.Wellness.adaptiveSecondaryText)

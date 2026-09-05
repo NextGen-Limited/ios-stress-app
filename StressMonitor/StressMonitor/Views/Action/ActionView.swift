@@ -53,6 +53,7 @@ struct ActionView: View {
             .padding(.bottom, 24)
         }
         .background(HomeCharacterDesignTokens.homeBackground.ignoresSafeArea())
+        .accessibleDynamicType()
         .navigationTitle("Action")
         .navigationBarTitleDisplayMode(.inline)
         .sheet(isPresented: $isChatPresented) {

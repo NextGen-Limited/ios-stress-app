@@ -12,8 +12,8 @@ struct HRVTrendChart: View {
     var referenceValue: Double = 52
     var deltaText: String? = nil
 
-    /// HRV accent color (green per HTML `--hrv-color: #34D399`).
-    private let hrvColor = Color(hex: "#34D399")
+    /// HRV accent color — see `Color.hrvTrendAccent`.
+    private let hrvColor = Color.hrvTrendAccent
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {
@@ -34,10 +34,38 @@ struct HRVTrendChart: View {
             RoundedRectangle(cornerRadius: 16, style: .continuous)
                 .stroke(Color.Wellness.adaptiveSecondaryText.opacity(0.08), lineWidth: 1)
         )
-        .accessibilityElement(children: .contain)
-        .accessibilityLabel(
-            "HRV trend chart. Average \(Int(referenceValue)) milliseconds. Reference line at \(Int(referenceValue)) milliseconds."
+        .accessibilityChart(
+            description: "HRV trend chart. Average \(Int(referenceValue)) milliseconds. Reference line at \(Int(referenceValue)) milliseconds.",
+            summary: accessibilityTrendSummary,
+            points: accessibilityPoints
         )
+    }
+
+    // MARK: - Accessibility Series (D-09)
+
+    private static let pointDateFormatter: DateFormatter = {
+        let formatter = DateFormatter()
+        formatter.dateFormat = "MMM d"
+        return formatter
+    }()
+
+    private var accessibilityTrendSummary: String {
+        guard !dataPoints.isEmpty else { return "Need more data" }
+        return VoiceOverLabels.trendSummary(
+            metric: "HRV",
+            values: dataPoints.map(\.value),
+            period: "7 days"
+        )
+    }
+
+    private var accessibilityPoints: [String] {
+        dataPoints.map { point in
+            VoiceOverLabels.chartPoint(
+                dateText: Self.pointDateFormatter.string(from: point.date),
+                valueText: "\(Int(point.value))",
+                unit: "ms"
+            )
+        }
     }
 
     // MARK: - Header

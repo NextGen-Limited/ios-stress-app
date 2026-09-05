@@ -1,4 +1,5 @@
 import Foundation
+import os
 import StoreKit
 
 /// Minimal transaction surface the grant flow needs, abstracted so the
@@ -33,6 +34,7 @@ final class StoreKitService: StoreKitServiceProtocol {
     private let subscriptionVerifier: PurchaseRedeemer
     private var productsByID: [String: Product] = [:]
     private var transactionUpdatesTask: Task<Void, Never>?
+    private static let logger = Logger(subsystem: "com.stressmonitor.app", category: "StoreKitService")
 
     // MARK: - Init / Deinit
 
@@ -306,16 +308,51 @@ final class StoreKitService: StoreKitServiceProtocol {
         }
     }
 
+    /// Updates-listener entry — routes each `Transaction.updates` delivery.
+    ///
+    /// Finish-site reachability audit (all five finish sites in this
+    /// service): the four `completePurchase` finishes — the revoked-pack
+    /// arm, the pack-after-redeem arm, the revoked-subscription arm, and
+    /// the subscription tail — execute only for verified transactions, by
+    /// construction. `purchase(_:)` and `purchase(pack:)` run
+    /// `checkVerified` first and throw on `.unverified` before
+    /// `completePurchase` is ever reached, and
+    /// `handle(transaction:jwsRepresentation:)` is reached only from the
+    /// `.verified` case below. Those four finishes are intentional queue
+    /// hygiene (clearing revoked/refunded/legacy-subscription transactions
+    /// so the queue drains) and are pinned by `CreditPurchaseFlowTests`.
+    /// The fifth site was this entry's own `.unverified` branch, which
+    /// finished — and thereby destroyed — the only consumable proof of
+    /// purchase; it now ignores without finishing
+    /// (`handleUnverifiedTransaction`).
     private func handle(transactionVerification result: VerificationResult<Transaction>) async {
         switch result {
         case .verified(let transaction):
             await handle(transaction: transaction, jwsRepresentation: result.jwsRepresentation)
 
         case .unverified(let transaction, _):
-            // No grant occurs for an unverified payload, so finishing is
-            // safe and clears the queue.
-            await transaction.finish()
+            await handleUnverifiedTransaction(transaction)
         }
+    }
+
+    /// `.unverified` branch of the updates-listener entry, extracted
+    /// protocol-typed so unit tests can drive it with a fake transaction —
+    /// `VerificationResult<Transaction>` itself cannot be constructed in
+    /// tests (no public `Transaction` initializer).
+    ///
+    /// No grant occurs for an unverified payload, and no finish either: a
+    /// finished unverified consumable is gone forever, destroying the only
+    /// proof of purchase the server redeem path needs. Leaving it
+    /// unfinished makes `Transaction.updates` redeliver it — the same
+    /// retry contract `handle(transaction:jwsRepresentation:)` documents.
+    /// This mirrors Apple's canonical observer sample, which ignores
+    /// unverified transactions without finishing them, and the in-file
+    /// `.unverified: break` arms of `fetchPurchaseHistory()` and
+    /// `refreshEntitlements()`.
+    func handleUnverifiedTransaction(_ transaction: any PurchaseTransactionHandle) async {
+        Self.logger.warning(
+            "Ignoring unverified transaction (\(transaction.productID, privacy: .public)) — left unfinished for Transaction.updates redelivery"
+        )
     }
 
     // MARK: - Grant orchestration

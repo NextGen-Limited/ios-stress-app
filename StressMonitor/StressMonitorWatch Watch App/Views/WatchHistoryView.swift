@@ -10,7 +10,6 @@ import SwiftUI
 ///  - An empty state featuring the Ripple otter + a "Measure Now" pill
 struct WatchHistoryView: View {
     @Bindable var viewModel: WatchStressViewModel
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
     private let readings: [SharedReading]
 
@@ -24,6 +23,9 @@ struct WatchHistoryView: View {
         self.readings = WatchSharedDataStore.shared.history7Days
     }
 
+    @ScaledMetric(relativeTo: .body) private var bodyScale: CGFloat = 1
+    @ScaledMetric(relativeTo: .caption2) private var caption2Scale: CGFloat = 1
+    @ScaledMetric(relativeTo: .footnote) private var footnoteScale: CGFloat = 1
     var body: some View {
         Group {
             if readings.isEmpty {
@@ -69,7 +71,7 @@ struct WatchHistoryView: View {
     private var heatmapCard: some View {
         VStack(alignment: .leading, spacing: 5) {
             Text("HEATMAP")
-                .font(.system(size: 8.5, weight: .semibold, design: .monospaced))
+                .font(.system(size: 8.5 * caption2Scale, weight: .semibold, design: .monospaced))
                 .tracking(0.06 * 8.5)
                 .foregroundStyle(WatchDesignTokens.muted)
             CalendarHeatmapView(readings: heatmapReadings)
@@ -109,11 +111,11 @@ struct WatchHistoryView: View {
     private func statCard(value: Int, label: String, category: StressCategory) -> some View {
         VStack(spacing: 3) {
             Text("\(value)")
-                .font(.system(size: 18, weight: .bold, design: .rounded).monospacedDigit())
+                .font(.system(size: 18 * bodyScale, weight: .bold, design: .rounded).monospacedDigit())
                 .tracking(-0.02 * 18)
                 .foregroundStyle(category.inkColor)
             Text(label.uppercased())
-                .font(.system(size: 7, weight: .semibold, design: .monospaced))
+                .font(.system(size: 7, weight: .semibold, design: .monospaced)) // dated exception 2026-09-05: 3-across stat-card micro-label — single word cannot wrap
                 .tracking(0.08 * 7)
                 .foregroundStyle(WatchDesignTokens.muted)
         }
@@ -130,7 +132,7 @@ struct WatchHistoryView: View {
     private var chartCard: some View {
         VStack(alignment: .leading, spacing: 3) {
             Text("WEEKLY TREND")
-                .font(.system(size: 7.5, weight: .semibold, design: .monospaced))
+                .font(.system(size: 7.5 * caption2Scale, weight: .semibold, design: .monospaced))
                 .tracking(0.08 * 7.5)
                 .foregroundStyle(WatchDesignTokens.muted)
             StressBarChart(entries: chartEntries)
@@ -174,19 +176,19 @@ struct WatchHistoryView: View {
                 .frame(width: 3, height: 22)
 
             Text("\(Int(reading.level))")
-                .font(.system(size: 14, weight: .bold, design: .rounded).monospacedDigit())
+                .font(.system(size: 14 * footnoteScale, weight: .bold, design: .rounded).monospacedDigit())
                 .tracking(-0.02 * 14)
                 .foregroundStyle(category.inkColor)
                 .frame(minWidth: 22, alignment: .leading)
 
             Text(category.displayName)
-                .font(.system(size: 10, weight: .semibold, design: .default))
+                .font(.system(size: 10 * caption2Scale, weight: .semibold, design: .default))
                 .foregroundStyle(WatchDesignTokens.inkSecondary)
 
             Spacer(minLength: 0)
 
             Text(timeLabel(for: reading.timestamp))
-                .font(.system(size: 7.5, weight: .semibold, design: .monospaced))
+                .font(.system(size: 7.5 * caption2Scale, weight: .semibold, design: .monospaced))
                 .tracking(0.04 * 7.5)
                 .foregroundStyle(WatchDesignTokens.muted)
         }
@@ -202,10 +204,10 @@ struct WatchHistoryView: View {
             Spacer(minLength: 0)
             CharacterFaceView(creature: .ripple, category: .relaxed, size: 48, showsHalo: true)
             Text("No readings yet")
-                .font(.system(size: 11, weight: .semibold, design: .default))
+                .font(.system(size: 11 * caption2Scale, weight: .semibold, design: .default))
                 .foregroundStyle(WatchDesignTokens.ink)
             Text("Take your first measurement to start tracking.")
-                .font(.system(size: 10, weight: .regular, design: .default))
+                .font(.system(size: 10 * caption2Scale, weight: .regular, design: .default))
                 .foregroundStyle(WatchDesignTokens.muted)
                 .multilineTextAlignment(.center)
                 .padding(.horizontal, 8)
@@ -214,10 +216,10 @@ struct WatchHistoryView: View {
                 Task { await viewModel.measureStress() }
             } label: {
                 Text("Measure Now")
-                    .font(.system(size: 12, weight: .semibold, design: .rounded))
+                    .font(.system(size: 12 * footnoteScale, weight: .semibold, design: .rounded))
                     .foregroundStyle(.white)
                     .frame(maxWidth: .infinity)
-                    .frame(height: 34)
+                    .frame(minHeight: 34)
                     .background(
                         Capsule(style: .continuous)
                             .fill(WatchDesignTokens.accentStrong)

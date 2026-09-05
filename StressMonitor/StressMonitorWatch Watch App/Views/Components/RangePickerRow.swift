@@ -41,6 +41,7 @@ struct RangePickerRow: View {
 
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
 
+    @ScaledMetric(relativeTo: .caption2) private var caption2Scale: CGFloat = 1
     var body: some View {
         HStack(spacing: 2) {
             ForEach(HistoryRange.allCases) { range in
@@ -70,10 +71,10 @@ struct RangePickerRow: View {
             selectedRange = range
         } label: {
             Text(range.shortLabel)
-                .font(.system(size: 11, weight: .semibold, design: .rounded).monospacedDigit())
+                .font(.system(size: 11 * caption2Scale, weight: .semibold, design: .rounded).monospacedDigit())
                 .foregroundStyle(isSelected ? .white : WatchDesignTokens.muted)
                 .frame(maxWidth: .infinity)
-                .frame(height: 26)
+                .frame(minHeight: 26)
                 .background(
                     RoundedRectangle(cornerRadius: WatchDesignTokens.radiusControl - 3, style: .continuous)
                         .fill(isSelected ? WatchDesignTokens.accentStrong : .clear)

@@ -25,14 +25,14 @@ struct CalendarHeatmapView: View {
     private let cellSize: CGFloat = 10
     private let cellSpacing: CGFloat = 2
 
+    @ScaledMetric(relativeTo: .caption2) private var caption2Scale: CGFloat = 1
     var body: some View {
         VStack(alignment: .leading, spacing: 4) {
             if let summary = headerSummary {
                 Text(summary)
-                    .font(.system(size: 8.5, weight: .semibold, design: .monospaced))
+                    .font(.system(size: 8.5 * caption2Scale, weight: .semibold, design: .monospaced))
                     .tracking(0.05 * 8.5)
                     .foregroundStyle(WatchDesignTokens.muted)
-                    .lineLimit(1)
             }
 
             HStack(alignment: .top, spacing: 6) {
@@ -97,7 +97,7 @@ struct CalendarHeatmapView: View {
         VStack(spacing: cellSpacing) {
             ForEach(dayLabels, id: \.self) { label in
                 Text(label)
-                    .font(.system(size: 7, weight: .regular, design: .monospaced))
+                    .font(.system(size: 7, weight: .regular, design: .monospaced)) // dated exception 2026-09-05: day-column labels aligned to fixed 10pt heatmap cells (D-09)
                     .foregroundStyle(WatchDesignTokens.muted)
                     .frame(width: 8, height: cellSize)
             }

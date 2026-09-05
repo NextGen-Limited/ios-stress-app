@@ -96,7 +96,7 @@ struct StressBarChart: View {
             let color = isToday ? WatchDesignTokens.accentStrong : WatchDesignTokens.muted
             let resolved = ctx.resolve(
                 Text(entry.dayLabel)
-                    .font(.system(size: 7, design: .monospaced))
+                    .font(.system(size: 7, design: .monospaced)) // dated exception 2026-09-05: canvas-drawn chart day label — geometry-derived (D-09)
                     .foregroundColor(color)
             )
             let textSize = resolved.measure(in: CGSize(width: slot, height: 12))

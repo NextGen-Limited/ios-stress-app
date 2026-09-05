@@ -87,7 +87,7 @@ struct CornerComplicationView: View {
             CharacterFaceView(creature: .ripple, category: entry.category, size: 22, showsHalo: false)
             Text(ComplicationDataProvider.shared.fetchLatestEntry().isPlaceholder
                  ? "—" : "\(Int(entry.stressLevel.rounded()))")
-                .font(.system(size: 14, weight: .bold, design: .rounded).monospacedDigit())
+                .font(.system(size: 14, weight: .bold, design: .rounded).monospacedDigit()) // dated exception 2026-09-05: accessory corner template — system-fixed slot
                 .foregroundColor(entry.category.color)
         }
         .widgetLabel { Text("Ripple") }

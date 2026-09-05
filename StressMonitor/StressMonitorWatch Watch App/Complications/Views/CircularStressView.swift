@@ -47,24 +47,24 @@ struct CircularStressView: View {
             VStack(spacing: verticalSpacing) {
                 if let characterEmoji {
                     Text(characterEmoji)
-                        .font(.system(size: emojiSize))
+                        .font(.system(size: emojiSize)) // dated exception 2026-09-05: parametric accessory ring geometry — font proportional to slot size
                         .lineLimit(1)
-                        .minimumScaleFactor(0.7)
+                        .minimumScaleFactor(0.7) // dated exception 2026-09-05: accessory ring interior — slot cannot accommodate the ramp
                 }
 
                 // Stress level number
                 Text(stressLevelText)
-                    .font(.system(size: textSize, weight: .bold, design: .rounded))
+                    .font(.system(size: textSize, weight: .bold, design: .rounded)) // dated exception 2026-09-05: parametric accessory ring geometry — font proportional to slot size
                     .foregroundColor(category.color)
                     .contentTransition(.numericText(value: stressLevel))
 
                 // Category label (optional)
                 if showLabel {
                     Text(category.label)
-                        .font(.system(size: labelSize, weight: .medium))
+                        .font(.system(size: labelSize, weight: .medium)) // dated exception 2026-09-05: parametric accessory ring geometry — font proportional to slot size
                         .foregroundColor(.secondary)
                         .lineLimit(1)
-                        .minimumScaleFactor(0.7)
+                        .minimumScaleFactor(0.7) // dated exception 2026-09-05: accessory ring interior — slot cannot accommodate the ramp
                 }
             }
         }
