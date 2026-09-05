@@ -115,24 +115,6 @@ struct AccessibleAnimationModifier<V: Equatable>: ViewModifier {
     }
 }
 
-/// Press effect whose scale is removed under Reduce Motion.
-struct PressEffectModifier: ViewModifier {
-    @State private var isPressed = false
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
-
-    func body(content: Content) -> some View {
-        let motionAllowed = WellnessMotion.isMotionAllowed(reduceMotionEnvironment: reduceMotion)
-        content
-            .scaleEffect(isPressed && motionAllowed ? 0.96 : 1.0)
-            .animation(motionAllowed ? .easeOut(duration: 0.1) : .none, value: isPressed)
-            .simultaneousGesture(
-                DragGesture(minimumDistance: 0)
-                    .onChanged { _ in isPressed = true }
-                    .onEnded { _ in isPressed = false }
-            )
-    }
-}
-
 /// Button style whose press-scale is removed under Reduce Motion.
 struct MotionAwareScaleButtonStyle: ButtonStyle {
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
@@ -142,102 +124,6 @@ struct MotionAwareScaleButtonStyle: ButtonStyle {
         return configuration.label
             .scaleEffect(configuration.isPressed && motionAllowed ? 0.95 : 1.0)
             .animation(motionAllowed ? .easeInOut(duration: 0.1) : .none, value: configuration.isPressed)
-    }
-}
-
-// MARK: - Staggered Appear
-
-struct StaggeredAppearModifier: ViewModifier {
-    let index: Int
-    let totalItems: Int
-    let baseDelay: Double
-
-    @State private var appeared = false
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
-
-    private var delay: Double {
-        baseDelay * Double(index)
-    }
-
-    func body(content: Content) -> some View {
-        if WellnessMotion.isMotionReduced(reduceMotionEnvironment: reduceMotion) {
-            content
-        } else {
-            content
-                .opacity(appeared ? 1 : 0)
-                .offset(y: appeared ? 0 : 20)
-                .onAppear {
-                    withAnimation(.easeOut(duration: 0.3).delay(delay)) {
-                        appeared = true
-                    }
-                }
-        }
-    }
-}
-
-// MARK: - Shimmer Loading Effect
-
-struct ShimmerLoadingModifier: ViewModifier {
-    @State private var phase: CGFloat = 0
-    @Environment(\.accessibilityReduceMotion) private var reduceMotion
-
-    func body(content: Content) -> some View {
-        if WellnessMotion.isMotionReduced(reduceMotionEnvironment: reduceMotion) {
-            content.redacted(reason: .placeholder)
-        } else {
-            content
-                .overlay(
-                    ShimmerEffectView(phase: $phase)
-                )
-                .redacted(reason: .placeholder)
-                .onAppear {
-                    withAnimation(.linear(duration: 1.5).repeatForever(autoreverses: false)) {
-                        phase = 1
-                    }
-                }
-        }
-    }
-}
-
-struct ShimmerEffectView: View {
-    @Binding var phase: CGFloat
-
-    var body: some View {
-        GeometryReader { geometry in
-            Rectangle()
-                .fill(
-                    LinearGradient(
-                        stops: [
-                            .init(color: .clear, location: 0),
-                            .init(color: Color.white.opacity(0.3), location: 0.5),
-                            .init(color: .clear, location: 1)
-                        ],
-                        startPoint: .leading,
-                        endPoint: .trailing
-                    )
-                )
-                .offset(x: phase * geometry.size.width * 2 - geometry.size.width)
-        }
-        .mask(Rectangle())
-    }
-}
-
-// MARK: - Accessible Transitions
-
-extension AnyTransition {
-    /// Opacity cross-fade either way — fades are allowed under Reduce Motion (D-12).
-    static func accessibleOpacity(motionReduced: Bool) -> AnyTransition {
-        .opacity
-    }
-
-    /// Scale normally; cross-fade under Reduce Motion.
-    static func accessibleScale(motionReduced: Bool) -> AnyTransition {
-        motionReduced ? .opacity : .scale
-    }
-
-    /// Slide normally; cross-fade under Reduce Motion.
-    static func accessibleSlide(motionReduced: Bool, edge: Edge = .bottom) -> AnyTransition {
-        motionReduced ? .opacity : .move(edge: edge)
     }
 }
 
@@ -275,18 +161,4 @@ extension View {
         modifier(AccessibleAnimationModifier(animation: animation, value: value))
     }
 
-    /// Press effect that stops scaling under Reduce Motion.
-    func pressEffect() -> some View {
-        modifier(PressEffectModifier())
-    }
-
-    /// Applies staggered appear animation for list items; static under Reduce Motion.
-    func staggeredAppear(index: Int, total: Int, delay: Double = 0.05) -> some View {
-        modifier(StaggeredAppearModifier(index: index, totalItems: total, baseDelay: delay))
-    }
-
-    /// Applies shimmer loading effect; static redacted placeholder under Reduce Motion.
-    func shimmerLoading() -> some View {
-        modifier(ShimmerLoadingModifier())
-    }
 }

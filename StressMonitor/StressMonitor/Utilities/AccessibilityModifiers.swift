@@ -1,7 +1,7 @@
 import SwiftUI
 
 /// Accessibility modifiers and helpers for WCAG compliance.
-/// Motion-gated helpers (accessibleAnimation, pressEffect) live in
+/// Motion-gated helper (accessibleAnimation) lives in
 /// Animation+Wellness.swift — the single owner of the Reduce Motion decision.
 extension View {
     /// Applies dual coding for stress levels (color + icon + text)
