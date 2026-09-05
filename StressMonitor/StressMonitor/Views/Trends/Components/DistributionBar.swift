@@ -12,6 +12,8 @@ struct DistributionBar: View {
     let highDays: Int
     var comment: String? = nil
 
+    @Environment(\.colorScheme) private var colorScheme
+
     // MARK: - Derived
 
     private var totalDays: Int {
@@ -85,7 +87,7 @@ struct DistributionBar: View {
                         color: StressCategory.moderate.color,
                         width: total * CGFloat(s.moderate) / 100,
                         label: "\(s.moderate)%",
-                        darkText: true
+                        textColor: colorScheme == .dark ? Color.black : Color.white
                     )
                 }
                 if s.high > 0 {
@@ -101,13 +103,13 @@ struct DistributionBar: View {
         .clipShape(RoundedRectangle(cornerRadius: 6, style: .continuous))
     }
 
-    private func barSegment(color: Color, width: CGFloat, label: String, darkText: Bool = false) -> some View {
+    private func barSegment(color: Color, width: CGFloat, label: String, textColor: Color = .white) -> some View {
         ZStack {
             Rectangle().fill(color)
             if width > 32 {
                 Text(label)
                     .font(.system(size: 11, weight: .semibold, design: .rounded))
-                    .foregroundStyle(darkText ? Color.black.opacity(0.65) : Color.white)
+                    .foregroundStyle(textColor)
             }
         }
         .frame(width: max(0, width))

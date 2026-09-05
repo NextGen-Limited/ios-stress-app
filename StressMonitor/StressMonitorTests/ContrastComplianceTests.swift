@@ -188,6 +188,24 @@ struct ContrastComplianceTests {
         #expect(ratio >= 3.0)
     }
 
+    @Test("White label text on the moderate distribution-bar segment passes 3:1 in light mode")
+    func whiteOnModerateDistributionSegmentLight() {
+        let ratio = contrastRatio(
+            UIColor.white,
+            on: resolved(StressCategory.moderate.color, .light)
+        )
+        #expect(ratio >= 3.0)
+    }
+
+    @Test("Black label text on the moderate distribution-bar segment passes 3:1 in dark mode")
+    func blackOnModerateDistributionSegmentDark() {
+        let ratio = contrastRatio(
+            UIColor.black,
+            on: resolved(StressCategory.moderate.color, .dark)
+        )
+        #expect(ratio >= 3.0)
+    }
+
     // MARK: - Stress Indicator Pairs (>= 3:1)
 
     @Test(
