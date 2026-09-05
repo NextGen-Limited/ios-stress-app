@@ -139,7 +139,7 @@ Plans:
   4. At the largest accessibility Dynamic Type size, the primary screens stay readable — no label truncates, clips, or overlaps another element.
   5. The orphaned redesign views are deleted from the source tree; no unreachable duplicate screen compiles into the binary.
 
-**Plans**: 3/6 plans executed
+**Plans**: 4/6 plans executed
 **UI hint**: yes
 
 Plans:
@@ -151,7 +151,7 @@ Plans:
 **Wave 2** *(surface files serialized after 03-02; chart files after 03-01)*
 
 - [x] 03-03-PLAN.md — A11Y-01: touch-target + icon-only-label sweep across the 14 surfaces (`.minimumTouchTarget` + token), dual-coding adoption where categories show, state-shape triage (error copy, NoDataCard empty states, locked-character dimming)
-- [ ] 03-04-PLAN.md — A11Y-04/D-09: chart accessibility series (trend-summary builder unit-pinned red-first + per-point labels) + gauge/hero-numeral values + chart-file legend targets
+- [x] 03-04-PLAN.md — A11Y-04/D-09: chart accessibility series (trend-summary builder unit-pinned red-first + per-point labels) + gauge/hero-numeral values + chart-file legend targets
 
 **Wave 3** *(blocked on Waves 1-2 — shares files with both)*
 
@@ -183,5 +183,5 @@ Plans:
 |-------|-----------|----------------|--------|-----------|
 | 1. Binary & Manifest Truth | v1.2 | 6/6 | Complete    | 2026-09-03 |
 | 2. Delete Correctness & Test-Suite Trust | v1.2 | 6/6 | In Progress|  |
-| 3. Accessibility Compliance | v1.2 | 3/6 | In Progress|  |
+| 3. Accessibility Compliance | v1.2 | 4/6 | In Progress|  |
 | 4. Store Submission Package | v1.2 | 0/TBD | Not started | - |
