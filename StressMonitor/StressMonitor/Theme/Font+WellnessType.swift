@@ -6,64 +6,37 @@ extension Font {
     ///
     /// UI text uses SF Pro (`.default` design); character moments use
     /// SF Pro Rounded (`.rounded` design). No bundled font assets required.
+    /// Text tokens are anchored to system text styles so they ride the
+    /// Dynamic Type ramp through AX5; gauge numerals stay fixed and are
+    /// labeled through accessibility values instead.
     struct WellnessType {
         // MARK: - Heading Fonts (SF Pro Rounded / SF Pro)
 
-        /// Hero number for stress ring center (SF Pro Rounded 72pt bold)
+        /// Hero number for stress ring center (SF Pro Rounded 72pt bold) — gauge class, fixed by design
         static var heroNumber: Font { .system(size: 72, weight: .bold, design: .rounded) }
 
-        /// Large metric display (SF Pro Rounded 48pt bold)
+        /// Large metric display (SF Pro Rounded 48pt bold) — gauge class, fixed by design
         static var largeMetric: Font { .system(size: 48, weight: .bold, design: .rounded) }
 
-        /// Card titles (SF Pro 28pt bold)
-        static var cardTitle: Font { .system(size: 28, weight: .bold, design: .default) }
+        /// Card titles (28pt bold, rides the .title ramp)
+        static var cardTitle: Font { .system(.title).weight(.bold) }
 
-        /// Section headers (SF Pro 22pt semibold)
-        static var sectionHeader: Font { .system(size: 22, weight: .semibold, design: .default) }
+        /// Section headers (22pt semibold, rides the .title2 ramp)
+        static var sectionHeader: Font { .system(.title2).weight(.semibold) }
 
         // MARK: - Body Fonts (SF Pro)
 
-        /// Primary content (SF Pro 17pt regular)
-        static var body: Font { .system(size: 17, weight: .regular, design: .default) }
+        /// Primary content (17pt regular, rides the .body ramp)
+        static var body: Font { .system(.body) }
 
-        /// Emphasized text (SF Pro 17pt semibold)
-        static var bodyEmphasized: Font { .system(size: 17, weight: .semibold, design: .default) }
+        /// Emphasized text (17pt semibold, rides the .headline ramp)
+        static var bodyEmphasized: Font { .system(.headline) }
 
-        /// Captions and labels (SF Pro 13pt regular)
-        static var caption: Font { .system(size: 13, weight: .regular, design: .default) }
+        /// Captions and labels (13pt regular, rides the .footnote ramp)
+        static var caption: Font { .system(.footnote) }
 
-        /// Tiny text (SF Pro 11pt regular)
-        static var caption2: Font { .system(size: 11, weight: .regular, design: .default) }
-    }
-}
-
-// MARK: - Dynamic Type Support
-extension View {
-    /// Apply Dynamic Type scaling with accessibility support
-    /// Limits scaling to accessibility3 and allows minimum 70% scale factor
-    func accessibleWellnessType() -> some View {
-        self
-            .dynamicTypeSize(...DynamicTypeSize.accessibility3)
-            .minimumScaleFactor(0.7)
-            .lineLimit(nil)
-    }
-
-    /// Apply Dynamic Type with single line constraint
-    /// Useful for buttons and labels that must stay single-line
-    func accessibleWellnessTypeSingleLine() -> some View {
-        self
-            .dynamicTypeSize(...DynamicTypeSize.accessibility3)
-            .minimumScaleFactor(0.7)
-            .lineLimit(1)
-    }
-
-    /// Apply Dynamic Type with specific line limit
-    /// - Parameter lines: Maximum number of lines
-    func accessibleWellnessType(lines: Int) -> some View {
-        self
-            .dynamicTypeSize(...DynamicTypeSize.accessibility3)
-            .minimumScaleFactor(0.7)
-            .lineLimit(lines)
+        /// Tiny text (11pt regular, rides the .caption2 ramp)
+        static var caption2: Font { .system(.caption2) }
     }
 }
 
@@ -71,20 +44,20 @@ extension View {
 extension Font {
     /// iOS System Fallback fonts when custom fonts are unavailable
     struct SystemFallback {
-        /// Large Title (34pt, Bold)
-        static let largeTitle = Font.system(size: 34, weight: .bold)
+        /// Large Title (34pt, Bold — rides the .largeTitle ramp)
+        static let largeTitle = Font.system(.largeTitle).weight(.bold)
 
-        /// Title (28pt, Bold)
-        static let title = Font.system(size: 28, weight: .bold)
+        /// Title (28pt, Bold — rides the .title ramp)
+        static let title = Font.system(.title).weight(.bold)
 
-        /// Title 2 (22pt, Bold)
-        static let title2 = Font.system(size: 22, weight: .bold)
+        /// Title 2 (22pt, Bold — rides the .title2 ramp)
+        static let title2 = Font.system(.title2).weight(.bold)
 
-        /// Body (17pt, Regular)
-        static let body = Font.system(size: 17, weight: .regular)
+        /// Body (17pt, Regular — rides the .body ramp)
+        static let body = Font.system(.body)
 
-        /// Caption (13pt, Regular)
-        static let caption = Font.system(size: 13, weight: .regular)
+        /// Caption (13pt, Regular — rides the .footnote ramp)
+        static let caption = Font.system(.footnote)
     }
 }
 
