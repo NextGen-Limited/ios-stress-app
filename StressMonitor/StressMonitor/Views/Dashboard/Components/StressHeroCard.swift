@@ -117,10 +117,18 @@ struct StressHeroCard: View {
 
     private var stateRow: some View {
         VStack(spacing: 4) {
-            Text(hasData ? category.displayName : "No Data")
-                .font(.system(size: 30, weight: .bold, design: .rounded))
-                .tracking(-0.8)
-                .foregroundStyle(hasData ? category.readableTextColor : fillColor)
+            if hasData {
+                Text(category.displayName)
+                    .font(.system(size: 30, weight: .bold, design: .rounded))
+                    .tracking(-0.8)
+                    .foregroundStyle(category.color)
+                    .stressDualCoding(category, showsCaption: false)
+            } else {
+                Text("No Data")
+                    .font(.system(size: 30, weight: .bold, design: .rounded))
+                    .tracking(-0.8)
+                    .foregroundStyle(fillColor)
+            }
 
             Text(hasData ? substate : "Waiting for a reading")
                 .font(.system(size: 13, weight: .medium))

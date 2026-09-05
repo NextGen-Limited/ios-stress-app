@@ -4,8 +4,11 @@ import SwiftUI
 extension View {
     /// Applies dual coding for stress levels (color + icon + text)
     /// Required for WCAG AA compliance
-    func stressDualCoding(_ category: StressCategory) -> some View {
-        modifier(StressDualCodingModifier(category: category))
+    /// - Parameter showsCaption: false when the content already renders the
+    ///   category's display name (prevents a duplicated visible name); the
+    ///   symbol channel and combined label are still applied.
+    func stressDualCoding(_ category: StressCategory, showsCaption: Bool = true) -> some View {
+        modifier(StressDualCodingModifier(category: category, showsCaption: showsCaption))
     }
 
     /// Ensures minimum touch target size (44x44pt)
@@ -28,6 +31,7 @@ extension View {
 
 struct StressDualCodingModifier: ViewModifier {
     let category: StressCategory
+    var showsCaption: Bool = true
 
     func body(content: Content) -> some View {
         HStack(spacing: 6) {
@@ -36,9 +40,11 @@ struct StressDualCodingModifier: ViewModifier {
             Image(systemName: category.icon)
                 .accessibilityHidden(true)
 
-            Text(category.displayName)
-                .font(.caption)
-                .foregroundColor(Color.Wellness.adaptiveSecondaryText)
+            if showsCaption {
+                Text(category.displayName)
+                    .font(.caption)
+                    .foregroundColor(Color.Wellness.adaptiveSecondaryText)
+            }
         }
         .accessibilityElement(children: .combine)
         .accessibilityLabel("\(category.displayName) stress level")

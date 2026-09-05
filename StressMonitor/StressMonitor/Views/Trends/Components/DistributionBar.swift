@@ -123,11 +123,11 @@ struct DistributionBar: View {
             ],
             spacing: 8
         ) {
-            legendItem(color: StressCategory.relaxed.color, label: "Relaxed", days: relaxedDays)
-            legendItem(color: StressCategory.mild.color, label: "Mild", days: mildDays)
-            legendItem(color: StressCategory.moderate.color, label: "Moderate", days: moderateDays)
+            legendItem(tier: .relaxed, label: "Relaxed", days: relaxedDays)
+            legendItem(tier: .mild, label: "Mild", days: mildDays)
+            legendItem(tier: .moderate, label: "Moderate", days: moderateDays)
             legendItem(
-                color: StressCategory.high.color,
+                tier: .high,
                 label: "High",
                 days: highDays,
                 dimmed: highDays == 0
@@ -135,11 +135,12 @@ struct DistributionBar: View {
         }
     }
 
-    private func legendItem(color: Color, label: String, days: Int, dimmed: Bool = false) -> some View {
+    private func legendItem(tier: StressCategory, label: String, days: Int, dimmed: Bool = false) -> some View {
         HStack(spacing: 8) {
             RoundedRectangle(cornerRadius: 3)
-                .fill(color)
+                .fill(tier.color)
                 .frame(width: 10, height: 10)
+                .stressDualCoding(tier, showsCaption: false)
             Text(label)
                 .font(.system(size: 12, weight: .medium))
                 .foregroundStyle(Color.Wellness.adaptiveSecondaryText)

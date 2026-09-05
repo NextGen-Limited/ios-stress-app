@@ -79,6 +79,7 @@ struct MeasurementDetailView: View {
             Text(categoryDisplayName)
                 .font(.system(size: 20, weight: .semibold, design: .rounded))
                 .foregroundStyle(category.color)
+                .stressDualCoding(category, showsCaption: false)
 
             Text(formatFullDate(measurement.timestamp))
                 .font(.system(size: 11, weight: .medium, design: .monospaced))
