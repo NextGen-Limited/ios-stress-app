@@ -2,7 +2,7 @@
 
 **Date:** 2026-09-05
 **Auditor:** plan 03-06 Task 1 (regenerated mechanical audit; nothing deleted in this task)
-**Status:** deletion set FINAL — awaiting the Task 2 blocking decision checkpoint
+**Status:** deletion set APPROVED (`approve-full-set`, 2026-09-05 — see §8) — executing Task 3
 **Scope:** app target `StressMonitor/StressMonitor/` view files (D-14: "compiled view type unreachable from the navigation graph"). Repo-root legacy source set (`StressMonitor/{Models,Services,Views}/`) is EXCLUDED per D-14. Watch target files are NOT touched (mirror convention — every name collision found is a separate-module declaration, not an orphan).
 
 ---
@@ -282,15 +282,17 @@ Per-batch break = restore the file + add a retained-because row (missed live ref
 
 ## 8. Decision record (Task 2 checkpoint fills this in)
 
-> **PENDING — blocking-human decision required before Task 3 touches any file.**
+> **DECIDED — `approve-full-set`.**
 >
-> Options: `approve-full-set` (all 84 files + 2 members as audited) · `approve-trimmed` (name the families to defer) · `reject` (no deletion this phase; audit stands as documented debt).
+> Options were: `approve-full-set` (all 84 files + 2 members as audited) · `approve-trimmed` (name the families to defer) · `reject` (no deletion this phase; audit stands as documented debt).
 
 | Field | Value |
 |-------|-------|
-| Decision | _awaiting user_ |
-| Date/timestamp | _awaiting user_ |
-| Approved set | _awaiting user_ |
+| Decision | **Approved (`approve-full-set`)** |
+| Date/timestamp | 2026-09-05 |
+| Approved set | The full set exactly as audited and committed at `512a598`: **84 files** (81 view files per the §5 disposition table + the 3 zero-call-site Utilities) + **2 member-level deletions** (`StressCategory.readableTextColor`; `StressCategory.overlayTextColor` conditional on the post-deletion zero-adopter grep per §2) + the **1 relocation** (§3: `StressCategory` extension out of Badge.swift → `Models/StressCategory.swift`, relocation-first). No families deferred; no exceptions granted. The 5 retained-because files (§4) stay. |
+
+Task 3 executes the §7 batch order under this approval. Any per-batch delete-compile break follows the §7 rule: restore + amend this record, never the build settings.
 
 ---
 
