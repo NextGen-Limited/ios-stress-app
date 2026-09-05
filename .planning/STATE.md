@@ -5,16 +5,16 @@ milestone_name: Submission Readiness
 current_phase: 3
 current_phase_name: Accessibility Compliance
 status: executing
-stopped_at: Completed 03-01-PLAN.md (contrast suite + D-04 retunes green)
-last_updated: "2026-09-05T01:13:18.496Z"
+stopped_at: Completed 03-02-PLAN.md (Dynamic Type rework + D-02 sweep green)
+last_updated: "2026-09-05T01:51:50.233Z"
 last_activity: 2026-09-05
 last_activity_desc: Phase 3 execution started
-state_head: 9e5f8efb3ec924cfb29ac0c39298402cef07c2c9
+state_head: f2e43950afb0a7e3bae21243af8a3c70fd2a5e4b
 progress:
   total_phases: 4
   completed_phases: 1
   total_plans: 18
-  completed_plans: 13
+  completed_plans: 14
   percent: 25
 ---
 
@@ -30,7 +30,7 @@ See: .planning/PROJECT.md (updated 2026-09-03 at v1.2 start)
 ## Current Position
 
 Phase: 3 (Accessibility Compliance) — EXECUTING
-Plan: 2 of 6
+Plan: 3 of 6
 Status: Ready to execute
 Last activity: 2026-09-05 — Phase 3 execution started
 
@@ -78,6 +78,7 @@ Per-plan history for v1.0/v1.1 archived under `.planning/milestones/v1.0-phases/
 | Phase 02 P05 | 25min | 2 tasks | 2 files |
 | Phase 02 P06 | 40min | 3 tasks | 5 files |
 | Phase 3 P01 | 32 min | 3 tasks | 8 files |
+| Phase 03 P02 | 34 min | 4 tasks | 41 files |
 
 ## Accumulated Context
 
@@ -119,6 +120,10 @@ Full log in PROJECT.md Key Decisions. v1.1 per-phase decisions archived with the
 - [Phase 2]: [Phase 2 P06] DATA-01 stays Pending in REQUIREMENTS.md — only the automatable portion (sweep fix, evidence-note apparatus, trust gate) is done; the live two-surface verification is the explicit outstanding end-of-phase human item (no physical hardware/CloudKit Console reachable from this session; simulator evidence rejected per Pitfall 7)
 - [Phase 3]: [Phase 3 P01, A11Y-02]: Contrast truth is machine-checked — ContrastComplianceTests (14 tests/36 cases) computes WCAG ratios from Theme tokens via UIColor.resolvedColor(with:) in both appearances; RED 4.242/4.318 at the old secondary hex, mutation red-proof, green at 6B6E7B
 - [Phase 3]: [Phase 3 P01]: settingsRippleBlue/accentTeal = fixed 0891B2 (fill-safe both appearances) — accentTeal is a live white-text fill (AIChatCard/SelfNoteCard/WeekCalendarStrip) and white-on-4FC3F7 is 2.00:1, so the plan's recommended dark 4FC3F7 was overridden by the binding-judge clause; textTertiary/textDescriptive are now computed aliases of adaptiveSecondaryText; StressCategory.color pinned as the stress-hue source via Color.stressColor(for:)
+- [Phase 03]: [Phase 3 P02, A11Y-04]: Dynamic Type anchor mechanism = per-view @ScaledMetric unit metrics (size: N * scale), because Font.system(size:weight:design:relativeTo:) does not exist in the iOS 26 SDK (SwiftUICore swiftinterface verified) — ramp is multiplicative so point sizes stay byte-identical at Large
+- [Phase 03]: [Phase 3 P02]: accessibleDynamicType() reworked to a no-argument no-cap/no-shrink wrap contract; scalableText/AdaptiveTextSizeModifier/accessibleWellnessType* deleted zero-adopter; limitedDynamicType kept as the dated-exception escape hatch; D-03 manifest 14/14 adopted
+- [Phase 03]: [Phase 3 P02]: WellnessType tokens ride the system text-style ramp (title/title2/body/headline/footnote/caption2) byte-identical at Large, pinned permanently by FontWellnessTypeParityTests (A029/B029) — A1 ramp assumption is now machine-checked; heroNumber/largeMetric stay fixed gauge class
+- [Phase 03]: [Phase 3 P02, D-02]: widget+watch sweep = 82 ScaledMetric anchors + 58 inline dated exceptions (9 classes: accessory templates 26, lock-screen slots 5, LA system slots 6, LA banner SDK-gap 2, watch fixed hero 3, ring geometry 4, icon wells 2, chart geometry 3, N-across labels 4, breathing-ring 3); 1 shrink deleted, 8 kept behind markers
 
 ### Pending Todos
 
@@ -163,8 +168,8 @@ Earlier v1.0 deferrals (Phase 01/02 verification gaps, `MockStoreKitService` Rel
 
 ## Session Continuity
 
-Last session: 2026-09-05T01:13:18.158Z
-Stopped at: Completed 03-01-PLAN.md (contrast suite + D-04 retunes green)
+Last session: 2026-09-05T01:51:49.944Z
+Stopped at: Completed 03-02-PLAN.md (Dynamic Type rework + D-02 sweep green)
 Resume file: None
 
 ## Operator Next Steps
