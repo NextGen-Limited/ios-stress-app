@@ -12,8 +12,8 @@ struct HRVTrendChart: View {
     var referenceValue: Double = 52
     var deltaText: String? = nil
 
-    /// HRV accent color (green per HTML `--hrv-color: #34D399`).
-    private let hrvColor = Color(hex: "#34D399")
+    /// HRV accent color — see `Color.hrvTrendAccent`.
+    private let hrvColor = Color.hrvTrendAccent
 
     var body: some View {
         VStack(alignment: .leading, spacing: 12) {

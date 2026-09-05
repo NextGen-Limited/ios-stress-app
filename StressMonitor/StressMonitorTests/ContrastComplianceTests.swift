@@ -218,6 +218,18 @@ struct ContrastComplianceTests {
         #expect(ratio >= 3.0)
     }
 
+    @Test(
+        "HRV trend chart accent passes 3:1 on the card background in both appearances",
+        arguments: [UIUserInterfaceStyle.light, .dark]
+    )
+    func hrvAccentOnCard(style: UIUserInterfaceStyle) {
+        let ratio = contrastRatio(
+            resolved(Color.hrvTrendAccent, style),
+            on: resolved(Color.Wellness.adaptiveCardBackground, style)
+        )
+        #expect(ratio >= 3.0)
+    }
+
     // MARK: - Stress Indicator Pairs (>= 3:1)
 
     @Test(

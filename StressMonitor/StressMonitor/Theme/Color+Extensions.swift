@@ -39,6 +39,13 @@ extension Color {
     static let stressHigh = Color(light: Color(hex: "#B25400"), dark: Color(hex: "#FF9F0A"))
     static let stressSevere = Color(light: Color(hex: "#FF3B30"), dark: Color(hex: "#FF453A"))
 
+    // MARK: - Chart Accents
+
+    /// HRV trend chart accent (green per HTML `--hrv-color: #34D399`). The
+    /// light variant is retuned to `#0F9D6E` — the base `#34D399` measures
+    /// 1.92:1 on the white light-mode card, failing the 3:1 UI-component bar.
+    static let hrvTrendAccent = Color(light: Color(hex: "#0F9D6E"), dark: Color(hex: "#34D399"))
+
     // MARK: - Semantic Colors
 
     static let primaryBlue = Color(light: Color(hex: "#007AFF"), dark: Color(hex: "#0A84FF"))
