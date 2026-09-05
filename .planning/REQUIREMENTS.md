@@ -35,7 +35,7 @@ Requirements for v1.2. Each maps to roadmap phases.
 
 ### Accessibility
 
-- [ ] **A11Y-01**: All touch targets meet the 44pt minimum
+- [x] **A11Y-01**: All touch targets meet the 44pt minimum
 - [x] **A11Y-02**: Color contrast passes WCAG AA on primary surfaces
 - [ ] **A11Y-03**: Reduce Motion respected for animated views
 - [ ] **A11Y-04**: Dynamic Type adopted on primary screens
@@ -87,7 +87,7 @@ Which phases cover which requirements. Updated during roadmap creation.
 | SHIP-01 | Phase 4 | Pending |
 | SHIP-02 | Phase 4 | Pending |
 | SHIP-03 | Phase 4 | Pending |
-| A11Y-01 | Phase 3 | Pending |
+| A11Y-01 | Phase 3 | Complete |
 | A11Y-02 | Phase 3 | Complete |
 | A11Y-03 | Phase 3 | Pending |
 | A11Y-04 | Phase 3 | Pending |
