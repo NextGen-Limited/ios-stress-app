@@ -20,16 +20,20 @@ struct DistributionBar: View {
         relaxedDays + mildDays + moderateDays + highDays
     }
 
-    /// Exact percentages that always sum to 100. Last non-zero segment
-    /// absorbs the rounding residual.
+    /// Exact percentages that always sum to 100. The last tier with
+    /// nonzero days absorbs the rounding residual — a tier with 0 days
+    /// must never receive a nonzero percentage (it would contradict its
+    /// own dimmed "0 days" legend and VoiceOver label).
     private var segments: (relaxed: Int, mild: Int, moderate: Int, high: Int) {
         guard totalDays > 0 else { return (0, 0, 0, 0) }
         let t = Double(totalDays)
-        let rPct = (Double(relaxedDays) / t * 100).rounded()
-        let mPct = (Double(mildDays) / t * 100).rounded()
-        let moPct = (Double(moderateDays) / t * 100).rounded()
-        let hPct = max(0, 100 - rPct - mPct - moPct)
-        return (Int(rPct), Int(mPct), Int(moPct), Int(hPct))
+        let days = [relaxedDays, mildDays, moderateDays, highDays]
+        var pcts = days.map { Int((Double($0) / t * 100).rounded()) }
+        let residual = 100 - pcts.reduce(0, +)
+        if let lastNonZero = days.lastIndex(where: { $0 > 0 }) {
+            pcts[lastNonZero] += residual
+        }
+        return (pcts[0], pcts[1], pcts[2], pcts[3])
     }
 
     // MARK: - Body
