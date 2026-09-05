@@ -386,6 +386,7 @@ struct SettingsView: View {
             .pickerStyle(.menu)
             .labelsHidden()
             .tint(Color.Wellness.adaptiveSecondaryText)
+            .minimumTouchTarget(DesignTokens.Layout.minTouchTarget)
             .accessibilityLabel(pickerLabel)
         }
         .padding(.vertical, 10)
@@ -528,6 +529,7 @@ struct SettingsView: View {
             Toggle("", isOn: isOn)
                 .labelsHidden()
                 .tint(.primaryGreen)
+                .minimumTouchTarget(DesignTokens.Layout.minTouchTarget)
         }
         .padding(.vertical, 10)
         .accessibilityElement(children: .combine)

@@ -63,7 +63,7 @@ struct MoodCheckInView: View {
                     .font(.system(size: 10, weight: .semibold, design: .rounded))
                     .foregroundStyle(isActive ? Color.white : Color.Wellness.adaptiveSecondaryText)
                     .lineLimit(1)
-                    .minimumScaleFactor(0.7)
+                    .minimumScaleFactor(0.7) // dated exception 2026-09-05: 5-across chip label cannot wrap; fixed font
             }
             .frame(maxWidth: .infinity)
             .frame(height: 64)

@@ -149,7 +149,7 @@ struct StressSourcesCard: View {
                 .font(.system(size: 11.99, weight: .bold, design: .rounded))
                 .foregroundStyle(Color(hex: "#363636"))
                 .lineLimit(1)
-                .minimumScaleFactor(0.7)
+                .minimumScaleFactor(0.7) // dated exception 2026-09-05: label in fixed 65pt N-across cell cannot wrap
         }
         .frame(width: 65, height: 42)
     }

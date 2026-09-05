@@ -52,7 +52,7 @@ struct EvolutionStageRow: View {
                 .font(.system(size: 12, weight: .semibold))
                 .foregroundStyle(Color.Wellness.adaptivePrimaryText)
                 .lineLimit(1)
-                .minimumScaleFactor(0.7)
+                .minimumScaleFactor(0.7) // dated exception 2026-09-05: N-across stage name cannot wrap; fixed font
 
             // Requirement
             Text(stageRequirementText(stage: stage, requirement: requirement, isThisUnlocked: isThisUnlocked))
@@ -61,7 +61,7 @@ struct EvolutionStageRow: View {
                 .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
                 .lineLimit(2)
                 .multilineTextAlignment(.center)
-                .minimumScaleFactor(0.7)
+                .minimumScaleFactor(0.7) // dated exception 2026-09-05: last-resort clamp after 2-line wrap; fixed font
         }
         .frame(maxWidth: .infinity)
         .padding(.vertical, 12)

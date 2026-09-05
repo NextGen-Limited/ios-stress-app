@@ -64,7 +64,7 @@ struct BioAgeDetailView: View {
                 Text(estimateText)
                     .font(.system(size: 96, weight: .heavy, design: .rounded))
                     .foregroundStyle(Color.white)
-                    .minimumScaleFactor(0.5)
+                    .minimumScaleFactor(0.5) // dated exception 2026-09-05: 96pt gauge numeral (D-09); width clamp
                 Text("yrs")
                     .font(.system(size: 16, weight: .medium))
                     .foregroundStyle(Color.white.opacity(0.8))

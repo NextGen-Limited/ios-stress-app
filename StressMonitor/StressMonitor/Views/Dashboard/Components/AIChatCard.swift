@@ -24,7 +24,7 @@ struct AIChatCard: View {
                 // Subtitle
                 Text("Talk with Ripple")
                     .font(Font.system(size: 14, weight: .regular, design: .rounded))
-                    .foregroundStyle(Color(hex: "808080"))
+                    .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
                     .tracking(-0.21)
                     .padding(.top, 7)
                     .padding(.leading, 28)
@@ -32,7 +32,7 @@ struct AIChatCard: View {
                 // Description
                 Text("\"It's always better to talk to your support group. If you need, Ripple is here for you!\"")
                     .font(Font.system(size: 13, weight: .regular, design: .rounded))
-                    .foregroundStyle(Color(hex: "808080"))
+                    .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
                     .tracking(-0.195)
                     .frame(width: 203, alignment: .leading)
                     .fixedSize(horizontal: false, vertical: true)
@@ -64,12 +64,12 @@ struct AIChatCard: View {
                 VStack(spacing: 2) {
                     Text("For informational purposes only.")
                         .font(Font.system(size: 10, weight: .light, design: .rounded))
-                        .foregroundStyle(Color(hex: "808080"))
+                        .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
                         .tracking(-0.15)
 
                     Text("Tap here if you need medical or therapy resource")
                         .font(Font.system(size: 10, weight: .light, design: .rounded))
-                        .foregroundStyle(Color(hex: "808080"))
+                        .foregroundStyle(Color.Wellness.adaptiveSecondaryText)
                         .tracking(-0.15)
                 }
                 .frame(maxWidth: .infinity)

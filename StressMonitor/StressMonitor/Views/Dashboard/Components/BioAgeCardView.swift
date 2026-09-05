@@ -77,7 +77,7 @@ struct BioAgeCardView: View {
             Text("\(result.estimatedAge)")
                 .font(.system(size: 56, weight: .heavy, design: .rounded))
                 .foregroundStyle(ageGradient)
-                .minimumScaleFactor(0.8)
+                .minimumScaleFactor(0.8) // dated exception 2026-09-05: 56pt gauge numeral (D-09); width clamp, not DT
 
             Text("years")
                     .font(.system(size: 14, weight: .medium, design: .rounded))

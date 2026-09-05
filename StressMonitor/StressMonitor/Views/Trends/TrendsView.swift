@@ -91,6 +91,7 @@ struct TrendsView: View {
                 .clipShape(Capsule())
         }
         .buttonStyle(.plain)
+        .minimumTouchTarget(DesignTokens.Layout.minTouchTarget)
     }
 
     // MARK: - 1. Editorial Summary

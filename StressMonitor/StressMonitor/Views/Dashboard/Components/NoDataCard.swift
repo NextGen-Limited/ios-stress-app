@@ -74,7 +74,7 @@ struct NoDataCard: View {
                     .font(.subheadline.bold())
                     .foregroundColor(.primaryBlue)
             }
-            .frame(minWidth: 44, minHeight: 44)
+            .minimumTouchTarget(DesignTokens.Layout.minTouchTarget)
         }
         .padding(24)
         .frame(maxWidth: .infinity)

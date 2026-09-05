@@ -51,6 +51,7 @@ struct BreathingExerciseView: View {
                         .font(.system(size: 16, weight: .medium))
                         .foregroundStyle(accentStrong)
                 }
+                .minimumTouchTarget(DesignTokens.Layout.minTouchTarget)
                 .accessibilityLabel("Back")
             }
             ToolbarItem(placement: .principal) {

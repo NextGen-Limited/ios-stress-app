@@ -57,6 +57,8 @@ struct MeasurementDetailView: View {
                         .font(.system(size: 15, weight: .semibold))
                         .foregroundStyle(Color.primaryBlue)
                 }
+                .minimumTouchTarget(DesignTokens.Layout.minTouchTarget)
+                .accessibilityLabel("Share measurement")
             }
         }
         .task {

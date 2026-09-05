@@ -61,6 +61,7 @@ struct RippleRecommendationCard: View {
                         .clipShape(Capsule())
                     }
                     .buttonStyle(.plain)
+                    .minimumTouchTarget(DesignTokens.Layout.minTouchTarget)
                 }
             }
         }

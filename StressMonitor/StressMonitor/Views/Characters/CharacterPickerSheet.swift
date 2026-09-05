@@ -62,7 +62,7 @@ struct CharacterPickerSheet: View {
                     .font(Typography.caption1)
                     .foregroundStyle(Color.Wellness.adaptivePrimaryText)
                     .lineLimit(1)
-                    .minimumScaleFactor(0.8)
+                    .minimumScaleFactor(0.8) // dated exception 2026-09-05: N-across grid name cannot wrap; fixed font
             }
             .frame(maxWidth: .infinity)
             .padding(Spacing.sm)
