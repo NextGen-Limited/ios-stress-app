@@ -74,7 +74,7 @@ extension Color {
 
         /// Adaptive secondary text
         static let adaptiveSecondaryText = Color(
-            light: Color(hex: "#777986"),
+            light: Color(hex: "#6B6E7B"),
             dark: Color(hex: "#9CA3AF")
         )
 
