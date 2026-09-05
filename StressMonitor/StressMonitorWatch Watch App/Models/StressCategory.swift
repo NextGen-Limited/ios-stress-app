@@ -8,10 +8,10 @@ import SwiftUI
 ///
 /// | Tier      | Score range | Hex       | Glyph |
 /// |-----------|-------------|-----------|-------|
-/// | Relaxed   | 0–25        | `#00A000` | ◌     |
-/// | Mild      | 25–50       | `#007AFF` | ◎     |
-/// | Moderate  | 50–75       | `#8A5A00` | ◐     |
-/// | High      | 75–90       | `#B25400` | ◑     |
+/// | Relaxed   | 0–24        | `#00A000` | ◌     |
+/// | Mild      | 25–49       | `#007AFF` | ◎     |
+/// | Moderate  | 50–74       | `#8A5A00` | ◐     |
+/// | High      | 75–89       | `#B25400` | ◑     |
 /// | Severe    | 90+         | `#FF3B30` | ●     |
 public enum StressCategory: String, CaseIterable, Codable, Sendable, Identifiable {
     case relaxed
@@ -89,13 +89,13 @@ public enum StressCategory: String, CaseIterable, Codable, Sendable, Identifiabl
     /// Short label combining the glyph and name ("◌ Relaxed").
     public var glyphLabel: String { "\(glyph) \(displayName)" }
 
-    /// Score range (inclusive lower, exclusive upper except severe).
+    /// Non-overlapping integer endpoints — a boundary score (25, 50, 75, 90) belongs to exactly one tier, matching `category(for:)`.
     public var scoreRange: ClosedRange<Double> {
         switch self {
-        case .relaxed:  return 0...25
-        case .mild:     return 25...50
-        case .moderate: return 50...75
-        case .high:     return 75...90
+        case .relaxed:  return 0...24
+        case .mild:     return 25...49
+        case .moderate: return 50...74
+        case .high:     return 75...89
         case .severe:   return 90...150
         }
     }
