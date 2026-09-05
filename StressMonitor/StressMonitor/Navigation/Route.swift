@@ -41,7 +41,8 @@ enum Route: Hashable, Codable {
     case breathingSummary(BreathingSessionResult)
 
     // Health
-    /// Health Coach chat over `POST /agent/chat`. Entry hidden behind
-    /// `FeatureFlags.agentChatEnabled` until the endpoint is deployed.
+    /// Health Coach chat over `POST /agent/chat`. Entry gated behind
+    /// `FeatureFlags.agentChatEnabled` — ships true ahead of the backend
+    /// Phase B deploy; sends surface a typed 404 until it lands.
     case agentChat
 }
