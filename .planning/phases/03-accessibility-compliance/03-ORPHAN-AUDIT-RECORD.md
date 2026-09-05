@@ -278,6 +278,10 @@ App sources are a `PBXFileSystemSynchronizedRootGroup` — deleting a `.swift` f
 
 Per-batch break = restore the file + add a retained-because row (missed live reference) or relocate + retry (missed relocation); the compiler is ground truth, the record is amended — never the build settings.
 
+### Amendments during execution (2026-09-05)
+
+- **Batch-boundary adjustment, batch 3 (not a retained-because):** deleting `DateHeaderView` (batch 3) broke the interim build — `StressCharacterCard.swift:46` constructs it. Both files are approved DELETEs from §5; the reference is a candidate-to-candidate edge (`StressCharacterCard` ↔ `DecorativeTriangleView` mutual, `CharacterPickerSheet` + `DateHeaderView` hanging off it) that crossed the batch 3/4/6 boundary. Resolution: the closure `{StressCharacterCard, DecorativeTriangleView, CharacterPickerSheet}` was executed WITH batch 3 (all three already approved in §5 — zero live references, grep re-verified at execution). Batch 4 proceeds with 6 files, batch 6 with 12. No file was restored; no disposition changed.
+
 ---
 
 ## 8. Decision record (Task 2 checkpoint fills this in)
