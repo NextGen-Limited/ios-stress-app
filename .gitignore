@@ -194,3 +194,4 @@ StressMonitor/StressMonitor.xcodeproj/StressMonitor.xcodeproj/
 
 # Firebase config (per-app, contains API keys)
 StressMonitor/StressMonitor/GoogleService-Info.plist
+.worktrees/
