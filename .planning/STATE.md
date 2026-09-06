@@ -1,19 +1,19 @@
 ---
-gsd_state_version: 1.0
+gsd_state_version: "1.0"
 milestone: v1.2
-milestone_name: Submission Readiness
 status: Awaiting next milestone
 stopped_at: Completed 03-06-PLAN.md (phase 3 complete — 6/6)
-last_updated: "2026-09-05T14:04:39.674Z"
+last_updated: "2026-09-06T04:18:42.600Z"
 last_activity: 2026-09-05
 last_activity_desc: Milestone v1.2 completed and archived
-state_head: 0aff6a5dd2bde35f130c6c94f8eb7298b185c411
+state_head: 6790f3bb7c6a3306693ef4ca3f306fdf16023d95
 progress:
   total_phases: 4
   completed_phases: 1
   total_plans: 18
   completed_plans: 18
   percent: 25
+milestone_name: Submission Readiness
 current_phase: 3
 current_phase_name: Accessibility Compliance
 ---
@@ -160,6 +160,7 @@ None yet.
 | 260829-kby | Firebase bootstrap state + AuthServiceError taxonomy (CI provisioning deferred) | 2026-08-29 | 6227803 | [260829-kby-…](./quick/260829-kby-provision-googleservice-info-plist-in-ci/) |
 | 260901-vfd | Fix `Color.stressColor(for: Double)` threshold bug | 2026-09-01 | cf2dc8c | [260901-vfd-…](./quick/260901-vfd-fix-color-stresscolor-for-double-thresho/) |
 | 4 | Update Settings UI to approved redesign direction (cream canvas, plain surface cards) | 2026-09-02 | 2b84862 | — |
+| 5 | Hide paywall credit-pack section (consumables unsupported) | 2026-09-06 | 6790f3b | — |
 
 ## Deferred Items
 
