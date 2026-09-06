@@ -10,7 +10,7 @@ We reserve the right to make modifications to these Terms at any time and for an
 
 ## 1. Services
 
-Our Services include: (i) reading health data from your Apple Health account with your permission (heart rate variability, heart rate, resting heart rate, respiratory rate, blood oxygen, sleep, step count, active energy, standing time, and date of birth); (ii) computing stress scores, trends, and factor breakdowns **on your device**; and (iii) offering an optional AI Coaching Chat feature that generates coaching responses using derived stress context, as further described in our Privacy Policy. We may add, modify, or discontinue features at any time.
+Our Services include: (i) reading health data from your Apple Health account with your permission (heart rate variability, heart rate, resting heart rate, respiratory rate, blood oxygen, sleep, step count, active energy, standing time, and workouts); (ii) computing stress scores, trends, and factor breakdowns **on your device**; and (iii) offering an optional AI Coaching Chat feature that generates coaching responses using derived stress context, as further described in our Privacy Policy. We may add, modify, or discontinue features at any time.
 
 ## 2. Acknowledgement and Disclaimers
 

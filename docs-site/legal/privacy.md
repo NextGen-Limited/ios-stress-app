@@ -16,9 +16,11 @@ We may collect and process the following key categories of information:
 - **Product interaction data**: basic app-interaction data (for example, which features are used) shared via Google Firebase for app functionality; never used for tracking or advertising.
 - **Support communications**: if you contact us, we receive whatever information you choose to include (for example, your email address and the content of your message).
 
-With your permission, StressMonitor connects to Apple Health (a "Third-Party Source") solely to read the following health information about you: heart rate variability (HRV), heart rate, resting heart rate, respiratory rate, blood oxygen (oxygen saturation), sleep analysis, step count, active energy burned, standing time, and your date of birth. The health information you permit us to read is collectively referred to as "Health Information."
+We do not collect your name, phone number, or payment details. Payments for optional subscriptions are processed entirely by Apple and are not visible to us.
 
 ## Health Information from Apple Health
+
+With your permission, StressMonitor connects to Apple Health (a "Third-Party Source") solely to read the following health information about you: heart rate variability (HRV), heart rate, resting heart rate, respiratory rate, blood oxygen (oxygen saturation), sleep analysis, step count, active energy burned, standing time, and workouts. The health information you permit us to read is collectively referred to as "Health Information."
 
 StressMonitor has **read-only** access to Apple Health. We never write data back to Apple Health, and we never transmit raw HealthKit readings to our servers. All stress scoring from Health Information is computed **locally on your device** and stored on your device.
 
