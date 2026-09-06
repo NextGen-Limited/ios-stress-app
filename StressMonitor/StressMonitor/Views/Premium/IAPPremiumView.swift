@@ -68,12 +68,6 @@ struct IAPPremiumView: View {
                             .padding(.top, 18)
                     }
 
-                    // Section 4b — Credit packs (DEC-1: secondary one-time
-                    // top-ups; the subscription above stays the leading path)
-                    packSection
-                        .padding(.horizontal, 16)
-                        .padding(.top, 26)
-
                     // Section 5 — Trust indicators
                     TrustRow()
                         .padding(.horizontal, 16)
@@ -140,7 +134,6 @@ struct IAPPremiumView: View {
         .navigationBarHidden(true)
         .task {
             await viewModel.loadInitialData()
-            await creditsViewModel.loadPacks()
             hasLoadedPlans = true
         }
         .onChange(of: viewModel.showSuccess) {
@@ -180,115 +173,6 @@ struct IAPPremiumView: View {
         } message: {
             Text(creditsViewModel.errorMessage ?? "An error occurred.")
         }
-    }
-
-    // MARK: - Pack section
-
-    private var packSection: some View {
-        VStack(alignment: .leading, spacing: 10) {
-            Text("OR TOP UP ONCE")
-                .font(Typography.iapSectionHeader)
-                .kerning(0.10 * 12)
-                .foregroundStyle(Color.iapHeaderTeal)
-                .padding(.horizontal, 4)
-
-            VStack(spacing: 10) {
-                ForEach(Array(orderedPacks.enumerated()), id: \.offset) { _, pack in
-                    PackCard(
-                        pack: pack,
-                        isSelected: creditsViewModel.selectedPack == pack?.id,
-                        isLoading: isLoadingPlans,
-                        savingsPercent: savingsPercent(for: pack),
-                        isBestValue: pack?.id == .large,
-                        onSelect: {
-                            if let id = pack?.id {
-                                creditsViewModel.selectedPack = id
-                                HapticManager.shared.buttonPress()
-                            }
-                        }
-                    )
-                }
-            }
-
-            packPurchaseButton
-
-            Text("Credit packs are one-time purchases — they don't renew automatically.")
-                .font(Typography.iapFinePrint)
-                .foregroundStyle(Color.iapTextSecondary)
-                .frame(maxWidth: .infinity, alignment: .leading)
-        }
-    }
-
-    private var packPurchaseButton: some View {
-        Button {
-            guard creditsViewModel.selectedPackDetails != nil else { return }
-            HapticManager.shared.buttonPress()
-            Task { await creditsViewModel.purchaseSelectedPack() }
-        } label: {
-            HStack(spacing: 8) {
-                if creditsViewModel.isLoading {
-                    ProgressView()
-                        .tint(Color.iapHeaderTeal)
-                } else {
-                    Text(packCTATitle)
-                        .font(Typography.iapCTA)
-                        .tracking(-0.02 * 16)
-                    Image(systemName: "plus.circle")
-                        .font(.system(size: 14, weight: .bold))
-                }
-            }
-            .foregroundStyle(Color.iapHeaderTeal)
-            .frame(maxWidth: .infinity)
-            .frame(minHeight: 44)
-            .background(
-                Capsule().fill(Color.iapPillBackground)
-            )
-            .overlay(
-                Capsule().stroke(Color.iapHeaderTeal.opacity(0.35), lineWidth: 1)
-            )
-        }
-        .buttonStyle(.plain)
-        .disabled(creditsViewModel.isLoading || creditsViewModel.selectedPackDetails == nil)
-        .accessibilityLabel(packCTATitle)
-    }
-
-    /// Packs ordered small -> large. While loading, returns two `nil`
-    /// placeholders so the section renders two skeleton cards.
-    private var orderedPacks: [CreditPack?] {
-        if isLoadingPlans || creditsViewModel.packs.isEmpty {
-            return [nil, nil]
-        }
-        let order: [CreditPackID] = [.small, .large]
-        return order.compactMap { id in
-            creditsViewModel.packs.first(where: { $0.id == id })
-        }
-    }
-
-    private var packCTATitle: String {
-        guard let pack = creditsViewModel.selectedPackDetails else {
-            return "Select a pack to buy"
-        }
-        guard let price = pack.displayPrice, !price.isEmpty else {
-            return "Buy \(pack.displayName)"
-        }
-        return "Buy \(pack.displayName) · \(price)"
-    }
-
-    /// Per-unit savings of one pack versus the most expensive per-credit
-    /// pack in the resolved set (typically large vs small).
-    private func savingsPercent(for pack: CreditPack?) -> Int? {
-        guard let pack, let price = pack.pricePerPack, pack.credits > 0 else { return nil }
-        let referenceUnit = creditsViewModel.packs
-            .compactMap { candidate -> Decimal? in
-                guard candidate.credits > 0, let candidatePrice = candidate.pricePerPack else { return nil }
-                return candidatePrice / Decimal(candidate.credits)
-            }
-            .max()
-        guard let referenceUnit, referenceUnit > 0 else { return nil }
-        let unit = price / Decimal(pack.credits)
-        guard unit < referenceUnit else { return nil }
-        let percent = Int(((referenceUnit - unit) / referenceUnit * 100) as NSDecimalNumber)
-        return percent > 0 ? percent : nil
     }
 
     // MARK: - Trial banner
