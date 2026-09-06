@@ -680,7 +680,7 @@
 		"CODE_SIGN_ENTITLEMENTS" = "StressMonitorWidget/StressMonitorWidget.entitlements";
 		"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 		"CODE_SIGN_STYLE" = Manual;
-		"CURRENT_PROJECT_VERSION" = 15;
+		"CURRENT_PROJECT_VERSION" = 16;
 		"DEVELOPMENT_TEAM" = "";
 		"DEVELOPMENT_TEAM[sdk=iphoneos*]" = K2TYLYAWMK;
 		"GENERATE_INFOPLIST_FILE" = YES;
@@ -716,7 +716,7 @@
 		"CODE_SIGN_ENTITLEMENTS" = "StressMonitorWidget/StressMonitorWidget.entitlements";
 		"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 		"CODE_SIGN_STYLE" = Manual;
-		"CURRENT_PROJECT_VERSION" = 15;
+		"CURRENT_PROJECT_VERSION" = 16;
 		"DEVELOPMENT_TEAM" = "";
 		"DEVELOPMENT_TEAM[sdk=iphoneos*]" = K2TYLYAWMK;
 		"GENERATE_INFOPLIST_FILE" = YES;
@@ -875,7 +875,7 @@
 		"CODE_SIGN_ENTITLEMENTS" = "StressMonitor/StressMonitor.entitlements";
 		"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Developer";
 		"CODE_SIGN_STYLE" = Manual;
-		"CURRENT_PROJECT_VERSION" = 15;
+		"CURRENT_PROJECT_VERSION" = 16;
 		"DEVELOPMENT_TEAM" = "";
 		"DEVELOPMENT_TEAM[sdk=iphoneos*]" = K2TYLYAWMK;
 		"ENABLE_PREVIEWS" = YES;
@@ -926,7 +926,7 @@
 		"CODE_SIGN_ENTITLEMENTS" = "StressMonitor/StressMonitor.entitlements";
 		"CODE_SIGN_IDENTITY[sdk=iphoneos*]" = "iPhone Distribution";
 		"CODE_SIGN_STYLE" = Manual;
-		"CURRENT_PROJECT_VERSION" = 15;
+		"CURRENT_PROJECT_VERSION" = 16;
 		"DEVELOPMENT_TEAM" = "";
 		"DEVELOPMENT_TEAM[sdk=iphoneos*]" = K2TYLYAWMK;
 		"ENABLE_PREVIEWS" = YES;
@@ -978,7 +978,7 @@
 		"CODE_SIGN_IDENTITY" = "Apple Development";
 		"CODE_SIGN_IDENTITY[sdk=watchos*]" = "iPhone Developer";
 		"CODE_SIGN_STYLE" = Manual;
-		"CURRENT_PROJECT_VERSION" = 15;
+		"CURRENT_PROJECT_VERSION" = 16;
 		"DEVELOPMENT_TEAM" = "";
 		"DEVELOPMENT_TEAM[sdk=watchos*]" = K2TYLYAWMK;
 		"ENABLE_PREVIEWS" = YES;
@@ -1020,7 +1020,7 @@
 		"CODE_SIGN_IDENTITY" = "Apple Development";
 		"CODE_SIGN_IDENTITY[sdk=watchos*]" = "iPhone Distribution";
 		"CODE_SIGN_STYLE" = Manual;
-		"CURRENT_PROJECT_VERSION" = 15;
+		"CURRENT_PROJECT_VERSION" = 16;
 		"DEVELOPMENT_TEAM" = "";
 		"DEVELOPMENT_TEAM[sdk=watchos*]" = K2TYLYAWMK;
 		"ENABLE_PREVIEWS" = YES;
