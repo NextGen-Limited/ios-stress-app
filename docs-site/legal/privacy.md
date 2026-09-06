@@ -16,11 +16,9 @@ We may collect and process the following key categories of information:
 - **Product interaction data**: basic app-interaction data (for example, which features are used) shared via Google Firebase for app functionality; never used for tracking or advertising.
 - **Support communications**: if you contact us, we receive whatever information you choose to include (for example, your email address and the content of your message).
 
-We do not collect your name, phone number, or payment details. Payments for optional subscriptions are processed entirely by Apple and are not visible to us.
+With your permission, StressMonitor connects to Apple Health (a "Third-Party Source") solely to read the following health information about you: heart rate variability (HRV), heart rate, resting heart rate, respiratory rate, blood oxygen (oxygen saturation), sleep analysis, step count, active energy burned, standing time, and your date of birth. The health information you permit us to read is collectively referred to as "Health Information."
 
 ## Health Information from Apple Health
-
-With your permission, StressMonitor connects to Apple Health (a "Third-Party Source") solely to read the following health information about you: heart rate variability (HRV), resting heart rate, sleep, activity, and workout recovery data. The health information you permit us to read is collectively referred to as "Health Information."
 
 StressMonitor has **read-only** access to Apple Health. We never write data back to Apple Health, and we never transmit raw HealthKit readings to our servers. All stress scoring from Health Information is computed **locally on your device** and stored on your device.
 
@@ -134,7 +132,7 @@ Our Services do not respond to Do Not Track ("DNT") signals because we do not tr
 
 ## Governing Law and Jurisdiction
 
-This Privacy Policy shall be governed by and construed in accordance with the laws of England and Wales. Any disputes relating to this Privacy Policy shall be subject to the exclusive jurisdiction of the courts of England and Wales, except as provided in the arbitration provision of the Terms.
+This Privacy Policy shall be governed by and construed in accordance with the laws of England and Wales. Any disputes relating to this Privacy Policy shall be subject to the exclusive jurisdiction of the courts of England and Wales.
 
 ## Changes to this Privacy Policy
 

@@ -6,13 +6,11 @@ Welcome and thank you for your interest in StressMonitor! These Terms of Service
 
 PLEASE READ THESE TERMS AND CONDITIONS OF USE CAREFULLY AS THEY CONTAIN IMPORTANT INFORMATION REGARDING YOUR LEGAL RIGHTS, REMEDIES AND OBLIGATIONS BY USING OUR SERVICES.
 
-NOTE: THESE TERMS CONTAIN A BINDING ARBITRATION PROVISION WITH A CLASS ACTION WAIVER. PLEASE REVIEW SECTION 19 BELOW BEFORE ACCESSING OR USING OUR SERVICES.
-
 We reserve the right to make modifications to these Terms at any time and for any reason. By continuing to access or use the Services after revisions become effective, you agree to be bound by the revised Terms. If you do not agree to these Terms, you must immediately stop using the Services.
 
 ## 1. Services
 
-Our Services include: (i) reading health data from your Apple Health account with your permission (heart rate variability, resting heart rate, sleep, activity, and workout recovery data); (ii) computing stress scores, trends, and factor breakdowns **on your device**; and (iii) offering an optional AI Coaching Chat feature that generates coaching responses using derived stress context, as further described in our Privacy Policy. We may add, modify, or discontinue features at any time.
+Our Services include: (i) reading health data from your Apple Health account with your permission (heart rate variability, heart rate, resting heart rate, respiratory rate, blood oxygen, sleep, step count, active energy, standing time, and date of birth); (ii) computing stress scores, trends, and factor breakdowns **on your device**; and (iii) offering an optional AI Coaching Chat feature that generates coaching responses using derived stress context, as further described in our Privacy Policy. We may add, modify, or discontinue features at any time.
 
 ## 2. Acknowledgement and Disclaimers
 
@@ -111,19 +109,15 @@ These Terms apply while you use the Services. We may, at any time and in our sol
 
 We may provide you with notices via the Services, including banners or in-app messages, or by e-mail. Such notice is deemed received upon receipt or twenty-four (24) hours after it was sent.
 
-## 19. Binding Arbitration
+## 19. Dispute Resolution
 
-**PLEASE READ THIS SECTION CAREFULLY, AS IT LIMITS THE MANNER IN WHICH YOU MAY SEEK RELIEF AND REQUIRES YOU TO RESOLVE DISPUTES THROUGH ARBITRATION.**
+If you have a dispute with us, we encourage you to first contact our support team at support@stressmonitor.app — most issues can be resolved informally and quickly.
 
-If you have a dispute with us, we encourage you to first contact our support team at support@stressmonitor.app to attempt to resolve the matter informally.
-
-Except for disputes in which either party seeks injunctive or equitable relief for alleged unlawful use of intellectual property, any dispute, claim, or controversy arising out of or relating to this Agreement, including its breach, termination, enforcement, interpretation, or validity, shall be referred to and finally resolved by arbitration administered by the London Court of International Arbitration (LCIA) under the LCIA Arbitration Rules in force at the date of the notice of arbitration. The seat of arbitration shall be London, England. The proceedings shall be conducted in English by a single arbitrator. The award will be final and binding, and the arbitrator may allocate arbitration fees and reasonable attorneys' fees to the prevailing party.
-
-Nothing in this Section prevents either party from seeking interim or injunctive relief from a court of competent jurisdiction. To the extent permitted by applicable law, both you and the Company waive any right to bring or participate in a class action or other representative proceeding.
+Any dispute, claim, or controversy arising out of or relating to this Agreement, including its breach, termination, enforcement, interpretation, or validity, shall be subject to the exclusive jurisdiction of the courts of England and Wales, save that either party may seek interim or injunctive relief from any court of competent jurisdiction. Nothing in these Terms affects the statutory rights you have as a consumer, including the right to bring a claim in the courts where you reside, where such rights cannot be excluded or limited by law.
 
 ## 20. Governing Law
 
-This Agreement is governed by and construed in accordance with the laws of England and Wales, without regard to conflict of laws principles. Any dispute not subject to arbitration under Section 19 is subject to the exclusive jurisdiction of the courts of England and Wales.
+This Agreement is governed by and construed in accordance with the laws of England and Wales, without regard to conflict of laws principles, and disputes are subject to the jurisdiction described in Section 19.
 
 ## 21. Entire Agreement
 
